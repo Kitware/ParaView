@@ -640,7 +640,7 @@ protected:
   void AddFileWriter(vtkPVWriter* writer);  
   
   // Helper for WriteVTKFile() and WritePVTKFile().
-  vtkPVWriter* FindPVWriter(const char* fileName, int parallel);
+  vtkPVWriter* FindPVWriter(const char* fileName, int parallel, int numParts);
   
 //BTX
   vtkArrayMap<const char*, vtkPVSource*>* Prototypes;

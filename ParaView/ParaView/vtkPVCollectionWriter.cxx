@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
-#include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCollectionWriter);
-vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.2");
+vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVCollectionWriter::vtkPVCollectionWriter()
@@ -69,33 +69,31 @@ void vtkPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int)
+int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int, int)
 {
-  // We support all data types in both parallel and serial mode.
+  // We support all data types in both parallel and serial mode, and
+  // with any number of parts.
   return data?1:0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCollectionWriter::Write(const char* fileName, const char*,
+void vtkPVCollectionWriter::Write(const char* fileName, vtkPVSource* pvs,
                                   int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  vtkPVSource* pvs = pvWin->GetCurrentPVSource();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   int i;
-  int n = pvs->GetNumberOfVTKSources();
   pm->ServerScript(
     "vtkXMLPVCollectionWriter writer\n"
     "writer SetNumberOfPieces %d\n"
     "writer SetGhostLevel %d\n"
     "writer SetFileName {%s}",
     numProcs, ghostLevel, fileName);
-  for(i=0; i < n; ++i)
+  for(i=0; i < pvs->GetNumberOfPVParts(); ++i)
     {
-    pm->ServerScript("writer AddInput [\"%s\" GetOutput]",
-                     pvs->GetVTKSourceTclName(i));
+    pm->ServerScript("writer AddInput \"%s\"",
+                     pvs->GetPVPart(i)->GetVTKDataTclName());
     }
   pm->RootScript("writer SetPiece 0");
   for (i=1; i < numProcs; ++i)

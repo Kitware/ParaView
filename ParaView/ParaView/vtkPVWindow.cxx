@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.446");
+vtkCxxRevisionMacro(vtkPVWindow, "1.447");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2244,11 +2244,12 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
   
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numParts = pvApp->GetProcessModule()->GetNumberOfPartitions();
-  int parallel = (numParts > 1);
+  int numParts = this->GetCurrentPVSource()->GetNumberOfPVParts();
+  int numProcs = pvApp->GetProcessModule()->GetNumberOfPartitions();
+  int parallel = (numProcs > 1);
   
   // Find the writer that supports this file name and data type.
-  vtkPVWriter* writer = this->FindPVWriter(filename, parallel);
+  vtkPVWriter* writer = this->FindPVWriter(filename, parallel, numParts);
   
   // Make sure a writer is available for this file type.
   if(!writer)
@@ -2288,8 +2289,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                        filename, ghostLevel);
   
   // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName(),
-                numParts, ghostLevel);
+  writer->Write(filename, this->GetCurrentPVSource(), numProcs, ghostLevel);
 }
 
 //-----------------------------------------------------------------------------
@@ -2346,8 +2346,8 @@ void vtkPVWindow::WriteData()
 
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numParts = pvApp->GetProcessModule()->GetNumberOfPartitions();
-  int parallel = (numParts > 1);
+  int parallel = (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1);
+  int numParts = this->GetCurrentPVSource()->GetNumberOfPVParts();
   const char* defaultExtension = 0;
   
   ostrstream typesStr;
@@ -2358,7 +2358,8 @@ void vtkPVWindow::WriteData()
   while(!it->IsDoneWithTraversal())
     {
     vtkPVWriter* wm = 0;
-    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel))
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
+                                                       numParts))
       {
       const char* desc = wm->GetDescription();
       const char* ext = wm->GetExtension();
@@ -2456,7 +2457,8 @@ void vtkPVWindow::WriteData()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
+vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
+                                       int numParts)
 {
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
@@ -2497,7 +2499,8 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   while(!it->IsDoneWithTraversal())
     {
     vtkPVWriter* wm = 0;
-    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel))
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
+                                                       numParts))
       {
       if(vtkString::EndsWith(fileName, wm->GetExtension()))
         {
@@ -4249,7 +4252,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.446 $");
+  this->ExtractRevision(os,"$Revision: 1.447 $");
 }
 
 //-----------------------------------------------------------------------------

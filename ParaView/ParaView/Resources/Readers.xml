@@ -211,7 +211,7 @@
  </Module>
  <Module name="XMLCollectionReader" class="vtkPVReaderModule"
          root_name="XMLCollectionReader" module_type="Reader"
-         extensions=".vtc" file_description="VTK Collection Files">
+         extensions=".pvd" file_description="ParaView Data Files">
   <Source class="vtkXMLCollectionReader"/>
  </Module>
  <Module name="HDF5RawImageReader"

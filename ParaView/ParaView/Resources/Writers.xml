@@ -70,7 +70,7 @@
  <Writer input="vtkDataSet"
          class="vtkPVCollectionWriter"
          writer="vtkXMLPVCollectionWriter"
-         extension=".vtc"
+         extension=".pvd"
          file_description="ParaView Data Files"/>
 </ModuleInterfaces>
 

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkDataSet;
 class vtkPVApplication;
+class vtkPVSource;
 
 class VTK_EXPORT vtkPVWriter : public vtkKWObject
 {
@@ -96,16 +97,15 @@ public:
   
   // Description:
   // Check whether this writer supports the given VTK data set's type.
-  virtual int CanWriteData(vtkDataSet* data, int parallel);
+  virtual int CanWriteData(vtkDataSet* data, int parallel, int numParts);
   
   // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();
   
   // Description:
-  // Write use this writer to store the given data set to the given
-  // file.
-  virtual void Write(const char* fileName, const char* dataTclName,
+  // Write the data from the given source to the given file name.
+  virtual void Write(const char* fileName, vtkPVSource* pvs,
                      int numProcs, int ghostLevel);
   
 protected:

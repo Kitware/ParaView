@@ -60,12 +60,13 @@ public:
   
   // Description:
   // Check whether this writer supports the given VTK data set's type.
-  virtual int CanWriteData(vtkDataSet* data, int parallel);
+  virtual int CanWriteData(vtkDataSet* data, int parallel, int numParts);
   
   // Description:
   // Write the current source's data to the collection file with the
   // given name.
-  void Write(const char* fileName, const char*, int numProcs, int ghostLevel);
+  void Write(const char* fileName, vtkPVSource* pvs, int numProcs,
+             int ghostLevel);
   
 protected:
   vtkPVCollectionWriter();

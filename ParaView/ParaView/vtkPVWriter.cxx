@@ -44,11 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.6");
+vtkCxxRevisionMacro(vtkPVWriter, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -89,13 +91,15 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel)
+int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel, int numParts)
 {
   if (data == NULL)
     {
     return 0;
     }
-  return (parallel == this->Parallel) && data->IsA(this->InputClassName);
+  return ((numParts == 1) &&
+          (parallel == this->Parallel) &&
+          data->IsA(this->InputClassName));
 }
 
 //----------------------------------------------------------------------------
@@ -105,11 +109,11 @@ vtkPVApplication* vtkPVWriter::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWriter::Write(const char* fileName, const char* dataTclName,
+void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
                         int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  
+  const char* dataTclName = pvs->GetPVPart()->GetVTKDataTclName();
   if(!this->Parallel)
     {
     pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);
