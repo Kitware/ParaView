@@ -29,10 +29,10 @@ IF(UNIX)
   ADD_CUSTOM_TARGET(maketcl ALL "cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix; make" )
   ADD_CUSTOM_TARGET(maketk ALL "cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix; make" )
 ELSE(UNIX)
-  SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tcl8.2.lib CACHE FILEPATH
+  SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tcl82.lib CACHE FILEPATH
    "Path to tcl library")
   SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/include CACHE PATH "Path to tcl include")
-  SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tk8.2.lib CACHE FILEPATH
+  SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tk82.lib CACHE FILEPATH
    "Path to tcl library")
   SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/include CACHE PATH "Path to tcl include")
   SET(TK_INTERNAL_PATH ${ParaViewComplete_SOURCE_DIR}/VTK/Rendering/tkInternals CACHE PATH "Path to tcl include")
