@@ -521,8 +521,6 @@
                    property="ExodusModelMetadata"
                    trace_name="metadata"
                    help="Turn this ON if you plan to write Exodus or EnSight files"/>
-    <BasicDSPFilterWidget trace_name="Apply basic time filtering"
-                      help="Apply basic time filtering"/>
   </Module>
 #else
     <Module name="byureader"
@@ -553,8 +551,6 @@
     <ArraySelection trace_name="block_sel"
                     property="BlockArrayStatus"
                     label_text="Block Arrays"  />
-    <BasicDSPFilterWidget trace_name="Apply basic time filtering"
-                      help="Apply basic time filtering"/>
   </Module>
 #endif
   <Module name="AVSucdReader"
