@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.223");
+vtkCxxRevisionMacro(vtkPVApplication, "1.224");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1293,7 +1293,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #endif
 
   vtkPVWindow *ui = vtkPVWindow::New();
-  this->Windows->AddItem(ui);
+  this->AddWindow(ui);
 
   vtkCallbackCommand *ccm = vtkCallbackCommand::New();
   ccm->SetClientData(this);

@@ -71,6 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
+#include "vtkKWWindowCollection.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
@@ -142,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.478");
+vtkCxxRevisionMacro(vtkPVWindow, "1.479");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -896,7 +897,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Init menus
 
-  if (pvApp->GetShowSplashScreen())
+  int use_splash = 
+    (app->GetShowSplashScreen() && app->GetWindows()->GetNumberOfItems() == 1);
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
     }
@@ -904,7 +907,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Init toolbars
 
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
     }
@@ -913,13 +916,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Interface for the preferences.
 
   // Create the main view.
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (main view)...");
     }
   this->CreateMainView(pvApp);
 
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
     }
@@ -1187,7 +1190,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->UpdateSourceMenu();
 
   // Update preferences
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
     }
