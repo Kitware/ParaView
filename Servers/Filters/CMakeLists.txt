@@ -14,6 +14,7 @@ SET(Filters_SRCS
   vtkPVSummaryHelper.cxx
 
   vtkPVLODActor.cxx
+  vtkPVLODVolume.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryInformation.cxx
   vtkPVRenderViewProxy.cxx
