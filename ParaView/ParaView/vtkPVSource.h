@@ -176,7 +176,7 @@ public:
   // Description:
   // This method gets called to set the VTK source parameters
   // from the widget values.
-  void UpdateVTKSourceParameters();
+  virtual void UpdateVTKSourceParameters();
 
   //---------------------------------------------------------------------
   // This is a poor way to create widgets.  Another method that integrates
@@ -238,11 +238,6 @@ public:
   void SetVTKSource(vtkSource *source, const char *tclName);
   vtkGetObjectMacro(VTKSource, vtkSource);
   vtkGetStringMacro(VTKSourceTclName);
-
-  // Description:
-  // A method used to broadcast changes resulting from widgets.
-  void AcceptHelper(char *method, char *args);
-  void AcceptHelper2(char *tclName, char *method, char *args);  
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);

@@ -153,7 +153,7 @@ void vtkPVStringEntry::Accept()
                          this->GetValue());
     }
 
-  pvApp->BroadcastScript("%s Set%s %s",
+  pvApp->BroadcastScript("%s Set%s {%s}",
                          this->ObjectTclName, this->VariableName,
                          this->GetValue());
 

@@ -608,6 +608,10 @@ void vtkPVSource::Select(vtkKWView *v)
                this->Notebook->GetWidgetName());
 
   this->UpdateProperties();
+  // This may best be merged with the UpdateProperties call but ...
+  // We make the call here to update the input menu, 
+  // which is now just another pvWidget.
+  this->UpdateParameterWidgets();
   
   // This assumes that a source only has one output.
   data = this->GetNthPVOutput(0);
@@ -1030,21 +1034,6 @@ void vtkPVSource::UpdateVTKSourceParameters()
       pvw->Accept();
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AcceptHelper(char *method, char *args)
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
-
-  pvApp->BroadcastScript("catch {%s %s %s}", name,  method, args);
 }
 
 //----------------------------------------------------------------------------

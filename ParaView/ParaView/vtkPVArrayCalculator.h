@@ -94,9 +94,14 @@ public:
   void SaveInTclScript(ofstream *file);
 
   // Description:
-  // Accept callback
-  virtual void AcceptCallback();
+  // Called when the Accept button is pressed.  It moves the widget values to the 
+  // VTK calculator filter.
+  virtual void UpdateVTKSourceParameters();
   
+  // Description:
+  // This method resets the widget values from the VTK filter.
+  virtual void UpdateParameterWidgets();
+
 protected:
   vtkPVArrayCalculator();
   ~vtkPVArrayCalculator();

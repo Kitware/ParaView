@@ -209,18 +209,17 @@ void vtkPVInputMenu::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  if ( ! this->ModifiedFlag)
+    {
+    return;
+    }
+
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource not set.");
     return;
     }
 
-  if (this->ModifiedFlag && this->PVSource)
-    {  
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
-                         this->GetTclName(), 
-                         this->CurrentValue->GetTclName());
-    }
 
   // Super does nothing.  We have to do everything here.
   // Notice we are changing PVObjects here so we do not
@@ -229,10 +228,15 @@ void vtkPVInputMenu::Accept()
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
                  this->CurrentValue->GetNthPVOutput(0)->GetTclName());
+    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
+                         this->GetTclName(), 
+                         this->CurrentValue->GetTclName());
     }
   else
     {
     this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
+    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue {}", 
+                         this->GetTclName());
     }
 
   this->vtkPVWidget::Accept();

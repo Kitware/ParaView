@@ -11,6 +11,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CalcInput.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CalcInput.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Calculator.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Calculator.tcl)
 
@@ -74,6 +78,10 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Trace.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl)
+
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
 
@@ -82,6 +90,9 @@ ADD_TEST(Axes ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
+
+ADD_TEST(CalcInput ${PARAVIEW_EXECUTABLE}
+                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CalcInput.tcl)
 
 ADD_TEST(Calculator ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Calculator.tcl)
@@ -130,3 +141,6 @@ ADD_TEST(ThresholdAttrMode ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(Trace ${PARAVIEW_EXECUTABLE}
              ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
+
+ADD_TEST(VectorTextSpace ${PARAVIEW_EXECUTABLE}
+             ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl)

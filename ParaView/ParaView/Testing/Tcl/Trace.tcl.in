@@ -54,12 +54,23 @@ $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp98)
 $pv(vtkTemp265) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
+set pv(vtkTemp286) [$pv(vtkTemp1) CalculatorCallback]
+$pv(vtkTemp286) AddScalarVariable Momentum_0 Momentum 0
+$pv(vtkTemp286) AddScalarVariable Momentum_1 Momentum 1
+$pv(vtkTemp286) SetFunctionLabel {Momentum_0+Momentum_1}
+set pv(vtkTemp298) [$pv(vtkTemp286) GetPVWidget {Result Array Name:}]
+$pv(vtkTemp298) SetValue {sum}
+$pv(vtkTemp286) AcceptCallback
+
 # OK, turn off the trace so that the file we source is not open.
 
 Application StopRecordingScript
 
 # Delete all the sources
 
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp286)
+$pv(vtkTemp286) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp265)
 $pv(vtkTemp265) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp98) DeleteCallback

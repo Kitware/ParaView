@@ -271,21 +271,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->FunctionLabel->Create(pvApp, "-background white");
   this->FunctionLabel->SetLabel("");
   this->Script("grid %s -columnspan 8 -sticky ew", this->FunctionLabel->GetWidgetName());
-
   
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetLabel [%s %s]",
-                                 this->FunctionLabel->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetFunction");
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetLabel]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetFunction",
-                                  this->FunctionLabel->GetTclName());
-
   this->ButtonClear->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonClear->Create(pvApp, "");
   this->ButtonClear->SetLabel("Clear");
@@ -627,20 +613,52 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
                        this->GetTclName(), variableName, arrayName);
 }
 
-void vtkPVArrayCalculator::AcceptCallback()
+//----------------------------------------------------------------------------
+void vtkPVArrayCalculator::UpdateVTKSourceParameters()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if (this->ModifiedFlag)
     {
-    this->GetPVApplication()->AddTraceEntry("$pv(%s) SetFunctionLabel {%s}",
-                                            this->GetTclName(),
-                                            this->FunctionLabel->GetLabel());
+    // The calculator UI is not a widget so we have to manage it here.
+    pvApp->AddTraceEntry("$pv(%s) SetFunctionLabel {%s}",
+                         this->GetTclName(), this->FunctionLabel->GetLabel());
+
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    pvApp->BroadcastScript("%s SetFunction {%s}",
+                           this->GetVTKSourceTclName(),
+                           this->FunctionLabel->GetLabel());
+
+    // Note: Since the Calculator is acting like a pvWidget, it has its own
+    // modified flag that vtkPVSource knows nothing about.
     this->ModifiedFlag = 0;
     }
-  this->vtkPVSource::AcceptCallback();
+
+  // This takes care of the input selection menu.
+  this->vtkPVSource::UpdateVTKSourceParameters();
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayCalculator::UpdateParameterWidgets()
+{
+
+  // This takes care of the input selection menu.
+  this->vtkPVSource::UpdateParameterWidgets();
+
+  this->Script("%s SetLabel [%s GetFunction]", 
+               this->FunctionLabel->GetTclName(), 
+               this->GetVTKSourceTclName());
+
+  // Note: Since the Calculator is acting like a pvWidget, it has its own
+  // modified flag that vtkPVSource knows nothing about.
+  this->ModifiedFlag = 0;
 }
 
 void vtkPVArrayCalculator::SetFunctionLabel(char *function)
 {
+  this->ModifiedFlag = 1;
   this->FunctionLabel->SetLabel(function);
 }
 
