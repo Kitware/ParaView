@@ -64,6 +64,7 @@
 #include "vtkXOpenGLRenderWindow.h"
 #include "vtkKWMessageDialog.h"
 int vtkKWViewFoundMatch;
+extern "C"
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
                              XPointer vtkNotUsed(arg))
 {  
@@ -84,7 +85,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.121");
+vtkCxxRevisionMacro(vtkKWView, "1.122");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1550,7 +1551,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.121 $");
+  this->ExtractRevision(os,"$Revision: 1.122 $");
 }
 
 //----------------------------------------------------------------------------
