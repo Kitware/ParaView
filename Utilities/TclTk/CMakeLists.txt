@@ -127,8 +127,7 @@ MACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR tcl_support_lib_dir tk_su
       "${build_dir}/${dir}/tcl${TCL_TK_VERSION}"
       "${tk_support_lib_dir}"
       "${build_dir}/${dir}/tk${TCL_TK_VERSION}"
-	   )
-    ENDFOREACH (config)
+      )
   ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
 
 ENDMACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR)
