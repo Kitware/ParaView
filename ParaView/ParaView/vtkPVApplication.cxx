@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.200");
+vtkCxxRevisionMacro(vtkPVApplication, "1.201");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -296,9 +296,6 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationVersionName(name);
   this->SetApplicationReleaseName("1");
 
-  // Find the installation directory (now that we have the app name)
-
-  this->FindApplicationInstallationDirectory();
 
   this->TotalVisibleMemorySizeValid = 0;
 
@@ -1034,6 +1031,10 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+
+  // Find the installation directory (now that we have the app name)
+  this->FindApplicationInstallationDirectory();
+
   if (this->RunBatchScript)
     {
     this->BroadcastScript("$Application LoadScript {%s}", 
