@@ -2,6 +2,11 @@
 /* DO NOT EDIT */
 #include <tcl.h>
 #include "vtkKWWidgetsConfigure.h"
+
+#if defined ( _MSC_VER )
+#pragma warning ( disable : 4115 )
+#endif
+
 #define INTERFACE 1
 #if INTERFACE
 #define ET_TCLARGS ClientData clientData,Tcl_Interp*interp,int argc,char**argv
