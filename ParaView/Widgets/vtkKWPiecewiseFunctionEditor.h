@@ -76,7 +76,13 @@ public:
 
   // Description:
   // Set/Get the window/level.
+  // This method will invoke FunctionChangedCommand and 
+  // WindowLevelChangedCommand. Use SetInteractiveWindowLevel to invoke
+  // FunctionChangingCommand and trigger a WindowLevelChangingCommand.
   virtual void SetWindowLevel(float window, float level);
+  virtual void SetInteractiveWindowLevel(float window, float level);
+  vtkGetMacro(Window, float);
+  vtkGetMacro(Level, float);
 
   // Description:
   // Set commands.
@@ -94,7 +100,8 @@ protected:
   float Window;
   float Level;
 
-  virtual void UpdateWindowLevelPoints();
+  virtual void UpdatePointsFromWindowLevel(int interactive = 0);
+  virtual void UpdateWindowLevelFromPoints();
 
   // Description:
   // Is point locked, protected, removable ?

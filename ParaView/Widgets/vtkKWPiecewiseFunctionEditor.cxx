@@ -40,9 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkKWRange.h"
 #include "vtkKWLabeledLabel.h"
+#include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -301,7 +302,7 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   // If the point was selected and the new point does not match (which
   // should not happen anyway), reselect the new point
 
-  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
     {
     this->SelectPoint(new_id);
     }
@@ -374,7 +375,7 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToParameter(
   // If the point was selected and the new point does not match (which
   // should not happen anyway), reselect the new point
 
-  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
     {
     this->SelectPoint(new_id);
     }
@@ -460,27 +461,23 @@ void vtkKWPiecewiseFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
 //----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangedCommand()
 {
-  this->Superclass::InvokeFunctionChangedCommand();
+  if (this->WindowLevelMode)
+    {
+    this->UpdateWindowLevelFromPoints();
+    }
 
-#if 0
-  float fArg[2];
-  fArg[0] = this->Window;
-  fArg[1] = this->Level;
-  this->InvokeEvent(vtkKWEvent::WindowLevelChangedEvent, fArg);
-#endif
+  this->Superclass::InvokeFunctionChangedCommand();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangingCommand()
 {
-  this->Superclass::InvokeFunctionChangingCommand();
+  if (this->WindowLevelMode)
+    {
+    this->UpdateWindowLevelFromPoints();
+    }
 
-#if 0
-  float fArg[2];
-  fArg[0] = this->Window;
-  fArg[1] = this->Level;
-  this->InvokeEvent(vtkKWEvent::WindowLevelChangingEvent, fArg);
-#endif
+  this->Superclass::InvokeFunctionChangingCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -496,8 +493,24 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
 
   if (this->WindowLevelMode)
     {
-    this->UpdateWindowLevelPoints();
+    // Use the whole value range
+
+    float parameter;
+    float *v_w_range = this->GetWholeValueRange();
+
+    if (this->GetFunctionSize() > 0 && 
+        this->GetFunctionPointParameter(0, parameter))
+      {
+      this->PiecewiseFunction->AddPoint(parameter, v_w_range[0]);
+      }
+    if (this->GetFunctionSize() > 1 &&
+        this->GetFunctionPointParameter(this->GetFunctionSize()-1, parameter))
+      {
+      this->PiecewiseFunction->AddPoint(parameter, v_w_range[1]);
+      }
     }
+
+  this->UpdatePointsFromWindowLevel();
 }
 
 //----------------------------------------------------------------------------
@@ -513,16 +526,179 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevel(float window, float level)
 
   if (this->WindowLevelMode)
     {
-    this->UpdateWindowLevelPoints();
+    this->UpdatePointsFromWindowLevel();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::UpdateWindowLevelPoints()
+void vtkKWPiecewiseFunctionEditor::SetInteractiveWindowLevel(
+  float window, float level)
 {
-  if (!this->WindowLevelMode)
+  if (this->Window == window && this->Level == level)
     {
     return;
+    }
+
+  this->Window = window;
+  this->Level = level;
+
+  if (this->WindowLevelMode)
+    {
+    this->UpdatePointsFromWindowLevel(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::UpdateWindowLevelFromPoints()
+{
+  if (this->WindowLevelMode && this->GetFunctionSize() >= 4)
+    {
+    float p1, p2;
+    if (this->GetFunctionPointParameter(1, p1) && 
+        this->GetFunctionPointParameter(2, p2))
+      {
+      float v1, v2;
+      v1 = this->PiecewiseFunction->GetValue(p1);
+      v2 = this->PiecewiseFunction->GetValue(p2);
+      this->Window = (v1 < v2 ? (p2 - p1) : p1 - p2);
+      this->Level = (p1 + p2) / 2.0;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
+{
+  if (!this->HasFunction())
+    {
+    return;
+    }
+
+  unsigned long mtime = this->GetFunctionMTime();
+
+  float *p_w_range = this->GetWholeParameterRange();
+  float *v_w_range = this->GetWholeValueRange();
+
+  float parameter;
+
+  // We are in not WindowLevel mode, make sure our points are within the
+  // range (while in W/L mode, those points can be out of the parameter range)
+
+  if (!this->WindowLevelMode)
+    {
+    int done;
+    do
+      {
+      done = 1;
+      for (int id = 0; id < this->GetFunctionSize(); id++)
+        {
+        if (this->GetFunctionPointParameter(id, parameter) &&
+            (parameter < p_w_range[0] || parameter > p_w_range[1]))
+          {
+          float value = this->PiecewiseFunction->GetValue(parameter);
+          this->PiecewiseFunction->RemovePoint(parameter);
+          this->PiecewiseFunction->AddPoint(
+            (parameter < p_w_range[0] ? p_w_range[0] : p_w_range[1]), value);
+          done = 0;
+          break;
+          }
+        }
+      } while (!done);
+    }
+
+  // We are in WindowLevel mode, make sure we have 4 points representing
+  // the ramp
+
+  else
+    {
+    // Get the current value bounds (default to the whole range if no points)
+
+    float start_v, end_v;
+    if (this->GetFunctionSize() > 0 && 
+        this->GetFunctionPointParameter(0, parameter))
+      {
+      start_v = this->PiecewiseFunction->GetValue(parameter);
+      }
+    else
+      {
+      start_v = v_w_range[0];
+      }
+    if (this->GetFunctionSize() > 1 &&
+        this->GetFunctionPointParameter(this->GetFunctionSize()-1, parameter))
+      {
+      end_v = this->PiecewiseFunction->GetValue(parameter);
+      }
+    else
+      {
+      end_v = v_w_range[1];
+      }
+
+    // Make sure that if Window < 0 the ramp is going down (if > 0, going up)
+
+    if ((this->Window < 0 && start_v < end_v) ||
+        (this->Window > 0 && start_v > end_v))
+      {
+      float temp = start_v;
+      start_v = end_v;
+      end_v = temp;
+      }
+
+    // Compute the 4 points parameters 
+
+    float points[4];
+    float window = this->Window > 0 ? this->Window : -this->Window;
+
+    points[1] = this->Level - window / 2;
+    points[0] = (points[1] > p_w_range[0]) ? p_w_range[0] : points[1] - 0.001;
+    points[2] = this->Level + window / 2;
+    points[3] = (points[2] < p_w_range[1]) ? p_w_range[1] : points[2] + 0.001;
+  
+    // Remove all extra-points
+
+    while (this->GetFunctionSize() > 4)
+      {
+      if (this->GetFunctionPointParameter(this->GetFunctionSize()-1,parameter))
+        {
+        this->PiecewiseFunction->RemovePoint(parameter);
+        }
+      }
+
+    // Check if modification is needed (if any of those points is different,
+    // just remove everything)
+
+    for (int id = 0; id < 4; id++)
+      {
+      if (!this->GetFunctionPointParameter(id, parameter) ||
+          parameter != points[id] ||
+          this->PiecewiseFunction->GetValue(parameter) != 
+          (id < 2 ? start_v : end_v))
+        {
+        this->PiecewiseFunction->RemoveAllPoints();
+        break;
+        }
+      }
+
+    // Set the points
+  
+    for (int id = 0; id < 4; id++)
+      {
+      this->PiecewiseFunction->AddPoint(points[id], id < 2 ? start_v : end_v);
+      }
+    }
+
+  // Was the function modified ?
+
+  if (this->GetFunctionMTime() > mtime)
+    {
+    if (interactive)
+      {
+      this->InvokeFunctionChangingCommand();
+      }
+    else
+      {
+      this->InvokeFunctionChangedCommand();
+      }
+    this->RedrawCanvasElements();
     }
 }
   
