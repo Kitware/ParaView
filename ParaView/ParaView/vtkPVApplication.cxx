@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.7");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.8");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -344,6 +344,7 @@ vtkPVApplication::vtkPVApplication()
   this->HostName = NULL;
   this->SetHostName("localhost");
   this->Port = 11111;
+  this->ReverseConnection = 0;
   this->Username = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftware = 0;
@@ -388,6 +389,8 @@ vtkPVApplication::vtkPVApplication()
   this->BatchScriptName = 0;
   this->RunBatchScript = 0;
   this->DemoPath = NULL;
+
+  this->LogThreshold = 0.01;
 }
 
 //----------------------------------------------------------------------------
@@ -574,6 +577,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "",
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
+  "--reverse-connection", "-rc",
+  "Have the server connect to the client.", 
   "--stereo", "",
   "Tell the application to enable stero rendering (only when running on a single process).",
   "--render-module", "",
@@ -1000,6 +1005,14 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->Port = atoi(newarg);
+      }
+    // Change behavior so server connects to the client.
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--reverse-connection",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-rc",
+                                            index) == VTK_OK )
+      {
+      this->ReverseConnection = 1;
       }
     }
 
@@ -1741,6 +1754,24 @@ void vtkPVApplication::ErrorExit()
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
 //----------------------------------------------------------------------------
+void vtkPVApplication::SetLogBufferLength(int length)
+{
+  vtkTimerLog::SetMaxEntries(length);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ResetLog()
+{
+  vtkTimerLog::ResetLog();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetEnableLog(int flag)
+{
+  vtkTimerLog::SetLogging(flag);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1774,11 +1805,13 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Username: " 
        << (this->Username?this->Username:"(none)") << endl;
     os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
     }
   if (this->ServerMode)
     {
     os << indent << "Running as a server\n";
     os << indent << "Port: " << this->Port << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
     }
   if (this->UseSoftwareRendering)
     {
@@ -1801,6 +1834,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "RenderModuleName: " 
     << (this->RenderModuleName?this->RenderModuleName:"(null)") << endl;
+
+  os << indent << "LogThreshold: " << this->LogThreshold << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
