@@ -39,11 +39,11 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-
+#include "vtkSmartPointer.h"
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.7");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.8");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -432,24 +432,24 @@ void vtkRedistributePolyData::Execute()
       }
     }
 
-  vtkPoints *outputPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> outputPoints = vtkSmartPointer<vtkPoints>::New();
   outputPoints->SetNumberOfPoints(totalNumPoints);
 
-  vtkCellArray *outputVerts = NULL;
-  vtkCellArray *outputLines = NULL;
-  vtkCellArray *outputPolys = NULL;
-  vtkCellArray *outputStrips = NULL;
+  vtkSmartPointer<vtkCellArray> outputVerts;
+  vtkSmartPointer<vtkCellArray> outputLines;
+  vtkSmartPointer<vtkCellArray> outputPolys;
+  vtkSmartPointer<vtkCellArray> outputStrips;
 
-  if (inputCellArrays[0]) { outputVerts = vtkCellArray::New();  }
-  if (inputCellArrays[1]) { outputLines = vtkCellArray::New();  }
-  if (inputCellArrays[2]) { outputPolys = vtkCellArray::New();  }
-  if (inputCellArrays[3]) { outputStrips = vtkCellArray::New(); }
+  if (inputCellArrays[0]) { outputVerts = vtkSmartPointer<vtkCellArray>::New();  }
+  if (inputCellArrays[1]) { outputLines = vtkSmartPointer<vtkCellArray>::New();  }
+  if (inputCellArrays[2]) { outputPolys = vtkSmartPointer<vtkCellArray>::New();  }
+  if (inputCellArrays[3]) { outputStrips = vtkSmartPointer<vtkCellArray>::New(); }
 
   vtkCellArray *outputCellArrays[NUM_CELL_TYPES];
-  outputCellArrays[0] = outputVerts;
-  outputCellArrays[1] = outputLines;
-  outputCellArrays[2] = outputPolys;
-  outputCellArrays[3] = outputStrips; 
+  outputCellArrays[0] = outputVerts.GetPointer();
+  outputCellArrays[1] = outputLines.GetPointer();
+  outputCellArrays[2] = outputPolys.GetPointer();
+  outputCellArrays[3] = outputStrips.GetPointer(); 
 
   vtkIdType* ptr = 0; 
   for (type=0; type<NUM_CELL_TYPES; type ++)
@@ -468,13 +468,12 @@ void vtkRedistributePolyData::Execute()
       }
     }
 
-  output->SetVerts(outputVerts);
-  output->SetLines(outputLines);
-  output->SetPolys(outputPolys);
-  output->SetStrips(outputStrips);
+  output->SetVerts(outputVerts.GetPointer());
+  output->SetLines(outputLines.GetPointer());
+  output->SetPolys(outputPolys.GetPointer());
+  output->SetStrips(outputStrips.GetPointer());
 
-  output->SetPoints(outputPoints);
-
+  output->SetPoints(outputPoints.GetPointer());
   //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   // ... Copy cells from input to output ...
   this->CopyCells(origNumCells, input, output, keepCellList);
@@ -961,7 +960,6 @@ void vtkRedistributePolyData::CopyArrays
             fArrayFrom[numComps*fromId[i]+j];
           }
         }
-       
       break;
 
     case VTK_DOUBLE:
@@ -1690,11 +1688,10 @@ void vtkRedistributePolyData::SendCells
   vtkIdType cellOffset = 0;
   vtkIdType inputNumCells;
 
-  vtkIdType* fromIds;
-  vtkIdType cnt = 0;
   for (type=0; type<NUM_CELL_TYPES; type++)
     {
-    fromIds = new vtkIdType[numCells[type]];
+    vtkIdType cnt = 0;
+    vtkIdType* fromIds = new vtkIdType[numCells[type]];
     if (sendCellList != NULL)
       {
       for (cellId = startCell[type]; cellId <=stopCell[type]; 
@@ -1804,7 +1801,6 @@ void vtkRedistributePolyData::ReceiveCells
 
   // ... receive cell data attribute data (Scalars, Vectors, etc.)...
 
-  vtkIdType cnt = 0;
   vtkIdType cellOffset= 0;
 
   vtkCellData* outputCellData = output->GetCellData();
@@ -1818,6 +1814,7 @@ void vtkRedistributePolyData::ReceiveCells
   int type;
   for (type=0; type<NUM_CELL_TYPES; type++)
     {
+    vtkIdType cnt = 0;
     vtkIdType numCells = stopCell[type]-startCell[type]+1;
     vtkIdType* toIds = new vtkIdType[numCells];
     for (cellId = startCell[type]; cellId <=stopCell[type]; 
@@ -2263,10 +2260,9 @@ void vtkRedistributePolyData::SendArrays
         {
         for (j = 0; j < numComps; j++)
           {
-          sf[numComps*i+j] = fArray[numComps*fromId[i]+j];
+          sf[numComps*i+j] = fArray[numComps*fromId[i]+j]; 
           }
         }
-      
       this->Controller->
         Send(sf, numToCopy*numComps, sendTo, sendTag);
       delete [] sf;
@@ -2556,7 +2552,7 @@ void vtkRedistributePolyData::ReceiveArrays
       break;
 
     case VTK_FLOAT:
-      fArray = ((vtkFloatArray*)Data)->GetPointer(0);
+      fArray = ((vtkFloatArray*)Data)->GetPointer(0); 
       sf = new float[numToCopy*numComps];
 
       this->Controller->
@@ -2568,7 +2564,6 @@ void vtkRedistributePolyData::ReceiveArrays
           fArray[toId[i]*numComps+j] = sf[numComps*i+j];
           }
         }
-      
       delete [] sf;
       break;
 
