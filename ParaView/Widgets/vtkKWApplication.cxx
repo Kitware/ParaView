@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
@@ -74,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.103");
+vtkCxxRevisionMacro(vtkKWApplication, "1.104");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);

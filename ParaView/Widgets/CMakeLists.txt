@@ -4,6 +4,7 @@ SET( KWWidgets_SRCS
 vtkCornerAnnotation.cxx
 vtkKWActorComposite.cxx 
 vtkKWApplication.cxx 
+vtkKWApplicationSettingsInterface.cxx
 vtkKWBWidgets.cxx
 vtkKWChangeColorButton.cxx 
 vtkKWCheckButton.cxx 
@@ -43,6 +44,9 @@ vtkKWTkUtilities.cxx
 vtkKWText.cxx 
 vtkKWThumbWheel.cxx
 vtkKWToolbar.cxx 
+vtkKWUserInterfacePanel.cxx
+vtkKWUserInterfaceManager.cxx
+vtkKWUserInterfaceNotebookManager.cxx
 vtkKWView.cxx 
 vtkKWViewCollection.cxx 
 vtkKWWidget.cxx 
@@ -56,6 +60,7 @@ ${VTK_TCL_HOME}/vtktcl.c
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
   vtkKWView.cxx
+  vtkKWUserInterfaceManager.cxx
   ABSTRACT
   )
 

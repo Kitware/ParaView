@@ -64,9 +64,6 @@ class vtkKWWindowCollection;
 template<class KeyType,class DataType> class vtkAbstractMap;
 //ETX
 
-#define VTK_KW_SPLASH_SCREEN_REG_KEY "ShowSplashScreen"
-#define VTK_KW_BALLOON_HELP_REG_KEY "ShowBalloonHelp"
-
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:

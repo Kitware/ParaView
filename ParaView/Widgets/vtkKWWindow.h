@@ -50,19 +50,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWCheckButton;
+class vtkKWApplicationSettingsInterface;
 class vtkKWFrame;
 class vtkKWImageLabel;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
 class vtkKWLoadSaveDialog;
 class vtkKWMenu;
 class vtkKWMessageDialog;
 class vtkKWNotebook;
 class vtkKWProgressGauge;
-class vtkKWRadioButton;
 class vtkKWSplitFrame;
 class vtkKWTclInteractor;
+class vtkKWUserInterfaceManager;
 class vtkKWView;
 class vtkKWViewCollection;
 
@@ -71,9 +70,8 @@ class vtkKWWindowMenuEntry;
 template<class DType> class vtkVector;
 //ETX
 
-#define VTK_KW_PREFERENCES_PAGE_LABEL "Preferences"
 #define VTK_KW_PAGE_SETUP_MENU_LABEL "Page Setup"
-#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
+#define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -160,10 +158,6 @@ public:
   vtkGetObjectMacro(PropertiesParent,vtkKWWidget);
   void SetPropertiesParent(vtkKWWidget*);
   void CreateDefaultPropertiesParent();
-
-  // Description:
-  // Create preferences properties page in the notebook.
-  void CreatePreferencesProperties();
 
   // Description:
   // Provide hide/show functionality of properties
@@ -308,9 +302,14 @@ public:
   void PrintRecentFiles();
   
   // Description:
-  // Callback to handle dialog settings change
-  void OnInterfaceSettingsChange();
-  vtkGetObjectMacro(InterfaceSettingsFrame,vtkKWLabeledFrame);
+  // Get the user interface manager.
+  virtual vtkKWUserInterfaceManager* GetUserInterfaceManager()
+    { return 0; };
+
+  // Description:
+  // Get the application settings interface. 
+  virtual vtkKWApplicationSettingsInterface* GetApplicationSettingsInterface() 
+    { return 0; };
 
   // Description:
   // Display the tcl interactor.
@@ -343,7 +342,6 @@ protected:
   // Description:
   // Display the exit dialog.
   int ExitDialog();
-
 
   virtual void CreateStatusImage();
 
@@ -392,12 +390,6 @@ protected:
   int   PromptBeforeClose;
   int   InExit;
 
-  vtkKWLabeledFrame *InterfaceSettingsFrame;
-  vtkKWCheckButton  *InterfaceSettingsConfirmExitCheck;
-  vtkKWCheckButton  *InterfaceSettingsSaveWindowGeometry;
-  vtkKWCheckButton  *InterfaceSettingsShowSplashScreenCheck;
-  vtkKWCheckButton  *InterfaceSettingsShowBalloonHelpCheck;
-  
 //BTX
   // Description:
   // This vector holds the list of most recently used files.
