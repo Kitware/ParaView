@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.12");
 
 
 
@@ -190,30 +190,27 @@ void vtkPVMultiDisplayRenderModule::StillRender()
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->LocalRender != localRender)
+  // This is cheap since we only change the client.
+  this->LocalRender = localRender;
+  if (this->CompositeID.ID)
     {
-    if (this->CompositeID.ID)
+    if (localRender)
       {
-      if (localRender)
-        {
-        pm->GetStream()
-          << vtkClientServerStream::Invoke
-          << this->CompositeID << "UseCompositingOff"
-          << vtkClientServerStream::End;
-        pm->SendStreamToClient();
-        }
-      else
-        {
-        pm->GetStream()
-          << vtkClientServerStream::Invoke
-          << this->CompositeID << "UseCompositingOn"
-          << vtkClientServerStream::End;
-        pm->SendStreamToClient();
-        }
-      this->LocalRender = localRender;
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOff"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
-    }
-
+    else
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOn"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
+      }
+    }  
 
   // Still Render can get called some funky ways.
   // Interactive renders get called through the PVInteractorStyles
