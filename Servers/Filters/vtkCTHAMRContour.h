@@ -12,26 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCTHAMRContour - Contour a cell attribute.
+// .NAME vtkCTHAMRContour - A source to test the new CTH AMR data object.
 //
 // .SECTION Description
-// vtkCTHAMRContour can use ghost levels or its own internal algorithm 
-// to eliminate seams between levels.
+// vtkCTHAMRContour is a collection of image datas. All have the same 
+// dimensions. Each block has a different origin and spacing. It uses mandelbrot
+// to create cell data. I scale the fractal array to look like a volume 
+// fraction. I may also add block id and level as extra cell arrays.
 
 #ifndef __vtkCTHAMRContour_h
 #define __vtkCTHAMRContour_h
 
 #include "vtkCTHDataToPolyDataFilter.h"
+#include "vtkToolkits.h" // I need the VTK_USE_PATENTED flag 
 
 class vtkCTHData;
-class vtkStringList;
+class vtkPlane;
 class vtkAppendPolyData;
+class vtkSynchronizedTemplates3D;
 class vtkContourFilter;
+class vtkDataSetSurfaceFilter;
+class vtkCutter;
 class vtkImageData;
 class vtkPolyData;
 class vtkFloatArray;
 class vtkDataArray;
-class vtkIdList;
 class vtkContourValues;
 
 class VTK_EXPORT vtkCTHAMRContour : public vtkCTHDataToPolyDataFilter
@@ -61,12 +66,12 @@ public:
     {this->SetInputScalarsSelection(fieldName);}
 
   // Description:
-  // Ignore ghost levels forces this filter to look at neighboring blocks.
-  vtkSetMacro(IgnoreGhostLevels,int);
-  vtkGetMacro(IgnoreGhostLevels,int);
-  
+  // Use a different algorithm that ignores ghost levels.
+  vtkSetMacro(IgnoreGhostLevels, int);
+  vtkGetMacro(IgnoreGhostLevels, int);
+
   // Description:
-  // Look at clip plane to compute MTime.
+  // Look at contours to compute MTime.
   unsigned long GetMTime();    
 
 protected:
@@ -75,27 +80,9 @@ protected:
 
   virtual void Execute();
 
-  void ExecuteBlock(vtkImageData* block, vtkPolyData* appendCache);
+  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData* append, double startProgress, double stopProgress);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
-                   vtkPolyData* appendCache);
-  void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
-                                  vtkFloatArray *pointVolumeFraction, int *dims);
-
-  void ExecuteCellDataToPointData2(vtkDataArray *cellVolumeFraction, 
-                            vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
-  void FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList);
-  float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
-                           double* pCell, float* pPoint, vtkCTHData* output);
-
-  void CreateInternalPipeline();
-  void DeleteInternalPipeline();
-
-  // Pipeline to extract a part from a block.
-  vtkImageData* Image;
-  vtkPolyData* PolyData;
-  vtkContourFilter* Contour;
-  vtkAppendPolyData* FinalAppend;
-  vtkIdList* IdList;
+                   vtkAppendPolyData* append);
 
 
   // ----
@@ -104,6 +91,23 @@ protected:
   vtkSetStringMacro(InputScalarsSelection);
 
   int IgnoreGhostLevels;
+
+  void CreateInternalPipeline();
+  void DeleteInternalPipeline();
+
+  // Pipeline to extract a part from a block.
+  vtkImageData* Image;
+  // Polydata is not instantiated.  It just holds the output
+  // from the internal pipeline.
+  vtkPolyData* PolyData;
+  // KitwareContourFilter took too long because of garbage collection
+  // when input of internal filter was deleted.
+  // Synchronized template super class is poly data source.
+#ifdef VTK_USE_PATENTED  
+  vtkSynchronizedTemplates3D* Contour;
+#else
+  vtkContourFilter* Contour;
+#endif
 
 private:
   void InternalImageDataCopy(vtkCTHAMRContour *src);
