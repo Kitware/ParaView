@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.6");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -93,6 +93,10 @@ void vtkKWLabeledLabel::Create(vtkKWApplication *app, const char *args)
   // Pack the labels
 
   this->Pack();
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 // ----------------------------------------------------------------------------
@@ -127,20 +131,14 @@ void vtkKWLabeledLabel::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledLabel::SetEnabled(int e)
+void vtkKWLabeledLabel::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  if (this->Label2)
     {
-    this->Label2->SetEnabled(e);
+    this->Label2->SetEnabled(this->Enabled);
     }
-
-  // Then call superclass, which will call SetEnabled on the label and 
-  // update the internal Enabled ivar (although it is not of much use here)
-
-  this->Superclass::SetEnabled(e);
 }
 
 // ---------------------------------------------------------------------------
