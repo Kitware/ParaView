@@ -53,15 +53,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
+#include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.1");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.2");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -244,15 +245,15 @@ void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
-                         sourceTclName, this->VariableName,
-                         static_cast<int>(this->MinMax[0]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[0]->GetMaxValue()),
-                         static_cast<int>(this->MinMax[1]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[1]->GetMaxValue()),
-                         static_cast<int>(this->MinMax[2]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[2]->GetMaxValue()));
-
+  pvApp->GetProcessModule()->ServerScript(
+    "%s Set%s %d %d %d %d %d %d", sourceTclName, this->VariableName,
+    static_cast<int>(this->MinMax[0]->GetMinValue()), 
+    static_cast<int>(this->MinMax[0]->GetMaxValue()),
+    static_cast<int>(this->MinMax[1]->GetMinValue()), 
+    static_cast<int>(this->MinMax[1]->GetMaxValue()),
+    static_cast<int>(this->MinMax[2]->GetMinValue()), 
+    static_cast<int>(this->MinMax[2]->GetMaxValue()));
+  
   this->LastAcceptedValues[0] =
     static_cast<int>(this->MinMax[0]->GetMinValue());
   this->LastAcceptedValues[1] =

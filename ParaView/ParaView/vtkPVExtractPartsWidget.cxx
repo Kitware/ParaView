@@ -41,21 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVExtractPartsWidget.h"
 
-#include "vtkKWWidget.h"
-#include "vtkKWListBox.h"
-#include "vtkKWLabel.h"
 #include "vtkCollection.h"
+#include "vtkKWLabel.h"
+#include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkUnsignedCharArray.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.1");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.2");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -199,8 +200,8 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
   for (idx = 0; idx < num; ++idx)
     {
     state = this->PartSelectionList->GetSelectState(idx);    
-    pvApp->BroadcastScript("%s SetInputMask %d %d",
-                           vtkSourceTclName, idx, state);
+    pvApp->GetProcessModule()->ServerScript("%s SetInputMask %d %d",
+                                            vtkSourceTclName, idx, state);
     this->LastAcceptedPartStates->InsertValue(idx, state);
     }
 

@@ -50,14 +50,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.1");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.2");
 
 //===========================================================================
 //***************************************************************************
@@ -109,8 +110,10 @@ vtkPV3DWidget::~vtkPV3DWidget()
   if (this->Widget3DTclName)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    pvApp->BroadcastScript("%s EnabledOff", this->Widget3DTclName);
-    pvApp->BroadcastScript("%s Delete", this->Widget3DTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s EnabledOff", this->Widget3DTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s Delete", this->Widget3DTclName);
     this->SetWidget3DTclName(NULL);
     }
   this->Observer->Delete();
@@ -181,7 +184,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   if (this->Widget3DTclName)
     {
     // Default/dummy interactor for satelite procs.
-    pvApp->BroadcastScript("%s SetInteractor pvRenderWindowInteractor", this->Widget3DTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s SetInteractor pvRenderWindowInteractor", this->Widget3DTclName);
     this->Script("%s InitializeObservers %s", this->GetTclName(),
                  this->Widget3DTclName);
     }
@@ -265,8 +269,8 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     this->PlaceWidget();
     }
 
-  pvApp->BroadcastScript("%s SetEnabled %d", this->Widget3DTclName, 
-                         visibility);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetEnabled %d", this->Widget3DTclName, visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
@@ -291,8 +295,8 @@ void vtkPV3DWidget::Deselect()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
 {
-  this->GetPVApplication()->BroadcastScript("%s SetEnabled %d",
-                                            this->Widget3DTclName, visibility);
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+    "%s SetEnabled %d", this->Widget3DTclName, visibility);
   //is->Widget3D->SetEnabled(visibility);  
 }
 
@@ -319,9 +323,9 @@ void vtkPV3DWidget::ActualPlaceWidget()
   float bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", 
-                         this->Widget3DTclName, 
-                         bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName, 
+    bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
   //this->Widget3D->PlaceWidget(bounds);
 }
 

@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPointWidget.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 
@@ -51,7 +52,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.2");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.3");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -141,16 +142,16 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     {
     this->SetSourceTclName(name);
 
-    pvApp->BroadcastScript("vtkPointSource %s;"
-                           "%s SetNumberOfPoints 1;"
-                           "%s SetRadius 0.0;"
-                           "vtkPolyData %s;"
-                           "%s SetOutput %s;", 
-                           name,
-                           name,
-                           name,
-                           outputName,
-                           name, outputName);
+    pvApp->GetProcessModule()->ServerScript("vtkPointSource %s;"
+                                            "%s SetNumberOfPoints 1;"
+                                            "%s SetRadius 0.0;"
+                                            "vtkPolyData %s;"
+                                            "%s SetOutput %s;", 
+                                            name,
+                                            name,
+                                            name,
+                                            outputName,
+                                            name, outputName);
     //special for saving in tcl scripts.
     sprintf(outputName, "[%s GetOutput]", name);
     this->SetOutputTclName(outputName);

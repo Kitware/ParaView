@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.1");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.2");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -111,8 +111,8 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 
   if (this->PlaneTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-                                              this->PlaneTclName);
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+      "%s Delete", this->PlaneTclName);
     this->SetPlaneTclName(NULL);
     }
   int i;
@@ -228,7 +228,8 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
     }
 
   pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetDrawPlane 0", this->Widget3DTclName);
 
   this->SetCenter(this->LastAcceptedCenter);
   this->SetNormal(this->LastAcceptedNormal);
@@ -259,15 +260,16 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->PlaceWidget();
-  pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetDrawPlane 0", this->Widget3DTclName);
 
   // This should be done in the initialization.
   // There must be a more general way of hooking up the plane object.
   // ExtractCTH uses this varible, General Clipping uses the select widget.
   if (this->VariableName && sourceTclName)
     {
-    pvApp->BroadcastScript("%s Set%s %s", sourceTclName,
-                           this->VariableName, this->PlaneTclName);                   
+    pvApp->GetProcessModule()->ServerScript(
+      "%s Set%s %s", sourceTclName, this->VariableName, this->PlaneTclName);
     }
   if ( this->PlaneTclName )
     {
@@ -278,18 +280,18 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
       val[cc] = atof( this->CenterEntry[cc]->GetValue() );
       }
     this->SetCenterInternal(val[0], val[1], val[2]);
-    pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
-                           this->PlaneTclName,
-                           val[0], val[1], val[2]);
+    pvApp->GetProcessModule()->ServerScript("%s SetOrigin %f %f %f", 
+                                            this->PlaneTclName,
+                                            val[0], val[1], val[2]);
     this->SetLastAcceptedCenter(val);
     for ( cc = 0; cc < 3; cc ++ )
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
       }
     this->SetNormalInternal(val[0], val[1], val[2]);
-    pvApp->BroadcastScript("%s SetNormal %f %f %f", 
-                           this->PlaneTclName,
-                           val[0], val[1], val[2]);
+    pvApp->GetProcessModule()->ServerScript("%s SetNormal %f %f %f", 
+                                            this->PlaneTclName,
+                                            val[0], val[1], val[2]);
     this->SetLastAcceptedNormal(val);
     }
 
@@ -469,20 +471,24 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceName("Plane");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  pvApp->BroadcastScript("vtkPlane %s", tclName);
+  pvApp->GetProcessModule()->ServerScript("vtkPlane %s", tclName);
   this->SetPlaneTclName(tclName);
 
   // Create the 3D widget on each process.
   // This is for tiled display and client server.
   // This may decrease compresion durring compositing.
   // We should have a special call instead of broadcast script.
-  // Better yet, controll visibility based on mode (client-server ...).
+  // Better yet, control visibility based on mode (client-server ...).
   sprintf(tclName, "pvImplicitPlaneWidget%d", instanceCount);
-  pvApp->BroadcastScript("vtkImplicitPlaneWidget %s", tclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "vtkImplicitPlaneWidget %s", tclName);
   this->SetWidget3DTclName(tclName);
-  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", this->Widget3DTclName);
-  pvApp->BroadcastScript("%s OutlineTranslationOff", this->Widget3DTclName);
-  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", this->Widget3DTclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetPlaceFactor 1.0", this->Widget3DTclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s OutlineTranslationOff", this->Widget3DTclName);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s PlaceWidget 0 1 0 1 0 1", this->Widget3DTclName);
 
   this->SetFrameLabel("Plane Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -606,14 +612,15 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       float bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->PlaneTclName,
-                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                             0.5*(bds[4]+bds[5]));
+      pvApp->GetProcessModule()->ServerScript(
+        "%s SetOrigin %f %f %f", this->PlaneTclName,
+        0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]), 0.5*(bds[4]+bds[5]));
       this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
-      pvApp->BroadcastScript("%s SetNormal 0 0 1", this->PlaneTclName);
+      pvApp->GetProcessModule()->ServerScript(
+        "%s SetNormal 0 0 1", this->PlaneTclName);
       this->SetLastAcceptedNormal(0, 0, 1);
       this->SetNormal(0, 0, 1);
       }
@@ -621,13 +628,15 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 
   if (pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
     {
-    pvApp->BroadcastScript("[%s GetPlaneProperty] SetOpacity 0.25; [%s GetSelectedPlaneProperty] SetOpacity 0.25", 
-                           this->Widget3DTclName, this->Widget3DTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "[%s GetPlaneProperty] SetOpacity 0.25; [%s GetSelectedPlaneProperty] SetOpacity 0.25", 
+      this->Widget3DTclName, this->Widget3DTclName);
     }
   else
     {
-    pvApp->BroadcastScript("[%s GetPlaneProperty] SetOpacity 1.0; [%s GetSelectedPlaneProperty] SetOpacity 1.0", 
-                           this->Widget3DTclName, this->Widget3DTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "[%s GetPlaneProperty] SetOpacity 1.0; [%s GetSelectedPlaneProperty] SetOpacity 1.0", 
+      this->Widget3DTclName, this->Widget3DTclName);
     }
 
   this->SetBalloonHelpString(this->BalloonHelpString);
@@ -704,8 +713,8 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(float x, float y, float z)
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
-                           this->Widget3DTclName, x, y, z);
+    pvApp->GetProcessModule()->ServerScript("%s SetOrigin %f %f %f", 
+                                            this->Widget3DTclName, x, y, z);
     }
 }
 
@@ -725,8 +734,8 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(float x, float y, float z)
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    pvApp->BroadcastScript("%s SetNormal %f %f %f", 
-                           this->Widget3DTclName, x, y, z);
+    pvApp->GetProcessModule()->ServerScript("%s SetNormal %f %f %f", 
+                                            this->Widget3DTclName, x, y, z);
     }
 }
 
@@ -785,8 +794,9 @@ void vtkPVImplicitPlaneWidget::Update()
   if (input)
     {
     input->GetDataInformation()->GetBounds(bds);
-    pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
-                           bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
+      bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
 
     // Should I also move the center of the plane?  Keep the old plane?
     // Keep the old normal?

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.1");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -540,7 +540,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     delete [] name;
     str << "}" << ends;
     //cout << str.str() << endl;
-    this->GetPVApplication()->BroadcastScript(str.str());
+    this->GetPVApplication()->GetProcessModule()->ServerScript(str.str());
     str.rdbuf()->freeze(0);
     }
 
@@ -576,8 +576,8 @@ void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
 
   const char* fname = this->Entry->GetValue();
 
-  pvApp->BroadcastScript("%s Set%s {%s}",
-                         sourceTclName, this->VariableName, fname);
+  pvApp->GetProcessModule()->ServerScript(
+    "%s Set%s {%s}", sourceTclName, this->VariableName, fname);
   this->SetLastAcceptedFileName(fname);  
 
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);

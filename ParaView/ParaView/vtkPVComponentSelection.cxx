@@ -41,17 +41,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVComponentSelection.h"
 
-#include "vtkPVSource.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
 #include "vtkKWCheckButton.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkArrayMap.txx"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9.4.1");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9.4.2");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -110,8 +111,8 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
     sprintf(compId, "%d", i);
     button->SetText(compId);
     this->CheckButtons->AddItem(button);
-    pvApp->BroadcastScript("%s Set%s %d %d", this->ObjectTclName, 
-                           this->VariableName, i, i);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s Set%s %d %d", this->ObjectTclName, this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
     this->LastAcceptedState[i] = 1;
@@ -144,20 +145,19 @@ void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
   
   if (this->ModifiedFlag)
     {
-    pvApp->BroadcastScript("%s RemoveAllValues", sourceTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s RemoveAllValues", sourceTclName);
     for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
       {
       if (this->GetState(i))
         {
-        pvApp->BroadcastScript("%s Set%s %d %d",
-                               sourceTclName, this->VariableName,
-                               i, i);
+        pvApp->GetProcessModule()->ServerScript(
+          "%s Set%s %d %d", sourceTclName, this->VariableName, i, i);
         }
       else
         {
-        pvApp->BroadcastScript("%s Set%s %d %d",
-                               sourceTclName, this->VariableName,
-                               i, -1);
+        pvApp->GetProcessModule()->ServerScript(
+          "%s Set%s %d %d", sourceTclName, this->VariableName, i, -1);
         }
       this->LastAcceptedState[i] = this->GetState(i);
       }

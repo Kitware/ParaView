@@ -41,18 +41,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVMinMax.h"
 
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
-#include "vtkKWScale.h"
 #include "vtkKWLabel.h"
-#include "vtkPVArrayMenu.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.2");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.3");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -297,9 +298,9 @@ void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s %s %f %f",
-                         sourceTclName, this->SetCommand,
-                         this->GetMinValue(), this->GetMaxValue());
+  pvApp->GetProcessModule()->ServerScript(
+    "%s %s %f %f", sourceTclName, this->SetCommand,
+    this->GetMinValue(), this->GetMaxValue());
 
   this->LastAcceptedValues[0] = this->GetMinValue();
   this->LastAcceptedValues[1] = this->GetMaxValue();

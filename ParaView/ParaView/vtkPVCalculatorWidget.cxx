@@ -53,21 +53,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.1");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.2");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -550,8 +551,8 @@ void vtkPVCalculatorWidget::ClearFunction()
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s RemoveAllVariables",
-                           this->PVSource->GetVTKSourceTclName(idx));
+    pvApp->GetProcessModule()->ServerScript(
+      "%s RemoveAllVariables", this->PVSource->GetVTKSourceTclName(idx));
     }
   
   this->ModifiedCallback();
@@ -575,17 +576,19 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s RemoveAllVariables",
-                           this->PVSource->GetVTKSourceTclName(idx));
+    pvApp->GetProcessModule()->ServerScript(
+      "%s RemoveAllVariables", this->PVSource->GetVTKSourceTclName(idx));
     if (strcmp(newMode, "point") == 0)
       {
-      pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
-                             this->PVSource->GetVTKSourceTclName());
+      pvApp->GetProcessModule()->ServerScript(
+        "%s SetAttributeModeToUsePointData",
+        this->PVSource->GetVTKSourceTclName());
       }
     else if (strcmp(newMode, "cell") == 0)
       {
-      pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
-                             this->PVSource->GetVTKSourceTclName());
+      pvApp->GetProcessModule()->ServerScript(
+        "%s SetAttributeModeToUseCellData",
+        this->PVSource->GetVTKSourceTclName());
       }
     }
 
@@ -647,9 +650,10 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s AddScalarVariable {%s} {%s} {%d}",
-                           this->PVSource->GetVTKSourceTclName(idx),
-                           variableName, arrayName, component);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s AddScalarVariable {%s} {%s} {%d}",
+      this->PVSource->GetVTKSourceTclName(idx),
+      variableName, arrayName, component);
     }
   
   this->AddTraceEntry("$kw(%s) AddScalarVariable {%s} {%s} {%d}",
@@ -669,9 +673,9 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s AddVectorVariable {%s} {%s} 0 1 2",
-                           this->PVSource->GetVTKSourceTclName(idx),
-                           variableName, arrayName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s AddVectorVariable {%s} {%s} 0 1 2",
+      this->PVSource->GetVTKSourceTclName(idx), variableName, arrayName);
     }
 
   this->AddTraceEntry("$kw(%s) AddVectorVariable {%s} {%s}",
@@ -725,8 +729,8 @@ void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
   // Format a command to move value from widget to vtkObjects (on all
   // processes).  The VTK objects do not yet have to have the same Tcl
   // name!
-  pvApp->BroadcastScript("%s SetFunction {%s}", vtkSourceTclName,
-                         this->FunctionLabel->GetLabel());
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetFunction {%s}", vtkSourceTclName, this->FunctionLabel->GetLabel());
   
   this->SetLastAcceptedFunction(this->FunctionLabel->GetLabel());
   

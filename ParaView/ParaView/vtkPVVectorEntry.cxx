@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
@@ -56,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.1");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -305,7 +306,7 @@ void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
     this->LastAcceptedValues[count] = entry->GetValueAsFloat();
     count++;
     }
-  pvApp->BroadcastScript(acceptCmd);
+  pvApp->GetProcessModule()->ServerScript(acceptCmd);
 
   this->AcceptCalled = 1;
   this->ModifiedFlag = 0;  

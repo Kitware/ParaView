@@ -49,11 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.1");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -242,18 +243,17 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
     {
     if(this->Round)
       {
-      pvApp->BroadcastScript("%s Set%s %d", 
-                             sourceTclName,
-                             this->VariableName, 
-                             this->RoundValue(this->GetValue()));
+      pvApp->GetProcessModule()->ServerScript(
+        "%s Set%s %d", sourceTclName, this->VariableName, 
+        this->RoundValue(this->GetValue()));
       this->SetLastAcceptedValue(this->RoundValue(this->GetValue()));
       }
     else
       {
-      pvApp->BroadcastScript("%s Set%s %g", 
-                             sourceTclName,
-                             this->VariableName, 
-                             this->GetValue());
+      pvApp->GetProcessModule()->ServerScript("%s Set%s %g", 
+                                              sourceTclName,
+                                              this->VariableName, 
+                                              this->GetValue());
       this->SetLastAcceptedValue(this->GetValue());
       }
     }

@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.1");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -628,11 +628,11 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
   pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
                 tclName, this->GetTclName());
     
-  pvApp->BroadcastScript(
+  pvApp->GetProcessModule()->ServerScript(
     "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
     tclName, tclName);
 
-  pvApp->BroadcastScript(
+  pvApp->GetProcessModule()->ServerScript(
     "%s AddObserver EndEvent {$Application LogEndEvent {Execute %s}}", 
     tclName, tclName);
 
@@ -649,7 +649,7 @@ void vtkPVSource::RemoveAllVTKSources()
   for (idx = 0; idx < num; ++ idx)
     {
     tclName = this->VTKSourceTclNames->GetString(idx);
-    pvApp->BroadcastScript("%s Delete", tclName);
+    pvApp->GetProcessModule()->ServerScript("%s Delete", tclName);
     }
 
   this->VTKSourceTclNames->RemoveAllItems();

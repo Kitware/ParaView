@@ -47,13 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.2");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.3");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -203,10 +204,10 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
     {
-    pvApp->BroadcastScript("%s Set%s %s",
-                           sourceTclName,
-                           this->VariableName,
-                           this->GetCurrentVTKValue());
+    pvApp->GetProcessModule()->ServerScript("%s Set%s %s",
+                                            sourceTclName,
+                                            this->VariableName,
+                                            this->GetCurrentVTKValue());
 
     this->SetLastAcceptedValue(this->GetCurrentVTKValue());
     }

@@ -43,22 +43,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
+#include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkKWLabel.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVInputProperty.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
-#include "vtkSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.1");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.2");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -215,8 +216,8 @@ void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
   if (this->Value == vtkDataSet::POINT_DATA_FIELD ||
       this->Value == vtkDataSet::CELL_DATA_FIELD)
     {
-    pvApp->BroadcastScript("%s SetAttributeMode %d", 
-                           sourceTclName, this->Value);
+    pvApp->GetProcessModule()->ServerScript("%s SetAttributeMode %d", 
+                                            sourceTclName, this->Value);
     }
   
   this->SetLastAcceptedAttributeMode(this->Value);

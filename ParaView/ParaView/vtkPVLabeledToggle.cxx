@@ -41,16 +41,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVLabeledToggle.h"
 
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
-#include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.1");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -189,8 +190,8 @@ void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s Set%s %d", sourceTclName, 
-                         this->VariableName, this->GetState());
+  pvApp->GetProcessModule()->ServerScript(
+    "%s Set%s %d", sourceTclName, this->VariableName, this->GetState());
 
   this->ModifiedFlag = 0;
   this->LastAcceptedValue = this->GetState();

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -61,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.1");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.2");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -179,7 +180,7 @@ void vtkPVPointWidget::UpdateVTKObject()
             this->PositionEntry[0]->GetValueAsFloat(),
             this->PositionEntry[1]->GetValueAsFloat(),
             this->PositionEntry[2]->GetValueAsFloat());
-    pvApp->BroadcastScript(acceptCmd);
+    pvApp->GetProcessModule()->ServerScript(acceptCmd);
     }
   
   this->SetLastAcceptedPosition(this->PositionEntry[0]->GetValueAsFloat(),
@@ -223,8 +224,8 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 
   ++instanceCount;
   sprintf(tclName, "pvPointWidget%d", instanceCount);
-  pvApp->BroadcastScript("vtkPointWidget %s", tclName);
-  pvApp->BroadcastScript("%s AllOff", tclName);
+  pvApp->GetProcessModule()->ServerScript("vtkPointWidget %s", tclName);
+  pvApp->GetProcessModule()->ServerScript("%s AllOff", tclName);
   this->SetWidget3DTclName(tclName);
 
   this->SetFrameLabel("Point Widget");
@@ -346,8 +347,8 @@ void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
   this->PositionEntry[2]->SetValue(z, 5);  
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                              this->Widget3DTclName, x, y, z);
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+      "%s SetPosition %f %f %f", this->Widget3DTclName, x, y, z);
     }
   this->Render();
 }
@@ -381,9 +382,8 @@ void vtkPVPointWidget::SetPosition()
     {
     val[cc] = atof(this->PositionEntry[cc]->GetValue());
     }
-  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                            this->Widget3DTclName, 
-                                            val[0], val[1], val[2]);
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+    "%s SetPosition %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }

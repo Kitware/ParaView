@@ -40,17 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSelectionList.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
+
+#include "vtkArrayMap.txx"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkArrayMap.txx"
+#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.34.4.1");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.34.4.2");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -213,10 +215,10 @@ void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // Command to update the UI.
-  pvApp->BroadcastScript("%s Set%s %d",
-                         sourceTclName,
-                         this->VariableName,
-                         this->CurrentValue); 
+  pvApp->GetProcessModule()->ServerScript("%s Set%s %d",
+                                          sourceTclName,
+                                          this->VariableName,
+                                          this->CurrentValue); 
 
   this->ModifiedFlag = 0;
   this->SetLastAcceptedValue(this->CurrentValue);

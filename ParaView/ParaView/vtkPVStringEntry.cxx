@@ -46,11 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.1");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -198,9 +199,9 @@ void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s Set%s {%s}",
-                         sourceTclName, this->VariableName,
-                         this->GetValue());
+  pvApp->GetProcessModule()->ServerScript("%s Set%s {%s}",
+                                          sourceTclName, this->VariableName,
+                                          this->GetValue());
 
   this->ModifiedFlag = 0;
   

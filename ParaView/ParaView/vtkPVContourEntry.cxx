@@ -51,12 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.1");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.2");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -382,13 +383,13 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 
   numContours = this->ContourValues->GetNumberOfContours();
 
-  pvApp->BroadcastScript("%s SetNumberOfContours %d",
-                         sourceTclName, numContours);
+  pvApp->GetProcessModule()->ServerScript("%s SetNumberOfContours %d",
+                                          sourceTclName, numContours);
   for (i = 0; i < numContours; i++)
     {
     value = this->ContourValues->GetValue(i);
-    pvApp->BroadcastScript("%s SetValue %d %f",
-                           sourceTclName, i, value);
+    pvApp->GetProcessModule()->ServerScript("%s SetValue %d %f",
+                                            sourceTclName, i, value);
     this->LastAcceptedContourValues->SetValue(i, value);
     }
   

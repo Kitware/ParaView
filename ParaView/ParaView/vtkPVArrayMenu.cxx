@@ -44,25 +44,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkPVData.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVApplication.h"
-#include "vtkPVInputMenu.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVFieldMenu.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.1");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.2");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -377,29 +377,29 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
 
   if (this->ArrayName)
     {
-    pvApp->BroadcastScript("%s Select%s%s {%s}", 
-                           sourceTclName,
-                           this->InputName,
-                           attributeName,
-                           this->ArrayName);
+    pvApp->GetProcessModule()->ServerScript("%s Select%s%s {%s}", 
+                                            sourceTclName,
+                                            this->InputName,
+                                            attributeName,
+                                            this->ArrayName);
     this->SetLastAcceptedArrayName(this->ArrayName);
     }
   else
     {
-    pvApp->BroadcastScript("%s Select%s%s {}", 
-                           sourceTclName,
-                           this->InputName,
-                           attributeName);
+    pvApp->GetProcessModule()->ServerScript("%s Select%s%s {}", 
+                                            sourceTclName,
+                                            this->InputName,
+                                            attributeName);
     this->SetLastAcceptedArrayName(NULL);
     }
 
   if (this->ShowComponentMenu)
     {
-    pvApp->BroadcastScript("%s Select%s%sComponent %d", 
-                           sourceTclName,
-                           this->InputName,
-                           attributeName,
-                           this->SelectedComponent);
+    pvApp->GetProcessModule()->ServerScript("%s Select%s%sComponent %d", 
+                                            sourceTclName,
+                                            this->InputName,
+                                            attributeName,
+                                            this->SelectedComponent);
     this->SetLastAcceptedComponent(this->SelectedComponent);
     }
 

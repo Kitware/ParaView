@@ -41,27 +41,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSelectCTHArrays.h"
 
-#include "vtkKWWidget.h"
-#include "vtkKWListBox.h"
-#include "vtkKWLabel.h"
 #include "vtkCollection.h"
-#include "vtkStringList.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWLabel.h"
+#include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
-#include "vtkPVInputMenu.h"
-#include "vtkKWCheckButton.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.1");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.2");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -212,8 +213,8 @@ void vtkPVSelectCTHArrays::AcceptInternal(const char* vtkSourceTclName)
     }
 
   // Start with no arrays selected.
-  pvApp->BroadcastScript("%s RemoveAllVolumeArrayNames",
-                         vtkSourceTclName);
+  pvApp->GetProcessModule()->ServerScript("%s RemoveAllVolumeArrayNames",
+                                          vtkSourceTclName);
 
 
   // Now loop through the input mask setting the selection states.
@@ -223,8 +224,8 @@ void vtkPVSelectCTHArrays::AcceptInternal(const char* vtkSourceTclName)
     if (state)
       {
       arrayName = this->ArraySelectionList->GetItem(idx);    
-      pvApp->BroadcastScript("%s AddVolumeArrayName {%s}",
-                           vtkSourceTclName, arrayName);
+      pvApp->GetProcessModule()->ServerScript("%s AddVolumeArrayName {%s}",
+                                              vtkSourceTclName, arrayName);
       }
     }
 
