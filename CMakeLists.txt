@@ -57,4 +57,10 @@ ELSE(UNIX)
                  ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk82.dll COPYONLY)
 ENDIF(UNIX)
 
+# Include the standard Dart testing module
+INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
 
+#
+# try to find the data files for VTKData
+#
+FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData ${VTK_SOURCE_DIR}/../../VTKData $ENV{VTK_DATA_ROOT})
