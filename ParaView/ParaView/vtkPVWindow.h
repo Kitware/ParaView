@@ -248,7 +248,6 @@ public:
   // Play the demo.
   void PlayDemo();
   void PlayDemo(int fromDashboard);
-  vtkSetMacro(InDemo, int);
 
   // Description:
   // Stuff for creating a log file for times.
