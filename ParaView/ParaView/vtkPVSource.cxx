@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.14");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.15");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -789,6 +789,14 @@ char* vtkPVSource::GetLabel()
 void vtkPVSource::SetLabel(const char* arg) 
 { 
   this->SetLabelNoTrace(arg);
+
+  // Update the nav window (that usually might display name + description)
+  vtkPVSource* current = this->GetPVWindow()->GetCurrentPVSource();
+  if (this->GetPVRenderView() && current)
+    {
+    this->GetPVRenderView()->UpdateNavigationWindow(
+      current, current->SourceGrabbed);
+    }
   // Trace here, not in SetLabel (design choice)
   this->GetPVApplication()->AddTraceEntry("$kw(%s) SetLabel {%s}",
                                           this->GetTclName(),
@@ -824,11 +832,6 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
   // Make sure the description frame is upto date.
   this->UpdateDescriptionFrame();
 
-  // Update the nav window (that usually might display name + description)
-  if (this->GetPVRenderView())
-    {
-    this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
-    }
 } 
 
 //----------------------------------------------------------------------------
@@ -2127,7 +2130,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.14 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.15 $");
 }
 
 //----------------------------------------------------------------------------
