@@ -180,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.90");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.91");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -924,42 +924,28 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       this->ControlledWidget->Reset();
       }
     
-    vtkCollectionIterator* it = this->AnimationEntriesIterator;
-    for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
-      {
-      vtkPVAnimationInterfaceEntry* entry
-        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
-      vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
-      if (prop)
-        {
-        this->Script(entry->GetTimeEquation());
-        prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
-        prop->GetWidget()->ModifiedCallback();
-        }
-      if ( entry->GetPVSource() )
-        {
-        entry->GetPVSource()->UpdateVTKSourceParameters();
-        }
-      }
-    
     // Generate the cache, or use previous cache.
     if (this->GetCacheGeometry())
       {
       this->Window->CacheUpdate(time, this->NumberOfFrames);
-      if (this->View)
-        {
-        this->View->EventuallyRender();
-        }
       }
     else
       {
+      vtkCollectionIterator* it = this->AnimationEntriesIterator;
       for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
         vtkPVAnimationInterfaceEntry* entry
           = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        if (prop)
+          {
+          this->Script(entry->GetTimeEquation());
+          prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
+          prop->GetWidget()->ModifiedCallback();
+          }
         if ( entry->GetPVSource() )
           {
-          entry->GetPVSource()->Accept();
+          entry->GetPVSource()->AcceptCallback();
           }
         }
       }

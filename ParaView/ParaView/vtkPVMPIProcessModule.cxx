@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.17");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.18");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -331,9 +331,7 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
     }
   o = NULL;
   
-  int rootOnly = tmpInfo->GetRootOnly();
-  
-  if (myId != 0 && !rootOnly)
+  if (myId != 0 && !tmpInfo->GetRootOnly())
     {
     tmpInfo->CopyFromObject(object);
     msgLength = tmpInfo->GetMessageLength();
@@ -352,7 +350,7 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
   this->TemporaryInformation->CopyFromObject(object);
-  if (!rootOnly)
+  if (!tmpInfo->GetRootOnly())
     {
     for (idx = 1; idx < numProcs; ++idx)
       {

@@ -52,12 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.41");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.42");
 
 //===========================================================================
 //***************************************************************************
@@ -177,6 +178,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->Widget3D = vtk3DWidget::SafeDownCast(pvApp->TclToVTKObject(this->Widget3DTclName));
 
+  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
+  
   // Only initialize observers on the UI process.
   if (this->Widget3DTclName)
     {
@@ -268,6 +271,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     this->PlaceWidget();
     }
 
+  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
   pvApp->BroadcastScript(
     "%s SetEnabled %d", this->Widget3DTclName, visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
@@ -281,6 +285,7 @@ void vtkPV3DWidget::Select()
 {
   if ( this->Visible )
     {
+    this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
     this->SetVisibilityNoTrace(1);
     }
 }

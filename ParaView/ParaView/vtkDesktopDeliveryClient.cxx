@@ -29,7 +29,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.5");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.6");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -218,7 +218,7 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
       else
         {
         this->ReadReducedImage();
-        //this->SetRenderWindowPixelData(this->ReducedImage, this->ReducedImageSize);
+        this->SetRenderWindowPixelData(this->ReducedImage, this->ReducedImageSize);
         }
       this->RenderWindowImageUpToDate = true;
       }

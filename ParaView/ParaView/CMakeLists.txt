@@ -31,6 +31,8 @@ SET( ParaView_SRCS
   vtkPVClientServerModule.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
+  vtkPVAxesActor.cxx
+  vtkPVAxesWidget.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositePartDisplay.cxx
   vtkPVCompositeRenderModule.cxx

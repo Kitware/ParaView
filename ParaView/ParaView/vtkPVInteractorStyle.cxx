@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.5");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.6");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -124,13 +124,15 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     }
 
   // Get the renderer.
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                          this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
+  if (!this->CurrentRenderer)
     {
-    return;
+    this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
+                            this->Interactor->GetEventPosition()[1]);
+    if (this->CurrentRenderer == NULL)
+      {
+      return;
+      }
     }
-  
 
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
@@ -192,9 +194,12 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMouseMove()
 {
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                          this->Interactor->GetEventPosition()[1]);
-
+  if (!this->CurrentRenderer)
+    {
+    this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
+                            this->Interactor->GetEventPosition()[1]);
+    }
+  
   if (this->Current)
     {
     this->Current->OnMouseMove(this->Interactor->GetEventPosition()[0],

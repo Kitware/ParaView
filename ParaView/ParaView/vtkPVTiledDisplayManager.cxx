@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.11");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.12");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -1071,7 +1071,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
     lc->InitTraversal();
     light = lc->GetNextItem();
 
-    // Setup tile independant stuff
+    // Setup tile independent stuff
     cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TileDimensions[0])) * 360.0 / 3.1415926);
     cam->SetPosition(renInfo.CameraPosition);
     cam->SetFocalPoint(renInfo.CameraFocalPoint);

@@ -25,25 +25,33 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
+#include "vtkCompressCompositer.h"
+#include "vtkFloatArray.h"
+#include "vtkImageActor.h"
+#include "vtkImageData.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkMultiProcessController.h"
-#include "vtkSocketController.h"
-#include "vtkCompressCompositer.h"
-#include "vtkTreeCompositer.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
+#include "vtkPointData.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkToolkits.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
-#include "vtkUnsignedCharArray.h"
+#include "vtkRenderWindow.h"
+#include "vtkSocketController.h"
 #include "vtkTimerLog.h"
+#include "vtkToolkits.h"
+#include "vtkTreeCompositer.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedCharArray.h"
 // Until we trigger LOD from AllocatedRenderTime ...
 #include "vtkPVApplication.h"
 #include "vtkByteSwap.h"
 
+#include "vtkOutlineFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkBMPWriter.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -52,7 +60,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.20");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.21");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -137,6 +145,9 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->BaseArray = NULL;
 
   this->UseCompositing = 0;
+  
+  this->RenWin = vtkRenderWindow::New();
+  this->CompositeData = vtkImageData::New();
 }
 
   
@@ -190,6 +201,9 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     {
     this->BaseArray->Delete();
     }
+  
+  this->RenWin->Delete();
+  this->CompositeData->Delete();
 }
 
 
@@ -342,6 +356,7 @@ void vtkClientCompositeManager::StartRender()
   if ( ! this->UseCompositing)
     {
     this->RenderWindow->EraseOn();
+    this->RenderWindow->Render();
     return;
     }
 
@@ -399,8 +414,9 @@ void vtkClientCompositeManager::StartRender()
   // Note: This will lockup unless every process has the same number
   // of renderers.
   rens->InitTraversal();
-  while ( (ren = rens->GetNextItem()) )
-    {
+  ren = rens->GetNextItem();
+//  while ( (ren = rens->GetNextItem()) )
+//    {
     cam = ren->GetActiveCamera();
     lc = ren->GetLights();
     lc->InitTraversal();
@@ -431,12 +447,17 @@ void vtkClientCompositeManager::StartRender()
     // Let the socket controller deal with byte swapping.
     controller->Send((float*)(&renInfo), 22, 1,
                      vtkCompositeManager::REN_INFO_TAG);
-    }
+//    }
   
   if (this->Tiled == 0)
     {
     this->ReceiveAndSetColorBuffer();
-    this->RenderWindow->EraseOff();
+//    this->RenderWindow->EraseOff();
+    this->EndRender();
+    cam->SetPosition(renInfo.CameraPosition);
+    cam->SetFocalPoint(renInfo.CameraFocalPoint);
+    cam->SetViewUp(renInfo.CameraViewUp);
+    ren->InvokeEvent(vtkCommand::StartEvent, NULL);
     }
 }
 
@@ -495,6 +516,8 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     // We have to set the color buffer as an even multiple of factor.
     }
    
+  this->CompositeData->Initialize();
+  
   // Set the color buffer
   if (this->UseChar) 
     {
@@ -510,42 +533,93 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     if (this->PData->GetNumberOfComponents() == 4)
       {
       vtkTimerLog::MarkStartEvent("Set RGBA Char Buffer");
-      this->RenderWindow->SetRGBACharPixelData(0, 0, 
-                            this->MagnifiedPDataSize[0]-1, 
-                            this->MagnifiedPDataSize[1]-1, buf, 0);
+//      this->RenderWindow->SetRGBACharPixelData(0, 0, 
+//                            this->MagnifiedPDataSize[0]-1, 
+//                            this->MagnifiedPDataSize[1]-1, buf, 0);
       vtkTimerLog::MarkEndEvent("Set RGBA Char Buffer");
       }
     else if (this->PData->GetNumberOfComponents() == 3)
       {
       vtkTimerLog::MarkStartEvent("Set RGB Char Buffer");
-      this->RenderWindow->SetPixelData(0, 0, 
-                            this->MagnifiedPDataSize[0]-1, 
-                            this->MagnifiedPDataSize[1]-1, buf, 0);
+//      this->RenderWindow->SetPixelData(0, 0, 
+//                            this->MagnifiedPDataSize[0]-1, 
+//                            this->MagnifiedPDataSize[1]-1, buf, 0);
       vtkTimerLog::MarkEndEvent("Set RGB Char Buffer");
       }
-    } 
+    this->CompositeData->GetPointData()->SetScalars(buf);
+    this->CompositeData->SetScalarType(VTK_UNSIGNED_CHAR);
+    this->CompositeData->SetNumberOfScalarComponents(buf->GetNumberOfComponents());
+    }
   else 
     {
     if (this->InternalReductionFactor)
       {
       vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
-      this->RenderWindow->SetRGBAPixelData(0, 0, 
-                     this->MagnifiedPDataSize[0]-1, 
-                     this->MagnifiedPDataSize[1]-1,
-                     static_cast<vtkFloatArray*>(this->MagnifiedPData), 
-                     0);
+//      this->RenderWindow->SetRGBAPixelData(0, 0, 
+//                     this->MagnifiedPDataSize[0]-1, 
+//                     this->MagnifiedPDataSize[1]-1,
+//                     static_cast<vtkFloatArray*>(this->MagnifiedPData), 
+//                     0);
       vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+      this->CompositeData->SetNumberOfScalarComponents(
+        this->MagnifiedPData->GetNumberOfComponents());
       }
     else
       {
       vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
-      this->RenderWindow->SetRGBAPixelData(
-                   0, 0, this->MagnifiedPDataSize[0]-1, 
-                   this->MagnifiedPDataSize[1]-1,
-                   static_cast<vtkFloatArray*>(this->PData), 0);
+//      this->RenderWindow->SetRGBAPixelData(
+//                   0, 0, this->MagnifiedPDataSize[0]-1, 
+//                   this->MagnifiedPDataSize[1]-1,
+//                   static_cast<vtkFloatArray*>(this->PData), 0);
       vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+      this->CompositeData->SetNumberOfScalarComponents(
+        this->PData->GetNumberOfComponents());
       }
+    this->CompositeData->GetPointData()->SetScalars(this->PData);
+    this->CompositeData->SetScalarType(VTK_FLOAT);
     }
+  this->CompositeData->SetDimensions(this->MagnifiedPDataSize[0],
+                                     this->MagnifiedPDataSize[1], 1);
+}
+
+void vtkClientCompositeManager::EndRender()
+{
+  if (this->CompositeData->GetScalarType() != VTK_UNSIGNED_CHAR)
+    {
+    return;
+    }
+
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  vtkRenderer *firstRen =
+    static_cast<vtkRenderer*>(renderers->GetItemAsObject(0));
+  
+  vtkRenderer *ren = vtkRenderer::New();
+  ren->SetRenderWindow(this->RenderWindow);
+  ren->SetLayer(1);
+  renderers->ReplaceItem(0, ren);
+  
+  vtkImageActor *imageActor = vtkImageActor::New();
+  imageActor->SetInput(this->CompositeData);
+  imageActor->SetDisplayExtent(0, this->MagnifiedPDataSize[0]-1,
+                               0, this->MagnifiedPDataSize[1]-1, 0, 0);
+  
+  ren->AddProp(imageActor);
+
+  vtkCamera *cam = ren->GetActiveCamera();
+  cam->ParallelProjectionOn();
+  cam->SetParallelScale(
+    (this->MagnifiedPDataSize[1]-1)*0.5);
+  ren->ResetCameraClippingRange();
+
+  ren->SetBackground(firstRen->GetBackground());
+
+  this->RenderWindow->Render();
+  
+  renderers->ReplaceItem(0, firstRen);
+  
+  ren->RemoveProp(imageActor);  
+  imageActor->Delete();
+  ren->Delete();
 }
 
 
@@ -846,7 +920,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
   rens = renWin->GetRenderers();
   rens->InitTraversal();
   // This is misleading.  We do not support multiple renderers.
-  for (renIdx = 0; renIdx < winInfo.NumberOfRenderers; ++renIdx)
+//  for (renIdx = 0; renIdx < winInfo.NumberOfRenderers; ++renIdx)
+  for (renIdx = 0; renIdx < 1; ++renIdx) // only consider 1st renderer
     {
     // Receive the camera information.
 
@@ -1063,7 +1138,7 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
     // Remove all of the observers.
     if (this->ClientFlag)
       {
-      this->RenderWindow->RemoveObserver(this->StartTag);
+//      this->RenderWindow->RemoveObserver(this->StartTag);
       // Will make do with first renderer. (Assumes renderer does not change.)
       rens = this->RenderWindow->GetRenderers();
       rens->InitTraversal();
@@ -1085,7 +1160,7 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       cbc->SetCallback(vtkClientCompositeManagerStartRender);
       cbc->SetClientData((void*)this);
       // renWin will delete the cbc when the observer is removed.
-      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
+//      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
       cbc->Delete();
 
       // Will make do with first renderer. (Assumes renderer does

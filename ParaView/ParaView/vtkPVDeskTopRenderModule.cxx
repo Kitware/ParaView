@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.3");
 
 
 
@@ -152,7 +152,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
 
   // **********************************************************
-  this->SetCompositeTclName("CCompositeManager1");
+  this->SetCompositeTclName("DesktopDelivery1");
   pm->Script("vtkDesktopDeliveryClient %s", this->CompositeTclName);
   pm->RootScript("vtkDesktopDeliveryServer %s", this->CompositeTclName);
   // Clean up this mess !!!!!!!!!!!!!

@@ -41,7 +41,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.6");
+vtkCxxRevisionMacro(vtkCTHData, "1.7");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -1294,7 +1294,6 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TopLevelOrigin: (" << this->TopLevelOrigin[0] << ", "
                                   << this->TopLevelOrigin[1] << ", "
                                   << this->TopLevelOrigin[2] << ")\n";
-  os << indent << "NumberOfGhostLevels: " << this->NumberOfGhostLevels << endl;
 
   os << indent << "NumberOfBlocks: "  << numBlocks << endl;
   for (idx = 0; idx < numBlocks; ++idx)
@@ -1312,6 +1311,8 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
     os << "\tCellExt: (" << e[0] << ", " << e[1] << ", " << e[2]
        << e[3] << ", " << e[4] << ", " << e[5] << ")\n";
     }
+  os << indent << "NumberOfGhostLevels: " << this->NumberOfGhostLevels
+     << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
@@ -77,6 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -92,6 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkTreeComposite.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVArrayInformation.h"
@@ -101,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.224");
+vtkCxxRevisionMacro(vtkPVData, "1.225");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -120,9 +123,12 @@ vtkPVData::vtkPVData()
   this->PropertiesParent = NULL; 
 
   this->CubeAxesTclName = NULL;
+
+  this->AxesWidgetTclName = NULL;
+
   this->PointLabelMapperTclName = NULL;
   this->PointLabelActorTclName = NULL;
-
+  
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
@@ -170,7 +176,8 @@ vtkPVData::vtkPVData()
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
   this->PointLabelCheck = vtkKWCheckButton::New();
-
+  this->AxesWidgetCheck = vtkKWCheckButton::New();
+  
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
 
@@ -306,7 +313,7 @@ vtkPVData::~vtkPVData()
     {
     if ( pvApp )
       {
-      pvApp->Script("%s Delete", this->CubeAxesTclName);
+      pvApp->GetProcessModule()->RootScript("%s Delete", this->CubeAxesTclName);
       }
     this->SetCubeAxesTclName(NULL);
     }
@@ -319,8 +326,20 @@ vtkPVData::~vtkPVData()
     this->PointLabelCheck = NULL;
     }
  
+  if (this->AxesWidgetTclName)
+    {
+    if (pvApp)
+      {
+      this->Script("%s Delete", this->AxesWidgetTclName);
+      }
+    this->SetAxesWidgetTclName(NULL);
+    }
+  
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
+
+  this->AxesWidgetCheck->Delete();
+  this->AxesWidgetCheck = NULL;
   
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
@@ -436,6 +455,7 @@ void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
   this->SetPointLabelVisibility(0);
+  this->SetAxesWidgetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -542,6 +562,12 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
+  this->AxesWidgetCheck->SetParent(this->ViewFrame->GetFrame());
+  this->AxesWidgetCheck->Create(this->Application, "-text \"Orientation Axes\"");
+  this->AxesWidgetCheck->SetCommand(this, "AxesWidgetCheckCallback");
+  this->AxesWidgetCheck->SetBalloonHelpString(
+    "Toggle the visibility of the orientation axes.");
+  
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
@@ -562,6 +588,10 @@ void vtkPVData::CreateProperties()
 
   this->Script("grid %s -sticky wns",
                this->ScalarBarCheck->GetWidgetName());
+  
+  this->Script("grid %s -sticky wns",
+               this->AxesWidgetCheck->GetWidgetName());
+  
 
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
@@ -1205,9 +1235,9 @@ void vtkPVData::UpdatePropertiesInternal()
   this->BoundsDisplay->SetBounds(bounds);
   if (this->CubeAxesTclName)
     {  
-    this->Script("%s SetBounds %f %f %f %f %f %f",
-                 this->CubeAxesTclName, bounds[0], bounds[1], bounds[2],
-                 bounds[3], bounds[4], bounds[5]);
+    this->GetPVApplication()->GetProcessModule()->RootScript(
+      "%s SetBounds %f %f %f %f %f %f", this->CubeAxesTclName,
+      bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
     }
 
   currentColorBy = this->ColorMenu->GetValue();
@@ -1965,18 +1995,25 @@ void vtkPVData::Initialize()
   
   sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
   this->SetCubeAxesTclName(newTclName);
-  this->Script("vtkCubeAxesActor2D %s", this->GetCubeAxesTclName());
-  this->Script("%s SetFlyModeToOuterEdges", this->GetCubeAxesTclName());
-  this->Script("[%s GetProperty] SetColor 1 1 1",
-               this->GetCubeAxesTclName());
+  pvApp->GetProcessModule()->RootScript("vtkCubeAxesActor2D %s", this->GetCubeAxesTclName());
+  pvApp->GetProcessModule()->RootScript("%s SetFlyModeToOuterEdges", this->GetCubeAxesTclName());
+  pvApp->GetProcessModule()->RootScript("[%s GetProperty] SetColor 1 1 1",
+                                        this->GetCubeAxesTclName());
   
-  this->Script("%s SetBounds %f %f %f %f %f %f",
-               this->GetCubeAxesTclName(), bounds[0], bounds[1], bounds[2],
-               bounds[3], bounds[4], bounds[5]);
-  this->Script("%s SetCamera [%s GetActiveCamera]",
-               this->GetCubeAxesTclName(), tclName);
-  this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
+  pvApp->GetProcessModule()->RootScript(
+    "%s SetBounds %f %f %f %f %f %f", this->GetCubeAxesTclName(),
+    bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
+  pvApp->GetProcessModule()->RootScript("%s SetCamera [%s GetActiveCamera]",
+                                        this->GetCubeAxesTclName(), tclName);
+  pvApp->GetProcessModule()->RootScript("%s SetInertia 20", this->GetCubeAxesTclName());
   
+  sprintf(newTclName, "AxesWidget%d", this->InstanceCount);
+  this->SetAxesWidgetTclName(newTclName);
+  this->Script("vtkPVAxesWidget %s", this->AxesWidgetTclName);
+  this->Script("%s SetParentRenderer %s", this->AxesWidgetTclName, tclName);
+  this->Script("%s SetInteractor %s",
+               this->AxesWidgetTclName,
+               pvApp->GetMainWindow()->GetInteractorTclName());
   // Choose the representation based on the data.
   // Polydata is always surface.
   // Structured data is surface when 2d, outline when 3d.
@@ -2065,6 +2102,7 @@ void vtkPVData::SetVisibility(int v)
     {
     this->SetPointLabelVisibility(v);
     }
+  this->GetPVApplication()->GetProcessModule()->RootScript("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
 }
 
 //----------------------------------------------------------------------------
@@ -2147,11 +2185,11 @@ void vtkPVData::SetCubeAxesVisibility(int val)
     {
     if (val)
       {
-      this->Script("%s AddProp %s", tclName, this->GetCubeAxesTclName());
+      this->GetPVApplication()->GetProcessModule()->RootScript("%s AddProp %s", tclName, this->GetCubeAxesTclName());
       }
     else
       {
-      this->Script("%s RemoveProp %s", tclName, this->GetCubeAxesTclName());
+      this->GetPVApplication()->GetProcessModule()->RootScript("%s RemoveProp %s", tclName, this->GetCubeAxesTclName());
       }
     }
 }
@@ -2165,6 +2203,18 @@ void vtkPVData::SetPointLabelVisibility(int val)
     this->AddTraceEntry("$kw(%s) this->SetPointLabelVisibility %d", 
       this->GetTclName(), val);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetAxesWidgetVisibility(int state)
+{
+  if (this->AxesWidgetCheck->GetState() != state)
+    {
+    this->AddTraceEntry("$kw(%s) SetAxesVisibility %d", this->GetTclName(),
+                        state);
+    this->AxesWidgetCheck->SetState(state);
+    }
+  this->Script("%s SetEnabled %d", this->AxesWidgetTclName, state);
 }
 
 //----------------------------------------------------------------------------
@@ -2214,6 +2264,18 @@ void vtkPVData::PointLabelCheckCallback()
       {
       this->GetPVRenderView()->EventuallyRender();
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::AxesWidgetCheckCallback()
+{
+  this->AddTraceEntry("$kw(%s) SetAxesWidgetVisibility %d", this->GetTclName(),
+                      this->AxesWidgetCheck->GetState());
+  this->SetAxesWidgetVisibility(this->AxesWidgetCheck->GetState());
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -2378,7 +2440,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
 {
   float range[2];
   const char* scalarMode;
-  char* result;
+  const char* result;
   char* renTclName;
   vtkPVPart *part;
   int partIdx, numParts;
@@ -2414,9 +2476,11 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           vtkErrorMacro("We ran out of sources.");
           return;
           }
-        pm->RootScript("%s GetNumberOfOutputs",
-                       this->GetPVSource()->GetVTKSourceTclName(sourceCount));
-        numOutputs = atoi(pm->GetRootResult());
+        vtkPVSource *source = this->GetPVSource();
+        pm->GatherInformation(source->GetNumberOfOutputsInformation(),
+                              (char*)(source->GetVTKSourceTclName(sourceCount)));
+        numOutputs =
+          source->GetNumberOfOutputsInformation()->GetNumberOfOutputs();
         outputCount = 0;
         }
 
@@ -2510,8 +2574,8 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << this->CubeAxesTclName << " SetFlyModeToOuterEdges\n\t"
           << "[" << this->CubeAxesTclName << " GetProperty] SetColor 1 1 1\n\t"
           << this->CubeAxesTclName << " SetBounds ";
-    this->Script("set tempResult [%s GetBounds]", this->CubeAxesTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
+    this->GetPVApplication()->GetProcessModule()->RootScript("set tempResult [%s GetBounds]", this->CubeAxesTclName);
+    result = this->GetPVApplication()->GetProcessModule()->GetRootResult();
     *file << result << "\n\t"
           << this->CubeAxesTclName << " SetCamera [";
     *file << renTclName << " GetActiveCamera]\n\t"
@@ -2585,7 +2649,6 @@ void vtkPVData::SaveState(ofstream *file)
     {
     *file << "$kw(" << this->GetTclName() << ") SetLineWidth " << i1 << endl;
     }
- 
 
   f1 = this->OpacityScale->GetValue();
   if (f1 != 1.0)
@@ -2639,6 +2702,9 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
+  os << indent << "AxesWidgetTclName: " << (this->AxesWidgetTclName ?
+                                            this->AxesWidgetTclName : "(none)")
+     << endl;
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   if (this->PVColorMap)
@@ -2652,10 +2718,10 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
+  os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
-
 }
 
 //----------------------------------------------------------------------------
