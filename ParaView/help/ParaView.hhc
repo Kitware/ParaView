@@ -56,8 +56,8 @@
       <param name="Local" value="Filters\Filters_Introduction.htm">
     </object>
     <li><object type="text/sitemap">
-      <param name="Name" value="Isosurface (Contour)">
-      <param name="Local" value="Filters\Isosurface_(Contour).htm">
+      <param name="Name" value="Isosurface Contour">
+      <param name="Local" value="Filters\Isosurface_Contour.htm">
     </object>
     <li><object type="text/sitemap">
       <param name="Name" value="Calculator">

@@ -22,7 +22,7 @@ NewWindow="New Window Caption","ParaView.hhc","ParaView.hhk","","",,,,,0x420,0,0
 Filters\Glyph.htm
 Filters\Threshold.htm
 Filters\Calculator.htm
-Filters\Isosurface_(Contour).htm
+Filters\Isosurface_Contour.htm
 Loading_Data\Loading_Data.htm
 Getting_Started\Compiling\Win32.htm
 Getting_Started\Compiling\Linux_Unix.htm
