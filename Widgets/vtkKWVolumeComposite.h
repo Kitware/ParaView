@@ -66,6 +66,8 @@ public:
   vtkGetMacro( LowResTextureID, int );
   vtkGetMacro( MedResTextureID, int );
   vtkGetMacro( HiResTextureID, int );
+  vtkGetMacro( VolumeProID, int );
+  vtkGetMacro( LowResVolumeProID, int );
 
   vtkGetObjectMacro( HiResTextureMapper, vtkVolumeTextureMapper2D );
   vtkGetObjectMacro( MedResTextureMapper, vtkVolumeTextureMapper2D );
@@ -94,15 +96,18 @@ protected:
 
   vtkImageResample                     *LowResResampler;
   vtkImageResample                     *MedResResampler;
-
+  vtkImageResample                     *VProResampler;
+  
   vtkVolumeTextureMapper2D             *LowResTextureMapper;
   vtkVolumeTextureMapper2D             *MedResTextureMapper;
   vtkVolumeTextureMapper2D             *HiResTextureMapper;
   
   float                                LowResMagnification[3];
   float                                MedResMagnification[3];
-
+  float                                VProMagnification[3];
+  
   vtkVolumeProMapper                   *VolumeProMapper;
+  vtkVolumeProMapper                   *LowResVolumeProMapper;
   int                                  UsingVolumeProMapper;
 
   int                                  RayCastID;
@@ -110,6 +115,7 @@ protected:
   int                                  MedResTextureID;
   int                                  HiResTextureID;
   int                                  VolumeProID;
+  int                                  LowResVolumeProID;
 };
 
 

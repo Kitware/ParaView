@@ -82,7 +82,9 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->LowResResampler       = vtkImageResample::New();
   this->MedResResampler       = vtkImageResample::New();
   this->VolumeProMapper       = vtkVolumeProMapper::New();
-
+  this->LowResVolumeProMapper = vtkVolumeProMapper::New();
+  this->VProResampler         = vtkImageResample::New();
+  
 
   gradientEstimator = vtkFiniteDifferenceGradientEstimator::New();
   directionEncoder  = vtkRecursiveSphereDirectionEncoder::New();
@@ -92,10 +94,6 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->RayCastMapper->SetGradientEstimator( gradientEstimator );
   this->HiResTextureMapper->SetGradientEstimator( gradientEstimator );
 
-//  this->LowResTextureMapper->SetMaximumNumberOfPlanes(128);
-//  this->MedResTextureMapper->SetMaximumNumberOfPlanes(128);
-//  this->HiResTextureMapper->SetMaximumNumberOfPlanes(128);
-  
   gradientEstimator->Delete();
   directionEncoder->Delete();
 
@@ -116,9 +114,10 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
     this->LODVolume->AddLOD( this->RayCastMapper,
 			     this->VolumeProperty, 11.0 );
 
-  this->LowResTextureID = -1;
-  this->MedResTextureID = -1;
-
+  this->LowResTextureID   = -1;
+  this->MedResTextureID   = -1;
+  this->LowResVolumeProID = -1;
+  
   this->LowResMagnification[0] = 1.0;
   this->LowResMagnification[1] = 1.0;
   this->LowResMagnification[2] = 1.0;
@@ -127,6 +126,10 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->MedResMagnification[1] = 1.0;
   this->MedResMagnification[2] = 1.0;
 
+  this->VProMagnification[0] = 1.0;
+  this->VProMagnification[1] = 1.0;
+  this->VProMagnification[2] = 1.0;
+  
   vtkPiecewiseFunction *pwf = vtkPiecewiseFunction::New();
   pwf->AddPoint(0,0.0);
   this->VolumeProperty->SetScalarOpacity(pwf);
@@ -147,10 +150,12 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
 
   if ( this->VolumeProMapper->GetNumberOfBoards() > 0 )
     {
-    this->LODVolume->SetLODMapper( this->RayCastID, this->VolumeProMapper );
+    this->VolumeProID = 
+      this->LODVolume->AddLOD( this->VolumeProMapper,
+                               this->VolumeProperty, 1.0 );
     this->UsingVolumeProMapper = 1;
     this->LODVolume->AutomaticLODSelectionOff();
-    this->LODVolume->SetSelectedLODID( this->RayCastID );
+    this->LODVolume->SetSelectedLODID( this->VolumeProID );
     }
   else
     {
@@ -220,161 +225,202 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   
   input->GetDimensions( size );
 
-  // if there is an opportunity for a 1/16th size volume then do it
-  // we find the target volume size and then reduce it
-  int subSize[3];
-  int i;
-  for (i = 0; i < 3; i++)
+  if ( this->UsingVolumeProMapper )
     {
-    subSize[i] = 2;
-    while (subSize[i] < size[i])
+    int subSize[3];
+    int i;
+    for ( i = 0; i < 3; i++ )
       {
-      subSize[i] = subSize[i] * 2;
+      subSize[i] = (size[i]>256)?(256):(size[i]);
+      }
+    
+    if ( size[0] != subSize[0] ||
+         size[1] != subSize[1] ||
+         size[2] != subSize[2] )
+      {
+      this->VProMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
+      this->VProMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
+      this->VProMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
+      this->VProResampler->SetInput(input);
+      this->VProResampler->InterpolateOff();
+      this->VProResampler->
+        SetAxisMagnificationFactor( 0, this->VProMagnification[0] );
+      this->VProResampler->
+        SetAxisMagnificationFactor( 1, this->VProMagnification[1] );
+      this->VProResampler->
+        SetAxisMagnificationFactor( 2, this->VProMagnification[2] );
+      this->VProResampler->Update();
+      this->LowResVolumeProMapper->SetInput( this->VProResampler->GetOutput() );  
+      if ( this->GetView() )
+        {
+        this->GetView()->GetWindow()->GetProgressGauge()->SetValue(70);
+        }
+      
+      this->LowResVolumeProID = 
+        this->LODVolume->AddLOD( this->LowResVolumeProMapper,
+                                 this->VolumeProperty, 0.0 );
       }
     }
-  float ratio = 1.0;
-  float numVoxels = subSize[0]*subSize[1]*subSize[2];
-  float numTVoxels = numVoxels;
-  while ((ratio > 1/16.1 || numVoxels > 66000.0) && 
-         subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
+  else
     {
-    // find the largest axis and divide it by 2
-    if (subSize[0] > subSize[1])
+    // if there is an opportunity for a 1/16th size volume then do it
+    // we find the target volume size and then reduce it
+    int subSize[3];
+    int i;
+    for (i = 0; i < 3; i++)
       {
-      if (subSize[0] > subSize[2])
+      subSize[i] = 2;
+      while (subSize[i] < size[i])
         {
-        subSize[0] = subSize[0] / 2;
+        subSize[i] = subSize[i] * 2;
+        }
+      }
+    float ratio = 1.0;
+    float numVoxels = subSize[0]*subSize[1]*subSize[2];
+    float numTVoxels = numVoxels;
+    while ((ratio > 1/16.1 || numVoxels > 66000.0) && 
+           subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
+      {
+      // find the largest axis and divide it by 2
+      if (subSize[0] > subSize[1])
+        {
+        if (subSize[0] > subSize[2])
+          {
+          subSize[0] = subSize[0] / 2;
+          }
+        else
+          {
+          subSize[2] = subSize[2] / 2;
+          }
         }
       else
         {
-        subSize[2] = subSize[2] / 2;
+        if (subSize[1] > subSize[2])
+          {
+          subSize[1] = subSize[1] / 2;
+          }
+        else
+          {
+          subSize[2] = subSize[2] / 2;
+          }
         }
+      numVoxels = subSize[0]*subSize[1]*subSize[2];
+      ratio = numVoxels / numTVoxels;
       }
-    else
+    // now we have a new volume at least 1 16th as small as the original, 
+    // the question is, is it large enough to bother with?
+    if (numVoxels > 32000)
       {
-      if (subSize[1] > subSize[2])
-        {
-        subSize[1] = subSize[1] / 2;
-        }
-      else
-        {
-        subSize[2] = subSize[2] / 2;
-        }
-      }
-    numVoxels = subSize[0]*subSize[1]*subSize[2];
-    ratio = numVoxels / numTVoxels;
-    }
-  // now we have a new volume at least 1 16th as small as the original, 
-  // the question is, is it large enough to bother with?
-  if (numVoxels > 32000)
-    {
-    this->LowResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
-    this->LowResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
-    this->LowResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
-    this->LowResResampler->SetInput(input);
-    this->LowResResampler->InterpolateOff();
-    this->LowResResampler->
-      SetAxisMagnificationFactor( 0, this->LowResMagnification[0] );
-    this->LowResResampler->
+      this->LowResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
+      this->LowResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
+      this->LowResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
+      this->LowResResampler->SetInput(input);
+      this->LowResResampler->InterpolateOff();
+      this->LowResResampler->
+        SetAxisMagnificationFactor( 0, this->LowResMagnification[0] );
+      this->LowResResampler->
       SetAxisMagnificationFactor( 1, this->LowResMagnification[1] );
-    this->LowResResampler->
-      SetAxisMagnificationFactor( 2, this->LowResMagnification[2] );
-    this->LowResResampler->Update();
-    this->LowResTextureMapper->SetInput( this->LowResResampler->GetOutput() );
-    
-    this->LowResTextureMapper->GetGradientEstimator()->ZeroPadOff();
-    this->LowResTextureMapper->GetGradientEstimator()->
-      SetInput( this->LowResResampler->GetOutput() );
-    this->LowResTextureMapper->GetGradientEstimator()->
-      SetGradientMagnitudeScale(scale);
-    this->LowResTextureMapper->GetGradientEstimator()->Update();
-    
-    if ( this->GetView() )
-      {
-      this->GetView()->GetWindow()->GetProgressGauge()->SetValue(70);
-      }
-    
-    this->LowResTextureID = 
-      this->LODVolume->AddLOD( this->LowResTextureMapper,
-			       this->VolumeProperty, 0.0 );
+      this->LowResResampler->
+        SetAxisMagnificationFactor( 2, this->LowResMagnification[2] );
+      this->LowResResampler->Update();
+      this->LowResTextureMapper->SetInput( this->LowResResampler->GetOutput() );
+      
+      this->LowResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+      this->LowResTextureMapper->GetGradientEstimator()->
+        SetInput( this->LowResResampler->GetOutput() );
+      this->LowResTextureMapper->GetGradientEstimator()->
+        SetGradientMagnitudeScale(scale);
+      this->LowResTextureMapper->GetGradientEstimator()->Update();
+      
+      if ( this->GetView() )
+        {
+        this->GetView()->GetWindow()->GetProgressGauge()->SetValue(70);
+        }
+      
+      this->LowResTextureID = 
+        this->LODVolume->AddLOD( this->LowResTextureMapper,
+                                 this->VolumeProperty, 0.0 );
     }
-
-  // if there is an opportunity for a 1/4th size volume then do it
-  // we find the target volume size and then reduce it
-  for (i = 0; i < 3; i++)
-    {
-    subSize[i] = 2;
-    while (subSize[i] < size[i])
+    
+    // if there is an opportunity for a 1/4th size volume then do it
+    // we find the target volume size and then reduce it
+    for (i = 0; i < 3; i++)
       {
-      subSize[i] = subSize[i] * 2;
-      }
-    }
-  ratio = 1.0;
-  numVoxels = subSize[0]*subSize[1]*subSize[2];
-  numTVoxels = numVoxels;
-  while ((ratio > 1/4.01 || numVoxels > 263000.0 ) && 
-         subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
-    {
-    // find the largest axis and divide it by 2
-    if (subSize[0] > subSize[1])
-      {
-      if (subSize[0] > subSize[2])
+      subSize[i] = 2;
+      while (subSize[i] < size[i])
         {
-        subSize[0] = subSize[0] / 2;
-        }
-      else
-        {
-        subSize[2] = subSize[2] / 2;
+        subSize[i] = subSize[i] * 2;
         }
       }
-    else
-      {
-      if (subSize[1] > subSize[2])
-        {
-        subSize[1] = subSize[1] / 2;
-        }
-      else
-        {
-        subSize[2] = subSize[2] / 2;
-        }
-      }
+    ratio = 1.0;
     numVoxels = subSize[0]*subSize[1]*subSize[2];
-    ratio = numVoxels / numTVoxels;
-    }
-  // now we have a new volume at least 1 4th as small as the original, 
-  // the question is, is it large enough to bother with?
-  if (numVoxels > 32000)
-    {
-    this->MedResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
-    this->MedResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
-    this->MedResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
-    this->MedResResampler->SetInput(input);
-    this->MedResResampler->InterpolateOff();
-    this->MedResResampler->
-      SetAxisMagnificationFactor( 0, this->MedResMagnification[0] );
-    this->MedResResampler->
-      SetAxisMagnificationFactor( 1, this->MedResMagnification[1] );
-    this->MedResResampler->
-      SetAxisMagnificationFactor( 2, this->MedResMagnification[2] );
-    this->MedResResampler->Update();
-    this->MedResTextureMapper->SetInput( this->MedResResampler->GetOutput() );
-
-    this->MedResTextureMapper->GetGradientEstimator()->ZeroPadOff();
-    this->MedResTextureMapper->GetGradientEstimator()->
-      SetInput( this->MedResResampler->GetOutput() );
-    this->MedResTextureMapper->GetGradientEstimator()->
-      SetGradientMagnitudeScale(scale);
-    this->MedResTextureMapper->GetGradientEstimator()->Update();
-    
-    if ( this->GetView() )
+    numTVoxels = numVoxels;
+    while ((ratio > 1/4.01 || numVoxels > 263000.0 ) && 
+           subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
       {
-      this->GetView()->GetWindow()->GetProgressGauge()->SetValue(100);
+      // find the largest axis and divide it by 2
+      if (subSize[0] > subSize[1])
+        {
+        if (subSize[0] > subSize[2])
+          {
+          subSize[0] = subSize[0] / 2;
+          }
+        else
+          {
+          subSize[2] = subSize[2] / 2;
+          }
+        }
+      else
+        {
+        if (subSize[1] > subSize[2])
+          {
+          subSize[1] = subSize[1] / 2;
+          }
+        else
+          {
+          subSize[2] = subSize[2] / 2;
+          }
+        }
+      numVoxels = subSize[0]*subSize[1]*subSize[2];
+      ratio = numVoxels / numTVoxels;
       }
-    
-    this->MedResTextureID = 
-      this->LODVolume->AddLOD( this->MedResTextureMapper,
-			       this->VolumeProperty, 0.0 );
+    // now we have a new volume at least 1 4th as small as the original, 
+    // the question is, is it large enough to bother with?
+    if (numVoxels > 32000)
+      {
+      this->MedResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
+      this->MedResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
+      this->MedResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
+      this->MedResResampler->SetInput(input);
+      this->MedResResampler->InterpolateOff();
+      this->MedResResampler->
+        SetAxisMagnificationFactor( 0, this->MedResMagnification[0] );
+      this->MedResResampler->
+        SetAxisMagnificationFactor( 1, this->MedResMagnification[1] );
+      this->MedResResampler->
+        SetAxisMagnificationFactor( 2, this->MedResMagnification[2] );
+      this->MedResResampler->Update();
+      this->MedResTextureMapper->SetInput( this->MedResResampler->GetOutput() );
+      
+      this->MedResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+      this->MedResTextureMapper->GetGradientEstimator()->
+        SetInput( this->MedResResampler->GetOutput() );
+      this->MedResTextureMapper->GetGradientEstimator()->
+        SetGradientMagnitudeScale(scale);
+      this->MedResTextureMapper->GetGradientEstimator()->Update();
+      
+      if ( this->GetView() )
+        {
+        this->GetView()->GetWindow()->GetProgressGauge()->SetValue(100);
+        }
+      
+      this->MedResTextureID = 
+        this->LODVolume->AddLOD( this->MedResTextureMapper,
+                                 this->VolumeProperty, 0.0 );
+      }
     }
+
+  
   vtkPiecewiseFunction *pwf = 
     this->VolumeProperty->GetScalarOpacity();
   
@@ -406,5 +452,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.13 $");
+  this->ExtractRevision(os,"$Revision: 1.14 $");
 }
