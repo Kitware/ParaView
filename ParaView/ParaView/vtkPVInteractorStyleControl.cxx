@@ -353,4 +353,6 @@ void vtkPVInteractorStyleControl::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Frame: " << this->LabeledFrame << endl;
+  os << indent << "DefaultManipulator: " << (this->DefaultManipulator?this->DefaultManipulator:"None") << endl;
+  os << indent << "ManipulatorCollection: " << this->ManipulatorCollection << endl;
 }
