@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.168");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.169");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -638,7 +638,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   this->SaveButtonFrame->Create(app, "frame", 0);
   this->SaveImagesButton->SetParent(this->SaveButtonFrame);
   this->SaveImagesButton->Create(app, 0);
-  this->SaveImagesButton->SetLabel("Save Images");
+  this->SaveImagesButton->SetLabel("Save Animation");
   this->SaveImagesButton->SetCommand(this, "SaveImagesCallback");
   this->SaveGeometryButton->SetParent(this->SaveButtonFrame);
   this->SaveGeometryButton->Create(app, 0);
