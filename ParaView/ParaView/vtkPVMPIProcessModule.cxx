@@ -87,7 +87,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.10");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.11");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -414,12 +414,18 @@ void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
   int debugNum = numProcs;
   if (pvApp->GetUseTiledDisplay())
     {
-    this->Script("%s SetNumberOfPieces 0",part->GetMapperTclName());
     this->Script("%s SetPiece 0", part->GetMapperTclName());
-    this->Script("%s SetUpdateNumberOfPieces 0",part->GetUpdateSuppressorTclName());
     this->Script("%s SetUpdatePiece 0", part->GetUpdateSuppressorTclName());
-    this->Script("%s SetNumberOfPieces 0", part->GetLODMapperTclName());
     this->Script("%s SetPiece 0", part->GetLODMapperTclName());
+    this->Script("%s SetUpdatePiece 0", part->GetLODUpdateSuppressorTclName());
+    this->Script("%s SetNumberOfPieces %d",
+                 part->GetMapperTclName(), 0);
+    this->Script("%s SetUpdateNumberOfPieces %d",
+                 part->GetUpdateSuppressorTclName(), 0);
+    this->Script("%s SetNumberOfPieces %d", 
+                 part->GetLODMapperTclName(), 0);
+    this->Script("%s SetUpdateNumberOfPieces %d",
+                 part->GetLODUpdateSuppressorTclName(), 0);
     for (id = 1; id < numProcs; ++id)
       {
       this->RemoteScript(id, "%s SetNumberOfPieces %d",
