@@ -26,15 +26,36 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "pvinit.h"
+//#include "vtkThreadedController.h"
+#include "vtkMultiThreader.h"
+
+
+struct vtkPVArgs
+{
+  int argc;
+  char **argv;
+};
+
+VTK_THREAD_RETURN_TYPE Process_Init( void *arg )
+{
+  vtkPVArgs *pvArgs = (vtkPVArgs *)arg;
+
+  Et_Init(pvArgs->argc, pvArgs->argv);
+
+  return VTK_THREAD_RETURN_VALUE;
+}
 
 #ifdef _WIN32
 #include <windows.h>
+
+
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nShowCmd)
 {
   int argc;
   char *argv[5];
+
   argv[0] = new char [strlen(lpCmdLine)+1];
   argv[1] = new char [strlen(lpCmdLine)+1];
   argv[2] = new char [strlen(lpCmdLine)+1];
@@ -79,8 +100,18 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
     }
   
+  // New processes need these args to initialize.
+  vtkPVArgs pvArgs;
+  pvArgs.argc = argc;
+  pvArgs.argv = argv;
   
-  Et_Init(argc,argv);
+  //vtkThreadedController *controller = vtkThreadedController::New();
+  //controller->SetNumberOfProcesses(1);
+  //controller->Initialize(argc, argv);
+  //controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
+  //controller->SingleMethodExecute();
+
+  Process_Init((void *)(&pvArgs));
 
   delete [] argv[0];
   delete [] argv[1];
@@ -96,3 +127,9 @@ int main(int argc, char *argv[])
   return 0;
 }
 #endif
+
+
+
+
+
+

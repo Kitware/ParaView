@@ -32,7 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVRenderView::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -49,6 +49,7 @@ vtkPVRenderView* vtkPVRenderView::New()
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
   this->CommandFunction = vtkPVRenderViewCommand;
@@ -56,6 +57,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Interactor = vtkDummyRenderWindowInteractor::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
   this->Interactor->Delete();
@@ -63,6 +65,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->SetInteractorStyle(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 {
   if (this->Interactor)
@@ -82,28 +85,123 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
     }
 } 
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
+{
+  if (this->Application)
+    {
+    vtkErrorMacro("RenderView already created");
+    return;
+    }
+
+  this->vtkKWRenderView::Create(app, args);
+
+  // Styles need motion events.
+  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
+               this->VTKWidget->GetWidgetName(), this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+// Called by a binding, so I must flip y.
+void vtkPVRenderView::MotionCallback(int x, int y)
+{
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AButtonPress(int num, int x, int y)
 {
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    if (num == 1)
+      {
+      this->InteractorStyle->OnLeftButtonDown(0, 0, x, y);
+      }
+    if (num == 2)
+      {
+      this->InteractorStyle->OnMiddleButtonDown(0, 0, x, y);
+      }
+    if (num == 3)
+      {
+      this->InteractorStyle->OnRightButtonDown(0, 0, x, y);
+      }
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AButtonRelease(int num, int x, int y)
 {
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    if (num == 1)
+      {
+      this->InteractorStyle->OnLeftButtonUp(0, 0, x, y);
+      }
+    if (num == 2)
+      {
+      this->InteractorStyle->OnMiddleButtonUp(0, 0, x, y);
+      }
+    if (num == 3)
+      {
+      this->InteractorStyle->OnRightButtonUp(0, 0, x, y);
+      }
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Button1Motion(int x, int y)
 {
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Button2Motion(int x, int y)
 {
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Button3Motion(int x, int y)
 {
+  int *size = this->GetRenderer()->GetSize();
+  y = size[1] - y;
+
+  if (this->InteractorStyle)
+    {
+    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AKeyPress(char key, int x, int y)
 {
+  x = y;
+
   if (this->InteractorStyle)
     {
     this->InteractorStyle->OnChar(0, 0, key, 1);

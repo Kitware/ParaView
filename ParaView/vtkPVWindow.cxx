@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStylePlaneSource.h"
 
 
-//--------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -50,6 +50,7 @@ vtkPVWindow* vtkPVWindow::New()
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {  
   this->CommandFunction = vtkPVWindowCommand;
@@ -57,10 +58,12 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWWidget::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
   // invoke super method first
@@ -102,7 +105,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // we keep a handle to them as well
   this->MainView = vtkPVRenderView::New();
   this->MainView->SetParent(this->ViewFrame);
-  this->MainView->Create(this->Application,"-width 200 -height 200");
+  // Why do I have to explicitly state the class?  I do not know.
+  this->MainView->vtkPVRenderView::Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
   // force creation of the properties parent
   this->MainView->GetPropertiesParent();
@@ -122,6 +126,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::SetupTest()
 {
   vtkInteractorStylePlaneSource *planeStyle = 
@@ -134,6 +139,7 @@ void vtkPVWindow::SetupTest()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::NewWindow()
 {
   vtkPVWindow *nw = vtkPVWindow::New();
@@ -144,12 +150,14 @@ void vtkPVWindow::NewWindow()
 
 
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::Save() 
 {
   //char *path;
   //
 }
 
+//----------------------------------------------------------------------------
 // Description:
 // Chaining method to serialize an object and its superclasses.
 void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
@@ -162,6 +170,7 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 {
   if (!strcmp(token,"MainView"))

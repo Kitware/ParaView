@@ -38,7 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkPVApplication* vtkPVApplication::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -51,117 +51,52 @@ vtkPVApplication* vtkPVApplication::New()
   return new vtkPVApplication;
 }
 
+//----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
   this->SetApplicationName("ParaView");
 }
 
+//----------------------------------------------------------------------------
 int vtkPVApplication::AcceptLicense()
 {
   return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVApplication::AcceptEvaluation()
 {
   return 1;
 }
 
 #ifdef _WIN32
+//----------------------------------------------------------------------------
 void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
 {
-  DWORD dwType, dwSize;
-  
-  dwType = REG_SZ;
-  dwSize = 40;
-  if(RegQueryValueEx(hKey,key, NULL, &dwType, 
-                     (BYTE *)val, &dwSize) != ERROR_SUCCESS)
-    {
-    strcpy(val,adefault);
-    }
 }
 #endif
 
+//----------------------------------------------------------------------------
 int VerifyKey(unsigned long key, const char *name, int id)
 {
-  // find letters
-  int letters[80];
-  int numLetters = 0;
-  unsigned long pos = 0;
-  
-  // extract letters and convert to numbers
-  while (pos < strlen(name))
-    {
-    if (name[pos] >= 'A' && name[pos] <= 'Z')
-      {
-      letters[numLetters] = name[pos] - 'A';
-      numLetters++;
-      }
-    if (name[pos] >= 'a' && name[pos] <= 'z')
-      {
-      letters[numLetters] = name[pos] - 'a';
-      numLetters++;
-      }
-    pos++;
-    }
-
-  if (numLetters < 1)
-    {
-    return 0;
-    }
-  
-  // now assign numbers into value
-  unsigned long value = 0;
-  pos = 29%numLetters;
-  int slot1 = letters[pos];
-  pos = (pos + 29)%numLetters;
-  int slot2 = letters[pos];
-  pos = (pos + 29)%numLetters;
-  int slot3 = letters[pos];
-  pos = (pos + 29)%numLetters;
-  int slot4 = letters[pos];
-  pos = (pos + 29)%numLetters;
-  int slot5 = letters[pos];
-
-  value = slot1;
-  value = value << 6;
-  value = value + slot2;
-  value = value << 6;
-  value = value + id;
-  value = value << 5;
-  value = value + slot3;
-  value = value << 5;
-  value = value + slot4;
-  value = value << 5;
-  value = value + slot5;
-
-  if (value == (key & 0xFBFFFFFF))
-    {
-    return 1;
-    }
-  else
-    {
-    return 0;
-    }
+ return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVApplication::PromptRegistration(char *name, char *IDS)
 {
   return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVApplication::CheckRegistration()
 {
   return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  // is this copy registered ?
-  if (!this->CheckRegistration())
-    {
-    return;
-    }  
-  
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
   ui->Create(this,"");
@@ -187,6 +122,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->vtkKWApplication::Start(argc,argv);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
 {
   

@@ -45,6 +45,10 @@ public:
   vtkTypeMacro(vtkPVRenderView,vtkKWRenderView);
 
   // Description:
+  // Create the TK widgets associated with the view.
+  void Create(vtkKWApplication *app, char *args);
+
+  // Description:
   // The events will be forwarded to this style object,
   void SetInteractorStyle(vtkInteractorStyle *style);
   vtkGetObjectMacro(InteractorStyle, vtkInteractorStyle);
@@ -57,6 +61,11 @@ public:
   void Button2Motion(int x, int y);
   void Button3Motion(int x, int y);
   void AKeyPress(char key, int x, int y);
+
+  // Description:
+  // Special binding added to this subclass.
+  void MotionCallback(int x, int y);
+
 
 protected:
   vtkPVRenderView();

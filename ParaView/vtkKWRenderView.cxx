@@ -70,6 +70,7 @@ vtkKWRenderView* vtkKWRenderView::New()
     {
     return (vtkKWRenderView*)ret;
     }
+
   // If the factory was unable to create the object, then create it here.
   return new vtkKWRenderView;
 }
@@ -653,5 +654,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.1 $");
+  this->ExtractRevision(os,"$Revision: 1.2 $");
 }

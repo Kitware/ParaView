@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVRenderWindowInteractor.cxx
+  Module:    vtkDummyRenderWindowInteractor.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,35 +26,37 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVRenderWindowInteractor.h"
+#include "vtkDummyRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 
 
 
-//------------------------------------------------------------------------------
-vtkPVRenderWindowInteractor* vtkPVRenderWindowInteractor::New()
+//----------------------------------------------------------------------------
+vtkDummyRenderWindowInteractor* vtkDummyRenderWindowInteractor::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderWindowInteractor");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkDummyRenderWindowInteractor");
   if(ret)
     {
-    return (vtkPVRenderWindowInteractor*)ret;
+    return (vtkDummyRenderWindowInteractor*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVRenderWindowInteractor;
+  return new vtkDummyRenderWindowInteractor;
 }
 
 
-int vtkPVRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
+int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
-vtkPVRenderWindowInteractor::vtkPVRenderWindowInteractor()
+//----------------------------------------------------------------------------
+vtkDummyRenderWindowInteractor::vtkDummyRenderWindowInteractor()
 {
-  //this->CommandFunction = vtkPVRenderWindowInteractorCommand;
+  //this->CommandFunction = vtkDummyRenderWindowInteractorCommand;
 }
 
-vtkPVRenderWindowInteractor::~vtkPVRenderWindowInteractor()
+//----------------------------------------------------------------------------
+vtkDummyRenderWindowInteractor::~vtkDummyRenderWindowInteractor()
 {
 }
 

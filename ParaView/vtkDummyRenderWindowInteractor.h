@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVRenderWindowInteractor.h
+  Module:    vtkDummyRenderWindowInteractor.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,29 +25,29 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVRenderWindowInteractor - For using styles
+// .NAME vtkDummyRenderWindowInteractor - For using styles
 // .SECTION Description
 // Dummy interactor should not get events.
 
-#ifndef __vtkPVRenderWindowInteractor_h
-#define __vtkPVRenderWindowInteractor_h
+#ifndef __vtkDummyRenderWindowInteractor_h
+#define __vtkDummyRenderWindowInteractor_h
 
 #include "vtkRenderWindowInteractor.h"
 
 class vtkKWApplication;
 
-class VTK_EXPORT vtkPVRenderWindowInteractor : public vtkRenderWindowInteractor
+class VTK_EXPORT vtkDummyRenderWindowInteractor : public vtkRenderWindowInteractor
 {
 public:
-  static vtkPVRenderWindowInteractor* New();
-  vtkTypeMacro(vtkPVRenderWindowInteractor,vtkRenderWindowInteractor);
+  static vtkDummyRenderWindowInteractor* New();
+  vtkTypeMacro(vtkDummyRenderWindowInteractor,vtkRenderWindowInteractor);
 
 
 protected:
-  vtkPVRenderWindowInteractor();
-  ~vtkPVRenderWindowInteractor();
-  vtkPVRenderWindowInteractor(const vtkPVRenderWindowInteractor&) {};
-  void operator=(const vtkPVRenderWindowInteractor&) {};
+  vtkDummyRenderWindowInteractor();
+  ~vtkDummyRenderWindowInteractor();
+  vtkDummyRenderWindowInteractor(const vtkDummyRenderWindowInteractor&) {};
+  void operator=(const vtkDummyRenderWindowInteractor&) {};
 
 };
 
