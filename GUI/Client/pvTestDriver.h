@@ -13,7 +13,7 @@
 
 =========================================================================*/
 // .NAME pvTestDriver - A program to run paraview for testing mpi and server modes.
-// .DESCRIPTION
+// .SECTION Description
 // 
 
 
