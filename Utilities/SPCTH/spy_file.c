@@ -239,14 +239,14 @@ void spy_setfilename(SpyFile* spy, const char *filename)
 
 /* Should make these macros */
 
-double max3(double x, double y, double z)
+static double max3(double x, double y, double z)
 {
   if (x>y && x>z) return x;
   if (y>x && y>z) return y;
   return z;
 }
 
-void stm_free_block(Structured_Mesh_Data* stm_data, int block)
+static void stm_free_block(Structured_Mesh_Data* stm_data, int block)
 {
   Structured_Block_Data *blk;
   double ***field;
@@ -318,7 +318,7 @@ void stm_free_block(Structured_Mesh_Data* stm_data, int block)
   if (blk->z != NULL) free(blk->z);
 }
 
-void realloc_blocks(Structured_Mesh_Data* stm_data, int n_blocks)
+static void realloc_blocks(Structured_Mesh_Data* stm_data, int n_blocks)
 {
   int i;
 
@@ -410,7 +410,7 @@ double *** spy_GetField(Structured_Block_Data *blk, int field_id)
 }
 
 /* Routine flips an array of ints */
-void flip_int(int *a, int nint)
+static void flip_int(int *a, int nint)
 {
   register int i;
   int tmp;
@@ -429,7 +429,7 @@ void flip_int(int *a, int nint)
 }
 
 /* Routine flips an array of doubles */
-void flip_double(double *a, int ndouble)
+static void flip_double(double *a, int ndouble)
 {
   register int i;
   double tmp;
@@ -455,7 +455,7 @@ void flip_double(double *a, int ndouble)
 
 
 /* Routine fread's an array of int's in a machine-independent manner */
-void fread_int(SpyFile* spy, int *a, int count, FILE *fp)
+static void fread_int(SpyFile* spy, int *a, int count, FILE *fp)
 {
   int in_count;
   in_count = fread(a,sizeof(int),count,fp);
@@ -466,7 +466,7 @@ void fread_int(SpyFile* spy, int *a, int count, FILE *fp)
 }
 
 /* Routine fread's an array of double's in a machine-independent manner */
-void fread_double(SpyFile* spy, double *a, int count, FILE *fp)
+static void fread_double(SpyFile* spy, double *a, int count, FILE *fp)
 {
   fread(a,sizeof(double),count,fp);
   if (spy->intel_way)
@@ -476,7 +476,7 @@ void fread_double(SpyFile* spy, double *a, int count, FILE *fp)
 }
 
 /* Routine fread's an array of double's in a machine-independent manner and convert to long*/
-void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
+static void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
 {
   int i;
   double* buffer;
@@ -500,7 +500,7 @@ void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
 /* Global variables describing the spy file */
 
 /* Routine initializes the group header to zeros */
-void init_group_header(SpyFile* spy)
+static void init_group_header(SpyFile* spy)
 {
   int i;
 
@@ -514,7 +514,7 @@ void init_group_header(SpyFile* spy)
 
 
 
-int read_group_header(SpyFile* spy)
+static int read_group_header(SpyFile* spy)
 {
   int ntmp;
   long lg = (long)spy->LastGroup;
@@ -533,7 +533,7 @@ int read_group_header(SpyFile* spy)
   return ntmp;
 }
 
-void ClearDumps(SpyFile* spy)
+static void ClearDumps(SpyFile* spy)
 {
   SpyFileDump *tmp;
 
@@ -548,7 +548,7 @@ void ClearDumps(SpyFile* spy)
 }
 
 
-void NewDumpR(SpyFile* spy, int cycle, double time, double offset)
+static void NewDumpR(SpyFile* spy, int cycle, double time, double offset)
 {
   if (spy->FirstDump==NULL)
     {
@@ -566,7 +566,7 @@ void NewDumpR(SpyFile* spy, int cycle, double time, double offset)
   spy->ThisDump->next=NULL;
 }
 
-void read_groups(SpyFile* spy)
+static void read_groups(SpyFile* spy)
 {
   int n;
 
@@ -592,7 +592,7 @@ void read_groups(SpyFile* spy)
 
 
 /* Routine reads the file header information */
-int read_file_header(SpyFile* spy)
+static int read_file_header(SpyFile* spy)
 {
   int i, n_blocks, n_tmp;
   char magic[8];
@@ -756,7 +756,7 @@ int spy_open_file_for_input(SpyFile* spy, const char *filename)
 
 
 
-double flt2dbl(SpyFile* spy, unsigned char *a)
+static double flt2dbl(SpyFile* spy, unsigned char *a)
 {
   unsigned char *ptmp;
 
@@ -782,7 +782,7 @@ double flt2dbl(SpyFile* spy, unsigned char *a)
 }
 
 
-int int4_2_int(SpyFile* spy, unsigned char *a)
+static int int4_2_int(SpyFile* spy, unsigned char *a)
 {
   unsigned char *ptmp;
 
@@ -826,7 +826,7 @@ Its worst-case size is 5*n bytes. */
    to provide allocated space for *data which will be
    n bytes long. */
 
-void rld(SpyFile* spy, double *data, int n, void *in, int n_in)
+static void rld(SpyFile* spy, double *data, int n, void *in, int n_in)
 {
   int i,j,k;
   unsigned char *ptmp,code;
@@ -865,7 +865,7 @@ void rld(SpyFile* spy, double *data, int n, void *in, int n_in)
 }
 
 
-void rld_trend(SpyFile* spy, double *data, int n, void *in, int n_in)
+static void rld_trend(SpyFile* spy, double *data, int n, void *in, int n_in)
 {
   int i,j,k;
   unsigned char *ptmp,code;
@@ -912,7 +912,7 @@ void rld_trend(SpyFile* spy, double *data, int n, void *in, int n_in)
 
 /* run-length-decode the integer data pointed to by *data
    Inverse of rle_int above */
-void rld_int(SpyFile* spy, int *data, int n, void *in, int n_in)
+static void rld_int(SpyFile* spy, int *data, int n, void *in, int n_in)
 {
   int i,j,k;
   unsigned char *ptmp,code;
@@ -946,7 +946,7 @@ void rld_int(SpyFile* spy, int *data, int n, void *in, int n_in)
     }
 }
 
-void read_dump_header(SpyFile* spy)
+static void read_dump_header(SpyFile* spy)
 {
   int tmp;
 
@@ -972,7 +972,7 @@ void read_dump_header(SpyFile* spy)
 
 
 /* Input the histogram data */
-void read_histogram_data(SpyFile* spy)
+static void read_histogram_data(SpyFile* spy)
 {
   int i;
   unsigned char *buffer;
@@ -1043,7 +1043,7 @@ void read_histogram_data(SpyFile* spy)
 
 
 /* Input the number of blocks and the block geometries */
-void read_block_geometries(SpyFile* spy)
+static void read_block_geometries(SpyFile* spy)
 {
   int j,k,l,m,n;
   int Ny, Nz;
@@ -1152,7 +1152,7 @@ void read_block_geometries(SpyFile* spy)
 
 }
 
-void read_tracers(SpyFile* spy)
+static void read_tracers(SpyFile* spy)
 {
   int old_tracerN;
   unsigned char *buffer;
@@ -1286,7 +1286,7 @@ void spy_read_variable_data(SpyFile* spy, int field_index)
 }
 
 /* Routine that checks endian and sets a global flag */
-void check_endian(SpyFile* spy)
+static void check_endian(SpyFile* spy)
 {
   float a;
   unsigned char *pa;
