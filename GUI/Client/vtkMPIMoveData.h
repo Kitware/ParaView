@@ -60,6 +60,13 @@ public:
   void SetMoveModeToCollect(){this->MoveMode=vtkMPIMoveData::COLLECT;}
   void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
 
+  // Description:
+  // Legacy API for ParaView 1.4
+  void SetPassThrough(int v) 
+    {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
+  void SetSocketController(vtkSocketController* c) {this->SetClientDataServerSocketController(c);}
+
+
 protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
