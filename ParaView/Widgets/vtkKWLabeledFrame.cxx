@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.1");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.2");
 
 
 
@@ -176,7 +176,7 @@ void vtkKWLabeledFrame::AdjustMargin()
       }
 
     this->Script("%s configure -height %d", 
-                 this->Border->GetWidgetName(), height / 2 + 1);
+                 this->Border->GetWidgetName(), height / 2);
     this->Script("%s configure -height %d", 
                  this->Border2->GetWidgetName(), height / 2);
 
@@ -184,7 +184,7 @@ void vtkKWLabeledFrame::AdjustMargin()
       {
       this->Script("place %s -relx 1 -x -13 -rely 0 -y %d -anchor center",
                    this->Icon->GetWidgetName(),
-                   height / 2 + 1 + 1);    
+                   height / 2 + 1);    
       this->Script("raise %s", this->Icon->GetWidgetName());
       }
     }
@@ -215,7 +215,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
 
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
 
-  this->LabelFrame->Create(app,"frame","-borderwidth 0 -padx 2 -relief flat");
+  this->LabelFrame->Create(app,"frame","-borderwidth 0 -relief flat");
 
   this->Label->Create(app,"label"," -bd 0 -pady 0 -padx 2");
 
