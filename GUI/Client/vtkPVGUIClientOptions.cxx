@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.5");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -32,9 +32,7 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
   this->StartEmpty = 0;
   this->ParaViewScriptName = 0;
   this->ParaViewDataName = 0;
-
-  // We do not require batch script in this subclass
-  this->RequireBatchScript = 0;
+  this->SetProcessType(vtkPVOptions::PARAVIEW);
 }
 
 //----------------------------------------------------------------------------
@@ -48,20 +46,44 @@ vtkPVGUIClientOptions::~vtkPVGUIClientOptions()
 void vtkPVGUIClientOptions::Initialize()
 {
   this->Superclass::Initialize();
-  this->AddBooleanArgument("--server", "-v", &this->ServerMode,
-    "Start ParaView as a server (use MPI run).");
-  this->AddBooleanArgument("--client", "-c", &this->ClientMode,
-    "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).");
   this->AddArgument("--data", 0, &this->ParaViewDataName,
-    "Load the specified data.");
+                    "Load the specified data.");
   this->AddBooleanArgument("--play-demo", "-pd", &this->PlayDemoFlag,
-    "Run the ParaView demo.");
+                           "Run the ParaView demo.");
   this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
-    "Do not use registry when running ParaView (for testing).");
+                           "Do not use registry when running ParaView (for testing).");
   this->AddBooleanArgument("--crash-on-errors", 0, &this->CrashOnErrors, 
-    "For debugging purposes. This will make ParaView abort on errors.");
+                           "For debugging purposes. This will make ParaView abort on errors.");
   this->AddBooleanArgument("--start-empty", "-e", &this->StartEmpty, 
-    "Start ParaView without any default modules.");
+                           "Start ParaView without any default modules.");
+
+  // Add deprecated command line arguments for paraview
+  this->AddDeprecatedArgument("--server", "-v", 
+                              "Deprecated. Use pvserver executable for this function now.", 
+                              vtkPVOptions::PARAVIEW); 
+  this->AddDeprecatedArgument("--render-server", "-rs", 
+                              "Deprecated. Use pvrenderserver.", 
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--client", "-c", 
+                              "Deprecated. Use pvclient executable for this function now.",
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--cave-configuration", "-cc", 
+                              "Deprecated. The cave configuration must now be specified in the xml .pvx file",
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--host", "-h",
+                              "Deprecated. Use --client-host, --data-server-host, --render-server-host",
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--port", 0, "Deprecated. Use --client-port, --data-port, --render-port.",
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--machines",
+                              "-m", 
+                              "Deprecated. Use xml pvx file to specify machines for render and data servers.",
+                              vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--use-software-rendering", "-r", 
+                              "Deprecated. This option is no longer available.", vtkPVOptions::PARAVIEW);
+  this->AddDeprecatedArgument("--use-satellite-rendering", "-s",  
+                              "Deprecated. This option is no longer available.", vtkPVOptions::PARAVIEW);
+
 }
 
 //----------------------------------------------------------------------------
@@ -89,10 +111,7 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PlayDemoFlag: " << this->PlayDemoFlag << endl;
   os << indent << "DisableRegistry: " << this->DisableRegistry << endl;
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
-  os << indent << "PortNumber: " << this->PortNumber<< endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
-  os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
-  os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;
   os << indent << "ParaViewScriptName: " << (this->ParaViewScriptName?this->ParaViewScriptName:"(none)") << endl;
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
 }

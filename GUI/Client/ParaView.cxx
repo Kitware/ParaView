@@ -14,15 +14,11 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
 #include "vtkPVConfig.h"
-
-#ifdef VTK_USE_MPI
-# include <mpi.h>
-#endif
+#include "vtkPVMain.h"
 
 #include "vtkMultiProcessController.h"
 #include "vtkOutputWindow.h"
 
-#include "vtkTimerLog.h"
 
 #include "vtkPVGUIClientOptions.h"
 #include "vtkPVProcessModuleBatchHelper.h"
@@ -93,119 +89,26 @@ void u_fpu_setup()
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
 {
-  int retVal = 0;
-  int startVal = 0;
-  
-#ifdef PARAVIEW_ENABLE_FPE
-  u_fpu_setup();
-#endif //PARAVIEW_ENABLE_FPE
-
-#ifdef VTK_USE_MPI
-  // This is here to avoid false leak messages from vtkDebugLeaks when
-  // using mpich. It appears that the root process which spawns all the
-  // main processes waits in MPI_Init() and calls exit() when
-  // the others are done, causing apparent memory leaks for any objects
-  // created before MPI_Init().
-  int myId = 0;
-  MPI_Init(&argc, &argv);
-  // Might as well get our process ID here.  I use it to determine
-  // Whether to initialize tk.  Once again, splitting Tk and Tcl 
-  // initialization would clean things up.
-  MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
-#endif
-
-  // Don't prompt the user with startup errors on unix.
 #if defined(_WIN32) && !defined(__CYGWIN__)
   vtkOutputWindow::GetInstance()->PromptUserOn();
 #else
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
-
-  int display_help = 0;
+  vtkPVMain::Initialize(argc, argv);
   vtkPVGUIClientOptions* options = vtkPVGUIClientOptions::New();
-  if ( !options->Parse(argc, argv) )
-    {
-    cerr << "Problem parsing command line arguments" << endl;
-    if ( options->GetUnknownArgument() )
-      {
-      cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
-      }
-    if ( options->GetErrorMessage() )
-      {
-      cerr << "Error: " << options->GetErrorMessage() << endl;
-      }
-    display_help = 1;
-    }
-  if ( display_help || options->GetHelpSelected() )
-    {
-    cerr << options->GetHelp() << endl;
-    options->Delete();
-#ifdef VTK_USE_MPI
-  MPI_Finalize();
-#endif
-    return 1;
-    }
-
-  // The server is a special case.  We do not initialize Tk for process 0.
-  // I would rather have application find this command line option, but
-  // I cannot create an application before I initialize Tcl.
-  // I could clean this up if I separate the initialization of Tk and Tcl.
-  // I do not do this because it would affect other applications.
-
-  // Create the process module for initializing the processes.
-  // Only the root server processes args.
-  
-  vtkProcessModule* pm = vtkPVCreateProcessModule::CreateProcessModule(options);
-
-  vtkProcessModuleGUIHelper* helper;
-  if ( options->GetBatchScriptName() )
-    {
-    helper = vtkPVProcessModuleBatchHelper::New();
-    }
-  else
-    {
-    helper = vtkPVProcessModuleGUIHelper::New();
-    }
-  helper->SetProcessModule(pm);
-  pm->SetGUIHelper(helper);
+  options->SetProcessType(vtkPVOptions::PARAVIEW);
+    // Create a pvmain
+  vtkPVMain* pvmain = vtkPVMain::New();
+  vtkProcessModuleGUIHelper* helper = vtkPVProcessModuleGUIHelper::New();;
+  // run the paraview main
+  int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
   helper->Delete();
-  
-  pm->Initialize();
-
-#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
-  vtkPVAdaptorInitialize();
-#endif
-  ParaViewInitializeInterpreter(pm);
-
-  // Start the application's event loop.  This will enable
-  // vtkOutputWindow's user prompting for any further errors now that
-  // startup is completed.
-  int new_argc = 0;
-  char** new_argv = 0;
-  options->GetRemainingArguments(&new_argc, &new_argv);
-
-  startVal = pm->Start(new_argc, new_argv);
-
-  // Clean up for exit.
-  pm->Finalize();
-  pm->Delete();
-  pm = NULL;
-
-  // free some memory
-  vtkTimerLog::CleanupLog();
-
-#ifdef VTK_USE_MPI
-  MPI_Finalize();
-#endif
-
   options->Delete();
-  
-#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
-  vtkPVAdaptorDispose();
-#endif
-  
-  return (retVal?retVal:startVal);
+  pvmain->Delete();
+  vtkPVMain::Finalize();
+  return ret;
 }
+
 
 //----------------------------------------------------------------------------
 #ifdef _WIN32
@@ -221,18 +124,8 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
   char**       argv;
   unsigned int i;
   int          j;
-  typedef void (* VOID_FUN)();
-  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary("user32.dll");
-  if(lib)
-    {
-    VOID_FUN func = (VOID_FUN)
-      vtkDynamicLoader::GetSymbolAddress(lib, "DisableProcessWindowsGhosting");
-    if(func)
-      {
-      (*func)();
-      }
-    }
-  
+
+  // convert the windows sytle arguments into unix style argc argv
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
   argc = 1;
@@ -328,8 +221,7 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 #else
 int main(int argc, char *argv[])
 {
-  int res = MyMain(argc, argv);
-  return res;
+  return MyMain(argc, argv);
 }
 #endif
 

@@ -24,6 +24,7 @@ SET(Filters_SRCS
   vtkPVGeometryInformation.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVGeometryFilter.cxx
+  vtkPVMain.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
   vtkCellCenterDepthSort.cxx
@@ -87,6 +88,10 @@ SET(Filters_SRCS
   vtkSelectInputs.cxx
   vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkPVMain.cxx
+  WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
   vtkCTHDataToCTHDataFilter.cxx

@@ -61,14 +61,14 @@ protected:
                           vtkstd::vector<char>& out, vtkstd::vector<char>& err,
                           int* foundWaiting);
 private:
-  // fullpath to paraview executable
-  vtkstd::string ParaView;
-  // fullpath to paraview server executable
-  vtkstd::string ParaViewServer;
-  // fullpath to paraview renderserver executable
-  vtkstd::string ParaViewRenderServer;
-  // fullpath to mpirun executable
-  vtkstd::string MPIRun;
+  vtkstd::string ParaView;  // fullpath to paraview executable
+  vtkstd::string ParaViewClient;  // fullpath to paraview client executable
+  vtkstd::string ParaViewServer;  // fullpath to paraview server executable
+  vtkstd::string ParaViewRenderServer;  // fullpath to paraview renderserver executable
+  vtkstd::string ParaViewDataServer;  // fullpath to paraview dataserver executable
+  vtkstd::string ParaViewBatch;  // fullpath to paraview batch executable
+  vtkstd::string MPIRun;  // fullpath to mpirun executable
+
 
   // This specify the preflags and post flags that can be set using:
   // VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
@@ -99,6 +99,7 @@ private:
 
   int RenderServerNumProcesses;
   double TimeOut;
+  int TestBatch;
   int TestRenderServer;
   int TestServer;
   int ArgStart;

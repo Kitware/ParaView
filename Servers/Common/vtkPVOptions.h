@@ -32,6 +32,18 @@ class vtkPVOptionsInternal;
 class VTK_EXPORT vtkPVOptions : public vtkObject
 {
 public:
+  enum ProcessTypeEnum
+  {
+    PARAVIEW = 0x1,
+    PVCLIENT = 0x2,
+    PVSERVER = 0x4,
+    PVRENDER_SERVER = 0x8,
+    PVDATA_SERVER = 0x10,
+    PVBATCH = 0x20,
+    XMLONLY = 0x40,
+    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER | PVDATA_SERVER
+  };
+  
   static vtkPVOptions* New();
   vtkTypeRevisionMacro(vtkPVOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -46,9 +58,13 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetMacro(ClientMode, int);
-  vtkGetMacro(PortNumber, int);
-  vtkGetMacro(RenderNodePort, int);
+  // Description:
+  // Get Various ports.
+  vtkGetMacro(ServerPort, int);
+  vtkGetMacro(DataServerPort, int);
   vtkGetMacro(RenderServerPort, int);
+  vtkGetMacro(RenderNodePort, int);
+  
   vtkGetMacro(DisableComposite, int);
   vtkGetMacro(UseSoftwareRendering, int);
   vtkGetMacro(UseSatelliteSoftwareRendering, int);
@@ -59,11 +75,21 @@ public:
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetStringMacro(RenderModuleName);
   vtkGetStringMacro(CaveConfigurationFileName);
-  vtkGetStringMacro(Username);
-  vtkGetStringMacro(HostName);
-  vtkGetStringMacro(RenderServerHostName);
   vtkGetStringMacro(MachinesFileName);
   vtkGetStringMacro(GroupFileName);
+  vtkGetStringMacro(ParaViewDataName);
+
+  // Description:
+  // Get the various types of host names. 
+  vtkGetStringMacro(ServerHostName);
+  vtkGetStringMacro(DataServerHostName);
+  vtkGetStringMacro(RenderServerHostName);
+  vtkGetStringMacro(ClientHostName);
+  // Description:
+  // Set/Get the type of the process for this set of options.
+  // data-server, render-server, combined-server or client.
+  ProcessTypeEnum GetProcessType() { return this->ProcessType;}
+  void SetProcessType(ProcessTypeEnum p) {this->ProcessType = p;}
 
   // Description:
   // vtkProcessModule needs to set the render module name
@@ -90,6 +116,14 @@ public:
   // Get the index of the last argument parsed.
   int GetLastArgument();
 
+  // Description:
+  // Pass in the name and the attributes for all tags that are not Options.
+  // If it returns 1, then it is successful, and 0 if it failed.
+  virtual int ParseExtraXMLTag(const char* , const char** ) {return 1;}
+  // Description:
+  // Is this in render server mode.
+  vtkGetMacro(ClientRenderServer, int);
+
 protected:
   // Description:
   // Default constructor.
@@ -100,11 +134,23 @@ protected:
   virtual ~vtkPVOptions();
 
   // Description:
-  // Add option.
-  void AddBooleanArgument(const char* longarg, const char* shortarg, int* var, const char* help);
-  void AddArgument(const char* longarg, const char* shortarg, int* var, const char* help);
-  void AddArgument(const char* longarg, const char* shortarg, char** var, const char* help);
-
+  // Add a command line option.  For each argument added there is a long
+  // version --long and a short version -l, a help string, and a variable
+  // that is set to the value of the option.  The types can be int, char*, or
+  // boolean (set to 1 of option is present).  Also deprecated arguments can
+  // be added with only a help string.  The help string should say that the
+  // argument is deprecated and suggest the alternative argument to use.
+  // Each option can specify in a bit flag int the processes that the option
+  // is valid for, the default is to be valid for all paraview processes.
+  void AddBooleanArgument(const char* longarg, const char* shortarg,
+                          int* var, const char* help, int type=ALLPROCESS);
+  void AddDeprecatedArgument(const char* longarg, const char* shortarg,
+                             const char* help, int type=ALLPROCESS);
+  void AddArgument(const char* longarg, const char* shortarg,
+                   int* var, const char* help, int type=ALLPROCESS);
+  void AddArgument(const char* longarg, const char* shortarg,
+                   char** var, const char* help, int type=ALLPROCESS);
+  
   // Description:
   // Initialize arguments.
   virtual void Initialize();
@@ -117,6 +163,16 @@ protected:
   // This method is called when wrong argument is found. If it returns 0, then
   // the parsing will fail.
   virtual int WrongArgument(const char* argument);
+  // Description:
+  // This method is called when a deprecated argument is found. If it returns 0, then
+  // the parsing will fail.
+  virtual int DeprecatedArgument(const char* argument);
+
+  // Description:
+  // This method loads the paraview config file.  The command line
+  // will override any of the values in this file, but all options can
+  // be in the file.
+  int LoadXMLConfigFile(const char*);
 
   vtkSetStringMacro(UnknownArgument);
   char* UnknownArgument;
@@ -126,37 +182,50 @@ protected:
 
   // Description:
   // Subclasses may need to access these
-  vtkSetStringMacro(Username);
-  char* Username;
-
-  vtkSetStringMacro(HostName);
-  char* HostName;
-
-  int PortNumber;
-
-  int ServerMode;
-  int ClientMode;
-  int RenderServerMode;
-  int RenderServerPort;
+  vtkSetStringMacro(ParaViewDataName);
+  char* ParaViewDataName;
 
   vtkSetStringMacro(RenderServerHostName);
   char* RenderServerHostName;
 
+  vtkSetStringMacro(ClientHostName);
+  char* ClientHostName;
+
+  vtkSetStringMacro(DataServerHostName);
+  char* DataServerHostName;
+
+  vtkSetStringMacro(ServerHostName);
+  char* ServerHostName;
+
+  // Port information
+  int ServerPort;
+  int DataServerPort;
+  int RenderServerPort;
+  int RenderNodePort;
+
+  int ServerMode;
+  int ClientMode;
+  int RenderServerMode;
+  int HelpSelected;
+
 private:
+  ProcessTypeEnum ProcessType; // data-server, render-server, combined-server, client
   // Options:
+  int ClientRenderServer;
+  int ConnectRenderToData;
+  int ConnectDataToRender;
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
-  int RenderNodePort;
   int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
-  int HelpSelected;
   int ReverseConnection;
   int AlwaysSSH;
   int TileDimensions[2];
   int UseRenderingGroup;
 
+  
   char* RenderModuleName;
 
   vtkSetStringMacro(CaveConfigurationFileName);
@@ -168,12 +237,16 @@ private:
   vtkSetStringMacro(GroupFileName);
   char* GroupFileName;
 
+  vtkSetStringMacro(XMLConfigFile);
+  char* XMLConfigFile;
+
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
   void operator=(const vtkPVOptions&); // Not implemented
 
   vtkPVOptionsInternal* Internals;
   static int UnknownArgumentHandler(const char* argument, void* call_data);
+  static int DeprecatedArgumentHandler(const char* argument, const char* value, void* call_data);
 
   void CleanArgcArgv();
   int Argc;

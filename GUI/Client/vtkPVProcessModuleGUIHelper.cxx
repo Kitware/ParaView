@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.11");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.12");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -141,56 +141,12 @@ int vtkPVProcessModuleGUIHelper::ActualRun(int argc, char **argv)
   return 0;
 }
 
-int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
+int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* )
 { 
-  vtkPVApplication *pvApp = this->PVApplication;
-  vtkPVClientServerModule* pm = 
-    vtkPVClientServerModule::SafeDownCast(this->ProcessModule);
-  if(!pm)
-    {
-    vtkErrorMacro("Attempt to call OpenConnectionDialog without using a vtkPVClientServerModule");
-    return 0;
-    }
-  if(!pvApp)
-    {
-    vtkErrorMacro("Attempt to call OpenConnectionDialog without using a vtkPVApplication");
-    return 0;
-    }
-    
-  char servers[1024];
-  servers[0] = 0;
-  pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
-  pvApp->Script("wm withdraw .");
-  vtkPVConnectDialog* dialog = 
-    vtkPVConnectDialog::New();
-  vtkPVOptions* options = this->ProcessModule->GetOptions();
-  dialog->SetHostname(options->GetHostName());
-  dialog->SetSSHUser(options->GetUsername());
-  dialog->SetPortNumber(options->GetPortNumber());
-  dialog->SetNumberOfProcesses(pm->GetNumberOfProcesses());
-  dialog->SetMultiProcessMode(pm->GetMultiProcessMode());
-  dialog->Create(this->PVApplication, 0);
-  dialog->SetListOfServers(servers);
-  int res = dialog->Invoke();
-  vtkPVGUIClientOptions* gcoptions = vtkPVGUIClientOptions::SafeDownCast(options);
-  if ( res )
-    {
-    gcoptions->SetHostName(dialog->GetHostName());
-    gcoptions->SetUsername(dialog->GetSSHUser());
-    gcoptions->SetPortNumber(dialog->GetPortNumber());
-    pm->SetNumberOfProcesses(dialog->GetNumberOfProcesses());
-    pm->SetMultiProcessMode(dialog->GetMultiProcessMode());
-    *start = 1;
-    }
-  pvApp->SetRegisteryValue(2, "RunTime", "Servers",
-                           dialog->GetListOfServers());
-  dialog->Delete();
-  
-  if ( !res )
-    {
-    return 0;
-    }
-  return 1;
+  // This should perhaps open a dialog and ask for where
+  // the server is running, but for now just die
+  vtkErrorMacro("Could not find server. Client must exit.");
+  return 0;
 }
 
   

@@ -19,5 +19,11 @@ ENDIF(VTK_USE_MPI)
 ADD_EXECUTABLE(pvserver pvserver.cxx)
 TARGET_LINK_LIBRARIES(pvserver ${LIBS})
 
+ADD_EXECUTABLE(pvrenderserver pvrenderserver.cxx)
+TARGET_LINK_LIBRARIES(pvrenderserver ${LIBS})
+
+ADD_EXECUTABLE(pvdataserver pvdataserver.cxx)
+TARGET_LINK_LIBRARIES(pvdataserver ${LIBS})
+
 ADD_EXECUTABLE(pvbatch pvbatch.cxx)
 TARGET_LINK_LIBRARIES(pvbatch ${LIBS} vtkPVServerManagerTCL vtkCommonTCL)

@@ -13,21 +13,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
-#include "vtkPVConfig.h"
-
-#ifdef VTK_USE_MPI
-# include <mpi.h>
-#endif
-
-#include "vtkMultiProcessController.h"
-#include "vtkOutputWindow.h"
-
-#include "vtkTimerLog.h"
-
+#include "vtkPVConfig.h" // Required to get build options for paraview
+#include "vtkPVMain.h"
+#include "vtkProcessModule.h"
 #include "vtkPVBatchOptions.h"
 #include "vtkPVProcessModuleBatchHelper.h"
-#include "vtkPVCreateProcessModule.h"
-#include "vtkProcessModule.h"
 
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
@@ -63,117 +53,21 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
-#ifdef PARAVIEW_ENABLE_FPE
-void u_fpu_setup()
-{
-#ifdef _MSC_VER
-  // enable floating point exceptions on MSVC
-  short m = 0x372;
-  __asm
-    {
-    fldcw m;
-    }
-#endif  //_MSC_VER
-#ifdef __linux__
-  // This only works on linux x86
-  unsigned int fpucw= 0x1372;
-  __asm__ ("fldcw %0" : : "m" (fpucw));
-#endif  //__linux__
-}
-#endif //PARAVIEW_ENABLE_FPE
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  int retVal = 0;
-  int startVal = 0;
-  
-#ifdef PARAVIEW_ENABLE_FPE
-  u_fpu_setup();
-#endif //PARAVIEW_ENABLE_FPE
-
-#ifdef VTK_USE_MPI
-  // This is here to avoid false leak messages from vtkDebugLeaks when
-  // using mpich. It appears that the root process which spawns all the
-  // main processes waits in MPI_Init() and calls exit() when
-  // the others are done, causing apparent memory leaks for any objects
-  // created before MPI_Init().
-  int myId = 0;
-  MPI_Init(&argc, &argv);
-  // Might as well get our process ID here.  I use it to determine
-  // Whether to initialize tk.  Once again, splitting Tk and Tcl 
-  // initialization would clean things up.
-  MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
-#endif
-
-  // Don't prompt the user with startup errors on unix.
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-#else
-  vtkOutputWindow::GetInstance()->PromptUserOff();
-#endif
-
-  int display_help = 0;
+  vtkPVMain::Initialize(argc, argv); // MPI must be initialized before any vtk object
+  vtkPVMain* pvmain = vtkPVMain::New();
   vtkPVBatchOptions* options = vtkPVBatchOptions::New();
-  if ( !options->Parse(argc, argv) )
-    {
-    cerr << "Problem parsing command line arguments" << endl;
-    if ( options->GetUnknownArgument() )
-      {
-      cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
-      }
-    if ( options->GetErrorMessage() )
-      {
-      cerr << "Error: " << options->GetErrorMessage() << endl;
-      }
-    display_help = 1;
-    }
-  if ( display_help || options->GetHelpSelected() )
-    {
-    cerr << options->GetHelp() << endl;
-    options->Delete();
-#ifdef VTK_USE_MPI
-  MPI_Finalize();
-#endif
-    return 1;
-    }
-
-  // Create the process module for initializing the processes.
-  // Only the root server processes args.
-  
-  vtkProcessModule* pm = vtkPVCreateProcessModule::CreateProcessModule(options);
-
+  options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModuleBatchHelper* helper = vtkPVProcessModuleBatchHelper::New();
-  helper->SetProcessModule(pm);
-  pm->SetGUIHelper(helper);
+  int ret = pvmain->Run(options, helper, ParaViewInitializeInterpreter, argc, argv);
   helper->Delete();
-
-  pm->Initialize();
-  ParaViewInitializeInterpreter(pm);
-
-  // Start the application's event loop.  This will enable
-  // vtkOutputWindow's user prompting for any further errors now that
-  // startup is completed.
-  int new_argc = 0;
-  char** new_argv = 0;
-  options->GetRemainingArguments(&new_argc, &new_argv);
-
-  startVal = pm->Start(new_argc, new_argv);
-
-  // Clean up for exit.
-  pm->Finalize();
-  pm->Delete();
-  pm = NULL;
-
-  // free some memory
-  vtkTimerLog::CleanupLog();
-
-#ifdef VTK_USE_MPI
-  MPI_Finalize();
-#endif
+  pvmain->Delete();
   options->Delete();
-
-  return (retVal?retVal:startVal);
+  vtkPVMain::Finalize();
+  return ret;
 }
 
 //----------------------------------------------------------------------------

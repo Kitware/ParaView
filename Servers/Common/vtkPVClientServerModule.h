@@ -30,7 +30,6 @@
 
 #include "vtkPVProcessModule.h"
 
-class vtkKWRemoteExecute;
 class vtkMapper;
 class vtkMapper;
 class vtkMultiProcessController;
@@ -183,10 +182,6 @@ protected:
   int ShouldWaitForConnection();
 
   // Description:
-  // Start a remote paraview server process.  Return 0 if connection failed.
-  int StartRemoteParaView(vtkSocketCommunicator* comm);
-
-  // Description:
   // Open a dialog to enter server information, if the start
   // variable is set to 1 in this function, then a remote paraview
   // should be started with StartRemoteParaView.
@@ -210,8 +205,6 @@ protected:
   int GatherRenderServer;
   vtkClientServerStream* LastServerResultStream;
   
-  vtkKWRemoteExecute* RemoteExecution;
-
   int Enabled;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented

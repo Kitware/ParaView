@@ -25,13 +25,13 @@
 #ifndef __vtkPVGUIClientOptions_h
 #define __vtkPVGUIClientOptions_h
 
-#include "vtkPVBatchOptions.h"
+#include "vtkPVOptions.h"
 
-class VTK_EXPORT vtkPVGUIClientOptions : public vtkPVBatchOptions
+class VTK_EXPORT vtkPVGUIClientOptions : public vtkPVOptions
 {
 public:
   static vtkPVGUIClientOptions* New();
-  vtkTypeRevisionMacro(vtkPVGUIClientOptions,vtkPVBatchOptions);
+  vtkTypeRevisionMacro(vtkPVGUIClientOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetMacro(PlayDemoFlag, int);
@@ -39,15 +39,7 @@ public:
   vtkGetMacro(CrashOnErrors, int);
   vtkGetMacro(StartEmpty, int);
   vtkGetStringMacro(ParaViewScriptName);
-  vtkGetStringMacro(ParaViewDataName);
-
-  // Description:
-  // Some variables need to be overwritten
-  vtkSetStringMacro(HostName);
-  vtkSetStringMacro(Username);
-  vtkSetClampMacro(PortNumber, int, 0, 65535);
   vtkSetStringMacro(ParaViewScriptName);
-
 protected:
   // Description:
   // Default constructor.
@@ -81,8 +73,6 @@ private:
   int StartEmpty;
   char* ParaViewScriptName;
 
-  vtkSetStringMacro(ParaViewDataName);
-  char* ParaViewDataName;
 };
 
 #endif // #ifndef __vtkPVGUIClientOptions_h

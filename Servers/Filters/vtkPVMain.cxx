@@ -17,6 +17,11 @@
 # include <mpi.h>
 #endif
 
+#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+#include "vtkPVAdaptor.h"
+#endif
+
+
 #include "vtkPVMain.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
@@ -31,7 +36,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.1");
+vtkCxxRevisionMacro(vtkPVMain, "1.2");
 
 
 
@@ -165,6 +170,9 @@ int vtkPVMain::Run(vtkPVOptions* options,
     }
 
   this->ProcessModule->Initialize();
+#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorCreatePrototypes();
+#endif
   (*initInterp)(this->ProcessModule);
 
   // Start the application's event loop.  This will enable

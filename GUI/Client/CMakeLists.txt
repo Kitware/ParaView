@@ -178,6 +178,9 @@ ENDIF(VTK_USE_MPI)
 
 SET(ParaViewBinary_SRCS ParaView.cxx)
 
+SET(PVClient_SRCS
+  pvclient.cxx)
+
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS ${ParaViewClient_SRCS})
 ENDIF (PARAVIEW_USE_ICE_T)
@@ -292,15 +295,16 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVHelpPaths.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVHelpPaths.h
   ESCAPE_QUOTES)
 
-IF (WIN32)
-  IF(TK_RESOURCE_FILE)
-    GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${TK_RESOURCE_FILE} PATH)
-    INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
-    SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
-  ENDIF(TK_RESOURCE_FILE)
-ENDIF (WIN32)
+IF(WIN32 AND TK_RESOURCE_FILE)
+  GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${TK_RESOURCE_FILE} PATH)
+  INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
+  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
+  SET(PVClient_SRCS ${PVClient_SRCS} Resources/ParaView.rc)
+ENDIF(WIN32 AND TK_RESOURCE_FILE)
+
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+ADD_EXECUTABLE(pvclient WIN32 ${PVClient_SRCS})
 
 SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
   "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
@@ -326,6 +330,10 @@ IF(VTK_USE_CARBON)
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
 
+TARGET_LINK_LIBRARIES (pvclient 
+  vtkKWParaViewCS
+  vtkClientServer 
+  ${PARAVIEW_ADDITIONAL_LIBRARIES})
 TARGET_LINK_LIBRARIES (paraview 
   vtkKWParaViewCS
   vtkClientServer 

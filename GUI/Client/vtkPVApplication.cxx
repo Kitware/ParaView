@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.328");
+vtkCxxRevisionMacro(vtkPVApplication, "1.329");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -977,14 +977,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
 //        rgDialog->Delete();
 //        }
 //      }
-
-  if (this->Options->GetBatchScriptName())
-    {
-    this->LoadScript(this->Options->GetBatchScriptName());
-    this->Exit();
-    return;
-    }
-
 
   // Splash screen ?
 

@@ -38,6 +38,7 @@ pvTestDriver::pvTestDriver()
   this->RenderServerNumProcesses = 0;
   this->TimeOut = 300;
   this->TestRenderServer = 0;
+  this->TestBatch = 0;
   this->TestServer = 0;
   this->ReverseConnection = 0;
 }
@@ -77,21 +78,25 @@ void pvTestDriver::CollectConfiguredOptions()
     {
     this->TimeOut = 1500;
     }
-  // Find the location of paraview
+// set the path to the binary directory
   this->ParaView = PARAVIEW_BINARY_DIR;
 #ifdef  CMAKE_INTDIR
   this->ParaView  += "/" CMAKE_INTDIR;
 #endif
-  this->ParaView += "/paraview";
-  // Find the location of the paraview render server
+  // now set the base part of the executables
+  this->ParaViewBatch = this->ParaView;
+  this->ParaViewClient = this->ParaView;
   this->ParaViewRenderServer = this->ParaView;
-  // Find the location of the paraview server
-  this->ParaViewServer = PARAVIEW_BINARY_DIR;
-#ifdef  CMAKE_INTDIR
-    this->ParaViewServer  += "/" CMAKE_INTDIR;
-#endif
-    // To test pvserver, change the following to pvserver
-    this->ParaViewServer += "/pvserver";
+  this->ParaViewServer = this->ParaView;
+  this->ParaViewDataServer = this->ParaView;
+  // now set the final execuable names
+  this->ParaViewBatch += "/pvbatch";
+  this->ParaView += "/paraview";
+  this->ParaViewClient += "/pvclient";
+  this->ParaViewRenderServer += "/pvrenderserver";
+  this->ParaViewServer += "/pvserver"; 
+  this->ParaViewDataServer += "/pvdataserver";
+
   // now find all the mpi information if mpi run is set
 #ifdef VTK_USE_MPI
 #ifdef VTK_MPIRUN_EXE
@@ -158,39 +163,41 @@ void pvTestDriver::CollectConfiguredOptions()
 int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
 {
   this->ArgStart = 1;
-  if(argc > 1)
+  int i;
+  for(i =1; i < argc - 1; ++i)
     {
-    int index = 1;
-    if(strcmp(argv[index], "--test-render-server") == 0)
+    if(strcmp(argv[i], "--test-render-server") == 0)
       {
-      this->ArgStart = index+1;
+      this->ArgStart = i+1;
       this->TestRenderServer = 1;
       this->TestServer = 1;
       fprintf(stderr, "Test Render Server.\n");
       }
-    if(strcmp(argv[index], "--test-r2d") == 0)
+    if(strcmp(argv[i], "--test-batch") == 0)
       {
-      this->ArgStart = index+1;
+      this->ArgStart = i+1;
+      this->TestBatch = 1;
+      fprintf(stderr, "Test Batch Server.\n");
+      }
+    if(strcmp(argv[i], "--test-r2d") == 0)
+      {
+      this->ArgStart = i+1;
       this->TestRenderServer = 2;
       this->TestServer = 1;
       fprintf(stderr, "Test Render Server.\n");
       }
-    if(strcmp(argv[index], "--test-server") == 0)
+    if(strcmp(argv[i], "--test-server") == 0)
       {
-      this->ArgStart = index+1;
+      this->ArgStart = i+1;
       this->TestServer = 1;
       fprintf(stderr, "Test Server.\n");
       }
-    if(strcmp(argv[index], "--one-mpi-np") == 0)
+    if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
       this->MPIClientNumProcessFlag = this->MPIServerNumProcessFlag = "1";
-      this->ArgStart = index+1;
+      this->ArgStart = i+1;
       fprintf(stderr, "Test with one mpi process.\n");
       }
-    }
-  int i;
-  for(i =1; i < argc - 1; ++i)
-    {
     if(strcmp(argv[i], "--test-rc") == 0)
       {
       this->ArgStart = i+1;
@@ -297,10 +304,6 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
   else
     {
     commandLine.push_back(paraView);
-    if(strlen(paraviewFlags) > 0 && strcmp(paraviewFlags, "--server") != 0)
-      {
-      commandLine.push_back(paraviewFlags);
-      }
     if(this->ReverseConnection)
       {
       commandLine.push_back("-rc");
@@ -326,6 +329,15 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
         commandLine.push_back(this->MPIServerPostFlags[i].c_str());
         }
       }
+    if(strcmp(paraviewFlags, "-r2d") == 0)
+      {
+      commandLine.push_back(paraviewFlags);
+      }
+    if(strcmp(paraviewFlags, "--client-render-server") == 0)
+      {
+      commandLine.push_back(paraviewFlags);
+      }
+    
     // remaining flags for the test 
     for(int ii = argStart; ii < argCount; ++ii)
       {
@@ -501,7 +513,7 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(renderServer)
     {
     this->CreateCommandLine(renderServerCommand,
-                            this->ParaView.c_str(),
+                            this->ParaViewRenderServer.c_str(),
                             "--render-server",
                             this->MPIRenderServerNumProcessFlag.c_str());
     this->ReportCommand(&renderServerCommand[0], "renderserver");
@@ -511,8 +523,15 @@ int pvTestDriver::Main(int argc, char* argv[])
   kwsys_stl::vector<const char*> serverCommand;
   if(server)
     {
+    const char* serverExe = this->ParaViewServer.c_str();
+    if(this->TestRenderServer)
+      {
+      serverExe = this->ParaViewDataServer.c_str();
+      }
+    
+      
     this->CreateCommandLine(serverCommand,
-                            this->ParaViewServer.c_str(),
+                            serverExe,
                             "--server",
                             this->MPIServerNumProcessFlag.c_str());
     this->ReportCommand(&serverCommand[0], "server");
@@ -545,8 +564,19 @@ int pvTestDriver::Main(int argc, char* argv[])
       this->MPIClientNumProcessFlag = this->MPIServerNumProcessFlag;
       }
     }
+  // default to paraview for tests
+  const char* pv = this->ParaView.c_str();
+  // if server or render server then use ParaViewClient
+  if(server || renderServer)
+    {
+    pv = this->ParaViewClient.c_str();
+    }
+  if(this->TestBatch)
+    {
+    pv = this->ParaViewBatch.c_str();
+    }
   this->CreateCommandLine(clientCommand,
-                          this->ParaView.c_str(),
+                          pv,
                           clientFlag.c_str(),
                           this->MPIClientNumProcessFlag.c_str(),
                           this->ArgStart, argc, argv);

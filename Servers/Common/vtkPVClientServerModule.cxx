@@ -42,7 +42,6 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkCallbackCommand.h"
-#include "vtkKWRemoteExecute.h"
 #include "vtkPVOptions.h"
 #ifndef _WIN32
 # include <unistd.h>
@@ -151,7 +150,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.23");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.24");
 
 
 //----------------------------------------------------------------------------
@@ -169,7 +168,6 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->MultiProcessMode = vtkPVClientServerModule::SINGLE_PROCESS_MODE;
   this->NumberOfProcesses = 2;
   this->GatherRenderServer = 0;
-  this->RemoteExecution = vtkKWRemoteExecute::New();
 
   this->Enabled = 1;
 }
@@ -198,7 +196,6 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->Arguments = NULL;
   this->ReturnValue = 0;
 
-  this->RemoteExecution->Delete();
 }
 
 
@@ -472,59 +469,6 @@ int vtkPVClientServerModule::OpenConnectionDialog(int* start)
   return this->GUIHelper->OpenConnectionDialog(start);
 }
 
-//----------------------------------------------------------------------------
-int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
-{ 
-  char numbuffer[100];
-  vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
-  // Add mpi
-  if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
-    {
-    sprintf(numbuffer, "%d", this->NumberOfProcesses);
-    runcommand += "mpirun -np ";
-    runcommand += numbuffer;
-    runcommand += " ";
-    }
-  runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
-  sprintf(numbuffer, "%d", this->Options->GetPortNumber());
-  runcommand += numbuffer;
-  this->RemoteExecution->SetRemoteHost(this->Options->GetHostName());
-  if ( this->Options->GetUsername() && this->Options->GetUsername()[0] )
-    {
-    this->RemoteExecution->SetSSHUser(this->Options->GetUsername());
-    }
-  else
-    {
-    this->RemoteExecution->SetSSHUser(0);
-    }
-  this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
-  int cc;
-  const int max_try = 10;
-  for ( cc = 0; cc < max_try; cc ++ )
-    {
-#ifdef _WIN32
-    Sleep(1000);
-#else
-    sleep(1);
-#endif
-    if ( this->RemoteExecution->GetResult() != vtkKWRemoteExecute::RUNNING )
-      {
-      cc = max_try;
-      break;
-      }
-    if (comm->ConnectTo(this->Options->GetHostName(), this->Options->GetPortNumber()))
-      {
-      break;
-      }
-    }
-  if ( cc < max_try )
-    {
-    return 1;
-    }
-  return 0;
-}
-
-  
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::ConnectToRemote()
@@ -538,27 +482,54 @@ void vtkPVClientServerModule::ConnectToRemote()
   vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
   vtkSocketCommunicator *commRenderServer = vtkSocketCommunicator::New();
   
-  // Get the host name from the command line arguments
   vtkCallbackCommand* cb = vtkCallbackCommand::New();
   cb->SetCallback(vtkPVClientServerModule::ErrorCallback);
   cb->SetClientData(this);
   comm->AddObserver(vtkCommand::ErrorEvent, cb);
   cb->Delete();
 
-  // Get the port from the command line arguments
-  // Establish connection
-  int start = 0;
-  if ( this->Options->GetAlwaysSSH() )
+  // if this is the client in render server mode, the first connection is
+  // the data server.  So, set the host and port correctly based on what
+  // type of process this is.
+  int port = 0;
+  char* hostName = 0;
+  switch(this->Options->GetProcessType())
     {
-    start = 1;
+    case vtkPVOptions::PVCLIENT:
+      if(this->Options->GetRenderServerMode())
+        {
+        port = this->Options->GetDataServerPort();
+        hostName = this->Options->GetDataServerHostName();
+        }
+      else
+        {
+        port = this->Options->GetServerPort();
+        hostName =  this->Options->GetServerHostName();
+        }
+      break;
+    case vtkPVOptions::PVSERVER:
+      port = this->Options->GetServerPort();
+      hostName = this->Options->GetClientHostName();
+      break;
+    case vtkPVOptions::PVRENDER_SERVER:
+      port = this->Options->GetRenderServerPort();
+      hostName = this->Options->GetClientHostName();
+      break;
+    case vtkPVOptions::PVDATA_SERVER:
+      port = this->Options->GetDataServerPort();
+      hostName = this->Options->GetClientHostName();
+      break;
+    case vtkPVOptions::PARAVIEW:
+    case vtkPVOptions::PVBATCH:
+    case vtkPVOptions::XMLONLY:
+    case vtkPVOptions::ALLPROCESS:
+      vtkErrorMacro("This type of process should not try to connect to a remote host");
+      return;
     }
-  int port = this->Options->GetPortNumber();
-  if(this->Options->GetRenderServerMode() && !this->Options->GetClientMode())
-    {
-    port = this->Options->GetRenderServerPort();
-    }
-  cout << "Connect to " << this->Options->GetHostName() << ":" << port << endl;
-  while (!comm->ConnectTo(this->Options->GetHostName(), port))
+  // Now connect to the data, combined, or client process which
+  // is now specified in hostName and port
+  cout << "Connect to " << hostName << ":" << port << endl;
+  while (!comm->ConnectTo(hostName, port))
     {  
     // Do not bother trying to start the client if reverse connection is specified.
     // only try the ConnectTo once if it is a server in reverse mode
@@ -567,7 +538,7 @@ void vtkPVClientServerModule::ConnectToRemote()
       // This is the "reverse-connection" server condition.  
       // For now just fail if connection is not found.
       vtkErrorMacro("Server error: Could not connect to the client. " 
-                    << this->Options->GetHostName() << " " << port);
+                    << hostName << " " << port);
       comm->Delete();
       commRenderServer->Delete();
       if(this->GUIHelper)
@@ -581,20 +552,9 @@ void vtkPVClientServerModule::ConnectToRemote()
       this->ReturnValue = 1;
       return;
       }
-    if ( start)
-      {
-      start = 0;
-      if(this->StartRemoteParaView(comm))
-        {
-        // if a remote paraview was successfuly started
-        // the connection would be made in StartRemoteParaView
-        // so break from the connect while loop 
-        break;
-        }
-      continue;
-      }
     if (this->Options->GetClientMode())
       {
+      int start = 0;
       if(!this->OpenConnectionDialog(&start))
         {
         // if the user canceled then just quit
@@ -615,6 +575,8 @@ void vtkPVClientServerModule::ConnectToRemote()
       }
     }
   
+  // If this is the client running in render server mode,
+  // next we need to connect to the render server
   if(this->Options->GetClientMode() && this->Options->GetRenderServerMode())
     {
     cout << "Connect to " << this->Options->GetRenderServerHostName() << ":" 
@@ -643,8 +605,8 @@ void vtkPVClientServerModule::ConnectToRemote()
       }
     }
 
-  // if you make it this far, then the connection
-  // was made.
+
+  // At this point all main client server connections have been made
   this->SocketController = vtkSocketController::New();
   this->SocketController->SetCommunicator(comm);
   this->ProgressHandler->SetSocketController(this->SocketController);
@@ -656,32 +618,62 @@ void vtkPVClientServerModule::ConnectToRemote()
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
   int needTwoSockets = 0;
-  if(this->Options->GetRenderServerMode() && this->Options->GetClientMode())
+  int port = 0;
+  int port2 = 0;
+  // Set needTwoSockets, port, and port2 based on process type
+  switch(this->Options->GetProcessType())
     {
-    needTwoSockets = 1;
-    this->RenderServerSocket = vtkSocketController::New();
+    case vtkPVOptions::PVCLIENT:
+      // The client running render server mode is the only one that 
+      // waits for two ports at the same time.  This happens in reverse
+      // connection in the client.
+      if(this->Options->GetRenderServerMode())
+        {
+        needTwoSockets = 1;
+        this->RenderServerSocket = vtkSocketController::New();
+        port = this->Options->GetDataServerPort();
+        port2 = this->Options->GetRenderServerPort();
+        }
+      else
+        {
+        port = this->Options->GetServerPort();
+        }
+      break;
+    case vtkPVOptions::PVSERVER:
+      port = this->Options->GetServerPort();
+      break;
+    case vtkPVOptions::PVRENDER_SERVER:
+      port = this->Options->GetRenderServerPort();
+      break;
+    case vtkPVOptions::PVDATA_SERVER:
+      port = this->Options->GetDataServerPort();
+      break;
+    case vtkPVOptions::PARAVIEW:
+    case vtkPVOptions::PVBATCH:
+    case vtkPVOptions::XMLONLY:
+    case vtkPVOptions::ALLPROCESS:
+      vtkErrorMacro("This type of process should not try to connect to a remote host");
+      return;
     }
-  
+  int sock = 0;
+  int sock2 = 0;
+
   this->SocketController = vtkSocketController::New();
   this->SocketController->Initialize();
   this->ProgressHandler->SetSocketController(this->SocketController);
   vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
   vtkSocketCommunicator* comm2 = 0;
-  int sock2 = 0;
   if(needTwoSockets)
     {
+    // open sock2 port2 
     comm2 = vtkSocketCommunicator::New();
-    cout << "Listen on port: " << this->Options->GetRenderServerPort() << endl;
-    sock2 = comm2->OpenSocket(this->Options->GetRenderServerPort());
+    cout << "Listen on render server port: " << port2 << endl;
+    sock2 = comm2->OpenSocket(port2);
     }
-  int port= this->Options->GetPortNumber();
-  if((!needTwoSockets && this->Options->GetRenderServerMode()) ||
-     (!this->Options->GetClientMode() && this->Options->GetRenderServerMode()))
-    {
-    port = this->Options->GetRenderServerPort();
-    }
+  // now oepn sock on port
   cout << "Listen on port: " << port << endl;
-  int sock = comm->OpenSocket(port);
+  sock = comm->OpenSocket(port);
+  // print out what we are waiting for
   if ( this->Options->GetClientMode() )
     {
     cout << "Waiting for server..." << endl;
@@ -694,8 +686,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
       }
     cout << "Waiting for client..." << endl;
     }
-
-  // Establish connection
+  // now wait for a connection on sock
   if (!comm->WaitForConnectionOnSocket(sock))
     {
     vtkErrorMacro("Wait timed out or could not initialize socket.");
@@ -704,7 +695,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     return;
     }
   cout << "connected to port " << port << "\n";
-    // Establish connection
+  // If there is a second connection, wait for it on sock2
   if (comm2 && !comm2->WaitForConnectionOnSocket(sock2))
     {
     vtkErrorMacro("Wait timed out or could not initialize render server socket.");
@@ -712,11 +703,11 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     this->ReturnValue = 1;
     return;
     }
+  // print out connection messages
   if(comm2)
     {
-    cout << "connected to port " << this->Options->GetRenderServerPort() << "\n";
+    cout << "connected to port " << port2 << "\n";
     }
-  
   if ( this->Options->GetClientMode() )
     {
     cout << "Server connected." << endl;
@@ -752,7 +743,8 @@ void vtkPVClientServerModule::Connect()
     {
     return;
     }
-
+  // Based on reverse connection information any process can
+  // wait to be connected to or it can connect to a waiting process
   if ( this->ShouldWaitForConnection())
     {
     this->SetupWaitForConnection();

@@ -35,7 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetStringMacro(BatchScriptName);
-  vtkGetMacro(ClientRenderServer, int);
 
 protected:
   // Description:
@@ -64,9 +63,6 @@ protected:
   char* BatchScriptName;
 
   int RequireBatchScript;
-  int ClientRenderServer;
-  int ConnectRenderToData;
-  int ConnectDataToRender;
 
 private:
   vtkPVBatchOptions(const vtkPVBatchOptions&); // Not implemented

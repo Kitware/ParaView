@@ -22,6 +22,8 @@ SET(Common_SRCS
   vtkMPIMToNSocketConnection.cxx
   vtkPVProgressHandler.cxx
   vtkPVOptions.cxx
+  vtkPVServerOptions.cxx
+  vtkPVOptionsXMLParser.cxx
   vtkPVCreateProcessModule.cxx
   vtkPVGenericAttributeInformation.cxx
   )
@@ -38,6 +40,8 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVProgressHandler.cxx
   vtkStringList.cxx
   vtkPVOptions.cxx
+  vtkPVOptionsXMLParser.cxx
+  vtkPVServerOptions.cxx
   vtkPVCreateProcessModule
   WRAP_EXCLUDE)
 

@@ -12,7 +12,7 @@
 
 =========================================================================*/
 #include "vtkPVOptions.h"
-
+#include "vtkPVOptionsXMLParser.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/CommandLineArguments.hxx>
@@ -24,6 +24,16 @@
 class vtkPVOptionsInternal
 {
 public:
+  vtkPVOptionsInternal(vtkPVOptions* p)
+    {
+      this->XMLParser = vtkPVOptionsXMLParser::New();
+      this->XMLParser->SetPVOptions(p);
+    }
+  ~vtkPVOptionsInternal()
+    {
+      this->XMLParser->Delete();
+    }
+  vtkPVOptionsXMLParser* XMLParser;
   kwsys::CommandLineArguments CMD;
 };
 //****************************************************************************
@@ -31,41 +41,54 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.18");
+vtkCxxRevisionMacro(vtkPVOptions, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
 {
+  this->ProcessType = ALLPROCESS;
   // Initialize kwsys::CommandLineArguments
-  this->Internals = new vtkPVOptionsInternal;
+  this->Internals = new vtkPVOptionsInternal(this);
   this->Internals->CMD.SetUnknownArgumentCallback(vtkPVOptions::UnknownArgumentHandler);
   this->Internals->CMD.SetClientData(this);
   this->UnknownArgument = 0;
   this->ErrorMessage = 0;
   this->Argc = 0;
   this->Argv = 0;
-
   this->CaveConfigurationFileName = 0;
   this->MachinesFileName = 0;
-  this->AlwaysSSH = 0;
   this->RenderModuleName = NULL;
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
+  this->XMLConfigFile = 0;
+
+  this->ClientRenderServer = 0;
+  this->ConnectRenderToData = 0;
+  this->ConnectDataToRender = 0;
+
 
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
   this->ClientMode = 0;
-  this->ServerMode = 1;
+  this->ServerMode = 0;
   this->RenderServerMode = 0;
-  this->HostName = NULL;
+
+  // initialize host names 
+  this->ServerHostName = 0;
+  this->SetServerHostName("localhost");
+  this->DataServerHostName = 0;
+  this->SetDataServerHostName("localhost");
   this->RenderServerHostName = 0;
   this->SetRenderServerHostName("localhost");
-  this->SetHostName("localhost");
-  this->PortNumber = 11111;
+  this->ClientHostName = 0;
+  this->SetClientHostName("localhost");
+  // initialize ports to defaults
+  this->ServerPort = 11111;
+  this->DataServerPort = 11111;
   this->RenderServerPort = 22221;
-  this->RenderNodePort = 0;
+  this->RenderNodePort = 0;  // this means pick a random port
+  
   this->ReverseConnection = 0;
-  this->Username = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftwareRendering = 0;
   this->UseStereoRendering = 0;
@@ -78,12 +101,14 @@ vtkPVOptions::vtkPVOptions()
 //----------------------------------------------------------------------------
 vtkPVOptions::~vtkPVOptions()
 {
+  this->SetXMLConfigFile(0);
   this->SetRenderModuleName(0);
   this->SetCaveConfigurationFileName(NULL);
   this->SetGroupFileName(0);
-  this->SetRenderServerHostName(NULL);
-  this->SetHostName(NULL);
-  this->SetUsername(0);
+  this->SetServerHostName(0);
+  this->SetDataServerHostName(0);
+  this->SetRenderServerHostName(0);
+  this->SetClientHostName(0);
   this->SetMachinesFileName(0);
   
   // Remove internals
@@ -103,6 +128,7 @@ const char* vtkPVOptions::GetHelp()
     }
 
   this->Internals->CMD.SetLineLength(width);
+  this->Internals->CMD.SetLineLength(300);
 
   return this->Internals->CMD.GetHelp();
 }
@@ -110,64 +136,99 @@ const char* vtkPVOptions::GetHelp()
 //----------------------------------------------------------------------------
 void vtkPVOptions::Initialize()
 {
-  this->AddBooleanArgument("--render-server", "-rs", &this->RenderServerMode,
-    "Start ParaView as a render server (use MPI run).");
+  this->AddBooleanArgument("--client-render-server", "-crs", &this->ClientRenderServer,
+                           "Run ParaView as a client to a data and render server."
+                           " The render server will wait for the data server.",
+                           vtkPVOptions::PVCLIENT);
+  this->AddBooleanArgument("--connect-render-to-data", "-r2d", &this->ConnectRenderToData,
+                           "Run ParaView as a client to a data and render server."
+                           " The data server will wait for the render server.",
+                           vtkPVOptions::PVCLIENT);
+  this->AddBooleanArgument("--connect-data-to-render", "-d2r", &this->ConnectDataToRender,
+                           "Run ParaView as a client to a data and render server."
+                           " The render server will wait for the data server.",
+                           vtkPVOptions::PVCLIENT);
+  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName, 
+                    "Tell the client the host name of the render server (default: localhost).", 
+                    vtkPVOptions::PVCLIENT);
+  this->AddArgument("--data", 0, &this->ParaViewDataName,
+                    "Load the specified data.", 
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
   this->AddArgument("--connect-id", 0, &this->ConnectID,
-    "Set the ID of the server and client to make sure they match.");
+                    "Set the ID of the server and client to make sure they match.",
+                    vtkPVOptions::PVCLIENT);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
-    "User specified rendering module.");
-  this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
-    "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
+                    "User specified rendering module.",
+                    vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
-    "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix.");
+                           "Render offscreen on the satellite processes."
+                           " This option only works with software rendering or mangled mesa on Unix.",
+                           vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
-    "Tell the application to enable stereo rendering (only when running on a single process).");
-  this->AddArgument("--host", "-h", &this->HostName, 
-    "Tell the program where to look for the peer (default: localhost). Used with --client for client connecting to the server or with --server -rc for server connecting to the client.");
-  this->AddArgument("--port", 0, &this->PortNumber, 
-    "Specify the port client and server will use (--port=11111).  Client and servers ports must match.");
-  this->AddArgument("--machines", "-m", &this->MachinesFileName, 
-    "Specify the network configurations file for the render server.");
+                           "Tell the application to enable stereo rendering"
+                           " (only when running on a single process).",
+                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddArgument("--server-host", "-dsh", &this->ServerHostName,
+                    "Tell the client the host name of the data server.",
+                    vtkPVOptions::PVCLIENT);
+  this->AddArgument("--data-server-host", "-dsh", &this->DataServerHostName,
+                    "Tell the client the host name of the data server.", 
+                    vtkPVOptions::PVCLIENT);
+  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
+                    "Tell the client the host name of the render server.", 
+                    vtkPVOptions::PVCLIENT);
+  this->AddArgument("--client-host", "-ch", &this->ClientHostName,
+                    "Tell the data|render server the host name of the client, use with -rc.",
+                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
+  this->AddArgument("--data-server-port", "-dsp", &this->DataServerPort,
+                    "What port data server use to connect to the client. (default 11111).", 
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVDATA_SERVER);
+  this->AddArgument("--render-server-port", "-rsp", &this->RenderServerPort,
+                    "What port should the render server use to connect to the client. (default 22221).", 
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVRENDER_SERVER);
+  this->AddArgument("--server-port", "-sp", &this->ServerPort,
+                    "What port should the combined server use to connect to the client. (default 11111).", 
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+
   this->AddArgument("--render-node-port", 0, &this->RenderNodePort, 
-    "Specify the port to be used by each render node (--render-node-port=22222).  Client and render servers ports must match.");
+                    "Specify the port to be used by each render node (--render-node-port=22222)."
+                    "  Client and render servers ports must match.",
+                    vtkPVOptions::XMLONLY);
   this->AddBooleanArgument("--disable-composite", "-dc", &this->DisableComposite, 
-    "Use this option when rendering resources are not available on the server.");
-
-  this->AddBooleanArgument("--use-software-rendering", "-r", &this->UseSoftwareRendering, 
-    "Use software (Mesa) rendering (supports off-screen rendering).");
-  this->AddBooleanArgument("--use-satellite-rendering", "-s", &this->UseSatelliteSoftwareRendering, 
-    "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.");
+                           "Use this option when rendering resources are not available on the server.", 
+                           vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection, 
-    "Have the server connect to the client.");
+                           "Have the server connect to the client.");
   this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
-    "Size of tile display in the number of displays in each row of the display.");
+                    "Size of tile display in the number of displays in each row of the display.",
+                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
-    "Size of tile display in the number of displays in each column of the display.");
-
-  // Temporarily removing this (for the release - it has bugs)
-  /*
-  this->AddBooleanArgument("--use-rendering-group", "-p", &this->UseRenderingGroup, 
-    "Use a subset of processes to render.");
-  this->AddArgument("--group-file", "-gf", &this->GroupFileName, 
-    "Group file is the name of the input file listing number of processors to render on.");
-    */
+                    "Size of tile display in the number of displays in each column of the display.",
+                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVOptions::PostProcess(int, const char* const*)
 {
-  if ( this->ServerMode && this->PortNumber )
+  switch(this->GetProcessType())
     {
-    this->RenderNodePort = this->PortNumber;
+    case vtkPVOptions::PVCLIENT:
+      this->ClientMode = 1;
+      break;
+    case vtkPVOptions::PARAVIEW:
+      break;
+    case vtkPVOptions::PVRENDER_SERVER:
+      this->RenderServerMode = 1;
+    case vtkPVOptions::PVDATA_SERVER:
+    case vtkPVOptions::PVSERVER:
+      this->ServerMode = 1;
+      break;
+    case vtkPVOptions::PVBATCH:
+    case vtkPVOptions::XMLONLY:
+    case vtkPVOptions::ALLPROCESS:
+      break;
     }
-  if ( this->ServerMode && this->HostName )
-    {
-    this->SetRenderServerHostName(this->HostName);
-    }
-  if ( this->CaveConfigurationFileName )
-    {
-    this->SetRenderModuleName("CaveRenderModule");
-    }
+  
   if ( this->UseSatelliteSoftwareRendering )
     {
     this->UseSoftwareRendering = 1;
@@ -188,12 +249,40 @@ int vtkPVOptions::PostProcess(int, const char* const*)
       this->TileDimensions[1] = 1;
       }
     }
+  if ( this->ClientRenderServer )
+    {
+    this->ClientMode = 1;
+    this->RenderServerMode = 1;
+    }
+  if ( this->ConnectDataToRender )
+    {
+    this->ClientMode = 1;
+    this->RenderServerMode = 1;
+    }
+  if ( this->ConnectRenderToData )
+    {
+    this->ClientMode = 1;
+    this->RenderServerMode = 2;
+    }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVOptions::WrongArgument(const char*)
+int vtkPVOptions::WrongArgument(const char* argument)
 {
+  // if the unknown file is a config file then it is OK
+  if(this->XMLConfigFile && strcmp(argument, this->XMLConfigFile) == 0)
+    {
+    // if the UnknownArgument is the XMLConfigFile then set the 
+    // UnknownArgument to null as it really is not Unknown anymore.
+    if(this->UnknownArgument && 
+       (strcmp(this->UnknownArgument, this->XMLConfigFile) == 0))
+      {
+      this->SetUnknownArgument(0);
+      }
+    return 1;
+    }
+
   return 0;
 }
 
@@ -204,17 +293,42 @@ const char* vtkPVOptions::GetArgv0()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVOptions::LoadXMLConfigFile(const char* fname)
+{
+  this->Internals->XMLParser->SetFileName(fname);
+  this->Internals->XMLParser->Parse();
+  this->SetXMLConfigFile(fname);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVOptions::Parse(int argc, const char* const argv[])
 {
   this->Internals->CMD.Initialize(argc, argv);
   this->Initialize();
   this->AddBooleanArgument("--help", "/?", &this->HelpSelected, 
-    "Displays available command line arguments.");
+                           "Displays available command line arguments.",
+                           ALLPROCESS);
+
+  // First get options from the xml file
+  for(int i =0; i < argc; ++i)
+    {
+    vtkstd::string arg = argv[i];
+    if(arg.size() > 4 && arg.find(".pvx") == (arg.size() -4))
+      {
+      if(!this->LoadXMLConfigFile(arg.c_str()))
+        {
+        return 0;
+        }
+      }
+    }
+  // now get options from the command line
   int res1 = this->Internals->CMD.Parse();
   int res2 = this->PostProcess(argc, argv);
   //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
   this->CleanArgcArgv();
   this->Internals->CMD.GetRemainingArguments(&this->Argc, &this->Argv);
+
   return res1 && res2;
 }
 
@@ -233,46 +347,116 @@ void vtkPVOptions::CleanArgcArgv()
     }
 }
 //----------------------------------------------------------------------------
-void vtkPVOptions::AddBooleanArgument(const char* longarg, const char* shortarg, int* var, const char* help)
+void vtkPVOptions::AddDeprecatedArgument(const char* longarg, const char* shortarg,
+                                         const char* help, int type)
 {
-  this->Internals->CMD.AddBooleanArgument(longarg, var, help);
-  if ( shortarg )
+  // if it is for xml or not for the current process do nothing
+  if((type == XMLONLY) || !(type & this->ProcessType))
     {
-    this->Internals->CMD.AddBooleanArgument(shortarg, var, longarg);
+    return;
+    }
+  // Add a callback for the deprecated argument handling
+  this->Internals->CMD.AddCallback(longarg, kwsys::CommandLineArguments::NO_ARGUMENT,
+                                   vtkPVOptions::DeprecatedArgumentHandler, this, help);
+  if(shortarg)
+    {
+    this->Internals->CMD.AddCallback(shortarg, kwsys::CommandLineArguments::NO_ARGUMENT,
+                                     vtkPVOptions::DeprecatedArgumentHandler, this, help);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, int* var, const char* help)
+int vtkPVOptions::DeprecatedArgument(const char* argument)
 {
-  typedef kwsys::CommandLineArguments argT;
-  this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
-  if ( shortarg )
+  ostrstream str;
+  str << "  " << this->Internals->CMD.GetHelp(argument);
+  str << ends;
+  this->SetErrorMessage(str.str());
+  delete [] str.str();
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVOptions::AddBooleanArgument(const char* longarg, const char* shortarg,
+                                      int* var, const char* help, int type)
+{
+  // add the argument to the XML parser
+  this->Internals->XMLParser->AddBooleanArgument(longarg, var, type);
+  if(type == XMLONLY)
     {
-    this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
+    return;
+    }
+  // if the process type matches then add the argument to the command line
+  if(type & this->ProcessType)
+    {
+    this->Internals->CMD.AddBooleanArgument(longarg, var, help);
+    if ( shortarg )
+      {
+      this->Internals->CMD.AddBooleanArgument(shortarg, var, longarg);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, char** var, const char* help)
+void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, int* var, const char* help, int type)
 {
-  typedef kwsys::CommandLineArguments argT;
-  this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
-  if ( shortarg )
+  this->Internals->XMLParser->AddArgument(longarg, var, type);
+  if(type == XMLONLY)
     {
-    this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
+    return;
+    }
+  if(type & this->ProcessType)
+    {
+    typedef kwsys::CommandLineArguments argT;
+    this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
+    if ( shortarg )
+      {
+      this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, char** var, const char* help, int type)
+{
+  this->Internals->XMLParser->AddArgument(longarg, var, type);
+  if(type == XMLONLY)
+    {
+    return;
+    }
+  if(type & this->ProcessType)
+    {
+    typedef kwsys::CommandLineArguments argT;
+    this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
+    if ( shortarg )
+      {
+      this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVOptions::UnknownArgumentHandler(const char* argument, void* call_data)
 {
-  //cout << "UnknownArgumentHandler: " << argument << endl;
   vtkPVOptions* self = static_cast<vtkPVOptions*>(call_data);
   if ( self )
     {
     self->SetUnknownArgument(argument);
     return self->WrongArgument(argument);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVOptions::DeprecatedArgumentHandler(const char* argument, 
+                                            const char* , void* call_data)
+{
+  //cout << "UnknownArgumentHandler: " << argument << endl;
+  vtkPVOptions* self = static_cast<vtkPVOptions*>(call_data);
+  if ( self )
+    {
+    return self->DeprecatedArgument(argument);
     }
   return 0;
 }
@@ -294,6 +478,7 @@ int vtkPVOptions::GetLastArgument()
 void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "XMLConfigFile: " << (this->XMLConfigFile?this->XMLConfigFile:"(none)") << endl;
   os << indent << "UnknownArgument: " << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
   os << indent << "ErrorMessage: " << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
@@ -311,6 +496,22 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running as a server\n";
     }
+  if (this->ConnectDataToRender)
+    {
+    os << indent << "Running as a client to a data and render server\n";
+    }
+
+  if (this->ConnectDataToRender)
+    {
+    os << indent << "Running as a client to a data and render server\n";
+    }
+
+  if (this->ClientRenderServer)
+    {
+    os << indent << "Running as a client connected to a render server\n";
+    }
+
+
 
   if (this->RenderServerMode)
     {
@@ -320,18 +521,15 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   if (this->ClientMode || this->ServerMode || this->RenderServerMode )
     {
     os << indent << "ConnectID is: " << this->ConnectID << endl;
-    os << indent << "Port Number: " << this->PortNumber << endl;
+    os << indent << "DataServerPort: " << this->DataServerPort << endl;
+    os << indent << "ServerPort: " << this->ServerPort << endl;
     os << indent << "Render Node Port: " << this->RenderNodePort << endl;
     os << indent << "Render Server Port: " << this->RenderServerPort << endl;
     os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;
-    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
-    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
-    os << indent << "Username: " 
-       << (this->Username?this->Username:"(none)") << endl;
-    if(this->AlwaysSSH)
-      {
-      os << indent << "Always using SSH" << endl;
-      }
+    os << indent << "ServerHostName: " << (this->ServerHostName?this->ServerHostName:"(none)") << endl;
+    os << indent << "DataServerHostName: " << (this->DataServerHostName?this->DataServerHostName:"(none)") << endl;
+    os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    os << indent << "ClientHostName: " << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
     }
 
   os << indent << "Software Rendering: " << (this->UseSoftwareRendering?"Enabled":"Disabled") << endl;
