@@ -524,6 +524,7 @@ void vtkFastGeometryFilter::UnstructuredGridExecute()
 void vtkFastGeometryFilter::ComputeInputUpdateExtents(vtkDataObject *output)
 {
   int piece, numPieces, ghostLevels;
+  vtkDataSet *input = this->GetInput();
   
   if (this->GetInput() == NULL)
     {
@@ -536,8 +537,14 @@ void vtkFastGeometryFilter::ComputeInputUpdateExtents(vtkDataObject *output)
   
   if (numPieces > 1)
     {
-    ++ghostLevels;
+    // The special execute for structured data handle oundaries internally.
+    if (input->GetDataObjectType() != VTK_STRUCTURED_GRID &&
+	input->GetDataObjectType() != VTK_IMAGE_DATA)
+      {
+      ++ghostLevels;
+      }
     }
+  
 
   this->GetInput()->SetUpdateExtent(piece, numPieces, ghostLevels);
 
