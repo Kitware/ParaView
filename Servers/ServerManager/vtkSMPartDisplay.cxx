@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.12");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.13");
 
 
 //----------------------------------------------------------------------------s
@@ -175,6 +175,7 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   
   this->OpacityUnitDistance    = 0;
   this->VolumeRenderMode       = 0;
+  this->VolumeRenderField      = NULL;
  }
 
 //----------------------------------------------------------------------------
@@ -1160,6 +1161,8 @@ void vtkSMPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *arrayI
 void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo, 
                                               vtkPVDataInformation *dataInfo)
 {
+  this->SetVolumeRenderField(arrayInfo->GetName());
+
   double range[2];
   arrayInfo->GetComponentRange(0, range);
   
@@ -1661,5 +1664,8 @@ void vtkSMPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VolumeColorProxy: "       << this->VolumeColorProxy       << endl;
   os << indent << "VolumeTetraFilterProxy: " << this->VolumeTetraFilterProxy << endl;
 
+  os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
+  os << indent << "VolumeRenderField: "
+     << (this->VolumeRenderField ? this->VolumeRenderField : "(NULL)") << endl;
 }
 

@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.10");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.11");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1107,111 +1107,7 @@ void vtkPVDisplayGUI::UpdateInternal()
 
   this->OpacityScale->SetValue(this->PVSource->GetPartDisplay()->GetOpacity());
 
-  vtkPVDataInformation* dataInfo = source->GetDataInformation();
-  char tmp[350], volCmd[1024], defCmd[350];
-  int i, numArrays, numComps;
-  vtkPVDataSetAttributesInformation *attrInfo;
-  vtkPVArrayInformation *arrayInfo;
-  int defPoint = 0;
-  vtkPVArrayInformation *defArray, *inputArray, *volRenArray;
-  int dataType = dataInfo->GetDataSetType();
-  
-  // Default is the scalars to use when current color is not found.
-  // This is sort of a mess, and should be handled by a color selection widget.
-  defCmd[0] = '\0'; 
-  defArray = NULL;
-  inputArray = NULL;
-  volRenArray = NULL;
-  
-  const char *currentVolumeField = this->VolumeScalarsMenu->GetValue();
-  this->VolumeScalarsMenu->ClearEntries();
-  
-  attrInfo = dataInfo->GetPointDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  int firstField = 1;
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(volCmd, "VolumeRenderPointField {%s}", arrayInfo->GetName());
-    if (numComps > 1)
-      {
-      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
-      }
-    else
-      {
-      sprintf(tmp, "Point %s", arrayInfo->GetName());
-      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-      if ( firstField || (strcmp(tmp, currentVolumeField) == 0) )
-        {
-        this->VolumeScalarsMenu->SetValue( tmp );
-        volRenArray = arrayInfo;
-        firstField = 0;
-        }
-      }
-    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
-      {
-      strcpy(defCmd, tmp);
-      defPoint = 1;
-      defArray = arrayInfo;
-      if ( !strlen(currentVolumeField) )
-        {
-        volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
-        }
-      }
-    }
-  
-  attrInfo = dataInfo->GetCellDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(volCmd, "VolumeRenderCellField {%s}", arrayInfo->GetName());
-    if (numComps > 1)
-      {
-      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(), numComps);
-      }
-    else
-      {
-      sprintf(tmp, "Cell %s", arrayInfo->GetName());
-      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-      if ( firstField || (strcmp(tmp, currentVolumeField) == 0) )
-        {
-        this->VolumeScalarsMenu->SetValue( tmp );
-        volRenArray = arrayInfo;
-        firstField = 0;
-        }
-      }
-    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
-      {
-      strcpy(defCmd, tmp);
-      defPoint = 1;
-      defArray = arrayInfo;
-      if ( !strlen(currentVolumeField) )
-        {
-        volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
-        }
-      }
-    }
-
-  // Determine if this is unstructured grid data and add the 
-  // volume rendering option
-  if ( this->RepresentationMenu->HasEntry( VTK_PV_VOLUME_LABEL ) )
-    {
-      this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
-    }
-  
-  if (dataType == VTK_UNSTRUCTURED_GRID && volRenArray)
-    {
-    this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-                                                  "DrawVolume");
-      
-    // Update the transfer functions    
-    pDisp->InitializeTransferFunctions(volRenArray, dataInfo);
-    }
+  this->UpdateVolumeGUI();
 }
 
 
@@ -1465,7 +1361,128 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
               this->PVSource->GetPartDisplay()->GetInterpolateColorsFlag());
     }
   this->UpdateEnableState();
-}  
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDisplayGUI::UpdateVolumeGUI()
+{
+  vtkSMPartDisplay *pDisp = this->PVSource->GetPartDisplay();
+  char tmp[350], volCmd[1024], defCmd[350];
+  int i, numArrays, numComps;
+  vtkPVDataInformation *dataInfo = this->PVSource->GetDataInformation();
+  vtkPVDataSetAttributesInformation *attrInfo;
+  vtkPVArrayInformation *arrayInfo;
+  int defPoint = 0;
+  vtkPVArrayInformation *defArray, *inputArray, *volRenArray;
+  int dataType = dataInfo->GetDataSetType();
+
+  this->VolumeRenderMode = pDisp->GetVolumeRenderMode();
+  
+  // Default is the scalars to use when current color is not found.
+  // This is sort of a mess, and should be handled by a color selection widget.
+  defCmd[0] = '\0'; 
+  defArray = NULL;
+  inputArray = NULL;
+  volRenArray = NULL;
+  
+  const char *currentVolumeField = pDisp->GetVolumeRenderField();
+  this->VolumeScalarsMenu->ClearEntries();
+  
+  attrInfo = dataInfo->GetPointDataInformation();
+  numArrays = attrInfo->GetNumberOfArrays();
+  int firstField = 1;
+  for (i = 0; i < numArrays; i++)
+    {
+    arrayInfo = attrInfo->GetArrayInformation(i);
+    numComps = arrayInfo->GetNumberOfComponents();
+    sprintf(volCmd, "VolumeRenderPointField {%s} %d",
+            arrayInfo->GetName(), numComps);
+    if (numComps > 1)
+      {
+      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
+      }
+    else
+      {
+      sprintf(tmp, "Point %s", arrayInfo->GetName());
+      }
+    this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
+    if (   firstField
+        || (   currentVolumeField
+            && (pDisp->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
+            && (strcmp(arrayInfo->GetName(), currentVolumeField) == 0) ) )
+      {
+      this->VolumeScalarsMenu->SetValue( tmp );
+      volRenArray = arrayInfo;
+      firstField = 0;
+      }
+    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
+      strcpy(defCmd, tmp);
+      defPoint = 1;
+      defArray = arrayInfo;
+      if (!currentVolumeField)
+        {
+        volRenArray = arrayInfo;
+        this->VolumeScalarsMenu->SetValue( tmp );
+        }
+      }
+    }
+  
+  attrInfo = dataInfo->GetCellDataInformation();
+  numArrays = attrInfo->GetNumberOfArrays();
+  for (i = 0; i < numArrays; i++)
+    {
+    arrayInfo = attrInfo->GetArrayInformation(i);
+    numComps = arrayInfo->GetNumberOfComponents();
+    sprintf(volCmd, "VolumeRenderCellField {%s} %d",
+            arrayInfo->GetName(), numComps);
+    if (numComps > 1)
+      {
+      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(), numComps);
+      }
+    else
+      {
+      sprintf(tmp, "Cell %s", arrayInfo->GetName());
+      }
+    this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
+    if (   firstField
+        || (   currentVolumeField
+            && (pDisp->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
+            && (strcmp(arrayInfo->GetName(), currentVolumeField) == 0) ) )
+      {
+      this->VolumeScalarsMenu->SetValue( tmp );
+      volRenArray = arrayInfo;
+      firstField = 0;
+      }
+    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
+      strcpy(defCmd, tmp);
+      defPoint = 1;
+      defArray = arrayInfo;
+      if (!currentVolumeField)
+        {
+        volRenArray = arrayInfo;
+        this->VolumeScalarsMenu->SetValue( tmp );
+        }
+      }
+    }
+
+  // Determine if this is unstructured grid data and add the 
+  // volume rendering option
+  if ( this->RepresentationMenu->HasEntry( VTK_PV_VOLUME_LABEL ) )
+    {
+      this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
+    }
+  
+  if (dataType == VTK_UNSTRUCTURED_GRID && volRenArray)
+    {
+    this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+                                                  "DrawVolume");
+      
+    // Update the transfer functions    
+    pDisp->InitializeTransferFunctions(volRenArray, dataInfo);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetActorColor(double r, double g, double b)
@@ -1525,19 +1542,30 @@ void vtkPVDisplayGUI::ColorByPropertyInternal()
 //----------------------------------------------------------------------------
 // Select which point field to use for volume rendering
 //
-void vtkPVDisplayGUI::VolumeRenderPointField(const char *name)
+void vtkPVDisplayGUI::VolumeRenderPointField(const char *name, int numComps)
 {
   if (name == NULL)
     {
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) VolumeRenderPointField {%s}", 
-                      this->GetTclName(), name);
+  this->AddTraceEntry("$kw(%s) VolumeRenderPointField {%s} %d", 
+                      this->GetTclName(), name, numComps);
+
+  this->ArraySetByUser = 1;
 
   char *str;
   str = new char [strlen(name) + 16];
-  sprintf(str, "Point %s", name);
+  if (numComps == 1)
+    {
+    sprintf(str, "Point %s", name);
+    }
+  else
+    {
+    sprintf(str, "Point %s (%d)", name, numComps);
+    }
+  this->VolumeScalarsMenu->SetValue(str);
+  delete[] str;
   
   // Update the transfer functions  
   vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
@@ -1546,10 +1574,7 @@ void vtkPVDisplayGUI::VolumeRenderPointField(const char *name)
   
   this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
   
-  this->VolumeScalarsMenu->SetValue(str);
   this->VolumeRenderPointFieldInternal(name);
-  
-  delete [] str;
 }
 
 //----------------------------------------------------------------------------
@@ -1566,19 +1591,30 @@ void vtkPVDisplayGUI::VolumeRenderPointFieldInternal(const char *name)
 //----------------------------------------------------------------------------
 // Select which cell field to use for volume rendering
 //
-void vtkPVDisplayGUI::VolumeRenderCellField(const char *name)
+void vtkPVDisplayGUI::VolumeRenderCellField(const char *name, int numComps)
 {
   if (name == NULL)
     {
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s}", 
-                      this->GetTclName(), name);
+  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s} %d", 
+                      this->GetTclName(), name, numComps);
+
+  this->ArraySetByUser = 1;
 
   char *str;
   str = new char [strlen(name) + 16];
-  sprintf(str, "Cell %s", name);
+  if (numComps == 1)
+    {
+    sprintf(str, "Cell %s", name);
+    }
+  else
+    {
+    sprintf(str, "Cell %s (%d)", name, numComps);
+    }
+  this->VolumeScalarsMenu->SetValue(str);
+  delete[] str;
   
   // Update the transfer functions  
   vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
@@ -1587,10 +1623,7 @@ void vtkPVDisplayGUI::VolumeRenderCellField(const char *name)
   
   this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
   
-  this->VolumeScalarsMenu->SetValue(str);
   this->VolumeRenderCellFieldInternal(name);
-  
-  delete [] str;
 }
 
 //----------------------------------------------------------------------------
@@ -1891,6 +1924,34 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
   this->Script("pack %s -after %s -fill x -expand t -pady 2", 
                this->ColorFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
+
+  // Make the color selection the same as the scalars we were just volume
+  // rendering.
+  if (this->VolumeRenderMode)
+    {
+    const char *colorSelection = this->VolumeScalarsMenu->GetValue();
+    char *str = new char[strlen(colorSelection) + 1];
+    strcpy(str, colorSelection);
+
+    char *mode = strtok(str, " ");
+    char *name = strtok(NULL, " ");
+    char *numCompsStr = strtok(NULL, " ");
+    int numComps = 1;
+    if (numCompsStr)
+      {
+      sscanf(numCompsStr, "(%d)", &numComps);
+      }
+    if (strcmp(mode, "Point") == 0)
+      {
+      this->ColorByPointField(name, numComps);
+      }
+    else
+      {
+      this->ColorByCellField(name, numComps);
+      }
+
+    delete[] str;
+    }
   
   this->VolumeRenderMode = 0;
   this->UpdateEnableState();
@@ -1909,6 +1970,36 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
   this->Script("pack %s -after %s -fill x -expand t -pady 2", 
                this->VolumeAppearanceFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
+
+  // Make scalar selection be the same for colors.
+  if (!this->VolumeRenderMode)
+    {
+    const char *colorSelection = this->ColorMenu->GetValue();
+    if (strcmp(colorSelection, "Property") != 0)
+      {
+      char *str = new char[strlen(colorSelection) + 1];
+      strcpy(str, colorSelection);
+
+      char *mode = strtok(str, " ");
+      char *name = strtok(NULL, " ");
+      char *numCompsStr = strtok(NULL, " ");
+      int numComps = 1;
+      if (numCompsStr)
+        {
+        sscanf(numCompsStr, "(%d)", &numComps);
+        }
+      if (strcmp(mode, "Point") == 0)
+        {
+        this->VolumeRenderPointField(name, numComps);
+        }
+      else
+        {
+        this->VolumeRenderCellField(name, numComps);
+        }
+
+      delete[] str;
+      }
+    }
   
   this->VolumeRenderMode = 1;
   this->UpdateEnableState();
