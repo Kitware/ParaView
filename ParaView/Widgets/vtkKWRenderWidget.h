@@ -143,7 +143,9 @@ public:
   virtual void SetCornerAnnotationColor(double *rgb)
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
   virtual double* GetCornerAnnotationColor();
+  //BTX
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
+  //ETX
 
   // Description:
   // Get and control the header annotation.
@@ -156,16 +158,20 @@ public:
   virtual double* GetHeaderAnnotationColor();
   virtual void SetHeaderAnnotationText(const char*);
   virtual char* GetHeaderAnnotationText();
+  //BTX
   vtkGetObjectMacro(HeaderAnnotation, vtkTextActor);
+  //ETX
   
   // Description:
   // Set/Get the distance units that pixel sizes are measured in
   virtual void SetDistanceUnits(const char*);
   vtkGetStringMacro(DistanceUnits);
   
+  //BTX
   // Description:
   // Get the current camera
   vtkCamera *GetCurrentCamera();
+  //ETX
 
   // Description:
   // Set / Get the collapsing of renders. If this is set to true, then
@@ -184,6 +190,7 @@ public:
   vtkSetMacro(EventIdentifier, int);
   vtkGetMacro(EventIdentifier, int);
 
+  //BTX
   // Description:
   // Get the renderer and render window
   vtkGetObjectMacro(Renderer, vtkRenderer);
@@ -196,6 +203,7 @@ public:
   // does not belong to this widget)
   virtual vtkRenderer* GetNthRenderer(int id);
   virtual int GetRendererId(vtkRenderer*);
+  //ETX
 
   // Description:
   // Get the VTK widget

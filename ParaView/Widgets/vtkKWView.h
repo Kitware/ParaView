@@ -140,6 +140,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkGetObjectMacro(ParentWindow,vtkKWWindow);
   void SetParentWindow(vtkKWWindow *);
 
+  //BTX
   // Description:
   // Return the RenderWindow or ImageWindow as appropriate.
   virtual vtkWindow *GetVTKWindow();
@@ -147,6 +148,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Return the Renderer or Imager as appropriate.
   virtual vtkViewport *GetViewport();
+  //ETX
 
   // Description:
   // Methods to support off screen rendering.
@@ -162,7 +164,9 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void RemoveComposite(vtkKWComposite *c);
   virtual void Remove2DComposite(vtkKWComposite *) {}
   virtual int HasComposite(vtkKWComposite *c);
+  //BTX
   vtkKWCompositeCollection *GetComposites() {return this->Composites;};
+  //ETX
   
   // Description:
   // Set/Get the selected composite
@@ -340,6 +344,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Get the control frame to put custom controls within
   vtkGetObjectMacro( ControlFrame, vtkKWWidget );
   
+  //BTX
   // Description:
   // This class now longer owns these objects.
   // I am providing these methods as temporary access to these objects.
@@ -347,6 +352,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
   virtual vtkRenderer* GetRenderer() { return NULL; }
   virtual vtkRenderer* GetRenderer2D() { return NULL; }
+  //ETX
     
   // Description:
   // The guts of the abort check method. Made public so that it can

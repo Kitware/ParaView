@@ -34,10 +34,12 @@ public:
   vtkTypeRevisionMacro(vtkKWGenericComposite,vtkKWComposite);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
   // Description:
   // Get the prop for this composite
   virtual vtkProp *GetProp() {return this->Prop;};
   void SetProp(vtkProp *);
+  //ETX
   
 protected:
   vtkKWGenericComposite();

@@ -120,7 +120,9 @@ public:
   void RemoveView(vtkKWView *);
   virtual void SetSelectedView(vtkKWView *);
   vtkGetObjectMacro(SelectedView,vtkKWView);
+  //BTX
   vtkKWViewCollection *GetViews() {return this->Views;};
+  //ETX
   vtkGetObjectMacro(ViewFrame,vtkKWFrame);
   
   // Description:

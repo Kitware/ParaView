@@ -40,6 +40,7 @@ public:
   // Create the properties object, called by UpdateProperties.
   virtual void CreateProperties();
 
+  //BTX
   // Description:
   // Set the input data for this Actor
   virtual void SetInput(vtkPolyData *input);
@@ -53,6 +54,7 @@ public:
   // Description:
   // Get the mapper for the composite
   vtkGetObjectMacro( Mapper, vtkPolyDataMapper );
+  //ETX
   
 protected:
   vtkKWActorComposite();
