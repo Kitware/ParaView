@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.12");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.13");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1830,6 +1830,29 @@ void vtkPVData::ColorByPropertyInternal()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPointFieldComponent(const char *name, int comp)
 {
+  const char *current;
+  current = this->ColorMenu->GetValue();
+  char newLabel[300];
+
+  // In case this is called from a script.
+  vtkDataArray *array = NULL;
+  if (this->VTKData)
+    {
+    array = this->VTKData->GetPointData()->GetArray(name);
+    }
+  if (array && array->GetNumberOfComponents() > 1)
+    {
+    sprintf(newLabel, "Point %s %d", name, comp);
+    }
+  else
+    {  
+    sprintf(newLabel, "Point %s", name);
+    }
+  if (strncmp(current, newLabel, strlen(newLabel)) != 0)
+    {
+    this->ColorMenu->SetValue(newLabel);
+    }
+
   this->AddTraceEntry("$kw(%s) ColorByPointFieldComponent {%s} %d", 
                       this->GetTclName(), name, comp);
   this->ColorByPointFieldComponentInternal(name, comp);
@@ -1840,7 +1863,7 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
                                                              int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+
   // I would like to make this an argument, but not right now.
   int numComps;
   vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
@@ -1895,6 +1918,29 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByCellFieldComponent(const char *name, int comp)
 {
+  const char *current;
+  current = this->ColorMenu->GetValue();
+  char newLabel[300];
+
+  // In case this is called from a script.
+  vtkDataArray *array = NULL;
+  if (this->VTKData)
+    {
+    array = this->VTKData->GetPointData()->GetArray(name);
+    }
+  if (array && array->GetNumberOfComponents() > 1)
+    {
+    sprintf(newLabel, "Cell %s %d", name, comp);
+    }
+  else
+    {  
+    sprintf(newLabel, "Cell %s", name);
+    }
+  if (strncmp(current, newLabel, strlen(newLabel)) != 0)
+    {
+    this->ColorMenu->SetValue(newLabel);
+    }
+
   this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent {%s} %d", 
                       this->GetTclName(), name, comp);
   this->ColorByCellFieldComponentInternal(name, comp);
@@ -2896,7 +2942,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.12 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.13 $");
 }
 
 //----------------------------------------------------------------------------
