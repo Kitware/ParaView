@@ -51,7 +51,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.130");
+vtkCxxRevisionMacro(vtkPVProbe, "1.131");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -204,7 +204,7 @@ void vtkPVProbe::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProbe::SetVisibilityInternal(int val)
+void vtkPVProbe::SetVisibilityNoTrace(int val)
 {
   if (this->PlotDisplay)
     {

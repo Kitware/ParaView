@@ -60,7 +60,7 @@ public:
 
   // Description:
   // Control the visibility of the pick display as well.
-  virtual void SetVisibilityInternal(int val);
+  virtual void SetVisibilityNoTrace(int val);
 
 protected:
   vtkPVProbe();
