@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.5.2.2");
 
 
 
@@ -96,6 +96,10 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->PVApplication->Register(this);
 
   this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
+  pm->SendStreamToServer();
+  pm->GetStream() <<  vtkClientServerStream::New << "vtkRenderer"
+                  << this->RendererID <<  vtkClientServerStream::End;
+  pm->SendStreamToClient();
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
   pm->SendStreamToClientAndServer();
   this->Renderer = 
@@ -121,7 +125,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->SendStreamToClientAndServer();
 
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToServer();
   int *tileDim = pvApp->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
   pm->GetStream() <<  vtkClientServerStream::Invoke
