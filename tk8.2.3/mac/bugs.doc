@@ -1,0 +1,49 @@
+Known bug list for Tk 8.0 for Macintosh
+
+by Ray Johnson
+Sun Microsystems Laboratories
+rjohnson@eng.sun.com
+
+RCS: @(#) Id
+
+We are now very close to passing the test suite for Tk.  We are very
+interested in finding remaining bugs that still linger.  Please let us
+know (and send us test cases) of any bugs you find.
+
+Known bugs:
+
+* Transient windows (set by wm transient) do not go away when the
+  master does.
+
+* Tearoff menus should be floating windows & floating windows should
+  float.  They also shouldn't be resizable.
+
+* The -use and -container windows only work with other Tk windows in
+  the same process.  Also, if you try really hard (for instance by binding 
+  on Destroy of an embedded window and destroying the container's toplevel) 
+  you can get Tk to crash.  This should never be necessary, however, since
+  the destruction of the embedded window triggers the destruction of the
+  container, so you can watch that instead.
+  All the focus bugs in Tk8.0 have been fixed, however.
+  
+* The send command is only implemented within the same app.
+
+* You cannot color buttons, and the indicators for radiobuttons and
+  checkbuttons under Appearance.  They will always use the current
+  Theme color.  But, then, you are not supposed to...
+
+* Drawing is not really correct.  This shows up mostly in the canvas
+  when line widths are greater than one.  Unfortunantly, this will not
+  be easy to fix.
+  
+* The active menu highlight color in Tearoff menus will not match the system-wide
+  menu highlight color under Appearance.  It will be black instead.  This is not
+  easy to fix, since the Appearance API's don't really allow you to get your hands
+  on this information...
+
+There are many other bugs.  However, will no get listed until they
+are reported at least once.  Send those bug reports in!
+
+
+
+Ray

@@ -1,0 +1,539 @@
+# Visual C++ 2.x and 4.0 makefile
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+# 
+# Copyright (c) 1995-1997 Sun Microsystems, Inc.
+# RCS: @(#) Id
+
+# Does not depend on the presence of any environment variables in
+# order to compile tcl; all needed information is derived from 
+# location of the compiler directories.
+
+#
+# Project directories
+#
+# ROOT    = top of source tree
+#
+# TMPDIR  = location where .obj files should be stored during build
+#
+# TOOLS32 = location of VC++ 32-bit development tools. Note that the
+#	    VC++ 2.0 header files are broken, so you need to use the
+#	    ones that come with the developer network CD's, or later
+#	    versions of VC++.
+#
+# TCLDIR = location of top of Tcl source heirarchy
+#
+
+ROOT		= ..
+TOOLS32		= c:\program files\devstudio\vc
+TOOLS32_rc	= c:\program files\devstudio\sharedide
+TCLDIR		= ..\..\tcl8.2
+INSTALLDIR      = c:\program files\tcl
+
+# Set this to the appropriate value of /MACHINE: for your platform
+MACHINE	= IX86
+
+# Uncomment the following line to compile with thread support
+#THREADDEFINES = -DTCL_THREADS=1
+
+# Set NODEBUG to 0 to compile with symbols
+NODEBUG = 1
+
+# uncomment the following two lines to compile with TCL_MEM_DEBUG
+#DEBUGDEFINES	=-DTCL_MEM_DEBUG
+
+######################################################################
+# Do not modify below this line
+######################################################################
+
+TCLNAMEPREFIX = tcl
+TKNAMEPREFIX = tk
+WISHNAMEPREFIX = wish
+VERSION = 82
+DOTVERSION = 8.2
+
+TCLSTUBPREFIX = $(TCLNAMEPREFIX)stub
+TKSTUBPREFIX  = $(TKNAMEPREFIX)stub
+
+
+BINROOT		= .
+!IF "$(NODEBUG)" == "1"
+TMPDIRNAME	= Release
+DBGX		=
+!ELSE
+TMPDIRNAME	= Debug
+DBGX		= d
+!ENDIF
+TMPDIR		= $(BINROOT)\$(TMPDIRNAME)
+OUTDIRNAME	= $(TMPDIRNAME)
+OUTDIR		= $(TMPDIR)
+
+TCLLIB 		= $(TCLNAMEPREFIX)$(VERSION)$(DBGX).lib
+TCLPLUGINLIB 	= $(TCLNAMEPREFIX)$(VERSION)p.lib
+TCLSTUBLIB	= $(TCLSTUBPREFIX)$(VERSION)$(DBGX).lib
+TKDLLNAME	= $(TKNAMEPREFIX)$(VERSION)$(DBGX).dll
+TKDLL 		= $(OUTDIR)\$(TKDLLNAME)
+TKLIB 		= $(OUTDIR)\$(TKNAMEPREFIX)$(VERSION)$(DBGX).lib
+TKSTUBLIBNAME	= $(TKSTUBPREFIX)$(VERSION)$(DBGX).lib
+TKSTUBLIB	= $(OUTDIR)\$(TKSTUBLIBNAME)
+TKPLUGINDLLNAME	= $(TKNAMEPREFIX)$(VERSION)p$(DBG).dll
+TKPLUGINDLL 	= $(OUTDIR)\$(TKPLUGINDLLNAME)
+TKPLUGINLIB 	= $(OUTDIR)\$(TKNAMEPREFIX)$(VERSION)p$(DBGX).lib
+
+WISH 		= $(OUTDIR)\$(WISHNAMEPREFIX)$(VERSION)$(DBGX).exe
+WISHC 		= $(OUTDIR)\$(WISHNAMEPREFIX)c$(VERSION)$(DBGX).exe
+WISHP 		= $(OUTDIR)\$(WISHNAMEPREFIX)p$(VERSION)$(DBGX).exe
+TKTEST 		= $(OUTDIR)\$(TKNAMEPREFIX)test.exe
+DUMPEXTS 	= $(TMPDIR)\dumpexts.exe
+CAT32           = $(TMPDIR)\cat32.exe
+
+BIN_INSTALL_DIR = $(INSTALLDIR)\bin
+INCLUDE_INSTALL_DIR = $(INSTALLDIR)\include
+LIB_INSTALL_DIR = $(INSTALLDIR)\lib
+SCRIPT_INSTALL_DIR = $(LIB_INSTALL_DIR)\tk$(DOTVERSION)
+
+WISHOBJS = \
+	$(TMPDIR)\winMain.obj
+
+TKTESTOBJS = \
+	$(TMPDIR)\tkTest.obj \
+	$(TMPDIR)\tkSquare.obj \
+	$(TMPDIR)\testMain.obj \
+	$(TCLLIBDIR)\tclThreadTest.obj
+
+XLIBOBJS = \
+	$(TMPDIR)\xcolors.obj \
+	$(TMPDIR)\xdraw.obj \
+	$(TMPDIR)\xgc.obj \
+	$(TMPDIR)\ximage.obj \
+	$(TMPDIR)\xutil.obj
+
+TKOBJS = \
+	$(TMPDIR)\tkConsole.obj \
+	$(TMPDIR)\tkUnixMenubu.obj \
+	$(TMPDIR)\tkUnixScale.obj \
+	$(XLIBOBJS) \
+	$(TMPDIR)\tkWin3d.obj \
+	$(TMPDIR)\tkWin32Dll.obj \
+	$(TMPDIR)\tkWinButton.obj \
+	$(TMPDIR)\tkWinClipboard.obj \
+	$(TMPDIR)\tkWinColor.obj \
+	$(TMPDIR)\tkWinConfig.obj \
+	$(TMPDIR)\tkWinCursor.obj \
+	$(TMPDIR)\tkWinDialog.obj \
+	$(TMPDIR)\tkWinDraw.obj \
+	$(TMPDIR)\tkWinEmbed.obj \
+	$(TMPDIR)\tkWinFont.obj \
+	$(TMPDIR)\tkWinImage.obj \
+	$(TMPDIR)\tkWinInit.obj \
+	$(TMPDIR)\tkWinKey.obj \
+	$(TMPDIR)\tkWinMenu.obj \
+	$(TMPDIR)\tkWinPixmap.obj \
+	$(TMPDIR)\tkWinPointer.obj \
+	$(TMPDIR)\tkWinRegion.obj \
+	$(TMPDIR)\tkWinScrlbr.obj \
+	$(TMPDIR)\tkWinSend.obj \
+	$(TMPDIR)\tkWinTest.obj \
+	$(TMPDIR)\tkWinWindow.obj \
+	$(TMPDIR)\tkWinWm.obj \
+	$(TMPDIR)\tkWinX.obj \
+	$(TMPDIR)\stubs.obj \
+	$(TMPDIR)\tk3d.obj \
+	$(TMPDIR)\tkArgv.obj \
+	$(TMPDIR)\tkAtom.obj \
+	$(TMPDIR)\tkBind.obj \
+	$(TMPDIR)\tkBitmap.obj \
+	$(TMPDIR)\tkButton.obj \
+	$(TMPDIR)\tkCanvArc.obj \
+	$(TMPDIR)\tkCanvBmap.obj \
+	$(TMPDIR)\tkCanvImg.obj \
+	$(TMPDIR)\tkCanvLine.obj \
+	$(TMPDIR)\tkCanvPoly.obj \
+	$(TMPDIR)\tkCanvPs.obj \
+	$(TMPDIR)\tkCanvText.obj \
+	$(TMPDIR)\tkCanvUtil.obj \
+	$(TMPDIR)\tkCanvWind.obj \
+	$(TMPDIR)\tkCanvas.obj \
+	$(TMPDIR)\tkClipboard.obj \
+	$(TMPDIR)\tkCmds.obj \
+	$(TMPDIR)\tkColor.obj \
+	$(TMPDIR)\tkConfig.obj \
+	$(TMPDIR)\tkCursor.obj \
+	$(TMPDIR)\tkEntry.obj \
+	$(TMPDIR)\tkError.obj \
+	$(TMPDIR)\tkEvent.obj \
+	$(TMPDIR)\tkFileFilter.obj \
+	$(TMPDIR)\tkFocus.obj \
+	$(TMPDIR)\tkFont.obj \
+	$(TMPDIR)\tkFrame.obj \
+	$(TMPDIR)\tkGC.obj \
+	$(TMPDIR)\tkGeometry.obj \
+	$(TMPDIR)\tkGet.obj \
+	$(TMPDIR)\tkGrab.obj \
+	$(TMPDIR)\tkGrid.obj \
+	$(TMPDIR)\tkImage.obj \
+	$(TMPDIR)\tkImgBmap.obj \
+	$(TMPDIR)\tkImgGIF.obj \
+	$(TMPDIR)\tkImgPPM.obj \
+	$(TMPDIR)\tkImgPhoto.obj \
+	$(TMPDIR)\tkImgUtil.obj \
+	$(TMPDIR)\tkListbox.obj \
+	$(TMPDIR)\tkMacWinMenu.obj \
+	$(TMPDIR)\tkMain.obj \
+	$(TMPDIR)\tkMenu.obj \
+	$(TMPDIR)\tkMenubutton.obj \
+	$(TMPDIR)\tkMenuDraw.obj \
+	$(TMPDIR)\tkMessage.obj \
+	$(TMPDIR)\tkObj.obj \
+	$(TMPDIR)\tkOldConfig.obj \
+	$(TMPDIR)\tkOption.obj \
+	$(TMPDIR)\tkPack.obj \
+	$(TMPDIR)\tkPlace.obj \
+	$(TMPDIR)\tkPointer.obj \
+	$(TMPDIR)\tkRectOval.obj \
+	$(TMPDIR)\tkScale.obj \
+	$(TMPDIR)\tkScrollbar.obj \
+	$(TMPDIR)\tkSelect.obj \
+	$(TMPDIR)\tkText.obj \
+	$(TMPDIR)\tkTextBTree.obj \
+	$(TMPDIR)\tkTextDisp.obj \
+	$(TMPDIR)\tkTextImage.obj \
+	$(TMPDIR)\tkTextIndex.obj \
+	$(TMPDIR)\tkTextMark.obj \
+	$(TMPDIR)\tkTextTag.obj \
+	$(TMPDIR)\tkTextWind.obj \
+	$(TMPDIR)\tkTrig.obj \
+	$(TMPDIR)\tkUtil.obj \
+	$(TMPDIR)\tkVisual.obj \
+	$(TMPDIR)\tkStubInit.obj \
+	$(TMPDIR)\tkStubLib.obj \
+	$(TMPDIR)\tkWindow.obj
+
+TKSTUBOBJS = $(TMPDIR)\tkStubLib.obj \
+
+
+cc32		= "$(TOOLS32)\bin\cl.exe"
+link32		= "$(TOOLS32)\bin\link.exe"
+lib32		= "$(TOOLS32)\bin\lib.exe"
+rc32		= "$(TOOLS32_rc)\bin\rc.exe"
+include32	= -I"$(TOOLS32)\include"
+
+WINDIR          = $(ROOT)\win
+GENERICDIR	= $(ROOT)\generic
+XLIBDIR		= $(ROOT)\xlib
+BITMAPDIR	= $(ROOT)\bitmaps
+TCLLIBDIR       = $(TCLDIR)\win\$(OUTDIRNAME)
+RCDIR		= $(WINDIR)\rc
+
+TK_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(BITMAPDIR) -I$(XLIBDIR) \
+			-I$(TCLDIR)\generic
+TK_DEFINES	= -D__WIN32__ $(DEBUGDEFINES) $(THREADDEFINES)
+
+TK_CFLAGS	= $(cdebug) $(cflags) $(cvarsdll) $(include32) \
+			$(TK_INCLUDES) $(TK_DEFINES) -DUSE_TCL_STUBS
+
+WISH_CFLAGS	= $(cdebug) $(cflags) $(cvarsdll) $(include32) \
+			$(TK_INCLUDES) $(TK_DEFINES)
+
+######################################################################
+# Link flags
+######################################################################
+
+!IF "$(NODEBUG)" == "1"
+ldebug = /RELEASE
+!ELSE
+ldebug = -debug:full -debugtype:cv
+!ENDIF
+
+# declarations common to all linker options
+lcommon = /NODEFAULTLIB /RELEASE /NOLOGO
+
+# declarations for use on Intel i386, i486, and Pentium systems
+!IF "$(MACHINE)" == "IX86"
+DLLENTRY = @12
+lflags   = $(lcommon) /MACHINE:$(MACHINE)
+!ELSE
+lflags   = $(lcommon) /MACHINE:$(MACHINE)
+!ENDIF
+
+conlflags = $(lflags) -subsystem:console -entry:mainCRTStartup
+guilflags = $(lflags) -subsystem:windows -entry:WinMainCRTStartup
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+!IF "$(MACHINE)" == "PPC"
+libc = libc$(DBGX).lib
+libcdll = crtdll$(DBGX).lib
+!ELSE
+libc = libc$(DBGX).lib oldnames.lib
+libcdll = msvcrt$(DBGX).lib oldnames.lib
+!ENDIF
+
+baselibs   = kernel32.lib $(optlibs) advapi32.lib
+winlibs    = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+guilibs	   = $(libc) $(winlibs)
+conlibs    = $(libc) $(baselibs)
+guilibsdll = $(libcdll) $(winlibs)
+
+######################################################################
+# Compile flags
+######################################################################
+
+!IF "$(NODEBUG)" == "1"
+!IF "$(MACHINE)" == "ALPHA"
+# MSVC on Alpha doesn't understand -Ot
+cdebug = -O2i -Gs -GD
+!ELSE
+# NOTE: Due to a bug in MSVC, we cannot use -O2 here or Tk starts to misbehave.
+cdebug = -Oti -Gs -GD
+!ENDIF
+!ELSE
+cdebug = -Z7 -Od -WX
+!ENDIF
+
+# declarations common to all compiler options
+ccommon = -c -W3 -nologo -Fp$(TMPDIR)\ -YX
+
+!IF "$(MACHINE)" == "IX86"
+cflags = $(ccommon) -D_X86_=1
+!ELSE
+!IF "$(MACHINE)" == "MIPS"
+cflags = $(ccommon) -D_MIPS_=1
+!ELSE
+!IF "$(MACHINE)" == "PPC"
+cflags = $(ccommon) -D_PPC_=1
+!ELSE
+!IF "$(MACHINE)" == "ALPHA"
+cflags = $(ccommon) -D_ALPHA_=1
+!ENDIF
+!ENDIF
+!ENDIF
+!ENDIF
+
+cvars      = -DWIN32 -D_WIN32
+cvarsmt    = $(cvars) -D_MT
+cvarsdll   = $(cvarsmt) -D_DLL
+
+!IF "$(NODEBUG)" == "1"
+cvarsdll   = $(cvars) -MD
+!ELSE
+cvarsdll   = $(cvars) -MDd
+!ENDIF
+
+CON_CFLAGS	= $(cdebug) $(cflags) $(cvars) $(include32) -DCONSOLE
+
+######################################################################
+# Project specific targets
+######################################################################
+
+all:    setup $(WISH) $(CAT32)
+install: install-binaries install-libraries
+plugin:	setup $(TKPLUGINDLL) $(WISHP)
+tktest: setup $(TKTEST) $(CAT32)
+test:	setup $(TKTEST) $(TKLIB) $(CAT32)
+	set TCL_LIBRARY=$(TCLDIR)/library
+	set PATH=$(TCLDIR)\win\$(TMPDIRNAME);$(PATH)
+	$(TKTEST) $(ROOT)/tests/all.tcl | $(CAT32)
+
+runtest: setup $(TKTEST) $(TKLIB) $(CAT32)
+	set TCL_LIBRARY=$(TCLDIR)/library
+	set PATH=$(TCLDIR)\win\$(TMPDIRNAME);$(PATH)
+	$(TKTEST) 
+
+console-wish : all $(WISHC)
+
+stubs:
+	$(TCLDIR)\win\$(TMPDIRNAME)\tclsh$(VERSION)$(DBGX) \
+		$(TCLDIR)\tools\genStubs.tcl $(GENERICDIR) \
+		$(GENERICDIR)\tk.decls $(GENERICDIR)\tkInt.decls
+
+setup:
+	@mkd $(TMPDIR)
+	@mkd $(OUTDIR)
+
+install-binaries:
+	@mkd "$(BIN_INSTALL_DIR)"
+	copy $(TKDLL) "$(BIN_INSTALL_DIR)"
+	copy $(WISH) "$(BIN_INSTALL_DIR)"
+	@mkd "$(LIB_INSTALL_DIR)"
+	copy $(TKLIB) "$(LIB_INSTALL_DIR)"
+
+install-libraries:
+	@mkd "$(INCLUDE_INSTALL_DIR)"
+	@mkd "$(INCLUDE_INSTALL_DIR)\X11"
+	copy "$(ROOT)\generic\tk.h"             "$(INCLUDE_INSTALL_DIR)"
+	copy "$(ROOT)\generic\tkDecls.h"        "$(INCLUDE_INSTALL_DIR)"
+	copy "$(ROOT)\generic\tkIntXlibDecls.h" "$(INCLUDE_INSTALL_DIR)"
+	xcopy "$(ROOT)\xlib\X11\*.h"            "$(INCLUDE_INSTALL_DIR)\X11"
+	@mkd "$(SCRIPT_INSTALL_DIR)"
+	@mkd "$(SCRIPT_INSTALL_DIR)\images"
+	@mkd "$(SCRIPT_INSTALL_DIR)\demos"
+	@mkd "$(SCRIPT_INSTALL_DIR)\demos\images"
+	xcopy "$(ROOT)\library"              "$(SCRIPT_INSTALL_DIR)"
+	xcopy "$(ROOT)\library\images"       "$(SCRIPT_INSTALL_DIR)\images"
+	xcopy "$(ROOT)\library\demos"        "$(SCRIPT_INSTALL_DIR)\demos"
+	xcopy "$(ROOT)\library\demos\images" "$(SCRIPT_INSTALL_DIR)\demos\images"
+
+$(TKLIB): $(TKDLL) $(TKSTUBLIB)
+
+$(TKSTUBLIB): $(TKSTUBOBJS)
+        $(lib32) /out:$@ $(TKSTUBOBJS)
+
+$(TKDLL): $(TKOBJS) $(TMPDIR)\tk.res $(TMPDIR)\tk.def
+	set LIB=$(TOOLS32)\lib
+       $(link32) $(ldebug) $(dlllflags) -def:$(TMPDIR)\tk.def \
+		-out:$@ $(TMPDIR)\tk.res $(TCLLIBDIR)\$(TCLSTUBLIB) \
+		$(guilibsdll) @<<
+			$(TKOBJS)
+<<
+
+$(TKPLUGINLIB): $(TKPLUGINDLL)
+
+$(TKPLUGINDLL): $(TKOBJS) $(TMPDIR)\tk.res $(TMPDIR)\plugin.def
+	set LIB=$(TOOLS32)\lib
+        $(link32) $(ldebug) $(dlllflags) -def:$(TMPDIR)\plugin.def \
+		-out:$@ $(TMPDIR)\tk.res $(TCLLIBDIR)\$(TCLPLUGINLIB) \
+		$(guilibsdll) @<<
+			$(TKOBJS)
+<<
+
+$(WISH): $(WISHOBJS) $(TKLIB) $(TMPDIR)\wish.res
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(ldebug) $(guilflags) $(TMPDIR)\wish.res -out:$@ \
+		$(guilibsdll) $(TCLLIBDIR)\$(TCLLIB) $(TKLIB) $(WISHOBJS) 
+
+$(WISHC): $(WISHOBJS) $(TKLIB) $(TMPDIR)\wish.res
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(ldebug) $(conlflags) $(TMPDIR)\wish.res -out:$@ \
+		$(guilibsdll) $(TCLLIBDIR)\$(TCLLIB) $(TKLIB) $(WISHOBJS) 
+
+$(WISHP): $(WISHOBJS) $(TKPLUGINLIB) $(TMPDIR)\wish.res
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(ldebug) $(guilflags) $(TMPDIR)\wish.res -out:$@ \
+		$(guilibsdll) $(TCLLIBDIR)\$(TCLPLUGINLIB) \
+		$(TKPLUGINLIB) $(WISHOBJS) 
+
+$(TKTEST): $(TKTESTOBJS) $(TKLIB) $(TMPDIR)\wish.res
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(ldebug) $(guilflags) $(TMPDIR)\wish.res -out:$@ \
+		$(guilibsdll) $(TCLLIBDIR)\$(TCLLIB) $(TKLIB) $(TKTESTOBJS)
+
+$(TMPDIR)\tk.def: $(DUMPEXTS) $(TKOBJS)
+	$(DUMPEXTS) -o $@ $(TKDLLNAME) @<<
+		$(TKOBJS)
+<<
+
+$(TMPDIR)\plugin.def: $(DUMPEXTS) $(TKOBJS)
+	$(DUMPEXTS) -o $@ $(TKPLUGINDLLNAME) @<<
+		$(TKOBJS)
+<<
+
+$(DUMPEXTS): $(TCLDIR)\win\winDumpExts.c
+	$(cc32) $(CON_CFLAGS) -Fo$(TMPDIR)\ $?
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(ldebug) $(conlflags) $(guilibs) -out:$@ \
+		$(TMPDIR)\winDumpExts.obj 
+
+$(CAT32): $(TCLDIR)\win\cat.c
+	$(cc32) $(CON_CFLAGS) -Fo$(TMPDIR)\ $?
+	set LIB=$(TOOLS32)\lib
+	$(link32) $(conlflags) -out:$@ -stack:16384 $(TMPDIR)\cat.obj $(conlibs)
+
+#
+# Regenerate the stubs files.
+#
+
+genstubs:
+	tclsh$(VERSION) $(TCLDIR)\tools\genStubs.tcl $(GENERICDIR) \
+		$(GENERICDIR)\tk.decls $(GENERICDIR)\tkInt.decls
+
+#
+# Special case object file targets
+#
+
+$(TMPDIR)\testMain.obj: $(ROOT)\win\winMain.c
+	$(cc32) $(WISH_CFLAGS) -DTK_TEST -Fo$@ $?
+
+$(TMPDIR)\tkTest.obj: $(ROOT)\generic\tkTest.c
+	$(cc32) $(WISH_CFLAGS) -Fo$@ $?
+
+$(TMPDIR)\tkSquare.obj: $(ROOT)\generic\tkSquare.c
+	$(cc32) $(WISH_CFLAGS) -Fo$@ $?
+
+$(TMPDIR)\winMain.obj: $(ROOT)\win\winMain.c
+	$(cc32) $(WISH_CFLAGS) -Fo$@ $?
+
+$(TMPDIR)\tkStubLib.obj : $(GENERICDIR)\tkStubLib.c
+	$(cc32) $(TK_CFLAGS) -DSTATIC_BUILD -Fo$@ $?
+
+#
+# Implicit rules
+#
+
+{$(XLIBDIR)}.c{$(TMPDIR)}.obj:
+	$(cc32) -DDLL_BUILD -DBUILD_tk $(TK_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(GENERICDIR)}.c{$(TMPDIR)}.obj:
+	$(cc32) -DDLL_BUILD -DBUILD_tk $(TK_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(WINDIR)}.c{$(TMPDIR)}.obj:
+	$(cc32) -DDLL_BUILD -DBUILD_tk $(TK_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(ROOT)\unix}.c{$(TMPDIR)}.obj:
+	$(cc32) -DDLL_BUILD -DBUILD_tk $(TK_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(RCDIR)}.rc{$(TMPDIR)}.res:
+	$(rc32) -fo $@ -r -i "$(GENERICDIR)" -i "$(TOOLS32)\include" \
+		-i "$(TCLDIR)\generic" $<
+
+clean:
+        -@del $(OUTDIR)\*.exp 
+	-@del $(OUTDIR)\*.lib 
+	-@del $(OUTDIR)\*.dll 
+	-@del $(OUTDIR)\*.exe
+	-@del $(OUTDIR)\*.pdb
+	-@del $(TMPDIR)\*.pch
+        -@del $(TMPDIR)\*.obj
+        -@del $(TMPDIR)\*.res
+        -@del $(TMPDIR)\*.def
+        -@del $(TMPDIR)\*.exe
+	-@rmd $(OUTDIR)
+	-@rmd $(TMPDIR)
+
+# dependencies
+
+$(TMPDIR)\tk.res: \
+    $(RCDIR)\buttons.bmp \
+    $(RCDIR)\cursor*.cur \
+    $(RCDIR)\tk.ico
+
+$(GENERICDIR)/default.h: $(WINDIR)/tkWinDefault.h
+$(GENERICDIR)/tkButton.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkCanvas.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkEntry.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkFrame.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkListbox.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMenu.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMenubutton.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMessage.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkScale.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkScrollbar.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkText.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkTextIndex.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkTextTag.c: $(GENERICDIR)/default.h
+
+$(GENERICDIR)/tkText.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextBTree.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextDisp.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextDisp.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextImage.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextIndex.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextMark.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextTag.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextWind.c: $(GENERICDIR)/tkText.h
+
+$(GENERICDIR)/tkMacWinMenu.c: $(GENERICDIR)/tkMenu.h
+$(GENERICDIR)/tkMenu.c: $(GENERICDIR)/tkMenu.h
+$(GENERICDIR)/tkMenuDraw.c: $(GENERICDIR)/tkMenu.h
+$(WINDIR)/tkWinMenu.c: $(GENERICDIR)/tkMenu.h
+

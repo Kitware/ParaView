@@ -3,7 +3,17 @@
 *.bat           -crlf
 *.dsp           -crlf
 *.dsw           -crlf
+browse           crlf=input
 configure        crlf=input
+configure.in     crlf=input
+hello            crlf=input
 install-sh       crlf=input
+ixset            crlf=input
 ldAix            crlf=input
 mkLinks          crlf=input
+rmt              crlf=input
+rolodex          crlf=input
+square           crlf=input
+tcolor           crlf=input
+timer            crlf=input
+widget           crlf=input

@@ -1,0 +1,337 @@
+'\"
+'\" Copyright (c) 1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH grid n 4.1 Tk "Tk Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+grid \- Geometry manager that arranges widgets in a grid
+.SH SYNOPSIS
+\fBgrid \fIoption arg \fR?\fIarg ...\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+The \fBgrid\fR command is used to communicate with the grid
+geometry manager that arranges widgets in rows and columns inside
+of another window, called the geometry master (or master window).
+The \fBgrid\fR command can have any of several forms, depending
+on the \fIoption\fR argument:
+.TP
+\fBgrid \fIslave \fR?\fIslave ...\fR? ?\fIoptions\fR?
+If the first argument to \fBgrid\fR is a window name (any value
+starting with ``.''), then the command is processed in the same
+way as \fBgrid configure\fR.
+.TP
+\fBgrid bbox \fImaster\fR ?\fIcolumn row\fR? ?\fIcolumn2 row2\fR?
+With no arguments, 
+the bounding box (in pixels) of the grid is returned.
+The return value consists of 4 integers.  The first two are the pixel
+offset from the master window (x then y) of the top-left corner of the
+grid, and the second two integers are the width and height of the grid,
+also in pixels.  If a single \fIcolumn\fP and \fIrow\fP is specified on 
+the command line, then the bounding box for that cell is returned, where the
+top left cell is numbered from zero.  If both \fIcolumn\fP and \fIrow\fP
+arguments are specified, then the bounding box spanning the rows and columns
+indicated is returned.
+.TP
+\fBgrid columnconfigure \fImaster index \fR?\fI\-option value...\fR?
+Query or set the column properties of the \fIindex\fP column of the 
+geometry master, \fImaster\fP.
+The valid options are \fB\-minsize\fP, \fB\-weight\fP and \fB-pad\fP.
+.VS
+If one or more options are provided, then \fIindex\fP may be given as 
+a list of column indeces to which the configuration options will operate on.
+.VE
+The \fB\-minsize\fP option sets the minimum size, in screen units,
+that will be permitted for this column.
+The \fB\-weight\fP option (an integer value)
+sets the relative weight for apportioning
+any extra spaces among
+columns.
+A weight of zero (0) indicates the column will not deviate from its requested
+size.  A column whose weight is two will grow at twice the rate as a column
+of weight one when extra space is allocated to the layout.
+The \fB-pad\fP option specifies the number of screen units that will be
+added to the largest window contained completely in that column when the
+grid geometry manager requests a size from the containing window.
+If only an option is specified, with no value,
+the current value of that option is returned.
+If only the master window and index is specified, all the current settings
+are returned in an list of "-option value" pairs.
+.TP
+\fBgrid configure \fIslave \fR?\fIslave ...\fR? ?\fIoptions\fR?
+The arguments consist of the names of one or more slave windows
+followed by pairs of arguments that specify how
+to manage the slaves.
+The characters \fB\-\fP,  \fBx\fP and \fB^\fP, 
+can be specified instead of a window name to alter the default
+location of a \fIslave\fP, as described in the ``RELATIVE PLACEMENT''
+section, below.
+The following options are supported:
+.RS
+.TP
+\fB\-column \fIn\fR
+Insert the slave so that it occupies the \fIn\fPth column in the grid.
+Column numbers start with 0.  If this option is not supplied, then the
+slave is arranged just to the right of previous slave specified on this
+call to \fIgrid\fP, or column "0" if it is the first slave.  For each
+\fBx\fP that immediately precedes the \fIslave\fP, the column position
+is incremented by one.  Thus the \fBx\fP represents a blank column
+for this row in the grid.
+.TP
+\fB\-columnspan \fIn\fR
+Insert the slave so that it occupies \fIn\fP columns in the grid.
+The default is one column, unless the window name is followed by a
+\fB\-\fP, in which case the columnspan is incremented once for each immediately
+following \fB\-\fP.
+.TP
+\fB\-in \fIother\fR
+Insert the slave(s) in the master
+window given by \fIother\fR.  The default is the first slave's
+parent window.
+.TP
+\fB\-ipadx \fIamount\fR
+The \fIamount\fR specifies how much horizontal internal padding to
+leave on each side of the slave(s).  This is space is added
+inside the slave(s) border.
+The \fIamount\fR must be a valid screen distance, such as \fB2\fR or \fB.5c\fR.
+It defaults to 0.
+.TP
+\fB\-ipady \fIamount\fR
+The \fIamount\fR specifies how much vertical internal padding to
+leave on on the top and bottom of the slave(s).
+This space is added inside the slave(s) border.
+The \fIamount\fR  defaults to 0.
+.TP
+\fB\-padx \fIamount\fR
+The \fIamount\fR specifies how much horizontal external padding to
+leave on each side of the slave(s), in screen units.
+The \fIamount\fR defaults to 0.
+This space is added outside the slave(s) border.
+.TP
+\fB\-pady \fIamount\fR
+The \fIamount\fR specifies how much vertical external padding to
+leave on the top and bottom of the slave(s), in screen units.
+The \fIamount\fR defaults to 0.
+This space is added outside the slave(s) border.
+.TP
+\fB\-row \fIn\fR
+Insert the slave so that it occupies the \fIn\fPth row in the grid.
+Row numbers start with 0.  If this option is not supplied, then the
+slave is arranged on the same row as the previous slave specified on this
+call to \fBgrid\fP, or the first unoccupied row if this is the first slave.
+.TP
+\fB\-rowspan \fIn\fR
+Insert the slave so that it occupies \fIn\fP rows in the grid.
+The default is one row.  If the next \fBgrid\fP command contains
+\fB^\fP characters instead of \fIslaves\fP that line up with the columns
+of this \fIslave\fP, then the \fBrowspan\fP of this \fIslave\fP is
+extended by one.
+.TP
+\fB\-sticky \fIstyle\fR
+If a slave's cell is larger than its requested dimensions, this
+option may be used to position (or stretch) the slave within its cell.
+\fIStyle\fR  is a string that contains zero or more of the characters
+\fBn\fP, \fBs\fP, \fBe\fP or \fBw\fP.
+The string can optionally contains spaces or
+commas, but they are ignored.  Each letter refers to a side (north, south,
+east, or west) that the slave will "stick" to.  If both \fBn\fP and \fBs\fP (or
+\fBe\fP and \fBw\fP) are specified, the slave will be stretched to fill the entire
+height (or width) of its cavity.  The \fBsticky\fP option subsumes the
+combination of \fB\-anchor\fP and \fB\-fill\fP that is used by \fBpack\fP.
+The default is \fB{}\fP, which causes the slave to be centered in its cavity,
+at its requested size.
+.LP
+If any of the slaves are already managed by the geometry manager
+then any unspecified options for them retain their previous values rather
+than receiving default values.
+.RE
+.TP
+\fBgrid forget \fIslave \fR?\fIslave ...\fR?
+Removes each of the \fIslave\fRs from grid for its
+master and unmaps their windows.
+The slaves will no longer be managed by the grid geometry manager.
+The configuration options for that window are forgotten, so that if the
+slave is managed once more by the grid geometry manager, the initial
+default settings are used.
+.TP
+\fBgrid info \fIslave\fR
+Returns a list whose elements are the current configuration state of
+the slave given by \fIslave\fR in the same option-value form that
+might be specified to \fBgrid configure\fR.
+The first two elements of the list are ``\fB\-in \fImaster\fR'' where
+\fImaster\fR is the slave's master.
+.TP
+\fBgrid location \fImaster x y\fR
+Given  \fIx\fP and \fIy\fP values in screen units relative to the master window, 
+the column and row number at that \fIx\fP and \fIy\fP location is returned.
+For locations that are above or to the left of the grid, \fB-1\fP is returned.
+.TP
+\fBgrid propagate \fImaster\fR ?\fIboolean\fR?
+If \fIboolean\fR has a true boolean value such as \fB1\fR or \fBon\fR
+then propagation is enabled for \fImaster\fR, which must be a window
+name (see ``GEOMETRY PROPAGATION'' below).
+If \fIboolean\fR has a false boolean value then propagation is
+disabled for \fImaster\fR.
+In either of these cases an empty string is returned.
+If \fIboolean\fR is omitted then the command returns \fB0\fR or
+\fB1\fR to indicate whether propagation is currently enabled
+for \fImaster\fR.
+Propagation is enabled by default.
+.TP
+\fBgrid rowconfigure \fImaster index \fR?\fI\-option value...\fR?
+Query or set the row properties of the \fIindex\fP row of the 
+geometry master, \fImaster\fP.
+The valid options are \fB\-minsize\fP, \fB\-weight\fP and \fB-pad\fP.
+.VS
+If one or more options are provided, then \fIindex\fP may be given as 
+a list of row indeces to which the configuration options will operate on.
+.VE
+The \fB\-minsize\fP option sets the minimum size, in screen units,
+that will be permitted for this row.
+The \fB\-weight\fP option (an integer value)
+sets the relative weight for apportioning
+any extra spaces among
+rows.
+A weight of zero (0) indicates the row will not deviate from its requested
+size.  A row whose weight is two will grow at twice the rate as a row
+of weight one when extra space is allocated to the layout.
+The \fB-pad\fP option specifies the number of screen units that will be
+added to the largest window contained completely in that row when the
+grid geometry manager requests a size from the containing window.
+If only an option is specified, with no value,
+the current value of that option is returned.
+If only the master window and index is specified, all the current settings
+are returned in an list of "-option value" pairs.
+.TP
+\fBgrid remove \fIslave \fR?\fIslave ...\fR?
+Removes each of the \fIslave\fRs from grid for its
+master and unmaps their windows.
+The slaves will no longer be managed by the grid geometry manager.
+However, the configuration options for that window are remembered,
+so that if the
+slave is managed once more by the grid geometry manager, the previous
+values are retained.
+.TP
+\fBgrid size \fImaster\fR
+Returns the size of the grid (in columns then rows) for \fImaster\fP.
+The size is determined either by the \fIslave\fP occupying the largest
+row or column, or the largest column or row with a \fBminsize\fP, 
+\fBweight\fP, or \fBpad\fP that is non-zero.
+.TP
+\fBgrid slaves \fImaster\fR ?\fI\-option value\fR?
+If no options are supplied, a list of all of the slaves in \fImaster\fR
+are returned, most recently manages first.
+\fIOption\fP can be either \fB\-row\fP or \fB\-column\fP which
+causes only the slaves in the row (or column) specified by \fIvalue\fP
+to be returned.
+.SH "RELATIVE PLACEMENT"
+.PP
+The \fBgrid\fP command contains a limited set of capabilities that
+permit layouts to be created without specifying the row and column 
+information for each slave.  This permits slaves to be rearranged, 
+added, or removed without the need to explicitly specify row and
+column information.
+When no column or row information is specified for a \fIslave\fP, 
+default values are chosen for
+\fBcolumn\fP, \fBrow\fP, \fBcolumnspan\fP and \fBrowspan\fP
+at the time the \fIslave\fP is managed. The values are chosen
+based upon the current layout of the grid, the position of the \fIslave\fP
+relative to other \fIslave\fPs in the same grid command, and the presence
+of the characters \fB\-\fP, \fB^\fP, and \fB^\fP in \fBgrid\fP
+command where \fIslave\fP names are normally expected.
+.RS
+.TP
+\fB\-\fP
+This increases the columnspan of the \fIslave\fP to the left.  Several
+\fB\-\fP's in a row will successively increase the columnspan. A \fB\-\fP
+may not follow a \fB^\fP or a \fBx\fP.
+.TP
+\fBx\fP
+This leaves an empty column between the \fIslave\fP on the left and
+the \fIslave\fP on the right.
+.TP
+\fB^\fP
+This extends the \fBrowspan\fP of the \fIslave\fP above the \fB^\fP's
+in the grid.  The number of \fB^\fP's in a row must match the number of
+columns spanned by the \fIslave\fP above it.
+.RE
+.SH "THE GRID ALGORITHM"
+.PP
+The grid geometry manager lays out its slaves in three steps.
+In the first step, the minimum size needed to fit all of the slaves
+is computed, then (if propagation is turned on), a request is made
+of the master window to become that size.
+In the second step, the requested size is compared against the actual size
+of the master.  If the sizes are different, then spaces is added to or taken
+away from the layout as needed.
+For the final step, each slave is positioned in its row(s) and column(s)
+based on the setting of its \fIsticky\fP flag.
+.PP
+To compute the minimum size of a layout, the grid geometry manager
+first looks at all slaves whose columnspan and rowspan values are one,
+and computes the nominal size of each row or column to be either the
+\fIminsize\fP for that row or column, or the sum of the \fIpad\fPding
+plus the size of the largest slave, whichever is greater.  Then the
+slaves whose rowspans or columnspans are greater than one are
+examined.  If a group of rows or columns need to be increased in size
+in order to accommodate these slaves, then extra space is added to each
+row or column in the group according to its \fIweight\fP.  For each
+group whose weights are all zero, the additional space is apportioned
+equally.
+.PP
+For masters whose size is larger than the requested layout, the additional
+space is apportioned according to the row and column weights.  If all of
+the weights are zero, the layout is centered within its master.
+For masters whose size is smaller than the requested layout, space is taken
+away from columns and rows according to their weights.  However, once a 
+column or row shrinks to its minsize, its weight is taken to be zero.
+If more space needs to be removed from a layout than would be permitted, as
+when all the rows or columns are at there minimum sizes, the layout is
+clipped on the bottom and right.
+.SH "GEOMETRY PROPAGATION"
+.PP
+The grid geometry manager normally computes how large a master must be to
+just exactly meet the needs of its slaves, and it sets the
+requested width and height of the master to these dimensions.
+This causes geometry information to propagate up through a
+window hierarchy to a top-level window so that the entire
+sub-tree sizes itself to fit the needs of the leaf windows.
+However, the \fBgrid propagate\fR command may be used to
+turn off propagation for one or more masters.
+If propagation is disabled then grid will not set
+the requested width and height of the master window.
+This may be useful if, for example, you wish for a master
+window to have a fixed size that you specify.
+
+.SH "RESTRICTIONS ON MASTER WINDOWS"
+.PP
+The master for each slave must either be the slave's parent
+(the default) or a descendant of the slave's parent.
+This restriction is necessary to guarantee that the
+slave can be placed over any part of its master that is
+visible without danger of the slave being clipped by its parent.
+In addition, all slaves in one call to \fBgrid\fP must have the same master.
+.SH "STACKING ORDER"
+.PP
+If the master for a slave is not its parent then you must make sure
+that the slave is higher in the stacking order than the master.
+Otherwise the master will obscure the slave and it will appear as
+if the slave hasn't been managed correctly.
+The easiest way to make sure the slave is higher than the master is
+to create the master window first:  the most recently created window
+will be highest in the stacking order.
+.SH CREDITS
+.PP
+The \fBgrid\fP command is based on ideas taken from the \fIGridBag\fP
+geometry manager written by Doug. Stein, and the \fBblt_table\fR geometry
+manager, written by George Howlett.
+.SH KEYWORDS
+geometry manager, location, grid, cell, propagation, size, pack

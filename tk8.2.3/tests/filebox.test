@@ -1,0 +1,308 @@
+# This file is a Tcl script to test out Tk's "tk_getOpenFile" and
+# "tk_getSaveFile" commands. It is organized in the standard fashion
+# for Tcl tests.
+#
+# Copyright (c) 1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+#
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+set tk_strictMotif_old $tk_strictMotif
+
+# Some tests require user interaction on non-unix platform
+
+set ::tcltest::testConfig(nonUnixUserInteraction) \
+    [expr {$::tcltest::testConfig(userInteraction) || \
+	$::tcltest::testConfig(unixOnly)}]
+
+#----------------------------------------------------------------------
+#
+# Procedures needed by this test file
+#
+#----------------------------------------------------------------------
+
+proc ToPressButton {parent btn} {
+    global isNative
+    if {!$isNative} {
+	after 100 SendButtonPress $parent $btn mouse
+    }
+}
+
+proc ToEnterFileByKey {parent fileName fileDir} {
+    global isNative
+    if {!$isNative} {
+	after 100 EnterFileByKey $parent [list $fileName] [list $fileDir]
+    }
+}
+
+proc PressButton {btn} {
+    event generate $btn <Enter>
+    event generate $btn <1> -x 5 -y 5
+    event generate $btn <ButtonRelease-1> -x 5 -y 5
+}
+
+proc EnterFileByKey {parent fileName fileDir} {
+    global tk_strictMotif
+    if {$parent == "."} {
+	set w .__tk_filedialog
+    } else {
+	set w $parent.__tk_filedialog
+    }
+    upvar #0 [winfo name $w] data
+
+    if {$tk_strictMotif} {
+	$data(sEnt) delete 0 end
+	$data(sEnt) insert 0 [file join $fileDir $fileName]
+    } else {
+	$data(ent) delete 0 end
+	$data(ent) insert 0 $fileName
+    }
+
+    update
+    SendButtonPress $parent ok mouse
+}
+
+proc SendButtonPress {parent btn type} {
+    global tk_strictMotif
+    if {$parent == "."} {
+	set w .__tk_filedialog
+    } else {
+	set w $parent.__tk_filedialog
+    }
+    upvar #0 [winfo name $w] data
+
+    set button $data($btn\Btn)
+    if ![winfo ismapped $button] {
+	update
+    }
+
+    if {$type == "mouse"} {
+	PressButton $button
+    } else {
+	event generate $w <Enter>
+	focus $w
+	event generate $button <Enter>
+	event generate $w <KeyPress> -keysym Return
+    }
+}
+
+
+#----------------------------------------------------------------------
+#
+# The test suite proper
+#
+#----------------------------------------------------------------------
+
+if {$tcl_platform(platform) == "unix"} {
+    set modes "0 1"
+} else {
+    set modes 1
+}
+
+set unknownOptionsMsg {1 {bad option "-foo": must be -defaultextension, -filetypes, -initialdir, -initialfile, -parent, or -title}}
+
+set tmpFile "filebox.tmp"
+makeFile {
+    # this file can be empty!
+} $tmpFile
+
+foreach mode $modes {
+
+    #
+    # Test both the motif version and the "tk" version of the file dialog
+    # box on Unix.
+    #
+
+    if {$tcl_platform(platform) == "unix"} {
+	set tk_strictMotif $mode
+    }
+
+    #
+    # Test both the "open" and the "save" dialogs
+    #
+
+    foreach command "tk_getOpenFile tk_getSaveFile" {
+	test filebox-1.1 "$command command" {
+	    list [catch {$command -foo} msg] $msg
+	} $unknownOptionsMsg
+
+	catch {$command -foo 1} msg
+	regsub -all ,      $msg "" options
+	regsub \"-foo\" $options "" options
+
+	foreach option $options {
+	    if {[string index $option 0] == "-"} {
+		test filebox-1.2 "$command command" {
+		    list [catch {$command $option} msg] $msg
+		} [list 1 "value for \"$option\" missing"]
+	    }
+	}
+
+	test filebox-1.3 "$command command" {
+	    list [catch {$command -foo bar} msg] $msg
+	} $unknownOptionsMsg
+
+	test filebox-1.4 "$command command" {
+	    list [catch {$command -initialdir} msg] $msg
+	} {1 {value for "-initialdir" missing}}
+
+	test filebox-1.5 "$command command" {
+	    list [catch {$command -parent foo.bar} msg] $msg
+	} {1 {bad window path name "foo.bar"}}
+
+	test filebox-1.6 "$command command" {
+	    list [catch {$command -filetypes {Foo}} msg] $msg
+	} {1 {bad file type "Foo", should be "typeName {extension ?extensions ...?} ?{macType ?macTypes ...?}?"}}
+
+	if {[info commands tkMotifFDialog] == "" && [info commands tkFDialog] == ""} {
+	    set isNative 1
+	} else {
+	    set isNative 0
+	}
+
+	set parent .
+
+	set verylongstring longstring:
+	set verylongstring $verylongstring$verylongstring
+	set verylongstring $verylongstring$verylongstring
+	set verylongstring $verylongstring$verylongstring
+	set verylongstring $verylongstring$verylongstring
+#	set verylongstring $verylongstring$verylongstring
+#	set verylongstring $verylongstring$verylongstring
+#	set verylongstring $verylongstring$verylongstring
+#	set verylongstring $verylongstring$verylongstring
+#	set verylongstring $verylongstring$verylongstring
+
+	set color #404040
+	test filebox-2.1 "$command command" {nonUnixUserInteraction} {
+	    ToPressButton $parent cancel
+	    $command -title "Press Cancel ($verylongstring)" -parent $parent
+	} ""
+
+	if {$command == "tk_getSaveFile"} {
+	    set fileName "12x 455"
+	    set fileDir [pwd]
+	    set pathName [file join [pwd] $fileName]
+	} else {
+	    set fileName $tmpFile
+	    set fileDir [pwd]
+	    set pathName [file join $fileDir $fileName]
+	}
+
+	test filebox-2.2 "$command command" {nonUnixUserInteraction} {
+	    ToPressButton $parent ok
+	    set choice [$command -title "Press Ok" \
+			    -parent $parent -initialfile $fileName -initialdir $fileDir]
+	} $pathName
+
+	test filebox-2.3 "$command command" {nonUnixUserInteraction} {
+	    ToEnterFileByKey $parent $fileName $fileDir
+	    set choice [$command -title "Enter \"$fileName\" and press Ok" \
+			    -parent $parent -initialdir $fileDir]
+	} $pathName
+
+	test filebox-2.4 "$command command" {nonUnixUserInteraction} {
+	    ToPressButton $parent ok
+	    set choice [$command -title "Enter \"$fileName\" and press Ok" \
+			    -parent $parent -initialdir . \
+			    -initialfile $fileName]
+	} $pathName
+
+	test filebox-2.5 "$command command" {nonUnixUserInteraction} {
+	    ToPressButton $parent ok
+	    set choice [$command -title "Enter \"$fileName\" and press Ok" \
+			    -parent $parent -initialdir /badpath \
+			    -initialfile $fileName]
+	} $pathName
+
+	test filebox-2.6 "$command command" {nonUnixUserInteraction} {
+	    toplevel .t1; toplevel .t2
+	    ToPressButton .t1 ok
+	    set choice {}
+	    lappend choice [$command \
+		    -title "Enter \"$fileName\" and press Ok" \
+		    -parent .t1 -initialdir $fileDir \
+		    -initialfile $fileName]
+	    ToPressButton .t2 ok
+	    lappend choice [$command \
+		    -title "Enter \"$fileName\" and press Ok" \
+		    -parent .t2 -initialdir $fileDir \
+		    -initialfile $fileName]
+	    ToPressButton .t1 ok
+	    lappend choice [$command \
+		    -title "Enter \"$fileName\" and press Ok" \
+		    -parent .t1 -initialdir $fileDir \
+		    -initialfile $fileName]
+	    destroy .t1
+	    destroy .t2
+	    set choice
+	} [list $pathName $pathName $pathName]
+ 
+
+
+	set filters(1) {}
+
+	set filters(2) {
+	    {"Text files"	{.txt .doc}	}
+	    {"Text files"	{}		TEXT}
+	    {"Tcl Scripts"	{.tcl}		TEXT}
+	    {"C Source Files"	{.c .h}		}
+	    {"All Source Files"	{.tcl .c .h}	}
+	    {"Image Files"	{.gif}		}
+	    {"Image Files"	{.jpeg .jpg}	}
+	    {"Image Files"	""		{GIFF JPEG}}
+	    {"All files"	*}
+	}
+
+	set filters(3) {
+	    {"Text files"	{.txt .doc}	TEXT}
+	    {"Foo"		{""}		TEXT}
+	}
+
+	foreach x [lsort -integer [array names filters]] {
+	    test filebox-3.$x "$command command" {nonUnixUserInteraction} {
+		ToPressButton $parent ok
+		set choice [$command -title "Press Ok" -filetypes $filters($x)\
+				-parent $parent -initialfile $fileName -initialdir $fileDir]
+	    } $pathName
+	}
+
+	#
+	# The rest of the tests need to be executed on Unix only. The test whether
+	# the dialog box widgets were implemented correctly. These tests are not
+	# needed on the other platforms because they use native file dialogs.
+	#
+
+
+
+
+	# end inner if
+    }
+
+    # end outer if
+}
+
+set tk_strictMotif $tk_strictMotif_old
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
