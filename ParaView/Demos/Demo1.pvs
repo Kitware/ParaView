@@ -1108,7 +1108,7 @@ proc iso_init {} {
     set iso(vtkTemp1) [$Application GetMainWindow]
     set iso(vtkTemp24) [$iso(vtkTemp1) GetMainView]
     $iso(vtkTemp1) Open "$DemoDir/quadric.vtk"
-    set iso(vtkTemp384) [vtkTemp1 GetCurrentPVSource]
+    set iso(vtkTemp384) [$iso(vtkTemp1) GetCurrentPVSource]
     if $pvDemoShouldStop {
         return
     }
@@ -1700,7 +1700,7 @@ proc stream2_init {} {
     }
 
     $streams(vtkTemp1) Open "$DemoDir/stream.vtk"
-    set streams(vtkTemp679) [vtkTemp1 GetCurrentPVSource]
+    set streams(vtkTemp679) [$streams(vtkTemp1) GetCurrentPVSource]
 
     if $pvDemoShouldStop {
         return
@@ -3574,7 +3574,7 @@ proc warp_init {} {
     set warp(vtkTemp1) [$Application GetMainWindow]
     set warp(vtkTemp24) [$warp(vtkTemp1) GetMainView]
     $warp(vtkTemp1) Open "$DemoDir/blow.vtk"
-    set warp(vtkTemp384) [vtkTemp1 GetCurrentPVSource]
+    set warp(vtkTemp384) [$warp(vtkTemp1) GetCurrentPVSource]
     set warp(vtkTemp450) [$warp(vtkTemp1) CreatePVSource WarpVector]
     set warp(vtkTemp462) [$warp(vtkTemp450) GetPVWidget {Vectors}]
     $warp(vtkTemp462) SetValue {displacement1}
