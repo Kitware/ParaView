@@ -52,6 +52,8 @@ $kw(vtkTemp325) SetValue {scalars}
 set kw(vtkTemp328) [$kw(vtkTemp319) GetPVWidget {Contour Values}]
 $kw(vtkTemp328) RemoveAllValues
 $kw(vtkTemp328) AddValue 10.0
+set kw(vtkTemp1029) [$kw(vtkTemp319) GetPVWidget {Compute Scalars}]
+$kw(vtkTemp1029) SetState 1
 $kw(vtkTemp319) AcceptCallback
 
 # Fix the size of the image.

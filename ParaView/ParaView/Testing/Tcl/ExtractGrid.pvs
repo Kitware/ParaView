@@ -33,6 +33,8 @@ set kw(vtkTemp358) [$kw(vtkTemp349) GetPVWidget {Contour Values}]
 $kw(vtkTemp358) RemoveAllValues
 $kw(vtkTemp358) AddValue 1.000000
 $kw(vtkTemp358) AddValue 10.000000
+set kw(vtkTemp1029) [$kw(vtkTemp349) GetPVWidget {Compute Scalars}]
+$kw(vtkTemp1029) SetState 1
 $kw(vtkTemp349) AcceptCallback
 $kw(vtkTemp21) SetCameraState -15.223 0.904 4.858  15.000 15.000 15.000  -0.409 0.911 -0.046
 $kw(vtkTemp21) SetCameraState 6.136 -18.690 13.825  15.000 15.000 15.000  -0.213 0.090 -0.973
