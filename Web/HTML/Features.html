@@ -14,11 +14,50 @@
     <td width="550" valign="top" bgcolor="#FFFFFF">
     <div align="left">
 
-    <font size=5>A Summary Of Features</font><br> ParaView is an extensible, 
-    open-source system that has several powerful features. These include:
+    <font size=5>Features</font><br>
+    The following summarizes the important features
+    of ParaView.
     <ul>
-      <li></li>
-      <li></li>
+      <li><u><b>Software Architecture</b></u></li>
+          <ul>
+          <li>Open-source</li>
+          <li>Uses C++ to drive the Tk widget set.</li>
+          <li>Portable across Windows and Unix systems</li>
+          <li>Built on the standard open-source VTK visualization system</li>
+          <li>Modular GUI may be extended to support your own tools</li>
+          <li>The application may be extended at run-time via Tcl scripting</li>
+          <li>Transparent multi-processor support</li>
+          <li>Supports data-streaming. (Has been used to process 1-pedabyte in a
+              single run on a 2048 processor machine.)</li>
+          <li>VTK or user-defined filters can be easily added.</li>
+          </ul>
+          <p>
+      <li><u><b>Visualization Capabilities</u></b></li>
+          <ul>
+          <li>Reads and writes a variety of data formats including Ensight, VTK, Plot3D, 
+              Wavefront, STL, etc.</li>
+          <li>Supports several source objects (e.g., lines, planes, spheres, implicit functions,
+              point clouds, etc.) used for probing, generating streamlines,
+              cutting, and representing geometry.</li>
+          <li>A large library of visualization filters are available. These include isocontouring,
+              cutting, clipping, color mapping, decimation, outlines, geometry extraction and glyphing.</li>
+          <li>Supports different interaction styles, switchable at run-time. Users can add their
+              own interaction styles.</li> 
+          <li>Annotation features such as scalar bars; 2D (fixed) and 3D (moves with object) 
+              text are available.</li>
+          <li>Picking</li>
+          <li>LOD displays allows for user trade-off between rendering fidelity and frame rate.</li>
+          </ul>
+          <p>
+      <li><u><b>Parallel Processing</u></b></li>
+          <ul>
+          <li>Supports parallel software rendering (tree composite with LOD)</li>
+          <li>Algorithms implemented in parallel</li>
+          <li>Data parallelism is supported</li>
+          <li>Supports MPI and shared memory architectures</li>
+          <li></li>
+          </ul>
+          <p>
     </ul>
     </div>
     </td>
