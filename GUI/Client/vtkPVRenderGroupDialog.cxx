@@ -20,7 +20,6 @@
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -30,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.7");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);

@@ -20,7 +20,6 @@
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -31,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.14");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
