@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -108,7 +108,7 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
-  this->ModifiedCallback;
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
