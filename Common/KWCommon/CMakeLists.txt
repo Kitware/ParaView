@@ -104,9 +104,6 @@ INCLUDE_DIRECTORIES(${KWSYS_INCLUDE_DIR})
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)
 TARGET_LINK_LIBRARIES(ProcessXML vtkCommon kwsys)
 
-OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
-MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
-
 IF(BUILD_SHARED_LIBS)
   # Let parent project set KW_INSTALL_LIB_DIR to control library install
   # location.
