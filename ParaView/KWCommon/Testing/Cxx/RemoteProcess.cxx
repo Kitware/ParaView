@@ -6,15 +6,7 @@
 
 int main()
 {
-  const char* args[] = {
-    "/usr/bin/find",
-    "/usr",
-    "-type",
-    "f",
-    "-name",
-    "\\*andy\\*",
-    0
-  };
+  const char* args = "/usr/bin/find /usr -type f -name \\*andy\\*";
   vtkKWRemoteExecute* re = vtkKWRemoteExecute::New();
   re->SetRemoteHost("public");
   re->RunRemoteCommand(args);

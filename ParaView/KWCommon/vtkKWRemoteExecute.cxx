@@ -74,13 +74,14 @@ public:
     }
   typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
   VectorOfStrings Args;
+  vtkstd::string Command;
 };
 //============================================================================
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.10");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -135,7 +136,7 @@ int vtkKWRemoteExecute::Detach()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRemoteExecute::RunRemoteCommand(const char* args[])
+int vtkKWRemoteExecute::RunRemoteCommand(const char* args)
 {
   if ( !this->RemoteHost )
     {
@@ -148,10 +149,9 @@ int vtkKWRemoteExecute::RunRemoteCommand(const char* args[])
     vtkErrorMacro("SSH Command not set");
     return 0;
     }
-  int cc;
-  for ( cc = 0; args[cc]; cc ++ )
+  if ( args )
     {
-    this->Internals->Args.push_back(args[cc]);
+    this->Internals->Command = args;
     }
   cout << "This is: " << this << endl;
   vtkMultiThreader* th = this->MultiThreader;
@@ -181,46 +181,10 @@ int vtkKWRemoteExecute::WaitToFinish()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRemoteExecute::RunCommand(const char* args[])
+int vtkKWRemoteExecute::RunCommand(const char* args)
 {
-#ifdef __WITH__FORK__
-  int res = 0;
-#ifdef _WIN32
-#else
-  pid_t pid;
-  if ( (pid = fork()) < 0 )
-    {
-    vtkErrorMacro("Cannot fork");
-    return 0;
-    }
-  if ( pid == 0 )
-    {
-    /*
-    if ( daemon(0,0) == -1 )
-      {
-      vtkErrorMacro("Cannot start process");
-      return 0;
-      }
-      */
-    execv(args[0], (char* const*)args);
-    return 0;
-    }
-  cout << "Child's pid: " << pid << endl;
-  res = pid;
-#endif
-  return res;
-#endif
-
-  int cc;
-  ostrstream str;
-  for ( cc = 0; args[cc]; cc ++ )
-    {
-    str << "\"" << args[cc] << "\" ";
-    }
-  str << ends;
-  cout << "Execute [" << str.str() << "]" << endl;
-  system(str.str());
-  str.rdbuf()->freeze(0);
+  cout << "Execute [" << args << "]" << endl;
+  system(this->Internals->Command.c_str());
   return VTK_OK;
 }
 
@@ -237,54 +201,27 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
 
   cout << "self is " << self << endl;
 
-  vtkKWRemoteExecuteInternal::VectorOfStrings &args = 
-    self->Internals->Args;
-
-  vtkKWRemoteExecuteInternal::VectorOfStrings::size_type cc;
-  int cnt=args.size()+5;
+  vtkstd::string command = "";
+  command +=  self->SSHCommand;
+  command += " ";
   if ( self->SSHArguments )
     {
-    cnt ++;
+    command += self->SSHArguments;
+    command += " ";
     }
   if ( self->SSHUser )
     {
-    cnt += 2;
-    }
-  cout << "Number of arguments: " << cnt << endl;
-  char** rargs = new char*[ cnt + 3];
-  int scnt=0;
-  rargs[scnt] = vtkString::Duplicate( self->SSHCommand);
-  scnt ++;
-  if ( self->SSHArguments )
-    {
-    rargs[scnt] = vtkString::Duplicate( self->SSHArguments);
-    scnt ++;
-    }
-  if ( self->SSHUser )
-    {
-    rargs[scnt] = vtkString::Duplicate("-l");
-    scnt++;
-    rargs[scnt] = vtkString::Duplicate( self->SSHUser);
-    scnt ++;
+    command += "-l ";
+    command += self->SSHUser;
+    command += " ";
     }
 
-  rargs[scnt] = vtkString::Duplicate( self->RemoteHost);
-  scnt ++;
+  command += self->RemoteHost;
+  command += " ";
 
-  cout << "Prepend: " << rargs[0] << endl;
+  command += "'" + self->Internals->Command + "'";
 
-  for ( cc = 0; cc < args.size(); cc ++ )
-    {
-    rargs[scnt] = vtkString::Duplicate( args[cc].c_str() );
-    scnt ++;
-    }
-  rargs[scnt] = 0;
-  int res = self->RunCommand((const char**)rargs);
-  for ( cc = 0; rargs[cc]; cc ++ )
-    {
-    delete [] rargs[cc];
-    }
-  delete [] rargs;
+  int res = self->RunCommand(command.c_str());
   if ( res == VTK_OK )
     {
     self->Result = vtkKWRemoteExecute::SUCCESS;
