@@ -4,8 +4,13 @@ SOURCE_FILES( ParaView_SRCS
 #vtkPVMethodInterface 
 #vtkPVSourceInterface 
 #vtkPVSourceInterfaceParser
+vtkAllToNPoly
+vtkBalancePoly
+vtkCommSched
 vtkDummyRenderWindow
 vtkDummyRenderer
+vtkRedistributePoly
+vtkWeightedPoly
 vtkKWBoundsDisplay
 vtkKWExtractGeometryByScalar
 vtkPassThroughFilter
