@@ -80,11 +80,6 @@ public:
   vtkGetMacro(ShowLabel, int);
 
   // Description:
-  // Set/Get the enabled state.
-  // Override to pass down to children.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -101,6 +96,10 @@ protected:
   // Pack or repack the widget. To be implemented by subclasses.
 
   virtual void Pack() {};
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWLabeledWidget(const vtkKWLabeledWidget&); // Not implemented
