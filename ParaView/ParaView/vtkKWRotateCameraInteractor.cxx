@@ -209,7 +209,6 @@ void vtkKWRotateCameraInteractor::SetRenderView(vtkPVRenderView *view)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::AButtonPress(int num, int x, int y)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
     this->AddTraceEntry("$kw(%s) AButtonPress %d %d %d",
@@ -255,7 +254,6 @@ void vtkKWRotateCameraInteractor::AButtonPress(int num, int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::AButtonRelease(int num, int x, int y)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
     this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
@@ -272,7 +270,6 @@ void vtkKWRotateCameraInteractor::AButtonRelease(int num, int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::Button1Motion(int x, int y)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
     this->AddTraceEntry("$kw(%s) Button1Motion %d %d",
@@ -310,7 +307,6 @@ void vtkKWRotateCameraInteractor::Button1Motion(int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::Button3Motion(int x, int y)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
     this->AddTraceEntry("$kw(%s) Button3Motion %d %d",
@@ -326,7 +322,6 @@ void vtkKWRotateCameraInteractor::Button3Motion(int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::MotionCallback(int x, int y)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
     this->AddTraceEntry("$kw(%s) MotionCallback %d %d",

@@ -231,8 +231,6 @@ void vtkPVInputMenu::ModifiedCallback()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Accept()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // Why does the widget have to be modified in order to execute this method???
   
 //  if ( ! this->ModifiedFlag)
@@ -245,7 +243,6 @@ void vtkPVInputMenu::Accept()
     vtkErrorMacro("PVSource not set.");
     return;
     }
-
 
   if (this->CurrentValue)
     {

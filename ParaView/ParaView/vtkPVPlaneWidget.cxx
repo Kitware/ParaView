@@ -322,8 +322,6 @@ void vtkPVPlaneWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Accept()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if ( this->CenterEntry->GetModifiedFlag())
     {
     this->CenterEntry->Accept();
