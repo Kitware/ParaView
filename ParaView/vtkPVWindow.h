@@ -87,6 +87,10 @@ protected:
 
   vtkKWToolbar *Toolbar;
   vtkKWWidget *ResetCameraButton;
+
+  vtkKWMenu *MenuSource;
+  
+  
   
   vtkKWNotebook *MainNotebook;
   int MainNotebookCreated;

@@ -69,6 +69,11 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWWidget::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWWidget::New();
+
+  this->MenuSource = vtkKWMenu::New();
+  this->MenuSource->SetParent(this->Menu);
+  
+  
   this->MainNotebook = vtkKWNotebook::New();
   this->MainNotebookCreated = 0;
   this->IsoScale = vtkKWScale::New();
@@ -84,6 +89,10 @@ vtkPVWindow::~vtkPVWindow()
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
   
+  this->MenuSource->Delete();
+  this->MenuSource->Delete();
+  
+  // Temporary stuff to delete.
   this->MainNotebook->SetParent(NULL);
   this->MainNotebook->Delete();
   this->MainNotebook = NULL;
@@ -116,13 +125,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script(
     "%s insert 0 command -label {New Window} -command {%s NewWindow}",
     this->GetMenuFile()->GetWidgetName(), this->GetTclName());
-  
-  this->Script(
-    "%s insert 1 command -label {Open} -command {%s Open}",
-    this->GetMenuFile()->GetWidgetName(), this->GetTclName());
-  this->Script(
-    "%s insert 2 command -label {Save} -command {%s Save}",
-    this->GetMenuFile()->GetWidgetName(), this->GetTclName());
+
+  // Create the menu for creating data sources.
+  this->MenuSource->Create(app,"-tearoff 0");
+  this->GetMenuFile()->InsertCascade(1, "New Data", this->MenuSource, 0);
+  this->MenuSource->AddCommand("Volume", this, "NewVolume");
+  this->MenuSource->AddCommand("Cone", this, "NewCone");
   
   this->CreateMenu->SetParent(this->GetMenu());
   this->CreateMenu->Create(this->Application,"menu","-tearoff 0");
