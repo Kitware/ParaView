@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.19");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -298,7 +298,6 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module,
   // Do not use reference counting.  This reference is short lived.
   this->PopupModule = module;
 
-  vtkKWApplication *app = this->GetApplication();
   if ( module->IsDeletable())
     {
     this->PopupMenu->SetState("Delete", vtkKWMenu::Normal);
