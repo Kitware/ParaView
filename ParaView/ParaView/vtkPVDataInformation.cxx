@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkByteSwap.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_BUILD_DEVELOPMENT
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
@@ -59,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.16");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.17");
 
 
 //----------------------------------------------------------------------------
