@@ -21,5 +21,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "tk8.4.5/[^/]+/[^/]+.c[:\"]"
   "jobserver unavailable"
   "xtree.[0-9]+. : warning C4702: unreachable code"
+  "warning LNK4221"
   )
 
