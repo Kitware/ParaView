@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.157");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.158");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -921,9 +921,16 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   if (pvApp)
     {
-    float ctime = static_cast<float>(this->GetCurrentTime()) / 
-      static_cast<float>(this->NumberOfFrames-1);
-
+    float ctime;
+    if (this->NumberOfFrames > 1)
+      {
+      ctime = static_cast<float>(this->GetCurrentTime()) / 
+        static_cast<float>(this->NumberOfFrames-1);
+      }
+    else
+      { // Seems reasonable to me.
+      ctime = static_cast<float>(this->GetCurrentTime());
+      }
     this->Script("set globalPVTime %g", ctime);
     
     if (this->ControlledWidget)
