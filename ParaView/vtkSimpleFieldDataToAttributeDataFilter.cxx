@@ -70,7 +70,7 @@ vtkSimpleFieldDataToAttributeDataFilter::~vtkSimpleFieldDataToAttributeDataFilte
 
 void vtkSimpleFieldDataToAttributeDataFilter::Execute()
 {
-  int num, i;
+  int num;
   vtkFieldData *field;
   vtkDataArray *array = NULL;
   vtkDataSet *input;

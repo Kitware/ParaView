@@ -100,50 +100,98 @@ vtkKWCenterOfRotation::vtkKWCenterOfRotation()
 //----------------------------------------------------------------------------
 vtkKWCenterOfRotation::~vtkKWCenterOfRotation()
 {
+  this->PrepareForDelete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCenterOfRotation::PrepareForDelete()
+{
   this->SetCameraInteractor(NULL);
   this->SetParentInteractor(NULL);
 
-  this->PickButton->Delete();
-  this->PickButton = NULL;
+  if (this->PickButton)
+    {
+    this->PickButton->Delete();
+    this->PickButton = NULL;
+    }
 
-  this->ResetButton->Delete();
-  this->ResetButton = NULL;
+  if (this->ResetButton)
+    {
+    this->ResetButton->Delete();
+    this->ResetButton = NULL;
+    }
 
-  this->OpenButton->Delete();
-  this->OpenButton = NULL;
+  if (this->OpenButton)
+    {
+    this->OpenButton->Delete();
+    this->OpenButton = NULL;
+    }
 
-  this->XLabel->Delete();
-  this->XLabel = NULL;
-  this->XEntry->Delete();
-  this->XEntry = NULL;
+  if (this->XLabel)
+    {
+    this->XLabel->Delete();
+    this->XLabel = NULL;
+    }
+  if (this->XEntry)
+    {
+    this->XEntry->Delete();
+    this->XEntry = NULL;
+    }
 
-  this->YLabel->Delete();
-  this->YLabel = NULL;
-  this->YEntry->Delete();
-  this->YEntry = NULL;
+  if (this->YLabel)
+    {
+    this->YLabel->Delete();
+    this->YLabel = NULL;
+    }
+  if (this->YEntry)
+    {
+    this->YEntry->Delete();
+    this->YEntry = NULL;
+    }
 
-  this->ZLabel->Delete();
-  this->ZLabel = NULL;
-  this->ZEntry->Delete();
-  this->ZEntry = NULL;
+  if (this->ZLabel)
+    {
+    this->ZLabel->Delete();
+    this->ZLabel = NULL;
+    }
+  if (this->ZEntry)
+    {
+    this->ZEntry->Delete();
+    this->ZEntry = NULL;
+    }
 
-  this->CloseButton->Delete();
-  this->CloseButton = NULL;
+  if (this->CloseButton)
+    {
+    this->CloseButton->Delete();
+    this->CloseButton = NULL;
+    }
 
 
   this->SetRenderView(NULL);
 
-  this->Picker->Delete();
-  this->Picker = NULL;
+  if (this->Picker)
+    {
+    this->Picker->Delete();
+    this->Picker = NULL;
+    }
 
-  this->CenterActor->Delete();
-  this->CenterActor = NULL;
+  if (this->CenterActor)
+    {
+    this->CenterActor->Delete();
+    this->CenterActor = NULL;
+    }
 
-  this->CenterMapper->Delete();
-  this->CenterMapper = NULL;
+  if (this->CenterMapper)
+    {
+    this->CenterMapper->Delete();
+    this->CenterMapper = NULL;
+    }
 
-  this->CenterSource->Delete();
-  this->CenterSource = NULL;
+  if (this->CenterSource)
+    {
+    this->CenterSource->Delete();
+    this->CenterSource = NULL;
+    }
 }
 
 
@@ -382,8 +430,11 @@ void vtkKWCenterOfRotation::SetRenderView(vtkPVRenderView *view)
     }
   
   // Picker needs a link to the Tree Composite class.
-  this->Picker->SetComposite(view->GetComposite());
-  
+  if (view)
+    {
+    this->Picker->SetComposite(view->GetComposite());
+    }
+
   // Now just set the render view with reference counting
   this->vtkKWInteractor::SetRenderView(view);
   this->Update();

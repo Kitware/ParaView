@@ -241,14 +241,6 @@ SOURCE=.\vtkKWInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWRenderView.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWRenderViewTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWRotateCameraInteractor.cxx
 # End Source File
 # Begin Source File
@@ -857,26 +849,6 @@ SOURCE=.\vtkKWInteractor.h
 # Begin Custom Build
 InputPath=.\vtkKWInteractor.h
 InputName=vtkKWInteractor
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWRenderView.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkKWRenderView.h
-InputName=vtkKWRenderView
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

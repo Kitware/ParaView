@@ -74,6 +74,11 @@ public:
   virtual void Button3Motion(int x, int y) {};
   virtual void AKeyPress(char key, int x, int y) {};
 
+  // Description:
+  // Get rid of all references.  A quick and dirty way
+  // of dealing with reference loops.
+  virtual void PrepareForDelete() {};
+
 protected:
   vtkKWInteractor();
   ~vtkKWInteractor();

@@ -128,6 +128,11 @@ public:
   // Callback from the contour button.
   void GlyphCallback();
 
+  // Description::
+  // Close this window, possibly exiting the application if no more
+  // windows are open.
+  virtual void Close();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -164,6 +169,9 @@ protected:
   // Separating out creation of the main view.
   void CreateMainView(vtkPVApplication *pvApp);
   
+  // Get rid of all references we own.
+  void PrepareForDelete();
+
   void ReadSourceInterfaces();
   vtkCollection *SourceInterfaces;
   

@@ -116,6 +116,11 @@ public:
   // Other interactors need access to this button to add bubble help.
   vtkGetObjectMacro(ResetButton, vtkKWWidget);
 
+  // Description:
+  // Get rid of all references.  A quick and dirty way
+  // of dealing with reference loops.
+  virtual void PrepareForDelete();
+
 protected: 
   vtkKWCenterOfRotation();
   ~vtkKWCenterOfRotation();

@@ -109,52 +109,111 @@ vtkPVWindow::vtkPVWindow()
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
-  this->InteractorToolbar->Delete();
-  this->InteractorToolbar = NULL;
-  this->Toolbar->Delete();
-  this->Toolbar = NULL;
+  this->PrepareForDelete();
+}
 
-  this->FlyInteractor->Delete();
-  this->FlyInteractor = NULL;
-  this->RotateCameraInteractor->Delete();
-  this->RotateCameraInteractor = NULL;
-  this->TranslateCameraInteractor->Delete();
-  this->TranslateCameraInteractor = NULL;
-  
-  this->CalculatorButton->Delete();
-  this->CalculatorButton = NULL;
-  
-  this->ThresholdButton->Delete();
-  this->ThresholdButton = NULL;
-  
-  this->ContourButton->Delete();
-  this->ContourButton = NULL;
+//----------------------------------------------------------------------------
+void vtkPVWindow::PrepareForDelete()
+{
+  if (this->InteractorToolbar)
+    {
+    this->InteractorToolbar->Delete();
+    this->InteractorToolbar = NULL;
+    }
+  if (this->Toolbar)
+    {
+    this->Toolbar->Delete();
+    this->Toolbar = NULL;
+    }
 
-  this->GlyphButton->Delete();
-  this->GlyphButton = NULL;
+  if (this->FlyInteractor)
+    {
+    this->FlyInteractor->Delete();
+    this->FlyInteractor = NULL;
+    }
+  if (this->RotateCameraInteractor)
+    {
+    this->RotateCameraInteractor->PrepareForDelete();
+    this->RotateCameraInteractor->Delete();
+    this->RotateCameraInteractor = NULL;
+    }
+  if (this->TranslateCameraInteractor)
+    {
+    this->TranslateCameraInteractor->Delete();
+    this->TranslateCameraInteractor = NULL;
+    }
   
-  this->ApplicationAreaFrame->Delete();
+  if (this->CalculatorButton)
+    {
+    this->CalculatorButton->Delete();
+    this->CalculatorButton = NULL;
+    }
   
-  this->CameraStyle->Delete();
-  this->CameraStyle = NULL;
+  if (this->ThresholdButton)
+    {
+    this->ThresholdButton->Delete();
+    this->ThresholdButton = NULL;
+    }
   
-  this->MainView->Delete();
-  this->MainView = NULL;
+  if (this->ContourButton)
+    {
+    this->ContourButton->Delete();
+    this->ContourButton = NULL;
+    }
+
+  if (this->GlyphButton)
+    {
+    this->GlyphButton->Delete();
+    this->GlyphButton = NULL;
+    }
   
-  this->SourceInterfaces->Delete();
-  this->SourceInterfaces = NULL;
+  if (this->ApplicationAreaFrame)
+    {
+    this->ApplicationAreaFrame->Delete();
+    this->ApplicationAreaFrame = NULL;
+    }
   
-  this->SourceMenu->Delete();
-  this->SourceMenu = NULL;
+  if (this->CameraStyle)
+    {
+    this->CameraStyle->Delete();
+    this->CameraStyle = NULL;
+    }
   
-  this->FilterMenu->Delete();
-  this->FilterMenu = NULL;  
+  if (this->MainView)
+    {
+    this->MainView->Delete();
+    this->MainView = NULL;
+    }
   
-  this->SelectMenu->Delete();
-  this->SelectMenu = NULL;
+  if (this->SourceInterfaces)
+    {
+    this->SourceInterfaces->Delete();
+    this->SourceInterfaces = NULL;
+    }
   
-  this->VTKMenu->Delete();
-  this->VTKMenu = NULL;
+  if (this->SourceMenu)
+    {
+    this->SourceMenu->Delete();
+    this->SourceMenu = NULL;
+    }
+  
+  if (this->FilterMenu)
+    {
+    this->FilterMenu->Delete();
+    this->FilterMenu = NULL;  
+    }
+  
+  if (this->SelectMenu)
+    {
+    this->SelectMenu->Delete();
+    this->SelectMenu = NULL;
+    }
+  
+  if (this->VTKMenu)
+    {
+    this->VTKMenu->Delete();
+    this->VTKMenu = NULL;
+    }
   
   this->SetCurrentPVData(NULL);
   //if (this->CurrentInteractor != NULL)
@@ -163,6 +222,14 @@ vtkPVWindow::~vtkPVWindow()
   //  this->CurrentInteractor = NULL;
   //  }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::Close()
+{
+  this->PrepareForDelete();
+  this->vtkKWWindow::Close();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)

@@ -67,6 +67,11 @@ public:
 
   void MotionCallback(int x, int y);
 
+  // Description:
+  // Get rid of all references so circular references will not
+  // keep objects from being deleted.
+  void PrepareForDelete();
+
 protected: 
   vtkKWRotateCameraInteractor();
   ~vtkKWRotateCameraInteractor();

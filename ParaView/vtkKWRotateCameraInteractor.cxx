@@ -66,11 +66,24 @@ vtkKWRotateCameraInteractor::vtkKWRotateCameraInteractor()
 //----------------------------------------------------------------------------
 vtkKWRotateCameraInteractor::~vtkKWRotateCameraInteractor()
 {
-  this->CenterUI->Delete();
-  this->CenterUI = NULL;
+  this->PrepareForDelete();
+}
 
-  this->Interactor->Delete();
-  this->Interactor = NULL;
+//----------------------------------------------------------------------------
+void vtkKWRotateCameraInteractor::PrepareForDelete()
+{
+  if (this->CenterUI)
+    {
+    this->CenterUI->PrepareForDelete();
+    this->CenterUI->Delete();
+    this->CenterUI = NULL;
+    }
+
+  if (this->Interactor)
+    {
+    this->Interactor->Delete();
+    this->Interactor = NULL;
+    }
 }
 
 
