@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.211");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.212");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1887,7 +1887,7 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
   vtkPVApplication *pvApp;
   char str[256];
 
-  sprintf(str, " %d Points", threshold);
+  sprintf(str, " %d points", threshold);
   this->LODThresholdValue->SetLabel(str);
 
   this->LODThreshold = threshold;
@@ -2340,7 +2340,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.211 $");
+  this->ExtractRevision(os,"$Revision: 1.212 $");
 }
 
 //------------------------------------------------------------------------------
