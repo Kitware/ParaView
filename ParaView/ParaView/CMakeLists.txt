@@ -97,6 +97,7 @@ SET( ParaView_SRCS
   vtkPVRenderGroupDialog.cxx
   vtkPVRenderView.cxx 
   vtkPVRibbonFilter.cxx
+  vtkPVSaveBatchScriptDialog.cxx
   vtkPVScalarRangeLabel.cxx 
   vtkPVScale.cxx 
   vtkPVSelectCTHArrays.cxx

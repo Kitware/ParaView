@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.31");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -330,7 +330,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     }
 
   int ncnt = 0;
-  for ( cc = strlen(file)-1; cc >= 0; cc -- )
+  for ( cc = (int)(strlen(file))-1; cc >= 0; cc -- )
     {
     if ( file[cc] >= '0' && file[cc] <= '9' )
       {
@@ -377,7 +377,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         }
       }
     int med = atoi(number);
-    this->FileNameLength = strlen(fileName) * 2;
+    this->FileNameLength = (int)(strlen(fileName)) * 2;
     char* rfname = new char[ this->FileNameLength ];
     int min = med+cnt;
     int max = med-cnt;

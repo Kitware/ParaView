@@ -100,6 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTimerLogDisplay.h"
 #include "vtkPVWriter.h"
 #include "vtkPVInputProperty.h"
+#include "vtkPVSaveBatchScriptDialog.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
@@ -128,7 +129,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.432");
+vtkCxxRevisionMacro(vtkPVWindow, "1.433");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1914,7 +1915,7 @@ void vtkPVWindow::OpenCallback()
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
-  loadDialog->SetDefaultExtension(".vtk");
+  loadDialog->SetDefaultExtension(".vtp");
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   if ( loadDialog->Invoke() )
@@ -2510,15 +2511,81 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 {
   vtkPVSource *pvs;
   int imageFlag = 0;
-  int animationFlag = 0;
   int offScreenFlag = 0;
-  char *path = NULL;
-  ofstream* file;    
+  int animationFlag = 0;
+  const char *imageFileName = NULL;
+  const char *geometryFileName = NULL;
+  ofstream* file;
+  char* ptr;
+  char* fileExt = NULL;
+  char* fileRoot = NULL;
+  char* filePath = new char[strlen(filename)+1];
   
+  // Extract directory, root and extension.
+  strcpy(filePath, filename);
+  ptr = filePath;
+  while (*ptr)
+    {
+    if (*ptr == '/')
+      {
+      fileRoot = ptr;
+      }
+    if (*ptr == '.')
+      {
+      fileExt = ptr;
+      }
+    ++ptr;
+    }
+  if (fileRoot)
+    {
+    *fileRoot = '\0';
+    ++fileRoot;
+    }
+  if (fileExt)
+    {
+    *fileExt = '\0';
+    ++fileExt;
+    }
+
+  // We may want different questions if there is no animation.
+  const char *script = this->AnimationInterface->GetScript();
+  if (script && script[0])
+    {
+    animationFlag = 1;
+    }
+
+  // SaveBatchScriptDialog
+  vtkPVSaveBatchScriptDialog* dialog = vtkPVSaveBatchScriptDialog::New();
+  dialog->SetMasterWindow(this);
+  dialog->SetFileRoot(fileRoot);
+  dialog->SetFilePath(filePath);
+  dialog->Create(this->GetPVApplication());    
+
+  delete [] filePath;
+  filePath = NULL;
+  fileRoot = NULL;
+  fileExt = NULL;
+  ptr = NULL;
+
+  if (dialog->Invoke() == 0)
+    { // Cancel condition.
+    dialog->Delete();
+    dialog = NULL;
+    return;
+    }
+
+  // Should I continue to save the batch script if it
+  // does not save an image or geometry?
+  offScreenFlag = dialog->GetOffScreen();
+  imageFileName = dialog->GetImagesFileName();
+  geometryFileName = dialog->GetGeometryFileName();
+
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
     vtkErrorMacro("Could not open file " << filename);
+    dialog->Delete();
+    dialog = NULL;
     delete file;
     return;
     }
@@ -2545,36 +2612,11 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
   *file << endl << endl;
 
 
-  // Descide what this script should do.
-  // Save an image or series of images, or run interactively.
-  const char *script = this->AnimationInterface->GetScript();
-  if (script && vtkString::Length(script) > 0)
-    {
-    if (vtkKWMessageDialog::PopupYesNo(
-          this->Application, this, "Animation", 
-          "Do you want your script to generate an animation?", 
-          vtkKWMessageDialog::QuestionIcon))
-      {
-      animationFlag = 1;
-      }
-    }
-  
-  if (animationFlag == 0)
-    {
-    imageFlag = 1;
-    }
-
-  if (animationFlag || imageFlag)
-    {
-    this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
-    path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
-    }
-
   const char* extension = 0;
   const char* writerName = 0;
-  if (path && vtkString::Length(path) > 0)
+  if (imageFileName && vtkString::Length(imageFileName) > 0)
     {
-    extension = this->ExtractFileExtension(path);
+    extension = this->ExtractFileExtension(imageFileName);
     if ( !extension)
       {
       vtkKWMessageDialog::PopupMessage(this->Application, this,
@@ -2583,6 +2625,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
                                        " format."
                                        " No image file will be generated.",
                                        vtkKWMessageDialog::ErrorIcon);
+      imageFileName = NULL;
       }
     else
       {
@@ -2596,23 +2639,31 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
                                          "Error",  err.str(),
                                          vtkKWMessageDialog::ErrorIcon);
         err.rdbuf()->freeze(0);
+        imageFileName = NULL;
         }
-      }
-
-    if (extension && writerName &&
-        vtkKWMessageDialog::PopupYesNo(this->Application, this, "Offscreen", 
-                                       "Do you want offscreen rendering?", 
-                                       vtkKWMessageDialog::QuestionIcon))
-      {
-      offScreenFlag = 1;
       }
     }
 
+  // Save the renderer stuff.
   this->GetMainView()->SaveInBatchScript(file);
+  if (offScreenFlag)
+    {
+    *file << "RenWin1 SetOffScreenRendering 1\n\n";
+    }    
+  // Set up the composite manager.
+  // We do not know if it will be run in parallel.
+  *file << "vtkCompositeManager compManager\n\t";
+  *file << "compManager SetRenderWindow RenWin1 \n\t";
+  *file << "compManager InitializePieces\n\n";
+  *file << "compManager ManualOn\n";
+  *file << "if {[catch {set myProcId [[compManager GetController] "
+      "GetLocalProcessId]}]} {set myProcId 0 } \n";
+  *file << "if {[catch {set numberOfProcs [[compManager GetController] "
+      "GetNumberOfProcesses]}]} {set numberOfProcs 0 } \n\n";
 
+  // Save out the VTK data pipeline.
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
-
   // Mark all sources as not visited.
   while( !it->IsDoneWithTraversal() )
     {    
@@ -2632,7 +2683,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     it->GoToNextItem();
     }
   it->Delete();
-
   // Mark all color maps as not visited.
   vtkPVColorMap *cm;
   this->PVColorMaps->InitTraversal();
@@ -2640,7 +2690,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     {    
     cm->SetVisitedFlag(0);
     }
-
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
   vtkCollectionIterator* cit = modules->NewIterator();
@@ -2653,64 +2702,159 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     }
   cit->Delete();
 
-  *file << "vtkCompositeManager compManager\n\t";
-  *file << "compManager SetRenderWindow RenWin1 \n\t";
-  *file << "compManager InitializePieces\n\n";
-
-  if (path && vtkString::Length(path) > 0)
+  // Create the image writer if necessary.
+  if (imageFileName && vtkString::Length(imageFileName) > 0)
     {
-    *file << "compManager ManualOn\n\t";
-    *file << "if {[catch {set myProcId [[compManager GetController] "
-      "GetLocalProcessId]}]} {set myProcId 0 } \n\n";
     if ( extension && writerName)
       {
       *file << "vtkWindowToImageFilter WinToImage\n\t";
       *file << "WinToImage SetInput RenWin1\n\t";
-      *file << writerName << " Writer\n\t";
-      *file << "Writer SetInput [WinToImage GetOutput]\n\n";
+      *file << writerName << " ImageWriter\n\t";
+      *file << "ImageWriter SetInput [WinToImage GetOutput]\n\n";
       }
-    if (offScreenFlag)
-      {
-      *file << "RenWin1 SetOffScreenRendering 1\n\n";
-      }    
-   
-    if (imageFlag)
-      {
-      *file << "if {$myProcId != 0} {compManager RenderRMI} else {\n\t";
-      *file << "RenWin1 Render\n\t";
-      if ( extension && writerName)
-        {
-        *file << "Writer SetFileName {" << path << "}\n\t";
-        *file << "Writer Write\n";
-        *file << "}\n\n";
-        }
-      }
-    if (animationFlag)
-      {
-      *file << "# prevent the tk window from showing up then start "
-        "the event loop\n";
-      int length = vtkString::Length(path);
-      char* newPath = vtkString::Duplicate(path);
-      // Remove the extension. The animation tool will add it's
-      // own interface.
-      if ( newPath[length-4] == '.')
-        {
-        char* tmpStr = new char[length-3];
-        strncpy(tmpStr, newPath, length-4);
-        tmpStr[length-4] = '\0';
-        delete [] newPath;
-        newPath = tmpStr;
-        }
-      this->AnimationInterface->SaveInBatchScript(file, newPath, extension,
-                                                  writerName);
-      delete [] newPath;
-      }
-    delete [] path;
-    *file << "vtkCommand DeleteAllObjects\n";
     }
 
+  if (geometryFileName)
+    {
+    *file << "vtkXMLPolyDataWriter GeometryWriter\n";
+    *file << "GeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
+    *file << "GeometryWriter SetDataModeToBinary" << endl;
+    *file << "GeometryWriter EncodeAppendedDataOff" << endl;
+    *file << "GeometryWriter SetWritePiece $myProcId" << endl;
+    }
+
+  if (animationFlag)
+    {
+    *file << "# prevent the tk window from showing up then start "
+      "the event loop\n";
+    int length = vtkString::Length(geometryFileName);
+    char* newPath = vtkString::Duplicate(geometryFileName);
+    // Remove the extension. The animation tool will add it's
+    // own interface.
+    if ( newPath[length-4] == '.')
+      {
+      char* tmpStr = new char[length-3];
+      strncpy(tmpStr, newPath, length-4);
+      tmpStr[length-4] = '\0';
+      delete [] newPath;
+      newPath = tmpStr;
+      }
+    this->AnimationInterface->SaveInBatchScript(file, newPath, geometryFileName, extension,
+                                                writerName);
+    delete [] newPath;
+    }
+  else
+    { // Just do one frame.
+    *file << "if {$myProcId != 0} {compManager RenderRMI} else {\n\t";
+    *file << "RenWin1 Render\n\t";
+    if ( extension && writerName)
+      {
+      *file << "ImageWriter SetFileName {" << imageFileName << "}\n\t";
+      *file << "ImageWriter Write\n";
+      }
+    *file << "}\n\n";
+
+    if (geometryFileName)
+      {
+      this->SaveGeometryInBatchFile(file, geometryFileName, -1);
+      }
+    }
+  *file << "vtkCommand DeleteAllObjects\n";
+
+  dialog->Delete();
+  dialog = NULL;
   delete file;
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file, 
+                                          const char* filename,
+                                          int timeIdx) 
+{
+  vtkPVSource* source;
+  const char* sourceName;
+  int numParts, partIdx;
+  vtkPVPart* part;
+  char *fileName;
+  vtkPVSourceCollection *sources;
+  char* fileExt = NULL;
+  char* fileRoot = NULL;
+  char* filePath = new char[strlen(filename)+1];
+  char* ptr;
+  
+  // Extract directory, root and extension.
+  strcpy(filePath, filename);
+  ptr = filePath;
+  while (*ptr)
+    {
+    if (*ptr == '/')
+      {
+      fileRoot = ptr;
+      }
+    if (*ptr == '.')
+      {
+      fileExt = ptr;
+      }
+    ++ptr;
+    }
+  if (fileRoot)
+    {
+    *fileRoot = '\0';
+    ++fileRoot;
+    }
+  if (fileExt)
+    {
+    *fileExt = '\0';
+    ++fileExt;
+    }
+
+  fileName = new char[strlen(fileRoot) + 30];      
+
+  // Loop through visible sources.
+  sources = this->GetSourceList("Sources");
+  sources->InitTraversal();
+  while ( (source = sources->GetNextPVSource()) )
+    {
+    if (source->GetVisibility())
+      {
+      sourceName = source->GetName();
+      numParts = source->GetNumberOfPVParts();
+      for ( partIdx = 0; partIdx < numParts; ++partIdx)
+        {
+        part = source->GetPVPart(partIdx);
+        // Create a file name for the geometry.
+        if (numParts == 1 && timeIdx >= 0)
+          {
+          sprintf(fileName, "%s%sT%04d.vtp", 
+                  fileRoot, sourceName, timeIdx);
+          }
+        else if (numParts != 1 && timeIdx >= 0)
+          {
+          sprintf(fileName, "%s%sP%dT%04d.vtp", 
+                  fileRoot, sourceName, partIdx, timeIdx);
+          }
+        else if (numParts == 1 && timeIdx < 0)
+          {
+          sprintf(fileName, "%s%s.vtp", 
+                  fileRoot, sourceName);
+          }
+        else if (numParts != 1 && timeIdx < 0)
+          {
+          sprintf(fileName, "%s%sP%d.vtp", 
+                  fileRoot, sourceName, partIdx);
+          }
+        *file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
+        *file << "GeometryWriter SetFileName {" << fileName << "}\n";
+        *file << "GeometryWriter Write\n";
+        }
+      }
+    }
+
+  delete [] fileName;
+  fileName = NULL;
+  delete [] filePath;
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SaveState()
@@ -4046,7 +4190,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.432 $");
+  this->ExtractRevision(os,"$Revision: 1.433 $");
 }
 
 //-----------------------------------------------------------------------------

@@ -71,6 +71,7 @@ public:
   void SetValue(const char *);
   void SetValue(int a);
   void SetValue(float f,int size);
+  void SetValue(float f);
   char *GetValue();
   int GetValueAsInt();
   float GetValueAsFloat();

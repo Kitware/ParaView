@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -289,12 +289,12 @@ int vtkPVArrayInformation::GetMessageLength()
   // N (length) charaters for name (including last /0 charater).
   if (this->Name)
     {
-    length += static_cast<int>(strlen(this->Name)) + 1;
+    length += (static_cast<int>(strlen(this->Name)) + 1) * sizeof(unsigned char);
     } 
   // char for a data type.
-  length += 1;
+  length += sizeof(unsigned char);
   // char for number of components
-  length += 1;
+  length += sizeof(unsigned char);
   // doubles for ranges.
   if (this->NumberOfComponents == 1)
     {
@@ -331,18 +331,18 @@ int vtkPVArrayInformation::WriteMessage(unsigned char *msg)
     {
     // N (length) charaters for name (including last /0 charater).
     memcpy(msg, this->Name, nameLength);
-    msg += nameLength;
-    length += nameLength;
+    msg += nameLength * sizeof(unsigned char);
+    length += nameLength * sizeof(unsigned char);
     } 
 
   // char for a data type.
   *msg = (unsigned char)(this->DataType);
-  msg += 1;
-  length += 1;
+  msg += sizeof(unsigned char);
+  length += sizeof(unsigned char);
   // char for number of components
   *msg = (unsigned char)(this->NumberOfComponents);
-  msg += 1;
-  length += 1;
+  msg += sizeof(unsigned char);
+  length += sizeof(unsigned char);
 
   // doubles for ranges.
   int num, idx;

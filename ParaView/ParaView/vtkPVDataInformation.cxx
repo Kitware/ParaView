@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -377,7 +377,7 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   // Figure out message length, and allocate memory.
   // 1- First byte is a flag specifying big or little endian (ignore for now).
   // 1- Second byte specifies the data set type.
-  length = 2;
+  length = 2*sizeof(unsigned char);
   
   // - vtkIdType for numberOfPoints
   // - vtkIdType for numberOfCells
@@ -405,7 +405,7 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
     {
     nameLength = 255;
     }
-  length += nameLength+1;
+  length += (nameLength+1) * sizeof(unsigned char);
 
 
   // Allocate memory for the message. 
@@ -418,9 +418,9 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
 #else
   *tmp = (unsigned char)(0);
 #endif
-  tmp += 1;
+  tmp += sizeof(unsigned char);
   *tmp = (unsigned char)(this->DataSetType);
-  tmp += 1;
+  tmp += sizeof(unsigned char);
   *((vtkIdType*)tmp) = this->NumberOfPoints;
   tmp += sizeof(vtkIdType);
   *((vtkIdType*)tmp) = this->NumberOfCells;

@@ -219,6 +219,12 @@ public:
   void SaveBatchScript(const char *filename);
 
   // Description:
+  // This should part of a render module !!!!!
+  void SaveGeometryInBatchFile(ofstream *file, 
+                               const char* filename,
+                               int timeIdx);
+
+  // Description:
   // Save the pipeline as a tcl script. Callback from menu.
   // Promps for a file name.
   void SaveBatchScript();

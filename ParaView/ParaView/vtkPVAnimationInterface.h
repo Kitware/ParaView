@@ -138,7 +138,8 @@ public:
 
   // Description:
   // Make the tcl script save the images of the animation.
-  void SaveInBatchScript(ofstream *file, const char *fileRoot,
+  void SaveInBatchScript(ofstream *file, const char *fileRoot, 
+                         const char* geometryFileName,
                          const char* extension, const char* writerName);
 
   // Description:

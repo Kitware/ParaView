@@ -134,7 +134,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.41");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -567,7 +567,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeStartEntry->Create(this->Application);
   this->TimeStartEntry->GetEntry()->SetWidth(6);
   this->TimeStartEntry->SetLabel("Start:");
-  this->TimeStartEntry->SetValue(this->TimeStart, 2);
+  this->TimeStartEntry->SetValue(this->TimeStart);
 
   this->Script("bind %s <KeyPress-Return> {%s TimeStartEntryCallback}",
                this->TimeStartEntry->GetEntry()->GetWidgetName(),
@@ -581,7 +581,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeStepEntry->Create(this->Application);
   this->TimeStepEntry->GetEntry()->SetWidth(6);
   this->TimeStepEntry->SetLabel("Step:");
-  this->TimeStepEntry->SetValue(this->TimeStep, 2);
+  this->TimeStepEntry->SetValue(this->TimeStep);
 
   this->Script("bind %s <KeyPress-Return> {%s TimeStepEntryCallback}",
                this->TimeStepEntry->GetEntry()->GetWidgetName(),
@@ -595,7 +595,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeEndEntry->Create(this->Application);
   this->TimeEndEntry->GetEntry()->SetWidth(6);
   this->TimeEndEntry->SetLabel("End:");
-  this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+  this->TimeEndEntry->SetValue(this->TimeEnd);
 
   this->Script("bind %s <KeyPress-Return> {%s TimeEndEntryCallback}",
                this->TimeEndEntry->GetEntry()->GetWidgetName(),
@@ -794,7 +794,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeStartEntry && this->TimeStartEntry->IsCreated())
     {
-    this->TimeStartEntry->SetValue(this->TimeStart, 3);
+    this->TimeStartEntry->SetValue(this->TimeStart);
     if (this->InPlay)
       {
       this->TimeStartEntry->EnabledOff();
@@ -807,7 +807,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeEndEntry && this->TimeEndEntry->IsCreated())
     {
-    this->TimeEndEntry->SetValue(this->TimeEnd, 3);
+    this->TimeEndEntry->SetValue(this->TimeEnd);
     if (this->InPlay)
       {
       this->TimeEndEntry->EnabledOff();
@@ -820,7 +820,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeStepEntry && this->TimeStepEntry->IsCreated())
     {
-    this->TimeStepEntry->SetValue(this->TimeStep, 3);
+    this->TimeStepEntry->SetValue(this->TimeStep);
     if (this->InPlay)
       {
       this->TimeStepEntry->EnabledOff();
@@ -865,7 +865,7 @@ void vtkPVAnimationInterface::SetTimeStart(float t)
 
   if (this->TimeStartEntry->IsCreated())
     {
-    this->TimeStartEntry->SetValue(this->TimeStart, 2);
+    this->TimeStartEntry->SetValue(this->TimeStart);
     }
 
   if (this->TimeScale->IsCreated())
@@ -895,7 +895,7 @@ void vtkPVAnimationInterface::SetTimeEnd(float t)
 
   if (this->TimeEndEntry->IsCreated())
     {
-    this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+    this->TimeEndEntry->SetValue(this->TimeEnd);
     }
 
   if (this->TimeScale->IsCreated())
@@ -925,7 +925,7 @@ void vtkPVAnimationInterface::SetTimeStep(float t)
 
   if (this->TimeStepEntry->IsCreated())
     {
-    this->TimeStepEntry->SetValue(this->TimeStep, 2);
+    this->TimeStepEntry->SetValue(this->TimeStep);
     }
 
   if (this->TimeScale->IsCreated())
@@ -1367,6 +1367,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   int fileCount;
   float t;
   float sgn = 1;
+  float frac;
 
   winToImage = vtkWindowToImageFilter::New();
   winToImage->SetInput(this->View->GetRenderWindow());
@@ -1411,6 +1412,12 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     
     ++fileCount;
     t = t + this->TimeStep;
+    // Do not let numerical issues keep us from getting the last sample.
+    frac = (t-this->TimeEnd)/this->TimeStep;
+    if (frac > 0 && frac < 0.01)
+      {
+      t = TimeEnd;
+      }
     }
 
   winToImage->Delete();
@@ -1430,8 +1437,8 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
   saveDialog->SetTitle("Save Animation Images");
-  saveDialog->SetDefaultExtension(".pva");
-  saveDialog->SetFileTypes("{{PV Animation} {.pva}}");
+  saveDialog->SetDefaultExtension(".vtp");
+  saveDialog->SetFileTypes("{{PV Animation} {.vtp}}");
 
   if ( saveDialog->Invoke() &&
        strlen(saveDialog->GetFileName())>0 )
@@ -1484,13 +1491,17 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
   int timeCount;
   float t;
   float sgn = 1;
+  float frac;
   vtkPVSourceCollection *sources;
 
   sources = this->GetWindow()->GetSourceList("Sources");
 
   // Writer has to be in tcl to connect to geometry filter. 
   this->GetPVApplication()->GetProcessModule()->ServerScript(
-          "vtkPolyDataWriter pvAnimWriter"); 
+          "vtkXMLPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+          "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetWritePiece [[$Application GetProcessModule] GetPartitionId]", 
+          this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
 
   fileName = new char[strlen(fileRoot) + 30];      
   if (this->TimeStep < 0)
@@ -1521,23 +1532,30 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
           // Create a file name for this image.
           if (numParts == 1)
             {
-            sprintf(fileName, "%s%sT%04d.vtk", 
+            sprintf(fileName, "%s%sT%04d.vtp", 
                     fileRoot, sourceName, timeCount);
             }
           else
             {
-            sprintf(fileName, "%s%sP%dT%04d.vtk", 
+            sprintf(fileName, "%s%sP%dT%04d.vtp", 
                     fileRoot, sourceName, partIdx, timeCount);
             }
           this->GetPVApplication()->GetProcessModule()->ServerScript(
                   "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
-                  part->GetMapperTclName(), fileName);
+                  part->GetMapperTclName(), fileName,
+                  this->GetPVApplication()->GetProcessModule()->GetPartitionId());
           }
         }
       }
     
     ++timeCount;
     t = t + this->TimeStep;
+    // Do not let numerical issues keep us from getting the last sample.
+    frac = (t-this->TimeEnd)/this->TimeStep;
+    if (frac > 0 && frac < 0.01)
+      {
+      t = TimeEnd;
+      }
     }
   this->GetPVApplication()->GetProcessModule()->ServerScript(
                                                    "pvAnimWriter Delete");
@@ -1547,11 +1565,15 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
 }
 
 //-----------------------------------------------------------------------------
+// These arguements are not consistent.  SHould I share a file root for both
+// images and geometry.
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* fileRoot,
+                                                const char* geometryFileName,
                                                 const char* extension,
                                                 const char* writerName)
 {
+  int timeIdx = 0;
   float t;
   float sgn;
   char countStr[100];
@@ -1574,18 +1596,25 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     *file << "# problems which occur with certain cards on Windows.\n\t";
     *file << "update\n\t";
     *file << "WinToImage Modified\n\t";
-    *file << "Writer SetFileName {" << fileRoot << countStr << extension
+    *file << "ImageWriter SetFileName {" << fileRoot << countStr << extension
           << "}\n\t";
-    *file << "Writer Write\n";
+    *file << "ImageWriter Write\n";
     }
   else
     {
     *file << "RenWin1 Render\n";
     }
+  if (geometryFileName)
+    {
+    this->GetWindow()->SaveGeometryInBatchFile(file, 
+                                               geometryFileName,
+                                               timeIdx);
+    }
   *file << "}\n\n"; 
 
   while ((sgn*t) < (sgn*this->TimeEnd))
     {
+    ++timeIdx; 
     t = t + this->TimeStep;
     if ((sgn*t) > (sgn*this->TimeEnd))
       {
@@ -1594,16 +1623,25 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
     *file << "if {$myProcId != 0} {treeComp RenderRMI} else {\n\t";  
-    sprintf(countStr, "%05d", (int)(t));
+    sprintf(countStr, "%05d", (int)(timeIdx));
     // Not necessary because WinToImage causes a render.
     //*file << "RenWin1 Render\n\t";
     *file << "# This update is necessary to resolve some exposure event\n\t";
     *file << "# problems which occur with certain cards on Windows.\n\t";
     *file << "update\n\t";
-    *file << "WinToImage Modified\n\t";
-    *file << "Writer SetFileName {" << fileRoot << countStr << extension
-          << "}\n\t";
-    *file << "Writer Write\n"; 
+    if (fileRoot && extension && writerName )
+      {
+      *file << "WinToImage Modified\n\t";
+      *file << "ImageWriter SetFileName {" << fileRoot << countStr << ".vtp"
+            << "}\n\t";
+      *file << "ImageWriter Write\n";
+      }
+    if (geometryFileName)
+      {
+      this->GetWindow()->SaveGeometryInBatchFile(file, 
+                                                 geometryFileName,
+                                                 timeIdx);
+      }
     *file << "}\n\n";
     }
 }

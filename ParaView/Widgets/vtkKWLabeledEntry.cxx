@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledEntry);
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.12");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.13");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -137,6 +137,12 @@ void vtkKWLabeledEntry::SetValue(const char *value)
 
 //----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetValue(int a)
+{
+  this->Entry->SetValue(a);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledEntry::SetValue(float a)
 {
   this->Entry->SetValue(a);
 }

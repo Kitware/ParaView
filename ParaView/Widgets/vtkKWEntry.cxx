@@ -79,7 +79,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.25");
+vtkCxxRevisionMacro(vtkKWEntry, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -177,6 +177,14 @@ void vtkKWEntry::SetValue(int i)
 {
   char tmp[1024];
   sprintf(tmp, "%d", i);
+  this->SetValue(tmp);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetValue(float f)
+{
+  char tmp[1024];
+  sprintf(tmp, "%g", f);
   this->SetValue(tmp);
 }
 
@@ -408,7 +416,7 @@ void vtkKWEntry::AddValue(const char* value)
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetNumberOfValues()
 {
-  return this->Internals->Entries.size();
+  return static_cast<int>(this->Internals->Entries.size());
 }
 
 //----------------------------------------------------------------------------
@@ -424,8 +432,9 @@ void vtkKWEntry::DeleteValue(int idx)
 {
   if ( idx < (int)this->Internals->Entries.size() )
     {
-    vtkErrorMacro("This entry has only: " << this->Internals->Entries.size() << 
-      " elements. Index " << idx << " is too high");
+    vtkErrorMacro("This entry has only: " 
+      << static_cast<int>(this->Internals->Entries.size()) 
+      << " elements. Index " << idx << " is too high");
     return;
     }
   vtkKWEntryInternals::VectorOfStrings::iterator it;
