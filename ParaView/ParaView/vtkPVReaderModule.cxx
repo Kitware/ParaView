@@ -171,7 +171,7 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
     if (clone->GetTraceInitialized() == 0)
       { 
       vtkPVApplication* pvApp=this->GetPVApplication();
-      pvApp->AddTraceEntry("set kw(%s) [%s GetCurrentPVSource]", 
+      pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetCurrentPVSource]", 
                            clone->GetTclName(), 
                            pvApp->GetMainWindow()->GetTclName());
       clone->SetTraceInitialized(1);
