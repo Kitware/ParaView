@@ -27,6 +27,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
+  vtkPVSummaryHelper.cxx
   vtkSelectInputs.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
@@ -170,7 +171,6 @@ SET( ParaViewClient_SRCS
   vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
   vtkPVStringWidgetProperty.cxx
-  vtkPVSummaryHelper.cxx
   vtkPVTiledDisplayManager.cxx
   vtkPVTimerInformation.cxx
   vtkPVTimerLogDisplay.cxx
