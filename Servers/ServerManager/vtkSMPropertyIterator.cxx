@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.4");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -38,10 +38,7 @@ vtkSMPropertyIterator::vtkSMPropertyIterator()
 //---------------------------------------------------------------------------
 vtkSMPropertyIterator::~vtkSMPropertyIterator()
 {
-  if (this->Proxy)
-    {
-    this->Proxy->Delete();
-    }
+  this->SetProxy(0);
   delete this->Internals;
 }
 

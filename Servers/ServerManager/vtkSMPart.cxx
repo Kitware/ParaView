@@ -16,16 +16,15 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
-#include "vtkPVPartDisplay.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.9");
+vtkCxxRevisionMacro(vtkSMPart, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -35,22 +34,13 @@ vtkSMPart::vtkSMPart()
 
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
-
-  this->ClassNameInformation = vtkPVClassNameInformation::New();
-
-  this->PartDisplay = NULL;
-  this->Displays = vtkCollection::New();
+  this->UpdateNeeded = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkSMPart::~vtkSMPart()
 {  
   this->DataInformation->Delete();
-  this->ClassNameInformation->Delete();
-
-  this->SetPartDisplay(0);
-  this->Displays->Delete();
-  this->Displays = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -143,8 +133,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
-  char *className = this->ClassNameInformation->GetVTKClassName();
+  const char *className = this->GetDataInformation()->GetDataSetTypeAsString();
   vtkClientServerStream stream;
   vtkClientServerID tempDataPiece = {0};
   if (className == NULL)
@@ -298,8 +287,7 @@ void vtkSMPart::CreateTranslatorIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
-  char *className = this->ClassNameInformation->GetVTKClassName();
+  const char *className = this->GetDataInformation()->GetDataSetTypeAsString();
   if (className == NULL)
     {
     vtkErrorMacro("Missing data information.");
@@ -348,63 +336,37 @@ void vtkSMPart::CreateTranslatorIfNecessary()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::AddDisplay(vtkPVDisplay* disp)
-{
-  if (disp)
-    {
-    this->Displays->AddItem(disp);
-    }
-} 
-
-//----------------------------------------------------------------------------
-void vtkSMPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
-{
-  if (this->PartDisplay)
-    {
-    this->Displays->RemoveItem(this->PartDisplay);
-    this->PartDisplay->UnRegister(this);
-    this->PartDisplay = NULL;
-    }
-  if (pDisp)
-    {
-    this->Displays->AddItem(pDisp);
-    this->PartDisplay = pDisp;
-    this->PartDisplay->Register(this);
-    this->PartDisplay->SetInput(this);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMPart::Update()
 {
-  vtkCollectionIterator* sit = this->Displays->NewIterator();
-
- 
-  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+  int fixme;  // I would like to get rid of this method.
+  // Do we every need to update just one part?
+  if (this->UpdateNeeded)
     {
-    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
-    if (disp)
-      {
-      disp->Update();
-      }
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->GetID(0) << "UpdateInformation"
+                    << vtkClientServerStream::End;
+    pm->GetStream()    
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->GetID(0) << "SetUpdateExtent"
+      << vtkClientServerStream::LastResult 
+      << pm->GetNumberOfPartitions() << 0
+      << vtkClientServerStream::End;    
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->GetID(0) << "Update"
+                    << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    this->UpdateNeeded = 0;
     }
-  sit->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPart::MarkForUpdate()
 {
-  vtkCollectionIterator* sit = this->Displays->NewIterator();
-
-  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
-    {
-    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
-    if (disp)
-      {
-      disp->InvalidateGeometry();
-      }
-    }
-  sit->Delete();
+  this->UpdateNeeded = 1;
 }
 
 //----------------------------------------------------------------------------

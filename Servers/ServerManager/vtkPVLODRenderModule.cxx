@@ -19,14 +19,14 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVLODPartDisplay.h"
+#include "vtkSMLODPartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkSMPart.h"
 #include "vtkPVDataInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModule::vtkPVLODRenderModule()
@@ -83,12 +83,12 @@ void vtkPVLODRenderModule::SetProcessModule(vtkProcessModule *pm)
 
 
 //----------------------------------------------------------------------------
-vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
+vtkSMPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
 {
-  vtkPVLODPartDisplay* pDisp;
+  vtkSMLODPartDisplay* pDisp;
 
-  pDisp = vtkPVLODPartDisplay::New();
-  pDisp->SetProcessModule(this->ProcessModule);
+  pDisp = vtkSMLODPartDisplay::New();
+  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
@@ -123,14 +123,14 @@ void vtkPVLODRenderModule::SetLODResolution(int resolution)
   if( this->LODResolution != resolution )
     {
     vtkObject* object;
-    vtkPVLODPartDisplay* partDisp;
+    vtkSMLODPartDisplay* partDisp;
 
     this->LODResolution = resolution;
 
     this->Displays->InitTraversal();
     while ( (object = this->Displays->GetNextItemAsObject()) )
       {
-      partDisp = vtkPVLODPartDisplay::SafeDownCast(object);
+      partDisp = vtkSMLODPartDisplay::SafeDownCast(object);
       if (partDisp)
         {
         partDisp->SetLODResolution(resolution);
@@ -145,7 +145,7 @@ void vtkPVLODRenderModule::SetLODResolution(int resolution)
 void vtkPVLODRenderModule::ComputeTotalVisibleMemorySize()
 {
   vtkObject* object;
-  vtkPVLODPartDisplay* pDisp;
+  vtkSMLODPartDisplay* pDisp;
   vtkPVLODPartDisplayInformation* info;
 
   this->TotalVisibleGeometryMemorySize = 0;
@@ -153,10 +153,10 @@ void vtkPVLODRenderModule::ComputeTotalVisibleMemorySize()
   this->Displays->InitTraversal();
   while ( (object=this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVLODPartDisplay::SafeDownCast(object);
+    pDisp = vtkSMLODPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
-      info = pDisp->GetInformation();
+      info = pDisp->GetLODInformation();
       this->TotalVisibleGeometryMemorySize += info->GetGeometryMemorySize();
       this->TotalVisibleLODMemorySize += info->GetLODGeometryMemorySize();
       }

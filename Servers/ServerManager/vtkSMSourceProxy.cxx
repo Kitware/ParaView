@@ -30,11 +30,11 @@
 #include "vtkSMPart.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
-
+#include "vtkCollection.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.20");
 
 struct vtkSMSourceProxyInternals
 {
@@ -100,23 +100,38 @@ void vtkSMSourceProxy::UpdateInformation()
 // TODO this should update information properties.
 void vtkSMSourceProxy::UpdatePipeline()
 {
-  int numIDs = this->GetNumberOfIDs();
-  if (numIDs <= 0)
-    {
+  // Parts sets the UpdateExtent, and checks whether an update is needed
+  // before sending the update to the server.
+  
+  // I am leaving the old code here to remind me that
+  // I would like to get rid of vtkSMParts eventually.
+  
+  if (strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") == 0)
+    { // Cannot set the update extent until we get the output.  Need to call update
+    // before we can get the output.  Cannot not update whole extent of every source.
+    // Multiblock should fix this.
+    int numIDs = this->GetNumberOfIDs();
+    if (numIDs <= 0)
+      {
+      return;
+      }
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream command;
+    for(int i=0; i<numIDs; i++)
+      {
+      command << vtkClientServerStream::Invoke << this->GetID(i)
+              << "Update" << vtkClientServerStream::End;
+      }
+    pm->SendStream(this->Servers, command, 0);
     return;
     }
-
-  vtkClientServerStream command;
-  for(int i=0; i<numIDs; i++)
-    {
-    command << vtkClientServerStream::Invoke << this->GetID(i)
-            << "Update" << vtkClientServerStream::End;
-    }
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, command, 0);
-
+    
   this->CreateParts();
+  int num = this->GetNumberOfParts();
+  for (int i= 0; i < num; ++i)
+    {
+    this->GetPart(i)->Update();
+    }
 }
 
 //---------------------------------------------------------------------------

@@ -56,6 +56,14 @@ SET( ServerManagerCommon_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
+  vtkSMDisplay.cxx
+  vtkSMPartDisplay.cxx
+  vtkSMCompositePartDisplay.cxx
+  vtkSMLODPartDisplay.cxx
+  vtkSMMultiDisplayPartDisplay.cxx
+  vtkSMCubeAxesDisplay.cxx
+  vtkSMPickDisplay.cxx
+  vtkSMPlotDisplay.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -68,13 +76,6 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVSimpleRenderModule.cxx
   vtkRMObject.cxx
   vtkRMScalarBarWidget.cxx
-  vtkPVDisplay.cxx
-  vtkPVPartDisplay.cxx
-  vtkPVCompositePartDisplay.cxx
-  vtkPVLODPartDisplay.cxx
-  vtkPVMultiDisplayPartDisplay.cxx
-  vtkPVPickDisplay.cxx
-  vtkPVPlotDisplay.cxx
 
   vtkSMXMLParser.cxx
   )
@@ -91,7 +92,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
   vtkRMObject.cxx 
-  vtkPVDisplay.cxx
+  vtkSMDisplay.cxx
   ABSTRACT
   )
 

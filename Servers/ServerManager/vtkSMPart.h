@@ -22,10 +22,9 @@
 
 #include "vtkSMProxy.h"
 
-class vtkPVClassNameInformation;
 class vtkPVDataInformation;
-class vtkPVPartDisplay;
-class vtkPVDisplay;
+class vtkSMPartDisplay;
+class vtkSMDisplay;
 class vtkCollection;
 
 class VTK_EXPORT vtkSMPart : public vtkSMProxy
@@ -52,29 +51,6 @@ public:
   // Description:
   void CreateTranslatorIfNecessary();
 
-  // These methods/ivars are just copied from PVPart.
-  // Cleanup later.
-
-  // Description:
-  // Temporary access to the display object.
-  // Render modules may eleimnate the need for this access.
-//BTX
-  vtkPVPartDisplay* GetPartDisplay() { return this->PartDisplay;}
-  void SetPartDisplay(vtkPVPartDisplay* pDisp);
-
-  // Description:
-  // We are starting to support multiple types of displays (plot).
-  // I am keeping the PartDisplay pointer and methods around
-  // until we come up with a better API (maybe proxy/properties).
-  // The method SetPartDisplay also adds the display to this collection.
-  void AddDisplay(vtkPVDisplay* disp);
-
-  // Description:
-  // This is used to get the class name of the output.
-  // It should probably just be a part of data information.
-  vtkPVClassNameInformation* GetClassNameInformation() 
-    {return this->ClassNameInformation;}
-
 //ETX
   // Description:
   // Update the data and geometry.
@@ -83,6 +59,7 @@ public:
   // Description:
   // Modified propagated forward to eliminate extra network update calls.
   void MarkForUpdate();
+  int UpdateNeeded;
 
 protected:
   vtkSMPart();
@@ -92,15 +69,8 @@ protected:
   void operator=(const vtkSMPart&); // Not implemented
 
   vtkPVDataInformation* DataInformation;
-  vtkPVClassNameInformation* ClassNameInformation;
   int DataInformationValid;
 
-  // We are starting to support multiple types of displays (plot).
-  // I am keeping the PartDisplay pointer and methods around
-  // until we come up with a better API (maybe proxy/properties).
-  // The part display is also in the collection.
-  vtkCollection* Displays;
-  vtkPVPartDisplay* PartDisplay;
 };
 
 #endif

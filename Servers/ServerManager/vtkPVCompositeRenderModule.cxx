@@ -21,14 +21,14 @@
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
 #include "vtkCallbackCommand.h"
-#include "vtkPVCompositePartDisplay.h"
+#include "vtkSMCompositePartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkClientServerStream.h"
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -77,11 +77,13 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
 
 
 //----------------------------------------------------------------------------
-vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
+vtkSMPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 {
-  vtkPVLODPartDisplay* pDisp = vtkPVCompositePartDisplay::New();
-  pDisp->SetProcessModule(this->ProcessModule);
-  pDisp->SetLODResolution(this->LODResolution); //this line differ from vtkPVMultiDisplayRenderModule
+  vtkSMLODPartDisplay* pDisp;
+
+  pDisp = vtkSMCompositePartDisplay::New();
+  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
+  pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
 
@@ -91,7 +93,7 @@ vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 void vtkPVCompositeRenderModule::StillRender()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalMemory = 0;
   int localRender;
@@ -100,15 +102,17 @@ void vtkPVCompositeRenderModule::StillRender()
 
   pm->SendPrepareProgress();
 
+  this->UpdateAllDisplays();
+
   // Find out whether we are going to render localy.
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
-      info = pDisp->GetInformation();
+      info = pDisp->GetLODInformation();
       totalMemory += info->GetGeometryMemorySize();
       }
     }
@@ -125,7 +129,7 @@ void vtkPVCompositeRenderModule::StillRender()
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       pDisp->SetCollectionDecision(localRender);
@@ -211,7 +215,7 @@ void vtkPVCompositeRenderModule::StillRender()
 void vtkPVCompositeRenderModule::InteractiveRender()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalGeoMemory = 0;
   unsigned long totalLODMemory = 0;
@@ -222,15 +226,17 @@ void vtkPVCompositeRenderModule::InteractiveRender()
 
   pm->SendPrepareProgress();
 
+  this->UpdateAllDisplays();
+
   // Compute memory totals.
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
-      info = pDisp->GetInformation();
+      info = pDisp->GetLODInformation();
       totalGeoMemory += info->GetGeometryMemorySize();
       totalLODMemory += info->GetLODGeometryMemorySize();
       }
@@ -268,7 +274,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       if (useLOD)
@@ -487,7 +493,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeCompression(int)
 int vtkPVCompositeRenderModule::MakeCollectionDecision()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
   int decision = 1;
 
   // Do I really need to store the TotalVisibleMemorySIze in the application???
@@ -514,7 +520,7 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
   this->Displays->InitTraversal();
   while ( (object=this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp)
       {
       pDisp->SetCollectionDecision(this->CollectionDecision);
@@ -529,7 +535,7 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
 int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
   int decision = 1;
 
   if (this->GetTotalVisibleMemorySizeValid())
@@ -554,7 +560,7 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
   this->Displays->InitTraversal();
   while ( (object=this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp)
       {
       pDisp->SetLODCollectionDecision(this->LODCollectionDecision);

@@ -59,13 +59,13 @@ public:
   // Needed so to make global LOD descision.
   unsigned long GetTotalVisibleGeometryMemorySize();
 
+  // Subclass create their own vtkSMPartDisplay object by
+  // implementing this method.
+  virtual vtkSMPartDisplay* CreatePartDisplay();
+  
 protected:
   vtkPVLODRenderModule();
   ~vtkPVLODRenderModule();
-
-  // Subclass create their own vtkPVPartDisplay object by
-  // implementing this method.
-  virtual vtkPVPartDisplay* CreatePartDisplay();
 
   // Move these to a render module when it is created.
   void ComputeTotalVisibleMemorySize();

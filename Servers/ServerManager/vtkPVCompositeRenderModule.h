@@ -90,13 +90,13 @@ public:
   // For picking the center of rotation.
   virtual float GetZBufferValue(int x, int y);
 
+  // Subclass create their own vtkSMPartDisplay object by
+  // implementing this method.
+  virtual vtkSMPartDisplay* CreatePartDisplay();
+  
 protected:
   vtkPVCompositeRenderModule();
   ~vtkPVCompositeRenderModule();
-
-  // Subclass create their own vtkPVPartDisplay object by
-  // implementing this method.
-  virtual vtkPVPartDisplay* CreatePartDisplay();
 
   // Computes the reduction factor to use in compositing.
   void ComputeReductionFactor();

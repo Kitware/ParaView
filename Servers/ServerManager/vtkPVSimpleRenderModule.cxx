@@ -18,34 +18,21 @@
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkPVPartDisplay.h"
-#include "vtkPVPlotDisplay.h"
-//#include "vtkCallbackCommand.h"
-//#include "vtkCommand.h"
-//#include "vtkMultiProcessController.h"
+#include "vtkSMPartDisplay.h"
+#include "vtkPVGeometryInformation.h"
+#include "vtkSMPlotDisplay.h"
 #include "vtkObjectFactory.h"
-//#include "vtkPVProcessModule.h"
-//#include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVProcessModule.h"
-//#include "vtkPVSourceCollection.h"
-//#include "vtkPVSourceList.h"
-//#include "vtkPVWindow.h"
-//#include "vtkPVSource.h"
-//#include "vtkPolyData.h"
-//#include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
-//#include "vtkRenderWindow.h"
-//#include "vtkFloatArray.h"
-//#include "vtkString.h"
 #include "vtkTimerLog.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSimpleRenderModule);
-vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -58,27 +45,15 @@ vtkPVSimpleRenderModule::~vtkPVSimpleRenderModule()
 {
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSimpleRenderModule::AddDisplay(vtkPVDisplay* disp)
-{
-  this->Displays->AddItem(disp);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSimpleRenderModule::RemoveDisplay(vtkPVDisplay* disp)
-{
-  this->Displays->RemoveItem(disp);
-}
-
 //-----------------------------------------------------------------------------
 void vtkPVSimpleRenderModule::CacheUpdate(int idx, int total)
 {
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
+  vtkSMPartDisplay* pDisp;
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    pDisp = vtkSMPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       pDisp->CacheUpdate(idx, total);
@@ -90,14 +65,14 @@ void vtkPVSimpleRenderModule::CacheUpdate(int idx, int total)
 void vtkPVSimpleRenderModule::InvalidateAllGeometries()
 {
   vtkObject* object;
-  vtkPVDisplay* pDisp;
+  vtkSMDisplay* pDisp;
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVDisplay::SafeDownCast(object);
+    pDisp = vtkSMDisplay::SafeDownCast(object);
     if (pDisp)
       {
-      pDisp->InvalidateGeometry();
+      pDisp->MarkConsumersAsModified();
       }
     }
 }
@@ -107,8 +82,7 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
 {
   double* tmp;
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
-  vtkSMPart* part;
+  vtkSMPartDisplay* pDisp;
 
   // Compute the bounds for our sources.
   bds[0] = bds[2] = bds[4] = VTK_DOUBLE_MAX;
@@ -116,11 +90,10 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    pDisp = vtkSMPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
-      part = pDisp->GetPart();
-      tmp = part->GetDataInformation()->GetBounds();
+      tmp = pDisp->GetGeometryInformation()->GetBounds();
       if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
       if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
       if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
@@ -138,98 +111,48 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
 }
 
 //----------------------------------------------------------------------------
-vtkPVPartDisplay* vtkPVSimpleRenderModule::CreatePartDisplay()
+vtkSMPartDisplay* vtkPVSimpleRenderModule::CreatePartDisplay()
 {
-  vtkPVPartDisplay* pDisp = vtkPVPartDisplay::New();
-  pDisp->SetProcessModule(this->ProcessModule);
+  vtkSMPartDisplay* pDisp = vtkSMPartDisplay::New();
+  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   return pDisp;
 }
 //----------------------------------------------------------------------------
-void vtkPVSimpleRenderModule::AddSource(vtkSMSourceProxy *s)
+void vtkPVSimpleRenderModule::AddDisplay(vtkSMDisplay* disp)
 {
-  vtkPVProcessModule *pm = this->ProcessModule;
-  vtkSMPart *part;
-  vtkPVPartDisplay *pDisp;
-  int num, idx;
-  
-  if (s == NULL)
+  if (disp == NULL)
     {
     return;
-    }  
-  
-  num = s->GetNumberOfParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = s->GetPart(idx);
-    // Create a part display for each part.
-    pDisp = this->CreatePartDisplay();
-    this->Displays->AddItem(pDisp);
-    part->SetPartDisplay(pDisp);
-    pDisp->SetPart(part);
-   
-    if (part && pDisp->GetPropID().ID != 0)
-      { 
-      vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
-             << pDisp->GetPropID() << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
-             << pDisp->GetVolumeID() << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-      }
-    pDisp->Delete();
     }
+  this->Displays->AddItem(disp);
+  disp->AddToRenderer(this->RendererID);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSimpleRenderModule::RemoveSource(vtkSMSourceProxy *s)
+void vtkPVSimpleRenderModule::RemoveDisplay(vtkSMDisplay* disp)
 {
-  int idx, num;
-  vtkPVProcessModule *pm = this->ProcessModule;
-  vtkSMPart *part;
-  vtkPVPartDisplay *pDisp;
-
-  if (s == NULL)
+  if (disp == NULL)
     {
     return;
     }
-
-  num = s->GetNumberOfParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = s->GetPart(idx);
-    pDisp = part->GetPartDisplay();
-    if (pDisp)
-      {
-      this->Displays->RemoveItem(pDisp);
-      if (pDisp->GetPropID().ID != 0)
-        {  
-        vtkClientServerStream& stream = pm->GetStream();
-        stream << vtkClientServerStream::Invoke << this->RendererID 
-               << "RemoveProp"
-               << pDisp->GetPropID() << vtkClientServerStream::End;
-        stream << vtkClientServerStream::Invoke << this->RendererID 
-               << "RemoveProp"
-               << pDisp->GetVolumeID() << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-        }
-      part->SetPartDisplay(NULL);
-      }
-    }
+  this->Displays->RemoveItem(disp);
+  disp->RemoveFromRenderer(this->RendererID);
 }
+
 
 
 //----------------------------------------------------------------------------
 void vtkPVSimpleRenderModule::UpdateAllDisplays()
 {
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
-  vtkPVProcessModule* pm = this->ProcessModule;
+  vtkSMDisplay* pDisp;
+  vtkProcessModule* pm = this->GetProcessModule();
   pm->SendPrepareProgress();
 
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    pDisp = vtkSMDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       pDisp->Update();
@@ -242,7 +165,7 @@ void vtkPVSimpleRenderModule::UpdateAllDisplays()
 void vtkPVSimpleRenderModule::SetUseTriangleStrips(int val)
 {
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
+  vtkSMPartDisplay* pDisp;
   vtkPVProcessModule *pm;
 
   pm = this->ProcessModule;
@@ -250,13 +173,10 @@ void vtkPVSimpleRenderModule::SetUseTriangleStrips(int val)
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
-    if (pDisp && pDisp->GetPart())
+    pDisp = vtkSMPartDisplay::SafeDownCast(object);
+    if (pDisp)
       {
-      vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke << pDisp->GetGeometryID()
-             <<  "SetUseStrips" << val << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pDisp->SetUseTriangleStrips(val);
       }
     }
 
@@ -291,12 +211,12 @@ void vtkPVSimpleRenderModule::SetUseParallelProjection(int val)
 void vtkPVSimpleRenderModule::SetUseImmediateMode(int val)
 {
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
+  vtkSMPartDisplay* pDisp;
 
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    pDisp = vtkSMPartDisplay::SafeDownCast(object);
     if (pDisp)
       {
       pDisp->SetUseImmediateMode(val);

@@ -157,6 +157,12 @@ protected:
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
   friend class vtkSMPropertyIterator;
+  friend class vtkSMPartDisplay;
+  friend class vtkSMLODPartDisplay;
+  friend class vtkSMCompositePartDisplay;
+  friend class vtkSMPickDisplay;
+  friend class vtkSMPlotDisplay;
+  friend class vtkSMCubeAxesDisplay;
   friend class vtkPVPointSourceWidget;
   friend class vtkPVLineSourceWidget;
   friend class vtkPVImplicitPlaneWidget;

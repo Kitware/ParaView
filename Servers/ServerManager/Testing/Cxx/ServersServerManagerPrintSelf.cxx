@@ -14,17 +14,17 @@
 =========================================================================*/
 
 #include "vtkPVCaveRenderModule.h"
-#include "vtkPVCompositePartDisplay.h"
+#include "vtkSMCompositePartDisplay.h"
 #include "vtkPVCompositeRenderModule.h"
-#include "vtkPVDisplay.h"
-#include "vtkPVLODPartDisplay.h"
+#include "vtkSMDisplay.h"
+#include "vtkSMLODPartDisplay.h"
 #include "vtkPVLODRenderModule.h"
 #include "vtkPVMPIRenderModule.h"
-#include "vtkPVMultiDisplayPartDisplay.h"
+#include "vtkSMMultiDisplayPartDisplay.h"
 #include "vtkPVMultiDisplayRenderModule.h"
-#include "vtkPVPartDisplay.h"
-#include "vtkPVPickDisplay.h"
-#include "vtkPVPlotDisplay.h"
+#include "vtkSMPartDisplay.h"
+#include "vtkSMPickDisplay.h"
+#include "vtkSMPlotDisplay.h"
 #include "vtkPVSimpleRenderModule.h"
 #include "vtkRMObject.h"
 #include "vtkRMScalarBarWidget.h"
@@ -97,17 +97,17 @@ int main(int , char *[])
 {
   vtkObject *c;
   c = vtkPVCaveRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVCompositePartDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMCompositePartDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVCompositeRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVLODPartDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMLODPartDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVLODRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkPVMPIRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVMultiDisplayPartDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMMultiDisplayPartDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVMultiDisplayRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVPartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVPickDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVPlotDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMPartDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMPickDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMPlotDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVSimpleRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkRMObject::New(); c->Print( cout ); c->Delete();
   c = vtkRMScalarBarWidget::New(); c->Print( cout ); c->Delete();

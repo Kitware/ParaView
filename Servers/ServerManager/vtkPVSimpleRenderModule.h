@@ -32,8 +32,8 @@ class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkCollection;
-class vtkPVPartDisplay;
-class vtkPVDisplay;
+class vtkSMPartDisplay;
+class vtkSMDisplay;
 class vtkPVSimpleRenderModuleObserver;
 
 class VTK_EXPORT vtkPVSimpleRenderModule : public vtkPVRenderModule
@@ -50,8 +50,8 @@ public:
   // I do not expect that this will be a permenant method.
   // As we create more types of displays, I will have to
   // find a different way of managing them.
-  virtual void AddDisplay(vtkPVDisplay* disp);
-  virtual void RemoveDisplay(vtkPVDisplay* disp);
+  virtual void AddDisplay(vtkSMDisplay* disp);
+  virtual void RemoveDisplay(vtkSMDisplay* disp);
   
   // Description:
   // Compute the bounding box of all the visibile props
@@ -84,13 +84,13 @@ public:
   // Calls InvalidateGeometry() on all part displays. For flip books.
   void InvalidateAllGeometries();
   
+  // Subclass can create their own vtkSMPartDisplay object by
+  // implementing this method.
+  virtual vtkSMPartDisplay* CreatePartDisplay();
+
 protected:
   vtkPVSimpleRenderModule();
   ~vtkPVSimpleRenderModule();
-
-  // Subclass can create their own vtkPVPartDisplay object by
-  // implementing this method.
-  virtual vtkPVPartDisplay* CreatePartDisplay();
 
   // This is used before a render to make sure all visible sources
   // have been updated.
