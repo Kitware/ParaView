@@ -22,7 +22,7 @@
 #include "vtkSMSinusoidKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -113,13 +113,13 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->OffsetThumbWheel->SetEntryCommand(this, "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEndCommand(this, "OffsetChangedCallback");
 
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->PhaseLabel->GetWidgetName(),
     this->PhaseThumbWheel->GetWidgetName());
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->FrequencyLabel->GetWidgetName(),
     this->FrequencyThumbWheel->GetWidgetName());
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->OffsetLabel->GetWidgetName(),
     this->OffsetThumbWheel->GetWidgetName());
 }

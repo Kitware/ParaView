@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.5");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.6");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -107,10 +107,10 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
   this->AnimationManager = NULL;
   this->ActiveKeyFrame = NULL;
 
-  this->IndexLabel = vtkKWLabel::New();
   this->IndexScale = vtkKWScale::New();
   this->CacheGeometry = 1;
 
+  this->TitleLabelLabel = vtkKWLabel::New();
   this->TitleLabel = vtkKWLabel::New();
 }
 
@@ -118,18 +118,18 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 vtkPVVerticalAnimationInterface::~vtkPVVerticalAnimationInterface()
 {
   this->Observer->Delete();
+  this->SetActiveKeyFrame(NULL);
+  this->SetAnimationCue(NULL);
   this->TopFrame->Delete();
   this->KeyFramePropertiesFrame->Delete();
   this->ScenePropertiesFrame->Delete();
   this->SelectKeyFrameLabel->Delete();
-  this->SetAnimationCue(NULL);
   this->PropertiesFrame->Delete();
   this->TypeFrame->Delete();
   this->TypeLabel->Delete();
   this->TypeImage->Delete();
   this->TypeMenuButton->Delete();
   this->SetAnimationManager(NULL);
-  this->IndexLabel->Delete();
   this->IndexScale->Delete();
   
   this->RecordAllButton->Delete();
@@ -137,8 +137,8 @@ vtkPVVerticalAnimationInterface::~vtkPVVerticalAnimationInterface()
   this->SaveFrame->Delete();
   this->CacheGeometryCheck->Delete();
   this->AdvancedAnimationCheck->Delete();
-  
-  this->SetActiveKeyFrame(NULL);
+ 
+  this->TitleLabelLabel->Delete();
   this->TitleLabel->Delete();
 }
 
@@ -160,12 +160,6 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       char* text = this->AnimationCue->GetTextRepresentation();
       this->TitleLabel->SetLabel(text);
       delete []text;
-      this->Script("pack %s -side top -fill none -expand f -anchor nw ",
-        this->TitleLabel->GetWidgetName());
-      }
-    else
-      {
-      this->Script("pack forget %s", this->TitleLabel->GetWidgetName());
       }
     }
 }
@@ -206,6 +200,10 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->KeyFramePropertiesFrame->GetWidgetName());
 
+  this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->TitleLabelLabel->Create(app,"-relief flat");
+  this->TitleLabelLabel->SetLabel("Current Track:");
+  
   this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->TitleLabel->Create(app,"-relief flat");
   vtkKWTkUtilities::ChangeFontWeightToBold(
@@ -214,10 +212,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->PropertiesFrame->Create(app, 0);
 
-  this->IndexLabel->SetParent(this->PropertiesFrame->GetFrame());
-  this->IndexLabel->Create(app, 0);
-  this->IndexLabel->SetLabel("Index:");
-  
   this->IndexScale->SetParent(this->PropertiesFrame->GetFrame());
   this->IndexScale->Create(app,0);
   this->IndexScale->DisplayEntry();
@@ -227,8 +221,8 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->IndexScale->SetCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEntryCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEndCommand(this, "IndexChangedCallback");
-  this->IndexScale->SetBalloonHelpString("Select a key frame in the "
-    "current sequence");
+  this->IndexScale->SetBalloonHelpString("Select a key frame at a particular index in the "
+    "current track");
   
   this->TypeLabel->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeLabel->Create(app, 0);
@@ -248,10 +242,10 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->BuildTypeMenu();
     
   this->SelectKeyFrameLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->SelectKeyFrameLabel->SetLabel("Select a key frame in the Animation Tracks "
+  this->SelectKeyFrameLabel->SetLabel("Select or Add a key frame in the Animation Tracks "
     "window to show its properties.");
 
-  this->SelectKeyFrameLabel->Create(app, 0);
+  this->SelectKeyFrameLabel->Create(app, "-justify left");
   this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
 
   // SAVE FRAME
@@ -284,7 +278,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
 
   this->AdvancedAnimationCheck->SetParent(this->SaveFrame->GetFrame());
   this->AdvancedAnimationCheck->Create(app, 0);
-  this->AdvancedAnimationCheck->SetText("Show Advanced Animation View");
+  this->AdvancedAnimationCheck->SetText("Show all animatable properties");
   this->AdvancedAnimationCheck->SetCommand(this, "AdvancedAnimationViewCallback");
   this->AdvancedAnimationCheck->SetState(this->AnimationManager->GetAdvancedView());
   this->AdvancedAnimationCheck->SetBalloonHelpString(
@@ -295,6 +289,9 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
 
   this->Script("grid columnconfigure %s 2 -weight 2",
     this->SaveFrame->GetFrame()->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 1 -weight 2",
+    this->KeyFramePropertiesFrame->GetFrame()->GetWidgetName());
 
   this->Update();
 }
@@ -457,9 +454,8 @@ void vtkPVVerticalAnimationInterface::Update()
   if (this->AnimationCue == NULL || this->AnimationCue->GetVirtual() ||
     (id = this->AnimationCue->GetTimeLine()->GetSelectedPoint())==-1)
     {
-    this->Script("pack forget %s", this->PropertiesFrame->GetWidgetName());
-    this->Script("pack %s -side bottom -fill x -expand t -anchor w",
-      this->SelectKeyFrameLabel->GetWidgetName());
+    this->Script("grid forget %s", this->PropertiesFrame->GetWidgetName());
+    this->Script("grid %s - -row 1 -sticky ew", this->SelectKeyFrameLabel->GetWidgetName());
     this->SetActiveKeyFrame(NULL);
     }
   else
@@ -468,9 +464,19 @@ void vtkPVVerticalAnimationInterface::Update()
     this->IndexScale->SetValue(id+1);
     this->ShowKeyFrame(id);
     this->UpdateEnableState();
-    this->Script("pack forget %s", this->SelectKeyFrameLabel->GetWidgetName());
-    this->Script("pack %s -side top -fill x -expand t -anchor center",
-      this->PropertiesFrame->GetWidgetName());
+    this->Script("grid forget %s", this->SelectKeyFrameLabel->GetWidgetName());
+    this->Script("grid %s - -row 1 -sticky ew", this->PropertiesFrame->GetWidgetName());
+    }
+  if (this->AnimationCue == NULL)
+    {
+    this->Script("grid forget %s", this->TitleLabel->GetWidgetName());
+    this->Script("grid forget %s", this->TitleLabelLabel->GetWidgetName());
+    }
+  else
+    
+    {
+    this->Script("grid %s %s -row 0 -sticky w", this->TitleLabelLabel->GetWidgetName(),
+      this->TitleLabel->GetWidgetName());
     }
 }
 
@@ -511,7 +517,6 @@ void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
   this->PropertiesFrame->GetFrame()->UnpackChildren();
 
   this->Script("grid %s - - -sticky ew",
-    /*this->IndexLabel->GetWidgetName(),*/
     this->IndexScale->GetWidgetName());
   
   this->Script("grid %s -columnspan 3 -sticky ew",

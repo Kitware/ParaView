@@ -85,13 +85,13 @@ protected:
   vtkKWFrame* TopFrame;
   vtkKWLabeledFrame* ScenePropertiesFrame;
   vtkKWLabeledFrame* KeyFramePropertiesFrame;
+  vtkKWLabel* TitleLabelLabel;
   vtkKWLabel* TitleLabel; // label to show the cue text representation.
   vtkKWFrame* PropertiesFrame;
   vtkKWFrame* TypeFrame; //frame containing the selection for differnt types of waveforms.
   vtkKWPushButton* TypeImage;
   vtkKWMenuButton* TypeMenuButton;
   vtkKWLabel* TypeLabel;
-  vtkKWLabel* IndexLabel;
   vtkKWScale* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
 

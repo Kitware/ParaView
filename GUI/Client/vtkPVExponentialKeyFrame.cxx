@@ -22,7 +22,7 @@
 #include "vtkSMExponentialKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
@@ -103,13 +103,13 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->EndPowerThumbWheel->SetEndCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEntryCommand(this, "EndPowerChangedCallback");
 
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->BaseLabel->GetWidgetName(),
     this->BaseThumbWheel->GetWidgetName());
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->StartPowerLabel->GetWidgetName(),
     this->StartPowerThumbWheel->GetWidgetName());
-  this->Script("grid %s %s -sticky ew",
+  this->Script("grid %s %s -sticky w",
     this->EndPowerLabel->GetWidgetName(),
     this->EndPowerThumbWheel->GetWidgetName());
 }
