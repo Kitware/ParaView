@@ -250,6 +250,14 @@ SOURCE=.\vtkKWMenu.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWMenuButton.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWMenuButtonTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWMenuTcl.cxx
 # End Source File
 # Begin Source File
@@ -961,6 +969,26 @@ InputName=vtkKWMenu
 # Begin Custom Build
 InputPath=.\vtkKWMenu.h
 InputName=vtkKWMenu
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWMenuButton.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWMenuButton.h
+InputName=vtkKWMenuButton
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
