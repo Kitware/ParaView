@@ -153,9 +153,11 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->Script("bind %s <KeyPress-Return> {%s AddValueCallback}",
                this->NewValueEntry->GetWidgetName(),
                this->GetTclName());
+  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
+               this->NewValueEntry->GetWidgetName(), this->GetTclName());
   
   this->AddValueButton->SetParent(this->NewValueFrame);
-  this->AddValueButton->Create(app, "-text {Add Value}");
+  this->AddValueButton->Create(app, "-text {Add}");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
   this->AddValueButton->SetBalloonHelpString("Add the new contour value to the contour values list");
   
@@ -164,13 +166,12 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
                this->NewValueEntry->GetWidgetName(),
                this->AddValueButton->GetWidgetName());
   
-  this->DeleteValueButton->SetParent(this);
-  this->DeleteValueButton->Create(app, "-text {Delete Value}");
+  this->DeleteValueButton->SetParent(this->NewValueFrame);
+  this->DeleteValueButton->Create(app, "-text {Delete}");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
   this->DeleteValueButton->SetBalloonHelpString("Remove the currently selected contour value from the list");
-  
 
-  this->Script("pack %s -anchor w -padx 10",
+  this->Script("pack %s -side left",
                this->DeleteValueButton->GetWidgetName());
 }
 
@@ -216,7 +217,7 @@ void vtkPVContourEntry::Accept()
 {
   int i;
   float value;
-  int numContours = this->ContourValuesList->GetNumberOfItems();
+  int numContours;
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->PVSource == NULL)
@@ -224,6 +225,15 @@ void vtkPVContourEntry::Accept()
     vtkErrorMacro("PVSource not set.");
     return;
     }
+
+  // Hit the add value button incase the user forgot.
+  // This does nothing if there is no value in there.
+  if (strcmp(this->NewValueEntry->GetValue(), "") != 0)
+    {
+    this->ContourValuesList->AppendUnique(this->NewValueEntry->GetValue());
+    this->NewValueEntry->SetValue("");
+    }
+  numContours = this->ContourValuesList->GetNumberOfItems();
 
   if (this->ModifiedFlag)
     {  
