@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.5");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.6");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -786,6 +786,10 @@ void vtkPVClientServerModule::CompleteArrays(vtkMapper *mapper, char *mapperTclN
     {
     return;
     }
+  if (mapper->GetInput()->GetNumberOfPoints() > 0)
+    {
+    return;
+    }
 
   this->BroadcastScript("[$Application GetProcessModule] SendCompleteArrays %s", mapperTclName);
 
@@ -797,6 +801,7 @@ void vtkPVClientServerModule::CompleteArrays(vtkMapper *mapper, char *mapperTclN
   int numComps = 0;
       
   // First Point data.
+  mapper->GetInput()->GetPointData()->Initialize();
   this->SocketController->Receive(&num, 1, 1, 987244);
   for (j = 0; j < num; ++j)
     {
@@ -853,6 +858,7 @@ void vtkPVClientServerModule::CompleteArrays(vtkMapper *mapper, char *mapperTclN
   mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
 
   // Next Cell data.
+  mapper->GetInput()->GetCellData()->Initialize();
   this->SocketController->Receive(&num, 1, 1, 987244);
   for (j = 0; j < num; ++j)
     {
@@ -1115,6 +1121,10 @@ void vtkPVClientServerModule::CompleteArrays(vtkDataSet *data, char *dataTclName
     {
     return;
     }
+  if (data->GetNumberOfPoints() > 0)
+    { // If we have points we are not empty and we can exit early.
+    return;
+    }
 
   this->BroadcastScript("[$Application GetProcessModule] SendCompleteArrays %s", dataTclName);
 
@@ -1126,6 +1136,7 @@ void vtkPVClientServerModule::CompleteArrays(vtkDataSet *data, char *dataTclName
   int numComps = 0;
       
   // First Point data.
+  data->GetPointData()->Initialize();
   this->SocketController->Receive(&num, 1, 1, 987244);
   for (j = 0; j < num; ++j)
     {
@@ -1182,6 +1193,7 @@ void vtkPVClientServerModule::CompleteArrays(vtkDataSet *data, char *dataTclName
   data->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
 
   // Next Cell data.
+  data->GetCellData()->Initialize();
   this->SocketController->Receive(&num, 1, 1, 987244);
   for (j = 0; j < num; ++j)
     {
