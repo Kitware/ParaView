@@ -61,6 +61,7 @@ class VTK_EXPORT vtkPVTimerLogDisplay : public vtkKWWidget
 public:
   static vtkPVTimerLogDisplay* New();
   vtkTypeMacro(vtkPVTimerLogDisplay, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create a Tk widget

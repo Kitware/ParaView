@@ -455,3 +455,12 @@ void vtkPVTimerLogDisplay::Dismiss()
   this->Script("grab release %s", this->GetWidgetName());
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
+
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  
+  os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
+  os << indent << "Threshold: " << this->Threshold << endl;
+}
