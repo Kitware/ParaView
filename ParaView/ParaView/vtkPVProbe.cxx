@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.5");
+vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.6");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -139,7 +139,7 @@ vtkPVProbe::~vtkPVProbe()
 void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->vtkPVSource::CreateProperties();
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
                   << "SetSpatialMatch" << 2
