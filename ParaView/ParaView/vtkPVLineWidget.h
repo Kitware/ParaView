@@ -86,7 +86,7 @@ public:
   // Description:
   // Set the resolution of the line widget.
   void SetResolution();
-  void SetResolution(float f);
+  void SetResolution(int f);
 
   // Description:
   // Set the tcl variables that are modified when accept is called.

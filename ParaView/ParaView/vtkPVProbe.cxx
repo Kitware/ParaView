@@ -57,12 +57,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVLineWidget.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyData.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
+
+vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -86,10 +89,6 @@ vtkPVProbe::vtkPVProbe()
   this->SelectedZEntry = vtkKWLabeledEntry::New();
   this->PointDataLabel = vtkKWLabel::New();
   
-  this->EndPointMenuFrame = vtkKWWidget::New();
-  this->EndPointLabel = vtkKWLabel::New();
-  this->EndPointMenu = vtkKWOptionMenu::New();
-
   this->EndPoint1Frame = vtkKWWidget::New();
   this->EndPoint1Label = vtkKWLabel::New();
   this->End1XEntry = vtkKWLabeledEntry::New();
@@ -104,11 +103,12 @@ vtkPVProbe::vtkPVProbe()
   
   this->DivisionsEntry = vtkKWLabeledEntry::New();
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
+
+  this->LineWidget = vtkPVLineWidget::New();
   
   this->ProbeFrame = vtkKWWidget::New();
 
   this->Dimensionality = -1;
-  this->CurrentEndPoint = -1;
   
   this->XYPlotTclName = NULL;
   
@@ -141,13 +141,6 @@ vtkPVProbe::~vtkPVProbe()
   this->PointDataLabel->Delete();
   this->PointDataLabel = NULL;
 
-  this->EndPointLabel->Delete();
-  this->EndPointLabel = NULL;
-  this->EndPointMenu->Delete();
-  this->EndPointMenu = NULL;
-  this->EndPointMenuFrame->Delete();
-  this->EndPointMenuFrame = NULL;
-
   this->EndPoint1Label->Delete();
   this->EndPoint1Label = NULL;
   this->End1XEntry->Delete();
@@ -169,6 +162,8 @@ vtkPVProbe::~vtkPVProbe()
   this->End2ZEntry = NULL;
   this->EndPoint2Frame->Delete();
   this->EndPoint2Frame = NULL;
+  
+  this->LineWidget->Delete();
   
   this->DivisionsEntry->Delete();
   this->DivisionsEntry = NULL;
@@ -354,22 +349,6 @@ void vtkPVProbe::CreateProperties()
   this->PointDataLabel->Create(pvApp, "");
 
   // widgets for lines
-  this->EndPointMenuFrame->SetParent(this->ProbeFrame);
-  this->EndPointMenuFrame->Create(pvApp, "frame", "");
-  this->EndPointLabel->SetParent(this->EndPointMenuFrame);
-  this->EndPointLabel->Create(pvApp, "");
-  this->EndPointLabel->SetLabel("Select End Point:");
-  this->EndPointMenu->SetParent(this->EndPointMenuFrame);
-  this->EndPointMenu->Create(pvApp, "");
-  this->EndPointMenu->AddEntryWithCommand("End Point 1", this,
-                                          "SetCurrentEndPoint 1");
-  this->EndPointMenu->AddEntryWithCommand("End Point 2", this,
-                                          "SetCurrentEndPoint 2");
-  this->EndPointMenu->SetValue("End Point 1");
-  
-  this->Script("pack %s %s -side left", this->EndPointLabel->GetWidgetName(),
-               this->EndPointMenu->GetWidgetName());
-
   this->EndPoint1Frame->SetParent(this->ProbeFrame);
   this->EndPoint1Frame->Create(pvApp, "frame", "");
   
@@ -478,6 +457,16 @@ void vtkPVProbe::CreateProperties()
   this->ShowXYPlotToggle->SetState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToRed}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
+
+  this->LineWidget->SetPVSource(this);
+  this->LineWidget->SetParent(this->ProbeFrame);
+  this->LineWidget->Create(pvApp);
+  this->AddPVWidget(this->LineWidget);
+  this->LineWidget->SetModifiedCommand(this->GetTclName(),
+				       "SetAcceptButtonColorToRed");
+  this->LineWidget->SetPoint1Method(this->GetTclName(), "EndPoint1");
+  this->LineWidget->SetPoint2Method(this->GetTclName(), "EndPoint2");
+  this->LineWidget->SetResolutionMethod(this->GetTclName(), "NumberOfLineDivisions");
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
@@ -492,13 +481,21 @@ void vtkPVProbe::CreateProperties()
 	       this->XYPlotTclName);
   this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
   this->Script("%s SetXTitle {Line Divisions}", this->XYPlotTclName);
+
+  this->SetEndPoint1(bounds[0], bounds[2], bounds[4]);
+  this->SetEndPoint2(bounds[1], bounds[3], bounds[5]);
+  this->SetNumberOfLineDivisions(10);
+  this->LineWidget->PlaceWidget();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallback()
 {
   int i;
   const char *arrayName = this->ScalarArrayMenu->GetValue();
   int component;
+  
+  this->LineWidget->Accept();
 
   // This can't be an accept command because this calls SetInput for the
   // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the
@@ -515,14 +512,6 @@ void vtkPVProbe::AcceptCallback()
     {
     pvApp->AddTraceEntry("$kw(%s) UseLine", this->GetTclName());
     pvApp->AddTraceEntry("$kw(%s) UpdateScalars", this->GetTclName());
-    pvApp->AddTraceEntry("[$kw(%s) GetEndPointMenu] SetValue \"End Point 1\"",
-                         this->GetTclName());
-    pvApp->AddTraceEntry("$kw(%s) SetCurrentEndPoint 1",
-                         this->GetTclName());
-    pvApp->AddTraceEntry("[$kw(%s) GetEndPointMenu] SetValue \"End Point 2\"",
-                         this->GetTclName());
-    pvApp->AddTraceEntry("$kw(%s) SetCurrentEndPoint 2",
-                         this->GetTclName());
     pvApp->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
                          this->GetTclName(),
                          this->ShowXYPlotToggle->GetState());
@@ -630,7 +619,7 @@ void vtkPVProbe::AcceptCallback()
     }
 }
 
-
+//----------------------------------------------------------------------------
 void vtkPVProbe::UpdateProbe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -681,15 +670,13 @@ void vtkPVProbe::UpdateProbe()
     {
     pvApp->BroadcastScript("vtkLineSource line");
     pvApp->BroadcastScript("line SetPoint1 %f %f %f",
-                           this->End1XEntry->GetValueAsFloat(),
-                           this->End1YEntry->GetValueAsFloat(),
-                           this->End1ZEntry->GetValueAsFloat());
+			   this->EndPoint1[0], this->EndPoint1[1],
+			   this->EndPoint1[2]);
     pvApp->BroadcastScript("line SetPoint2 %f %f %f",
-                           this->End2XEntry->GetValueAsFloat(),
-                           this->End2YEntry->GetValueAsFloat(),
-                           this->End2ZEntry->GetValueAsFloat());
+			   this->EndPoint2[0], this->EndPoint2[1],
+			   this->EndPoint2[2]);
     pvApp->BroadcastScript("line SetResolution %d",
-			   this->DivisionsEntry->GetValueAsInt());
+			   this->NumberOfLineDivisions);
     pvApp->BroadcastScript("%s SetInput [line GetOutput]",
                            this->GetVTKSourceTclName());
     pvApp->BroadcastScript("line Delete");  
@@ -769,6 +756,7 @@ void vtkPVProbe::Deselect(int doPackForget)
   this->vtkPVSource::Deselect(doPackForget);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::UsePoint()
 {
   this->Dimensionality = 0;
@@ -781,6 +769,7 @@ void vtkPVProbe::UsePoint()
   this->SetAcceptButtonColorToRed();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::UseLine()
 {
   this->Dimensionality = 1;
@@ -792,25 +781,15 @@ void vtkPVProbe::UseLine()
                this->InputMenu->GetWidgetName());
   this->ScalarArrayMenu->Update();
 
-  this->Script("pack %s %s %s %s %s",
-               this->EndPointMenuFrame->GetWidgetName(),
-               this->EndPoint1Frame->GetWidgetName(),
-               this->EndPoint2Frame->GetWidgetName(),
-	       this->DivisionsEntry->GetWidgetName(),
-               this->ShowXYPlotToggle->GetWidgetName());
+  this->Script("pack %s %s",
+               this->ShowXYPlotToggle->GetWidgetName(),
+	       this->LineWidget->GetWidgetName());
     
-  char* endPt = this->EndPointMenu->GetValue();
-  if (strcmp(endPt, "End Point 1") == 0)
-    {
-    this->SetCurrentEndPoint(1);
-    }
-  else if (strcmp(endPt, "End Point 2") == 0)
-    {
-    this->SetCurrentEndPoint(2);
-    }
+  this->LineWidget->Reset();
   this->SetAcceptButtonColorToRed();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::SetSelectedPoint(float point[3])
 {
   this->SelectedXEntry->SetValue(point[0], 4);
@@ -818,58 +797,36 @@ void vtkPVProbe::SetSelectedPoint(float point[3])
   this->SelectedZEntry->SetValue(point[2], 4);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::SetEndPoint1(float point[3])
 {
   this->End1XEntry->SetValue(point[0], 4);
   this->End1YEntry->SetValue(point[1], 4);
   this->End1ZEntry->SetValue(point[2], 4);
+  this->EndPoint1[0] = point[0];
+  this->EndPoint1[1] = point[1];
+  this->EndPoint1[2] = point[2];
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::SetEndPoint2(float point[3])
 {
   this->End2XEntry->SetValue(point[0], 4);
   this->End2YEntry->SetValue(point[1], 4);
   this->End2ZEntry->SetValue(point[2], 4);
+  this->EndPoint2[0] = point[0];
+  this->EndPoint2[1] = point[1];
+  this->EndPoint2[2] = point[2];
 }
 
-void vtkPVProbe::SetCurrentEndPoint(int id)
+//----------------------------------------------------------------------------
+void vtkPVProbe::SetNumberOfLineDivisions(int i)
 {
-  this->CurrentEndPoint = id;
-  
-  if (id == 1)
-    {
-    this->Script("%s configure -state disabled",
-                 this->End2XEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state disabled",
-                 this->End2YEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state disabled",
-                 this->End2ZEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state normal",
-                 this->End1XEntry->GetEntry()->GetWidgetName()); 
-    this->Script("%s configure -state normal",
-                 this->End1YEntry->GetEntry()->GetWidgetName()); 
-    this->Script("%s configure -state normal",
-                 this->End1ZEntry->GetEntry()->GetWidgetName()); 
-    }
-  else if (id == 2)
-    {
-    this->Script("%s configure -state disabled",
-                 this->End1XEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state disabled",
-                 this->End1YEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state disabled",
-                 this->End1ZEntry->GetEntry()->GetWidgetName());
-    this->Script("%s configure -state normal",
-                 this->End2XEntry->GetEntry()->GetWidgetName()); 
-    this->Script("%s configure -state normal",
-                 this->End2YEntry->GetEntry()->GetWidgetName()); 
-    this->Script("%s configure -state normal",
-                 this->End2ZEntry->GetEntry()->GetWidgetName()); 
-    }
+  this->NumberOfLineDivisions = i;
+  this->DivisionsEntry->SetValue(i);
 }
 
-vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
-
+//----------------------------------------------------------------------------
 vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName, 
 					 char *inputType, char *help, 
 					 vtkPVSourceCollection *sources)
@@ -881,6 +838,7 @@ vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName,
   return inputMenu;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::SaveInTclScript(ofstream *file)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
@@ -985,8 +943,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "CurrentEndPoint: " << this->GetCurrentEndPoint() << endl;
+
   os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
-  os << indent << "EndPointMenu: " << this->GetEndPointMenu() << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }

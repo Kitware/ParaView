@@ -207,9 +207,9 @@ void vtkPVLineWidget::SetPoint2()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetResolution(float f)
+void vtkPVLineWidget::SetResolution(int i)
 {
-  this->ResolutionEntry->SetValue(f, 5);
+  this->ResolutionEntry->SetValue(i);
   float res = this->ResolutionEntry->GetValueAsFloat();
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetResolution(res);
@@ -228,7 +228,7 @@ void vtkPVLineWidget::SetResolution()
     {
     return;
     }
-  float res = this->ResolutionEntry->GetValueAsFloat();
+  int res = this->ResolutionEntry->GetValueAsInt();
   this->SetResolution(res);
   this->ModifiedCallback();
   this->ValueChanged = 0; 
@@ -269,7 +269,8 @@ void vtkPVLineWidget::Accept()
   char acceptCmd[1024];
   if ( this->Point1Variable && this->Point1Object )
     {
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point1Object, this->Point1Variable,
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point1Object, 
+	    this->Point1Variable,
 	    this->Point1[0]->GetValueAsFloat(),
 	    this->Point1[1]->GetValueAsFloat(),
 	    this->Point1[2]->GetValueAsFloat());
@@ -277,7 +278,8 @@ void vtkPVLineWidget::Accept()
     }
   if ( this->Point2Variable && this->Point2Object )
     {
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point2Object, this->Point2Variable,
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point2Object, 
+	    this->Point2Variable,
 	    this->Point2[0]->GetValueAsFloat(),
 	    this->Point2[1]->GetValueAsFloat(),
 	    this->Point2[2]->GetValueAsFloat());
@@ -285,8 +287,9 @@ void vtkPVLineWidget::Accept()
     }
   if ( this->ResolutionVariable && this->ResolutionObject )
     {
-    sprintf(acceptCmd, "%s Set%s %f", this->ResolutionObject, this->ResolutionVariable,
-	    this->ResolutionEntry->GetValueAsFloat());
+    sprintf(acceptCmd, "%s Set%s %i", this->ResolutionObject, 
+	    this->ResolutionVariable,
+	    this->ResolutionEntry->GetValueAsInt());
     pvApp->BroadcastScript(acceptCmd);
     }
   this->Superclass::Accept();
@@ -302,17 +305,20 @@ void vtkPVLineWidget::Reset()
   if ( this->Point1Variable && this->Point1Object )
     {
     this->Script("eval %s SetPoint1 [ %s Get%s ]",
-		 this->GetTclName(), this->Point1Object, this->Point1Variable);
+		 this->GetTclName(), this->Point1Object, 
+		 this->Point1Variable);
     }
   if ( this->Point2Variable && this->Point2Object )
     {
     this->Script("eval %s SetPoint2 [ %s Get%s ]",
-		 this->GetTclName(), this->Point2Object, this->Point2Variable);
+		 this->GetTclName(), this->Point2Object, 
+		 this->Point2Variable);
     }
   if ( this->ResolutionVariable && this->ResolutionObject )
     {
     this->Script("%s SetResolution [ %s Get%s ]",
-		 this->GetTclName(), this->ResolutionObject, this->ResolutionVariable);
+		 this->GetTclName(), this->ResolutionObject, 
+		 this->ResolutionVariable);
     }
   this->Superclass::Reset();
 }
@@ -376,13 +382,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long, void*)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  static int instanceCount = 0;
-  char lineTclName[256];
-
-  ++instanceCount;
-  sprintf(lineTclName, "pvLine%d", instanceCount);
-  this->SetTraceName(lineTclName);
-  
+  this->SetTraceName("Line");
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());

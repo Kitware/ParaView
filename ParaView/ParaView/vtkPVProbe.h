@@ -55,6 +55,7 @@ class vtkKWLabeledEntry;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkPVArrayMenu;
+class vtkPVLineWidget;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -94,16 +95,30 @@ public:
   void SetSelectedPoint(float point[3]);
   void SetEndPoint1(float point[3]);
   void SetEndPoint2(float point[3]);
+  void SetEndPoint1(float x, float y, float z) 
+    { 
+    float p[3]; 
+    p[0] = x; p[1] = y; p[2] = z;
+    this->SetEndPoint1(p);
+    }
+  void SetEndPoint2(float x, float y, float z) 
+    { 
+    float p[3]; 
+    p[0] = x; p[1] = y; p[2] = z;
+    this->SetEndPoint2(p);
+    }
+  vtkGetVector3Macro(EndPoint1, float);
+  vtkGetVector3Macro(EndPoint2, float);  
 
   // Description:
   // Get the dimensionality of the input to vtkProbeFilter.
   vtkGetMacro(Dimensionality, int);
-  
-  // Description:
-  // Get the current end point id of the line input to vtkProbeFilter.
-  vtkGetMacro(CurrentEndPoint, int);
-  void SetCurrentEndPoint(int id);
 
+  // Description:
+  // Set and get the number of line divisions.
+  void SetNumberOfLineDivisions(int);
+  vtkGetMacro(NumberOfLineDivisions, int);
+  
   // Description:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   void SaveInTclScript(ofstream *file);
@@ -111,10 +126,6 @@ public:
   // Description:
   // Method to update which scalars are being used in the xyplot
   virtual void UpdateScalars();
-
-  //Description:
-  // Access to the EndPointMenu from Tcl
-  vtkGetObjectMacro(EndPointMenu, vtkKWOptionMenu);
 
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
@@ -145,9 +156,6 @@ protected:
   vtkKWLabeledEntry *SelectedZEntry;  
   vtkKWLabel *PointDataLabel;
   
-  vtkKWLabel *EndPointLabel;
-  vtkKWOptionMenu *EndPointMenu;
-  vtkKWWidget *EndPointMenuFrame;
   vtkKWWidget *EndPoint1Frame;
   vtkKWLabel *EndPoint1Label;
   vtkKWLabeledEntry *End1XEntry;
@@ -160,14 +168,18 @@ protected:
   vtkKWLabeledEntry *End2ZEntry;
   vtkKWCheckButton *ShowXYPlotToggle;
   vtkKWLabeledEntry *DivisionsEntry;
+  vtkPVLineWidget *LineWidget;
   
   int Dimensionality; // point = 0, line = 1
-  int CurrentEndPoint;
   
   char* XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
 
   int InstanceCount;
+
+  float EndPoint1[3];
+  float EndPoint2[3];
+  int NumberOfLineDivisions;
 
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
