@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.25");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.26");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -95,39 +95,37 @@ int vtkKWLoadSaveDialog::Invoke()
   char *path = NULL;
   ostrstream command;
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
-  if (this->ChooseDirectory)
+  int support_choose_dir = this->Application->EvaluateBooleanExpression(
+    "string equal [info commands tk_chooseDirectory] tk_chooseDirectory");
+
+  if (this->ChooseDirectory && support_choose_dir)
     {
     command << "tk_chooseDirectory";
     }
   else
     {
-#endif
     command << (this->SaveDialog ? "tk_getSaveFile" : "tk_getOpenFile");
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
     }
-#endif
 
   command << " -title {" << this->Title << "}"
           << " -initialdir {" 
-          << ((this->LastPath && strlen(this->LastPath)>0)? this->LastPath : ".")
+          << ((this->LastPath && strlen(this->LastPath)>0)? this->LastPath:".")
           << "}";
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
   if (this->ChooseDirectory)
     {
-    command << " -mustexist 1";
+    if (support_choose_dir)
+      {
+      command << " -mustexist 1";
+      }
     }
   else
     {
-#endif
     command << " -defaultextension {" 
             << (this->DefaultExtension ? this->DefaultExtension : "")
             << "}"
             << " -filetypes {" << this->FileTypes << "}";
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
     }
-#endif
   
   vtkKWWindow* window = this->GetWindow();
   if (window)
@@ -156,18 +154,14 @@ int vtkKWLoadSaveDialog::Invoke()
     path = this->Application->GetMainInterp()->result;
 
     this->SetFileName(path);
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
-    if (this->ChooseDirectory)
+    if (this->ChooseDirectory && support_choose_dir)
       {
       this->SetLastPath(path);
       }
     else
       {
-#endif
       this->GenerateLastPath(path);
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
       }
-#endif
     res = 1;
     }
   else
