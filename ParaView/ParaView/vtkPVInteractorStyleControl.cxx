@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.1");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -597,7 +597,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   for ( cc = 0; cc < 9; cc ++ )
     {
     this->Menus[cc]->SetParent(frame->GetFrame());
-    this->Menus[cc]->Create(app, "");
+    this->Menus[cc]->Create(app, "-anchor w");
     }
 
   this->Labels[0]->SetLabel("Left");
@@ -607,25 +607,31 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->Labels[4]->SetLabel("Shift");
   this->Labels[5]->SetLabel("Control");
 
-  this->Script("grid x %s %s %s -sticky ew", 
+  char *grid_settings = " -sticky news -padx 1 -pady 1";
+
+  this->Script("grid x %s %s %s %s", 
                this->Labels[0]->GetWidgetName(), 
                this->Labels[1]->GetWidgetName(), 
-               this->Labels[2]->GetWidgetName());
-  this->Script("grid %s %s %s %s -sticky ew", 
+               this->Labels[2]->GetWidgetName(),
+               grid_settings);
+  this->Script("grid %s %s %s %s %s", 
                this->Labels[3]->GetWidgetName(), 
                this->Menus[0]->GetWidgetName(), 
                this->Menus[1]->GetWidgetName(), 
-               this->Menus[2]->GetWidgetName());
-  this->Script("grid %s %s %s %s -sticky ew", 
+               this->Menus[2]->GetWidgetName(),
+               grid_settings);
+  this->Script("grid %s %s %s %s %s", 
                this->Labels[4]->GetWidgetName(), 
                this->Menus[3]->GetWidgetName(), 
                this->Menus[4]->GetWidgetName(), 
-               this->Menus[5]->GetWidgetName());
-  this->Script("grid %s %s %s %s -sticky ew", 
+               this->Menus[5]->GetWidgetName(),
+               grid_settings);
+  this->Script("grid %s %s %s %s %s", 
                this->Labels[5]->GetWidgetName(), 
                this->Menus[6]->GetWidgetName(), 
                this->Menus[7]->GetWidgetName(), 
-               this->Menus[8]->GetWidgetName());
+               this->Menus[8]->GetWidgetName(),
+               grid_settings);
                
   this->Script("grid columnconfigure %s 0 -weight 0", 
                frame->GetFrame()->GetWidgetName());
