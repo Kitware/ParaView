@@ -26,7 +26,10 @@
 #include "vtkSMProxy.h"
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
-class vtkSMDisplayerProxy;
+class vtkSMProxy;
+//BTX
+struct vtkSMDisplayWindowProxyInternals;
+//ETX
 
 class VTK_EXPORT vtkSMDisplayWindowProxy : public vtkSMProxy
 {
@@ -46,7 +49,7 @@ public:
   // Description:
   // Adds a display to the list of managed displays. This adds
   // the actor(s) to the renderer.
-  void AddDisplayer(vtkSMDisplayerProxy* displayer);
+  void AddDisplayer(vtkSMProxy* displayer);
 
   // Description:
   // Generate a screenshot from the render window.
@@ -63,6 +66,9 @@ protected:
   vtkSMProxy* WindowToImage;
 
 private:
+
+  vtkSMDisplayWindowProxyInternals* DWInternals;
+
   vtkSMDisplayWindowProxy(const vtkSMDisplayWindowProxy&); // Not implemented
   void operator=(const vtkSMDisplayWindowProxy&); // Not implemented
 };

@@ -19,6 +19,30 @@
         default_values="0">
      </IntVectorProperty>
 
+     <IntVectorProperty
+        name="ScalarVisibility"
+        command="SetScalarVisibility"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1 1 1"
+        update_self="1">
+     </DoubleVectorProperty>
+
      <SubProxy>
        <Proxy name="mapper" class="vtkPolyDataMapper">
           <IntVectorProperty
@@ -128,6 +152,14 @@
    </DisplayerProxy>
 
    <DisplayWindowProxy name="DefaultDisplayWindow">
+     <ProxyProperty name="Displayers" 
+                    command="AddDisplayer"
+                    update_self="1">
+        <ProxyGroupDomain>
+          <Group name="rendering"/>
+        </ProxyGroupDomain>
+     </ProxyProperty>
+
      <IntVectorProperty 
         name="WindowPosition" 
         command="SetPosition" 

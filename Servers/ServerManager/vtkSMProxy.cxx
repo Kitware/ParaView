@@ -26,7 +26,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMProxy, "1.9");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -533,6 +533,21 @@ void vtkSMProxy::UpdateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::UpdateSelfAndAllInputs()
+{
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+
+  while (!iter->IsAtEnd())
+    {
+    iter->GetProperty()->UpdateAllInputs();
+    iter->Next();
+    }
+  iter->Delete();
+
+  this->UpdateVTKObjects();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated)
@@ -615,18 +630,23 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxy::SaveState(const char* name, ofstream* file, vtkIndent indent)
 {
-  *file << indent 
-        << this->XMLGroup << " : " 
-        << this->XMLName << " : "
-        << name << " : " << endl;
+  *file << indent
+        << "<Proxy group=\"" 
+        << this->XMLGroup << "\" type=\"" 
+        << this->XMLName << "\" id=\""
+        << name << "\">" << endl;
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
   while (!iter->IsAtEnd())
     {
-    iter->GetProperty()->SaveState(iter->GetKey(), file, indent.GetNextIndent());
+    ostrstream propID;
+    propID << name << "." << iter->GetKey() << ends;
+    iter->GetProperty()->SaveState(propID.str(), file, indent.GetNextIndent());
+    delete [] propID.str();
     iter->Next();
     }
+  *file << indent << "</Proxy>" << endl;
 
   iter->Delete();
 }

@@ -19,24 +19,43 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSmartPointer.h"
+
+#include <vtkstd/vector>
+
+#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.5");
 
-vtkCxxSetObjectMacro(vtkSMProxyProperty, Proxy, vtkSMProxy);
+struct vtkSMProxyPropertyInternals
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > Proxies;
+};
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
-  this->Proxy = 0;
+  this->PPInternals = new vtkSMProxyPropertyInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::~vtkSMProxyProperty()
 {
-  if (this->Proxy)
+  delete this->PPInternals;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::UpdateAllInputs()
+{
+  unsigned int numProxies = this->GetNumberOfProxies();
+  for (unsigned int idx=0; idx < numProxies; idx++)
     {
-    this->Proxy->Delete();
+    vtkSMProxy* proxy = this->GetProxy(idx);
+    if (proxy)
+      {
+      proxy->UpdateSelfAndAllInputs();
+      }
     }
 }
 
@@ -49,21 +68,73 @@ void vtkSMProxyProperty::AppendCommandToStream(
     return;
     }
 
-  *str << vtkClientServerStream::Invoke << objectId << this->Command;
-  if (this->Proxy)
+  unsigned int numProxies = this->GetNumberOfProxies();
+  if (numProxies < 1)
     {
-    int numIDs = this->Proxy->GetNumberOfIDs();
-    for(int i=0; i<numIDs; i++)
+    return;
+    }
+
+  for (unsigned int idx=0; idx < numProxies; idx++)
+    {
+    *str << vtkClientServerStream::Invoke << objectId << this->Command;
+    vtkSMProxy* proxy = this->GetProxy(idx);
+    if (proxy)
       {
-      *str << this->Proxy->GetID(i);
+      if (this->UpdateSelf)
+        {
+        *str << proxy;
+        }
+      else
+        {
+        int numIDs = proxy->GetNumberOfIDs();
+        for(int i=0; i<numIDs; i++)
+          {
+          *str << proxy->GetID(i);
+          }
+        }
       }
+    else
+      {
+      vtkClientServerID nullID = { 0 };
+      *str << nullID;
+      }
+    *str << vtkClientServerStream::End;
     }
-  else
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
+{
+  this->PPInternals->Proxies.push_back(proxy);
+  if (modify)
     {
-    vtkClientServerID nullID = { 0 };
-    *str << nullID;
+    this->Modified();
     }
-  *str << vtkClientServerStream::End;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy)
+{
+  this->AddProxy(proxy, 1);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::RemoveAllProxies()
+{
+  this->PPInternals->Proxies.clear();
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxyProperty::GetNumberOfProxies()
+{
+  return this->PPInternals->Proxies.size();
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyProperty::GetProxy(unsigned int idx)
+{
+  return this->PPInternals->Proxies[idx];
 }
 
 //---------------------------------------------------------------------------
@@ -75,35 +146,53 @@ void vtkSMProxyProperty::SaveState(
     {
     return;
     }
-  for (unsigned int i=0; i<this->GetNumberOfDomains(); i++)
+  
+  *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")
+        << "\" id=\"" << name << "\" ";
+  vtkstd::vector<vtkStdString> proxies;
+  unsigned int numProxies = this->GetNumberOfProxies();
+  for (unsigned int idx=0; idx<numProxies; idx++)
     {
-    vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
-      this->GetDomain(i));
-    if (dom)
+    for (unsigned int i=0; i<this->GetNumberOfDomains(); i++)
       {
-      unsigned int numGroups = dom->GetNumberOfGroups();
-      for (unsigned int j=0; j<numGroups; j++)
+      vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
+        this->GetDomain(i));
+      if (dom)
         {
-        const char* proxyname = pm->IsProxyInGroup(
-          this->Proxy, dom->GetGroup(j));
-        if (proxyname)
+        unsigned int numGroups = dom->GetNumberOfGroups();
+        for (unsigned int j=0; j<numGroups; j++)
           {
-          *file << indent 
-                << name 
-                << " : " <<  proxyname
-                << " : " << dom->GetGroup(j)
-                << endl;
-          return;
+          const char* proxyname = pm->IsProxyInGroup(
+            this->GetProxy(idx), dom->GetGroup(j));
+          if (proxyname)
+            {
+            proxies.push_back(proxyname);
+            }
           }
         }
       }
     }
+  unsigned int numFoundProxies = proxies.size();
+  if (numFoundProxies > 0)
+    {
+    *file << "number_of_elements=\"" << numFoundProxies << "\">" << endl;
+    for(unsigned int i=0; i<numFoundProxies; i++)
+      {
+      *file << indent.GetNextIndent() << "<Element index=\""
+            << i << "\" " << "value=\"" << proxies[i].c_str() << "\"/>"
+            << endl;
+      }
+    }
+  else
+    {
+    *file << ">" << endl;
+    }
+  *file << indent << "</Property>" << endl;
+          
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "Proxy: " << this->Proxy << endl;
 }

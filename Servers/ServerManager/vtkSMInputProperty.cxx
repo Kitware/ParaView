@@ -17,71 +17,26 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSmartPointer.h"
-
-#include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.2");
 
-struct vtkSMInputPropertyInternals
-{
-  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > Inputs;
-};
+int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
 //---------------------------------------------------------------------------
 vtkSMInputProperty::vtkSMInputProperty()
 {
-  this->ImmediateUpdate = 1;
+  this->ImmediateUpdate = vtkSMInputProperty::InputsUpdateImmediately;
   this->UpdateSelf = 1;
   this->MultipleInput = 0;
   this->CleanCommand = 0;
-
-  this->IPInternals = new vtkSMInputPropertyInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMInputProperty::~vtkSMInputProperty()
 {
-  delete this->IPInternals;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputProperty::AddInput(vtkSMSourceProxy* input, int modify)
-{
-  this->IPInternals->Inputs.push_back(input);
-  if (modify)
-    {
-    this->Modified();
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputProperty::AddInput(vtkSMSourceProxy* input)
-{
-  this->AddInput(input, 1);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputProperty::RemoveAllInputs()
-{
-  this->IPInternals->Inputs.clear();
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMInputProperty::GetInput(unsigned int idx)
-{
-  return this->IPInternals->Inputs[idx];
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMInputProperty::GetNumberOfInputs()
-{
-  return this->IPInternals->Inputs.size();
 }
 
 //---------------------------------------------------------------------------
@@ -99,13 +54,13 @@ void vtkSMInputProperty::AppendCommandToStream(
          << objectId << "CleanInputs" << this->CleanCommand
          << vtkClientServerStream::End;
     }
-  unsigned int numInputs = this->GetNumberOfInputs();
+  unsigned int numInputs = this->GetNumberOfProxies();
   for (unsigned int i=0; i<numInputs; i++)
     {
     *str << vtkClientServerStream::Invoke 
          << objectId 
          << "AddInput" 
-         << this->IPInternals->Inputs[i] 
+         << this->GetProxy(i) 
          << this->Command;
     if (this->MultipleInput)
       {
@@ -116,44 +71,6 @@ void vtkSMInputProperty::AppendCommandToStream(
       *str << 0;
       }
     *str << vtkClientServerStream::End;
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputProperty::SaveState(
-  const char* name,  ofstream* file, vtkIndent indent)
-{
-  vtkSMProxyManager* pm = this->GetProxyManager();
-  if (!pm)
-    {
-    return;
-    }
-  
-  unsigned int numInputs = this->GetNumberOfInputs();
-  for (unsigned int idx=0; idx<numInputs; idx++)
-    {
-    for (unsigned int i=0; i<this->GetNumberOfDomains(); i++)
-      {
-      vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
-        this->GetDomain(i));
-      if (dom)
-        {
-        unsigned int numGroups = dom->GetNumberOfGroups();
-        for (unsigned int j=0; j<numGroups; j++)
-          {
-          const char* proxyname = pm->IsProxyInGroup(
-            this->GetInput(idx), dom->GetGroup(j));
-          if (proxyname)
-            {
-            *file << indent 
-                  << name 
-                  << " : " <<  proxyname
-                  << " : " << dom->GetGroup(j)
-                  << endl;
-            }
-          }
-        }
-      }
     }
 }
 

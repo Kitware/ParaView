@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMProperty, "1.3");
 
 struct vtkSMPropertyInternals
 {
@@ -39,6 +39,7 @@ vtkSMProperty::vtkSMProperty()
   this->ImmediateUpdate = 0;
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
+  this->XMLName = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -46,6 +47,7 @@ vtkSMProperty::~vtkSMProperty()
 {
   this->SetCommand(0);
   delete this->PInternals;
+  this->SetXMLName(0);
 }
 
 //---------------------------------------------------------------------------
@@ -83,6 +85,12 @@ void vtkSMProperty::AppendCommandToStream(
 //---------------------------------------------------------------------------
 int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
 {
+  const char* name = element->GetAttribute("name");
+  if(name) 
+    { 
+    this->SetXMLName(name); 
+    }
+
   const char* command = element->GetAttribute("command");
   if(command) 
     { 
@@ -100,7 +108,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
   retVal = element->GetScalarAttribute("update_self", &update_self);
   if(retVal) 
     { 
-    this->SetImmediateUpdate(update_self); 
+    this->SetUpdateSelf(update_self); 
     }
 
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)

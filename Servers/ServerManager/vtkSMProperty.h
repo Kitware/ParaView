@@ -76,6 +76,9 @@ protected:
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
   // Description:
+  virtual void UpdateAllInputs() {};
+
+  // Description:
   void AddDomain(vtkSMDomain* dom);
 
   // Description:
@@ -90,6 +93,11 @@ protected:
 
   int ImmediateUpdate;
   int UpdateSelf;
+
+  // Description:
+  vtkSetStringMacro(XMLName);
+
+  char* XMLName;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

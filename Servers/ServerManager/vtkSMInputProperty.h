@@ -19,33 +19,15 @@
 #ifndef __vtkSMInputProperty_h
 #define __vtkSMInputProperty_h
 
-#include "vtkSMProperty.h"
+#include "vtkSMProxyProperty.h"
 
-class vtkSMSourceProxy;
-//BTX
-struct vtkSMInputPropertyInternals;
-//ETX
-
-class VTK_EXPORT vtkSMInputProperty : public vtkSMProperty
+class VTK_EXPORT vtkSMInputProperty : public vtkSMProxyProperty
 {
 public:
   static vtkSMInputProperty* New();
-  vtkTypeRevisionMacro(vtkSMInputProperty, vtkSMProperty);
+  vtkTypeRevisionMacro(vtkSMInputProperty, vtkSMProxyProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  void AddInput(vtkSMSourceProxy* input);
-  void AddInput(vtkSMSourceProxy* input, int modify);
-
-  // Description:
-  void RemoveAllInputs();
-
-  // Description:
-  vtkSMSourceProxy* GetInput(unsigned int idx);
-
-  // Description:
-  unsigned int GetNumberOfInputs();
-
   // Description:
   vtkSetStringMacro(CleanCommand);
   vtkGetStringMacro(CleanCommand);
@@ -53,6 +35,16 @@ public:
   // Description:
   vtkSetMacro(MultipleInput, int);
   vtkGetMacro(MultipleInput, int);
+
+  // Description:
+  static int GetInputsUpdateImmediately()
+    {
+      return vtkSMInputProperty::InputsUpdateImmediately;
+    }
+  static void SetInputsUpdateImmediately(int up)
+    {
+      vtkSMInputProperty::InputsUpdateImmediately = up;
+    }
 
 protected:
   vtkSMInputProperty();
@@ -75,13 +67,11 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
-  virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
-
   int MultipleInput;
+  
+  static int InputsUpdateImmediately;
 
   char* CleanCommand;
-
-  vtkSMInputPropertyInternals* IPInternals;
 
 private:
   vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented

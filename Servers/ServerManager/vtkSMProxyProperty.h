@@ -26,6 +26,9 @@
 #include "vtkSMProperty.h"
 
 class vtkSMProxy;
+//BTX
+struct vtkSMProxyPropertyInternals;
+//ETX
 
 class VTK_EXPORT vtkSMProxyProperty : public vtkSMProperty
 {
@@ -35,13 +38,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Set the proxy to be used. The IDs stored in the proxy are passed
-  // to the command stream.
-  void SetProxy(vtkSMProxy* proxy);
+  void AddProxy(vtkSMProxy* proxy);
+  void AddProxy(vtkSMProxy* proxy, int modify);
 
   // Description:
-  // Return the proxy.
-  vtkGetObjectMacro(Proxy, vtkSMProxy);
+  void RemoveAllProxies();
+
+  // Description:
+  unsigned int GetNumberOfProxies();
+
+  // Description:
+  vtkSMProxy* GetProxy(unsigned int idx);
 
 protected:
   vtkSMProxyProperty();
@@ -59,9 +66,12 @@ protected:
     vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
-  vtkSMProxy* Proxy;
+  // Description:
+  virtual void UpdateAllInputs();
 
   virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
+
+  vtkSMProxyPropertyInternals* PPInternals;
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

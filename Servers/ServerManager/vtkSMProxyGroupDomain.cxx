@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -27,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.3");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -56,22 +55,16 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
   if (pp)
     {
-    return this->IsInDomain(pp->GetProxy());
-    }
-
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(property);
-  if (ip)
-    {
     unsigned int numMatches = 0;
-    unsigned int numInputs = ip->GetNumberOfInputs();
-    for (unsigned int i=0; i<numInputs; i++)
+    unsigned int numProxies = pp->GetNumberOfProxies();
+    for (unsigned int i=0; i<numProxies; i++)
       {
-      if (this->IsInDomain(ip->GetInput(i)))
+      if (this->IsInDomain(pp->GetProxy(i)))
         {
         numMatches++;
         }
       }
-    if (numMatches == numInputs)
+    if (numMatches == numProxies)
       {
       return 1;
       }

@@ -27,43 +27,11 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
 {
-  vtkSMIntVectorProperty* intVec;
-  vtkSMDoubleVectorProperty* doubleVec;
-
-  double ones[3] = {1, 1, 1};
-
-  // This property actually invokes a method on this (as opposed
-  // to the VTK object on the server). Note that an observer is
-  // added but doUpdate is disabled. The update is done manually
-  // in UpdateVTKObjects() using PushProperty()
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetScalarVisibility");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 0);
-  intVec->SetUpdateSelf(1);
-  this->AddProperty("ScalarVisibility", intVec);
-  intVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetColor");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(ones);
-  doubleVec->SetUpdateSelf(1);
-  this->AddProperty("Color", doubleVec);
-  doubleVec->Delete();
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetRepresentation");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 2);
-  intVec->SetUpdateSelf(1);
-  this->AddProperty("Representation", intVec);
-  intVec->Delete();
 }
 
 //---------------------------------------------------------------------------

@@ -20,9 +20,18 @@
 #include "vtkSMDisplayerProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSmartPointer.h"
+
+#include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.7");
+
+struct vtkSMDisplayWindowProxyInternals
+{
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxy> > DisplayVectorType;
+  DisplayVectorType Displayers;
+};
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
@@ -33,6 +42,8 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
   this->WindowToImage = vtkSMProxy::New();
   this->WindowToImage->ClearServerIDs();
   this->WindowToImage->AddServerID(0);
+  
+  this->DWInternals = new vtkSMDisplayWindowProxyInternals;
 
 }
 
@@ -40,6 +51,7 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
 vtkSMDisplayWindowProxy::~vtkSMDisplayWindowProxy()
 {
   this->WindowToImage->Delete();
+  delete this->DWInternals;
 }
 
 //---------------------------------------------------------------------------
@@ -205,8 +217,24 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMDisplayerProxy* display)
+void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMProxy* display)
 {
+  vtkSMDisplayWindowProxyInternals::DisplayVectorType::iterator iter =
+    this->DWInternals->Displayers.begin();
+
+  for(; iter != this->DWInternals->Displayers.end(); iter++)
+    {
+    if ( display == iter->GetPointer()) { break; }
+    }
+
+  if ( iter != this->DWInternals->Displayers.end() )
+    {
+    vtkDebugMacro("Displayer has been added before. Ignoring.");
+    return;
+    }
+
+  this->DWInternals->Displayers.push_back(display);
+
   this->CreateVTKObjects(1);
 
   vtkSMProxy* actorProxy = display->GetSubProxy("actor");

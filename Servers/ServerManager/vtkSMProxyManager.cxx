@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.8");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.9");
 
 class vtkSMProxyManagerElementMapType:
   public vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> > {};
@@ -315,15 +315,28 @@ void vtkSMProxyManager::SaveState(const char* filename)
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
-    os << indent << "Proxy group : " << it->first.c_str() << endl;
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
     for (; it2 != it->second.end(); it2++)
       {
-      it2->second->SaveState(it2->first.c_str(), &os, indent.GetNextIndent());
+      it2->second->SaveState(it2->first.c_str(), &os, indent);
       }
     }
-  
+
+  it = this->Internals->RegisteredProxyMap.begin();
+  for (; it != this->Internals->RegisteredProxyMap.end(); it++)
+    {
+    os << indent 
+       << "<ProxyCollection name=\"" << it->first.c_str() << "\">" << endl;
+    vtkSMProxyManagerProxyMapType::iterator it2 =
+      it->second.begin();
+    for (; it2 != it->second.end(); it2++)
+      {
+      os << indent.GetNextIndent()
+         << "<Item name=\"" << it2->first.c_str() << "\">" << endl;
+      }
+    os << indent << "</ProxyCollection>" << endl;
+    }
 }
 
 //---------------------------------------------------------------------------
