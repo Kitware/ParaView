@@ -81,12 +81,9 @@ public:
     { this->SetRelativeRange(range[0], range[1]); };
   
   // Description:
-  // Set/Get the resolution. Also get the entries resolution, which is the
-  // number of decimal places displayed in the entries 
-  // (computed automatically from the current resolution).
+  // Set/Get the resolution.
   virtual void SetResolution(float r);
   vtkGetMacro(Resolution, float);
-  vtkGetMacro(EntriesResolution, int);
 
   // Description:
   // Adjust the resolution automatically (to a power of 10 in this implem)
@@ -303,7 +300,6 @@ protected:
   int   LabelPosition;
   int   EntriesPosition;
   int   ZoomButtonsPosition;
-  int   EntriesResolution;
   int   EntriesWidth;
   int   SliderCanPush;
   int   ShowZoomButtons;
@@ -325,7 +321,6 @@ protected:
   virtual void CreateEntries();
   virtual void CreateZoomButtons();
   virtual void UpdateEntriesValue();
-  virtual void UpdateEntriesResolution();
   virtual void ConstraintResolution();
 
   // Description:

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.24");
+vtkCxxRevisionMacro(vtkKWRange, "1.25");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -92,7 +92,6 @@ vtkKWRange::vtkKWRange()
   this->LabelPosition       = vtkKWRange::POSITION_SIDE1;
   this->EntriesPosition     = vtkKWRange::POSITION_SIDE1;
   this->ZoomButtonsPosition = vtkKWRange::POSITION_SIDE1;
-  this->EntriesResolution   = 2;
   this->EntriesWidth        = 10;
   this->SliderCanPush       = 0;
   this->DisableCommands     = 0;
@@ -263,7 +262,7 @@ void vtkKWRange::CreateEntries()
       }
     }
 
-  this->UpdateEntriesResolution();
+  this->UpdateEntriesValue();
 }
 
 //----------------------------------------------------------------------------
@@ -642,7 +641,7 @@ void vtkKWRange::SetResolution(float arg)
   
   this->RedrawCanvas();
 
-  this->UpdateEntriesResolution();
+  this->UpdateEntriesValue();
 }
 
 //----------------------------------------------------------------------------
@@ -686,36 +685,9 @@ void vtkKWRange::UpdateEntriesValue()
     {
     if (this->Entries[i] && this->Entries[i]->IsCreated())
       {
-      this->Entries[i]->SetValue(this->Range[i], this->EntriesResolution);
+      this->Entries[i]->SetValue(this->Range[i]);
       }
     }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWRange::UpdateEntriesResolution()
-{
-  if (fabs(this->Resolution) >= 1.0)
-    {
-    this->EntriesResolution = 0;
-    }
-  else 
-    {
-    if (this->IsCreated())
-      {
-      // Trick here: use the 'expr' Tcl command to display the shortest
-      // representation of the floating point number this->Resolution.
-      // sprintf would be of no help here.
-
-      const char *res = this->Script("expr %f", fabs(this->Resolution));
-      const char *pos = strchr(res, '.');
-      if (pos)
-        {
-        this->EntriesResolution = (int)(strlen(res)) - (pos - res) - 1;
-        }
-      }
-    }
-
-  this->UpdateEntriesValue();
 }
 
 //----------------------------------------------------------------------------
@@ -2211,7 +2183,6 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Range: " 
      << this->Range[0] << "..." <<  this->Range[1] << endl;
   os << indent << "Resolution: " << this->Resolution << endl;
-  os << indent << "EntriesResolution: " << this->EntriesResolution << endl;
   os << indent << "Thickness: " << this->Thickness << endl;
   os << indent << "InternalThickness: " << this->InternalThickness << endl;
   os << indent << "Orientation: "<< this->Orientation << endl;
