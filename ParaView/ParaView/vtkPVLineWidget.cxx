@@ -75,9 +75,6 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->Point1Variable = 0;
   this->Point2Variable = 0;
   this->ResolutionVariable = 0;
-  this->Point1Object = 0;
-  this->Point2Object = 0;
-  this->ResolutionObject = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -97,30 +94,24 @@ vtkPVLineWidget::~vtkPVLineWidget()
   this->SetPoint1Variable(0);
   this->SetPoint2Variable(0);
   this->SetResolutionVariable(0);
-  this->SetPoint1Object(0);
-  this->SetPoint2Object(0);
-  this->SetResolutionObject(0);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint1Method(const char* wname, const char* varname)
+void vtkPVLineWidget::SetPoint1VariableName(const char* varname)
 {
-  this->SetPoint1Object(wname);
   this->SetPoint1Variable(varname);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint2Method(const char* wname, const char* varname)
+void vtkPVLineWidget::SetPoint2VariableName(const char* varname)
 {
-  this->SetPoint2Object(wname);
   this->SetPoint2Variable(varname);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetResolutionMethod(const char* wname, const char* varname)
+void vtkPVLineWidget::SetResolutionVariableName(const char* varname)
 {
-  this->SetResolutionObject(wname);
   this->SetResolutionVariable(varname);
 }
 
@@ -259,44 +250,62 @@ void vtkPVLineWidget::Accept()
   if (traceFlag)
     {
     *traceFile << "$kw(" << this->GetTclName() << ") SetPoint1 "
-	       << this->Point1[0]->GetValue() << " "
-	       << this->Point1[1]->GetValue() << " "
-	       << this->Point1[2]->GetValue() << endl;
+               << this->Point1[0]->GetValue() << " "
+               << this->Point1[1]->GetValue() << " "
+               << this->Point1[2]->GetValue() << endl;
     *traceFile << "$kw(" << this->GetTclName() << ") SetPoint2 "
-	       << this->Point2[0]->GetValue() << " "
-	       << this->Point2[1]->GetValue() << " "
-	       << this->Point2[2]->GetValue() << endl;
+               << this->Point2[0]->GetValue() << " "
+               << this->Point2[1]->GetValue() << " "
+               << this->Point2[2]->GetValue() << endl;
     *traceFile << "$kw(" << this->GetTclName() << ") SetResolution "
-	       << this->ResolutionEntry->GetValue() << endl;
+               << this->ResolutionEntry->GetValue() << endl;
     }
 
   char acceptCmd[1024];
-  if ( this->Point1Variable && this->Point1Object )
+  if ( this->Point1Variable && this->ObjectTclName )
     {    
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point1Object, 
-	    this->Point1Variable,
-	    this->Point1[0]->GetValueAsFloat(),
-	    this->Point1[1]->GetValueAsFloat(),
-	    this->Point1[2]->GetValueAsFloat());
-    pvApp->Script(acceptCmd);
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+            this->Point1Variable,
+            this->Point1[0]->GetValueAsFloat(),
+            this->Point1[1]->GetValueAsFloat(),
+            this->Point1[2]->GetValueAsFloat());
+    pvApp->BroadcastScript(acceptCmd);
     }
-  if ( this->Point2Variable && this->Point2Object )
+  if ( this->Point2Variable && this->ObjectTclName )
     {
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point2Object, 
-	    this->Point2Variable,
-	    this->Point2[0]->GetValueAsFloat(),
-	    this->Point2[1]->GetValueAsFloat(),
-	    this->Point2[2]->GetValueAsFloat());
-    pvApp->Script(acceptCmd);
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+            this->Point2Variable,
+            this->Point2[0]->GetValueAsFloat(),
+            this->Point2[1]->GetValueAsFloat(),
+            this->Point2[2]->GetValueAsFloat());
+    pvApp->BroadcastScript(acceptCmd);
     }
-  if ( this->ResolutionVariable && this->ResolutionObject )
+  if ( this->ResolutionVariable && this->ObjectTclName )
     {
-    sprintf(acceptCmd, "%s Set%s %i", this->ResolutionObject, 
-	    this->ResolutionVariable,
-	    this->ResolutionEntry->GetValueAsInt());
-    pvApp->Script(acceptCmd);
+    sprintf(acceptCmd, "%s Set%s %i", this->ObjectTclName, 
+            this->ResolutionVariable,
+            this->ResolutionEntry->GetValueAsInt());
+    pvApp->BroadcastScript(acceptCmd);
     }
   this->Superclass::Accept();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::ActualPlaceWidget()
+{
+  vtkDataSet* data = 0;
+  if ( this->PVSource->GetPVInput() )
+    {
+    data = this->PVSource->GetPVInput()->GetVTKData();
+    }
+  this->Widget3D->SetInput(data);
+
+  float bounds[6];
+  data->GetBounds(bounds);
+
+  this->SetPoint1((bounds[0]+bounds[1])/2, bounds[2], (bounds[4]+bounds[5])/2);
+  this->SetPoint2((bounds[0]+bounds[1])/2, bounds[3], (bounds[4]+bounds[5])/2);
+  this->Widget3D->PlaceWidget();  
 }
 
 //----------------------------------------------------------------------------
@@ -306,30 +315,30 @@ void vtkPVLineWidget::Reset()
     {
     return;
     }
-  if ( this->Point1Variable && this->Point1Object )
+  if ( this->Point1Variable && this->ObjectTclName )
     {
     this->Script("eval %s SetPoint1 [ %s Get%s ]",
-		 this->GetTclName(), this->Point1Object, 
-		 this->Point1Variable);
+                 this->GetTclName(), this->ObjectTclName, 
+                 this->Point1Variable);
     }
-  if ( this->Point2Variable && this->Point2Object )
+  if ( this->Point2Variable && this->ObjectTclName )
     {
     this->Script("eval %s SetPoint2 [ %s Get%s ]",
-		 this->GetTclName(), this->Point2Object, 
-		 this->Point2Variable);
+                 this->GetTclName(), this->ObjectTclName, 
+                 this->Point2Variable);
     }
-  if ( this->ResolutionVariable && this->ResolutionObject )
+  if ( this->ResolutionVariable && this->ObjectTclName )
     {
     this->Script("%s SetResolution [ %s Get%s ]",
-		 this->GetTclName(), this->ResolutionObject, 
-		 this->ResolutionVariable);
+                 this->GetTclName(), this->ObjectTclName, 
+                 this->ResolutionVariable);
     }
   this->Superclass::Reset();
 }
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget* vtkPVLineWidget::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVLineWidget::SafeDownCast(clone);
@@ -337,8 +346,8 @@ vtkPVLineWidget* vtkPVLineWidget::ClonePrototype(vtkPVSource* pvSource,
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone, 
-				      vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                      vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVLineWidget* pvlw = vtkPVLineWidget::SafeDownCast(clone);
@@ -356,6 +365,18 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+
+  const char* point1_variable = element->GetAttribute("point1_variable");
+  if(point1_variable)
+    {
+    this->SetPoint1VariableName(point1_variable);
+    }
+
+  const char* point2_variable = element->GetAttribute("point2_variable");
+  if(point2_variable)
+    {
+    this->SetPoint2VariableName(point2_variable);
+    }
 
   return 1;
 }
@@ -423,64 +444,64 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->ResolutionEntry->SetValue(0);
 
   this->Script("grid propagate %s 1",
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-	       this->CoordinateLabel[0]->GetWidgetName(),
-	       this->CoordinateLabel[1]->GetWidgetName(),
-	       this->CoordinateLabel[2]->GetWidgetName());
+               this->CoordinateLabel[0]->GetWidgetName(),
+               this->CoordinateLabel[1]->GetWidgetName(),
+               this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-	       this->Labels[0]->GetWidgetName(),
-	       this->Point1[0]->GetWidgetName(),
-	       this->Point1[1]->GetWidgetName(),
-	       this->Point1[2]->GetWidgetName());
+               this->Labels[0]->GetWidgetName(),
+               this->Point1[0]->GetWidgetName(),
+               this->Point1[1]->GetWidgetName(),
+               this->Point1[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-	       this->Labels[1]->GetWidgetName(),
-	       this->Point2[0]->GetWidgetName(),
-	       this->Point2[1]->GetWidgetName(),
-	       this->Point2[2]->GetWidgetName());
+               this->Labels[1]->GetWidgetName(),
+               this->Point2[0]->GetWidgetName(),
+               this->Point2[1]->GetWidgetName(),
+               this->Point2[2]->GetWidgetName());
   this->Script("grid %s %s - - -sticky ew",
-	       this->ResolutionLabel->GetWidgetName(),
-	       this->ResolutionEntry->GetWidgetName());
+               this->ResolutionLabel->GetWidgetName(),
+               this->ResolutionEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-		 this->Point1[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point1[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <Key> {%s SetValueChanged}",
-		 this->Point2[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point2[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetPoint1}",
-		 this->Point1[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point1[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetPoint2}",
-		 this->Point2[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point2[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPoint1}",
-		 this->Point1[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point1[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPoint2}",
-		 this->Point2[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->Point2[i]->GetWidgetName(),
+                 this->GetTclName());
     }
   this->Script("bind %s <Key> {%s SetValueChanged}",
-	       this->ResolutionEntry->GetWidgetName(),
-	       this->GetTclName());
+               this->ResolutionEntry->GetWidgetName(),
+               this->GetTclName());
   this->Script("bind %s <FocusOut> {%s SetResolution}",
-	       this->ResolutionEntry->GetWidgetName(),
-	       this->GetTclName());
+               this->ResolutionEntry->GetWidgetName(),
+               this->GetTclName());
   this->Script("bind %s <KeyPress-Return> {%s SetResolution}",
-	       this->ResolutionEntry->GetWidgetName(),
-	       this->GetTclName());
+               this->ResolutionEntry->GetWidgetName(),
+               this->GetTclName());
   
 }

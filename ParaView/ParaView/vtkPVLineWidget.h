@@ -90,9 +90,16 @@ public:
 
   // Description:
   // Set the tcl variables that are modified when accept is called.
-  void SetPoint1Method(const char* wname, const char* varname);
-  void SetPoint2Method(const char* wname, const char* varname);
-  void SetResolutionMethod(const char* wname, const char* varname);
+  void SetPoint1VariableName(const char* varname);
+  void SetPoint2VariableName(const char* varname);
+  void SetResolutionVariableName(const char* varname);
+
+  // Description:
+  // This method does the actual placing. It sets the first point at 
+  // (bounds[0]+bounds[1])/2, bounds[2], (bounds[4]+bounds[5])/2
+  // and the second point at
+  // (bounds[0]+bounds[1])/2, bounds[3], (bounds[4]+bounds[5])/2
+  virtual void ActualPlaceWidget();
     
 //BTX
   // Description:
@@ -101,7 +108,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVLineWidget* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -110,7 +117,7 @@ protected:
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 
   friend class vtkLineWidgetObserver;
 //ETX
@@ -136,16 +143,10 @@ protected:
   vtkSetStringMacro(Point1Variable);
   vtkSetStringMacro(Point2Variable);
   vtkSetStringMacro(ResolutionVariable);
-  vtkSetStringMacro(Point1Object);
-  vtkSetStringMacro(Point2Object);
-  vtkSetStringMacro(ResolutionObject);
 
   char *Point1Variable;
   char *Point2Variable;
   char *ResolutionVariable;
-  char *Point1Object;
-  char *Point2Object;
-  char *ResolutionObject;
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
