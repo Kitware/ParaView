@@ -70,12 +70,13 @@ static Tcl_Interp *Et_Interp = 0;
 #include "kwappicon.h"
 #endif
 
-int vtkKWApplication::WidgetVisibility = 1;
+#include <tclInt.h>
 
+int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.138");
+vtkCxxRevisionMacro(vtkKWApplication, "1.139");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -528,20 +529,30 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   (void)err;
 
-  // This is mandatory, it does more than just finding the executable
+  // Set TCL_LIBRARY, TK_LIBRARY for the embedded version of Tk (kind
+  // of deprecated right now)
+
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
+  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
+  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+#endif
+
+  // This is mandatory *now*, it does more than just finding the executable
+  // (like finding the encodings, setting variables depending on the value
+  // of TCL_LIBRARY, TK_LIBRARY
 
   Tcl_FindExecutable(argv[0]);
 
-  // Add the path to our internal Tcl/Tk support library/packages 
-  // to the environment
+  // Find the path to our internal Tcl/Tk support library/packages
+  // if we are not using the installed Tcl/Tk
+  
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
 
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES)
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
-  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
-#else
   char tcl_library[1024] = "";
   char tk_library[1024] = "";
+
   const char *nameofexec = Tcl_GetNameOfExecutable();
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
@@ -552,15 +563,20 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     util->Delete();
 
     sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+    sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
+
+    // At this point this is useless, since the call to Tcl_FindExecutable
+    // already used the contents of the env variable. Anyway, let's just
+    // set them to comply with the path that we are about to set
+
     sprintf(buffer, "TCL_LIBRARY=%s", tcl_library);
     putenv(buffer);
-
-    sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
     sprintf(buffer, "TK_LIBRARY=%s", tk_library);
     putenv(buffer);
     }
 #endif
-#endif
+
+  // Create the interpreter
 
   interp = Tcl_CreateInterp();
   args = Tcl_Merge(argc-1, argv+1);
@@ -571,16 +587,21 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
+  // Sets the path to the Tcl and Tk library manually
+  // if we are not using the installed Tcl/Tk
+  // (nope, the env variables like TCL_LIBRARY were not used when the
+  // interpreter was created, they were used during the call to 
+  // Tcl_FindExecutable).
+
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
 
-  // It seems the environment is not propagated correctly to the interpreter,
-  // so set the libs explicitly
+  // Tcl lib path
 
   if (tcl_library && *tcl_library)
     {
-    if (!Tcl_SetVar(
-          interp, "tcl_library", tcl_library, TCL_LEAVE_ERR_MSG))
+    if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
+                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
       {
       if (err)
         {
@@ -589,10 +610,13 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       return NULL;
       }
     }
+  
+  // Tk lib path
 
   if (tk_library && *tk_library)
     {
-    if (!Tcl_SetVar(interp, "tk_library", tk_library, TCL_LEAVE_ERR_MSG))
+    if (!Tcl_SetVar(interp, "tk_library", tk_library, 
+                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
       {
       if (err)
         {
@@ -602,8 +626,53 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       }
     }
 
+  // Prepend our Tcl Tk lib path to the library paths
+  // This *is* mandatory if we want encodings files to be found, as they
+  // are searched by browsing TclGetLibraryPath().
+  // (nope, updating the Tcl tcl_libPath var won't do the trick)
+
+  Tcl_Obj *new_libpath = Tcl_NewObj();
+
+  if (tcl_library && *tcl_library)
+    {
+    Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
+    if (obj && 
+        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
+      {
+      *err << "Tcl_ListObjAppendElement error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    }
+  
+  if (tk_library && *tk_library)
+    {
+    Tcl_Obj *obj = Tcl_NewStringObj(tk_library, -1);
+    if (obj && 
+        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
+      {
+      *err << "Tcl_ListObjAppendElement error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    }
+  
+  // Actually let's be conservative for now and not use the
+  // predefined lib paths
+#if 0    
+  Tcl_Obj *old_libpath = TclGetLibraryPath();
+  if (old_libpath && 
+      !Tcl_ListObjAppendList(interp, new_libpath, old_libpath) !=TCL_OK && err)
+    {
+    *err << "Tcl_ListObjAppendList error: " 
+         << Tcl_GetStringResult(interp) << endl;
+    }
 #endif
- 
+
+  TclSetLibraryPath(new_libpath);
+
+#endif
+
+  // Init Tcl
+
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 
@@ -625,6 +694,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     return NULL;
     }
 
+  // Init Tk
+
   status = Tk_Init(interp);
   if (status != TCL_OK)
     {
@@ -644,10 +715,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   ApplicationIcon_DoInit(interp);
 #endif
 
-  // initialize VTK
+  // Initialize VTK
+
   Vtktcl_Init(interp);
 
-  // initialize Widgets
+  // Initialize Widgets
+
   if (vtkKWApplication::WidgetVisibility)
     {
     Vtkkwwidgetstcl_Init(interp);
