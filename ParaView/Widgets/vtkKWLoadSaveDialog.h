@@ -70,8 +70,8 @@ public:
   // Description:
   // Set the file types the dialog will open or save
   // Should be in TK format
-  vtkSetStringMacro( FileTypes );
-  vtkGetStringMacro( FileTypes );
+  vtkSetStringMacro(FileTypes);
+  vtkGetStringMacro(FileTypes);
 
   // Description:
   // Retrieve the file path that the user selected
@@ -99,12 +99,17 @@ public:
   vtkGetStringMacro(DefaultExtension);
   
   // Description:
+  // Set a filename to be displayed in the dialog when it pops up
+  vtkSetStringMacro(InitialFileName);
+  vtkGetStringMacro(InitialFileName);
+
+  // Description:
   // Set or reset the SaveDialog. If set, the dialog will be
   // save file dialog. If reset, the dialog will be load 
   // dialog
-  vtkSetClampMacro( SaveDialog, int, 0, 1 );
-  vtkBooleanMacro( SaveDialog, int );
-  vtkGetMacro( SaveDialog, int );
+  vtkSetClampMacro(SaveDialog, int, 0, 1);
+  vtkBooleanMacro(SaveDialog, int);
+  vtkGetMacro(SaveDialog, int);
 
   // Description:
   // Set or reset the ChooseDirectory ivar.
@@ -134,6 +139,7 @@ protected:
   ~vtkKWLoadSaveDialog();
 
   char *FileTypes;
+  char *InitialFileName;
   char *Title;
   char *FileName;
   char *DefaultExtension;
