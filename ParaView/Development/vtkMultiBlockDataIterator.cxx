@@ -21,12 +21,8 @@
 #include "vtkMultiBlockDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.1");
+vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.2");
 vtkStandardNewMacro(vtkMultiBlockDataIterator);
-
-vtkCxxSetObjectMacro(vtkMultiBlockDataIterator, 
-                     DataSet,
-                     vtkMultiBlockDataSet);
 
 class vtkMultiBlockDataIteratorInternal
 {
@@ -46,6 +42,25 @@ vtkMultiBlockDataIterator::~vtkMultiBlockDataIterator()
 {
   this->SetDataSet(0);
   delete this->Internal;
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiBlockDataIterator::SetDataSet(vtkMultiBlockDataSet* dataset)
+{
+  if (this->DataSet != dataset)
+    {
+    if (this->DataSet) 
+      { 
+      this->DataSet->UnRegister(this); 
+      }
+    this->DataSet = dataset;
+    if (this->DataSet) 
+      { 
+      this->DataSet->Register(this); 
+      this->GoToFirstItem();
+      }
+    this->Modified();
+    }   
 }
 
 //----------------------------------------------------------------------------

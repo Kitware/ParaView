@@ -21,12 +21,8 @@
 #include "vtkHierarchicalDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.2");
 vtkStandardNewMacro(vtkHierarchicalDataIterator);
-
-vtkCxxSetObjectMacro(vtkHierarchicalDataIterator, 
-                     DataSet,
-                     vtkHierarchicalDataSet);
 
 class vtkHierarchicalDataIteratorInternal
 {
@@ -50,6 +46,25 @@ vtkHierarchicalDataIterator::~vtkHierarchicalDataIterator()
 {
   this->SetDataSet(0);
   delete this->Internal;
+}
+
+//----------------------------------------------------------------------------
+void vtkHierarchicalDataIterator::SetDataSet(vtkHierarchicalDataSet* dataset)
+{
+  if (this->DataSet != dataset)
+    {
+    if (this->DataSet) 
+      { 
+      this->DataSet->UnRegister(this); 
+      }
+    this->DataSet = dataset;
+    if (this->DataSet) 
+      { 
+      this->DataSet->Register(this); 
+      this->GoToFirstItem();
+      }
+    this->Modified();
+    }   
 }
 
 //----------------------------------------------------------------------------
