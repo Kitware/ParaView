@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.39");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.40");
 
 
 //----------------------------------------------------------------------------
@@ -369,6 +369,8 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
          << "RemoveAllPoints"  << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "SetColorSpaceToHSVNoWrap"  << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
          << "RemoveAllPoints" << vtkClientServerStream::End;
   
@@ -729,7 +731,7 @@ void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
          << "AddHSVPoint" << range[1] << 0.8 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "SetColorSpaceToHSV" << vtkClientServerStream::End;
+         << "SetColorSpaceToHSVNoWrap" << vtkClientServerStream::End;
   
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
