@@ -296,6 +296,10 @@ void outputFunction(FILE *fp, FileInfo *data)
       strcmp(data->ClassName,currentFunction->Name) &&
       strcmp(data->ClassName,currentFunction->Name + 1))
     {
+    if(currentFunction->IsLegacy)
+      {
+      fprintf(fp,"#if !defined(VTK_LEGACY_REMOVE)\n");
+      }
     fprintf(fp,"  if (!strcmp(\"%s\",method) && msg.GetNumberOfArguments(0) == %i)\n",
             currentFunction->Name, currentFunction->NumberOfArguments+2);
     fprintf(fp, "    {\n");
@@ -355,6 +359,10 @@ void outputFunction(FILE *fp, FileInfo *data)
     fprintf(fp,"      return 1;\n");
     fprintf(fp,"      }\n");
     fprintf(fp,"    }\n");
+    if(currentFunction->IsLegacy)
+      {
+      fprintf(fp,"#endif\n");
+      }
 
     wrappedFunctions[numberOfWrappedFunctions] = currentFunction;
     numberOfWrappedFunctions++;
