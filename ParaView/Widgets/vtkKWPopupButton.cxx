@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.6");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.7");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -66,6 +66,7 @@ vtkKWPopupButton::vtkKWPopupButton()
 vtkKWPopupButton::~vtkKWPopupButton()
 {
   this->SetPopupTitle(0);
+
   if (this->PopupTopLevel)
     {
     this->PopupTopLevel->Delete();
@@ -106,7 +107,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   // Bind the button so that it popups the toplevel
 
   tk_cmd << "bind " << this->GetWidgetName() 
-         << " <ButtonPress> {" << this->GetTclName() << " DisplayPopupCallback}"
+         << " <ButtonPress> {" 
+         << this->GetTclName() << " DisplayPopupCallback}"
          << endl;
 
   // Create the toplevel
@@ -115,7 +117,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
 
   tk_cmd << "wm withdraw " << this->PopupTopLevel->GetWidgetName() << endl
          << "wm title " << this->PopupTopLevel->GetWidgetName() 
-         << " [wm title [winfo toplevel " << this->GetWidgetName() << "]]"<< endl
+         << " [wm title [winfo toplevel " 
+         << this->GetWidgetName() << "]]"<< endl
          << "wm transient " << this->PopupTopLevel->GetWidgetName() 
          << " " << this->GetWidgetName() << endl
          << "wm protocol " << this->PopupTopLevel->GetWidgetName()
@@ -150,7 +153,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   
   if ( this->PopupTitle )
     {
-    this->Script("wm title %s {%s}", this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
+    this->Script("wm title %s {%s}", 
+                 this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
     }
 
   // Update enable state
@@ -165,22 +169,26 @@ void vtkKWPopupButton::SetPopupTitle(const char* title)
     {
     return;
     }
+
   if ( vtkString::Equals(this->PopupTitle, title) )
     {
     return;
     }
+
   if ( this->PopupTitle )
     {
     delete [] this->PopupTitle;
     this->PopupTitle = 0;
     }
+
   if ( title )
     {
     this->PopupTitle = vtkString::Duplicate(title);
 
-    if ( this->IsCreated() && this->PopupTopLevel->IsCreated() )
+    if (this->IsCreated() && this->PopupTopLevel->IsCreated())
       {
-      this->Script("wm title %s {%s}", this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
+      this->Script("wm title %s {%s}", 
+                   this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
       }
     }
 }
@@ -286,6 +294,7 @@ void vtkKWPopupButton::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTopLevel: " << this->PopupTopLevel << endl;
   os << indent << "PopupFrame: " << this->PopupFrame << endl;
   os << indent << "PopupCloseButton: " << this->PopupCloseButton << endl;
-  os << indent << "PopupTitle: " << (this->PopupTitle?this->PopupTitle:"(none)") << endl;
+  os << indent << "PopupTitle: " 
+     << (this->PopupTitle ? this->PopupTitle : "(none)") << endl;
 }
 
