@@ -234,6 +234,23 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object,
   return str.str();
 }
 
+  
+  
+    
+void vtkKWMenu::CheckRadioButton(vtkKWObject* Object, 
+                                 const char* varname, int id)
+{
+  char *rbv = 
+    this->CreateRadioButtonVariable(Object,varname);
+  this->Script("set %s",rbv);
+  if (this->GetIntegerResult(this->Application) != id)
+    {
+    this->Script("set %s %d",rbv,id);
+    }
+  delete [] rbv;
+}
+
+
 void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
 			       vtkKWObject* Object, 
 			       const char* MethodAndArgString,
