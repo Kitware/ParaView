@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.8");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.9");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1280,7 +1280,7 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
 void vtkPVLookmarkManager::SetLookmarkIconCommand(vtkKWLookmark *lmkWidget, vtkIdType index)
 {
   ostrstream viewCallback;
-  viewCallback << "ViewLookmarkCallback " << index;
+  viewCallback << "ViewLookmarkCallback " << index << ends;
   lmkWidget->GetLmkIcon()->UnsetBind("<Button-1>");
   lmkWidget->GetLmkIcon()->UnsetBind("<Double-1>");
   lmkWidget->GetLmkIcon()->SetBind(this, "<Button-1>", viewCallback.str());
@@ -3807,7 +3807,7 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
     vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(lmkItem);
     if(!this->LmkFolderWidgets->IsItemPresent(oldLmkFolder))
       {
-      oldLmkFolder->RemoveFolder();
+      oldLmkFolder->Delete();
       this->Script("destroy %s", oldLmkFolder->GetWidgetName());
       if(oldLmkFolder)
         {
