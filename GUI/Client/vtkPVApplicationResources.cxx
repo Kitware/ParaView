@@ -73,8 +73,10 @@
 #include "Resources/vtkPVAMRPartButton.h"
 #include "Resources/vtkPVAMROutlineButton.h"
 #include "Resources/vtkPVAMRSurfaceButton.h"
-
-
+#include "Resources/vtkPVRamp.h"
+#include "Resources/vtkPVStep.h"
+#include "Resources/vtkPVExponential.h"
+#include "Resources/vtkPVSinusoid.h"
 
 // Splash screen
 
@@ -390,6 +392,34 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVAMRSurfaceButton_height,
                     image_PVAMRSurfaceButton_pixel_size,
                     image_PVAMRSurfaceButton_buffer_length);
+
+  this->CreatePhoto("PVRamp",
+    image_PVRamp,
+    image_PVRamp_width,
+    image_PVRamp_height,
+    image_PVRamp_pixel_size,
+    image_PVRamp_buffer_length);
+
+  this->CreatePhoto("PVStep",
+    image_PVStep,
+    image_PVStep_width,
+    image_PVStep_height,
+    image_PVStep_pixel_size,
+    image_PVStep_buffer_length);
+
+  this->CreatePhoto("PVExponential",
+    image_PVExponential,
+    image_PVExponential_width,
+    image_PVExponential_height,
+    image_PVExponential_pixel_size,
+    image_PVExponential_buffer_length);
+  
+  this->CreatePhoto("PVSinusoid",
+    image_PVSinusoid,
+    image_PVSinusoid_width,
+    image_PVSinusoid_height,
+    image_PVSinusoid_pixel_size,
+    image_PVSinusoid_buffer_length);
 
 }
 

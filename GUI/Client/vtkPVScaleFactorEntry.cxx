@@ -23,29 +23,32 @@
 #include "vtkSMBoundsDomain.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.14");
-
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.15");
+//-----------------------------------------------------------------------------
 vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
-  this->ScaleFactor = 0.1;
 }
 
+//-----------------------------------------------------------------------------
 vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
 {
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::Initialize()
 {
   this->Superclass::Initialize();
   this->Update();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::Update()
 {
   this->UpdateScaleFactor();
   this->vtkPVWidget::Update();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::UpdateScaleFactor()
 {
   vtkSMProperty *prop = this->GetSMProperty();
@@ -65,35 +68,14 @@ void vtkPVScaleFactorEntry::UpdateScaleFactor()
     this->Superclass::Update();
     return;
     }
-  
-  int exists, i;
-  
-  double bnds[6];
-  
-  for (i = 0; i < 3; i++)
-    {
-    bnds[2*i] = dom->GetMinimum(i, exists);
-    if (!exists)
-      {
-      bnds[2*i] = 0;
-      }
-    bnds[2*i+1] = dom->GetMaximum(i, exists);
-    if (!exists)
-      {
-      bnds[2*i+1] = 1;
-      }
-    } 
-  
-  double maxBnds = bnds[1] - bnds[0];
-  maxBnds = (bnds[3] - bnds[2] > maxBnds) ? (bnds[3] - bnds[2]) : maxBnds;
-  maxBnds = (bnds[5] - bnds[4] > maxBnds) ? (bnds[5] - bnds[4]) : maxBnds;
-  maxBnds *= this->ScaleFactor;
-  
+  int exists;
+  double max = dom->GetMaximum(0, exists);
   char value[1000];
-  sprintf(value, "%g", maxBnds);
+  sprintf(value, "%g", max);
   this->SetValue(value);
 }
 
+//-----------------------------------------------------------------------------
 int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
                                               vtkPVXMLPackageParser *parser)
 {
@@ -102,13 +84,6 @@ int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
     return 0;
     }
 
-  // Setup the scaling.
-  if(!element->GetScalarAttribute("scale_factor",
-                                  &this->ScaleFactor))
-    {
-    this->ScaleFactor = 0.1;
-    }
-  
   const char* input_menu = element->GetAttribute("input_menu");
   if (input_menu)
     {
@@ -136,22 +111,8 @@ int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
   return 1;
 }
 
-void vtkPVScaleFactorEntry::CopyProperties(
-  vtkPVWidget *clone, vtkPVSource *source,
-  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
-{
-  this->Superclass::CopyProperties(clone, source, map);
-  vtkPVScaleFactorEntry *pvsfe = vtkPVScaleFactorEntry::SafeDownCast(clone);
-  if (pvsfe)
-    {
-    pvsfe->ScaleFactor = this->ScaleFactor;
-    }
-}                        
-
 //----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
-  os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
 }

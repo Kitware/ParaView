@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.6");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -31,6 +31,7 @@ vtkSMBoundsDomain::vtkSMBoundsDomain()
 {
   this->Mode = vtkSMBoundsDomain::NORMAL;
   this->InputInformation = 0;
+  this->ScaleFactor = 0.1;
 }
 
 //---------------------------------------------------------------------------
@@ -166,6 +167,15 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
         this->AddMinimum(0, -magn);
         this->AddMaximum(0,  magn);
         }
+      else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
+        {
+        double maxbounds = bounds[1] - bounds[0];
+        maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
+        maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
+        maxbounds *= this->ScaleFactor;
+        this->AddMinimum(0, 0);
+        this->AddMaximum(0, maxbounds);
+        }
       return;
       }
     }
@@ -193,11 +203,21 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
       {
       this->Mode = vtkSMBoundsDomain::ORIENTED_MAGNITUDE;
       }
+    else if (strcmp(mode, "scaled_extent") == 0)
+      {
+      this->Mode = vtkSMBoundsDomain::SCALED_EXTENT;
+      }
     else
       {
       vtkErrorMacro("Unrecognized mode: " << mode);
       return 0;
       }
+    }
+
+  const char* scalefactor = element->GetAttribute("scale_factor");
+  if (scalefactor)
+    {
+    sscanf(scalefactor,"%lf", &this->ScaleFactor);
     }
   
   return 1;
@@ -209,4 +229,5 @@ void vtkSMBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Mode: " << this->Mode << endl;
+  os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
 }

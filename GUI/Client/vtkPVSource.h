@@ -485,6 +485,8 @@ public:
   // This legacy method is for backward compatability.
   void SetAcceptButtonColorToModified();
 
+  // Description:
+  void MarkSourcesForUpdate();
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -498,8 +500,6 @@ protected:
 
   virtual void InitializeWidgets();  
 
-  // Description:
-  void MarkSourcesForUpdate();
 
   vtkPVColorMap *PVColorMap;
   

@@ -1668,8 +1668,7 @@
         command="SetWidth"
         number_of_elements="1"
         default_values="1" >
-       <DoubleRangeDomain name="range"/>
-       <BoundsDomain name="bounds">
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.01">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
          </RequiredProperties>
@@ -1999,8 +1998,7 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain name="range" min="0"/>
-        <BoundsDomain name="bounds">
+        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.01">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>
@@ -2640,8 +2638,7 @@
         command="SetMaximumPropagation"
         number_of_elements="1"
         default_values="1.0" >
-       <DoubleRangeDomain name="range"/>
-       <BoundsDomain name="bounds">
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
          </RequiredProperties>
@@ -3078,13 +3075,13 @@
      <!-- This is a hack used to bypass the fact that ParaView
           does not have special proxies for things like point sources.
           It should be removed in the future -->
+     <!-- TODO: Should this be removed now? -->
      <DoubleVectorProperty
         name="Radius"
         number_of_elements="1"
         default_values="0.1"
         information_only="1">
-        <DoubleRangeDomain name="range"/>
-        <BoundsDomain name="bounds">
+        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>
@@ -3113,8 +3110,7 @@
         command="SetMaximumPropagation"
         number_of_elements="1"
         default_values="1.0" >
-       <DoubleRangeDomain name="range"/>
-       <BoundsDomain name="bounds">
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
          </RequiredProperties>

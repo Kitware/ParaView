@@ -844,4 +844,360 @@
       </SubProxy>
     </BoxWidgetProxy>
   </ProxyGroup>
+
+  <ProxyGroup name="animation">
+    <AnimationCueProxy name="AnimationCue" class="notused">
+      <!-- No server side objects created. All properties are updateself -->
+      <IntVectorProperty
+         name="TimeMode"
+         command="SetTimeMode"
+         number_of_elements="1" 
+         update_self="1"
+         default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Normalized" />
+          <Entry value="1" text="Relative" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+   
+      <DoubleVectorProperty
+        name="StartTime"
+        command="SetStartTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="EndTime"
+        command="SetEndTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </DoubleVectorProperty>
+      
+      <ProxyProperty name="AnimatedProxy" 
+        command="SetAnimatedProxy"
+        update_self="1">
+      </ProxyProperty>
+
+      <StringVectorProperty
+        name="AnimatedPropertyName" 
+        command="SetAnimatedPropertyName"
+        number_of_elements="1"
+        update_self="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AnimatedDomainName"
+        command="SetAnimatedDomainName"
+        number_of_elements="1"
+        update_self="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty
+        name="AnimatedElement"
+        command="SetAnimatedElement"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <ProxyProperty name="Manipulator"
+        command="SetManipulator"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_manipulators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </AnimationCueProxy>
+
+    <!--Scene -->
+    <AnimationSceneProxy name="AnimationScene" class="notused">
+      <!-- No server side objects created. All properties are updateself -->
+      <IntVectorProperty
+         name="TimeMode"
+         command="SetTimeMode"
+         number_of_elements="1" 
+         update_self="1"
+         default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Normalized" />
+          <Entry value="1" text="Relative" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+    
+      <DoubleVectorProperty
+        name="StartTime"
+        command="SetStartTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="EndTime"
+        command="SetEndTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </DoubleVectorProperty>
+      
+      <ProxyProperty name="AnimatedProxy" 
+        command="SetAnimatedProxy"
+        update_self="1">
+      </ProxyProperty>
+
+      <StringVectorProperty
+        name="AnimatedPropertyName" 
+        command="SetAnimatedPropertyName"
+        number_of_elements="1"
+        update_self="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AnimatedDomainName"
+        command="SetAnimatedDomainName"
+        number_of_elements="1"
+        update_self="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty
+        name="AnimatedElement"
+        command="SetAnimatedElement"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <ProxyProperty name="Manipulator"
+        command="SetManipulator"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_manipulators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="Loop"
+        command="SetLoop"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="FrameRate"
+        command="SetFrameRate"
+        number_of_elements="1"
+        update_self="1"
+        default_values="10">
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Cue"
+        command="AddCue"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty
+        name="PlayMode"
+        command="SetPlayMode"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Sequence" />
+          <Entry value="1" text="Realtime" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+    </AnimationSceneProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="animation_manipulators">
+    <LinearAnimationCueManipulatorProxy name="LinearAnimationCueManipulator"
+      class="notused">
+      <DoubleVectorProperty
+        name="StartValue"
+        command="SetStartValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="EndValue"
+        command="SetEndValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+    </LinearAnimationCueManipulatorProxy>
+
+    <KeyFrameAnimationCueManipulatorProxy name="KeyFrameAnimationCueManipulator"
+      class="notused">
+      <ProxyProperty
+        name="KeyFrame"
+        command="AddKeyFrame"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_keyframes" />
+        </ProxyGroupDomain>
+      </ProxyProperty>  
+    </KeyFrameAnimationCueManipulatorProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="animation_keyframes">
+    <KeyFrameProxy name="KeyFrame" class="notused">
+      <DoubleVectorProperty
+        name="KeyTime"
+        command="SetKeyTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+    
+      <DoubleVectorProperty
+        name="KeyValue"
+        command="SetKeyValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+    </KeyFrameProxy>
+      
+    <BooleanKeyFrameProxy name="BooleanKeyFrame" class="notused">
+      <DoubleVectorProperty
+        name="KeyTime"
+        command="SetKeyTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+    
+      <DoubleVectorProperty
+        name="KeyValue"
+        command="SetKeyValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+    </BooleanKeyFrameProxy>
+
+    
+    <RampKeyFrameProxy name="RampKeyFrame" class="notused">
+      <DoubleVectorProperty
+        name="KeyTime"
+        command="SetKeyTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+    
+      <DoubleVectorProperty
+        name="KeyValue"
+        command="SetKeyValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+    </RampKeyFrameProxy>
+
+    <ExponentialKeyFrameProxy name="ExponentialKeyFrame" class="notused">
+      <DoubleVectorProperty
+        name="KeyTime"
+        command="SetKeyTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+    
+      <DoubleVectorProperty
+        name="KeyValue"
+        command="SetKeyValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Base"
+        command="SetBase"
+        number_of_elements="1"
+        update_self="1"
+        default_values="2.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="StartPower"
+        command="SetStartPower"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="EndPower"
+        command="SetEndPower"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+    </ExponentialKeyFrameProxy>
+
+    <SinusoidKeyFrameProxy name="SinusoidKeyFrame" class="notused">
+      <DoubleVectorProperty
+        name="KeyTime"
+        command="SetKeyTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+    
+      <DoubleVectorProperty
+        name="KeyValue"
+        command="SetKeyValue"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Phase"
+        command="SetPhase"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Frequency"
+        command="SetFrequency"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Offset"
+        command="SetOffset"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+    </SinusoidKeyFrameProxy>
+
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

@@ -108,6 +108,11 @@ public:
   vtkSMDomain* GetDomain(const char* name);
 
   // Description:
+  // Returns the number of domains this property has. This can be 
+  // used to specify a valid index for GetDomain(index).
+  unsigned int GetNumberOfDomains();
+
+  // Description:
   // Calls Update() on all domains contained by the property
   // as well as all dependant domains. This is usually called
   // after SetUncheckedXXX() to tell all dependant domains to

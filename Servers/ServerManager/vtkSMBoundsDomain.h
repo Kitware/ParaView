@@ -42,20 +42,26 @@ public:
   virtual void Update(vtkSMProperty*);
 
   // Description:
-  vtkSetClampMacro(Mode, int, 0, 2);
+  vtkSetClampMacro(Mode, int, 0, 3);
   vtkGetMacro(Mode, int);
 
   // Description:
   void SetInputInformation(vtkPVDataInformation* input);
 
 //BTX
+  // Description:
+  // SCALED_EXTENT: is used for vtkPVScaleFactorEntry.
   enum Modes
   {
     NORMAL,
     MAGNITUDE,
-    ORIENTED_MAGNITUDE
+    ORIENTED_MAGNITUDE,
+    SCALED_EXTENT
   };
 //ETX
+
+  vtkSetMacro(ScaleFactor, double);
+  vtkGetMacro(ScaleFactor, double);
 
 protected:
   vtkSMBoundsDomain();
@@ -72,6 +78,8 @@ protected:
   int Mode;
 
   vtkPVDataInformation* InputInformation;
+
+  double ScaleFactor; // Used only in SCALED_EXTENT mode.
 
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented

@@ -19,7 +19,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMBooleanDomain);
-vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMBooleanDomain::vtkSMBooleanDomain()
@@ -50,6 +50,22 @@ int vtkSMBooleanDomain::IsInDomain(vtkSMProperty* property)
     }
 
   return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMBooleanDomain::SetAnimationValue(vtkSMProperty* property,
+  int idx, double value)
+{
+  if (!property)
+    {
+    return;
+    }
+  vtkSMIntVectorProperty* ivp = 
+    vtkSMIntVectorProperty::SafeDownCast(property);
+  if (ivp)
+    {
+    ivp->SetElement(idx, static_cast<int>(value));
+    }
 }
 
 //---------------------------------------------------------------------------

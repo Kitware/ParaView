@@ -89,6 +89,9 @@ class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkSMAxesProxy;
+class vtkKWSplitFrame;
+
+class vtkPVAnimationManager;
 
 //BTX
 template <class key, class data> 
@@ -148,7 +151,7 @@ public:
   // Description:
   // Find a data source with name "sourcename" in the source list called
   // "listname"
-  vtkPVSource *GetPVSource(const char* listname, char* sourcename);
+  vtkPVSource *GetPVSource(const char* listname, const char* sourcename);
 
   // Description:
   // This method is called when error icon is clicked.
@@ -174,6 +177,7 @@ public:
   // Description:
   // Callback to show the animation page.
   void ShowAnimationProperties();
+  void ShowAnimationPanes();
 
   // Description:
   // Access to the toolbars.
@@ -264,7 +268,15 @@ public:
   // Stuff for creating a log file for times.
   void ShowTimerLog();
   void ShowErrorLog();
-  
+ 
+  // Description:
+  // Callback for saving animation as images.
+  void SaveAnimation();
+
+  // Description:
+  // Callback for saving animation geometry in a series of .vtp files.
+  void SaveGeometry();
+
   // Description:
   // Callback fronm the file menus "SaveData" entry.
   // It pops up a dialog to get the filename.
@@ -324,6 +336,7 @@ public:
   // Description:
   // Access to the animation interface for scripting.
   vtkGetObjectMacro(AnimationInterface, vtkPVAnimationInterface);
+  vtkGetObjectMacro(AnimationManager, vtkPVAnimationManager);
 
   // Description:
   // Add a prototype from which a module can be created.
@@ -542,6 +555,15 @@ public:
   //             "camera"      : camera toolbar.
   void SetToolbarVisibility(const char* identifier, int state);
 
+  // Description:
+  // This changes the visibility of the Horizontal pane.
+  // Animation key frames are shown in the Horizontal pane.
+  int GetHorizontalPaneVisibility();
+  void SetHorizontalPaneVisibility(int);
+  void HideHorizontalPane() { this->SetHorizontalPaneVisibility(0); }
+  void ShowHorizontalPane() { this->SetHorizontalPaneVisibility(1); }
+  void ToggleHorizontalPaneVisibilityCallback();
+
   // Description::
   // Override Unregister since widgets have loops.
   virtual void UnRegister(vtkObjectBase *o);
@@ -627,6 +649,7 @@ protected:
   // if we ever get more that one renderer, the animation
   // will save out the window with all renderers.
   vtkPVAnimationInterface *AnimationInterface;
+  vtkPVAnimationManager* AnimationManager;
 
   // Initialization methods called from create.
   void InitializeMenus(vtkKWApplication* app);
@@ -716,7 +739,8 @@ protected:
 
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
-
+  vtkKWSplitFrame *LowerFrame;
+  
   vtkClientServerID ServerFileListingID;
 
   vtkSMAxesProxy *CenterAxesProxy; 

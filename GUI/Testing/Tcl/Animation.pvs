@@ -1,0 +1,229 @@
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
+set kw(vtkTemp640) [$kw(vtkTemp5) CreatePVSource SphereSource]
+set kw(vtkTemp641) [$kw(vtkTemp640) GetPVWidget {Center}]
+$kw(vtkTemp641) SetValue 0 0 0
+set kw(vtkTemp647) [$kw(vtkTemp640) GetPVWidget {Radius}]
+$kw(vtkTemp647) SetValue 0.5
+set kw(vtkTemp653) [$kw(vtkTemp640) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp653) SetValue 8
+set kw(vtkTemp658) [$kw(vtkTemp640) GetPVWidget {Start Theta}]
+$kw(vtkTemp658) SetValue 0
+set kw(vtkTemp663) [$kw(vtkTemp640) GetPVWidget {End Theta}]
+$kw(vtkTemp663) SetValue 360
+set kw(vtkTemp668) [$kw(vtkTemp640) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp668) SetValue 8
+set kw(vtkTemp673) [$kw(vtkTemp640) GetPVWidget {Start Phi}]
+$kw(vtkTemp673) SetValue 0
+set kw(vtkTemp678) [$kw(vtkTemp640) GetPVWidget {End Phi}]
+$kw(vtkTemp678) SetValue 180
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp640) AcceptCallback
+set kw(vtkTemp706) [$kw(vtkTemp5) CreatePVSource SphereSource]
+set kw(vtkTemp707) [$kw(vtkTemp706) GetPVWidget {Center}]
+$kw(vtkTemp707) SetValue 1 0 0
+set kw(vtkTemp713) [$kw(vtkTemp706) GetPVWidget {Radius}]
+$kw(vtkTemp713) SetValue 0.5
+set kw(vtkTemp719) [$kw(vtkTemp706) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp719) SetValue 8
+set kw(vtkTemp724) [$kw(vtkTemp706) GetPVWidget {Start Theta}]
+$kw(vtkTemp724) SetValue 0
+set kw(vtkTemp729) [$kw(vtkTemp706) GetPVWidget {End Theta}]
+$kw(vtkTemp729) SetValue 360
+set kw(vtkTemp734) [$kw(vtkTemp706) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp734) SetValue 8
+set kw(vtkTemp739) [$kw(vtkTemp706) GetPVWidget {Start Phi}]
+$kw(vtkTemp739) SetValue 0
+set kw(vtkTemp744) [$kw(vtkTemp706) GetPVWidget {End Phi}]
+$kw(vtkTemp744) SetValue 180
+$kw(vtkTemp706) AcceptCallback
+$kw(vtkTemp5) ResetCameraCallback
+$kw(vtkTemp5) ShowAnimationPanes
+set kw(vtkTemp778) [$kw(vtkTemp5) GetAnimationManager]
+set kw(vtkTemp454) [$kw(vtkTemp778) GetHAnimationInterface]
+set kw(vtkTemp457) [$kw(vtkTemp454) GetParentTree]
+set kw(vtkTemp683) [$kw(vtkTemp457) GetChild "_Scene_.Sources;Sphere1"]
+$kw(vtkTemp683) SetExpanded 1
+set kw(vtkTemp478) [$kw(vtkTemp778) GetAnimationScene]
+$kw(vtkTemp478) SetCurrentTime 1.096224
+$kw(vtkTemp778) SetCurrentTime 0.018270
+set kw(vtkTemp699) [$kw(vtkTemp683) GetChild "_Scene_.Sources;Sphere1.Radius.0"]
+$kw(vtkTemp699) CreateAndAddKeyFrame 0.018270 0
+set kw(vtkTemp780) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_0"]
+$kw(vtkTemp780) SetKeyTime 0.018270
+$kw(vtkTemp780) SetKeyValue 0.000000
+$kw(vtkTemp457) RemoveKeyFrame 0
+$kw(vtkTemp683) RemoveKeyFrame 0
+$kw(vtkTemp780) SetKeyValue 0.500000
+$kw(vtkTemp699) GetFocus
+set kw(vtkTemp464) [$kw(vtkTemp778) GetVAnimationInterface]
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp478) SetCurrentTime 28.574909
+$kw(vtkTemp778) SetCurrentTime 0.476248
+$kw(vtkTemp699) CreateAndAddKeyFrame 0.476248 0
+set kw(vtkTemp783) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_1"]
+$kw(vtkTemp783) SetKeyTime 0.476248
+$kw(vtkTemp783) SetKeyValue 0.000000
+$kw(vtkTemp457) RemoveKeyFrame 0
+$kw(vtkTemp683) RemoveKeyFrame 0
+$kw(vtkTemp457) RemoveKeyFrame 0
+$kw(vtkTemp783) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp478) SetCurrentTime 55.688185
+$kw(vtkTemp778) SetCurrentTime 0.928136
+$kw(vtkTemp699) CreateAndAddKeyFrame 0.928136 0
+set kw(vtkTemp786) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_2"]
+$kw(vtkTemp786) SetKeyTime 0.928136
+$kw(vtkTemp786) SetKeyValue 0.000000
+$kw(vtkTemp683) SetKeyFrameTime 0 0.018270
+$kw(vtkTemp457) SetKeyFrameTime 0 0.018270
+$kw(vtkTemp457) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp786) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp457) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp683) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp780) SetKeyTime 0.000000
+$kw(vtkTemp464) SetKeyFrameType 3
+set kw(vtkTemp789) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_0"]
+$kw(vtkTemp789) SetKeyTime 0.000000
+$kw(vtkTemp789) SetKeyValue 0.500000
+$kw(vtkTemp457) SetKeyFrameTime 0 0.476248
+$kw(vtkTemp457) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 0 0.476248
+$kw(vtkTemp683) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp457) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp683) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp789) SetOffset 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameType 2
+set kw(vtkTemp804) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_1"]
+$kw(vtkTemp804) SetKeyTime 0.476248
+$kw(vtkTemp804) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp786) SetKeyValue 1.000000
+$kw(vtkTemp464) SetKeyFrameType 1
+set kw(vtkTemp810) [$kw(vtkTemp699) GetKeyFrame "KeyFrameName_2"]
+$kw(vtkTemp810) SetKeyTime 0.928136
+$kw(vtkTemp810) SetKeyValue 1.000000
+$kw(vtkTemp683) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 1 0.476248
+$kw(vtkTemp683) SetKeyFrameTime 1 0.476248
+$kw(vtkTemp683) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 1 0.928136
+$kw(vtkTemp683) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp457) SetKeyFrameTime 1 1.000000
+$kw(vtkTemp683) SetKeyFrameTime 1 1.000000
+$kw(vtkTemp810) SetKeyTime 1.000000
+$kw(vtkTemp478) SetDuration 20.000000
+$kw(vtkTemp478) SetFrameRate 1.000000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp804) SetKeyTime 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp683) SetExpanded 0
+set kw(vtkTemp751) [$kw(vtkTemp457) GetChild "_Scene_.Sources;Sphere2"]
+$kw(vtkTemp751) SetExpanded 1
+$kw(vtkTemp478) SetCurrentTime 0.243605
+$kw(vtkTemp778) SetCurrentTime 0.012180
+set kw(vtkTemp767) [$kw(vtkTemp751) GetChild "_Scene_.Sources;Sphere2.Radius.0"]
+$kw(vtkTemp767) CreateAndAddKeyFrame 0.012180 0
+set kw(vtkTemp813) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_3"]
+$kw(vtkTemp813) SetKeyTime 0.012180
+$kw(vtkTemp813) SetKeyValue 0.000000
+$kw(vtkTemp751) RemoveKeyFrame 0
+$kw(vtkTemp813) SetKeyValue 0.500000
+$kw(vtkTemp767) GetFocus
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp478) SetCurrentTime 9.890378
+$kw(vtkTemp778) SetCurrentTime 0.494519
+$kw(vtkTemp767) CreateAndAddKeyFrame 0.494519 0
+set kw(vtkTemp816) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_4"]
+$kw(vtkTemp816) SetKeyTime 0.494519
+$kw(vtkTemp816) SetKeyValue 0.000000
+$kw(vtkTemp751) RemoveKeyFrame 0
+$kw(vtkTemp816) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp478) SetCurrentTime 19.512789
+$kw(vtkTemp778) SetCurrentTime 0.975639
+$kw(vtkTemp767) CreateAndAddKeyFrame 0.975639 0
+set kw(vtkTemp819) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_5"]
+$kw(vtkTemp819) SetKeyTime 0.975639
+$kw(vtkTemp819) SetKeyValue 0.000000
+$kw(vtkTemp751) SetKeyFrameTime 0 0.012180
+$kw(vtkTemp751) SetKeyFrameTime 1 0.975639
+$kw(vtkTemp819) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp751) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp751) SetKeyFrameTime 1 0.975639
+$kw(vtkTemp813) SetKeyTime 0.000000
+$kw(vtkTemp464) SetKeyFrameType 3
+set kw(vtkTemp822) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_3"]
+$kw(vtkTemp822) SetKeyTime 0.000000
+$kw(vtkTemp822) SetKeyValue 0.500000
+$kw(vtkTemp751) SetKeyFrameTime 0 0.494519
+$kw(vtkTemp751) SetKeyFrameTime 1 0.975639
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp751) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp751) SetKeyFrameTime 1 0.975639
+$kw(vtkTemp464) SetKeyFrameIndex 0
+$kw(vtkTemp822) SetOffset -0.500000
+$kw(vtkTemp822) SetOffset 0.300000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameType 1
+set kw(vtkTemp837) [$kw(vtkTemp767) GetKeyFrame "KeyFrameName_4"]
+$kw(vtkTemp837) SetKeyTime 0.494519
+$kw(vtkTemp837) SetKeyValue 0.500000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp837) SetKeyValue 0.100000
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp464) SetKeyFrameIndex 2
+$kw(vtkTemp751) SetKeyFrameTime 0 0.000000
+$kw(vtkTemp751) SetKeyFrameTime 1 1.000000
+$kw(vtkTemp819) SetKeyTime 1.000000
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp464) SetKeyFrameIndex 1
+$kw(vtkTemp837) SetKeyTime 0.425000
+$kw(vtkTemp478) SetCurrentTime 0.000000
+update
+$kw(vtkTemp464) SetCacheGeometry 0
+$kw(vtkTemp478) Play
+update
+$kw(vtkTemp478) SetCurrentTime 0.000000
+$kw(vtkTemp478) SetCurrentTime 9.000000
+update
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

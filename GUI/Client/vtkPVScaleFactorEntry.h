@@ -37,23 +37,15 @@ public:
   // Initialize after creation
   virtual void Initialize();
 
-  vtkSetMacro(ScaleFactor, float);
-  
 protected:
   vtkPVScaleFactorEntry();
   ~vtkPVScaleFactorEntry();
   
   virtual void UpdateScaleFactor();
 
-//BTX
-  virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
                                 vtkPVXMLPackageParser* parser);  
   
-  float ScaleFactor;
-
 private:
   vtkPVScaleFactorEntry(const vtkPVScaleFactorEntry&); // Not implemented
   void operator=(const vtkPVScaleFactorEntry&); // Not implemented

@@ -1,0 +1,69 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkSMAnimationCueManipulatorProxy.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkSMAnimationCueManipulatorProxy
+// .SECTION Description
+// Manipulator provides means to animate with various time functions.
+// .SECTION See Also
+// vtkSMAnimationCueProxy
+
+#ifndef __vtkSMAnimationCueManipulatorProxy_h
+#define __vtkSMAnimationCueManipulatorProxy_h
+
+#include "vtkSMProxy.h"
+class vtkSMAnimationCueProxy;
+class vtkClientServerID;
+
+class VTK_EXPORT vtkSMAnimationCueManipulatorProxy : public vtkSMProxy
+{
+public:
+  vtkTypeRevisionMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  vtkClientServerID GetID() {return this->SelfID;}
+
+  virtual void SaveInBatchScript(ofstream* file);
+protected:
+  // Description:
+  // This method is called when the AnimationCue's StartAnimationCueEvent is
+  // triggerred, to let the animation manipulator know that the cue has
+  // been restarted. This is here for one major reason: after the last key frame,
+  // the state of the scene must be as it was left a the the last key frame. This does not
+  // happend automatically, since if while animating the currentime never coincides with the 
+  // last key frame's key time, then it never gets a chance to update the properties value.
+  // Hence, we note when the cue begins. Then, if the currentime is beyond that of the last key 
+  // frame we pretend that the current time coincides with that of the last key frame and let
+  // it update the properties. This is done only once per Animation cycle. The Initialize method
+  // is used to indicate that a new animation cycle has begun.
+  virtual void Initialize(){ }
+  
+  // Description:
+  // This updates the values based on currenttime.
+  // currenttime is normalized to the time range of the Cue.
+  virtual void UpdateValue(double currenttime, 
+    vtkSMAnimationCueProxy* cueproxy)=0;
+
+  vtkSMAnimationCueManipulatorProxy();
+  ~vtkSMAnimationCueManipulatorProxy();
+//BTX
+  friend class vtkSMAnimationCueProxy;
+//ETX
+private:
+  vtkSMAnimationCueManipulatorProxy(const vtkSMAnimationCueManipulatorProxy&); // Not implemented.
+  void operator=(const vtkSMAnimationCueManipulatorProxy&); // Not implemented.
+  
+};
+
+#endif
+

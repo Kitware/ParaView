@@ -391,5 +391,76 @@
         <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
     </WriterProxy>
+
+    <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
+      <StringVectorProperty name="FileName" command="SetFileName" />
+      
+      <IntVectorProperty 
+        name="NumberOfPieces" 
+        command="SetNumberOfPieces"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="-1"/>
+      </IntVectorProperty>
+<!--     
+      <IntVectorProperty name="PieceInfo"
+        command="GetPartitionId"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Piece" command="SetPiece"
+        information_property="PieceInfo">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+-->  
+      
+      <ProxyProperty 
+        name="Input" 
+        commad="AddInput"
+        update_self="1">
+        <!--What is the group for vtkSMPartDisplayProxy ? -->
+      </ProxyProperty>
+     
+      <Property
+        name="Start"
+        command="Start"
+        update_self="1"
+        immediate_update="1">
+      </Property>
+      
+      <DoubleVectorProperty 
+        name="WriteTime" 
+        command="WriteTime" 
+        number_of_elements="1"
+        update_self="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      
+      <Property
+        name="Finish"
+        command="Finish"
+        update_self="1"
+        immediate_update="1">
+      </Property>
+
+    </XMLPVAnimationWriterProxy>
+
+    <SummaryHelperProxy name="SummaryHelper" class="vtkPVSummaryHelper">
+      <ProxyProperty name="Writer" command="SetWriter">
+        <ProxyGroupDomain name="group">
+          <Group name="writers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property
+        name="SynchronizeSummaryFiles"
+        command="SynchronizeSummaryFiles"
+        immediate_update="1">
+      </Property>
+    </SummaryHelperProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

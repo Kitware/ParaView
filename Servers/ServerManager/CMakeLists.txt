@@ -8,6 +8,16 @@ SET( ServerManagerCommon_SRCS
   vtkSMLineWidgetProxy.cxx
   vtkSMPointWidgetProxy.cxx 
   vtkSMSphereWidgetProxy.cxx
+  vtkSMKeyFrameProxy.cxx
+  vtkSMBooleanKeyFrameProxy.cxx
+  vtkSMRampKeyFrameProxy.cxx
+  vtkSMExponentialKeyFrameProxy.cxx
+  vtkSMSinusoidKeyFrameProxy.cxx
+  vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMLinearAnimationCueManipulatorProxy.cxx
+  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
+  vtkSMAnimationCueProxy.cxx
+  vtkSMAnimationSceneProxy.cxx
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
@@ -42,6 +52,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
+  vtkSMPropertyStatusManager.cxx
   vtkSMProxy.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
@@ -57,6 +68,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
+  vtkSMSummaryHelperProxy.cxx
   vtkSMTransformProxy.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
@@ -70,6 +82,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMCubeAxesDisplay.cxx
   vtkSMPlotDisplay.cxx
   vtkSMPointLabelDisplay.cxx
+  vtkSMXMLPVAnimationWriterProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -93,6 +106,7 @@ SET( ServerManager_SRCS
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
+  vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx

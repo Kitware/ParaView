@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMProperty, "1.25");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -141,6 +141,12 @@ vtkSMDomain* vtkSMProperty::GetDomain(const char* name)
     }
 
   return it->second.GetPointer();
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProperty::GetNumberOfDomains()
+{
+  return this->PInternals->Domains.size();
 }
 
 //---------------------------------------------------------------------------

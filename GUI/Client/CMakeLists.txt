@@ -70,7 +70,19 @@ SET( ParaViewClient_SRCS
   vtkKWView.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
+  vtkPVTimeLine.cxx
+  vtkPVAnimationScene.cxx
   vtkPVAnimationInterface.cxx
+  vtkPVAnimationCue.cxx
+  vtkPVAnimationCueTree.cxx
+  vtkPVKeyFrame.cxx
+  vtkPVRampKeyFrame.cxx
+  vtkPVBooleanKeyFrame.cxx
+  vtkPVExponentialKeyFrame.cxx
+  vtkPVSinusoidKeyFrame.cxx
+  vtkPVAnimationManager.cxx
+  vtkPVHorizontalAnimationInterface.cxx
+  vtkPVVerticalAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
   vtkPVApplicationResources.cxx
   vtkPVApplicationSettingsInterface.cxx
@@ -224,6 +236,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVObjectWidget
   vtkPVValueList
   vtkPVWidget
+  vtkPVKeyFrame
   ABSTRACT
   )
 

@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.41");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -178,16 +178,14 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     {
     bd->AddRequiredProperty(input->GetSMProperty(), "Input");
     }
+  bd->SetMode(vtkSMBoundsDomain::SCALED_EXTENT);
+  bd->SetScaleFactor(this->RadiusScaleFactor);
   prop->AddDomain("bounds", bd);
   this->RadiusWidget->SetSMProperty(prop);
   bd->Delete();
 
   this->RadiusWidget->Create(app);
-  if (this->RadiusWidget->GetSMPropertyName())
-    {
-    this->RadiusWidget->SetScaleFactor(this->RadiusScaleFactor);
-    }
-  else
+  if (!this->RadiusWidget->GetSMPropertyName())
     {
     this->RadiusWidget->SetValue(&this->DefaultRadius, 1);
     }

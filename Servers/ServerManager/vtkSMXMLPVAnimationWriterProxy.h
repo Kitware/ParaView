@@ -1,0 +1,61 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkSMXMLPVAnimationWriterProxy.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkSMXMLPVAnimationWriterProxy - ServerManager object to write out animation
+// geometry.
+// .SECTION Description
+//
+
+#ifndef __vtkSMXMLPVAnimationWriterProxy_h
+#define __vtkSMXMLPVAnimationWriterProxy_h
+
+#include "vtkSMProxy.h"
+class vtkSMXMLPVAnimationWriterProxyInternals;
+class vtkSMSummaryHelperProxy;
+
+class VTK_EXPORT vtkSMXMLPVAnimationWriterProxy : public vtkSMProxy
+{
+public:
+  static vtkSMXMLPVAnimationWriterProxy* New();
+  vtkTypeRevisionMacro(vtkSMXMLPVAnimationWriterProxy, vtkSMProxy);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  void AddInput(vtkSMProxy* input);
+  
+  void WriteTime(double time);
+
+  void Start();
+  void Finish();
+
+  vtkGetMacro(ErrorCode, int);
+protected:
+  vtkSMXMLPVAnimationWriterProxy();
+  ~vtkSMXMLPVAnimationWriterProxy();
+  
+  virtual void CreateVTKObjects(int numObjects);
+  int ErrorCode;
+
+  vtkSMSummaryHelperProxy* SummaryHelperProxy;
+//BTX
+  friend class vtkSMXMLPVAnimationWriterProxyInternals;
+  vtkSMXMLPVAnimationWriterProxyInternals* Internals;
+//ETX
+
+private:
+  vtkSMXMLPVAnimationWriterProxy(const vtkSMXMLPVAnimationWriterProxy&); // Not implemented.
+  void operator=(const vtkSMXMLPVAnimationWriterProxy&); // Not implemented.
+};
+
+#endif
+
