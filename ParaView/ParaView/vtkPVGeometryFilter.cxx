@@ -14,9 +14,6 @@
 =========================================================================*/
 #include "vtkPVGeometryFilter.h"
 
-#include "vtkFloatArray.h"
-#include "vtkCellArray.h"
-#include "vtkPolygon.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -36,7 +33,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.24");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.25");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -45,7 +42,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->OutlineFlag = 0;
   this->UseOutline = 1;
   this->UseStrips = 0;
-  this->GenerateCellNormals = 1;
   this->NumberOfRequiredInputs = 0;
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
   this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
@@ -136,112 +132,43 @@ void vtkPVGeometryFilter::Execute()
   if (input->IsA("vtkImageData"))
     {
     this->ImageDataExecute(static_cast<vtkImageData*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
 
   if (input->IsA("vtkStructuredGrid"))
     {
     this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
 
   if (input->IsA("vtkRectilinearGrid"))
     {
     this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
 
   if (input->IsA("vtkUnstructuredGrid"))
     {
     this->UnstructuredGridExecute(static_cast<vtkUnstructuredGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
   if (input->IsA("vtkPolyData"))
     {
     this->PolyDataExecute(static_cast<vtkPolyData*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
   if (input->IsA("vtkDataSet"))
     {
     this->DataSetExecute(static_cast<vtkDataSet*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
   if (input->IsA("vtkHierarchicalBoxDataSet"))
     {
     this->HierarchicalBoxExecute(static_cast<vtkHierarchicalBoxDataSet*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
     return;
     }
   return;
 }
-
-//----------------------------------------------------------------------------
-// We need to change the mapper.  Now it always flat shades when cell normals
-// are available.
-void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
-{
-  if ( ! this->GenerateCellNormals)
-    {
-    return;
-    }
-
-  if (output->GetVerts() && output->GetVerts()->GetNumberOfCells())
-    { // We can deal with these later.
-    return;
-    }
-  if (output->GetLines() && output->GetLines()->GetNumberOfCells())
-    { // We can deal with these later.
-    return;
-    }
-  if (output->GetStrips() && output->GetStrips()->GetNumberOfCells())
-    { // We can deal with these later.
-    return;
-    }
-
-  vtkIdType* endCellPtr;
-  vtkIdType* cellPtr;
-  vtkIdType *pts = 0;
-  vtkIdType npts = 0;
-  unsigned char count = 0;
-  double polyNorm[3];
-  vtkFloatArray* cellNormals = vtkFloatArray::New();
-  cellNormals->SetNumberOfComponents(3);
-  cellNormals->Allocate(3*output->GetNumberOfCells());
-  vtkCellArray* aPrim = output->GetPolys();
-  vtkPoints* p = output->GetPoints();
-
-
-  cellPtr = aPrim->GetPointer();
-  endCellPtr = cellPtr+aPrim->GetNumberOfConnectivityEntries();
-
-  while (cellPtr < endCellPtr)
-    {
-    npts = *cellPtr++;
-    pts = cellPtr;
-    cellPtr += npts;
-
-    vtkPolygon::ComputeNormal(p,npts,pts,polyNorm);
-    cellNormals->InsertNextTuple(polyNorm);    
-    }
-
-  if (cellNormals->GetNumberOfTuples() != output->GetNumberOfCells())
-    {
-    vtkErrorMacro("Number of cell normals does not match output.");
-    cellNormals->Delete();
-    return;
-    }
-
-  output->GetCellData()->SetNormals(cellNormals);
-  cellNormals->Delete();
-  cellNormals = NULL;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input)
@@ -482,5 +409,4 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "UseOutline: " << (this->UseOutline?"on":"off") << endl;
   os << indent << "UseStrips: " << (this->UseStrips?"on":"off") << endl;
-  os << indent << "GenerateCellNormals: " << (this->GenerateCellNormals?"on":"off") << endl;
 }
