@@ -40,6 +40,7 @@ vtkPVSelectionList
 vtkPVSource 
 vtkPVSourceCollection 
 vtkPVSourceInterface 
+vtkPVSourceInterfaceParser
 vtkPVSourceList 
 vtkPVThreshold 
 vtkPVTreeComposite 
@@ -50,12 +51,24 @@ vtkSingleContourFilter
 vtkStringList 
 )
 
+WRAP_EXCLUDE_FILES(
+vtkPVSourceInterfaceParser
+)
+
 ABSTRACT_FILES(
 vtkInteractorStyleExtent 
 )
 
 VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
 ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
+
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
+               ESCAPE_QUOTES)
+INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
+
+INCLUDE_DIRECTORIES(${EXPAT_SOURCE_DIR}/xmlparse)
+TARGET_LINK_LIBRARIES (vtkKWParaViewTCL Expat)
 
 IF (TK_LIBRARY)
   LINK_LIBRARIES (${TK_LIBRARY})
@@ -109,4 +122,3 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
 
 TARGET_LINK_LIBRARIES (ParaView 
                        vtkKWParaViewTCL)
-
