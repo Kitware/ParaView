@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.6");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.7");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -456,14 +456,14 @@ void vtkPVArrayMenu::ResetInternal()
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              const char* sourceTclName)
+                                              vtkClientServerID sourceID)
 {
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
     this->AttributeType);
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. " 
                   << this->GetClassName());
@@ -473,19 +473,19 @@ void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
   if (this->ArrayName)
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << " {" << this->ArrayName << "}\n";
     }
   else
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << " {}\n";
     }
   if (this->ShowComponentMenu)
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << "Component "  << this->SelectedComponent << endl;
     }
 }

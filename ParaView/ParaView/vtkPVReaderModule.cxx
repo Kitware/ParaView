@@ -53,10 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
-
+#include <string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.4");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.5");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -363,9 +363,13 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
     {
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->ServerScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
-                     this->FileEntry->GetVariableName(), fname);
-    
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->GetVTKSourceID() 
+                    << (vtkstd::string("Set") 
+                        + vtkstd::string(this->FileEntry->GetVariableName())).c_str()
+                    << fname
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     const char* ext = this->ExtractExtension(fname);
     if (ext)
       {

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.7");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.8");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -293,21 +293,28 @@ const char* vtkPVStringEntry::GetValue()
 
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::SaveInBatchScriptForPart(ofstream *file, 
-                                                const char* sourceTclName)
+                                                vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
-  if (sourceTclName == NULL || this->VariableName == NULL)
+  if (sourceID.ID == 0 || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro(<< this->GetClassName()
+                  << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
-  this->Script("set tempValue [%s Get%s]", 
-               sourceTclName, this->VariableName);
-  result = this->Application->GetMainInterp()->result;
-  *file << " {" << result << "}\n";
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << (vtkstd::string("Get") 
+                      + vtkstd::string(this->VariableName)).c_str()
+                  << vtkClientServerStream::End;
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " {" << result.str() << "}\n";
+  delete [] result.str();
 }
 
 //----------------------------------------------------------------------------

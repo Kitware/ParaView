@@ -77,7 +77,7 @@ protected:
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
   vtkPVSourceWidget(const vtkPVSourceWidget&); // Not implemented
   void operator=(const vtkPVSourceWidget&); // Not implemented

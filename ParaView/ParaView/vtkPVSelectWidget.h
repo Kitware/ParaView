@@ -212,7 +212,7 @@ protected:
 
   // Description:
   // For saving the widget into a VTK tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:
   vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.9");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.10");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -150,7 +150,7 @@ void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
   int i;
   float value;
@@ -162,7 +162,7 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
     {
     value = this->Property->GetScalar(2*(i+1));
     *file << "\t";
-    *file << sourceTclName << " SetValue " 
+    *file << "pvTemp" << sourceID << " SetValue " 
           << i << " " << value << endl;
     }
 }

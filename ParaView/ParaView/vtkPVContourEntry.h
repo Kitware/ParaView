@@ -120,7 +120,7 @@ protected:
   // Description:
   // The widget saves it state/command in the vtk tcl script.
   virtual void SaveInBatchScriptForPart(ofstream *file, 
-                                        const char* sourceTclName);
+                                        vtkClientServerID);
 };
 
 #endif

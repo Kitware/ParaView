@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.3");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.4");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -495,15 +495,17 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
 
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SaveInBatchScriptForPart(ofstream *file,
-                                                  const char* sourceTclName)
+                                                  vtkClientServerID sourceID)
 {
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro(<< this->GetClassName()
+                  << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << sourceTclName << " SetTimeValue " << this->GetTimeValue()
+  *file << "\t" << "pvTemp" << sourceID
+        << " SetTimeValue " << this->GetTimeValue()
         << endl;;
 }
 

@@ -311,7 +311,7 @@ protected:
   // Saves for a specific part.  SaveInBatchScript loops over parts.
   // This is the way Accept and Reset should work.
   virtual void SaveInBatchScriptForPart(ofstream *file, 
-                                        const char* sourceTclName);
+                                        vtkClientServerID);
 
 };
 

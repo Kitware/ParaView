@@ -131,7 +131,7 @@ protected:
 
   // For saving batch scripts.
   void SaveInBatchScriptForPart(ofstream *file,
-                                const char* sourceTclName);
+                                vtkClientServerID);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

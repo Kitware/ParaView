@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.7");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.8");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -438,38 +438,61 @@ void vtkPVLineWidget::ActualPlaceWidget()
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
-                                               const char* sourceTclName)
+                                               vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Point1
   if (this->Point1Variable)
     {  
-    *file << "\t" << sourceTclName << " Set" << this->Point1Variable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->Point1Variable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point1Variable;
+    ostrstream str;
+    str << "Get" << this->Point1Variable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << " " << result.str() << "\n"; 
+    delete [] result.str();
+    delete [] str.str();
     }
-
   // Point2
   if (this->Point2Variable)
     {
-    *file << "\t" << sourceTclName << " Set" << this->Point2Variable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->Point2Variable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point2Variable; 
+    ostrstream str;
+    str << "Get" << this->Point2Variable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToClient();
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << " " << result.str() << "\n";
+    delete [] result.str();
+    delete [] str.str();
     }
 
   // Resolution
   if (this->ResolutionVariable)
     {
-    *file << "\t" << sourceTclName << " Set" << this->ResolutionVariable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->ResolutionVariable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->ResolutionVariable;
+    ostrstream str;
+    str << "Get" << this->ResolutionVariable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToClient();
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0); 
+    result << ends;
+   *file << " " << result.str() << "\n";
+    delete [] result.str();
+    delete [] str.str();
     }
 }
 

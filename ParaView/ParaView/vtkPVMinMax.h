@@ -225,7 +225,7 @@ protected:
   
   // Description:
   // Save this widget to a file
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
   
 private:
   vtkPVMinMax(const vtkPVMinMax&); // Not implemented

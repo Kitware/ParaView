@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.5");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.6");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -193,8 +193,7 @@ void vtkPVPointWidget::UpdateVTKObject()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, 
-                                                const char*)
+void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, vtkClientServerID)
 {
 }
 

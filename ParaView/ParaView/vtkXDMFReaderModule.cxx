@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.2");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.3");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -126,9 +126,14 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
     }
   
   const char* res = clone->GetVTKSourceTclName();
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s Set%s {%s}", res, "FileName", fname);
-
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule(); 
+  
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->GetVTKSourceID() 
+                  << "SetFileName"
+                  << fname
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   this->Internals->GridList.erase(
     this->Internals->GridList.begin(),
     this->Internals->GridList.end());

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.8");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.9");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -681,21 +681,24 @@ const char* vtkPVFileEntry::GetValue()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName)
+void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
+                                              vtkClientServerID sourceID)
 {
   if (this->Range[0] < this->Range[1])
     {
-    *file << "\tset " << sourceTclName << "_files {";
-    *file << this->Script("concat $%s_files", sourceTclName);
+    *file << "\tset " << "pvTemp" << sourceID << "_files {";
+    *file << this->Script("concat $pvTemp%d_files", sourceID.ID);
     *file << "}" << endl;
 
-    *file << "\t" << sourceTclName << " Set" << this->VariableName 
-          << " [ lindex $" << sourceTclName << "_files " << this->TimeStep 
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName 
+          << " [ lindex $" << "pvTemp" << sourceID << "_files " 
+          << this->TimeStep 
           << "]\n";
     }
   else
     {
-    *file << "\t" << sourceTclName << " Set" << this->VariableName << " {" 
+    *file << "\t" << "pvTemp" << sourceID
+          << " Set" << this->VariableName << " {" 
           << this->Entry->GetValue() << "}\n";
     }
 }

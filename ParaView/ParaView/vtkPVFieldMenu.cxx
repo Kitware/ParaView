@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.5");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.6");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -250,16 +250,16 @@ void vtkPVFieldMenu::ResetInternal()
 
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              const char* sourceTclName)
+                                              vtkClientServerID sourceID)
 {
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. ");
     return;
     }
 
   *file << "\t";
-  *file << sourceTclName << " SetAttributeMode " << this->Value << endl;
+  *file << "pvTemp" << sourceID << " SetAttributeMode " << this->Value << endl;
 }
 
 //----------------------------------------------------------------------------

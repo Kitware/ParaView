@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.12");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.13");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2412,9 +2412,16 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           vtkErrorMacro("We ran out of sources.");
           return;
           }
-        pm->RootScript("%s GetNumberOfOutputs",
-                       this->GetPVSource()->GetVTKSourceTclName(sourceCount));
-        numOutputs = atoi(pm->GetRootResult());
+        pm->GetStream() << vtkClientServerStream::Invoke 
+                        << this->GetPVSource()->GetVTKSourceID(sourceCount)
+                        << "GetNumberOfOutputs" 
+                        << vtkClientServerStream::End;
+        pm->SendStreamToServer();
+        if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
+          {
+          vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
+          numOutputs = 0;
+          }
         outputCount = 0;
         }
 
@@ -2434,12 +2441,12 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
       // Move to next output
       ++outputCount;
 
-
- //      *file << "vtkPolyDataMapper " << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
-//             << part->GetPartDisplay()->GetMapperTclName() << " SetInput ["
-//             << part->GetGeometryTclName() << " GetOutput]\n\t";  
+      
+      *file << "vtkPolyDataMapper pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetInput ["
+            << "pvTemp" << part->GetGeometryID() << " GetOutput]\n\t";  
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
-            << "pvTemp" << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
+            << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
@@ -2498,7 +2505,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
               << "\n";
         }
 
-      *file << "pvTemp" << renID.ID << " AddActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n";
+      *file << "Ren1" << " AddActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n";
       }  
     }
 

@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.16");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.17");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2014,8 +2014,8 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 
     if (this->VTKMultipleInputsFlag)
       { 
-      const char* sourceTclName = this->GetVTKSourceTclName(0);
-      if (sourceTclName == NULL)
+      vtkClientServerID sourceID = this->GetVTKSourceID(0);
+      if (sourceID.ID == 0)
         { // Sanity check.
         vtkErrorMacro("Missing tcl name.");
         return;
@@ -2027,7 +2027,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         vtkPVPart* part = pvs->GetPart(partIdx);
         
         *file << "\t";
-        *file << sourceTclName << " Add" << inputName  << " [pvTemp" 
+        *file << "pvTemp" << sourceID << " Add" << inputName  << " [pvTemp" 
               << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
               << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
         }      
@@ -2038,7 +2038,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       int numSources = this->GetNumberOfVTKSources();
       for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
         {
-        const char* sourceTclName = this->GetVTKSourceTclName(sourceIdx);
+        vtkClientServerID sourceID = this->GetVTKSourceID(sourceIdx);
         // This is to handle the case when there are multiple
         // inputs and the first one has multiple parts. For
         // example, in the Glyph filter, when the input has multiple
@@ -2048,7 +2048,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         int partIdx = sourceIdx % numParts;
         vtkPVPart* part = pvs->GetPart(partIdx);
         *file << "\t";
-        *file << sourceTclName << " Set" << inputName << " [pvTemp" 
+        *file << "pvTemp" << sourceID << " Set" << inputName << " [pvTemp" 
               << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
               << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
 

@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.8");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.9");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -282,10 +282,8 @@ void vtkPVWidget::SaveInBatchScript(ofstream *file)
   numSources = this->PVSource->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    ostrstream str;
-    str << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) << ends;
-    this->SaveInBatchScriptForPart(file, str.str());
-    delete [] str.str();
+    this->SaveInBatchScriptForPart(file, 
+                                   this->PVSource->GetVTKSourceID(sourceIdx));
     }
 }
 
@@ -296,7 +294,7 @@ void vtkPVWidget::SaveState(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
+void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, vtkClientServerID)
 {
   // Either SaveInBatchScript or SaveInBatchScriptForPart
   // must be defined.

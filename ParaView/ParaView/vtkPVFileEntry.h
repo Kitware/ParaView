@@ -143,7 +143,7 @@ public:
 
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
-  void SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName);
+  void SaveInBatchScriptForPart(ofstream* file, vtkClientServerID);
 
   // Description:
   // Get the range of files.

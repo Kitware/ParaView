@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.2");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.3");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -93,11 +93,12 @@ void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
     return;
     } 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID << "GetClassName" 
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->SourceID << "GetClassName" 
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToClient();
   const char* dataClassName;
-  if(pm->GetLastServerResult().GetArgument(0, 0, &dataClassName))
+  if(pm->GetLastClientResult().GetArgument(0, 0, &dataClassName))
     {
     *file << dataClassName << " pvTemp" << this->SourceID.ID << "\n";
     }
@@ -107,14 +108,14 @@ void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
 
 //----------------------------------------------------------------------------
 void vtkPVSourceWidget::SaveInBatchScriptForPart(ofstream *file, 
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
-  if (sourceTclName == NULL || this->VariableName == NULL)
+  if (sourceID.ID == 0 || this->VariableName == NULL)
     {
     return;
     } 
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName
         << " pvTemp" << this->SourceID.ID << endl;
 }
 

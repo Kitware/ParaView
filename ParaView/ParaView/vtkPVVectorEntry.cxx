@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.8");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.9");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -559,15 +559,15 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
-  const char* sourceTclName)
+                                                vtkClientServerID sourceID)
 {
   if (this->ScriptValue == NULL)
     {
-    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceTclName);
+    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceID);
     return;
     }
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
   *file << " " << this->ScriptValue << "\n";
 }
 

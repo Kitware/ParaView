@@ -207,7 +207,7 @@ protected:
   
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

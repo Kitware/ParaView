@@ -50,10 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayMenu.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.6");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.7");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -456,20 +457,32 @@ void vtkPVMinMax::MaxValueCallback()
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SaveInBatchScriptForPart(ofstream *file,
-                                           const char* sourceTclName)
+                                           vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << this->GetMinCommand
+                  << vtkClientServerStream::End; 
+  pm->SendStreamToClient();
+  {
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << "pvTemp" << sourceID << " " << this->SetCommand;
+  *file << " " << result.str();
+  }
   
-  *file << sourceTclName << " " << this->SetCommand;
-  this->Script("set tempValue [%s %s]", 
-               sourceTclName, this->GetMinCommand);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result;
-
-  this->Script("set tempValue [%s %s]", 
-               sourceTclName, this->GetMaxCommand);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result << "\n";
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << this->GetMaxCommand
+                  << vtkClientServerStream::End; 
+  pm->SendStreamToClient();
+  {
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " " << result.str() << "\n";
+  }
 }
 
 

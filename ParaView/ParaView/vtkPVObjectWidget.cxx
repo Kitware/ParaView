@@ -47,8 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
+#include "vtkPVProcessModule.h"
+#include <string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12.4.1");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -66,21 +68,31 @@ vtkPVObjectWidget::~vtkPVObjectWidget()
 
 //----------------------------------------------------------------------------
 void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
-  char *result;
-  
-  if (sourceTclName == NULL || this->VariableName == NULL)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
+ 
+  if (sourceID.ID == 0 || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro(<< this->GetClassName()
+                  << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
-  this->Script("set tempValue [%s Get%s]", 
-               this->ObjectID.ID, this->VariableName);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result << "\n";
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
+  ostrstream str;
+  str << "Get" << this->VariableName << ends;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
+                  << str.str() 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " " << result.str() << "\n";
+  delete [] result.str();
+  delete [] str.str();
 }
 
 //----------------------------------------------------------------------------

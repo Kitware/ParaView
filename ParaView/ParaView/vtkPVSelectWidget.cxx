@@ -52,10 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
-
+#include "vtkPVProcessModule.h"
+#include <string>
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.7");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.8");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -480,15 +481,20 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file, 
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
-  this->Script("%s Get%s",sourceTclName,this->VariableName);
-  const char *tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
-  if (tmp && strlen(tmp) > 0)
-    {
-    *file << "\t" << sourceTclName << " Set" << this->VariableName
-          << " " << this->GetCurrentVTKValue() << endl;
-    }
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << (vtkstd::string("Get") 
+                      + vtkstd::string(this->VariableName)).c_str()
+                  << vtkClientServerStream::End; 
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName
+        << " " << result.str() << endl;
+  delete [] result.str();
 }
 
 //-----------------------------------------------------------------------------

@@ -253,7 +253,7 @@ protected:
 
   // Description:
   // The widget saves it state/command in the vtk tcl script.
-  void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:
   vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented

@@ -182,7 +182,7 @@ protected:
 
   // Description:
   // An interface for saving a widget into a script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 };
 
