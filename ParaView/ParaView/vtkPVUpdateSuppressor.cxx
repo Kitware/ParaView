@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.4.2.2");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.4.2.3");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -78,9 +78,11 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdatePiece(this->UpdatePiece);
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
   input->Update();
-  // I tried to limit the shallow copy to only when the input changes, but
-  // I had problems with setting the relased data flag.  It is quick anyway.
-  output->ShallowCopy(input);
+  if (input->GetPipelineMTime() > this->UpdateTime)
+    {
+    output->ShallowCopy(input);
+    this->UpdateTime.Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
