@@ -1,0 +1,39 @@
+1. Start ParaView (see <link> for information on how to launch ParaView)
+
+2. Create a Plot3D file reader by selecting PLOT3DReader from VTK -> Sources
+   menu. Click Browse next to the XYZFileName entry and locate combxyz.bin
+   in the ParaView data directory. Next, click Browse next to the QFileName
+   entry and locate combq.bin in the data directory. Click accept.
+
+   <outline.jpg>
+
+3. Rotate the camera around the cursor until you see the outline of the
+   combustor from the front. Zoom in until the outline occupies almost
+   the whole window.
+
+4. Push the Cut button on the toolbar.
+
+   <toolbar-cut.jpg>
+
+5. Create different cut planes by changing the plane normal (clicking on
+   the "X Normal", "Y Normal", "Z Normal" and "Use Camera Normal" buttons). 
+   You can also change the center of the plane  using the x, y and z entries
+   for center point.
+
+   <xnormal.jpg> <ynormal.jpg>
+   <znormal.jpg> <cameranormal.jpg>
+
+6. Next let's use the Clip utility. Remove the cut filter by clicking on
+   Delete. Now create an isosurface of density (use a value of 0.3) 
+   (see the IsoSurface tutorial for details on how to create contours).
+   To clip the isosurface, click on the Clip button on the toolbar.
+   Push Accept to use the default clip values (plane normal is in the
+   positive z direction and the center is the center of the bounds).
+   Note the direction of the clip can be changed by changing the sign of
+   the normal. Experiment with different plane normals and center positions.
+
+   <toolbar-clip.jpg>
+   <result.jpg>
+   
+   
+
