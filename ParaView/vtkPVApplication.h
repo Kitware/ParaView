@@ -5,9 +5,8 @@
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
-
-
-Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
+  
+Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
 
