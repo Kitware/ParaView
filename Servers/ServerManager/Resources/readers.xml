@@ -1,6 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
 
+   <SourceProxy name="PVDReader" 
+                class="vtkPVDReader">
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
