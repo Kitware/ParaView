@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.2");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.3");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -471,5 +471,7 @@ void vtkKWToolbarSet::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "ToolbarsFrame: " << this->ToolbarsFrame << endl;
+  os << indent << "ShowBottomSeparator: " 
+     << (this->ShowBottomSeparator ? "On" : "Off") << endl;
 }
 
