@@ -38,6 +38,10 @@ $kw(vtkTemp257) DeleteCallback
 $kw(vtkTemp1) Open "testUnstructuredGrid.$ext"
 set kw(vtkTemp291) [$kw(vtkTemp1) GetCurrentPVSource]
 $kw(vtkTemp291) AcceptCallback
+
+set kw(vtkTemp841) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]
+$kw(vtkTemp841) AcceptCallback
+
 update
 
 # Fix the size of the image.
