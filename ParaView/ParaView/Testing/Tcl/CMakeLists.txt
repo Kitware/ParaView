@@ -19,7 +19,7 @@ IF (VTK_USE_MPI)
                CombustorTest
                ConeCubeCylSQ
                CutContours
-	       Data
+               Data
                Delete
                DeleteSource
                EnSight
@@ -37,7 +37,9 @@ IF (VTK_USE_MPI)
                Threshold
                ThresholdAttrMode
                Trace
-               VectorTextSpace)
+               VectorTextSpace
+               Write
+               )
 
          ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
@@ -64,7 +66,7 @@ FOREACH (tfile
          CombustorTest
          ConeCubeCylSQ
          CutContours
-	 Data
+         Data
          Delete
          DeleteSource
          EnSight
@@ -82,7 +84,9 @@ FOREACH (tfile
          Threshold
          ThresholdAttrMode
          Trace
-         VectorTextSpace)
+         VectorTextSpace
+         Write
+         )
 
    ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
             ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
@@ -97,8 +101,8 @@ ADD_TEST(PrintSelf-ParaView ${TCL_TCLSH}
 
 ADD_TEST(TestSetObjectMacro-ParaView ${TCL_TCLSH}
          ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
-	 "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"
-	 "vtkSetObjectMacro")
+         "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"
+         "vtkSetObjectMacro")
 
 ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/otherPrint.pvs

@@ -1,0 +1,31 @@
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+$pvWindow Open "$DataDir/Data/blow.vtk"
+if { [catch {
+  $pvWindow DisableMenus
+  $pvWindow ShowAnimationProperties
+  $pvWindow ShowCurrentSourceProperties
+  $pvWindow EnableMenus
+  $pvWindow WriteVTKFile vtkParaViewWriteTest.vtk
+  $pvWindow WritePVTKFile vtkParaViewWriteTestGhost.vtk 3
+  file delete -force vtkParaViewWriteTest.vtk
+  file delete -force vtkParaViewWriteTestGhost.vtk
+  $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
+  file delete -force vtkParaViewWriteTest.tcl
+  $pvWindow ErrorMessage "This is an error"
+  $pvWindow WarningMessage "This is a warning"
+} ] != 0 } {
+	Application SetExitStatus 1
+}
+
+Application Exit
