@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.22");
+vtkCxxRevisionMacro(vtkKWRange, "1.23");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -594,9 +594,16 @@ void vtkKWRange::SetRange(float r0, float r1)
 //----------------------------------------------------------------------------
 void vtkKWRange::GetRelativeRange(float &r0, float &r1)
 {
-  float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
-  r0 = (this->Range[0] - this->WholeRange[0]) / whole_range;
-  r1 = (this->Range[1] - this->WholeRange[0]) / whole_range;
+  if (this->WholeRange[1] == this->WholeRange[0])
+    {
+    r0 = r1 = 0.0;
+    }
+  else
+    {
+    float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
+    r0 = (this->Range[0] - this->WholeRange[0]) / whole_range;
+    r1 = (this->Range[1] - this->WholeRange[0]) / whole_range;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1526,7 +1533,7 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
     }
 
   const char *canv = this->Canvas->GetWidgetName();
-  float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
+  float r0, r1;
   int i, pos_min = 0, pos_max, pos_range;
 
   if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
@@ -1540,10 +1547,9 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
 
   pos_range = pos_max - pos_min;
 
-  pos[0] = (int)((float)pos_range * 
-                 ((this->Range[0] - this->WholeRange[0]) / whole_range));
-  pos[1] = (int)((float)pos_range * 
-                 ((this->Range[1] - this->WholeRange[0]) / whole_range));
+  this->GetRelativeRange(r0, r1);
+  pos[0] = (int)((float)pos_range * r0);
+  pos[1] = (int)((float)pos_range * r1);
 
   if (this->Inverted)
     {
