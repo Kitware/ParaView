@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.78");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.79");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2211,6 +2211,7 @@ void vtkPVColorMap::SetScalarBarOrientation(int o)
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->ScalarBarActorID << "SetOrientation" << o
                   << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
   this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
                       this->GetTclName(), o);
