@@ -41,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.43");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -119,7 +119,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 
   this->ManipulatorCollection = 0;
   this->DefaultManipulator = 0;
-  this->RegisteryName = 0;
+  this->RegistryName = 0;
 
   this->ArgumentsFrame = vtkKWFrame::New();
 
@@ -146,7 +146,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     }
   // So that events will not be called.
   this->InEvent = 1;
-  this->StoreRegistery();
+  this->StoreRegistry();
   int cc;
   if ( this->LabeledFrame )
     {
@@ -168,7 +168,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     }
 
   this->SetDefaultManipulator(0);
-  this->SetRegisteryName(0);
+  this->SetRegistryName(0);
   
   this->ArgumentsFrame->Delete();
   this->Observer->Delete();
@@ -188,7 +188,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
 {
   if ( this->GetApplication() )
     {
-    this->ReadRegistery();
+    this->ReadRegistry();
     vtkPVInteractorStyleControlInternal::ManipulatorMap::iterator it;
     int cc;
     for ( cc = 0; cc < 9; cc ++ )
@@ -232,7 +232,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
         char manipulator[100];
         char buffer[100];
         sprintf(manipulator, "Manipulator%s", it->first.c_str());
-        if ( this->GetApplication()->GetRegisteryValue(2, "RunTime", manipulator,
+        if ( this->GetApplication()->GetRegistryValue(2, "RunTime", manipulator,
             buffer) &&
           *buffer > 0 )
           {
@@ -370,7 +370,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
       {
       const char* val = this->GetApplication()->EvaluateString("%s", value);
       char *rname = kwsys::SystemTools::AppendStrings("Manipulator", name);
-      this->GetApplication()->SetRegisteryValue(2, "RunTime", rname, val);
+      this->GetApplication()->SetRegistryValue(2, "RunTime", rname, val);
       delete[] rname;
       }
     }
@@ -605,9 +605,9 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::ReadRegistery()
+void vtkPVInteractorStyleControl::ReadRegistry()
 {
-  if ( !this->GetApplication() || !this->RegisteryName )
+  if ( !this->GetApplication() || !this->RegistryName )
     {
     vtkErrorMacro("Application and type of Interactor Style Controler"
                   " have to be defined");
@@ -622,8 +622,8 @@ void vtkPVInteractorStyleControl::ReadRegistery()
     int key = static_cast<int>(cc / 3);
     buffer[0] = 0;
     sprintf(manipulator, "ManipulatorT%sM%dK%d", 
-            this->RegisteryName, mouse, key);
-    if ( this->GetApplication()->GetRegisteryValue(2, "RunTime", manipulator,
+            this->RegistryName, mouse, key);
+    if ( this->GetApplication()->GetRegistryValue(2, "RunTime", manipulator,
                                               buffer) &&
          *buffer > 0 &&
          this->GetManipulator(buffer) )
@@ -634,9 +634,9 @@ void vtkPVInteractorStyleControl::ReadRegistery()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::StoreRegistery()
+void vtkPVInteractorStyleControl::StoreRegistry()
 {
-  if ( !this->GetApplication() || !this->RegisteryName )
+  if ( !this->GetApplication() || !this->RegistryName )
     {
     return;
     }
@@ -648,8 +648,8 @@ void vtkPVInteractorStyleControl::StoreRegistery()
     int key = static_cast<int>(cc / 3);
     
     sprintf(manipulator, "ManipulatorT%sM%dK%d", 
-            this->RegisteryName, mouse, key);
-    this->GetApplication()->SetRegisteryValue(2, "RunTime", manipulator,
+            this->RegistryName, mouse, key);
+    this->GetApplication()->SetRegistryValue(2, "RunTime", manipulator,
                                          this->Menus[cc]->GetValue());
     }
 }
@@ -831,6 +831,6 @@ void vtkPVInteractorStyleControl::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Frame: " << this->LabeledFrame << endl;
   os << indent << "DefaultManipulator: " << (this->DefaultManipulator?this->DefaultManipulator:"None") << endl;
   os << indent << "ManipulatorCollection: " << this->ManipulatorCollection << endl;
-  os << indent << "RegisteryName: " << (this->RegisteryName?this->RegisteryName:"none") << endl;
+  os << indent << "RegistryName: " << (this->RegistryName?this->RegistryName:"none") << endl;
   os << indent << "CurrentManipulator: " << this->CurrentManipulator << endl;
 }

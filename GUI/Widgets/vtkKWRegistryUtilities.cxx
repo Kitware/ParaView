@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWRegisteryUtilities.cxx
+  Module:    vtkKWRegistryUtilities.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,39 +11,39 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWRegistryUtilities.h"
 
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
 
 #ifdef _WIN32
-#  include "vtkKWWin32RegisteryUtilities.h"
+#  include "vtkKWWin32RegistryUtilities.h"
 #else // _WIN32
-#  include "vtkKWUNIXRegisteryUtilities.h"
+#  include "vtkKWUNIXRegistryUtilities.h"
 #endif // _WIN32
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.10");
+vtkCxxRevisionMacro(vtkKWRegistryUtilities, "1.1");
 
 //----------------------------------------------------------------------------
-vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
+vtkKWRegistryUtilities *vtkKWRegistryUtilities::New()
 {
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRegisteryUtilities");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRegistryUtilities");
   if(ret)
     {
-    return static_cast<vtkKWRegisteryUtilities*>(ret);
+    return static_cast<vtkKWRegistryUtilities*>(ret);
     }
-  vtkDebugLeaks::DestructClass("vtkKWRegisteryUtilities");
+  vtkDebugLeaks::DestructClass("vtkKWRegistryUtilities");
 #ifdef _WIN32
-  return vtkKWWin32RegisteryUtilities::New();
+  return vtkKWWin32RegistryUtilities::New();
 #else // _WIN32
-  return vtkKWUNIXRegisteryUtilities::New();
+  return vtkKWUNIXRegistryUtilities::New();
 #endif // _WIN32
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
+vtkKWRegistryUtilities::vtkKWRegistryUtilities()
 {
   this->TopLevel    = 0;
   this->Opened      = 0;
@@ -54,18 +54,18 @@ vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
+vtkKWRegistryUtilities::~vtkKWRegistryUtilities()
 {
   this->SetTopLevel(0);
   if ( this->Opened )
     {
-    vtkErrorMacro("vtkKWRegisteryUtilities::Close should be "
+    vtkErrorMacro("vtkKWRegistryUtilities::Close should be "
                   "called here. The registry is not closed.");
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::Open(const char *toplevel,
+int vtkKWRegistryUtilities::Open(const char *toplevel,
                                   const char *subkey, int readonly)
 {
   int res = 0;
@@ -82,7 +82,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     }
   if ( !toplevel )
     {
-    vtkErrorMacro("vtkKWRegisteryUtilities::Opened() Toplevel not defined");
+    vtkErrorMacro("vtkKWRegistryUtilities::Opened() Toplevel not defined");
     return 0;
     }
 
@@ -94,7 +94,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     return 0;
     }
 
-  if ( readonly == vtkKWRegisteryUtilities::READONLY )
+  if ( readonly == vtkKWRegistryUtilities::READONLY )
     {
     res = this->OpenInternal(toplevel, subkey, readonly);
     }
@@ -113,7 +113,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::Close()
+int vtkKWRegistryUtilities::Close()
 {
   int res = 0;
   if ( this->Opened )
@@ -131,7 +131,7 @@ int vtkKWRegisteryUtilities::Close()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
+int vtkKWRegistryUtilities::ReadValue(const char *subkey, 
                                        const char *key, 
                                        char *value)
 {  
@@ -145,7 +145,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegisteryUtilities::READONLY) )
+                     vtkKWRegistryUtilities::READONLY) )
       {
       return 0;
       }
@@ -164,7 +164,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::DeleteKey(const char *subkey, 
+int vtkKWRegistryUtilities::DeleteKey(const char *subkey, 
                                        const char *key)
 {
   int res = 1;
@@ -172,7 +172,7 @@ int vtkKWRegisteryUtilities::DeleteKey(const char *subkey,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegistryUtilities::READWRITE) )
       {
       return 0;
       }
@@ -193,14 +193,14 @@ int vtkKWRegisteryUtilities::DeleteKey(const char *subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
+int vtkKWRegistryUtilities::DeleteValue(const char *subkey, const char *key)
 {
   int res = 1;
   int open = 0;
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegistryUtilities::READWRITE) )
       {
       return 0;
       }
@@ -221,7 +221,7 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key, 
+int vtkKWRegistryUtilities::SetValue(const char *subkey, const char *key, 
                                       const char *value)
 {
   int res = 1;
@@ -229,7 +229,7 @@ int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-                     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegistryUtilities::READWRITE) )
       {
       return 0;
       }
@@ -250,13 +250,13 @@ int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRegisteryUtilities::IsSpace(char c)
+int vtkKWRegistryUtilities::IsSpace(char c)
 {
   return isspace(c);
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWRegisteryUtilities::Strip(char *str)
+char *vtkKWRegistryUtilities::Strip(char *str)
 {
   int cc;
   int len;
@@ -287,7 +287,7 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWRegistryUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   if( this->TopLevel )

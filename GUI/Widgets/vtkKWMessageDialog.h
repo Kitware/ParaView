@@ -118,7 +118,7 @@ public:
   // Utility methods to create various dialog windows.
   // icon is a enumerated icon type described in vtkKWIcon.
   // title is a title string of the dialog. name is the dialog name
-  // used for the registery. message is the text message displayed
+  // used for the registry. message is the text message displayed
   // in the dialog.
   static void PopupMessage(vtkKWApplication *app, vtkKWWindow *masterWin,
                            const char* title, 

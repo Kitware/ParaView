@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.14");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.15");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -339,10 +339,10 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->Script("place %s -relx 0 -rely 1 -x -5 -y 5 -anchor se", 
                 this->AcceptPullDownArrow->GetWidgetName());
 
-  if (app->GetRegisteryValue(2,"RunTime", 
+  if (app->GetRegistryValue(2,"RunTime", 
           VTK_PV_AUTO_ACCEPT_REG_KEY,0))
     {
-    this->SetAutoAccept(app->GetIntRegisteryValue(2,"RunTime",
+    this->SetAutoAccept(app->GetIntRegistryValue(2,"RunTime",
                                   VTK_PV_AUTO_ACCEPT_REG_KEY));
     }
 
@@ -399,7 +399,7 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     }
   this->AutoAccept = val;
 
- this->GetApplication()->SetRegisteryValue(
+ this->GetApplication()->SetRegistryValue(
    2, "RunTime", VTK_PV_AUTO_ACCEPT_REG_KEY, "%d", val);
 
   // Synchronize the two auto accept guis.

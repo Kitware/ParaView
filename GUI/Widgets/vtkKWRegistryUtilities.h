@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWRegisteryUtilities.h
+  Module:    vtkKWRegistryUtilities.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegisteryUtilities - A registery class
+// .NAME vtkKWRegistryUtilities - A registry class
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. On Win32 platform it is 
-// implemented using the registery and on unix as a file in
+// implemented using the registry and on unix as a file in
 // the user's home directory.
 
-#ifndef __vtkKWRegisteryUtilities_h
-#define __vtkKWRegisteryUtilities_h
+#ifndef __vtkKWRegistryUtilities_h
+#define __vtkKWRegistryUtilities_h
 
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
+class VTK_EXPORT vtkKWRegistryUtilities : public vtkObject
 {
 public:
   // Description:
   // Standard New and type methods
-  static vtkKWRegisteryUtilities* New();
-  vtkTypeRevisionMacro(vtkKWRegisteryUtilities, vtkObject);
+  static vtkKWRegistryUtilities* New();
+  vtkTypeRevisionMacro(vtkKWRegistryUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -88,8 +88,8 @@ public:
 //ETX
 
   protected:
-  vtkKWRegisteryUtilities();
-  virtual ~vtkKWRegisteryUtilities();
+  vtkKWRegistryUtilities();
+  virtual ~vtkKWRegistryUtilities();
 
   // Description:
   // Should the registry be locked?
@@ -140,8 +140,8 @@ private:
   int Locked;
   int GlobalScope;
 
-  vtkKWRegisteryUtilities(const vtkKWRegisteryUtilities&); // Not implemented
-  void operator=(const vtkKWRegisteryUtilities&); // Not implemented
+  vtkKWRegistryUtilities(const vtkKWRegistryUtilities&); // Not implemented
+  void operator=(const vtkKWRegistryUtilities&); // Not implemented
 };
 
 #endif

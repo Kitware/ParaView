@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWRegistryUtilities.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.187");
+vtkCxxRevisionMacro(vtkKWApplication, "1.188");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -101,8 +101,8 @@ vtkKWApplication::vtkKWApplication()
 
   this->ExitStatus = 0;
 
-  this->Registery = 0;
-  this->RegisteryLevel = 10;
+  this->Registry = 0;
+  this->RegistryLevel = 10;
 
   this->UseMessageDialogs = 1;  
 
@@ -239,9 +239,9 @@ vtkKWApplication::~vtkKWApplication()
     this->TraceFile = NULL;
     }
 
-  if (this->Registery )
+  if (this->Registry )
     {
-    this->Registery->Delete();
+    this->Registry->Delete();
     }
 }
 
@@ -274,8 +274,8 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     {
     char setup_key[REG_KEY_NAME_SIZE_MAX];
     sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
-    vtkKWRegisteryUtilities *reg 
-      = this->GetRegistery(this->GetApplicationName());
+    vtkKWRegistryUtilities *reg 
+      = this->GetRegistry(this->GetApplicationName());
     char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
@@ -771,36 +771,36 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::GetApplicationSettingsFromRegistery()
+void vtkKWApplication::GetApplicationSettingsFromRegistry()
 { 
   // Show balloon help ?
 
-  if (this->HasRegisteryValue(
+  if (this->HasRegistryValue(
     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
     {
-    this->ShowBalloonHelp = this->GetIntRegisteryValue(
+    this->ShowBalloonHelp = this->GetIntRegistryValue(
       2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY);
     }
 
   // Save window geometry ?
 
-  if (this->HasRegisteryValue(
+  if (this->HasRegistryValue(
     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
-    this->SaveWindowGeometry = this->GetIntRegisteryValue(
+    this->SaveWindowGeometry = this->GetIntRegistryValue(
       2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY);
     }
 
   // Show splash screen ?
 
-  if (this->HasRegisteryValue(
+  if (this->HasRegistryValue(
     2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
     {
-    this->ShowSplashScreen = this->GetIntRegisteryValue(
+    this->ShowSplashScreen = this->GetIntRegistryValue(
       2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
     }
 
-  if (this->RegisteryLevel <= 0)
+  if (this->RegistryLevel <= 0)
     {
     this->ShowSplashScreen = 0;
     this->SaveWindowGeometry = 0;
@@ -1219,21 +1219,21 @@ void vtkKWApplication::AddTraceEntry(const char *format, ...)
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
+vtkKWRegistryUtilities *vtkKWApplication::GetRegistry( const char*toplevel )
 {
-  this->GetRegistery();
-  this->Registery->SetTopLevel( toplevel );
-  return this->Registery;
+  this->GetRegistry();
+  this->Registry->SetTopLevel( toplevel );
+  return this->Registry;
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
+vtkKWRegistryUtilities *vtkKWApplication::GetRegistry()
 {
-  if ( !this->Registery )
+  if ( !this->Registry )
     {
-    this->Registery = vtkKWRegisteryUtilities::New();
+    this->Registry = vtkKWRegistryUtilities::New();
     }
-  return this->Registery;
+  return this->Registry;
 }
 
 //----------------------------------------------------------------------------
@@ -1260,7 +1260,7 @@ int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 {
   char buffer[REG_KEY_VALUE_SIZE_MAX];
   int retval = 0;
-  if ( this->GetRegisteryValue(3, "Dialogs", dialogname, buffer) )
+  if ( this->GetRegistryValue(3, "Dialogs", dialogname, buffer) )
     {
     retval = atoi(buffer);
     }
@@ -1271,17 +1271,17 @@ int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 void vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
                                                int response)
 {
-  this->SetRegisteryValue(3, "Dialogs", dialogname, "%d", response);
+  this->SetRegistryValue(3, "Dialogs", dialogname, "%d", response);
 }
 
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::SetRegisteryValue(int level, const char* subkey, 
+int vtkKWApplication::SetRegistryValue(int level, const char* subkey, 
                                         const char* key, 
                                         const char* format, ...)
 {
-  if ( this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+  if ( this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
@@ -1296,21 +1296,21 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
   vsprintf(value, format, var_args);
   va_end(var_args);
   
-  vtkKWRegisteryUtilities *reg 
-    = this->GetRegistery(this->GetApplicationName());
+  vtkKWRegistryUtilities *reg 
+    = this->GetRegistry(this->GetApplicationName());
   res = reg->SetValue(buffer, key, value);
   return res;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetRegisteryValue(int level, const char* subkey, 
+int vtkKWApplication::GetRegistryValue(int level, const char* subkey, 
                                         const char* key, char* value)
 {
   int res = 0;
   char buff[REG_KEY_VALUE_SIZE_MAX];
   if ( !this->GetApplication() ||
-       this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+       this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
@@ -1319,8 +1319,8 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
           this->GetApplicationVersionName(),
           subkey);
 
-  vtkKWRegisteryUtilities *reg 
-    = this->GetRegistery(this->GetApplicationName());
+  vtkKWRegistryUtilities *reg 
+    = this->GetRegistry(this->GetApplicationName());
   res = reg->ReadValue(buffer, key, buff);
   if ( *buff && value )
     {
@@ -1331,11 +1331,11 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey, 
+int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey, 
                                       const char* key)
 {
-  if ( this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+  if ( this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
@@ -1345,18 +1345,18 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
           this->GetApplicationVersionName(),
           subkey);
   
-  vtkKWRegisteryUtilities *reg 
-    = this->GetRegistery(this->GetApplicationName());
+  vtkKWRegistryUtilities *reg 
+    = this->GetRegistry(this->GetApplicationName());
   res = reg->DeleteValue(buffer, key);
   return res;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::HasRegisteryValue(int level, const char* subkey, 
+int vtkKWApplication::HasRegistryValue(int level, const char* subkey, 
                                         const char* key)
 {
   char buffer[REG_KEY_VALUE_SIZE_MAX];
-  return this->GetRegisteryValue(level, subkey, key, buffer);
+  return this->GetRegistryValue(level, subkey, key, buffer);
 }
 
 //----------------------------------------------------------------------------
@@ -1405,17 +1405,17 @@ int vtkKWApplication::LoadScript(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-float vtkKWApplication::GetFloatRegisteryValue(int level, const char* subkey, 
+float vtkKWApplication::GetFloatRegistryValue(int level, const char* subkey, 
                                                const char* key)
 {
-  if ( this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+  if ( this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
   float res = 0;
   char buffer[REG_KEY_VALUE_SIZE_MAX];
-  if ( this->GetRegisteryValue( 
+  if ( this->GetRegistryValue( 
          level, subkey, key, buffer ) )
     {
     res = atof(buffer);
@@ -1424,18 +1424,18 @@ float vtkKWApplication::GetFloatRegisteryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey, 
+int vtkKWApplication::GetIntRegistryValue(int level, const char* subkey, 
                                       const char* key)
 {
-  if ( this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+  if ( this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
 
   int res = 0;
   char buffer[REG_KEY_VALUE_SIZE_MAX];
-  if ( this->GetRegisteryValue( 
+  if ( this->GetRegistryValue( 
          level, subkey, key, buffer ) )
     {
     res = atoi(buffer);
@@ -1444,19 +1444,19 @@ int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::BooleanRegisteryCheck(int level, 
+int vtkKWApplication::BooleanRegistryCheck(int level, 
                                             const char* subkey,
                                             const char* key, 
                                             const char* trueval)
 {
-  if ( this->GetRegisteryLevel() < 0 ||
-       this->GetRegisteryLevel() < level )
+  if ( this->GetRegistryLevel() < 0 ||
+       this->GetRegistryLevel() < level )
     {
     return 0;
     }
   char buffer[REG_KEY_VALUE_SIZE_MAX];
   int allset = 0;
-  if ( this->GetRegisteryValue(level, subkey, key, buffer) )
+  if ( this->GetRegistryValue(level, subkey, key, buffer) )
     {
     if (buffer && trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
       {
@@ -2102,7 +2102,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
   os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
-  os << indent << "RegisteryLevel: " << this->GetRegisteryLevel() << endl;
+  os << indent << "RegistryLevel: " << this->GetRegistryLevel() << endl;
   os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
      << endl;
   os << indent << "ExitOnReturn: " << (this->ExitOnReturn ? "on":"off") << endl;

@@ -139,10 +139,10 @@ public:
 
   // Description:
   // Show either navigation window with a fragment of pipeline or a
-  // source window with a list of sources. If the argument registery
-  // is 1, then the value will be stored in the registery.
-  void ShowNavigationWindowCallback(int registery);
-  void ShowSelectionWindowCallback(int registery);
+  // source window with a list of sources. If the argument registry
+  // is 1, then the value will be stored in the registry.
+  void ShowNavigationWindowCallback(int registry);
+  void ShowSelectionWindowCallback(int registry);
   
   // Description:
   // Export the renderer and render window to a file.

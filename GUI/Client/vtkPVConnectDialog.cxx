@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.20");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.21");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -119,7 +119,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->MPINumberOfServers->EnabledOff();
 
   char servers[1024];
-  if ( app->GetRegisteryValue(2, "RunTime", "ConnectionServers", servers) )
+  if ( app->GetRegistryValue(2, "RunTime", "ConnectionServers", servers) )
     {
     const char* server = servers;
     size_t cc;
@@ -165,7 +165,7 @@ void vtkPVConnectDialog::OK()
     servers += ",";
     servers += this->Hostname->GetWidget()->GetValueFromIndex(cc);
     }
-  this->GetApplication()->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
+  this->GetApplication()->SetRegistryValue(2, "RunTime", "ConnectionServers", servers.c_str());
 
   this->Superclass::OK();
 }

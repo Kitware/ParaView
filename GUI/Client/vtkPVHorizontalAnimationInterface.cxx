@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.12");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -247,10 +247,10 @@ void vtkPVHorizontalAnimationInterface::RemoveAllKeyFrames()
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::RestoreWindowGeometry()
 {
-  if (this->GetApplication()->HasRegisteryValue(2, "Geometry", 
+  if (this->GetApplication()->HasRegistryValue(2, "Geometry", 
       "AnimationFrame1Size"))
     {
-    int reg_size = this->GetApplication()->GetIntRegisteryValue(
+    int reg_size = this->GetApplication()->GetIntRegistryValue(
       2, "Geometry", "AnimationFrame1Size");
     this->SplitFrame->SetFrame1Size(reg_size);
     }
@@ -261,7 +261,7 @@ void vtkPVHorizontalAnimationInterface::SaveWindowGeometry()
 {
   if (this->IsCreated())
     {
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "Geometry", "AnimationFrame1Size", "%d",
       this->SplitFrame->GetFrame1Size());
     }

@@ -28,7 +28,7 @@
 class vtkKWLabel;
 class vtkKWMessageDialog;
 class vtkKWMessageDialog;
-class vtkKWRegisteryUtilities;
+class vtkKWRegistryUtilities;
 class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindow;
@@ -103,7 +103,7 @@ public:
 
   // Description:
   // Set/Get the ApplicationVersionName - this is the name + version number
-  // (no spaces, usually used as the master key to store registery settings,
+  // (no spaces, usually used as the master key to store registry settings,
   //  ex: VolView20, ParaView1.1, etc)
   vtkSetStringMacro(ApplicationVersionName);
   vtkGetStringMacro(ApplicationVersionName);
@@ -210,19 +210,19 @@ public:
 
   //BTX
   // Description:
-  // Return the Registery object. It is created on first use
+  // Return the Registry object. It is created on first use
   // and deleted on exiting the application.
-  vtkKWRegisteryUtilities *GetRegistery( const char* toplevel);
-  vtkKWRegisteryUtilities *GetRegistery( );
+  vtkKWRegistryUtilities *GetRegistry( const char* toplevel);
+  vtkKWRegistryUtilities *GetRegistry( );
   //ETX
 
   // Description:
-  // Set or get the current registery level. If the called
-  // registery level is lower than current one, the operation is 
-  // successfull. Registery level -1 means to ignore all the 
-  // registery operations.
-  vtkSetClampMacro(RegisteryLevel, int, -1, 10);
-  vtkGetMacro(RegisteryLevel, int);
+  // Set or get the current registry level. If the called
+  // registry level is lower than current one, the operation is 
+  // successfull. Registry level -1 means to ignore all the 
+  // registry operations.
+  vtkSetClampMacro(RegistryLevel, int, -1, 10);
+  vtkGetMacro(RegistryLevel, int);
 
   // Description:
   // This value will be returned by application1 at exit.
@@ -258,32 +258,32 @@ public:
   void SetMessageDialogResponse(const char* dialogname, int response);
 
   //Description:
-  // Set or get the registery value for the application.
+  // Set or get the registry value for the application.
   // When storing multiple arguments, separate with spaces.
-  // If the level is lower than current registery level, operation 
+  // If the level is lower than current registry level, operation 
   // will be successfull.
   //BTX
-  int SetRegisteryValue(int level, const char* subkey, const char* key, 
+  int SetRegistryValue(int level, const char* subkey, const char* key, 
                         const char* format, ...);
   //ETX
-  int GetRegisteryValue(int level, const char* subkey, const char* key, 
+  int GetRegistryValue(int level, const char* subkey, const char* key, 
                         char* value);
-  int DeleteRegisteryValue(int level, const char* subkey, const char* key);
-  int HasRegisteryValue(int level, const char* subkey, const char* key);
+  int DeleteRegistryValue(int level, const char* subkey, const char* key);
+  int HasRegistryValue(int level, const char* subkey, const char* key);
   
   // Description:
-  // Perform a boolean check of the value in registery. If the value
+  // Perform a boolean check of the value in registry. If the value
   // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegisteryCheck(int level, const char* subkey, const char* key, 
+  int BooleanRegistryCheck(int level, const char* subkey, const char* key, 
                             const char* trueval);
 
   // Description:
-  // Get float registery value (zero if not found).
-  // If the level is lower than current registery level, operation 
+  // Get float registry value (zero if not found).
+  // If the level is lower than current registry level, operation 
   // will be successfull.
-  float GetFloatRegisteryValue(int level, const char* subkey, 
+  float GetFloatRegistryValue(int level, const char* subkey, 
                                const char* key);
-  int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
+  int   GetIntRegistryValue(int level, const char* subkey, const char* key);
   
   // Description:
   // Get the splash screen, if this app have/show a splash screen.
@@ -309,10 +309,10 @@ public:
   vtkGetMacro(InExit, int);
 
   // Descrition:
-  // Get those application settings that are stored in the registery
-  // Should be called once the application name is known (and the registery
+  // Get those application settings that are stored in the registry
+  // Should be called once the application name is known (and the registry
   // level set).
-  virtual void GetApplicationSettingsFromRegistery();
+  virtual void GetApplicationSettingsFromRegistry();
 
   // Description:
   // Get/Set the internal character encoding of the application.
@@ -398,8 +398,8 @@ protected:
 
   ofstream *TraceFile;
 
-  vtkKWRegisteryUtilities *Registery;
-  int RegisteryLevel;
+  vtkKWRegistryUtilities *Registry;
+  int RegistryLevel;
   int BalloonHelpDelay;
 
   int UseMessageDialogs;

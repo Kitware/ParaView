@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.26");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.27");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -482,11 +482,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->ShowMostRecentPanelsCheckButton)
     {
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
       {
       this->ShowMostRecentPanelsCheckButton->SetState(
-        this->GetApplication()->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegistryValue(
           2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY));
       }
     else
@@ -519,11 +519,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatFrameCheckButton)
     {
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
       {
       this->FlatFrameCheckButton->SetState(
-        this->GetApplication()->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegistryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY));
       }
     else
@@ -537,11 +537,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatButtonsCheckButton)
     {
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
       {
       this->FlatButtonsCheckButton->SetState(
-        this->GetApplication()->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegistryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY));
       }
     else
@@ -592,7 +592,7 @@ void vtkKWApplicationSettingsInterface::SaveWindowGeometryCallback()
   
   int state = this->SaveWindowGeometryCheckButton->GetState() ? 1 : 0;
   
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", state);
   
   this->GetApplication()->SetSaveWindowGeometry(state);
@@ -609,7 +609,7 @@ void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
 
   int state = this->ShowSplashScreenCheckButton->GetState() ? 1 : 0;
  
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY, "%d", state);
 
   this->GetApplication()->SetShowSplashScreen(state);
@@ -626,7 +626,7 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 
   int state = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
 
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY, "%d", state);
 
   this->GetApplication()->SetShowBalloonHelp(state);
@@ -638,7 +638,7 @@ void vtkKWApplicationSettingsInterface::ShowMostRecentPanelsCallback()
   if (this->IsCreated())
     {
     int flag = this->ShowMostRecentPanelsCheckButton->GetState() ? 1 : 0;
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY, "%d", flag);
     if (this->Window)
       {
@@ -653,7 +653,7 @@ void vtkKWApplicationSettingsInterface::EnableDragAndDropCallback()
   if (this->IsCreated())
     {
     int flag = this->EnableDragAndDropCheckButton->GetState() ? 1 : 0;
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY, "%d", flag);
     vtkKWUserInterfaceNotebookManager *uim_nb = 
       vtkKWUserInterfaceNotebookManager::SafeDownCast(
@@ -699,7 +699,7 @@ void vtkKWApplicationSettingsInterface::FlatFrameCallback()
     return;
     }
 
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", 
     this->FlatFrameCheckButton->GetState() ? 1 : 0);
 
@@ -718,7 +718,7 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
     return;
     }
 
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", 
     this->FlatButtonsCheckButton->GetState() ? 1 : 0); 
 

@@ -142,7 +142,7 @@ public:
 
   // Description::
   // Add a "Recent Files" sub-menu to the File menu and fill it with the
-  // most recent files stored in the registery.
+  // most recent files stored in the registry.
   // - menuEntry is the name of the menu entry in the File menu above which 
   //   the sub-menu will be inserted. If NULL (or not found), the sub-menu
   //   will be inserted before the last entry in the File menu 
@@ -260,33 +260,33 @@ public:
 
   //BTX
   //Description:
-  // Set or get the registery value for the application.
+  // Set or get the registry value for the application.
   // When storing multiple arguments, separate with spaces.
-  // If the level is lower than current registery level, operation 
+  // If the level is lower than current registry level, operation 
   // will be successfull.
   /*
-  int SetWindowRegisteryValue(int level, const char* subkey, const char* key, 
+  int SetWindowRegistryValue(int level, const char* subkey, const char* key, 
                         const char* format, ...);
-  int GetWindowRegisteryValue(int level, const char* subkey, const char* key, 
+  int GetWindowRegistryValue(int level, const char* subkey, const char* key, 
                         char*value);
-  int DeleteRegisteryValue(int level, const char* subkey, const char* key);
+  int DeleteRegistryValue(int level, const char* subkey, const char* key);
   */
   
   // Description:
-  // Get float registery value (zero if not found).
-  // If the level is lower than current registery level, operation 
+  // Get float registry value (zero if not found).
+  // If the level is lower than current registry level, operation 
   // will be successfull.
-  float GetFloatRegisteryValue(int level, const char* subkey, 
+  float GetFloatRegistryValue(int level, const char* subkey, 
                                const char* key);
-  int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
+  int   GetIntRegistryValue(int level, const char* subkey, const char* key);
 
   // Description:
-  // Perform a boolean check of the value in registery. If the value 
+  // Perform a boolean check of the value in registry. If the value 
   // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegisteryCheck(int level, const char* subkey, const char* key, const char* trueval);
+  int BooleanRegistryCheck(int level, const char* subkey, const char* key, const char* trueval);
   
   // Description:
-  // Save or retrieve color from registery. If color does not 
+  // Save or retrieve color from registry. If color does not 
   // exist, it will retrieve -1, -1 ,-1 and return 0 (1 if success).
   void SaveColor(int level, const char*, float rgb[3]);
   void SaveColor(int level, const char*, double rgb[3]);
@@ -294,8 +294,8 @@ public:
   int RetrieveColor(int level, const char*, double rgb[3]);
 
   // Description:
-  // Save or retrieve the last path of the dialog to the registery.
-  // The string argument is the registery key.
+  // Save or retrieve the last path of the dialog to the registry.
+  // The string argument is the registry key.
   void SaveLastPath(vtkKWLoadSaveDialog *, const char*);
   void RetrieveLastPath(vtkKWLoadSaveDialog *, const char*);
 

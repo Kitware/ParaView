@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.21");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.22");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -105,13 +105,13 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%f",
+    pvapp->SetRegistryValue(2, "RunTime", "LODThreshold", "%f",
                              this->LODThreshold);
-    pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
-    pvapp->SetRegisteryValue(2, "RunTime", "OutlineThreshold", "%f",
+    pvapp->SetRegistryValue(2, "RunTime", "OutlineThreshold", "%f",
                              this->OutlineThreshold);
-    pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
                              this->RenderInterruptsEnabled);
 
     }
@@ -221,10 +221,10 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODThresholdValue->Create(app, "-anchor w");
 
   if (pvapp &&
-      pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
+      pvapp->GetRegistryValue(2, "RunTime", "LODThreshold", 0))
     {
     this->LODThreshold = 
-      pvapp->GetFloatRegisteryValue(2, "RunTime", "LODThreshold");
+      pvapp->GetFloatRegistryValue(2, "RunTime", "LODThreshold");
     }
   this->SetLODThreshold(this->LODThreshold);
   this->LODThresholdScale->SetValue(this->LODThreshold);
@@ -267,10 +267,10 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODResolutionValue->Create(app, "-anchor w");
 
   if (pvapp &&
-      pvapp->GetRegisteryValue(2, "RunTime", "LODResolution", 0))
+      pvapp->GetRegistryValue(2, "RunTime", "LODResolution", 0))
     {
     this->LODResolution =
-      pvapp->GetIntRegisteryValue(2, "RunTime", "LODResolution");
+      pvapp->GetIntRegistryValue(2, "RunTime", "LODResolution");
     }
   this->SetLODResolution(this->LODResolution);
   this->LODResolutionScale->SetValue(150 - this->LODResolution);
@@ -308,10 +308,10 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->OutlineThresholdValue->Create(app, "-anchor w");
 
   if (pvapp &&
-      pvapp->GetRegisteryValue(2, "RunTime", "OutlineThreshold", 0))
+      pvapp->GetRegistryValue(2, "RunTime", "OutlineThreshold", 0))
     {
     this->OutlineThreshold =
-      pvapp->GetFloatRegisteryValue(2, "RunTime", "OutlineThreshold");
+      pvapp->GetFloatRegistryValue(2, "RunTime", "OutlineThreshold");
     }
   this->SetOutlineThreshold(this->OutlineThreshold);
   this->OutlineThresholdScale->SetValue(this->OutlineThreshold/1000000.0);
@@ -342,11 +342,11 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
                                              "-text \"Allow rendering interrupts\"");
   this->RenderInterruptsEnabledCheck->SetCommand(this, "RenderInterruptsEnabledCheckCallback");
   
-  if (pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+  if (pvapp && pvapp->GetRegistryValue(2, "RunTime", 
                                         "RenderInterruptsEnabled", 0))
     {
     this->RenderInterruptsEnabled = 
-      pvapp->GetIntRegisteryValue(2, "RunTime", "RenderInterruptsEnabled");
+      pvapp->GetIntRegistryValue(2, "RunTime", "RenderInterruptsEnabled");
     }
   this->RenderInterruptsEnabledCheck->SetState(this->RenderInterruptsEnabled);
   // This call just forwards the value to the render module.

@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.25");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.26");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -166,9 +166,9 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
 
-  if (pvApp->HasRegisteryValue(2,"RunTime","AdvancedAnimationView"))
+  if (pvApp->HasRegistryValue(2,"RunTime","AdvancedAnimationView"))
     {
-    this->AdvancedView = pvApp->GetIntRegisteryValue(2, "RunTime", "AdvancedAnimationView");
+    this->AdvancedView = pvApp->GetIntRegistryValue(2, "RunTime", "AdvancedAnimationView");
     }
 
   this->HAnimationInterface->SetParent(this->HorizantalParent);
@@ -199,7 +199,7 @@ void vtkPVAnimationManager::SetAdvancedView(int advanced)
     }
   this->AdvancedView = advanced;
   this->Update();
-  this->GetApplication()->SetRegisteryValue(2, "RunTime",
+  this->GetApplication()->SetRegistryValue(2, "RunTime",
     "AdvancedAnimationView", "%d", advanced);
 }
 

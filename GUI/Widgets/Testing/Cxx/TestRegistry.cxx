@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    TestRegistery.cxx
+  Module:    TestRegistry.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWRegistryUtilities.h"
 
 #define IFT(x,res) if ( !x )                    \
   {                                             \
@@ -35,7 +35,7 @@ int main(int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   int res = 0;
   
-  vtkKWRegisteryUtilities *reg = vtkKWRegisteryUtilities::New();
+  vtkKWRegistryUtilities *reg = vtkKWRegistryUtilities::New();
   reg->SetTopLevel("TestRegistry");
   
   IFT(reg->SetValue("TestSubkey",  "TestKey1", "Test Value 1"), res);

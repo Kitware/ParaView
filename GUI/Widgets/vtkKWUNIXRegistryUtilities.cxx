@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWUNIXRegisteryUtilities.cxx
+  Module:    vtkKWUNIXRegistryUtilities.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWUNIXRegisteryUtilities.h"
+#include "vtkKWUNIXRegistryUtilities.h"
 
 #include "vtkObjectFactory.h"
 
@@ -26,12 +26,12 @@
 
 #define BUFFER_SIZE 8192
 
-vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.5");
+vtkStandardNewMacro( vtkKWUNIXRegistryUtilities );
+vtkCxxRevisionMacro(vtkKWUNIXRegistryUtilities, "1.1");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
-class vtkKWUNIXRegisteryUtilitiesInternals
+class vtkKWUNIXRegistryUtilitiesInternals
 {
 public:
   typedef vtkstd::map<vtkStdString, vtkStdString> StringToStringMap;
@@ -41,21 +41,21 @@ public:
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
+vtkKWUNIXRegistryUtilities::vtkKWUNIXRegistryUtilities()
 {
-  this->Internals = new vtkKWUNIXRegisteryUtilitiesInternals;
+  this->Internals = new vtkKWUNIXRegistryUtilitiesInternals;
   this->SubKey  = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkKWUNIXRegisteryUtilities::~vtkKWUNIXRegisteryUtilities()
+vtkKWUNIXRegistryUtilities::~vtkKWUNIXRegistryUtilities()
 {
   delete this->Internals;
 }
 
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
+int vtkKWUNIXRegistryUtilities::OpenInternal(const char *toplevel,
                                               const char *subkey, 
                                               int readonly)
 {  
@@ -67,7 +67,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
     return 0;
     }
   str << getenv("HOME") << "/." << toplevel << "rc" << ends;
-  if ( readonly == vtkKWRegisteryUtilities::READWRITE )
+  if ( readonly == vtkKWRegistryUtilities::READWRITE )
     {
     ofstream ofs( str.str(), ios::out|ios::app );
     str.rdbuf()->freeze(0);
@@ -132,7 +132,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::CloseInternal()
+int vtkKWUNIXRegistryUtilities::CloseInternal()
 {
   int res = 0;
   if ( !this->Changed )
@@ -171,7 +171,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
 
   if ( !this->Internals->EntriesMap.empty() )
     {
-    vtkKWUNIXRegisteryUtilitiesInternals::StringToStringMap::iterator it;
+    vtkKWUNIXRegistryUtilitiesInternals::StringToStringMap::iterator it;
     for ( it = this->Internals->EntriesMap.begin();
       it != this->Internals->EntriesMap.end();
       ++ it )
@@ -191,7 +191,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
+int vtkKWUNIXRegistryUtilities::ReadValueInternal(const char *skey,
                                                    char *value)
 
 {
@@ -201,7 +201,7 @@ int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
     {
     return 0;
     }
-  vtkKWUNIXRegisteryUtilitiesInternals::StringToStringMap::iterator it
+  vtkKWUNIXRegistryUtilitiesInternals::StringToStringMap::iterator it
     = this->Internals->EntriesMap.find(key);
   if ( it != this->Internals->EntriesMap.end() )
     {
@@ -213,14 +213,14 @@ int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::DeleteKeyInternal(const char* vtkNotUsed(key))
+int vtkKWUNIXRegistryUtilities::DeleteKeyInternal(const char* vtkNotUsed(key))
 {
   int res = 0;
   return res;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::DeleteValueInternal(const char *skey)
+int vtkKWUNIXRegistryUtilities::DeleteValueInternal(const char *skey)
 {
   char *key = this->CreateKey( skey );
   if ( !key )
@@ -233,7 +233,7 @@ int vtkKWUNIXRegisteryUtilities::DeleteValueInternal(const char *skey)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUNIXRegisteryUtilities::SetValueInternal(const char *skey, 
+int vtkKWUNIXRegistryUtilities::SetValueInternal(const char *skey, 
                                                   const char *value)
 {
   char *key = this->CreateKey( skey );
@@ -247,7 +247,7 @@ int vtkKWUNIXRegisteryUtilities::SetValueInternal(const char *skey,
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWUNIXRegisteryUtilities::CreateKey( const char *key )
+char *vtkKWUNIXRegistryUtilities::CreateKey( const char *key )
 {
   char *newkey;
   if ( !this->SubKey || !key )
@@ -261,7 +261,7 @@ char *vtkKWUNIXRegisteryUtilities::CreateKey( const char *key )
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUNIXRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWUNIXRegistryUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.19");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.20");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -176,9 +176,9 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "reported during startup. Turn this off to avoid unnecessary popup "
     "messages during startup.");
 
-  if (!app->GetRegisteryValue(2,"RunTime", 
+  if (!app->GetRegistryValue(2,"RunTime", 
       VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY,0)||
-    app->GetIntRegisteryValue(2,"RunTime",VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY))
+    app->GetIntRegistryValue(2,"RunTime",VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY))
     {
     this->ShowTraceFilesCheckButton->SetState(1);
     }
@@ -297,7 +297,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
 
  int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
 
- this->GetApplication()->SetRegisteryValue(
+ this->GetApplication()->SetRegistryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
 
  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
@@ -318,7 +318,7 @@ void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
 
   int flag = this->ShowTraceFilesCheckButton->GetState() ? 1 : 0;
 
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
 
   vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
@@ -339,7 +339,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
 
  int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
 
- this->GetApplication()->SetRegisteryValue(
+ this->GetApplication()->SetRegistryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
 
  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());

@@ -42,7 +42,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.215");
+vtkCxxRevisionMacro(vtkKWWindow, "1.216");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -416,9 +416,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     uim->Create(app);
     }
 
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
         2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY) &&
-      !this->GetIntRegisteryValue(
+      !this->GetIntRegistryValue(
         2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
     {
     this->ShowMostRecentPanels(0);
@@ -432,11 +432,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     vtkKWUserInterfaceNotebookManager::SafeDownCast(uim);
   if (uim_nb)
     {
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY))
       {
       uim_nb->SetEnableDragAndDrop(
-        this->GetIntRegisteryValue(
+        this->GetIntRegistryValue(
           2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY));
       }
     }
@@ -546,11 +546,11 @@ void vtkKWWindow::SaveWindowGeometry()
     {
     this->Script("wm geometry %s", this->GetWidgetName());
 
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
       this->GetApplication()->GetMainInterp()->result);
 
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
       this->MiddleFrame->GetFrame1Size());
     }
@@ -561,11 +561,11 @@ void vtkKWWindow::RestoreWindowGeometry()
 {
   if (this->IsCreated())
     {
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
       {
       char geometry[40];
-      if (this->GetApplication()->GetRegisteryValue(
+      if (this->GetApplication()->GetRegistryValue(
             2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
         {
         this->Script("wm geometry %s %s", this->GetWidgetName(), geometry);
@@ -577,10 +577,10 @@ void vtkKWWindow::RestoreWindowGeometry()
                    this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
       }
 
-    if (this->GetApplication()->HasRegisteryValue(
+    if (this->GetApplication()->HasRegistryValue(
           2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
       {
-      int reg_size = this->GetApplication()->GetIntRegisteryValue(
+      int reg_size = this->GetApplication()->GetIntRegistryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
       if (reg_size >= this->MiddleFrame->GetFrame1MinimumSize())
         {
@@ -682,9 +682,9 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name,
   // Restore state from registry.
   ostrstream reg_key;
   reg_key << name << "_ToolbarVisibility" << ends;
-  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
+  if (this->GetApplication()->GetRegistryValue(2, "RunTime", reg_key.str(), 0))
     {
-    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
+    visibility = this->GetApplication()->GetIntRegistryValue(2, "RunTime", reg_key.str());
     }
   this->SetToolbarVisibility(toolbar, name, visibility);
   reg_key.rdbuf()->freeze(0);
@@ -742,7 +742,7 @@ void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* ,
     }
   ostrstream reg_key;
   reg_key << name << "_ToolbarVisibility" << ends;
-  this->GetApplication()->SetRegisteryValue(2, "RunTime", reg_key.str(),
+  this->GetApplication()->SetRegistryValue(2, "RunTime", reg_key.str(),
     "%d", flag);
   reg_key.rdbuf()->freeze(0); 
   this->UpdateToolbarAspect();
@@ -1014,7 +1014,7 @@ void vtkKWWindow::AddRecentFilesMenu(
     }
   this->MenuFile->InsertCascade(insert_idx, label, mrf_menu, underline);
 
-  // Fill the recent files vector with recent files stored in registery
+  // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
 
   this->MostRecentFilesUtilities->SetDefaultTargetObject(target);
@@ -1125,17 +1125,17 @@ int vtkKWWindow::ExitDialog()
 }
 
 //----------------------------------------------------------------------------
-float vtkKWWindow::GetFloatRegisteryValue(int level, const char* subkey, 
+float vtkKWWindow::GetFloatRegistryValue(int level, const char* subkey, 
                                           const char* key)
 {
-  return this->GetApplication()->GetFloatRegisteryValue(level, subkey, key);
+  return this->GetApplication()->GetFloatRegistryValue(level, subkey, key);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey, 
+int vtkKWWindow::GetIntRegistryValue(int level, const char* subkey, 
                                       const char* key)
 {
-  return this->GetApplication()->GetIntRegisteryValue(level, subkey, key);
+  return this->GetApplication()->GetIntRegistryValue(level, subkey, key);
 }
 
 //----------------------------------------------------------------------------
@@ -1144,7 +1144,7 @@ void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
   //  "OpenDirectory"
   if ( dialog->GetLastPath() )
     {
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       1, "RunTime", key, dialog->GetLastPath());
     }
 }
@@ -1153,7 +1153,7 @@ void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 {
   char buffer[1024];
-  if ( this->GetApplication()->GetRegisteryValue(1, "RunTime", key, buffer) )
+  if ( this->GetApplication()->GetRegistryValue(1, "RunTime", key, buffer) )
     {
     if ( *buffer )
       {
@@ -1165,7 +1165,7 @@ void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 //----------------------------------------------------------------------------
 void vtkKWWindow::SaveColor(int level, const char* key, double rgb[3])
 {
-  this->GetApplication()->SetRegisteryValue(
+  this->GetApplication()->SetRegistryValue(
     level, "Colors", key, "Color: %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
 }
 
@@ -1188,7 +1188,7 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, double rgb[3])
   rgb[2] = -1;
 
   int ok = 0;
-  if (this->GetApplication()->GetRegisteryValue(
+  if (this->GetApplication()->GetRegistryValue(
         level, "Colors", key, buffer) )
     {
     if (*buffer)
@@ -1212,12 +1212,12 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::BooleanRegisteryCheck(int level, 
+int vtkKWWindow::BooleanRegistryCheck(int level, 
                                        const char* subkey,
                                        const char* key, 
                                        const char* trueval)
 {
-  return this->GetApplication()->BooleanRegisteryCheck(level, subkey, key, trueval);
+  return this->GetApplication()->BooleanRegistryCheck(level, subkey, key, trueval);
 }
 
 
@@ -1369,10 +1369,10 @@ void vtkKWWindow::UpdateToolbarAspect()
     }
 
   int flat_frame;
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
     {
-    flat_frame = this->GetApplication()->GetIntRegisteryValue(
+    flat_frame = this->GetApplication()->GetIntRegistryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
     }
   else
@@ -1381,10 +1381,10 @@ void vtkKWWindow::UpdateToolbarAspect()
     }
 
   int flat_buttons;
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
     {
-    flat_buttons = this->GetApplication()->GetIntRegisteryValue(
+    flat_buttons = this->GetApplication()->GetIntRegistryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
     }
   else

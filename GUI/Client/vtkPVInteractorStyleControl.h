@@ -94,14 +94,14 @@ public:
   vtkGetStringMacro(DefaultManipulator);
 
   // Description:
-  // Read and store information to the registery.
-  void ReadRegistery();
-  void StoreRegistery();
+  // Read and store information to the registry.
+  void ReadRegistry();
+  void StoreRegistry();
 
   // Description:
-  // Type or name of manipulator is used for storing in the registery.
-  vtkSetStringMacro(RegisteryName);
-  vtkGetStringMacro(RegisteryName);
+  // Type or name of manipulator is used for storing in the registry.
+  vtkSetStringMacro(RegistryName);
+  vtkGetStringMacro(RegistryName);
 
   // Description:
   // Add argument that can be modified for specific manipulator.
@@ -154,7 +154,7 @@ protected:
 
   vtkCollection *ManipulatorCollection;
   char* DefaultManipulator;
-  char* RegisteryName;
+  char* RegistryName;
 
   // This is hack to get tcl name;
   vtkPVCameraManipulator *CurrentManipulator;

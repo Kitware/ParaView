@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.677");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -525,10 +525,10 @@ void vtkPVWindow::PrepareForDelete()
     {
     int state;
     state = this->ResetCameraButton->GetCheckButtonState("ViewAngle");
-    pvApp->SetRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle", 
+    pvApp->SetRegistryValue(2, "RunTime", "ResetViewResetsViewAngle", 
                              "%d", state);
     state = this->ResetCameraButton->GetCheckButtonState("CenterOfRotation");
-    pvApp->SetRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 
+    pvApp->SetRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 
                              "%d", state);
     }
 
@@ -685,7 +685,7 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->GetApplication())
     {
-    this->GetApplication()->SetRegisteryValue(2, 
+    this->GetApplication()->SetRegistryValue(2, 
                                               "RunTime", 
                                               "CenterActorVisibility",
                                               "%d", 
@@ -1002,16 +1002,16 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   
   // Create options and popup option menu for the reset camera button.
   int state = 0;
-  if (app->GetRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 0))
+  if (app->GetRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 0))
     {
-    state = app->GetIntRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation");
+    state = app->GetIntRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation");
     }
   this->ResetCameraButton->AddCheckButton("Reset Center Of Rotation", "CenterOfRotation", state,
                                           "Button sets the center opf rotation to center of visible modules.");
   state = 0;
-  if (app->GetRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle", 0))
+  if (app->GetRegistryValue(2, "RunTime", "ResetViewResetsViewAngle", 0))
     {
-    state = app->GetIntRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle");
+    state = app->GetIntRegistryValue(2, "RunTime", "ResetViewResetsViewAngle");
     }
   this->ResetCameraButton->AddCheckButton("Reset View Angle", "ViewAngle", state,
                                           "Button sets the view plane normal to the default z axis.");
@@ -1072,11 +1072,11 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   checkCommand << "ToolbarMenuCheckCallback " << buttonName << ends;
   menu->AddCheckButton(buttonName,var,this, checkCommand.str(),
     "Show/Hide button in toolbar.");
-  // Look in the registery to see if a button should be visible.
+  // Look in the registry to see if a button should be visible.
   vtkKWApplication* app = this->GetApplication();
-  if (app->GetRegisteryValue(2, "RunTime", buttonName, 0))
+  if (app->GetRegistryValue(2, "RunTime", buttonName, 0))
     {
-    buttonVisibility = app->GetIntRegisteryValue(2, "RunTime", buttonName);
+    buttonVisibility = app->GetIntRegistryValue(2, "RunTime", buttonName);
     }
   menu->CheckCheckButton(this, buttonName, buttonVisibility);
 
@@ -1113,9 +1113,9 @@ void vtkPVWindow::ToolbarMenuCheckCallback(const char* buttonName)
   vtkKWPushButton *button = 0;
   if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK && button )
     {
-    // Save in the registery
+    // Save in the registry
     vtkPVApplication* pvApp = this->GetPVApplication();
-    pvApp->SetRegisteryValue(2, "RunTime", buttonName, 
+    pvApp->SetRegistryValue(2, "RunTime", buttonName, 
                              "%d", checkValue);
     if (checkValue)
       {
@@ -1167,7 +1167,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Allow the user to interactively resize the properties parent.
   // Set the left panel size (Frame1) for this app. Do it now before
-  // the superclass eventually restores the size from the registery
+  // the superclass eventually restores the size from the registry
 
   this->MiddleFrame->SetFrame1MinimumSize(200);
   this->MiddleFrame->SetFrame2MinimumSize(200);
@@ -1199,9 +1199,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Script("pack %s -side top -fill both -expand t",
                this->LowerFrame->GetWidgetName());
   int hvisibility = 0;
-  if (app->HasRegisteryValue(2, "RunTime", "HorizontalPaneVisibility"))
+  if (app->HasRegistryValue(2, "RunTime", "HorizontalPaneVisibility"))
     {
-    hvisibility = app->GetIntRegisteryValue(2, "RunTime", "HorizontalPaneVisibility");
+    hvisibility = app->GetIntRegistryValue(2, "RunTime", "HorizontalPaneVisibility");
     }
   this->SetHorizontalPaneVisibility(hvisibility);
   
@@ -1373,11 +1373,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                this->GetWidgetName(), 
                this->GetTclName());
 
-  if (pvApp->GetRegisteryValue(2, "RunTime", "CenterActorVisibility", 0))
+  if (pvApp->GetRegistryValue(2, "RunTime", "CenterActorVisibility", 0))
     {
     if (
       (this->CenterActorVisibility = 
-       pvApp->GetIntRegisteryValue(2, "RunTime", "CenterActorVisibility")))
+       pvApp->GetIntRegistryValue(2, "RunTime", "CenterActorVisibility")))
       {
       this->ShowCenterActor();
       }
@@ -4037,7 +4037,7 @@ void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
         VTK_PV_SHOW_HORZPANE_LABEL);
       }
     }
-  this->GetApplication()->SetRegisteryValue(2, "RunTime",
+  this->GetApplication()->SetRegistryValue(2, "RunTime",
     "HorizontalPaneVisibility", "%d", arg);
 }
 
@@ -4347,8 +4347,8 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
       pos--;
       }
     pth[pos] = '\0';
-    // Store in the registery
-    this->GetApplication()->SetRegisteryValue(
+    // Store in the registry
+    this->GetApplication()->SetRegistryValue(
       2, "RunTime", "PackagePath", pth);
     delete [] pth;
     }
@@ -4937,10 +4937,10 @@ void vtkPVWindow::UpdateToolbarAspect()
   
   // Decide the properties of the toolbars.
   int flat_frame;
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
     {
-    flat_frame = this->GetApplication()->GetIntRegisteryValue(
+    flat_frame = this->GetApplication()->GetIntRegistryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
     }
   else
@@ -4949,10 +4949,10 @@ void vtkPVWindow::UpdateToolbarAspect()
     }
 
   int flat_buttons;
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
     {
-    flat_buttons = this->GetApplication()->GetIntRegisteryValue(
+    flat_buttons = this->GetApplication()->GetIntRegistryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
     }
   else
@@ -5311,7 +5311,7 @@ void vtkPVWindow::SaveWindowGeometry()
   this->Superclass::SaveWindowGeometry();
   if (this->IsCreated())
     {
-    this->GetApplication()->SetRegisteryValue(
+    this->GetApplication()->SetRegistryValue(
       2, "Geometry", "WindowHorizontalFrame1Size",
       "%d", this->LowerFrame->GetFrame1Size());
 
@@ -5323,10 +5323,10 @@ void vtkPVWindow::SaveWindowGeometry()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::RestorePVWindowGeometry()
 {
-  if (this->GetApplication()->HasRegisteryValue(
+  if (this->GetApplication()->HasRegistryValue(
       2, "Geometry", "WindowHorizontalFrame1Size"))
     {
-    int reg_size = this->GetApplication()->GetIntRegisteryValue(
+    int reg_size = this->GetApplication()->GetIntRegistryValue(
       2, "Geometry", "WindowHorizontalFrame1Size");
     if (reg_size >= this->LowerFrame->GetFrame1MinimumSize())
       {
@@ -5353,9 +5353,9 @@ void vtkPVWindow::AddLowerToolbar(vtkKWToolbar* toolbar, const char* name,
   // Restore state from registry.
   ostrstream reg_key;
   reg_key << name << "_ToolbarVisibility" << ends;
-  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
+  if (this->GetApplication()->GetRegistryValue(2, "RunTime", reg_key.str(), 0))
     {
-    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
+    visibility = this->GetApplication()->GetIntRegistryValue(2, "RunTime", reg_key.str());
     }
   this->SetLowerToolbarVisibility(toolbar, name, visibility);
   reg_key.rdbuf()->freeze(0);

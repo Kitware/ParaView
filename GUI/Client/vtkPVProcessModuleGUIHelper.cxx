@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.12");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.13");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -91,13 +91,13 @@ int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServe
       retVal = 1;
       this->PVApplication->SetStartGUI(0);
       }
-    // Get the application settings from the registery
+    // Get the application settings from the registry
     // It has to be called now, after ParseCommandLineArguments, which can 
-    // change the registery level (also, it can not be called in the application
+    // change the registry level (also, it can not be called in the application
     // constructor or even the KWApplication constructor since we need the
     // application name to be set)
 
-    this->PVApplication->GetApplicationSettingsFromRegistery();
+    this->PVApplication->GetApplicationSettingsFromRegistry();
     }
 
   this->PVApplication->SetProcessModule(

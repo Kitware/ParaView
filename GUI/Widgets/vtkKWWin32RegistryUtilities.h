@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWin32RegisteryUtilities.h
+  Module:    vtkKWWin32RegistryUtilities.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,23 +11,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegisteryUtilities - A Win32 implementation of the registery
+// .NAME vtkKWRegistryUtilities - A Win32 implementation of the registry
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. It is designed specifically for 
 // Win32 platform.
 
-#ifndef __vtkKWWin32RegisteryUtilities_h
-#define __vtkKWWin32RegisteryUtilities_h
+#ifndef __vtkKWWin32RegistryUtilities_h
+#define __vtkKWWin32RegistryUtilities_h
 
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWRegistryUtilities.h"
 #include "vtkWindows.h" // needed for HKEY
 
-class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
+class VTK_EXPORT vtkKWWin32RegistryUtilities : public vtkKWRegistryUtilities
 {
 public:
-  static vtkKWWin32RegisteryUtilities* New();
-  vtkTypeRevisionMacro(vtkKWWin32RegisteryUtilities, vtkKWRegisteryUtilities);
+  static vtkKWWin32RegistryUtilities* New();
+  vtkTypeRevisionMacro(vtkKWWin32RegistryUtilities, vtkKWRegistryUtilities);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -55,13 +55,13 @@ public:
   virtual int CloseInternal();
 
 protected:
-  vtkKWWin32RegisteryUtilities();
-  virtual ~vtkKWWin32RegisteryUtilities();
+  vtkKWWin32RegistryUtilities();
+  virtual ~vtkKWWin32RegistryUtilities();
 
 private:
   HKEY HKey;
-  vtkKWWin32RegisteryUtilities(const vtkKWWin32RegisteryUtilities&); // Not implemented
-  void operator=(const vtkKWWin32RegisteryUtilities&); // Not implemented
+  vtkKWWin32RegistryUtilities(const vtkKWWin32RegistryUtilities&); // Not implemented
+  void operator=(const vtkKWWin32RegistryUtilities&); // Not implemented
 };
 
 #endif

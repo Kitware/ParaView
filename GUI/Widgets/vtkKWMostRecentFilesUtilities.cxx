@@ -22,7 +22,7 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.1");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.2");
 vtkStandardNewMacro(vtkKWMostRecentFilesUtilities );
 
 int vtkKWMostRecentFilesUtilitiesCommand(ClientData cd, Tcl_Interp *interp,
@@ -265,9 +265,9 @@ void vtkKWMostRecentFilesUtilities::SaveMostRecentFilesToRegistry(
         }
       if (target_command && *target_command)
         {
-        this->GetApplication()->SetRegisteryValue(
+        this->GetApplication()->SetRegistryValue(
           1, reg_key, filename_key, (*it)->GetFileName());
-        this->GetApplication()->SetRegisteryValue(
+        this->GetApplication()->SetRegistryValue(
           1, reg_key, command_key, target_command);
         ++count;
         }
@@ -280,9 +280,9 @@ void vtkKWMostRecentFilesUtilities::SaveMostRecentFilesToRegistry(
     {
     sprintf(filename_key,VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN,count);
     sprintf(command_key,VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN,count);
-    this->GetApplication()->DeleteRegisteryValue(
+    this->GetApplication()->DeleteRegistryValue(
       1, reg_key, filename_key);
-    this->GetApplication()->DeleteRegisteryValue(
+    this->GetApplication()->DeleteRegistryValue(
       1, reg_key, command_key);
     }
 }
@@ -320,9 +320,9 @@ void vtkKWMostRecentFilesUtilities::LoadMostRecentFilesFromRegistry(
     {
     sprintf(filename_key, VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN, i);
     sprintf(command_key, VTK_KW_MRF_REGISTRY_COMMAND_KEYNAME_PATTERN, i);
-    if (this->GetApplication()->GetRegisteryValue(
+    if (this->GetApplication()->GetRegistryValue(
           1, reg_key, filename_key, filename) &&
-        this->GetApplication()->GetRegisteryValue(
+        this->GetApplication()->GetRegistryValue(
           1, reg_key, command_key, command) &&
         strlen(filename) >= 1)
       {

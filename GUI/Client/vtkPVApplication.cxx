@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.343");
+vtkCxxRevisionMacro(vtkPVApplication, "1.344");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -734,8 +734,8 @@ void vtkPVApplication::DeleteTraceFiles(char* name, int all)
 //----------------------------------------------------------------------------
 int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
 {
-  if ( this->GetRegisteryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, 0) &&
-    !this->GetIntRegisteryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY) )
+  if ( this->GetRegistryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, 0) &&
+    !this->GetIntRegistryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY) )
     {
     return 0;
     }
@@ -813,7 +813,7 @@ int vtkPVApplication::ParseCommandLineArguments(int vtkNotUsed(argc), char*argv[
 
   if ( this->Options->GetDisableRegistry() )
     {
-    this->RegisteryLevel = 0;
+    this->RegistryLevel = 0;
     }
 
   // Set the tiled display flag if any tiled display option is used.
@@ -1200,25 +1200,25 @@ void vtkPVApplication::Start(int argc, char*argv[])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::GetApplicationSettingsFromRegistery()
+void vtkPVApplication::GetApplicationSettingsFromRegistry()
 { 
-  this->Superclass::GetApplicationSettingsFromRegistery();
+  this->Superclass::GetApplicationSettingsFromRegistry();
 
   // Show sources description ?
 
-  if (this->HasRegisteryValue(
+  if (this->HasRegistryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY))
     {
-    this->ShowSourcesLongHelp = this->GetIntRegisteryValue(
+    this->ShowSourcesLongHelp = this->GetIntRegistryValue(
       2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY);
     }
 
   // Show name in sources description browser
 
-  if (this->HasRegisteryValue(
+  if (this->HasRegistryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY))
     {
-    this->SourcesBrowserAlwaysShowName = this->GetIntRegisteryValue(
+    this->SourcesBrowserAlwaysShowName = this->GetIntRegistryValue(
       2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY);
     }
 }
@@ -1726,7 +1726,7 @@ void vtkPVApplication::FindApplicationInstallationDirectory()
 
   // Paraview is installed in the bin/ directory. Strip it off if found.
   // This will only happen if the binary has been installed. No change is
-  // made if the path is retrieved from the registery, or if the binary
+  // made if the path is retrieved from the registry, or if the binary
   // is a 'build'.
 
   int length = strlen(this->ApplicationInstallationDirectory);

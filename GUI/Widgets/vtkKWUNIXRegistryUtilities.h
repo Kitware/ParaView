@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWUNIXRegisteryUtilities.h
+  Module:    vtkKWUNIXRegistryUtilities.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,24 +11,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegisteryUtilities - A registery class
+// .NAME vtkKWRegistryUtilities - A registry class
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. It is implemented as a file in
 // the user's home directory.
 
-#ifndef __vtkKWUNIXRegisteryUtilities_h
-#define __vtkKWUNIXRegisteryUtilities_h
+#ifndef __vtkKWUNIXRegistryUtilities_h
+#define __vtkKWUNIXRegistryUtilities_h
 
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWRegistryUtilities.h"
 
-class vtkKWUNIXRegisteryUtilitiesInternals;
+class vtkKWUNIXRegistryUtilitiesInternals;
 
-class VTK_EXPORT vtkKWUNIXRegisteryUtilities : public vtkKWRegisteryUtilities
+class VTK_EXPORT vtkKWUNIXRegistryUtilities : public vtkKWRegistryUtilities
 {
 public:
-  static vtkKWUNIXRegisteryUtilities* New();
-  vtkTypeRevisionMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
+  static vtkKWUNIXRegistryUtilities* New();
+  vtkTypeRevisionMacro(vtkKWUNIXRegistryUtilities, vtkKWRegistryUtilities);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -57,8 +57,8 @@ public:
   virtual int CloseInternal();
 
 protected:
-  vtkKWUNIXRegisteryUtilities();
-  virtual ~vtkKWUNIXRegisteryUtilities();
+  vtkKWUNIXRegistryUtilities();
+  virtual ~vtkKWUNIXRegistryUtilities();
   vtkSetStringMacro(SubKey);
 
   char *CreateKey(const char *key);
@@ -66,10 +66,10 @@ protected:
 private:
   char *SubKey;
 
-  vtkKWUNIXRegisteryUtilitiesInternals* Internals;
+  vtkKWUNIXRegistryUtilitiesInternals* Internals;
 
-  vtkKWUNIXRegisteryUtilities(const vtkKWUNIXRegisteryUtilities&); // Not implemented
-  void operator=(const vtkKWUNIXRegisteryUtilities&); // Not implemented
+  vtkKWUNIXRegistryUtilities(const vtkKWUNIXRegistryUtilities&); // Not implemented
+  void operator=(const vtkKWUNIXRegistryUtilities&); // Not implemented
 };
 
 #endif

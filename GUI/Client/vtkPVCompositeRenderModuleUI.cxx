@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.21");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.22");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -76,23 +76,23 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
 {
-  // Save UI values in registery.
+  // Save UI values in registry.
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
                              this->RenderInterruptsEnabled);
-    pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "UseFloatInComposite", "%d",
                              this->CompositeWithFloatFlag);
-    pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "UseRGBAInComposite", "%d",
                              this->CompositeWithRGBAFlag);
-    pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionFlag);
-    pvapp->SetRegisteryValue(2, "RunTime", "CompositeThreshold", "%f",
+    pvapp->SetRegistryValue(2, "RunTime", "CompositeThreshold", "%f",
                              this->CompositeThreshold);
-    pvapp->SetRegisteryValue(2, "RunTime", "ReductionFactor", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "ReductionFactor", "%d",
                              this->ReductionFactor);
-    pvapp->SetRegisteryValue(2, "RunTime", "SquirtLevel", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "SquirtLevel", "%d",
                              this->SquirtLevel);
     }
 
@@ -215,10 +215,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->CompositeThresholdLabel->SetParent(this->LODScalesFrame);
     this->CompositeThresholdLabel->Create(app, "-anchor w");
     if (pvapp &&
-        pvapp->GetRegisteryValue(2, "RunTime", "CompositeThreshold", 0))
+        pvapp->GetRegistryValue(2, "RunTime", "CompositeThreshold", 0))
       {
       this->CompositeThreshold = 
-        pvapp->GetFloatRegisteryValue(2, "RunTime", "CompositeThreshold");
+        pvapp->GetFloatRegistryValue(2, "RunTime", "CompositeThreshold");
       }
 
     // Force the set.
@@ -264,10 +264,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->ReductionFactorLabel->SetText("2 Pixels");
     this->ReductionFactorLabel->Create(app, "-anchor w");
     if (pvapp &&
-        pvapp->GetRegisteryValue(2, "RunTime", "ReductionFactor", 0))
+        pvapp->GetRegistryValue(2, "RunTime", "ReductionFactor", 0))
       {
       this->SetReductionFactor(
-        pvapp->GetIntRegisteryValue(2, "RunTime", "ReductionFactor"));
+        pvapp->GetIntRegistryValue(2, "RunTime", "ReductionFactor"));
       }
     else
       {
@@ -306,10 +306,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->SquirtLevelLabel->SetParent(this->LODScalesFrame);
     this->SquirtLevelLabel->Create(app, "-anchor w");
     if (pvapp &&
-        pvapp->GetRegisteryValue(2, "RunTime", "SquirtLevel", 0))
+        pvapp->GetRegistryValue(2, "RunTime", "SquirtLevel", 0))
       {
       this->SquirtLevel = 
-        pvapp->GetIntRegisteryValue(2, "RunTime", "SquirtLevel");
+        pvapp->GetIntRegistryValue(2, "RunTime", "SquirtLevel");
       }
 
     if (pvapp->GetOptions()->GetClientMode() &&
@@ -373,10 +373,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->CompositeWithFloatCheck->SetCommand(this, 
                                               "CompositeWithFloatCallback");
     if (pvapp && 
-        pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
+        pvapp->GetRegistryValue(2, "RunTime", "UseFloatInComposite", 0))
       {
       this->CompositeWithFloatFlag =
-        pvapp->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite");
+        pvapp->GetIntRegistryValue(2, "RunTime", "UseFloatInComposite");
       }
     this->CompositeWithFloatCheck->SetState(this->CompositeWithFloatFlag);
     this->CompositeWithFloatCallback();
@@ -385,11 +385,11 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
       "If rendering defects occur, try turning this on.");
   
     this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
-    if (pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+    if (pvapp && pvapp->GetRegistryValue(2, "RunTime", 
                                           "UseRGBAInComposite", 0))
       {
       this->CompositeWithRGBAFlag =
-        pvapp->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite");
+        pvapp->GetIntRegistryValue(2, "RunTime", "UseRGBAInComposite");
       }
     this->CompositeWithRGBACheck->SetState(this->CompositeWithRGBAFlag);
     this->CompositeWithRGBACallback();
@@ -400,10 +400,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->CompositeCompressionCheck->SetCommand(this, 
                                                "CompositeCompressionCallback");
     if (pvapp && 
-        pvapp->GetRegisteryValue(2, "RunTime", "UseCompressionInComposite", 0))
+        pvapp->GetRegistryValue(2, "RunTime", "UseCompressionInComposite", 0))
       {
       this->CompositeCompressionFlag = 
-        pvapp->GetIntRegisteryValue(2, "RunTime", "UseCompressionInComposite");
+        pvapp->GetIntRegistryValue(2, "RunTime", "UseCompressionInComposite");
       }
     this->CompositeCompressionCheck->SetState(this->CompositeCompressionFlag);
     this->CompositeCompressionCallback();

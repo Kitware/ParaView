@@ -219,10 +219,10 @@ public:
   vtkBooleanMacro(SourcesBrowserAlwaysShowName, int);
 
   // Descrition:
-  // Get those application settings that are stored in the registery
-  // Should be called once the application name is known (and the registery
+  // Get those application settings that are stored in the registry
+  // Should be called once the application name is known (and the registry
   // level set).
-  virtual void GetApplicationSettingsFromRegistery();
+  virtual void GetApplicationSettingsFromRegistry();
 
   // Description:
   // Enable or disable test errors. This refers to wether errors make test fail
