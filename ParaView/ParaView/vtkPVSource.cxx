@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.3");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.4");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -281,7 +281,7 @@ void vtkPVSource::SetPVInput(vtkPVData *pvd)
                          pvd->GetVTKDataTclName());
 
 
-  this->GetPVRenderView()->UpdateNavigationWindow(this, 1);
+  this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 
   // Try to set the actor translate
   //float *pt;
@@ -2067,7 +2067,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.3 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.4 $");
 }
 
 //----------------------------------------------------------------------------
