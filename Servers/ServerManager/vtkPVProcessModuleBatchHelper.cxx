@@ -25,7 +25,7 @@
 #include "vtkString.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.3");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.4");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -210,7 +210,16 @@ int vtkPVProcessModuleBatchHelper::RunGUIStart(int argc, char **argv, int numSer
 
   vtkPVBatchOptions* boptions = vtkPVBatchOptions::SafeDownCast(this->ProcessModule->GetOptions());
   char* file = vtkString::Duplicate(boptions->GetBatchScriptName());
-  int res = 0;
+  int res = 0; 
+  // make exit do nothing in batch scripts
+  if(Tcl_GlobalEval(interp, "proc exit {} {}") != TCL_OK)
+    {
+    cerr << "\n    Script: \n" << "proc exit {} {}"
+         << "\n    Returned Error on line "
+         << interp->errorLine << ": \n"  
+         << Tcl_GetStringResult(interp) << endl;
+    res = 1;
+    }
   // add this window as a variable
   if ( Tcl_EvalFile(interp, file) != TCL_OK )
     {
