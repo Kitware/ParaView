@@ -415,6 +415,17 @@ void vtkKWWindow::Close()
   this->Application->Close(this);
 }
 
+void vtkKWWindow::Render()
+{
+  vtkKWView *v;
+  
+  this->Views->InitTraversal();
+  while ((v = this->Views->GetNextKWView()))
+    {
+    v->Render();
+    }
+}
+
 // invoke the apps about dialog when selected
 void vtkKWWindow::DisplayAbout()
 {
@@ -785,8 +796,6 @@ void vtkKWWindow::StoreRecentMenuToRegistry(char *key)
 {
 #ifdef _WIN32
   char fkey[1024];
-  char File[1024];
-  char Cmd[1024];
   
   if (!key)
     {
@@ -910,7 +919,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.49 $");
+  this->ExtractRevision(os,"$Revision: 1.50 $");
 }
 
 int vtkKWWindow::ExitDialog()

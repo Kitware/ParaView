@@ -87,7 +87,7 @@ class vtkKWEvent
     ContourAnnotationAddEvent,
     ContourAnnotationRemoveEvent,
     ContourAnnotationChangeColorEvent,
-    ContourAnnotationChangeThicknessEvent,
+    ContourAnnotationChangeLineWidthEvent,
     // PV
     InitializeTraceEvent,
   };

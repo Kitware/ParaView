@@ -185,6 +185,10 @@ public:
   vtkSetMacro(PromptBeforeClose, int);
   vtkGetMacro(PromptBeforeClose, int);
 
+  // Description:
+  // Call render on all views
+  void Render();
+
   //Description:
   // Set/Get Number of recent files in the menu.
   vtkSetClampMacro(NumberOfRecentFiles, unsigned int, 4, 10);

@@ -141,5 +141,5 @@ void vtkKWProgressGauge::SetValue(int value)
 		 wname, this->Value, wname, wname);
     }
   // do an update
-  this->Script("update");
+  this->Script("update idletasks");
 }
