@@ -124,7 +124,14 @@ void vtkPVData::Clone(vtkPVApplication *pvApp)
   
   // Now create an actor composite with identical tcl names in every process.
   vtkPVActorComposite *c;
-  c = vtkPVActorComposite::New();
+  char *tclName;
+  tclName = new char[strlen(this->GetTclName())+strlen("ActorComposite")+1];
+  sprintf(tclName, "%sActorComposite", this->GetTclName());
+  c = vtkPVActorComposite::SafeDownCast(
+             pvApp->MakeTclObject("vtkPVActorComposite", tclName));
+  delete [] tclName;
+  tclName = NULL;
+  
   c->Clone(pvApp);
   this->SetActorComposite(c);
   c->Delete();
@@ -405,6 +412,7 @@ void vtkPVData::GetBounds(float bounds[6])
     {
     vtkWarningMacro("Cannot update without Assignment.");
     }
+  
   else
     {
     this->Data->SetUpdateExtent(this->Assignment->GetPiece(),

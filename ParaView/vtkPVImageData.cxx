@@ -187,7 +187,8 @@ void vtkPVImageData::SetData(vtkDataSet *data)
 {
   vtkImageData *image = vtkImageData::SafeDownCast(data);
   int *ext;
-  
+  int id = this->GetPVApplication()->GetController()->GetLocalProcessId();
+
   if (data != NULL && image == NULL)
     {
     vtkErrorMacro("Expecting an image");
@@ -211,14 +212,10 @@ void vtkPVImageData::SetData(vtkDataSet *data)
     {
     //this->ActorComposite->SetModeToDataSet();
     this->ActorComposite->SetModeToImageTexture();
-    // Sets the scalar range...
-    this->ActorComposite->Initialize();
     }
   else
     {
     this->ActorComposite->SetModeToImageOutline();
-    // Sets the scalar range...
-    this->ActorComposite->Initialize();
     }
 }
 

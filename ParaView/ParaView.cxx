@@ -59,6 +59,8 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 {
   vtkPVApplication *self = (vtkPVApplication *)(localArg);
 
+  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
+  
   self->SimpleScript((char*)remoteArg);
 }
 

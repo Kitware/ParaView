@@ -313,7 +313,7 @@ void vtkPVImageTextureFilter::Execute()
     y = origin[1] + (float)(this->Extent[2]) * spacing[1];
     z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     
-  vtkDebugMacro("P1: " << x << ", " << y << ", " << z);
+    vtkDebugMacro("P1: " << x << ", " << y << ", " << z);
     
     this->PlaneSource->SetPoint1(x, y, z);
     x = origin[0] + (float)(this->Extent[0]) * spacing[0];
@@ -321,7 +321,7 @@ void vtkPVImageTextureFilter::Execute()
     z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     this->PlaneSource->SetPoint2(x, y, z);
 
-  vtkDebugMacro("P2: " << x << ", " << y << ", " << z);
+   vtkDebugMacro("P2: " << x << ", " << y << ", " << z);
     
     }
   

@@ -538,7 +538,7 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
     vtkKWLabel *labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -603,7 +603,7 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -685,7 +685,7 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -747,7 +747,7 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -809,7 +809,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -831,7 +831,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   minEntry = vtkKWEntry::New();
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
-  minEntry->Create(this->Application, "-width 7");
+  minEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", minEntry->GetWidgetName());
 
   // Max
@@ -849,7 +849,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   maxEntry = vtkKWEntry::New();
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
-  maxEntry->Create(this->Application, "-width 7");
+  maxEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", maxEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -901,7 +901,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -923,7 +923,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 6");
+  xEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -941,7 +941,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 6");
+  yEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -959,7 +959,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 6");
+  zEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1016,7 +1016,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -1038,7 +1038,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 5");
+  xEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -1056,7 +1056,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 5");
+  yEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -1074,7 +1074,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 5");
+  zEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // W
@@ -1092,7 +1092,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   wEntry = vtkKWEntry::New();
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
-  wEntry->Create(this->Application, "-width 5");
+  wEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1154,7 +1154,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -1176,7 +1176,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   uEntry = vtkKWEntry::New();
   this->Widgets->AddItem(uEntry);
   uEntry->SetParent(frame);
-  uEntry->Create(this->Application, "-width 4");
+  uEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", uEntry->GetWidgetName());
 
   // V
@@ -1194,7 +1194,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   vEntry = vtkKWEntry::New();
   this->Widgets->AddItem(vEntry);
   vEntry->SetParent(frame);
-  vEntry->Create(this->Application, "-width 4");
+  vEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", vEntry->GetWidgetName());
 
   // W
@@ -1212,7 +1212,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   wEntry = vtkKWEntry::New();
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
-  wEntry->Create(this->Application, "-width 4");
+  wEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
 
   // X
@@ -1230,7 +1230,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 4");
+  xEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -1248,7 +1248,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 4");
+  yEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -1266,7 +1266,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 4");
+  zEntry->Create(this->Application, "-width 2");
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1331,7 +1331,7 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   labelWidget = vtkKWLabel::New();
   this->Widgets->AddItem(labelWidget);
   labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "-width 19 -justify right");
+  labelWidget->Create(this->Application, "-width 18 -justify right");
   labelWidget->SetLabel(label);
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
 
@@ -1390,7 +1390,7 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *ge
   labelWidget = vtkKWLabel::New();
   this->Widgets->AddItem(labelWidget);
   labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "-width 19 -justify right");
+  labelWidget->Create(this->Application, "-width 18 -justify right");
   labelWidget->SetLabel(label);
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
 

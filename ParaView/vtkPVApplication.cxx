@@ -81,6 +81,15 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationName("ParaView");
 
   this->Controller = NULL;
+
+  // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
+  /// of Application.  Lets force it.
+  //if (this->TclName != NULL)
+  //  {
+  //  vtkErrorMacro("Expecting TclName to be NULL.");
+  //  }
+  //this->TclName = new char [strlen("Application")+1];
+  //strcpy(this->TclName,"Application");
 }
 
 
@@ -110,7 +119,11 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 
   // cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
   
+  //cerr << "      >>>> Broadcast : " << str << endl;
+  //sleep(1);  
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+  //sleep(1);
+  //cerr << "      <<<< Finished Broadcast : " << str << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -131,7 +144,6 @@ void vtkPVApplication::BroadcastSimpleScript(char *str)
 {
   int id, num;
   
-  //cerr << str << endl;
   num = this->Controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {
@@ -273,7 +285,6 @@ vtkPVSource *vtkPVApplication::MakePVSource(const char *pvsClassName,
 
   return pvs;
 }
-
 
 
 //----------------------------------------------------------------------------

@@ -42,6 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
+class vtkPVImageTextureFilter;
 class vtkPVAssignment;
 class vtkPVApplication;
 class vtkPVData;
@@ -94,6 +95,7 @@ public:
   // Description:
   // The mapper needs to know what the assignment is.
   void SetAssignment(vtkPVAssignment *a);
+  vtkPVAssignment *GetAssignment() { return this->Assignment;}
 
   // Description:
   // ONLY SET THIS IF YOU ARE A PVDATA!
@@ -158,7 +160,10 @@ protected:
   
   // the data object that owns this composite
   vtkPVData *PVData;
-
+  
+  vtkPVAssignment *Assignment;
+  vtkPVImageTextureFilter *TextureFilter;
+  
   int Mode;
   // Super class stores a vtkPolyDataInput, this is a more general input.
   vtkDataSet *DataSetInput;

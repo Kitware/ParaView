@@ -53,7 +53,8 @@ vtkPVImageSource* vtkPVImageSource::New()
 void vtkPVImageSource::SetNthPVOutput(int idx, vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  int id = pvApp->GetController()->GetLocalProcessId();
+  
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(), idx,
@@ -75,9 +76,17 @@ void vtkPVImageSource::InitializePVOutput(int idx)
 {
   vtkPVImageData *output;
   vtkPVData *input;
-  vtkPVAssignment *assignment;  
-
-  output = vtkPVImageData::New();
+  vtkPVAssignment *assignment;
+  char *outputTclName;
+  
+  // Convoluted way of creating an object. (just to get the tcl name I want).
+  outputTclName = new char[strlen(this->GetTclName()) + strlen("Output") + 1];
+  sprintf(outputTclName, "%sOutput", this->GetTclName());
+  output = vtkPVImageData::SafeDownCast( 
+    this->GetPVApplication()->MakeTclObject("vtkPVImageData",outputTclName));
+  delete [] outputTclName;
+  outputTclName = NULL;
+  
   output->Clone(this->GetPVApplication());
   this->SetNthPVOutput(idx, output);
 

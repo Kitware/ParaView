@@ -78,6 +78,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->PVData = NULL;
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
+  
+  this->Assignment = NULL;
+  this->TextureFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +110,13 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->AmbientScale = NULL;
   
   this->SetPVData(NULL);
+  
+  this->SetAssignment(NULL);
+  if (this->TextureFilter != NULL)
+    {
+    this->TextureFilter->Delete();
+    this->TextureFilter = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -441,11 +451,30 @@ int vtkPVActorComposite::GetVisibility()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
 {
-  this->Mapper->SetPiece(a->GetPiece());
-  this->Mapper->SetNumberOfPieces(a->GetNumberOfPieces());
-  //cerr << "ActorComp: " << this << ", mapper: " << this->Mapper 
-  //     << ", assignment: " << a << ", piece: " << a->GetPiece()
-  //     << ", numPieces: " << a->GetNumberOfPieces() << endl;
+  if (a == this->Assignment)
+    {  
+    return;
+    }
+  
+  this->Modified();
+  
+  if (this->TextureFilter)
+    {
+    this->TextureFilter->SetAssignment(a);
+    }
+
+  if (this->Assignment)
+    {
+    this->Assignment->UnRegister(this);
+    this->Assignment = NULL;
+    }
+  if (a)
+    {
+    this->Assignment = a;
+    a->Register(this);
+    this->Mapper->SetPiece(a->GetPiece());
+    this->Mapper->SetNumberOfPieces(a->GetNumberOfPieces());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -506,9 +535,9 @@ void vtkPVActorComposite::SetMode(int mode)
 
   if (this->DataSetInput->IsA("vtkPolyData"))
     { // Only one mode for poly data.
-    if (mode != VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
+    if (this->Mode != VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
       {
-      vtkWarningMacro("Use poly data mode for poly data input.");
+      //vtkWarningMacro("Use poly data mode for poly data input.");
       this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
       }
     this->vtkKWActorComposite::SetInput((vtkPolyData*)this->DataSetInput);
@@ -517,9 +546,9 @@ void vtkPVActorComposite::SetMode(int mode)
 
   if (this->DataSetInput->IsA("vtkImageData"))
     { // Three possible modes for image data.
-    if (mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
+    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
       {
-      vtkWarningMacro("You cannot use poly data mode with an image input.");
+      //vtkWarningMacro("You cannot use poly data mode with an image input.");
       this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
       }
     if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
@@ -532,12 +561,17 @@ void vtkPVActorComposite::SetMode(int mode)
       }
     if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
       {
-      vtkPVImageTextureFilter *tf = vtkPVImageTextureFilter::New();
-      tf->SetInput((vtkImageData *)(this->DataSetInput));
-      this->vtkKWActorComposite::SetInput(tf->GetGeometryOutput());
+      if (this->TextureFilter)
+	{
+	this->TextureFilter->Delete();
+	}
+      this->TextureFilter = vtkPVImageTextureFilter::New();
+      this->TextureFilter->SetAssignment(this->Assignment);
+      this->TextureFilter->SetInput((vtkImageData *)(this->DataSetInput));
+      this->vtkKWActorComposite::SetInput(this->TextureFilter->GetGeometryOutput());
 
       vtkTexture *texture = vtkTexture::New();
-      texture->SetInput(tf->GetTextureOutput());
+      texture->SetInput(this->TextureFilter->GetTextureOutput());
       this->GetActor()->SetTexture(texture);
       texture->Delete();
       texture = NULL;
@@ -549,9 +583,9 @@ void vtkPVActorComposite::SetMode(int mode)
     }
     
   // Default to data set mode.
-  if (mode != VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
+  if (this->Mode != VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
     {
-    vtkWarningMacro("Use data set mode.");
+    //vtkWarningMacro("Use data set mode.");
     this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
     }
   vtkGeometryFilter *geom = vtkGeometryFilter::New();

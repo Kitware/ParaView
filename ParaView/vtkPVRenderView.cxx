@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
+#include "vtkToolkits.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 
@@ -37,15 +38,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWEventNotifier.h"
 
-#if defined _WIN32
+#ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
-#elif defined VTK_USE_MESA
+#endif
+
+#ifdef VTK_USE_MESA
 #include "vtkMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
-#else
+#endif
+
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
-#endif
 
 #include "vtkTimerLog.h"
 
@@ -360,6 +363,7 @@ void vtkPVRenderView::Clone(vtkPVApplication *pvApp)
   this->Application = pvApp;
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+  
   pvApp->BroadcastScript("%s OffScreenRenderingOn", this->GetTclName());
     
   // Create wants to set the application in the KW superclasses.
@@ -728,9 +732,9 @@ void vtkPVRenderView::TransmitBounds()
   controller = pvApp->GetController();
   
   this->Renderer->ComputeVisiblePropBounds(bounds);
-
+  
   // Makes an assumption about how the tasks are setup (UI id is 0).
-  controller->Send(bounds, 6, 0, 112);  
+  controller->Send(bounds, 6, 0, 112);
 }
 
 //----------------------------------------------------------------------------

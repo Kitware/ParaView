@@ -214,8 +214,29 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the main view
   // we keep a handle to them as well
-  this->MainView = vtkPVRenderView::New();
-  this->MainView->Clone((vtkPVApplication*)app);
+  this->CreateMainView((vtkPVApplication*)app);
+  
+  this->Script( "wm deiconify %s", this->GetWidgetName());
+  
+  // Setup an interactor style.
+  //  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
+  //  this->MainView->SetInteractorStyle(style);
+  this->MainView->SetInteractorStyle(this->CameraStyle);
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
+{
+  static int instanceCount = 0;
+  char tclName[20];
+  
+  // Create a name.
+  sprintf(tclName, "View%d", ++instanceCount);
+  this->MainView = vtkPVRenderView::SafeDownCast(
+                       pvApp->MakeTclObject("vtkPVRenderView",tclName));
+  this->MainView->Clone(pvApp);
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
@@ -225,21 +246,17 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MainView->Delete();
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
-
-  this->Script( "wm deiconify %s", this->GetWidgetName());
-  
-  
-  // Setup an interactor style.
-//  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
-//  this->MainView->SetInteractorStyle(style);
-  this->MainView->SetInteractorStyle(this->CameraStyle);
 }
 
+
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::UseCameraStyle()
 {
   this->GetMainView()->SetInteractorStyle(this->CameraStyle);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
 {
   this->MainView->SetSelectedComposite(comp);  

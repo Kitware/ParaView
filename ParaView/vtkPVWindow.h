@@ -150,6 +150,9 @@ protected:
 
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
   vtkPVApplication *GetPVApplication();
+
+  // Separating out creation of the main view.
+  void CreateMainView(vtkPVApplication *pvApp);
 };
 
 
