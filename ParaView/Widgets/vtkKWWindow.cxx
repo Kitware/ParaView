@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.121");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -707,7 +707,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   // Properties panel
 
-  this->PropertiesHidden = 0;
   this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
                                     "OnToggleProperties", 1 );
 
@@ -752,11 +751,9 @@ void vtkKWWindow::OnPrint(int propagate, int res)
 
 void vtkKWWindow::ShowProperties()
 {
-  if (this->PropertiesHidden)
+  if (this->MiddleFrame && !this->MiddleFrame->GetFrame1Visibility())
     {
-    this->MiddleFrame->SetFrame1MinimumSize(360);
-    //this->MiddleFrame->SetFrame1Size(360);
-    this->PropertiesHidden = 0;
+    this->MiddleFrame->Frame1VisibilityOn();
     this->Script("%s entryconfigure 0 -label {%s}",
                  this->GetMenuWindow()->GetWidgetName(),
                  VTK_KW_HIDE_PROPERTIES_LABEL);
@@ -765,11 +762,9 @@ void vtkKWWindow::ShowProperties()
 
 void vtkKWWindow::HideProperties()
 {
-  if (!this->PropertiesHidden)
+  if (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility())
     {
-    this->MiddleFrame->SetFrame1MinimumSize(0);
-    this->MiddleFrame->SetFrame1Size(0);
-    this->PropertiesHidden = 1;
+    this->MiddleFrame->Frame1VisibilityOff();
     this->Script("%s entryconfigure 0 -label {%s}",
                  this->GetMenuWindow()->GetWidgetName(),
                  VTK_KW_SHOW_PROPERTIES_LABEL);
@@ -778,13 +773,13 @@ void vtkKWWindow::HideProperties()
 
 void vtkKWWindow::OnToggleProperties()
 {
-  if (this->PropertiesHidden)
+  if (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility())
     {
-    this->ShowProperties();
+    this->HideProperties();
     }
   else
     {
-    this->HideProperties();
+    this->ShowProperties();
     }
 }
 
@@ -1159,7 +1154,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.121 $");
+  this->ExtractRevision(os,"$Revision: 1.122 $");
 }
 
 int vtkKWWindow::ExitDialog()

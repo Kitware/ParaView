@@ -379,7 +379,6 @@ protected:
   char  *Title;
   int   PromptBeforeClose;
   int   InExit;
-  int   PropertiesHidden;
 
   vtkKWLabeledFrame *DialogSettingsFrame;
   vtkKWCheckButton  *DialogSettingsConfirmExitCheck;
