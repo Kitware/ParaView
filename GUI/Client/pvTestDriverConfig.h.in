@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    TestClientServer.h.in
+  Module:    pvTestDriverConfig.h.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

@@ -1,5 +1,5 @@
 PROJECT(PVClient)
-INCLUDE_REGULAR_EXPRESSION("vtk.*|TestClient.*")
+
 SET( ParaViewShared_SRCS
   vtkPVApplication.cxx
   )
@@ -365,12 +365,12 @@ IF(WIN32 AND TK_RESOURCE_FILE)
 ENDIF(WIN32 AND TK_RESOURCE_FILE)
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
-CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/TestClientServer.h.in
-  ${PVGUI_BINARY_DIR}/Client/TestClientServer.h
+CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/pvTestDriverConfig.h.in
+  ${PVGUI_BINARY_DIR}/Client/pvTestDriverConfig.h
   ESCAPE_QUOTES)
 
-ADD_EXECUTABLE(TestClientServer TestClientServer.cxx)
-TARGET_LINK_LIBRARIES(TestClientServer kwsys)
+ADD_EXECUTABLE(pvTestDriver pvTestDriver.cxx)
+TARGET_LINK_LIBRARIES(pvTestDriver kwsys)
 
 IF(VTK_USE_CARBON)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
