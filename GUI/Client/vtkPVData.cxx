@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.258");
+vtkCxxRevisionMacro(vtkPVData, "1.259");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -633,8 +633,10 @@ void vtkPVData::CreateProperties()
                                                 "DrawWireframe");
   this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
-  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-                                                "DrawVolume");
+// Remove this option for 1.4 release
+//  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+//                                                "DrawVolume");
+
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
 
