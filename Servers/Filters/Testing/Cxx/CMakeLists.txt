@@ -3,6 +3,7 @@ SET(ServersFilters_SRCS
   ServersFiltersPrintSelf
   TestCTH
   TestPVFilters
+  TestMPI
   )
 
 FOREACH(name ${ServersFilters_SRCS})
