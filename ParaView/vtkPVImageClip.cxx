@@ -26,9 +26,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVImageClip.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVImage.h"
 
@@ -70,6 +69,7 @@ vtkPVImageClip::vtkPVImageClip()
   this->ClipZMaxLabel->SetParent(this);
   
   this->ImageClip = vtkImageClip::New();
+  this->ImageClip->ClipDataOn();
 }
 
 //----------------------------------------------------------------------------
@@ -173,6 +173,20 @@ int vtkPVImageClip::Create(char *args)
 
 
 //----------------------------------------------------------------------------
+void vtkPVImageClip::SetInput(vtkPVImage *pvi)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvi->GetTclName());
+    }  
+  
+  this->GetImageClip()->SetInput(pvi->GetImageData());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageClip::SetOutput(vtkPVImage *pvi)
 {
   this->SetPVData(pvi);
@@ -185,6 +199,24 @@ vtkPVImage *vtkPVImageClip::GetOutput()
 {
   return vtkPVImage::SafeDownCast(this->Output);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::SetOutputWholeExtent(int xMin, int xMax, 
+					  int yMin, int yMax, 
+					  int zMin, int zMax)
+{  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutputWholeExtent %d %d %d %d %d %d", 
+			   this->GetTclName(), xMin,xMax, yMin,yMax, zMin,zMax);
+    }  
+
+  this->ImageClip->SetOutputWholeExtent(xMin, xMax, yMin, yMax, zMin, zMax);
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVImageClip::ExtentsChanged()

@@ -57,22 +57,29 @@ vtkPVImage* vtkPVImage::New()
 //----------------------------------------------------------------------------
 void vtkPVImage::Clip()
 {
-  vtkPVImageClip *clip;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *newComp;
-  int *extents;
-  
-  extents = this->GetImageData()->GetExtent();
-  extents[5] = (extents[4] + extents[5])/2;
-  extents[4] = extents[5];
-  
-  clip = vtkPVImageClip::New();
-  clip->GetImageClip()->SetInput(this->GetImageData());
-  
-  clip->GetImageClip()->ClipDataOn();
-  clip->GetImageClip()->SetOutputWholeExtent(extents);
-  clip->GetImageClip()->Update();
+  vtkPVImageClip *clip;
+  vtkPVImage *pvi;
+  vtkPVAssignment *a;
+  int ext[6];
 
+  
   newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
+  clip = vtkPVImageClip::New();
+  clip->Clone(pvApp);
+  pvi = vtkPVImage::New();
+  pvi->Clone(pvApp);
+  
+  this->GetImageData()->GetExtent(ext);
+  ext[5] = (ext[4] + ext[5])/2;
+  ext[4] = ext[5];
+  
+  clip->SetInput(this);
+  clip->SetOutput(pvi);
+  clip->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+  
   newComp->SetSource(clip);
   newComp->SetCompositeName("clip");
   
@@ -94,6 +101,7 @@ void vtkPVImage::Clip()
   
   newComp->Delete();
   clip->Delete();
+  pvi->Delete();
 }
 
 //----------------------------------------------------------------------------

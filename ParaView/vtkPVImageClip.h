@@ -48,10 +48,18 @@ public:
   int Create(char *args);
 
   // Description:
+  // Used to connect pipelines.  Executes in all processes.
+  void SetInput(vtkPVImage *pvi);
+
+  // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
   void SetOutput(vtkPVImage *pvd);
   vtkPVImage *GetOutput();
+
+  // Description:
+  // Changes filters clip and clones in satellite processes.
+  void SetOutputWholeExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
   
   void ExtentsChanged();
 
