@@ -49,6 +49,16 @@
   </Filter>
 </Module>
 
+<Module name="Append" menu_name="Append Datasets" root_name="Append" module_type="Filter" 
+        long_help="Takes an input of multiple datasets and output has only one unstructured grid." 
+        short_help="Append multiple datasets into one.">
+  <Filter class="vtkAppendFilter" >
+    <Input name="Input" class="vtkDataSet" quantity="Multiple" > 
+      <GroupRequirement quantity="Multiple" /> 
+    </Input> 
+  </Filter>
+</Module>
+
 <Module name="CellCenters" menu_name="Cell Centers" root_name="Centers" module_type="Filter"
         long_help="Create a point (no geometry) at the center of each input cell." 
         short_help="Convert cells to vertices.">
