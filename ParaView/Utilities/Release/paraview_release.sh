@@ -23,9 +23,9 @@
 #
 
 # Release version number.
-TAG="ParaView-1-2-1"
+TAG="ParaView-1-2-Sandia-20040308"
 PARAVIEW_VERSION="1.2"
-VERSION="${PARAVIEW_VERSION}.1"
+VERSION="${PARAVIEW_VERSION}.Sandia20040308"
 RELEASE="1"
 
 # Project configuration.
