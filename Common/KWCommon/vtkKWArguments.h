@@ -34,7 +34,22 @@ public:
 
 
   //BTX
-  typedef vtkKWArgumentsInternal Internal;
+
+  // Description:
+  // These are different argument types.
+  enum ArgumentTypeEnum { 
+    NO_ARGUMENT,    // The option takes no argument             --foo
+    CONCAT_ARGUMENT,// The option takes argument after no space --foobar
+    SPACE_ARGUMENT, // The option takes argument after space    --foo bar
+    EQUAL_ARGUMENT  // The option takes argument after equal    --foo=bar
+  };
+
+  enum VariableTypeEnum {
+    NO_VARIABLE_TYPE = 0, // The variable is not specified
+    INT_TYPE,             // The variable is integer (int)
+    DOUBLE_TYPE,          // The variable is float (double)
+    STRING_TYPE           // The variable is string (char*)
+  };
 
   // These are prototypes for callbacks.
   typedef int(*CallbackType)(const char* argument, const char* value, 
@@ -47,22 +62,16 @@ public:
     int ArgumentType;
     CallbackType Callback;
     void* CallData;
+    void* Variable;
+    int VariableType;
     const char* Help;
     };
   
   // Description:
-  // These are different argument types.
-  enum { 
-    NO_ARGUMENT,    // The option takes no argument             --foo
-    CONCAT_ARGUMENT,// The option takes argument after no space --foobar
-    SPACE_ARGUMENT, // The option takes argument after space    --foo bar
-    EQUAL_ARGUMENT  // The option takes argument after equal    --foo=bar
-  };
-  //ETX
-  
-  // Description:
   // Initialize internal data structures. This should be called before parsing.
   void Initialize(int argc, char* argv[]);
+
+  //ETX
   
   // Description:
   // Initialize internal data structure and pass arguments one by one. This is
@@ -80,12 +89,21 @@ public:
   // it are argument, argument type, callback method, and call data. The
   // argument help specifies the help string used with this option. The
   // callback and call_data can be skipped.
-  void AddCallback(const char* argument, int type, CallbackType callback, 
+  void AddCallback(const char* argument, ArgumentTypeEnum type, CallbackType callback, 
                    void* call_data, const char* help);
-  void AddCallback(const char* argument, int type, const char* help)
+  void AddCallback(const char* argument, ArgumentTypeEnum type, const char* help)
     {
     this->AddCallback(argument, type, 0, 0, help);
     }
+
+  // Description:
+  // Add handler for argument which is going to set the variable to the
+  // specified value.
+  void AddHandler(const char* argument, ArgumentTypeEnum type, VariableTypeEnum vtype, void* variable, const char* help);
+  void AddHandler(const char* argument, ArgumentTypeEnum type, int* variable, const char* help);
+  void AddHandler(const char* argument, ArgumentTypeEnum type, double* variable, const char* help);
+  void AddHandler(const char* argument, ArgumentTypeEnum type, char** variable, const char* help);
+  void AddBooleanHandler(const char* argument, int* variable, const char* help);
 
   // Description:
   // This method registers callbacks for argument types from array of
@@ -126,6 +144,7 @@ protected:
   vtkSetStringMacro(Help);
   void GenerateHelp();
 
+  typedef vtkKWArgumentsInternal Internal;
   Internal* Internals;
   char* Help;
 

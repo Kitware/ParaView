@@ -6,7 +6,14 @@ ADD_EXECUTABLE(CommonKWCommonPrintSelf CommonKWCommonPrintSelf.cxx)
 
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
-ADD_TEST(TestCommandLineArguments ${CXX_TEST_PATH}/TestCommandLineArguments -A -B asdklj -C=jkaskhd --long1 --long2 kjasdh --long3=dsljf -Dkdsfj -DONE --long4akhdkj -D lkdjlkjf -B)
+ADD_TEST(TestCommandLineArguments
+  ${CXX_TEST_PATH}/TestCommandLineArguments
+  -A -B asdklj -C=jkaskhd --long1 --long2 kjasdh --long3=dsljf -Dkdsfj -DONE
+  --long4akhdkj 
+  --some-int-variable 5
+  --some-double-variable1543.3
+  --some-string-variable=HelloWorld
+  -D lkdjlkjf -B)
 # disable this one for now
 #ADD_TEST(TestRemoteProcess ${CXX_TEST_PATH}/TestRemoteProcess)
 ADD_TEST(CommonKWCommonPrintSelf ${CXX_TEST_PATH}/CommonKWCommonPrintSelf)

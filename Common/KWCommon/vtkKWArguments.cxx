@@ -84,7 +84,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.19");
+vtkCxxRevisionMacro(vtkKWArguments, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -137,6 +137,7 @@ int vtkKWArguments::Parse()
     vtkKWArguments::Internal::String& arg = this->Internals->Argv[cc];
     vtkKWArguments::Internal::CallbacksMap::iterator it;
 
+    // Does the argument match to any we know about?
     for ( it = this->Internals->Callbacks.begin();
       it != this->Internals->Callbacks.end();
       it ++ )
@@ -158,25 +159,28 @@ int vtkKWArguments::Parse()
       }
     if ( matches.size() > 0 )
       {
+      // Ok, we found one or more arguments that match what user specified.
+      // Let's find the longest one.
       vtkKWArguments::Internal::VectorOfStrings::size_type kk;
       vtkKWArguments::Internal::VectorOfStrings::size_type maxidx = 0;
       vtkKWArguments::Internal::String::size_type maxlen = 0;
       for ( kk = 0; kk < matches.size(); kk ++ )
         {
-        //cout << "Possible argument: " << matches[kk] << endl;
         if ( matches[kk].size() > maxlen )
           {
           maxlen = matches[kk].size();
           maxidx = kk;
           }
         }
-      //cout << "This argument is: " << matches[maxidx] << endl;
+      // So, the longest one is probably the right one. Now see if it has any
+      // additional value
       const char* value = 0;
       vtkKWArguments::CallbackStructure *cs 
         = &this->Internals->Callbacks[matches[maxidx]];
       const vtkKWArguments::Internal::String& sarg = matches[maxidx];
       if ( cs->ArgumentType == NO_ARGUMENT )
         {
+        // No value
         }
       else if ( cs->ArgumentType == SPACE_ARGUMENT )
         {
@@ -184,23 +188,28 @@ int vtkKWArguments::Parse()
           {
           return 0;
           }
+        // Value is the next argument
         value = this->Internals->Argv[cc+1].c_str();
         cc ++;
         }
       else if ( cs->ArgumentType == EQUAL_ARGUMENT )
         {
-        if ( arg.size() == sarg.size() )
+        if ( arg.size() == sarg.size() || *(arg.c_str() + sarg.size()) != '=' )
           {
           return 0;
           }
+        // Value is everythng followed the '=' sign
         value = arg.c_str() + sarg.size()+1;
         }
       else if ( cs->ArgumentType == CONCAT_ARGUMENT )
         {
+        // Value is whatever follows the argument
         value = arg.c_str() + sarg.size();
         }
 
+      // Store the value in the map
       this->Internals->ArgumentValues[sarg.c_str()] = (value?value:"1");
+      // Call the callback
       if ( cs->Callback )
         {
         if ( !cs->Callback(sarg.c_str(), value, cs->CallData) )
@@ -208,9 +217,48 @@ int vtkKWArguments::Parse()
           return 0;
           }
         }
+      if ( cs->Variable )
+        {
+        if ( !value )
+          {
+          value = "1";
+          }
+        if ( cs->VariableType == vtkKWArguments::INT_TYPE )
+          {
+          int* variable = static_cast<int*>(cs->Variable);
+          char* res = 0;
+          *variable = strtol(value, &res, 10);
+          //if ( res && *res )
+          //  {
+          //  Can handle non-int
+          //  }
+          }
+        else if ( cs->VariableType == vtkKWArguments::DOUBLE_TYPE )
+          {
+          double* variable = static_cast<double*>(cs->Variable);
+          char* res = 0;
+          *variable = strtod(value, &res);
+          //if ( res && *res )
+          //  {
+          //  Can handle non-int
+          //  }
+          }
+        else if ( cs->VariableType == vtkKWArguments::STRING_TYPE )
+          {
+          char** variable = static_cast<char**>(cs->Variable);
+          if ( *variable )
+            {
+            delete [] *variable;
+            *variable = 0;
+            }
+          *variable = new char[ strlen(value) + 1 ];
+          strcpy(*variable, value);
+          }
+        }
       }
     else
       {
+      // Handle unknown arguments
       if ( this->Internals->UnknownArgumentCallback )
         {
         if ( !this->Internals->UnknownArgumentCallback(arg.c_str(), 
@@ -227,6 +275,7 @@ int vtkKWArguments::Parse()
         }
       }
     }
+  // We are done parsing, so remember what was the last argument
   this->Internals->LastArgument = cc;
   return 1;
 }
@@ -254,7 +303,7 @@ void vtkKWArguments::GetRemainingArguments(int* argc, char*** argv)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWArguments::AddCallback(const char* argument, int type, 
+void vtkKWArguments::AddCallback(const char* argument, ArgumentTypeEnum type, 
   CallbackType callback, void* call_data, const char* help)
 {
   vtkKWArguments::CallbackStructure s;
@@ -262,10 +311,50 @@ void vtkKWArguments::AddCallback(const char* argument, int type,
   s.ArgumentType = type;
   s.Callback     = callback;
   s.CallData     = call_data;
+  s.VariableType = vtkKWArguments::NO_VARIABLE_TYPE;
+  s.Variable     = 0;
   s.Help         = help;
 
   this->Internals->Callbacks[argument] = s;
   this->GenerateHelp();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::AddHandler(const char* argument, ArgumentTypeEnum type,
+  VariableTypeEnum vtype, void* variable, const char* help)
+{
+  vtkKWArguments::CallbackStructure s;
+  s.Argument     = argument;
+  s.ArgumentType = type;
+  s.Callback     = 0;
+  s.CallData     = 0;
+  s.VariableType = vtype;
+  s.Variable     = variable;
+  s.Help         = help;
+
+  this->Internals->Callbacks[argument] = s;
+  this->GenerateHelp();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::AddHandler(const char* argument, ArgumentTypeEnum type,
+  int* variable, const char* help)
+{
+  this->AddHandler(argument, type, vtkKWArguments::INT_TYPE, variable, help);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::AddHandler(const char* argument, ArgumentTypeEnum type,
+  double* variable, const char* help)
+{
+  this->AddHandler(argument, type, vtkKWArguments::DOUBLE_TYPE, variable, help);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::AddHandler(const char* argument, ArgumentTypeEnum type,
+  char** variable, const char* help)
+{
+  this->AddHandler(argument, type, vtkKWArguments::STRING_TYPE, variable, help);
 }
 
 //----------------------------------------------------------------------------
@@ -305,6 +394,9 @@ const char* vtkKWArguments::GetHelp(const char* arg)
     {
     return 0;
     }
+
+  // Since several arguments may point to the same argument, find the one this
+  // one point to if this one is pointing to another argument.
   vtkKWArguments::CallbackStructure *cs = &(it->second);
   while ( 1 )
     {
@@ -316,6 +408,7 @@ const char* vtkKWArguments::GetHelp(const char* arg)
       }
     cs = &(hit->second);
     }
+  // Should never happened
   return 0;
 }
 
@@ -323,6 +416,9 @@ const char* vtkKWArguments::GetHelp(const char* arg)
 void vtkKWArguments::GenerateHelp()
 {
   ostrstream str;
+
+  // Collapse all arguments into the map of vectors of all arguments that do
+  // the same thing.
   vtkKWArguments::Internal::CallbacksMap::iterator it;
   typedef vtkstd::map<vtkKWArguments::Internal::String, 
      vtkKWArguments::Internal::SetOfStrings > MapArgs;
@@ -367,6 +463,7 @@ void vtkKWArguments::GenerateHelp()
       }
     }
  
+  // Find the length of the longest string
   vtkKWArguments::Internal::String::size_type maxlen = 0;
   for ( mpit = mp.begin();
     mpit != mp.end();
@@ -389,8 +486,13 @@ void vtkKWArguments::GenerateHelp()
         }
       }
     }
+
+  // Create format for that string
   char format[80];
   sprintf(format, "%%%ds", static_cast<unsigned int>(maxlen));
+
+
+  // Print help for each option
   for ( mpit = mp.begin();
     mpit != mp.end();
     mpit ++ )
@@ -418,6 +520,8 @@ void vtkKWArguments::GenerateHelp()
     int cnt = 0;
     while ( len > 0)
       {
+      // If argument with help is longer than line length, split it on previous
+      // space (or tab) and continue on the next line
       vtkKWArguments::Internal::String::size_type cc;
       for ( cc = 0; ptr[cc]; cc ++ )
         {
