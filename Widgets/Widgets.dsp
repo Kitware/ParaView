@@ -162,11 +162,19 @@ SOURCE=.\vtkKWGenericCompositeTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWLabel.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWLabeledFrame.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWLabeledFrameTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWLabelTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -215,6 +223,14 @@ SOURCE=.\vtkKWOptionMenu.cxx
 # Begin Source File
 
 SOURCE=.\vtkKWOptionMenuTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWPushButton.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWPushButtonTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -558,6 +574,35 @@ InputName=vtkKWGenericComposite
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWLabel.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWLabel.h
+InputName=vtkKWLabel
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWLabel.h
+InputName=vtkKWLabel
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWLabeledFrame.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
@@ -732,6 +777,35 @@ InputName=vtkKWOptionMenu
 # Begin Custom Build
 InputPath=.\vtkKWOptionMenu.h
 InputName=vtkKWOptionMenu
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWPushButton.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWPushButton.h
+InputName=vtkKWPushButton
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWPushButton.h
+InputName=vtkKWPushButton
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
