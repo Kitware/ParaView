@@ -17,6 +17,10 @@ IF (VTK_USE_MPI)
               ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.pvs 
               -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
 
+      ADD_TEST(BoundsDisplay-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BoundsDisplay.pvs 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
       ADD_TEST(CalcInput-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
               ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CalcInput.pvs 
               -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
@@ -119,6 +123,10 @@ ADD_TEST(Axes ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.pvs 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
+
+ADD_TEST(BoundsDisplay ${PARAVIEW_EXECUTABLE}
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BoundsDisplay.pvs 
          -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(CalcInput ${PARAVIEW_EXECUTABLE}

@@ -68,6 +68,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 #include "vtkPVStringEntry.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVBoundsDisplay.h"
+#include "vtkPVScalarRangeLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkCallbackCommand.h"
 
@@ -589,6 +591,9 @@ void vtkPVSource::Accept()
                this->AcceptButton->GetWidgetName());
 #endif
   
+    // All PVSources are initialized automatically.
+    this->SetTraceInitialized(1);
+
   // We need to pass the parameters from the UI to the VTK objects before
   // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
   // about unspecified file names, etc., when ExecuteInformation is called on
@@ -607,10 +612,6 @@ void vtkPVSource::Accept()
     { // This is the first time, initialize data.    
     vtkPVData *input;
     vtkPVData *ac;
-
-    // All PVSources are initialized automatically.
-    // This is here to avoid traces of widgets before accept is called.
-    this->SetTraceInitialized(1);
     
     ac = this->GetPVOutput(0);
     if (ac == NULL)
@@ -1238,43 +1239,22 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   this->GetPVOutput(0)->SaveInTclScript(file, tclName);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSource::InitializePVWidgetTrace(vtkObject* o, unsigned long event, 
-                                          void* clientData, void* callData)
-{
-  vtkPVWidget *pvw = vtkPVWidget::SafeDownCast(o);
-  vtkPVSource *self = static_cast<vtkPVSource*>(clientData);
-  vtkPVApplication *pvApp;
-
-  if (self == NULL)
-    {
-    vtkErrorWithObjectMacro(self, "PVWidget trace initialization failed.");
-    return;
-    }
-  pvApp = self->GetPVApplication();
-  if (pvApp == NULL || self == NULL || pvw == NULL)
-    {
-    vtkErrorWithObjectMacro(self, "PVWidget trace initialization failed.");
-    return;
-    }
-
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPVWidget {%s}]", pvw->GetTclName(),
-                       self->GetTclName(), pvw->GetTraceName());
-  pvw->TraceInitializedOn();
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 {
+  char str[512];
   this->Widgets->AddItem(pvw);  
 
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  pvw->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
+  if (pvw->GetTraceName() == NULL)
+    {
+    vtkWarningMacro("TarceName not set.");
+    return;
+    }
+
+  pvw->SetTraceReferenceObject(this);
+  sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
+  pvw->SetTraceReferenceCommand(str);
 }
 
 
@@ -1310,6 +1290,59 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   inputMenu->Delete();
   return inputMenu;
 }
+
+//----------------------------------------------------------------------------
+vtkPVBoundsDisplay* vtkPVSource::AddBoundsDisplay(vtkPVInputMenu *inputMenu)
+{
+  vtkPVBoundsDisplay* boundsDisplay;
+
+  if (inputMenu == NULL)
+    {
+    vtkErrorMacro("Bounds display must have an associated input menu.");
+    return NULL;
+    }
+
+  // Format the label
+  boundsDisplay = vtkPVBoundsDisplay::New();
+  boundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
+  boundsDisplay->Create(this->Application);
+  // This assumes there will be no more than one bounds display per source.
+  boundsDisplay->SetTraceName("BoundsDisplay");
+  // Here we assume the data set name is "Input".  Generalize it when needed.
+  boundsDisplay->GetWidget()->SetLabel("Input Bounds");
+  boundsDisplay->SetInputMenu(inputMenu);
+  inputMenu->AddDependant(boundsDisplay);
+  this->Script("pack %s -side top -fill x",
+               boundsDisplay->GetWidgetName());
+  this->AddPVWidget(boundsDisplay);
+  boundsDisplay->Delete();
+  return boundsDisplay;
+}
+
+//----------------------------------------------------------------------------
+vtkPVScalarRangeLabel* vtkPVSource::AddScalarRangeLabel(vtkPVArrayMenu *arrayMenu)
+{
+  vtkPVScalarRangeLabel* rangeLabel;
+
+  if (arrayMenu == NULL)
+    {
+    vtkErrorMacro("Range label must have an associated array menu.");
+    return NULL;
+    }
+
+  rangeLabel = vtkPVScalarRangeLabel::New();
+  rangeLabel->SetArrayMenu(arrayMenu);
+  arrayMenu->AddDependant(rangeLabel);
+  rangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
+  rangeLabel->Create(this->Application);
+  // This assumes there will be no more than one range label per source.
+  rangeLabel->SetTraceName("ScalarRangeLabel");
+  this->Script("pack %s", rangeLabel->GetWidgetName());
+  this->AddPVWidget(rangeLabel);
+  rangeLabel->Delete();
+  return rangeLabel;
+}
+
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label, 
@@ -1355,8 +1388,6 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName,
 {
   vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
 
-  this->AddPVWidget(toggle);
-
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   toggle->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
@@ -1365,6 +1396,7 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName,
 
   this->Script("pack %s -fill x -expand t", toggle->GetWidgetName());
   
+  this->AddPVWidget(toggle);
   toggle->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -1378,7 +1410,6 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
   vtkPVFileEntry *entry;
 
   entry = vtkPVFileEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
@@ -1386,6 +1417,7 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
+  this->AddPVWidget(entry);
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -1399,7 +1431,6 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName,
   vtkPVStringEntry *entry;
 
   entry = vtkPVStringEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
@@ -1407,6 +1438,7 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName,
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
+  this->AddPVWidget(entry);
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -1420,13 +1452,13 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName,
   vtkPVVectorEntry *entry;
 
   entry = vtkPVVectorEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 1, NULL, help);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
+  this->AddPVWidget(entry);
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -1446,13 +1478,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   subLabels[1] = new char[strlen(l2) + 1];
   strcpy(subLabels[1], l2);
   entry = vtkPVVectorEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 2, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  this->AddPVWidget(entry);
   entry->Delete();
   
   for (i = 0; i < 2; i++)
@@ -1479,13 +1511,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   subLabels[2] = new char[strlen(l3) + 1];
   strcpy(subLabels[2], l3);
   entry = vtkPVVectorEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 3, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  this->AddPVWidget(entry);
   entry->Delete();
   
   for (i = 0; i < 3; i++)
@@ -1516,13 +1548,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   strcpy(subLabels[3], l4);
 
   entry = vtkPVVectorEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 4, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  this->AddPVWidget(entry);
   entry->Delete();
   
   for (i = 0; i < 4; i++)
@@ -1560,13 +1592,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   strcpy(subLabels[5], l6);
 
   entry = vtkPVVectorEntry::New();
-  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 6, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  this->AddPVWidget(entry);
   entry->Delete();
   
   for (i = 0; i < 6; i++)
@@ -1586,7 +1618,6 @@ vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
   vtkPVScale *scale;
 
   scale = vtkPVScale::New();
-  this->AddPVWidget(scale);
   scale->SetParent(this->ParameterFrame->GetFrame());
   scale->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   scale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
@@ -1594,6 +1625,7 @@ vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
 
   this->Script("pack %s -fill x -expand t", scale->GetWidgetName());
 
+  this->AddPVWidget(scale);
   scale->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -1605,7 +1637,6 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *varName,
                                              char *help)
 {
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
-  this->AddPVWidget(sl);
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel(label);
   sl->SetObjectVariable(this->GetVTKSourceTclName(), varName);
@@ -1626,6 +1657,7 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *varName,
   sl->Register(this);
   this->LastSelectionList = sl;
 
+  this->AddPVWidget(sl);
   sl->Delete();
 
   // Although it has been deleted, it did not destruct.

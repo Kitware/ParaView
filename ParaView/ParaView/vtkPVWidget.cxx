@@ -60,9 +60,6 @@ vtkPVWidget* vtkPVWidget::New()
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
-  //this->ObjectTclName = NULL;
-  //this->VariableName = NULL;
-
   this->ModifiedCommandObjectTclName = NULL;
   this->ModifiedCommandMethod = NULL;
 
@@ -75,22 +72,12 @@ vtkPVWidget::vtkPVWidget()
 //----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
-  //this->SetObjectTclName(NULL);
-  //this->SetVariableName(NULL);
-
   this->SetModifiedCommandObjectTclName(NULL);
   this->SetModifiedCommandMethod(NULL);
 
   this->DependantCollection->Delete();
   this->DependantCollection = NULL;
 }
-
-//----------------------------------------------------------------------------
-//void vtkPVWidget::SetObjectVariable(const char* objName, const char* varName)
-//{
-//  this->SetObjectTclName(objName);
-//  this->SetVariableName(varName);
-//}
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
@@ -144,19 +131,6 @@ void vtkPVWidget::ModifiedCallback()
     this->Script("%s %s", this->ModifiedCommandObjectTclName,
                  this->ModifiedCommandMethod);
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVWidget::InitializeTrace()
-{
-  if (this->TraceInitialized)
-    {
-    return 1;
-    }
-
-  this->InvokeEvent(vtkKWEvent::InitializeTraceEvent, 0);
-  this->TraceInitialized = 1;
-  return 1;
 }
 
 //----------------------------------------------------------------------------

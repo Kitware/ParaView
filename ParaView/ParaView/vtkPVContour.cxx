@@ -94,7 +94,6 @@ void vtkPVContour::CreateProperties()
 {
   vtkPVApplication*      pvApp = this->GetPVApplication();
   vtkPVArrayMenu*        arrayMenu;
-  vtkPVScalarRangeLabel* rangeLabel;
   vtkPVContourEntry*     entry;
   vtkPVLabeledToggle*    computeScalarsCheck;
   vtkPVLabeledToggle*    computeNormalsCheck;
@@ -109,18 +108,12 @@ void vtkPVContour::CreateProperties()
 
   arrayMenu = this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
                                  "Choose which scalar array you want to contour.");
+
+  // We need to keep this around to check for scalars when the input changes.
   this->ArrayMenu = arrayMenu;
   this->ArrayMenu->Register(this);
 
-  rangeLabel = vtkPVScalarRangeLabel::New();
-  rangeLabel->SetArrayMenu(arrayMenu);
-  arrayMenu->AddDependant(rangeLabel);
-  rangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
-  rangeLabel->Create(pvApp);
-  this->AddPVWidget(rangeLabel);
-  this->Script("pack %s", rangeLabel->GetWidgetName());
-  rangeLabel->Delete();
-  rangeLabel = NULL;
+  this->AddScalarRangeLabel(arrayMenu);
   
   entry = vtkPVContourEntry::New();
   entry->SetPVSource(this);

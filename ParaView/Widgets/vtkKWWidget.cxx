@@ -307,7 +307,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.24 $");
+  this->ExtractRevision(os,"$Revision: 1.25 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
@@ -362,30 +362,22 @@ int vtkKWWidget::InitializeTrace()
     return 1;
     }
 
-  // Give any callback the oportunity to initialize the event.
-  // I think I will remove this eventually.  Right now, PVSources use
-  // this to initialize the PVWidgets.
-  this->InvokeEvent(vtkKWEvent::InitializeTraceEvent, 0);
-  if (this->TraceInitialized)
-    {
-    return 1;
-    }
-
   // The new general way to initialize objects (from vtkKWObject).
   if (this->TraceReferenceObject && this->TraceReferenceCommand)
     {
     if (this->TraceReferenceObject->InitializeTrace())
       {
       this->Application->AddTraceEntry("set kw(%s) [$kw(%s) %s]",
-                                       this->GetTclName(), 
-                                       this->TraceReferenceObject->GetTclName(),
-                                       this->TraceReferenceCommand);
+                                      this->GetTclName(), 
+                                      this->TraceReferenceObject->GetTclName(),
+                                      this->TraceReferenceCommand);
       this->TraceInitialized = 1;
       return 1;
       }
     }
 
-  // The only other possibility is to have the parent initialize the childs trace.
+  // The only other possibility is to have the 
+  // parent initialize the childs trace.
   // This will only work if we have a parent and this child has a trace name.
   // The name is the way to get the children from the parent.
   if (this->Parent == NULL || this->TraceName == NULL)

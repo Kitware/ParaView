@@ -74,6 +74,11 @@ public:
   // This calculates new range to display (using the array menu).
   virtual void Update();
 
+  // Description:
+  // Access to the range values.
+  // This is used in a regression test.
+  vtkGetVector2Macro(Range, float);
+
 protected:
   vtkPVScalarRangeLabel();
   ~vtkPVScalarRangeLabel();
@@ -82,8 +87,8 @@ protected:
 
   vtkPVArrayMenu *ArrayMenu;
   vtkKWLabel *Label;
-  float Min;
-  float Max;
+
+  float Range[2];
 };
 
 

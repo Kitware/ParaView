@@ -71,8 +71,8 @@ vtkPVScalarRangeLabel::vtkPVScalarRangeLabel()
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = NULL;
 
-  this->Min = VTK_LARGE_FLOAT;
-  this->Max = -VTK_LARGE_FLOAT;
+  this->Range[0] = VTK_LARGE_FLOAT;
+  this->Range[1] = -VTK_LARGE_FLOAT;
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +112,6 @@ void vtkPVScalarRangeLabel::Update()
   vtkPVInputMenu *inputMenu;
   vtkPVData *pvd;
   vtkDataArray *array;
-  float range[2];
   float temp[2];
 
   if (this->ArrayMenu == NULL)
@@ -124,8 +123,8 @@ void vtkPVScalarRangeLabel::Update()
   array = this->ArrayMenu->GetVTKArray();
   if (array == NULL || array->GetName() == NULL)
     {
-    this->Min = VTK_LARGE_FLOAT;
-    this->Max = -VTK_LARGE_FLOAT;
+    this->Range[0] = VTK_LARGE_FLOAT;
+    this->Range[1] = -VTK_LARGE_FLOAT;
     this->Label->SetLabel("Missing Array");
     return;
     }
@@ -144,48 +143,46 @@ void vtkPVScalarRangeLabel::Update()
     return;
     }
 
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
+  this->Range[0] = VTK_LARGE_FLOAT;
+  this->Range[1] = -VTK_LARGE_FLOAT;
   pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
                          pvd->GetVTKDataTclName(),
                          array->GetName());
   
-  array->GetRange(range, 0);  
+  array->GetRange(this->Range, 0);  
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; id++)
     {
     controller->Receive(temp, 2, id, 1976);
     // try to protect against invalid ranges.
-    if (range[0] > range[1])
+    if (this->Range[0] > this->Range[1])
       {
-      range[0] = temp[0];
-      range[1] = temp[1];
+      this->Range[0] = temp[0];
+      this->Range[1] = temp[1];
       }
     else if (temp[0] < temp[1])
       {
-      if (temp[0] < range[0])
+      if (temp[0] < this->Range[0])
         {
-        range[0] = temp[0];
+        this->Range[0] = temp[0];
         }
-      if (temp[1] > range[1])
+      if (temp[1] > this->Range[1])
         {
-        range[1] = temp[1];
+        this->Range[1] = temp[1];
         }
       }
     }
 
   char str[512];
-  if (range[0] > range[1])
+  if (this->Range[0] > this->Range[1])
     {
     sprintf(str, "Invalid Data Range");
     }
   else
     {
-    sprintf(str, "Scalar Range: %f to %f", range[0], range[1]);
+    sprintf(str, "Scalar Range: %f to %f", this->Range[0], this->Range[1]);
     }
 
-  this->Min = range[0];
-  this->Max = range[1];
   this->Label->SetLabel(str);
 }
 

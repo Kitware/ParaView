@@ -59,9 +59,13 @@ vtkPVPlaneWidget::vtkPVPlaneWidget()
   this->CommandFunction = vtkPVPlaneWidgetCommand;
 
   this->CenterEntry = vtkPVVectorEntry::New();
+  this->CenterEntry->SetTraceReferenceObject(this);
+  this->CenterEntry->SetTraceReferenceCommand("GetCenterEntry");
   this->CenterResetButton = vtkKWPushButton::New();
 
   this->NormalEntry = vtkPVVectorEntry::New();
+  this->NormalEntry->SetTraceReferenceObject(this);
+  this->NormalEntry->SetTraceReferenceCommand("GetNormalEntry");
   this->NormalButtonFrame = vtkKWWidget::New();
   this->NormalCameraButton = vtkKWPushButton::New();
   this->NormalXButton = vtkKWPushButton::New();

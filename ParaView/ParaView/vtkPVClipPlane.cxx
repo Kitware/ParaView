@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVBoundsDisplay.h"
 #include "vtkObjectFactory.h"
 
 int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
@@ -85,7 +84,6 @@ void vtkPVClipPlane::CreateProperties()
   vtkPVInputMenu *inputMenu;
   vtkPVPlaneWidget *planeWidget;
   vtkPVVectorEntry *offsetEntry;
-  vtkPVBoundsDisplay *boundsDisplay;
 
   this->vtkPVSource::CreateProperties();
  
@@ -93,17 +91,7 @@ void vtkPVClipPlane::CreateProperties()
                                  "Set the input to this filter.",
                                  this->GetPVWindow()->GetSources());
 
-  boundsDisplay = vtkPVBoundsDisplay::New();
-  boundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
-  boundsDisplay->Create(this->Application);
-  boundsDisplay->GetWidget()->SetLabel("Input Bounds");
-  boundsDisplay->SetInputMenu(inputMenu);
-  inputMenu->AddDependant(boundsDisplay);
-  this->Script("pack %s -side top -fill x",
-               boundsDisplay->GetWidgetName());
-  this->AddPVWidget(boundsDisplay);
-  boundsDisplay->Delete();
-  boundsDisplay = NULL;
+  this->AddBoundsDisplay(inputMenu);
 
   // The Plane widget makes its owns VTK object (vtkPlane) so we do not
   // need to make the association.

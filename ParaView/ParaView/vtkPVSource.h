@@ -72,6 +72,8 @@ class vtkPVRenderView;
 class vtkKWLabeledFrame;
 class vtkKWLabel;
 class vtkPVWidget;
+class vtkPVBoundsDisplay;
+class vtkPVScalarRangeLabel;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -164,6 +166,7 @@ public:
 
   //---------------------------------------------------------------------
   // This is a poor way to create widgets.  Another method should be created.
+  // Well, these do not seem so bad as conveniance methods. 
   
   // Description:
   // Create a menu to select the input.
@@ -171,9 +174,17 @@ public:
                                char* help, vtkCollection* sources);
 
   // Description:
+  // Adds a widget that displays the bounds of the input.
+  vtkPVBoundsDisplay* AddBoundsDisplay(vtkPVInputMenu *inputMenu);
+
+  // Description:
   // Create a menu to select the active scalars of the input..
   vtkPVArrayMenu *AddArrayMenu(const char* label, int attributeType, 
                                int numComponents, const char* help);
+
+  // Description:
+  // Adds a widget that displays the scalar range of the input array.
+  vtkPVScalarRangeLabel* AddScalarRangeLabel(vtkPVArrayMenu *arrayMenu);
 
   // Description:
   // Create an entry for a filename.
@@ -271,12 +282,6 @@ public:
   vtkPVData **GetPVInputs() { return this->PVInputs; };
   vtkGetMacro(NumberOfPVOutputs, int);
   vtkPVData **GetPVOutputs() { return this->PVOutputs; };
-
-  // Description:
-  // Event procedure for initializing PVWidget traces.
-  // Used internally.
-  static void InitializePVWidgetTrace(vtkObject* o, unsigned long event, 
-                                      void* clientData, void* callData);
 
 protected:
   vtkPVSource();
