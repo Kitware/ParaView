@@ -1293,13 +1293,43 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::CancelCallback()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
+  vtkPVSource *prev;
+  int i;
+  
   if (this->PVOutput == NULL)
     { // Accept has not been called yet.  Delete the object.
-    // ???
-    this->GetWindow()->SetCurrentSource(NULL);
+    // Need to remove the data connected with this source from the list of
+    // inputs, but not sure how to do that since the PVData is NULL at this
+    // point.
+    
+    for (i = 0; i < this->GetNumberOfInputs(); i++)
+      {
+      this->GetNthInput(i)->RemovePVSourceFromUsers(this);
+      }
+    
+    // We need to unpack the notebook for this source and pack the one for the
+    // source of this source (if there is one).
+
+    prev = this->GetWindow()->GetPreviousSource();
+    this->GetWindow()->SetCurrentSource(prev);
+    if (prev)
+      {
+      prev->ShowProperties();
+      }
+    
+    // We need to remove this source from the Source List.    
+    this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
+    this->GetWindow()->GetSourceList()->Update();    
+
     this->GetWindow()->GetMainView()->RemoveComposite(this);
+    
     // How do we delete the sources in all processes ???
-    // this->Delete();
+//    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+//      {
+//      pvApp->BroadcastScript("%s Delete", this->GetTclName());
+//      }
+//    this->Delete();
     }
   else
     {

@@ -87,7 +87,7 @@ void vtkPVPolyData::Shrink()
   sprintf(name, "Shrink%d", count);
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
+  // Link the PVSource to the vtkSource.
   f = vtkPVPolyDataToPolyDataFilter::New();
   pvApp->SetupPVPolyDataSource(f,"vtkShrinkPolyData",name);
   f->SetInput(this);
