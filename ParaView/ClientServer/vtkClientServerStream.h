@@ -46,12 +46,16 @@ public:
   vtkClientServerStream& operator=(const vtkClientServerStream&);
 
   // Description:
-  // Enumeration of message types.
+  // Enumeration of message types that may be stored in a stream.
+  // This must be kept in sync with the string table in this class's
+  // .cxx file.
   enum Commands { New, Invoke, Delete, AssignResult,
                   Reply, Error, EndOfCommands};
 
   // Description:
-  // Enumeration of data types that may be stored in a stream.
+  // Enumeration of data types that may be stored in a stream.  This
+  // must be kept in sync with the string table in this class's .cxx
+  // file.
   enum Types {
     int8_value, int8_array,
     int16_value, int16_array,
@@ -239,12 +243,24 @@ public:
   // Utility methods:
 
   // Description:
-  // Get a string describing the given type.
-  const char* GetStringFromType(vtkClientServerStream::Types type) const;
+  // Get a string describing the given type.  Returns "unknown" if the
+  // type value is invalid.
+  static const char* GetStringFromType(vtkClientServerStream::Types type);
 
   // Description:
-  // Get the type named by the given string.
-  vtkClientServerStream::Types GetTypeFromString(const char* name) const;
+  // Get the type named by the given string.  Returns
+  // vtkClientServerStream::End if the type string is not recognized.
+  static vtkClientServerStream::Types GetTypeFromString(const char* name);
+
+  // Description:
+  // Get a string describing the given command.  Returns "unknown" if
+  // the command value is invalid.
+  static const char* GetStringFromCommand(vtkClientServerStream::Commands cmd);
+
+  // Description:
+  // Get the command named by the given string.  Returns
+  // vtkClientServerStream::EndOfCommands if the string is not recognized.
+  static vtkClientServerStream::Commands GetCommandFromString(const char* name);
 
   // Description:
   // Print the contents of the stream in a human-readable form.

@@ -1337,10 +1337,11 @@ static const char* const vtkClientServerStreamTypeNames[] =
 //----------------------------------------------------------------------------
 const char*
 vtkClientServerStream
-::GetStringFromType(vtkClientServerStream::Types type) const
+::GetStringFromType(vtkClientServerStream::Types type)
 {
   // Lookup the type if it is in range.
-  if(type <= vtkClientServerStream::End)
+  if(type >= vtkClientServerStream::int8_value &&
+     type <= vtkClientServerStream::End)
     {
     return vtkClientServerStreamTypeNames[type];
     }
@@ -1352,7 +1353,7 @@ vtkClientServerStream
 
 //----------------------------------------------------------------------------
 vtkClientServerStream::Types
-vtkClientServerStream::GetTypeFromString(const char* name) const
+vtkClientServerStream::GetTypeFromString(const char* name)
 {
   // Find a string matching the given name.
   for(int t = vtkClientServerStream::int8_value;
@@ -1364,6 +1365,49 @@ vtkClientServerStream::GetTypeFromString(const char* name) const
       }
     }
   return vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+// Map from the vtkClientServerStream::Commands enumeration to strings.
+// This must be kept in-sync with the enumeration.
+static const char* const vtkClientServerStreamCommandNames[] =
+{
+  "New", "Invoke", "Delete", "AssignResult",
+  "Reply", "Error", "EndOfCommands",
+  0
+};
+
+//----------------------------------------------------------------------------
+const char*
+vtkClientServerStream
+::GetStringFromCommand(vtkClientServerStream::Commands cmd)
+{
+  // Lookup the command if it is in range.
+  if(cmd >= vtkClientServerStream::New &&
+     cmd <= vtkClientServerStream::EndOfCommands)
+    {
+    return vtkClientServerStreamCommandNames[cmd];
+    }
+  else
+    {
+    return "unknown";
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream::Commands
+vtkClientServerStream::GetCommandFromString(const char* name)
+{
+  // Find a string matching the given name.
+  for(int c = vtkClientServerStream::New;
+      name && c < vtkClientServerStream::EndOfCommands; ++c)
+    {
+    if(strcmp(vtkClientServerStreamCommandNames[c], name) == 0)
+      {
+      return static_cast<vtkClientServerStream::Commands>(c);
+      }
+    }
+  return vtkClientServerStream::EndOfCommands;
 }
 
 //----------------------------------------------------------------------------
@@ -1409,18 +1453,7 @@ void vtkClientServerStream::Print(ostream& os) const
   for(int m=0; m < this->GetNumberOfMessages(); ++m)
     {
     os << "Message " << m << " = ";
-    switch(this->GetCommand(m))
-      {
-      case vtkClientServerStream::New: os << "New"; break;
-      case vtkClientServerStream::Invoke: os << "Invoke"; break;
-      case vtkClientServerStream::Delete: os << "Delete"; break;
-      case vtkClientServerStream::AssignResult: os << "AssignResult"; break;
-      case vtkClientServerStream::Reply: os << "Reply"; break;
-      case vtkClientServerStream::Error: os << "Error"; break;
-      case vtkClientServerStream::EndOfCommands:
-      default: os << "invalid"; break;
-      }
-    os << "\n";
+    os << this->GetStringFromCommand(this->GetCommand(m)) << "\n";
     for(int a=0; a < this->GetNumberOfArguments(m); ++a)
       {
       switch(this->GetArgumentType(m, a))
