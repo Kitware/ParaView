@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.29");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.30");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -140,15 +140,15 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   // Create the label.
 
   this->Label->SetParent(this->LabelOutsideButton ? this : this->MainFrame);
-  this->Label->Create(app, "");
+  this->Label->Create(app, "-padx 2 -pady 0 -highlightthickness 0 -bd 0");
   this->Label->SetLabel(this->Text);
 
   // Create the color button
 
   this->ColorButton->SetParent(this->MainFrame);
   this->ColorButton->Create(
-    this->Application, "button", 
-    "-bd 0 -highlightthickness	0 -width 2 -padx 0 -pady 0");
+    this->Application, "label", 
+    "-bd 0 -highlightthickness 0 -padx 0 -pady 0 -width 2");
 
   this->UpdateColorButton();
 
@@ -178,7 +178,7 @@ void vtkKWChangeColorButton::Pack()
 
   if (this->LabelOutsideButton)
     {
-    this->Script("pack %s -expand n -fill both -padx 2 -pady 2",
+    this->Script("pack %s -expand y -fill y -padx 2 -pady 2",
                  this->ColorButton->GetWidgetName());
     this->Script("grid %s -row 0 -column %d -sticky news", 
                  this->MainFrame->GetWidgetName(),
@@ -242,14 +242,12 @@ void vtkKWChangeColorButton::UpdateColorButton()
             (int)(this->Color[0] * 255.5), 
             (int)(this->Color[1] * 255.5), 
             (int)(this->Color[2] * 255.5));
-    this->Script("%s configure -bg %s -activebackground	%s", 
-                 this->ColorButton->GetWidgetName(), color, color);
+    this->Script("%s configure -bg %s", 
+                 this->ColorButton->GetWidgetName(), color);
     }
   else
     {
-    this->Script("%s configure -bg [%s cget -disabledforeground] "
-                 "-activebackground	[%s cget -disabledforeground]", 
-                 this->ColorButton->GetWidgetName(), 
+    this->Script("%s configure -bg [%s cget -disabledforeground] ", 
                  this->ColorButton->GetWidgetName(), 
                  this->ColorButton->GetWidgetName());
     }
@@ -263,22 +261,22 @@ void vtkKWChangeColorButton::Bind()
     return;
     }
 
-  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+  this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
                this->MainFrame->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+  this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
                this->MainFrame->GetWidgetName(), this->GetTclName());
 
   if (!this->LabelOutsideButton)
     {
-    this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+    this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
                  this->Label->GetWidgetName(), this->GetTclName());
-    this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+    this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
                  this->Label->GetWidgetName(), this->GetTclName());
     }
 
-  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+  this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
                this->ColorButton->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+  this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
                this->ColorButton->GetWidgetName(), this->GetTclName());
 }
 
@@ -310,14 +308,14 @@ void vtkKWChangeColorButton::UnBind()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::AButtonPress(int /*x*/, int /*y*/)
+void vtkKWChangeColorButton::ButtonPressCallback(int /*x*/, int /*y*/)
 {  
   this->Script("%s configure -relief sunken", 
                this->MainFrame->GetWidgetName());  
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::AButtonRelease(int x, int y)
+void vtkKWChangeColorButton::ButtonReleaseCallback(int x, int y)
 {  
   this->Script("%s configure -relief raised", 
                this->MainFrame->GetWidgetName());  
@@ -340,7 +338,7 @@ void vtkKWChangeColorButton::AButtonRelease(int x, int y)
 
   if ((x >= xw) && (x<= xw+dxw) && (y >= yw) && (y <= yw + dyw))
     {
-    this->ChangeColor();
+    this->QueryUserForColor();
     }  
 }
 
@@ -395,7 +393,7 @@ void vtkKWChangeColorButton::SetBalloonHelpJustification(int j)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::ChangeColor()
+void vtkKWChangeColorButton::QueryUserForColor()
 {  
   int r, g, b;
   char *result, tmp[3];
@@ -488,7 +486,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
 }
 
 //----------------------------------------------------------------------------

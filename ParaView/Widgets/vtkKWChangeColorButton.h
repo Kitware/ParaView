@@ -71,11 +71,6 @@ public:
   vtkGetStringMacro(Text);
  
   // Description:
-  // Handle button press and release events
-  void AButtonPress(int x, int y);
-  void AButtonRelease(int x, int y);
-  
-  // Description:
   // Set the command that is called when the color is changed - the object is
   // the KWObject that will have the method called on it.  The second argument
   // is the name of the method to be called and any arguments in string form.
@@ -108,9 +103,14 @@ public:
   vtkBooleanMacro(LabelOutsideButton, int);
 
   // Description:
-  // Update the color
-  void ChangeColor();
+  // Query user for color
+  void QueryUserForColor();
 
+  // Description:
+  // Callbacks (handle button press and release events, etc.)
+  void ButtonPressCallback(int x, int y);
+  void ButtonReleaseCallback(int x, int y);
+  
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
