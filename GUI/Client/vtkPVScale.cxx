@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.60");
+vtkCxxRevisionMacro(vtkPVScale, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -227,7 +227,6 @@ void vtkPVScale::SetValue(double val)
 void vtkPVScale::SetValueInternal(double val)
 {
   double newVal;
-  double oldVal;
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -241,7 +240,9 @@ void vtkPVScale::SetValueInternal(double val)
     newVal = val;
     }
 
-/*  oldVal = this->Scale->GetValue();
+/*
+  double oldVal;
+  oldVal = this->Scale->GetValue();
   if (newVal == oldVal)
     {
     this->Scale->SetValue(newVal); // to keep the entry in sync with the scale
