@@ -53,6 +53,14 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->Accept->SetParent(this->Properties);
   
   this->Glyph = vtkGlyph3D::New();
+
+  
+  this->Widgets = vtkKWWidgetCollection::New();
+  
+  this->NumberOfAcceptCommands = 0;
+  this->AcceptCommandArrayLength = 0;
+  this->AcceptCommands = NULL;
+
 }
 
 //----------------------------------------------------------------------------
@@ -69,6 +77,11 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
   
   this->Glyph->Delete();
   this->Glyph = NULL;
+
+  this->Widgets->Delete();
+  this->Widgets = NULL;
+
+  this->DeleteAcceptCommands();
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +112,37 @@ void vtkPVGlyph3D::CreateProperties()
 	       this->GlyphSourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->ScaleFactorEntry->GetWidgetName());
+
+  
+  
+  // Try to create a widget without instance variables.
+  vtkKWLabeledEntry *entry = vtkKWLabeledEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->Properties);
+  entry->Create(this->Application);
+  entry->SetLabel("Scale Factor:");
+  // Initialize (value 1, with size 2).
+  entry->SetValue(1.0, 2);
+  this->Script("pack %s", entry->GetWidgetName());
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper SetScaleFactor [%s GetValueAsFloat]",
+                          this->GetTclName(), entry->GetTclName()); 
+  entry->Delete();
+  
+
 }
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::AcceptHelper(char *method, char *args)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->Script("[%s GetPolyDataSource] %s %s", this->GetTclName(),
+                method, args);
+  pvApp->BroadcastScript("[%s GetPolyDataSource] %s %s", this->GetTclName(),
+                         method, args);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
@@ -296,4 +339,60 @@ void vtkPVGlyph3D::GetSource()
   this->GetInput()->GetActorComposite()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::AddAcceptCommand(const char *format, ...)
+{
+  static char event[16000];
+
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  // Check to see if we need to extent to array of commands.
+  if (this->AcceptCommandArrayLength <= this->NumberOfAcceptCommands)
+    { // Yes.
+    int i;
+    // Allocate a new array
+    this->AcceptCommandArrayLength += 20;
+    char **tmp = new char* [this->AcceptCommandArrayLength];
+    // Copy array elements.
+    for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+      {
+      tmp[i] = this->AcceptCommands[i];
+      }
+    // Delete the old array.
+    if (this->AcceptCommands)
+      {
+      delete [] this->AcceptCommands;
+      this->AcceptCommands = NULL;
+      }
+    // Set the new array.
+    this->AcceptCommands = tmp;
+    tmp = NULL;
+    }
+
+  // Allocate the string for and set the new command.
+  this->AcceptCommands[this->NumberOfAcceptCommands] 
+              = new char[strlen(event) + 2];
+  strcpy(this->AcceptCommands[this->NumberOfAcceptCommands], event);
+  this->NumberOfAcceptCommands += 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::DeleteAcceptCommands()
+{
+  int i;
+
+  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+    {
+    delete [] this->AcceptCommands[i];
+    this->AcceptCommands[i] = NULL;
+    }
+  delete [] this->AcceptCommands;
+  this->AcceptCommands = NULL;
+  this->NumberOfAcceptCommands = 0;
+  this->AcceptCommandArrayLength = 0;
 }

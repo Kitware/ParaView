@@ -75,6 +75,10 @@ public:
   void ScaleFactorChanged();
   void GetSource();
   
+  // Description:
+  // A method used to broadcast changes resulting from widgets.
+  void AcceptHelper(char *method, char *args);
+
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();
@@ -88,6 +92,16 @@ protected:
 
   vtkGlyph3D *Glyph;
   vtkPVSource *GlyphSource;
+
+//BTX
+  // List of strings
+  int NumberOfAcceptCommands;
+  int AcceptCommandArrayLength;
+  char **AcceptCommands;
+  void AddAcceptCommand(const char *EventString, ...);
+  void DeleteAcceptCommands();
+//ETX
+  
 };
 
 #endif
