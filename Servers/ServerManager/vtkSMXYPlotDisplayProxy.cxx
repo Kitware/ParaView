@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -320,8 +320,33 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
   this->PropertyProxy->UpdateVTKObjects();
   this->XYPlotActorProxy->UpdateVTKObjects();
 }
+
 //-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->AddProxy(this->XYPlotActorProxy);
+}
+
 //-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->RemoveProxy(this->XYPlotActorProxy); 
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

@@ -1259,7 +1259,8 @@
     <XYPlotActorProxy name="XYPlotActor" class="vtkXYPlotActor">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInput"
+        clean_command="RemoveAllInputs">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -1347,6 +1348,19 @@
         name="XTitle"
         command="SetXTitle"
         number_of_elements="1">
+      </StringVectorProperty>
+      <StringVectorProperty
+        name="SelectInputScalars"
+        command="SelectInputScalars"
+        update_self="1"
+        clean_command="RemoveAllInputScalars"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
     </XYPlotActorProxy>
   </ProxyGroup>

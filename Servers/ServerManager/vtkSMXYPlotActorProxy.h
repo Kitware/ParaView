@@ -22,6 +22,7 @@
 
 #include "vtkSMProxy.h"
 class vtkSMSourceProxy;
+class vtkSMXYPlotActorProxyInternals;
 
 class VTK_EXPORT vtkSMXYPlotActorProxy : public vtkSMProxy
 {
@@ -37,13 +38,38 @@ public:
   void AddInput(vtkSMSourceProxy* input, const char* method, int portIdx, 
     int hasMultipleInputs);
 
+  // Description:
+  // To remove the dataset for the Plot.
+  void CleanInputs(const char* cleancommand);
+
+  // Description:
+  // Methods to set the position/position2 of the actor.
+  void SetPosition(double x, double y);
+  void SetPosition2(double x, double y);
+
+  // Description:
+  // Remove all the arrays selected for plotting.
+  void RemoveAllArrayNames();
+
+  // Description:
+  // Add an array name to be plotted.
+  void AddArrayName(const char* arrayname);
+
+  // Description:
+  // Method to push the property values onto server objects.
+  virtual void UpdateVTKObjects();
 
 protected:
   vtkSMXYPlotActorProxy();
   ~vtkSMXYPlotActorProxy();
 
+  vtkSMXYPlotActorProxyInternals* Internals;
+  int ArrayNamesModified;
+
   vtkSMSourceProxy* Input;
   void SetInput(vtkSMSourceProxy*);
+
+  void SetupInputs();
 
 private:
   vtkSMXYPlotActorProxy(const vtkSMXYPlotActorProxy&); // Not implemented.

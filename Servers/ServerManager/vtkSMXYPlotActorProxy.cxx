@@ -21,117 +21,166 @@
 #include "vtkClientServerID.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMPart.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkMath.h"
+
+#include <vtkstd/vector>
+#include <vtkstd/string>
+
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.2");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
+
+class vtkSMXYPlotActorProxyInternals
+{
+public:
+  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
+  VectorOfStrings ArrayNames;
+};
 
 //-----------------------------------------------------------------------------
 vtkSMXYPlotActorProxy::vtkSMXYPlotActorProxy()
 {
   this->Input = 0;
+  this->Internals = new vtkSMXYPlotActorProxyInternals;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMXYPlotActorProxy::~vtkSMXYPlotActorProxy()
 {
   this->SetInput(0);
+  delete this->Internals;
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
-  const char* method, int portIdx, int hasMultipleInputs)
+void vtkSMXYPlotActorProxy::RemoveAllArrayNames()
 {
-  if (!input)
+  this->Internals->ArrayNames.clear();
+  this->ArrayNamesModified = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::AddArrayName(const char* arrayname)
+{
+  this->Internals->ArrayNames.push_back(vtkstd::string(arrayname));
+  this->ArrayNamesModified = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::SetPosition(double x, double y)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
+    {
+    vtkClientServerID sourceID = this->GetID(i); 
+    stream << vtkClientServerStream::Invoke
+      << sourceID  << "GetPositionCoordinate"
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << vtkClientServerStream::LastResult << "SetValue"
+      << x << y << 0.0
+      << vtkClientServerStream::End;
+    }
+  if ( stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::SetPosition2(double x, double y)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
+    {
+    vtkClientServerID sourceID = this->GetID(i); 
+    stream << vtkClientServerStream::Invoke
+      << sourceID  << "GetPosition2Coordinate"
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << vtkClientServerStream::LastResult << "SetValue"
+      << x << y << 0.0
+      << vtkClientServerStream::End;
+    }
+  if ( stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
+  if (this->ArrayNamesModified && this->Input)
+    {
+    this->ArrayNamesModified = 0;
+    this->SetupInputs(); 
+    }
+}
+  
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::SetupInputs()
+{
+  if (!this->Input)
     {
     return;
     }
-  input->CreateParts();
-  this->SetInput(input);
-  this->CreateVTKObjects(1);
 
-/*
-  int numInputs = input->GetNumberOfParts();
-  this->CreateVTKObjects(1);
-  
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   vtkClientServerID sourceID = this->GetID(0);
 
-  int partIdx;
- 
-  int total_numArrays = 0;
-  // Determine total number of arrays from each part.
-  for (partIdx = 0; partIdx  < numInputs; partIdx++)
-    {
-    vtkSMPart* part = input->GetPart(partIdx);
-    vtkPVDataInformation* dataInfo = part->GetDataInformation();
-    vtkPVDataSetAttributesInformation* pdi = dataInfo->
-      GetPointDataInformation();
-    total_numArrays += pdi->GetNumberOfArrays();
-    }
+  stream << vtkClientServerStream::Invoke
+    << sourceID << "RemoveAllInputs"
+    << vtkClientServerStream::End;
+
+
+  int total_numArrays = this->Internals->ArrayNames.size();
 
   if (total_numArrays == 0)
     {
-    vtkErrorMacro("No arrays in PointData. Cannot plot input!");
+    pm->SendStream(this->GetServers(), stream);
     return;
+    }
+
+  if (this->Input->GetNumberOfParts() > 1)
+    {
+    vtkWarningMacro("Can only handle inputs with 1 part.");
     }
   
   // To assign unique plot color to each array.
   double color_step = 1.0 / total_numArrays;
   double color = 0;
-  
+
   int arrayCount = 0;
-  const char* arrayname;
-
-  // This feels like a very improper place to build the XYplot inputs.
-  // In this case, if the dataset arrays change, one needs to set the input again
-  // (even if the input object hasn't been replaced, but merely filtered differently).
-  // Probably I should do this in MarkConsumersAsModified (or Update).
-  for (partIdx = 0; partIdx < numInputs; ++partIdx)
+  
+  vtkSMXYPlotActorProxyInternals::VectorOfStrings::iterator iter;
+  for (iter = this->Internals->ArrayNames.begin(); 
+    iter != this->Internals->ArrayNames.end(); ++iter)
     {
-    vtkSMPart* part = input->GetPart(partIdx);
-    vtkPVDataInformation* dataInfo = part->GetDataInformation();
-    vtkPVDataSetAttributesInformation* pdi = dataInfo->
-      GetPointDataInformation();
-    int numArrays = pdi->GetNumberOfArrays();
-    for (int arr = 0; arr < numArrays; ++arr)
-      {
-      vtkPVArrayInformation* arrayInfo = pdi->GetArrayInformation(arr);
-      arrayname = arrayInfo->GetName();
-      if (arrayname && arrayInfo->GetNumberOfComponents() != 1)
-        {
-        continue; // it's very easy to extend it to plot all components,
-                  // but I will leave that for the time being, as I am
-                  // not sure that's what we want.
-        }
-      stream << vtkClientServerStream::Invoke
-        << sourceID  << method  << part->GetID(0) << arrayname << 0
-        << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-        << sourceID << "SetPlotLabel" << arrayCount << arrayname
-        << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << sourceID << "AddInput"
+      << this->Input->GetPart(0)
+      << (*iter).c_str() << 0 /*component no*/
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << sourceID << "SetPlotLabel" << arrayCount << (*iter).c_str()
+      << vtkClientServerStream::End;
+    
+    double r, g , b;
+    vtkMath::HSVToRGB(color, 1.0, 1.0, &r, &g, &b);
 
-      double r, g , b;
-      vtkMath::HSVToRGB(color, 1.0, 1.0, &r, &g, &b);
+    stream << vtkClientServerStream::Invoke
+      << sourceID << "SetPlotColor"
+      << arrayCount << r << g << b 
+      << vtkClientServerStream::End;
 
-      stream << vtkClientServerStream::Invoke
-        << sourceID << "SetPlotColor"
-        << arrayCount << r << g << b 
-        << vtkClientServerStream::End;
-
-      color += color_step;
-      arrayCount++;
-      }
+    color += color_step;
+    arrayCount++;
     }
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("LegendVisibility"));
   if (ivp)
@@ -145,19 +194,49 @@ void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
   if (arrayCount == 1)
     {
     stream << vtkClientServerStream::Invoke
-      << sourceID << "SetYTitle" << arrayname 
+      << sourceID << "SetYTitle" << (*iter).c_str() 
       << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
       << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1
       << vtkClientServerStream::End;
     }
   pm->SendStream(this->GetServers(), stream);
-  this->UpdateVTKObjects();
-  */
+  this->UpdateVTKObjects(); // this is required for LegendVisibility. 
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
+  const char* , int , int )
+{
+  if (!input)
+    {
+    return;
+    }
+  input->CreateParts();
+  this->SetInput(input);
+  this->CreateVTKObjects(1);
+  this->ArrayNamesModified = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::CleanInputs(const char* command)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID sourceID = this->GetID(0);
+
+  stream << vtkClientServerStream::Invoke
+    << sourceID << command << vtkClientServerStream::End;
+  pm->SendStream(this->GetServers(), stream);
+  this->ArrayNamesModified = 1;
+  this->SetInput(0);
+  
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotActorProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ArrayNamesModified: " << this->ArrayNamesModified << endl;
+  os << indent << "Input: " << this->Input << endl;
 }

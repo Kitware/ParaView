@@ -1331,11 +1331,15 @@
       <ProxyProperty
         name="Input"
         command="SetInput"
+        immediate_update="1"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
+        <InputArrayDomain name="input_array"
+          attribute_type="point">
+        </InputArrayDomain>
       </ProxyProperty>
       <Property
         name="Update"
@@ -1362,7 +1366,6 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
- 
       <SubProxy>
         <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
       </SubProxy>

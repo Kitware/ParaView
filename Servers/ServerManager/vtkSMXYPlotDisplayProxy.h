@@ -31,6 +31,11 @@ public:
   vtkTypeRevisionMacro(vtkSMXYPlotDisplayProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Called when the display is added/removed to/from a RenderModule.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
+
 protected:
   vtkSMXYPlotDisplayProxy();
   ~vtkSMXYPlotDisplayProxy();
