@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.14");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -577,6 +577,8 @@ void vtkKWParameterValueFunctionEditor::Bind()
     {
     const char *canv = this->Canvas->GetWidgetName();
 
+    // Mouse motion
+
     tk_cmd << "bind " <<  canv
            << " <ButtonPress-1> {" << this->GetTclName() 
            << " StartInteractionCallback %%x %%y}" << endl;
@@ -592,6 +594,45 @@ void vtkKWParameterValueFunctionEditor::Bind()
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
+
+    // Key bindings
+
+    tk_cmd << "bind " <<  canv
+           << " <Enter> {" << this->GetTclName() 
+           << " CanvasEnterCallback}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-n> {" << this->GetTclName() 
+           << " SelectNextPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Next> {" << this->GetTclName() 
+           << " SelectNextPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-p> {" << this->GetTclName() 
+           << " SelectPreviousPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Prior> {" << this->GetTclName() 
+           << " SelectPreviousPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Home> {" << this->GetTclName() 
+           << " SelectFirstPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-End> {" << this->GetTclName() 
+           << " SelectLastPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-x> {" << this->GetTclName() 
+           << " RemoveSelectedPoint}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Delete> {" << this->GetTclName() 
+           << " RemoveSelectedPoint}" << endl;
+
     }
 
   tk_cmd << ends;
@@ -615,6 +656,8 @@ void vtkKWParameterValueFunctionEditor::UnBind()
     {
     const char *canv = this->Canvas->GetWidgetName();
 
+    // Mouse motion
+
     tk_cmd << "bind " << canv
            << " <ButtonPress-1> {}" << endl;
     
@@ -627,6 +670,34 @@ void vtkKWParameterValueFunctionEditor::UnBind()
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
            << " <ButtonRelease-1> {}" << endl;
 
+    // Key bindings
+
+    tk_cmd << "bind " <<  canv
+           << " <Enter> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-n> {}"<< endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Next> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-p> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Prior> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Home> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-End> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-x> {}" << endl;
+
+    tk_cmd << "bind " <<  canv
+           << " <KeyPress-Delete> {}" << endl;
     }
   
   tk_cmd << ends;
@@ -877,13 +948,13 @@ void vtkKWParameterValueFunctionEditor::InvokeCommand(const char *command)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::InvokePointCommand(const char *command,
-                                                           int id)
+void vtkKWParameterValueFunctionEditor::InvokePointCommand(
+  const char *command, int id, const char *extra)
 {
   if (command && *command && !this->DisableCommands && 
       this->HasFunction() && id >= 0 && id < this->GetFunctionSize())
     {
-    this->Script("eval %s %d", command, id);
+    this->Script("eval %s %d %s", command, id, (extra ? extra : ""));
     }
 }
 
@@ -912,11 +983,20 @@ void vtkKWParameterValueFunctionEditor::InvokePointMovedCommand(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::InvokePointRemovedCommand(int id)
+void vtkKWParameterValueFunctionEditor::InvokePointRemovedCommand(
+  int id, float parameter)
 {
-  this->InvokePointCommand(this->PointRemovedCommand, id);
+  ostrstream param_str;
+  param_str << parameter << ends;
+  this->InvokePointCommand(this->PointRemovedCommand, id, param_str.str());
+  param_str.rdbuf()->freeze(0);
 
-  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointRemovedEvent, &id);
+  float fargs[2];
+  fargs[0] = id;
+  fargs[1] = parameter;
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::PointRemovedEvent, fargs);
 }
 
 //----------------------------------------------------------------------------
@@ -1540,6 +1620,158 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SelectNextPoint()
+{
+  if (this->HasSelection())
+    {
+    this->SelectPoint(this->SelectedPoint == this->GetFunctionSize() - 1 
+                      ? 0 : this->SelectedPoint + 1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SelectPreviousPoint()
+{
+  if (this->HasSelection())
+    {
+    this->SelectPoint(this->SelectedPoint == 0  
+                      ? this->GetFunctionSize() - 1 : this->SelectedPoint - 1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SelectFirstPoint()
+{
+  this->SelectPoint(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SelectLastPoint()
+{
+  this->SelectPoint(this->GetFunctionSize() - 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::RemoveSelectedPoint()
+{
+  if (!this->HasSelection())
+    {
+    return 0;
+    }
+
+  return this->RemovePoint(this->SelectedPoint);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::RemovePoint(int id)
+{
+  float parameter;
+  if (!this->GetFunctionPointParameter(id, parameter) ||
+      !this->RemoveFunctionPoint(id))
+    {
+    return 0;
+    }
+
+  // Redraw the points
+
+  this->RedrawCanvasElements();
+
+  // If all points are gone, clear selection
+  // If we the point was removed before the selection, shift the selection
+  // If the selection was at the end, select the last one
+
+  if (this->HasSelection())
+    {
+    if (!this->GetFunctionSize())
+      {
+      this->ClearSelection();
+      }
+    else if (id < this->SelectedPoint)
+      {
+      this->SelectPoint(this->SelectedPoint - 1);
+      }
+    else if (this->SelectedPoint >= this->GetFunctionSize())
+      {
+      this->SelectLastPoint();
+      }
+    }
+
+  this->InvokePointRemovedCommand(id, parameter);
+  this->InvokeFunctionChangedCommand();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::RemovePointAtParameter(float parameter)
+{
+  int fsize = this->GetFunctionSize();
+  float point_param;
+  for (int i = 0; i < fsize; i++)
+    {
+    if (this->GetFunctionPointParameter(i, point_param) &&
+        point_param == parameter)
+      {
+      return this->RemovePoint(i);
+      }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
+  int x, int y, int &id)
+{
+  if (!this->AddFunctionPointAtCanvasCoordinates(x, y, id))
+    {
+    return 0;
+    }
+
+  // Redraw the point
+
+  this->RedrawCanvasPoint(id);
+
+  // If we the point was inserted before the selection, shift the selection
+
+  if (this->HasSelection() && id <= this->SelectedPoint)
+    {
+    this->SelectPoint(this->SelectedPoint + 1);
+    }
+
+  this->InvokePointAddedCommand(id);
+  this->InvokeFunctionChangedCommand();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::AddPointAtParameter(
+  float parameter, int &id)
+{
+  if (!this->AddFunctionPointAtParameter(parameter, id))
+    {
+    return 0;
+    }
+
+  // Redraw the point
+
+  this->RedrawCanvasPoint(id);
+
+  // If we the point was inserted before the selection, shift the selection
+
+  if (this->HasSelection() && id <= this->SelectedPoint)
+    {
+    this->SelectPoint(this->SelectedPoint + 1);
+    }
+
+  this->InvokePointAddedCommand(id);
+  this->InvokeFunctionChangedCommand();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
   vtkKWParameterValueFunctionEditor *editor)
 {
@@ -1563,7 +1795,7 @@ int vtkKWParameterValueFunctionEditor::MergePointsFromEditor(
         (!this->GetFunctionPointParameter(id, parameter) ||
          editor_parameter != parameter))
       {
-      this->AddFunctionPointAtParameter(editor_parameter, new_id);
+      this->AddPointAtParameter(editor_parameter, new_id);
       }
     }
 
@@ -1946,7 +2178,8 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
   
   float parameter;
   int *point_id = reinterpret_cast<int *>(calldata);
-  
+  float *fargs = reinterpret_cast<float *>(calldata);
+
   switch (event)
     {
     // Synchronize visible range
@@ -1966,7 +2199,7 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
       break;
 
     case vtkKWParameterValueFunctionEditor::PointRemovedEvent:
-      self->RemoveFunctionPoint(*point_id);
+      self->RemovePointAtParameter(fargs[1]);
       break;
 
     case vtkKWParameterValueFunctionEditor::FunctionChangedEvent:
@@ -2018,6 +2251,15 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
 void vtkKWParameterValueFunctionEditor::ConfigureCallback()
 {
   this->RedrawCanvas();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::CanvasEnterCallback()
+{
+  if (this->IsCreated())
+    {
+    this->Script("focus %s", this->Canvas->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2119,16 +2361,10 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
 
   if (id >= nb_points)
     {
-    int old_size = this->GetFunctionSize();
-    if (!this->AddFunctionPointAtCanvasCoordinates(c_x, c_y, id))
+    if (!this->AddPointAtCanvasCoordinates(c_x, c_y, id))
       {
       return;
       }
-    if (old_size != this->GetFunctionSize())
-      {
-      this->InvokePointAddedCommand(id);
-      }
-    this->InvokeFunctionChangedCommand();
     }
 
   // Select the point (that was found or just added)
@@ -2303,14 +2539,7 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
        y < -VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
        y > this->CanvasHeight - 1 + VTK_KW_RANGE_CANVAS_DELETE_MARGIN))
     {
-    int old_size = this->GetFunctionSize();
-    int old_id = this->SelectedPoint;
-    this->RemoveFunctionPoint(this->SelectedPoint);
-    if (old_size != this->GetFunctionSize())
-      {
-      this->InvokePointRemovedCommand(old_id);
-      this->InvokeFunctionChangedCommand();
-      }
+    this->RemovePoint(this->SelectedPoint);
     }
   else
     {

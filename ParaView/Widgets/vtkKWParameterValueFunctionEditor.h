@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkKWParameterValueFunctionEditor - a parameter/value function editor
 // .SECTION Description
 // A widget that allows the user to edit a parameter/value function.
+// Keybindings: Delete or x, Home, End, PageUp or p, PageDown or n, 
 
 #ifndef __vtkKWParameterValueFunctionEditor_h
 #define __vtkKWParameterValueFunctionEditor_h
@@ -176,10 +177,25 @@ public:
 
   // Description:
   // Select/Deselect a point, get the selected point (-1 if none selected)
-  virtual void SelectPoint(int id);
   vtkGetMacro(SelectedPoint, int);
+  virtual void SelectPoint(int id);
   virtual void ClearSelection();
-  virtual int HasSelection();
+  virtual int  HasSelection();
+  virtual void SelectNextPoint();
+  virtual void SelectPreviousPoint();
+  virtual void SelectFirstPoint();
+  virtual void SelectLastPoint();
+
+  // Description:
+  // Remove a point
+  virtual int RemoveSelectedPoint();
+  virtual int RemovePoint(int id);
+  virtual int RemovePointAtParameter(float parameter);
+
+  // Description:
+  // Add a point
+  virtual int AddPointAtCanvasCoordinates(int x, int y, int &id);
+  virtual int AddPointAtParameter(float parameter, int &id);
 
   // Description:
   // Merge all the points from another function editor.
@@ -213,6 +229,8 @@ public:
   // Description:
   // Set commands.
   // Point... commands are passed the index of the point that is/was modified.
+  // PointRemovedCommand take an additional arg which is the value of 
+  // the parameter of the point that was removed.
   // SelectionChanged is called on selection/deselection.
   // FunctionChanged is called when the function was changed (as the
   // result of an interaction which is now over, like point added/(re)moved). 
@@ -239,7 +257,7 @@ public:
   virtual void InvokePointAddedCommand(int id);
   virtual void InvokePointMovingCommand(int id);
   virtual void InvokePointMovedCommand(int id);
-  virtual void InvokePointRemovedCommand(int id);
+  virtual void InvokePointRemovedCommand(int id, float parameter);
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeFunctionChangedCommand();
   virtual void InvokeFunctionChangingCommand();
@@ -313,6 +331,7 @@ public:
   // Description:
   // Callbacks
   virtual void ConfigureCallback();
+  virtual void CanvasEnterCallback();
   virtual void VisibleParameterRangeChangingCallback();
   virtual void VisibleParameterRangeChangedCallback();
   virtual void VisibleValueRangeChangingCallback();
@@ -377,9 +396,10 @@ protected:
   char  *VisibleRangeChangingCommand;
 
   virtual void InvokeCommand(const char *command);
-  virtual void InvokePointCommand(const char *command, int id);
-  virtual void SetObjectMethodCommand(char **command, 
-                                      vtkKWObject *object, const char *method);
+  virtual void InvokePointCommand(
+    const char *command, int id, const char *extra = 0);
+  virtual void SetObjectMethodCommand(
+    char **command, vtkKWObject *object, const char *method);
 
   // GUI
 
