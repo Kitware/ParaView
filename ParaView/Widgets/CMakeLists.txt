@@ -41,7 +41,6 @@ vtkKWText.cxx
 vtkKWToolbar.cxx 
 vtkKWView.cxx 
 vtkKWViewCollection.cxx 
-vtkKWVolumeComposite.cxx 
 vtkKWWidget.cxx 
 vtkKWWidgetCollection.cxx 
 vtkKWWindow.cxx 
