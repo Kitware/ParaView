@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.172");
+vtkCxxRevisionMacro(vtkKWWindow, "1.173");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1410,7 +1410,6 @@ void vtkKWWindow::SetErrorIcon(int s)
 //----------------------------------------------------------------------------
 void vtkKWWindow::ErrorMessage(const char* message)
 {
-  //cout << message << endl;
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "VTK Error",
     message, vtkKWMessageDialog::ErrorIcon);

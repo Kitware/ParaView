@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.32");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.33");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -1024,7 +1024,6 @@ int vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
       }
     }
   minsize << ends;
-  // cout << minsize.str() << endl;
 
   int ok = 1;
   if (Tcl_GlobalEval(interp, minsize.str()) != TCL_OK)

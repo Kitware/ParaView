@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.60");
+vtkCxxRevisionMacro(vtkKWScale, "1.61");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -934,8 +934,6 @@ void vtkKWScale::Resize()
   
   this->Script("winfo width %s", this->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(this->Application);
-  
-//  cout << "width: " << width << endl;
   
   char labelText[100];
   
