@@ -123,6 +123,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->MenuEdit = NULL;
   this->MenuView = NULL;
+  this->MenuWindow = NULL;
   this->MenuProperties = NULL;
   this->NumberOfMRUFiles = 0;
   this->PrintTargetDPI = 100;
@@ -169,6 +170,10 @@ vtkKWWindow::~vtkKWWindow()
   if (this->MenuView)
     {
     this->MenuView->Delete();
+    }
+  if (this->MenuWindow)
+    {
+    this->MenuWindow->Delete();
     }
   if (this->StatusImageName)
     {
@@ -327,6 +332,30 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
     }
   
   return this->MenuView;
+}
+
+vtkKWMenu *vtkKWWindow::GetMenuWindow()
+{
+  if (this->MenuWindow)
+    {
+    return this->MenuWindow;
+    }
+
+  this->MenuWindow = vtkKWMenu::New();
+  this->MenuWindow->SetParent(this->GetMenu());
+  this->MenuWindow->SetTearOff(0);
+  this->MenuWindow->Create(this->Application, "");
+  // make sure Help menu is on the right
+  if (this->MenuEdit)
+    { 
+    this->Menu->InsertCascade(1, "Window", this->MenuWindow, 0);
+    }
+  else
+    {
+    this->Menu->InsertCascade(2, "Window", this->MenuWindow, 0);
+    }
+  
+  return this->MenuWindow;
 }
 
 vtkKWMenu *vtkKWWindow::GetMenuProperties()
@@ -819,7 +848,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
 int vtkKWWindow::ExitDialog()

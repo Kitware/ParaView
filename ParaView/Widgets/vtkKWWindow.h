@@ -102,13 +102,14 @@ public:
   vtkGetObjectMacro(MenuFile,vtkKWMenu);
   vtkKWMenu *GetMenuEdit();
   vtkKWMenu *GetMenuView();
+  vtkKWMenu *GetMenuWindow();
   vtkKWMenu *GetMenuProperties();
   
   // Description:
   // Operations on the views.
   void AddView(vtkKWView *);
   void RemoveView(vtkKWView *);
-  void SetSelectedView(vtkKWView *);
+  virtual void SetSelectedView(vtkKWView *);
   vtkGetObjectMacro(SelectedView,vtkKWView);
   vtkKWViewCollection *GetViews() {return this->Views;};
   vtkGetObjectMacro(ViewFrame,vtkKWWidget);
@@ -202,6 +203,7 @@ protected:
   vtkKWMenu *MenuProperties;
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuView;
+  vtkKWMenu *MenuWindow;
   vtkKWMenu *MenuHelp;
   vtkKWWidget *StatusFrame;
   vtkKWWidget *StatusImage;
