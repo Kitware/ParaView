@@ -1,4 +1,5 @@
 SET( ParaView_SRCS
+  vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx

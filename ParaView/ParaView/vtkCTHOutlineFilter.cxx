@@ -30,7 +30,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.1");
+vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.2");
 vtkStandardNewMacro(vtkCTHOutlineFilter);
 
 //----------------------------------------------------------------------------
@@ -56,7 +56,8 @@ void vtkCTHOutlineFilter::Execute()
   int *dimensions;
   int ghostLevels;
   
-  dimensions = input->GetDimensions();
+  // Hack
+  dimensions = input->GetBlockPointDimensions(0);
   ghostLevels = input->GetNumberOfGhostLevels();
 
   numBlocks = input->GetNumberOfBlocks();

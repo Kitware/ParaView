@@ -19,6 +19,7 @@
 #include "vtkCTHData.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkToolkits.h"
 #include "vtkImageData.h"
 #include "vtkCharArray.h"
 #include "vtkPointData.h"
@@ -30,7 +31,9 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkPolyData.h"
 #include "vtkClipPolyData.h"
+#include "vtkKitwareContourFilter.h"
 #include "vtkContourFilter.h"
+#include "vtkKitwareCutter.h"
 #include "vtkCutter.h"
 #include "vtkStringList.h"
 #include "vtkPlane.h"
@@ -39,7 +42,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.3");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.4");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -548,22 +551,13 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
   int pIncX, pIncY, pIncZ;
   int blockId, numBlocks;
   vtkIdList* blockList = vtkIdList::New();
-  int *dims = data->GetDimensions();
+  // hack
+  int *dims = data->GetBlockPointDimensions(0);
   pIncX = 1;
   pIncY = dims[0];
   pIncZ = pIncY * dims[1];
-  vtkDataArray* array;
-  int* cellLevelArray;
   int numCellsPerBlock = data->GetNumberOfCellsPerBlock();
   int numPtsPerBlock = data->GetNumberOfPointsPerBlock();
-
-  array = data->GetCellData()->GetArray("Depth");
-  if (array == NULL)
-    {
-    vtkErrorMacro("Until BlockLevel is part of vtkCTHData, we need a depth array.");
-    return;
-    }
-  cellLevelArray = (int*)(array->GetVoidPointer(0));  
 
   // All neighbor cell incs except 0 and 1.
   // Funny order is for cache locality.
@@ -596,7 +590,13 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
       {
       // We should really have level a better part of the data set structure.
       // Look to level array for now.
-      if (cellLevelArray[blockId*numCellsPerBlock] == level)
+      if (data->GetBlockLevel(blockId) < 0)
+        {
+        vtkErrorMacro("Bad block level");
+        // avoids an infinite loop.
+        ++blocksFinished;
+        }
+      if (data->GetBlockLevel(blockId) == level)
         {
         // Mark a block as finished (before we start processing the block).
         ++blocksFinished;
@@ -641,7 +641,7 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
               } // x loop
             } // y loop
           } // z loop
-        } // if (cellLevelArray[blockId*numCellsPerBlock] == level)
+        } // if (data->GetBlockLevel(blockId) == level)
       } // for (blockId = 0; blockId < numBlocks; ++blockId)
       // Move to next level.
       ++level;
@@ -663,7 +663,8 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
                                                float* pCell, float* pPoint, 
                                                vtkCTHData* input)
 {
-  int* dims = input->GetDimensions();
+  // hack
+  int* dims = input->GetBlockPointDimensions(0);
   float* spacing;
   float sum = 0.0;
   float weight;
@@ -867,7 +868,7 @@ void vtkCTHExtractAMRPart::FindPointCells(vtkCTHData* self, vtkIdType ptId,
   int x0, x1, y0, y1, z0, z1;
   float dx, dy, dz;
   float pt[3];
-  int* dims = self->GetDimensions();
+  int* dims = self->GetPointDimensions();
   int pMaxX = dims[0]-1;
   int pMaxY = dims[1]-1;
   int pMaxZ = dims[2]-1;
@@ -1008,7 +1009,8 @@ void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtk
   float e;
 
   blockList->Initialize();
-  dims = self->GetDimensions();
+  // hack
+  dims = self->GetBlockPointDimensions(0);
   origin = self->GetBlockOrigin(blockId);
   spacing = self->GetBlockSpacing(blockId);
   bds0[0] = origin[0];
@@ -1034,12 +1036,12 @@ void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtk
       bds1[4] = origin[2];
       bds1[5] = origin[2]+spacing[2]*(float)(dims[2]-1);
       // Intersection of bounds
-      if (bds1[0]>bds0[0]) {bds1[0] = bds0[0];}
-      if (bds1[1]<bds0[1]) {bds1[1] = bds0[1];}
-      if (bds1[2]>bds0[2]) {bds1[2] = bds0[2];}
-      if (bds1[3]<bds0[3]) {bds1[3] = bds0[3];}
-      if (bds1[4]>bds0[4]) {bds1[4] = bds0[4];}
-      if (bds1[5]<bds0[5]) {bds1[5] = bds0[5];}
+      if (bds1[0]<bds0[0]) {bds1[0] = bds0[0];}
+      if (bds1[1]>bds0[1]) {bds1[1] = bds0[1];}
+      if (bds1[2]<bds0[2]) {bds1[2] = bds0[2];}
+      if (bds1[3]>bds0[3]) {bds1[3] = bds0[3];}
+      if (bds1[4]<bds0[4]) {bds1[4] = bds0[4];}
+      if (bds1[5]>bds0[5]) {bds1[5] = bds0[5];}
       // Check for overlap.
       if (bds1[0] < bds1[1]+e && bds1[2] < bds1[3]+e && bds1[4] < bds1[5]+e)
         { // All three projections are touching.

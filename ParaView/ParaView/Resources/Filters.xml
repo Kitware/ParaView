@@ -93,7 +93,15 @@
   <LabeledToggle label="Convert strips to polys" trace_name="ConvertStripsToPolys" variable="ConvertStripsToPolys" help="Turn on/off conversion of degenerate strips to polys."/>
   <LabeledToggle label="Point merging" trace_name="PointMerging" variable="PointMerging" help="Turn this On to control wheter points merging is performed."/>
 </Module>
-
+<Module name="CleanUnstructuredGrid" menu_name="CleanToGrid" root_name="CleanUGrid" module_type="Filter" 
+        long_help="This filter shrinks merges points and converts to unstructured grid." 
+        short_help="Merge points.">
+  <Filter class="vtkCleanUnstructuredGrid">
+    <Input name="Input" class="vtkDataSet" /> 
+  </Filter>
+  <InputMenu label="Input" help="Set the input to this filter."
+             input_name="Input"/>
+</Module>
 <Module name="PVConnectivityFilter" menu_name="Connectivity" root_name="Connect" module_type="Filter" 
         long_help="Mark connected components with integer point attribute array." 
         short_help="Find connected components.">
