@@ -272,6 +272,11 @@ void vtkPVInputMenu::ModifiedCallback()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Accept()
 {
+  if (!this->ModifiedFlag)
+    {
+    return;
+    }
+
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource not set.");
@@ -288,6 +293,16 @@ void vtkPVInputMenu::Accept()
                            this->GetTclName(), 
                            this->CurrentValue->GetTclName());
       }
+    // Make input data invisible.
+    vtkPVData* input = this->PVSource->GetPVInput();
+    if (input)
+      {
+      if (this->PVSource->GetReplaceInput() && input->GetPropertiesCreated())
+        {
+        input->SetVisibilityInternal(0);
+        }
+      }
+
     }
   else
     {
@@ -298,6 +313,7 @@ void vtkPVInputMenu::Accept()
                            this->GetTclName());
       }
     }
+  this->ModifiedFlag=1;
 }
 
 //----------------------------------------------------------------------------
@@ -330,14 +346,14 @@ void vtkPVInputMenu::Reset()
 }
 
 vtkPVInputMenu* vtkPVInputMenu::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVInputMenu::SafeDownCast(clone);
 }
 
 void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVInputMenu* pvim = vtkPVInputMenu::SafeDownCast(clone);
