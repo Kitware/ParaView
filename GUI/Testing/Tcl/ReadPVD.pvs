@@ -12,7 +12,7 @@ $kw(vtkTemp4) FinalizeRead $kw(vtkTemp898) "$DataDir/Data/chombo3d.pvd"
 set kw(vtkTemp903) [$kw(vtkTemp898) GetPVWidget {Filename}]
 $kw(vtkTemp903) SetValue "$DataDir/Data/chombo3d.pvd"
 
-$kw(vtkTemp4) WriteVTKFile tmpchombo3d.pvd
+$kw(vtkTemp4) WriteVTKFile "$TempDir/tmpchombo3d.pvd"
 
 # Barrier after write. We don't want to delete files before they are written.
 $Application SendStringToClientAndServer {
@@ -21,13 +21,13 @@ $Application SendStringToClientAndServer {
 }
 
 #delete main file:
-file delete -force tmpchombo3d.pvd
+file delete -force "$TempDir/tmpchombo3d.pvd"
 # Delete the temporary file's pieces.
 for {set i 0} { $i < 16 } { incr i } {
-  catch { file delete -force "tmpchombo3d/tmpchombo3d_$i.vti" }
+  catch { file delete -force "$TempDir/tmpchombo3d/tmpchombo3d_$i.vti" }
 }
 #delete directory
-file delete -force tmpchombo3d
+file delete -force "$TempDir/tmpchombo3d"
 
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
