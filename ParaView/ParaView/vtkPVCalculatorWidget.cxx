@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -744,7 +744,7 @@ void vtkPVCalculatorWidget::ResetInternal(const char* vtkSourceTclName)
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 {
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
   this->FunctionLabel->SetLabel(function);
 }
 

@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.8");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -188,7 +188,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true",
                this->PointWidget->GetWidgetName());
 
-
+  this->ModifiedCallback();
 }
 
 //-----------------------------------------------------------------------------

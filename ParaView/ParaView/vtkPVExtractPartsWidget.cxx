@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.5");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -137,7 +137,7 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
 

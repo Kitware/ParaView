@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.10");
+vtkCxxRevisionMacro(vtkPVPart, "1.11");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -493,10 +493,6 @@ void vtkPVPart::SetVisibility(int v)
   if (this->GetPropTclName())
     {
     pvApp->BroadcastScript("%s SetVisibility %d", this->GetPropTclName(), v);
-    }
-  if (v == 0 && this->GetGeometryTclName())
-    {
-    pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->GetMapperTclName());
     }
 
   // Recompute total visibile memory size.

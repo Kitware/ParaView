@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.2");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -154,7 +154,7 @@ void vtkPVSelectCTHArrays::Create(vtkKWApplication *app)
 
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
 

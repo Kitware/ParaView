@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.12");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -108,7 +108,7 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback;
 }
 
 //----------------------------------------------------------------------------
@@ -260,6 +260,7 @@ void vtkPVGroupInputsWidget::SetSelectState(vtkPVSource *input, int val)
     if (pvs == input)
       {
       this->PartSelectionList->SetSelectState(idx, val);
+      this->ModifiedCallback();
       return;
       }
     ++idx;
@@ -313,7 +314,7 @@ void vtkPVGroupInputsWidget::AllOnCallback()
     this->PartSelectionList->SetSelectState(idx, 1);
     }
 
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -328,7 +329,7 @@ void vtkPVGroupInputsWidget::AllOffCallback()
     this->PartSelectionList->SetSelectState(idx, 0);
     }
 
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
 

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.37");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -578,7 +578,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       }
 
     // In this case, the widget does not match the object.
-    this->ModifiedFlag = 1;
+    this->ModifiedCallback();
 
     if (ai)
       {

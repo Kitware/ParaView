@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -166,7 +166,7 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetPoint1 %f %f %f; %s SetAlignToNone",
                                         this->Widget3DTclName, pos[0], pos[1], pos[2],
                                         this->Widget3DTclName);
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
   this->Render();
 }
 
@@ -200,7 +200,7 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetPoint2 %f %f %f; %s SetAlignToNone",
                                         this->Widget3DTclName, pos[0], pos[1], pos[2],
                                         this->Widget3DTclName);
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
   this->Render();
 }
 

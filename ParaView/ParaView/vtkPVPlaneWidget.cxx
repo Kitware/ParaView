@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -164,7 +164,7 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[0]->SetValue(x, 3);
   this->CenterEntry[1]->SetValue(y, 3);
   this->CenterEntry[2]->SetValue(z, 3); 
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
     this->GetPVApplication()->BroadcastScript("%s SetCenter %f %f %f",
@@ -178,7 +178,7 @@ void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[0]->SetValue(x, 3);
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
     this->GetPVApplication()->BroadcastScript("%s SetNormal %f %f %f",
