@@ -31,7 +31,8 @@ public:
     {
     this->Stream.rdbuf()->freeze(0);
     }
-
+  Output(const Output&){}
+  void operator=(const Output&){}
   ostrstream Stream;
 
   int MaxLen;
