@@ -31,6 +31,7 @@ vtkCxxRevisionMacro(vtkSMPointLabelDisplayProxy, "Revision: 1.1$");
 //-----------------------------------------------------------------------------
 vtkSMPointLabelDisplayProxy::vtkSMPointLabelDisplayProxy()
 {
+  this->CollectProxy = 0;
   this->UpdateSuppressorProxy = 0;
   this->MapperProxy = 0;
   this->ActorProxy = 0;
@@ -41,6 +42,7 @@ vtkSMPointLabelDisplayProxy::vtkSMPointLabelDisplayProxy()
 //-----------------------------------------------------------------------------
 vtkSMPointLabelDisplayProxy::~vtkSMPointLabelDisplayProxy()
 {
+  this->CollectProxy = 0;
   this->UpdateSuppressorProxy = 0;
   this->MapperProxy = 0;
   this->ActorProxy = 0;
@@ -60,8 +62,10 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
   this->InvalidateGeometry();
   this->CreateVTKObjects(1);
 
+  this->SetupPipeline(); // Have to this earlier
+  
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("Input"));
+    this->CollectProxy->GetProperty("Input"));
   if (!ip)
     {
     vtkErrorMacro("Failed to find property Input on UpdateSuppressorProxy.");
@@ -70,7 +74,6 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
   ip->RemoveAllProxies();
   ip->AddProxy(input);
 
-  this->SetupPipeline();
   this->SetupDefaults();
 }
 
@@ -87,18 +90,20 @@ void vtkSMPointLabelDisplayProxy::CreateVTKObjects(int numObjects)
     vtkErrorMacro("Can handle on 1 input!");
     numObjects = 1;
     }
-  
+ 
+  this->CollectProxy = this->GetSubProxy("Collect");
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->MapperProxy = this->GetSubProxy("Mapper");
   this->ActorProxy = this->GetSubProxy("Actor");
   this->TextPropertyProxy =  this->GetSubProxy("Property");
 
-  if (!this->UpdateSuppressorProxy || !this->MapperProxy
+  if (!this->CollectProxy || !this->UpdateSuppressorProxy || !this->MapperProxy
     || !this->ActorProxy || !this->TextPropertyProxy)
     {
     vtkErrorMacro("Not all required subproxies were defined.");
     return;
     }
+  this->CollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->MapperProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -118,7 +123,23 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
   vtkSMProxyProperty* pp;
 
   vtkClientServerStream stream;
-
+  
+  for (unsigned int i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs();i++)
+    {
+    stream << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput"
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->UpdateSuppressorProxy->GetServers(), stream);
+    }
+  
   svp =  vtkSMStringVectorProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("OutputType"));
   if (!svp)
@@ -127,9 +148,7 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
       "UpdateSuppressorProxy.");
     return;
     }
-// I don't set the output type...so the output will me same as the input.
-//  svp->SetElement(0, "vtkUnstructuredGrid");
-//  svp->SetElement(0, "vtkPolyData");
+  svp->SetElement(0, "vtkUnstructuredGrid");
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->MapperProxy->GetProperty("Input"));
@@ -174,6 +193,66 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
   vtkSMIntVectorProperty* ivp;
 
   unsigned int i;
+  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+    {
+    // A rather complex mess to set the correct server variable 
+    // on all of the remote duplication filters.
+    if(pm->GetClientMode())
+      {
+      // We need this because the socket controller has no way of distinguishing
+      // between processes.
+      stream << vtkClientServerStream::Invoke
+        << this->CollectProxy->GetID(i) << "SetServerToClient"
+        << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      }
+    // pm->ClientMode is only set when there is a server.
+    if(pm->GetClientMode())
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->CollectProxy->GetID(i) << "SetServerToDataServer"
+        << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+      }
+    // if running in render server mode
+    if(pm->GetOptions()->GetRenderServerMode())
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
+        << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+      }  
+
+    // Handle collection setup with client server.
+    stream << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetSocketController"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) 
+      << "SetClientDataServerSocketController"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+
+    stream << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
+      << pm->GetMPIMToNSocketConnectionID()
+      << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+
+    }
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CollectProxy->GetProperty("MoveMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property MoveMode on CollectProxy.");
+    return;
+    }
+  ivp->SetElement(0, 2); // Clone mode.
+  this->CollectProxy->UpdateVTKObjects();
+
   for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
     {
     // Tell the update suppressor to produce the correct partition.

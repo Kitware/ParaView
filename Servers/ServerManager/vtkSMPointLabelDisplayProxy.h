@@ -69,6 +69,7 @@ protected:
   virtual void MarkConsumersAsModified();
   virtual void CreateVTKObjects(int numObjects);
 
+  vtkSMProxy* CollectProxy;
   vtkSMProxy* UpdateSuppressorProxy;
   vtkSMProxy* MapperProxy;
   vtkSMProxy* ActorProxy;
