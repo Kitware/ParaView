@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.15");
+vtkCxxRevisionMacro(vtkKWListBox, "1.16");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -178,6 +178,13 @@ void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj,
                obj->GetTclName(), methodAndArgs);
 }
 
+void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj, 
+                                          const char* methodAndArgs)
+{
+  this->Script("bind %s <ButtonRelease-1> {%s %s}", this->Listbox->GetWidgetName(),
+               obj->GetTclName(), methodAndArgs);
+}
+
 
 int vtkKWListBox::AppendUnique(const char* name)
 {
@@ -220,7 +227,7 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
   this->Script("frame %s ", wname);
   this->Scrollbar->Create( app, "scrollbar", "" );
   
-  this->Listbox->Create( app, "listbox", args );
+  this->Listbox->Create( app, "listbox", (args?args:"") );
   
   this->Script( "%s configure -yscroll {%s set}", 
                 this->Listbox->GetWidgetName(),

@@ -88,6 +88,10 @@ public:
   void SetDoubleClickCallback(vtkKWObject* obj, const char* methodAndArgs);
   
   // Description:
+  // Set callback for single click on a list item.
+  void SetSingleClickCallback(vtkKWObject* obj, const char* methodAndArgs);
+  
+  // Description:
   // Get number of items in the list.
   int GetNumberOfItems();
   
