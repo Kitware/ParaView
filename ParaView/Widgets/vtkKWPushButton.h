@@ -61,6 +61,13 @@ public:
 
   void SetLabel(const char *label);
 
+  // Description:
+  // This will configures the state of the button to Disable or Normal.
+  // I did not like the method name SetState because it conflicts 
+  // with check buttons.
+  void Disable();
+  void Enable();
+
 protected:
   vtkKWPushButton() {};
   ~vtkKWPushButton() {};

@@ -75,3 +75,27 @@ void vtkKWPushButton::SetLabel( const char *name )
     this->Script("%s configure -text {%s}", this->GetWidgetName(), name );
     }
 }
+
+
+void vtkKWPushButton::Disable()
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Widget not created yet.");
+    return;
+    }
+
+  this->Script("%s configure -state disabled", this->GetWidgetName());
+}
+
+void vtkKWPushButton::Enable()
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Widget not created yet.");
+    return;
+    }
+
+  this->Script("%s configure -state normal", this->GetWidgetName());
+}
+
