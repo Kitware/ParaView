@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.16");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -387,22 +387,30 @@ void vtkKWColorTransferFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
   float parameter = point[0];
   float *rgb = point + 1;
 
-  char format[1024];
-  sprintf(format, "%%d: (%%.%df; %%.2f, %%.2f, %%.2f)",
+  ostrstream label_str;
+  if (!(this->ShowPointIndex ||
+        (this->ShowSelectedPointIndex && id == this->SelectedPoint)))
+    {
+    label_str << id << ": ";
+    }
+
+  char format[1024], buffer[1024];
+  sprintf(format, "(%%.%df; %%.2f, %%.2f, %%.2f)",
           this->ParameterRange->GetEntriesResolution());
-  
-  char range[1024];
   if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
     {
     float hsv[3];
     vtkMath::RGBToHSV(rgb, hsv);
-    sprintf(range, format, id, parameter, hsv[0], hsv[1], hsv[2]);
+    sprintf(buffer, format, parameter, hsv[0], hsv[1], hsv[2]);
     }
   else
     {
-    sprintf(range, format, id, parameter, rgb[0], rgb[1], rgb[2]);
+    sprintf(buffer, format, parameter, rgb[0], rgb[1], rgb[2]);
     }
-  this->PointLabel->SetLabel(range);
+
+  label_str << buffer << ends;
+  this->PointLabel->SetLabel(label_str.str());
+  label_str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -429,11 +437,14 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app,
   this->ColorSpaceOptionMenu->SetBalloonHelpString(
     "Change the interpolation color space to RGB or HSV.");
 
+  char callback[128];
+  sprintf(callback, "ColorSpaceCallback %d", VTK_CTF_RGB);
   this->ColorSpaceOptionMenu->AddEntryWithCommand(
-    VTK_KW_CTF_EDITOR_RGB_LABEL, this, "ColorSpaceToRGBCallback");
+    VTK_KW_CTF_EDITOR_RGB_LABEL, this, callback);
 
+  sprintf(callback, "ColorSpaceCallback %d", VTK_CTF_HSV);
   this->ColorSpaceOptionMenu->AddEntryWithCommand(
-    VTK_KW_CTF_EDITOR_HSV_LABEL, this, "ColorSpaceToHSVCallback");
+    VTK_KW_CTF_EDITOR_HSV_LABEL, this, callback);
 
   // Pack the widget
 
@@ -546,25 +557,17 @@ void vtkKWColorTransferFunctionEditor::UpdateRangeLabelWithRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::ColorSpaceToRGBCallback()
+void vtkKWColorTransferFunctionEditor::ColorSpaceCallback(int v)
 {
   if (this->ColorTransferFunction &&
-      this->ColorTransferFunction->GetColorSpace() != VTK_CTF_RGB)
+      this->ColorTransferFunction->GetColorSpace() != v)
     {
-    this->ColorTransferFunction->SetColorSpaceToRGB();
+    this->ColorTransferFunction->SetColorSpace(v);
     this->Update();
-    this->InvokeFunctionChangedCommand();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::ColorSpaceToHSVCallback()
-{
-  if (this->ColorTransferFunction &&
-      this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV)
-    {
-    this->ColorTransferFunction->SetColorSpaceToHSV();
-    this->Update();
+    if (this->HasSelection())
+      {
+      this->UpdatePointLabelWithFunctionPoint(this->SelectedPoint);
+      }
     this->InvokeFunctionChangedCommand();
     }
 }

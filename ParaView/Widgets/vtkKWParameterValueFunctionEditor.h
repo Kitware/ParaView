@@ -219,12 +219,40 @@ public:
     { this->SetSelectedPointColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
+  // Set/Get the point text color.
+  // Overriden by ComputePointColorFromValue if supported.
+  vtkGetVector3Macro(PointTextColor, float);
+  virtual void SetPointTextColor(float r, float g, float b);
+  virtual void SetPointTextColor(float rgb[3])
+    { this->SetPointTextColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the selected point text color.
+  // Overriden by ComputePointColorFromValue if supported.
+  vtkGetVector3Macro(SelectedPointTextColor, float);
+  virtual void SetSelectedPointTextColor(float r, float g, float b);
+  virtual void SetSelectedPointTextColor(float rgb[3])
+    { this->SetSelectedPointTextColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
   // Set all points color to be a function of the value (might not be
   // supported/implemented in subclasses). Override PointColor.
   vtkBooleanMacro(ComputePointColorFromValue, int);
   virtual void SetComputePointColorFromValue(int);
   vtkGetMacro(ComputePointColorFromValue, int);
   
+  // Description:
+  // Show the point index in the canvas.
+  vtkBooleanMacro(ShowPointIndex, int);
+  virtual void SetShowPointIndex(int);
+  vtkGetMacro(ShowPointIndex, int);
+
+  // Description:
+  // Show the selected point index in the canvas.
+  vtkBooleanMacro(ShowSelectedPointIndex, int);
+  virtual void SetShowSelectedPointIndex(int);
+  vtkGetMacro(ShowSelectedPointIndex, int);
+
   // Description:
   // Set commands.
   // Point... commands are passed the index of the point that is/was modified.
@@ -377,9 +405,13 @@ protected:
   float SelectedPointRadius;
   int   DisableCommands;
   int   SelectedPoint;
+  int   ShowPointIndex;
+  int   ShowSelectedPointIndex;
 
   float PointColor[3];
   float SelectedPointColor[3];
+  float PointTextColor[3];
+  float SelectedPointTextColor[3];
   int   ComputePointColorFromValue;
 
   // Commands
@@ -473,6 +505,7 @@ protected:
   // Only those functions need to be implemented in the subclasses.
   // See public: section too.
   virtual int  GetFunctionPointColor(int id, float rgb[3]);
+  virtual int  GetFunctionPointTextColor(int id, float rgb[3]);
   virtual int  GetFunctionPointParameter(int id, float &parameter) = 0;
   virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y) = 0;
   virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id) = 0;

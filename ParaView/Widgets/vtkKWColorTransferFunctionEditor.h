@@ -75,8 +75,7 @@ public:
 
   // Description:
   // Callbacks
-  virtual void ColorSpaceToRGBCallback();
-  virtual void ColorSpaceToHSVCallback();
+  virtual void ColorSpaceCallback(int v);
 
   // Description:
   // Proxy to the function. 

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -434,14 +434,22 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
 
   float *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
 
-  char format[1024];
-  sprintf(format, "%%d: (%%.%df; %%.%df)",
+  ostrstream label_str;
+  if (!(this->ShowPointIndex ||
+        (this->ShowSelectedPointIndex && id == this->SelectedPoint)))
+    {
+    label_str << id << ": ";
+    }
+
+  char format[1024], buffer[1024];
+  sprintf(format, "(%%.%df; %%.%df)",
           this->ParameterRange->GetEntriesResolution(),
           this->ValueRange->GetEntriesResolution());
+  sprintf(buffer, format, point[0], point[1]);
 
-  char range[1024];
-  sprintf(range, format, id, point[0], point[1]);
-  this->PointLabel->SetLabel(range);
+  label_str << buffer << ends;
+  this->PointLabel->SetLabel(label_str.str());
+  label_str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

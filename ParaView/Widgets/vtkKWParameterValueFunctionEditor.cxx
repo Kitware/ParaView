@@ -46,18 +46,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.16");
 
-#define VTK_KW_RANGE_POINT_RADIUS_MIN    2
+#define VTK_KW_RANGE_POINT_RADIUS_MIN     2
 
 #define VTK_KW_RANGE_CANVAS_BORDER        1
 #define VTK_KW_RANGE_CANVAS_WIDTH_MIN     10
 #define VTK_KW_RANGE_CANVAS_HEIGHT_MIN    10
 #define VTK_KW_RANGE_CANVAS_DELETE_MARGIN 35
 
+#define VTK_KW_RANGE_SELECTED_TAG         "selected"
 #define VTK_KW_RANGE_POINT_TAG            "point"
-#define VTK_KW_RANGE_SELECTED_POINT_TAG   "spoint"
 #define VTK_KW_RANGE_LINE_TAG             "line"
+#define VTK_KW_RANGE_TEXT_TAG             "text"
 
 #define VTK_KW_RANGE_NB_ICONS             5
 
@@ -74,24 +75,34 @@ vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.15");
 //----------------------------------------------------------------------------
 vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 {
-  this->HideParameterRange      = 0;
-  this->HideValueRange          = 0;
-  this->CanvasHeight            = 50;
-  this->CanvasWidth             = 0;
-  this->LockEndPointsParameter  = 0;
-  this->DisableAddAndRemove     = 0;
-  this->PointRadius             = 4;
-  this->SelectedPointRadius     = 1.45;
-  this->DisableCommands         = 0;
-  this->SelectedPoint           = -1;
+  this->HideParameterRange          = 0;
+  this->HideValueRange              = 0;
+  this->CanvasHeight                = 50;
+  this->CanvasWidth                 = 0;
+  this->LockEndPointsParameter      = 0;
+  this->DisableAddAndRemove         = 0;
+  this->PointRadius                 = 4;
+  this->SelectedPointRadius         = 1.45;
+  this->DisableCommands             = 0;
+  this->SelectedPoint               = -1;
+  this->ShowPointIndex              = 0;
+  this->ShowSelectedPointIndex      = 1;
 
-  this->PointColor[0]           = 1.0;
-  this->PointColor[1]           = 1.0;
-  this->PointColor[2]           = 1.0;
+  this->PointColor[0]               = 1.0;
+  this->PointColor[1]               = 1.0;
+  this->PointColor[2]               = 1.0;
 
-  this->SelectedPointColor[0]   = 0.59;
-  this->SelectedPointColor[1]   = 0.63;
-  this->SelectedPointColor[2]   = 0.82;
+  this->SelectedPointColor[0]       = 0.737; // 0.59;
+  this->SelectedPointColor[1]       = 0.772; // 0.63;
+  this->SelectedPointColor[2]       = 0.956; // 0.82;
+
+  this->PointTextColor[0]           = 0.0;
+  this->PointTextColor[1]           = 0.0;
+  this->PointTextColor[2]           = 0.0;
+
+  this->SelectedPointTextColor[0]   = 0.0;
+  this->SelectedPointTextColor[1]   = 0.0;
+  this->SelectedPointTextColor[2]   = 0.0;
 
   this->ComputePointColorFromValue  = 0;
 
@@ -105,13 +116,13 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->VisibleRangeChangedCommand  = NULL;
   this->VisibleRangeChangingCommand = NULL;
 
-  this->Canvas                  = vtkKWWidget::New();
-  this->ParameterRange          = vtkKWRange::New();
-  this->ValueRange              = vtkKWRange::New();
-  this->TitleFrame              = vtkKWFrame::New();
-  this->InfoFrame               = vtkKWFrame::New();
-  this->RangeLabel              = vtkKWLabel::New();
-  this->PointLabel              = vtkKWLabel::New();
+  this->Canvas                      = vtkKWWidget::New();
+  this->ParameterRange              = vtkKWRange::New();
+  this->ValueRange                  = vtkKWRange::New();
+  this->TitleFrame                  = vtkKWFrame::New();
+  this->InfoFrame                   = vtkKWFrame::New();
+  this->RangeLabel                  = vtkKWLabel::New();
+  this->PointLabel                  = vtkKWLabel::New();
 
   this->LastRedrawCanvasElementsTime      = 0;
   this->LastRelativeVisibleParameterRange = 0.0;
@@ -302,6 +313,53 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointColor(
     rgb[2] = this->PointColor[2];
     }
   
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::GetFunctionPointTextColor(
+  int id, float rgb[3])
+{
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  if (!this->ComputePointColorFromValue)
+    {
+    if (id == this->SelectedPoint)
+      {
+      rgb[0] = this->SelectedPointTextColor[0];
+      rgb[1] = this->SelectedPointTextColor[1];
+      rgb[2] = this->SelectedPointTextColor[2];
+      }
+    else
+      {
+      rgb[0] = this->PointTextColor[0];
+      rgb[1] = this->PointTextColor[1];
+      rgb[2] = this->PointTextColor[2];
+      }
+    return 1;
+    }
+
+  // Get the point color
+
+  float prgb[3];
+  if (!this->GetFunctionPointColor(id, prgb))
+    {
+    return 0;
+    }
+
+  float l = (rgb[0] + rgb[1] + rgb[2]) / 3.0;
+  if (l > 0.5)
+    {
+    rgb[0] = rgb[1] = rgb[2] = 0.0;
+    }
+  else
+    {
+    rgb[0] = rgb[1] = rgb[2] = 1.0;
+    }
+    
   return 1;
 }
 
@@ -552,11 +610,23 @@ void vtkKWParameterValueFunctionEditor::Bind()
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG
+           << " <B1-Motion> {" << this->GetTclName() 
+           << " MovePointCallback %%x %%y 0}" << endl;
+
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG
+           << " <Shift-B1-Motion> {" << this->GetTclName() 
+           << " MovePointCallback %%x %%y 1}" << endl;
+
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
+           << " <ButtonRelease-1> {" << this->GetTclName() 
+           << " EndInteractionCallback %%x %%y}" << endl;
+
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
@@ -629,10 +699,19 @@ void vtkKWParameterValueFunctionEditor::UnBind()
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
            << " <B1-Motion> {}" << endl;
 
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG 
+           << " <B1-Motion> {}" << endl;
+
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
            << " <Shift-B1-Motion> {}" << endl;
 
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG 
+           << " <Shift-B1-Motion> {}" << endl;
+
     tk_cmd << canv << " bind " << VTK_KW_RANGE_POINT_TAG 
+           << " <ButtonRelease-1> {}" << endl;
+
+    tk_cmd << canv << " bind " << VTK_KW_RANGE_TEXT_TAG 
            << " <ButtonRelease-1> {}" << endl;
 
     // Key bindings
@@ -862,7 +941,7 @@ void vtkKWParameterValueFunctionEditor::SetPointColor(
 
   this->Modified();
 
-  this->RedrawCanvas();
+  this->RedrawCanvasElements();
 }
 
 //----------------------------------------------------------------------------
@@ -889,6 +968,52 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointTextColor(
+  float r, float g, float b)
+{
+  if ((r == this->PointTextColor[0] &&
+       g == this->PointTextColor[1] &&
+       b == this->PointTextColor[2]) ||
+      r < 0.0 || r > 1.0 ||
+      g < 0.0 || g > 1.0 ||
+      b < 0.0 || b > 1.0)
+    {
+    return;
+    }
+
+  this->PointTextColor[0] = r;
+  this->PointTextColor[1] = g;
+  this->PointTextColor[2] = b;
+
+  this->Modified();
+
+  this->RedrawCanvasElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSelectedPointTextColor(
+  float r, float g, float b)
+{
+  if ((r == this->SelectedPointTextColor[0] &&
+       g == this->SelectedPointTextColor[1] &&
+       b == this->SelectedPointTextColor[2]) ||
+      r < 0.0 || r > 1.0 ||
+      g < 0.0 || g > 1.0 ||
+      b < 0.0 || b > 1.0)
+    {
+    return;
+    }
+
+  this->SelectedPointTextColor[0] = r;
+  this->SelectedPointTextColor[1] = g;
+  this->SelectedPointTextColor[2] = b;
+
+  this->Modified();
+
+  this->RedrawCanvasPoint(this->SelectedPoint);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetComputePointColorFromValue(int arg)
 {
   if (this->ComputePointColorFromValue == arg)
@@ -901,6 +1026,50 @@ void vtkKWParameterValueFunctionEditor::SetComputePointColorFromValue(int arg)
   this->Modified();
 
   this->RedrawCanvasElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetShowPointIndex(int arg)
+{
+  if (this->ShowPointIndex == arg)
+    {
+    return;
+    }
+
+  this->ShowPointIndex = arg;
+
+  this->Modified();
+
+  this->RedrawCanvasElements();
+
+  // Since the point label can show the point index, update it too
+
+  if (this->HasSelection())
+    {
+    this->UpdatePointLabelWithFunctionPoint(this->SelectedPoint);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetShowSelectedPointIndex(int arg)
+{
+  if (this->ShowSelectedPointIndex == arg)
+    {
+    return;
+    }
+
+  this->ShowSelectedPointIndex = arg;
+
+  this->Modified();
+
+  this->RedrawCanvasPoint(this->SelectedPoint);
+
+  // Since the point label can show the point index, update it too
+
+  if (this->HasSelection())
+    {
+    this->UpdatePointLabelWithFunctionPoint(this->SelectedPoint);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1370,6 +1539,9 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasPoint(int id,
     *tk_cmd << canv << " create oval 0 0 0 0 " 
             << "-tag {p" << id << " " << VTK_KW_RANGE_POINT_TAG << "}\n";
 
+    *tk_cmd << canv << " create text 0 0 -text {} " 
+            << "-tag {t" << id << " " << VTK_KW_RANGE_TEXT_TAG << "}\n";
+
     if (id > 0)
       {
       *tk_cmd << canv << " create line 0 0 0 0 " 
@@ -1382,6 +1554,8 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasPoint(int id,
 
   *tk_cmd << canv << " coords p" << id << " "
           << x - r << " " << y - r << " " << x + r << " " << y + r << endl;
+
+  *tk_cmd << canv << " coords t" << id << " " << x << " " << y + 1 << endl;
 
   if (id > 0)
     {
@@ -1401,13 +1575,33 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasPoint(int id,
   // Update the point color
 
   float rgb[3];
+  char color[10];
+
   if (this->GetFunctionPointColor(id, rgb))
     {
-    char color[10];
     sprintf(color, "#%02x%02x%02x", 
             (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
     *tk_cmd << canv << " itemconfigure p" << id
             << " -outline black -fill " << color << endl;
+    }
+
+  // Update the text
+
+  if (this->ShowPointIndex ||
+      (this->ShowSelectedPointIndex && id == this->SelectedPoint))
+    {
+    if (this->GetFunctionPointTextColor(id, rgb))
+      {
+      sprintf(color, "#%02x%02x%02x", 
+              (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
+      *tk_cmd << canv << " itemconfigure t" << id
+              << " -font {{fixed} " << 7 - (id > 8 ? 1 : 0) << "} -text " 
+              << id + 1 << " -fill " << color << endl;
+      }
+    }
+  else
+    {
+    *tk_cmd << canv << " itemconfigure t" << id << " -text {}" << endl;
     }
 
   // Execute the command, free the stream
@@ -1450,7 +1644,8 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
   if (nb_points_changed && this->HasSelection())
     {
     int item_id = atoi(
-      this->Script("%s find withtag %s",canv,VTK_KW_RANGE_SELECTED_POINT_TAG));
+      this->Script("lindex [%s find withtag %s] 0",
+                   canv, VTK_KW_RANGE_SELECTED_TAG));
     this->GetCanvasItemCenter(item_id, s_x, s_y);
     }
 
@@ -1469,10 +1664,10 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
   c_nb_points = this->CanvasHasTag(VTK_KW_RANGE_POINT_TAG);
   for (i = nb_points; i < c_nb_points; i++)
     {
-    tk_cmd << canv << " delete p" << i << " l" << i << endl;
+    tk_cmd << canv << " delete p" << i << " l" << i << " t" << i << endl;
     }
 
-  // Update the line aspect
+  // Update the items aspect
 
   tk_cmd << canv << " itemconfigure " << VTK_KW_RANGE_LINE_TAG
          << " -fill black -width 2 " << endl;
@@ -1531,10 +1726,17 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
     {
     const char *canv = this->Canvas->GetWidgetName();
 
-    this->Script("%s addtag %s withtag p%d",
-                 canv, VTK_KW_RANGE_SELECTED_POINT_TAG, this->SelectedPoint);
-    this->Script("%s raise %s all",
-                 canv, VTK_KW_RANGE_SELECTED_POINT_TAG);
+    ostrstream tk_cmd;
+
+    tk_cmd << canv << " addtag " << VTK_KW_RANGE_SELECTED_TAG 
+           << " withtag p" <<  this->SelectedPoint << endl;
+    tk_cmd << canv << " addtag " << VTK_KW_RANGE_SELECTED_TAG 
+           << " withtag t" <<  this->SelectedPoint << endl;
+    tk_cmd << canv << " raise " << VTK_KW_RANGE_SELECTED_TAG << " all" << endl;
+
+    tk_cmd << ends;
+    this->Script(tk_cmd.str());
+    tk_cmd.rdbuf()->freeze(0);
     }
 
   // Draw the selected point accordingly and update its aspect
@@ -1562,8 +1764,16 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
     {
     const char *canv = this->Canvas->GetWidgetName();
 
-    this->Script("%s dtag p%d %s",
-                 canv, this->SelectedPoint, VTK_KW_RANGE_SELECTED_POINT_TAG);
+    ostrstream tk_cmd;
+
+    tk_cmd << canv << " dtag p" <<  this->SelectedPoint
+           << " " << VTK_KW_RANGE_SELECTED_TAG << endl;
+    tk_cmd << canv << " dtag t" <<  this->SelectedPoint
+           << " " << VTK_KW_RANGE_SELECTED_TAG << endl;
+
+    tk_cmd << ends;
+    this->Script(tk_cmd.str());
+    tk_cmd.rdbuf()->freeze(0);
     }
 
   // Deselect
@@ -1693,9 +1903,16 @@ int vtkKWParameterValueFunctionEditor::AddPointAtCanvasCoordinates(
     return 0;
     }
 
-  // Redraw the point
+  // Draw the point (or all the points if the index have changed)
 
-  this->RedrawCanvasPoint(id);
+  if (this->ShowPointIndex)
+    {
+    this->RedrawCanvasElements();
+    }
+  else
+    {
+    this->RedrawCanvasPoint(id);
+    }
 
   // If we the point was inserted before the selection, shift the selection
 
@@ -1719,9 +1936,16 @@ int vtkKWParameterValueFunctionEditor::AddPointAtParameter(
     return 0;
     }
 
-  // Redraw the point
+  // Draw the point (or all the points if the index have changed)
 
-  this->RedrawCanvasPoint(id);
+  if (this->ShowPointIndex)
+    {
+    this->RedrawCanvasElements();
+    }
+  else
+    {
+    this->RedrawCanvasPoint(id);
+    }
 
   // If we the point was inserted before the selection, shift the selection
 
@@ -2555,7 +2779,19 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << this->SelectedPointColor[0] << ", " 
      << this->SelectedPointColor[1] << ", " 
      << this->SelectedPointColor[2] << ")" << endl;
+  os << indent << "PointTextColor: ("
+     << this->PointTextColor[0] << ", " 
+     << this->PointTextColor[1] << ", " 
+     << this->PointTextColor[2] << ")" << endl;
+  os << indent << "SelectedPointTextColor: ("
+     << this->SelectedPointTextColor[0] << ", " 
+     << this->SelectedPointTextColor[1] << ", " 
+     << this->SelectedPointTextColor[2] << ")" << endl;
   os << indent << "ComputePointColorFromValue: "
      << (this->ComputePointColorFromValue ? "On" : "Off") << endl;
+  os << indent << "ShowPointIndex: "
+     << (this->ShowPointIndex ? "On" : "Off") << endl;
+  os << indent << "ShowSelectedPointIndex: "
+     << (this->ShowSelectedPointIndex ? "On" : "Off") << endl;
 }
 
