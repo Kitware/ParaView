@@ -79,7 +79,7 @@ vtkKWApplication::vtkKWApplication()
   strcpy(this->ApplicationReleaseName, "unknown" );
 
   // setup tcl stuff
-  this->MainInterp = vtkTclGetGlobalInterp();  
+  this->MainInterp = Et_Interp;
   this->Windows = vtkKWWindowCollection::New();  
   
   // add the application as $app
