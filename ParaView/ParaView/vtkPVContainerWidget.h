@@ -114,10 +114,12 @@ public:
   // For saving the widget into a VTK tcl script.
   virtual void SaveInBatchScript(ofstream *file);
 
+  //BTX
   // Description:
   // Called when accept button is pushed.
   // Adds to the trace file and sets the objects variable from UI.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // Called when reset button is pushed.

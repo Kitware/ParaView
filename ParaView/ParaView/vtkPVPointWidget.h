@@ -95,10 +95,12 @@ public:
   // Description:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
-    
+
+  //BTX
   // Description:
   // Called when the PVSources accept button is called.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

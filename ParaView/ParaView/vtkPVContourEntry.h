@@ -64,9 +64,11 @@ public:
   // can be traced properly.
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
+  //BTX
   // Description:
   // Gets called when the accept button is pressed.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // Gets called when the reset button is pressed.

@@ -76,12 +76,14 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  //BTX
   // Description:
   // Called when accept button is pushed.
   // Sets object's variable to the widget's value.
   // Side effect is to turn modified flag off.
   virtual void AcceptInternal(vtkClientServerID);
-  
+  //ETX
+
   // Description:
   // Called then the reset button is pushed.
   // Sets the widget's value to the object-variable's value.

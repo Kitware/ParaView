@@ -238,11 +238,13 @@ public:
   // This method does not initialize trace variable or check modified.
   virtual void Trace(ofstream *file) = 0;  
 
+  //BTX
   // Description:
   // Most subclasses implement these methods to move state from VTK objects
   // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
+  //ETX
 
   // Description:
   // Set/get the property to use with this widget.  Overridden in subclasses.

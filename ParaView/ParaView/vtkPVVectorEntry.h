@@ -161,10 +161,12 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  //BTX
   // Description:
   // Move widget state to vtk object or back.
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
+  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

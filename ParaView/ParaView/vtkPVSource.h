@@ -222,14 +222,20 @@ public:
   void AddVTKSource(const char *tclName);
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
+  //BTX
   vtkClientServerID GetVTKSourceID(int idx);
+  //ETX
   unsigned int GetVTKSourceIDAsInt(int idx);
   // Legacy
+  //BTX
   vtkClientServerID GetVTKSourceID() {return this->GetVTKSourceID(0);}
+  //ETX
   unsigned int GetVTKSourceIDAsInt() {return this->GetVTKSourceIDAsInt(0);}
 
 
+  //BTX
   void AddVTKSource(vtkClientServerID);
+  //ETX
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);

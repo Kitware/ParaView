@@ -69,9 +69,11 @@ public:
   // Callback that set the center to the middle of the bounds.
   void CenterResetCallback();
 
+  //BTX
   // Description:
   // The Tcl name of the VTK implicit plane.
   vtkGetMacro(SphereID, vtkClientServerID);
+  //ETX
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -107,19 +109,23 @@ public:
   // Description:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
-    
+
+  //BTX
   // Description:
   // Called when the PVSources accept button is called.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  //BTX
   // Description:
   // Return a contained object by name as follows:
   // Sphere == SphereID
   vtkClientServerID GetObjectByName(const char* ){ return this->SphereID;}
+  //ETX
 
 protected:
   vtkPVSphereWidget();

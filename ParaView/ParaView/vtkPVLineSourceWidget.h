@@ -86,10 +86,12 @@ public:
   // This creates the line source (one for all parts).
   virtual void SaveInBatchScript(ofstream *file);
 
+  //BTX
   // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // The methods get called when the Reset button is pressed. 

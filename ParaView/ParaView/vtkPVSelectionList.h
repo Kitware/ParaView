@@ -115,10 +115,12 @@ public:
                                      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  //BTX
   // Description:
   // Called when accept button is pushed.
   // Sets the objects variable from UI.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // Called when reset button is pushed.

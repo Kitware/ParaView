@@ -61,7 +61,9 @@ public:
   vtkGetStringMacro(String);
   
   virtual void AcceptInternal();
+  //BTX
   vtkSetMacro(ObjectID, vtkClientServerID);
+  //ETX
   vtkSetStringMacro(VTKCommand);
   //BTX
   void SetStringType(vtkPVSelectWidget::ElementTypes);

@@ -77,10 +77,12 @@ public:
   void NormalYCallback();
   void NormalZCallback();
 
+  //BTX
   // Description:
   // The Tcl name of the VTK implicit plane.
   vtkGetMacro(PlaneID, vtkClientServerID);
   vtkSetMacro(PlaneID, vtkClientServerID);
+  //ETX
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -123,10 +125,12 @@ public:
   // Description:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
-    
+
+  //BTX
   // Description:
   // Called when the PVSources accept button is called.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

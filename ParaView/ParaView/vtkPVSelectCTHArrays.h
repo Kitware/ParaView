@@ -87,11 +87,13 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  //BTX
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK calculator filter.
   virtual void AcceptInternal(vtkClientServerID);
-  
+  //ETX
+
   // Description:
   // This method resets the widget values from the VTK filter.
   virtual void ResetInternal();

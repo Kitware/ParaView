@@ -65,12 +65,14 @@ public:
   vtkTypeRevisionMacro(vtkPVObjectWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
   // Description:
   // The point of a PV widget is that it is an interface for
   // some objects state/ivars.  This is one way the object/variable
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
   vtkSetMacro(ObjectID,vtkClientServerID);
+  //ETX
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);
 

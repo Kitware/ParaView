@@ -153,10 +153,12 @@ public:
   // Since sub widgets may hove their own objects ...
   virtual void SaveInBatchScript(ofstream *file);
 
+  //BTX
   // Description:
   // Called when accept button is pushed.
   // Sets the objects variable from UI.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // Called when reset button is pushed.

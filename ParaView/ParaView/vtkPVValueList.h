@@ -97,10 +97,12 @@ public:
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
 
+  //BTX
   // Description:
   // Gets called when the accept button is pressed. The sub-classes
   // should first call this and then do their own thing.
   virtual void AcceptInternal(vtkClientServerID);
+  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

@@ -64,13 +64,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp);
-  
+
+  //BTX
   // Description:
-  // Called when accept button is pushed.  
+  // Called when accept button is pushed.
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void AcceptInternal(vtkClientServerID);
-  
+  //ETX
+
   // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.

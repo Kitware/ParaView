@@ -70,10 +70,12 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  //BTX
   // Description:
   // Trying out a ne protocal.
   virtual void AcceptInternal(vtkClientServerID) { this->ModifiedFlag = 0;}
   virtual void ResetIntenral(vtkClientServerID) { this->ModifiedFlag = 0;}
+  //ETX
 
   // Description:
   // Empty method to keep superclass from complaining.

@@ -116,8 +116,9 @@ public:
   // object.  This specifies the type of the attribute (i.e Scalars, Vectors ...).
   // It defaults to NULL.
   vtkSetMacro(AttributeType, int);
-  vtkGetMacro(AttributeType, int);  
+  vtkGetMacro(AttributeType, int);
 
+  //BTX
   // Description:
   // This is the filter/object that will be modified by the widgtet when the 
   // selected array gets changed in the menu.  It should have methods like:
@@ -125,6 +126,7 @@ public:
   // Description:
   vtkSetMacro(ObjectID,vtkClientServerID);
   vtkGetMacro(ObjectID,vtkClientServerID);
+  //ETX
 
   // Description:
   // This input menu supplies the data set.

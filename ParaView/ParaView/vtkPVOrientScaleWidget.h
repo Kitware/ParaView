@@ -68,12 +68,14 @@ public:
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
-  
+
+  //BTX
   // Description:
   // Move widget state to vtk object or back.
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
-  
+  //ETX
+
   // Description:
   // Save this widget's state into a PVScript.  This method does not initialize
   // trace variable or check modified.

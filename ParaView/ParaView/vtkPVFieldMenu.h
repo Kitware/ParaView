@@ -110,11 +110,13 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  //BTX
   // Description:
   // Called when the accept or reset button is pressed.
   // This internal version is passed VTK source name,
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
+  //ETX
 
   // Description:
   // Set/get the property to use with this widget.
