@@ -455,6 +455,11 @@ public:
   // Convenience method for rendering.
   vtkPVRenderView *GetPVRenderView();
 
+  // Description:
+  // This used to be private, but now the animation
+  // interface uses it to force an update.
+  void MarkSourcesForUpdate();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -555,7 +560,6 @@ protected:
   int AcceptButtonRed;
   vtkTimeStamp PipelineModifiedTime;
   vtkTimeStamp UpdateTime;
-  void MarkSourcesForUpdate();
 
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;
