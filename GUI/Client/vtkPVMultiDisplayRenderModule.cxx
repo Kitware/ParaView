@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.14");
 
 
 
@@ -151,11 +151,11 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
 
   // Find out whether we are going to render localy.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
       info = pDisp->GetInformation();
@@ -168,11 +168,11 @@ void vtkPVMultiDisplayRenderModule::StillRender()
     localRender = 1;
     }
   // Change the collection flags and update.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       pDisp->SetCollectionDecision(localRender);
       pDisp->Update();
@@ -259,11 +259,11 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
 
   // Compute memory totals.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
       info = pDisp->GetInformation();
@@ -298,11 +298,11 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     }
 
   // Change the collection flags and update.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       // I had to add this because the default for the
       // Collection filter is not to collect 

@@ -33,7 +33,9 @@ class vtkPVApplication;
 class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkPVPartDisplay;
+class vtkPVDisplay;
 class vtkPolyDataMapper;
+class vtkCollection;
 
 class VTK_EXPORT vtkPVPart : public vtkKWObject
 {
@@ -112,6 +114,13 @@ public:
   void SetPartDisplay(vtkPVPartDisplay* pDisp);
 
   // Description:
+  // We are starting to support multiple types of displays (plot).
+  // I am keeping the PartDisplay pointer and methods around
+  // until we come up with a better API (maybe proxy/properties).
+  // The method SetPartDisplay also adds the display to this collection.
+  void AddDisplay(vtkPVDisplay* disp);
+
+  // Description:
   // VTKSourceIndex points to the VTKSourceID in this
   // part's PVSource. The tcl name of the VTK source that produced
   // the data in this part can be obtained with
@@ -131,10 +140,29 @@ public:
   vtkGetMacro(VTKOutputIndex, int);
   vtkSetMacro(VTKOutputIndex, int);
 
+  // Description:
+  // Update the data and geometry.
+  void Update();
+
+  // Description:
+  // Modified propagated forward to eliminate extra network update calls.
+  void MarkForUpdate();
+
+  // Description:
+  // Set visibility of all of the displays.
+  // I would like to remove this method once the properties are finished.
+  // UI would directly manipulate the displays.
+  void SetVisibility(int v);
+
 protected:
   vtkPVPart();
   ~vtkPVPart();
 
+  // We are starting to support multiple types of displays (plot).
+  // I am keeping the PartDisplay pointer and methods around
+  // until we come up with a better API (maybe proxy/properties).
+  // The part display is also in the collection.
+  vtkCollection* Displays;
   vtkPVPartDisplay* PartDisplay;
   
   // A part needs a name to show in the extract part filter.
