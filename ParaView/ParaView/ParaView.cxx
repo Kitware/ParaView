@@ -274,12 +274,25 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   pvArgs.RetVal = &retVal;
+
+#ifdef VTK_USE_MPI
+
+  controller->CreateOutputWindow();
+
+
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
-
+  
   controller->Finalize();
   controller->Delete();
-  
+
+#else
+  controller->SetNumberOfProcesses(1);
+  vtkMultiProcessController::SetGlobalController(controller);
+  Process_Init(controller, (void *)(&pvArgs)); 
+  controller->Delete();
+#endif
+
   for(j=0; j<argc; j++)
     {
     free(argv[j]);
