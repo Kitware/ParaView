@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.4");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.5");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -562,7 +562,7 @@ const char* vtkPVContourEntry::GetLabel()
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::UpdateProperty()
 {
-  float numContours = this->ContourValues->GetNumberOfContours();
+  int numContours = this->ContourValues->GetNumberOfContours();
   float *scalars = new float[2*numContours+1];
   scalars[0] = numContours;
   int i;
