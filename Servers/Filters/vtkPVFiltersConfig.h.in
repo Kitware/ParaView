@@ -18,5 +18,6 @@
 
 #cmakedefine PARAVIEW_USE_SYSTEM_HDF5
 #cmakedefine XDMF_SYSTEM_HDF5
+#cmakedefine PARAVIEW_BUILD_WITH_ADAPTOR
 
 #endif

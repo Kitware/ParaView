@@ -13,11 +13,13 @@
 =========================================================================*/
 #include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
 #include "vtkPVConfig.h"
+#include "vtkPVFiltersConfig.h"
+
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #endif
 
-#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
 #include "vtkPVAdaptor.h"
 #endif
 
@@ -36,7 +38,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.4");
+vtkCxxRevisionMacro(vtkPVMain, "1.5");
 
 
 
@@ -79,12 +81,18 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
   (void)argc;
   (void)argv;
 #endif
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorInitialize();
+#endif
 }
 
 void vtkPVMain::Finalize()
 {
 #ifdef VTK_USE_MPI
   MPI_Finalize();
+#endif
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorDispose();
 #endif
 }
 
@@ -172,9 +180,7 @@ int vtkPVMain::Run(vtkPVOptions* options,
     }
 
   this->ProcessModule->Initialize();
-#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
-  vtkPVAdaptorCreatePrototypes();
-#endif
+
   (*initInterp)(this->ProcessModule);
 
   // Start the application's event loop.  This will enable
