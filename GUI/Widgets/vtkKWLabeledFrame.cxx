@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.36");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.37");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -181,23 +181,16 @@ void vtkKWLabeledFrame::AdjustMargin()
 //----------------------------------------------------------------------------
 void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-borderwidth 0 -relief flat"))
     {
-    vtkErrorMacro("LabeledFrame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
+  this->ConfigureOptions(args);
 
-  // Create the top level
-
-  const char *wname = this->GetWidgetName();
-
-  this->Script("frame %s -borderwidth 0 -relief flat %s",
-               wname, (args ? args : ""));
-  
   this->Border->SetParent(this);
   this->Border->Create(app, "frame", "-borderwidth 0 -relief flat");
 
@@ -220,10 +213,11 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
                this->GetLabel()->GetWidgetName());
 
   // At this point, although this->Label (a labeled label) has been created,
-  // UpdateEnableState() has been called already and ShowLabelOff() has benn
+  // UpdateEnableState() has been called already and ShowLabelOff() has been
   // called on the label. Therefore, the label of this->Label was not created
   // since it is lazy created/allocated on the fly only when needed.
   // Force label icon to be created now, so that we can set its image option.
+
   this->Label->ShowLabelOn();
   this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
   this->Script("%s config -bd 0 -pady 0 -padx 0", 

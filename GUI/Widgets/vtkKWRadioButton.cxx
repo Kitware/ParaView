@@ -17,27 +17,21 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.14");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.15");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // must set the application
-  if (this->IsCreated())
+  if (!this->vtkKWWidget::Create(app, "radiobutton", "-value 1"))
     {
-    vtkErrorMacro("RadioButton already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("radiobutton %s -value 1", wname);
   this->Configure();
-  this->Script("%s configure %s", wname, (args?args:""));
+  this->ConfigureOptions(args);
 
   // Update enable state
 

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.11");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.12");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -123,19 +123,13 @@ int vtkKWPushButtonSet::HasButton(int id)
 //----------------------------------------------------------------------------
 void vtkKWPushButtonSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("The pushbutton set is already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the container frame
-
-  this->Script("frame %s %s", this->GetWidgetName(), args ? args : "");
 
   // Update enable state
 

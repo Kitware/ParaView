@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.8");
+vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.9");
 
 int vtkvtkKWCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -112,19 +112,13 @@ int vtkKWCheckButtonSet::HasButton(int id)
 //----------------------------------------------------------------------------
 void vtkKWCheckButtonSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("The checkbutton set is already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the container frame
-
-  this->Script("frame %s %s", this->GetWidgetName(), args ? args : "");
 
   // Update enable state
 

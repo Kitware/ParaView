@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.27");
+vtkCxxRevisionMacro(vtkKWListBox, "1.28");
 
 
 //----------------------------------------------------------------------------
@@ -254,39 +254,35 @@ int vtkKWListBox::AppendUnique(const char* name)
 //----------------------------------------------------------------------------
 void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("OptionListBox already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   
-  this->Script("frame %s ", wname);
-  this->Scrollbar->Create( app, "scrollbar", "" );
+  this->Scrollbar->Create(app, "scrollbar", NULL);
   
-  this->Listbox->Create( app, "listbox", (args?args:"") );
+  this->Listbox->Create(app, "listbox", args);
   
-  this->Script( "%s configure -yscroll {%s set}", 
-                this->Listbox->GetWidgetName(),
-                this->Scrollbar->GetWidgetName());
+  this->Script("%s configure -yscroll {%s set}", 
+               this->Listbox->GetWidgetName(),
+               this->Scrollbar->GetWidgetName());
   
-  this->Script( "%s configure -command {%s yview}", 
-                this->Scrollbar->GetWidgetName(),
-                this->Listbox->GetWidgetName());
+  this->Script("%s configure -command {%s yview}", 
+               this->Scrollbar->GetWidgetName(),
+               this->Listbox->GetWidgetName());
     
   if (this->ScrollbarFlag)
     {
-    this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
+    this->Script("pack %s -side right -fill y", 
+                 this->Scrollbar->GetWidgetName());
     }
-  this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
+  this->Script("pack %s -side left -expand 1 -fill both", 
+               this->Listbox->GetWidgetName());
 
   // Update enable state
 

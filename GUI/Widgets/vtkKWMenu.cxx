@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.50");
+vtkCxxRevisionMacro(vtkKWMenu, "1.51");
 
 
 
@@ -43,20 +43,19 @@ vtkKWMenu::~vtkKWMenu()
 //----------------------------------------------------------------------------
 void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "menu", args))
     {
-    vtkErrorMacro("Menu already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  this->Script("menu %s -tearoff %d %s", 
-               this->GetWidgetName(), this->TearOff, (args ? args : "")); 
+  const char *wname = this->GetWidgetName();
+  this->Script("%s configure -tearoff %d", wname, this->TearOff); 
 
   this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", 
-               this->GetWidgetName(), this->GetTclName());
+               wname, this->GetTclName());
 
   // Update enable state
   
@@ -726,8 +725,12 @@ const char* vtkKWMenu::GetItemLabel(int position)
 //----------------------------------------------------------------------------
 int vtkKWMenu::HasItem(const char* menuname)
 {
-  this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
-  return !vtkKWObject::GetIntegerResult(this->GetApplication());
+  if (this->IsCreated())
+    {
+    this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
+    return !vtkKWObject::GetIntegerResult(this->GetApplication());
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -794,13 +797,16 @@ int vtkKWMenu::GetState(const char* item)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(int index, int state)
 {
-  char stateStr[][9] = { "normal", "active", "disabled" };
-  if ( state <= vtkKWMenu::Normal || state > vtkKWMenu::Disabled )
+  if (this->IsCreated())
     {
-    state = 0;
+    char stateStr[][9] = { "normal", "active", "disabled" };
+    if (state <= vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
+      {
+      state = 0;
+      }
+    this->Script("catch {%s entryconfigure %d -state %s}", 
+                 this->GetWidgetName(), index, stateStr[state] );
     }
-  this->Script("catch {%s entryconfigure %d -state %s}", 
-               this->GetWidgetName(), index, stateStr[state] );
 }
 
 //----------------------------------------------------------------------------

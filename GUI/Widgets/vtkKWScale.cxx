@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.76");
+vtkCxxRevisionMacro(vtkKWScale, "1.77");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -170,22 +170,13 @@ vtkKWScale::~vtkKWScale()
 // ---------------------------------------------------------------------------
 void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("Scale already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the frame that will embend all widgets
-
-  wname = this->GetWidgetName();
-  this->Script("frame %s -bd 0", wname);
 
   // If we need the scale to popup, create the toplevel and the pushbutton
 
@@ -217,14 +208,13 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   // Create the scale
 
-  this->Scale->SetApplication(app);
-  this->Script(
-    "scale %s -orient horizontal -showvalue no -bd 2 -highlightthickness 0"
-    " -resolution %g -from %g -to %g %s", 
-    this->Scale->GetWidgetName(), 
-    this->Resolution,
-    this->Range[0], this->Range[1],
-    (args ? args : ""));
+  this->Scale->Create(app, "scale", NULL);
+  this->Script("%s configure -orient horizontal -showvalue no -bd 2 "
+               "-highlightthickness 0 -resolution %g -from %g -to %g %s", 
+               this->Scale->GetWidgetName(), 
+               this->Resolution,
+               this->Range[0], this->Range[1],
+               (args ? args : ""));
 
   this->PackWidget();
   this->Bind();

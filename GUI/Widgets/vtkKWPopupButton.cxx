@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.13");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.14");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -168,7 +168,7 @@ void vtkKWPopupButton::UnBind()
   this->Script("bind %s <ButtonPress> {}", 
                this->GetWidgetName());
 
-  if (this->PopupCloseButton)
+  if (this->PopupCloseButton && this->PopupCloseButton->IsCreated())
     {
     this->Script("bind %s <ButtonPress> {}", 
                  this->PopupCloseButton->GetWidgetName());

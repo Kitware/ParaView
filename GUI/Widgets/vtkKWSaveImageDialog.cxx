@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.24");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.25");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -81,16 +81,17 @@ int vtkKWSaveImageDialog::Invoke()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
+void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* args)
 {
-  // Already created ?
-
   if (this->IsCreated())
     {
-    vtkErrorMacro("SaveDialog already created");
+    vtkErrorMacro("vtkKWSaveImageDialog already created");
     return;
     }
 
-  this->SetApplication(app);
+  // Call the superclass to create the dialog
+
+  this->Superclass::Create(app, args);
+
   this->SetTitle("Save As Image");
 }

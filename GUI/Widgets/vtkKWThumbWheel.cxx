@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.20");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.21");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -163,22 +163,13 @@ vtkKWThumbWheel::~vtkKWThumbWheel()
 void vtkKWThumbWheel::Create(vtkKWApplication *app, 
                              const char * vtkNotUsed(args))
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("Thumbwheel already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the frame that will embend all widgets
-
-  wname = this->GetWidgetName();
-  this->Script("frame %s -bd 0", wname);
 
   // If we need the thumbwheel to popup, create the toplevel and the pushbutton
 

@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.9");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.10");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -113,19 +113,13 @@ int vtkKWLabeledLabelSet::HasLabeledLabel(int id)
 //----------------------------------------------------------------------------
 void vtkKWLabeledLabelSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("The labeled label set is already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the container frame
-
-  this->Script("frame %s %s", this->GetWidgetName(), args ? args : "");
 
   // Update enable state
 

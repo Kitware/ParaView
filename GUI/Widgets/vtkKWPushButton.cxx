@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.17");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -34,30 +34,16 @@ vtkKWPushButton::~vtkKWPushButton()
 //----------------------------------------------------------------------------
 void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "button", NULL))
     {
-    vtkErrorMacro("PushButton already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // Create the button
-
-  wname = this->GetWidgetName();
-
-  this->Script("button %s", wname);
-
   this->SetTextOption(this->ButtonLabel);
-
-  if (args && *args)
-    {
-    this->Script("%s config %s", wname, args);
-    }
+  this->ConfigureOptions(args);
 
   // Update enable state
 

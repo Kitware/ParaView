@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.189");
+vtkCxxRevisionMacro(vtkKWWindow, "1.190");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -277,26 +277,18 @@ vtkKWWindow::~vtkKWWindow()
 //----------------------------------------------------------------------------
 void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Window already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  Tcl_Interp *interp = app->GetMainInterp();
-
-  // Create the top level
-
-  wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
 
   this->Script("toplevel %s -visual best %s -class %s",
-               wname, args, this->WindowClass);
+               wname, (args ? args : ""), this->WindowClass);
 
   this->Script("wm title %s {%s}", 
                wname, this->GetTitle());
@@ -502,7 +494,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->ProgressGauge->SetParent(this->ProgressFrame);
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 4);
+    vtkKWTkUtilities::GetPhotoHeight(
+      app->GetMainInterp(), this->StatusImageName) - 4);
   this->ProgressGauge->Create(app, "");
 
   this->Script("pack %s -side right -padx 2 -pady 2",

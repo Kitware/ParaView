@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.9");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -64,63 +64,65 @@ vtkKWListSelectOrder::~vtkKWListSelectOrder()
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("Entry already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-
-  this->Script("frame %s %s",wname, (args?args:""));
-  vtkKWFrame* frame;
   this->SourceList->SetParent(this);
   this->SourceList->Create(app, 0);
-  this->SourceList->GetListbox()->Configure("-selectmode multiple");
+  this->SourceList->GetListbox()->ConfigureOptions("-selectmode multiple");
   this->Script("pack %s -side left -expand true -fill both",
     this->SourceList->GetWidgetName());
-  frame = vtkKWFrame::New();
+
+  vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
   frame->Create(app, 0);
+
   this->AddButton->SetParent(frame->GetFrame());
   this->AddButton->Create(app,0);
   this->AddButton->SetLabel("Add");
   this->AddButton->SetCommand(this, "AddCallback");
+
   this->AddAllButton->SetParent(frame->GetFrame());
   this->AddAllButton->Create(app,0);
   this->AddAllButton->SetLabel("Add All");
   this->AddAllButton->SetCommand(this, "AddAllCallback");
+
   this->RemoveButton->SetParent(frame->GetFrame());
   this->RemoveButton->Create(app,0);
   this->RemoveButton->SetLabel("Remove");
   this->RemoveButton->SetCommand(this, "RemoveCallback");
+
   this->RemoveAllButton->SetParent(frame->GetFrame());
   this->RemoveAllButton->Create(app,0);
   this->RemoveAllButton->SetLabel("RemoveAll");
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
+
   this->Script("pack %s %s %s %s -side top -fill x",
     this->AddButton->GetWidgetName(),
     this->AddAllButton->GetWidgetName(),
     this->RemoveButton->GetWidgetName(),
     this->RemoveAllButton->GetWidgetName());
+
   this->Script("pack %s -side left -expand false -fill y",
     frame->GetWidgetName());
   frame->Delete();
+
   frame = vtkKWFrame::New();
   frame->SetParent(this);
   frame->Create(app, 0);
+
   this->FinalList->SetParent(frame->GetFrame());
   this->FinalList->Create(app, 0);
-  this->FinalList->GetListbox()->Configure("-selectmode multiple");
+  this->FinalList->GetListbox()->ConfigureOptions("-selectmode multiple");
+
   this->Script("pack %s -side top -expand true -fill both",
     this->FinalList->GetWidgetName());
+
   vtkKWFrame* btframe = vtkKWFrame::New();
   btframe->SetParent(frame->GetFrame());
   btframe->Create(app, 0);
@@ -129,13 +131,16 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
   this->UpButton->Create(app, 0);
   this->UpButton->SetLabel("Up");
   this->UpButton->SetCommand(this, "UpCallback");
+
   this->DownButton->SetParent(btframe->GetFrame());
   this->DownButton->Create(app, 0);
   this->DownButton->SetLabel("Down");
   this->DownButton->SetCommand(this, "DownCallback");
+
   this->Script("pack %s %s -side left -fill x",
     this->UpButton->GetWidgetName(),
     this->DownButton->GetWidgetName());
+
   this->Script("pack %s -side top -expand false -fill x",
     btframe->GetWidgetName());
   btframe->Delete();

@@ -43,13 +43,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  void Create(vtkKWApplication *app, const char *name, const char *args);
-  virtual int IsCreated();
+  // Create the corresponding Tk widget.
+  // This should be called by all subclasses to ensure that flags are set
+  // correctly.
+  // If 'type' is NULL, this method will only set the proper flags indicating
+  // that the widget has been created and perform some checkings. It will be
+  // up to the subclass to create the appropriate Tk widget after calling
+  // the superclass's Create().
+  // Return 1 on success, 0 otherwise.
+  int Create(vtkKWApplication *app, const char *type, const char *args);
+  int IsCreated();
 
   // Description:
   // Set tk configuration options of the widget
-  void Configure(const char* opts);
+  void ConfigureOptions(const char* opts);
 
   // Description:
   // Query if widget is "alive" (i.e. is created and not deleted as far as

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.54");
+vtkCxxRevisionMacro(vtkKWEntry, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -219,40 +219,35 @@ void vtkKWEntry::SetValue(double f, int size)
 //----------------------------------------------------------------------------
 void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to set the appropriate flags then create manually
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Entry already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
+  const char *wname = this->GetWidgetName();
 
-  // create the top level
-  wname = this->GetWidgetName();
-
-  if ( this->PullDown )
+  if (this->PullDown)
     {
-    this->Script("combobox %s %s",wname, (args?args:""));
-    this->Entry = this;
+    this->Script("combobox %s %s", wname, (args ? args : ""));
     }
   else
     {
-    this->Script("entry %s %s",wname, (args?args:""));
-    this->Entry = this;
+    this->Script("entry %s %s", wname, (args ? args : ""));
     }
-  const char* entry = this->Entry->GetWidgetName();
-  this->Script("%s configure -textvariable %sValue", entry, entry);
-  if ( this->Width > 0)
+  this->Entry = this;
+
+  const char* entry_wname = this->Entry->GetWidgetName();
+  this->Script("%s configure -textvariable %sValue", entry_wname, entry_wname);
+  if (this->Width > 0)
     {
-    this->Script("%s configure -width %d", entry, this->Width);
+    this->Script("%s configure -width %d", entry_wname, this->Width);
     }
-  if ( this->ReadOnly )
+  if (this->ReadOnly)
     {
-    this->Script("%s configure -state disabled", entry);
+    this->Script("%s configure -state disabled", entry_wname);
     }
 
   // Update enable state

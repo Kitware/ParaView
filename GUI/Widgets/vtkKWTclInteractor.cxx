@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.20");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.21");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -106,20 +106,15 @@ void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // Set the application
+  // Call the superclass to set the appropriate flags then create manually
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Interactor already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  // create the top level
-  wname = this->GetWidgetName();
+
+  const char *wname = this->GetWidgetName();
   if (this->MasterWindow)
     {
     this->Script("toplevel %s -class %s", 
@@ -130,6 +125,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
     {
     this->Script("toplevel %s", wname);
     }
+
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
   if (this->MasterWindow)

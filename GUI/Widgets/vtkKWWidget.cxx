@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.101");
+vtkCxxRevisionMacro(vtkKWWidget, "1.102");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -86,12 +86,13 @@ vtkKWWidget::~vtkKWWidget()
     {
     this->Script("destroy %s",this->GetWidgetName());
     }
+
   if (this->WidgetName)
     {
     delete [] this->WidgetName;
     }
+
   this->SetParent(NULL);
-  this->SetApplication(NULL);
   this->SetTraceName(NULL);
 }
 
@@ -148,22 +149,70 @@ const char *vtkKWWidget::GetWidgetName()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::Create(vtkKWApplication *app, const char *name, 
-                         const char *args)
+int vtkKWWidget::Create(vtkKWApplication *app, 
+                        const char *type, 
+                        const char *args)
 {
   if (this->IsCreated())
     {
-    vtkErrorMacro("widget already created");
-    return;
+    if (type)
+      {
+      vtkErrorMacro(
+        << this->GetClassName() << " (" << type << ") already created");
+      }
+    else
+      {
+      vtkErrorMacro(<< this->GetClassName() << " already created");
+      }
+    return 0;
+    }
+
+  if (!app)
+    {
+    vtkErrorMacro("Can not create widget without application");
+    return 0;
     }
 
   this->SetApplication(app);
 
-  this->Script("%s %s %s", name, this->GetWidgetName(), (args ? args : ""));
+  if (type)
+    {
+    if (args)
+      {
+      this->Script("%s %s %s", type, this->GetWidgetName(), args);
+      }
+    else
+      {
+      this->Script("%s %s", type, this->GetWidgetName());
+      }
 
-  // Update enable state
+    /* Update enable state
+       At this point, the widget is considered created, although for all 
+       all subclasses calling this method, only a part of the widget has
+       really been created (for ex., this method will be used to create the
+       main container for the widget, like a frame, and the subclass will
+       create the subwidgets to put in). 
+       Ideally, we could have a function that explicitly sets when a widget
+       is fully created or not.
+       Anyway, most subclasses override the virtual UpdateEnableState()
+       method to propagate the Enabled state to their subwidgets components.
+       If we call it now, it will immediately go inside the overriden method
+       and try to act on widget that have propably not been created yet: it
+       is therefore important that the overriden UpdateEnableState() is smart
+       enough and test if each subwidget has really been created 
+       (subobj->IsCreated() instead of just this->IsCreated(), which will 
+       return true at the moment). It is the case at the moment.
+       Also, each subclass should call UpdateEnableState() at the end of their
+       own Create() method, so that the code that is supposed to be executed
+       in the overriden UpdateEnableState() for the subwidgets is really 
+       executed now that they have been created.
+       The call here, even if it goes down to the subclass, is still needed.
+    */
+   
+    this->UpdateEnableState();
+    }
 
-  this->UpdateEnableState();
+  return 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -414,7 +463,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.101 $");
+  this->ExtractRevision(os,"$Revision: 1.102 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1638,14 +1687,13 @@ int vtkKWWidget::IsGrabbed()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::Configure(const char* opts)
+void vtkKWWidget::ConfigureOptions(const char* opts)
 {
-  if ( !this->IsCreated() || !opts )
+  if (!this->IsCreated() || !opts)
     {
     return;
     }
-  this->Script("%s configure %s",
-    this->GetWidgetName(), opts);
+  this->Script("%s configure %s", this->GetWidgetName(), opts);
 }
 
 /*

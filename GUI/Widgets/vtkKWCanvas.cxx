@@ -39,28 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCanvas );
-vtkCxxRevisionMacro(vtkKWCanvas, "1.2");
+vtkCxxRevisionMacro(vtkKWCanvas, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWCanvas::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "canvas", args))
     {
-    vtkErrorMacro("Canvas already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the button
-
-  wname = this->GetWidgetName();
-
-  this->Script("canvas %s %s", wname, (args ? args : ""));
 
   // Update enable state
 

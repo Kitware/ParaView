@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.5");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.6");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -107,19 +107,13 @@ vtkKWToolbarSet::GetToolbarSlot(vtkKWToolbar *toolbar)
 //----------------------------------------------------------------------------
 void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("The toolbar set is already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the object
-
-  this->Script("frame %s %s", this->GetWidgetName(), args ? args : "");
 
   // Create the toolbars frame container
 

@@ -21,7 +21,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.31");
+vtkCxxRevisionMacro(vtkKWLabel, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -98,17 +98,13 @@ void vtkKWLabel::UpdateText()
 //----------------------------------------------------------------------------
 void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to set the appropriate flags then create manually
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Label already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create the top level
 
   const char *wname = this->GetWidgetName();
 
@@ -122,11 +118,7 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
     }
 
   this->UpdateText();
-
-  if (args && *args)
-    {
-    this->Script("%s config %s", wname, args);
-    }
+  this->ConfigureOptions(args);
 
   // Set bindings (if any)
   

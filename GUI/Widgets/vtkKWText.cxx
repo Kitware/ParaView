@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.21");
+vtkCxxRevisionMacro(vtkKWText, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -73,21 +73,13 @@ void vtkKWText::SetValue(const char *s)
 //----------------------------------------------------------------------------
 void vtkKWText::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "text", args))
     {
-    vtkErrorMacro("Text already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("text %s %s",wname,(args?args:""));
 
   // Update enable state
 

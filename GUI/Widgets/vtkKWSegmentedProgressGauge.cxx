@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.9");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.10");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -50,22 +50,14 @@ vtkKWSegmentedProgressGauge::~vtkKWSegmentedProgressGauge()
 void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
                                          const char *args)
 {
-  const char *wname;
-  
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("Segmented progress gauge already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, args);
-  
+ 
   this->ProgressFrame->Create(app, "-bd 1 -relief sunken");
   
   this->ProgressCanvas->Create(app, "");

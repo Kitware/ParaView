@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.3");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.4");
 
 int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -60,20 +60,13 @@ vtkKWPopupFrame::~vtkKWPopupFrame()
 void vtkKWPopupFrame::Create(vtkKWApplication *app, 
                              const char* vtkNotUsed(args))
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-borderwidth 0 -relief flat"))
     {
-    vtkErrorMacro("PopupFrame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // --------------------------------------------------------------
-  // Create the container
-
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   // --------------------------------------------------------------
   // If in popup mode, create the popup button

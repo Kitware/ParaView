@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.20");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.21");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -45,29 +45,28 @@ vtkKWProgressGauge::~vtkKWProgressGauge()
 
 void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("CheckButton already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
+  const char *wname = this->GetWidgetName();
 
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s", wname);
   this->Script("canvas %s.display -borderwidth 0  -highlightthickness 0 -width %d -height %d %s",
-               wname, this->Length, this->Height, args);
+               wname, this->Length, this->Height, (args ? args : ""));
+
   this->Script("pack %s.display -expand yes", wname);
+
   // initialize the bar color to the background so it does
   // not show up until used
+
   this->Script(
     "%s.display create rectangle 0 0 0 0 -outline \"\"  -tags bar", 
-               wname );
+    wname);
+
   this->Script(
     "%s.display create text [expr 0.5 * %d] [expr 0.5 * %d] "
     "-anchor c -text \"\" -tags value",

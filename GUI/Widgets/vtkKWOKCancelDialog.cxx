@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
-vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.11");
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.12");
 
 
 int vtkKWOKCancelDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -50,7 +50,14 @@ vtkKWOKCancelDialog::~vtkKWOKCancelDialog()
 
 void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
 {
-  // invoke super method
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("OKCancelDialog already created");
+    return;
+    }
+
   this->Superclass::Create(app,args);
   
   this->Message->Create(app, "");

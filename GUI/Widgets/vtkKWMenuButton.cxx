@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.19");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.20");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -41,22 +41,22 @@ vtkKWMenuButton::~vtkKWMenuButton()
 //----------------------------------------------------------------------------
 void vtkKWMenuButton::Create(vtkKWApplication *app, const char *args)
 { 
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "menubutton", NULL))
     {
-    vtkErrorMacro("Menu already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
   this->Menu->SetParent(this);
-  this->Script("menubutton %s -menu %s -indicatoron 1 -relief raised -bd 2 -direction flush %s", 
-               this->GetWidgetName(), this->Menu->GetWidgetName(), (args ? args : ""));
+  this->Menu->Create(app, NULL);  
 
-  // Should the args be passed through?
-
-  this->Menu->Create(app, "");  
+  this->Script("%s config -menu %s -indicatoron 1 -relief raised -bd 2 "
+               "-direction flush %s", 
+               this->GetWidgetName(), 
+               this->Menu->GetWidgetName(), 
+               (args ? args : ""));
 
   // Update enable state
 

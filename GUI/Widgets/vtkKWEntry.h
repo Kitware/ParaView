@@ -79,12 +79,12 @@ public:
   int GetNumberOfValues();
   void DeleteAllValues();
 
-
   // Description:
-  // Make this entry a puldown combobox.
+  // Make this entry a pulldown combobox.
   vtkSetClampMacro(PullDown, int, 0, 1);
   vtkBooleanMacro(PullDown, int);
   vtkGetMacro(PullDown, int);
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 

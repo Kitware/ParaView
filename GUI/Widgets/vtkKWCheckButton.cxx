@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.28");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -141,22 +141,16 @@ void vtkKWCheckButton::SetState(int s)
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "checkbutton", NULL))
     {
-    vtkErrorMacro("CheckButton already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  const char *wname = this->GetWidgetName();
-
-  this->Script("checkbutton %s", wname);
   this->Configure();
-  this->Script("%s configure %s", wname, (args?args:""));
+  this->ConfigureOptions(args);
 
   // Update enable state
 

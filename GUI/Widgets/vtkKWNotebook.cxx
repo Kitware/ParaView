@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.62");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.63");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -218,25 +218,19 @@ vtkKWNotebook::~vtkKWNotebook()
 //----------------------------------------------------------------------------
 void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("The notebook is already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  const char *wname;
-
   ostrstream cmd;
 
-  // Create the frame holding the whole widget
-
-  wname = this->GetWidgetName();
-  this->Script("frame %s -width %d -height %d -bd 0 -relief flat %s",
-               wname, this->MinimumWidth, this->MinimumHeight, args);
+  cmd << this->GetWidgetName() << " configure -width " << this->MinimumWidth 
+      <<  " -height " << this->MinimumHeight << " -bd 0 -relief flat " 
+      << (args ? args : "") << endl;
 
   // Create the frame that stores the tabs button
 
@@ -817,17 +811,20 @@ void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
 
   ostrstream cmd;
 
-  cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
-      << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl
-      << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " TogglePagePinnedCallback " << page->Id << "}" 
-      << endl
-      << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
-      << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
-      << " %%X %%Y}" 
-      << endl;
+  if (page->Label && page->Label->IsCreated())
+    {
+    cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
+        << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl
+        << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
+        << this->GetTclName()<<" TogglePagePinnedCallback " << page->Id << "}" 
+        << endl
+        << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
+        << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
+        << " %%X %%Y}" 
+        << endl;
+    }
 
-  if (page->ImageLabel)
+  if (page->ImageLabel && page->ImageLabel->IsCreated())
     {
     cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
         << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl;
@@ -848,11 +845,14 @@ void vtkKWNotebook::UnBindPage(vtkKWNotebook::Page *page)
 
   ostrstream cmd;
 
-  cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {}\n"
-      << "bind " << page->Label->GetWidgetName() << " <Double-1> {}\n"
-      << "bind " << page->Label->GetWidgetName() << " <Button-3> {}\n";
+  if (page->Label && page->Label->IsCreated())
+    {
+    cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {}\n"
+        << "bind " << page->Label->GetWidgetName() << " <Double-1> {}\n"
+        << "bind " << page->Label->GetWidgetName() << " <Button-3> {}\n";
+    }
 
-  if (page->ImageLabel)
+  if (page->ImageLabel && page->ImageLabel->IsCreated())
     {
     cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {}\n";
     }

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.42");
+vtkCxxRevisionMacro(vtkKWObject, "1.43");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.42 $");
+  this->ExtractRevision(os,"$Revision: 1.43 $");
 }
 
 //----------------------------------------------------------------------------
@@ -195,17 +195,20 @@ const char* vtkKWObject::Script(const char* format, ...)
 //----------------------------------------------------------------------------
 int vtkKWObject::GetIntegerResult(vtkKWApplication *app)
 {
-  int res;
-  
-  res = atoi(Tcl_GetStringResult(app->GetMainInterp()));
-  return res;
+  if (app)
+    {
+    return atoi(Tcl_GetStringResult(app->GetMainInterp()));
+    }
+  return 0;
 }
+
 float vtkKWObject::GetFloatResult(vtkKWApplication *app)
 {
-  float res;
-  
-  res = atof(Tcl_GetStringResult(app->GetMainInterp()));
-  return res;
+  if (app)
+    {
+    return atof(Tcl_GetStringResult(app->GetMainInterp()));
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.45");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.46");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -91,23 +91,21 @@ void vtkKWChangeColorButton::SetColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 {
-  // Check if already created
+  // Do not call vtkKWLabeledWidget::Create() here since we have to create
+  // the Label in a special way (i.e. as a child of the MainFrame widget
+  // that would not have been known to the superclass).
+  // Use vtkKWWidget's Create() instead.
 
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(
+        app, "frame", "-relief flat -bd 0 -highlightthickness 0"))
     {
-    vtkErrorMacro("Change color button already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
- 
-  // Do not call vtkKWLabeledWidget::Create() here since we have to create
-  // the Label in a special way.
-
-  // Create the container frame
-
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
-               this->GetWidgetName(), args ? args : "");
+  this->ConfigureOptions(args);
 
   // Create the main frame
 
@@ -115,6 +113,8 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   this->MainFrame->Create(app, "-relief raised -bd 2");
 
   // Create the label now if it has to be shown now
+  // CreateLabel() has been overriden so that the label can be attached
+  // to the MainFrame if needed
 
   if (this->ShowLabel)
     {
@@ -236,7 +236,7 @@ void vtkKWChangeColorButton::SetLabelAfterColor(int arg)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::UpdateColorButton()
 {
-  if (!this->IsCreated())
+  if (!this->ColorButton->IsCreated())
     {
     return;
     }
@@ -275,24 +275,36 @@ void vtkKWChangeColorButton::Bind()
     return;
     }
 
-  this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
-               this->MainFrame->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
-               this->MainFrame->GetWidgetName(), this->GetTclName());
+  if (this->MainFrame->IsCreated())
+    {
+    this->Script(
+      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
+      this->MainFrame->GetWidgetName(), this->GetTclName());
+    this->Script(
+      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
+      this->MainFrame->GetWidgetName(), this->GetTclName());
+    }
 
   if (!this->LabelOutsideButton && 
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
-                 this->GetLabel()->GetWidgetName(), this->GetTclName());
-    this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
-                 this->GetLabel()->GetWidgetName(), this->GetTclName());
+    this->Script(
+      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
+      this->GetLabel()->GetWidgetName(), this->GetTclName());
+    this->Script(
+      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
+      this->GetLabel()->GetWidgetName(), this->GetTclName());
     }
 
-  this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
-               this->ColorButton->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
-               this->ColorButton->GetWidgetName(), this->GetTclName());
+  if (this->ColorButton->IsCreated())
+    {
+    this->Script(
+      "bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
+      this->ColorButton->GetWidgetName(), this->GetTclName());
+    this->Script(
+      "bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
+      this->ColorButton->GetWidgetName(), this->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -303,10 +315,13 @@ void vtkKWChangeColorButton::UnBind()
     return;
     }
 
-  this->Script("bind %s <Any-ButtonPress> {}", 
-               this->MainFrame->GetWidgetName());
-  this->Script("bind %s <Any-ButtonRelease> {}", 
-               this->MainFrame->GetWidgetName());
+  if (this->MainFrame->IsCreated())
+    {
+    this->Script("bind %s <Any-ButtonPress> {}", 
+                 this->MainFrame->GetWidgetName());
+    this->Script("bind %s <Any-ButtonRelease> {}", 
+                 this->MainFrame->GetWidgetName());
+    }
 
   if (!this->LabelOutsideButton &&
       this->HasLabel() && this->GetLabel()->IsCreated())
@@ -317,10 +332,13 @@ void vtkKWChangeColorButton::UnBind()
                  this->GetLabel()->GetWidgetName());
     }
 
-  this->Script("bind %s <Any-ButtonPress> {}",
-               this->ColorButton->GetWidgetName());
-  this->Script("bind %s <Any-ButtonRelease> {}", 
-               this->ColorButton->GetWidgetName());
+  if (this->ColorButton->IsCreated())
+    {
+    this->Script("bind %s <Any-ButtonPress> {}",
+                 this->ColorButton->GetWidgetName());
+    this->Script("bind %s <Any-ButtonRelease> {}", 
+                 this->ColorButton->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -512,7 +530,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.45 $");
+  this->ExtractRevision(os,"$Revision: 1.46 $");
 }
 
 //----------------------------------------------------------------------------

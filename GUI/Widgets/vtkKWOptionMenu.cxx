@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.30");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -167,32 +167,23 @@ void vtkKWOptionMenu::ClearEntries()
 //----------------------------------------------------------------------------
 void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "menubutton", NULL))
     {
-    vtkErrorMacro("OptionMenu already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // Create the menu
-
   this->Menu->SetParent(this);
+  this->Menu->Create(app, "-tearoff 0");
 
-  // Create the top level
-
-  wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   
-  this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s "
+  this->Script("%s configure -textvariable %sValue -indicatoron 1 -menu %s "
                "-relief raised -bd 2 -highlightthickness 0 -anchor c "
                "-direction flush %s", 
-               wname, wname, this->Menu->GetWidgetName(), (args?args:""));
-
-  this->Menu->Create(app, "-tearoff 0");
+               wname, wname, this->Menu->GetWidgetName(), (args ? args : ""));
 
   // Update enable state
 

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.5");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -61,20 +61,15 @@ vtkKWScalarComponentSelectionWidget::~vtkKWScalarComponentSelectionWidget()
 void vtkKWScalarComponentSelectionWidget::Create(
   vtkKWApplication *app, const char *args)
 {
-  // Check if already created
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("KWScalarComponentSelectionWidget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // Create the top level
-
-  const char *wname = this->GetWidgetName();
-  this->Script("frame %s -bd 0 -relief flat %s", wname, (args ? args : ""));
+  this->ConfigureOptions(args);
 
   // --------------------------------------------------------------
   // Component selection

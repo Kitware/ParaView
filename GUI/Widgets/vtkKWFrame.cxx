@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.21");
+vtkCxxRevisionMacro(vtkKWFrame, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWFrame::vtkKWFrame()
@@ -45,20 +45,18 @@ vtkKWFrame::~vtkKWFrame()
 //----------------------------------------------------------------------------
 void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 {
-  const char *wname;
-  
-  // Set the application
-  if (this->IsCreated())
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("ScrollableFrame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
+
+  const char *wname = this->GetWidgetName();
   
-  if ( this->Scrollable )
+  if (this->Scrollable)
     {
-    // create the top level
-    wname = this->GetWidgetName();
     this->Script("ScrolledWindow %s -relief flat -borderwidth 2", wname);
 
     this->ScrollFrame = vtkKWWidget::New();
@@ -67,19 +65,18 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
     this->ScrollFrame->Create(app, 
                               "ScrollableFrame",
                               "-height 1024 -constrainedwidth 1");
-    this->Script("%s setwidget %s", this->GetWidgetName(),
+    this->Script("%s setwidget %s", 
+                 this->GetWidgetName(),
                  this->ScrollFrame->GetWidgetName());
 
     this->Frame = vtkKWWidget::New();
     this->Frame->SetParent(this->ScrollFrame);
     this->Script("%s getframe", this->ScrollFrame->GetWidgetName());
     this->Frame->SetWidgetName(app->GetMainInterp()->result);
-    this->Frame->SetApplication(app);
+    this->Frame->Create(app, NULL, NULL);
     }
   else
     {
-    // create the top level
-    wname = this->GetWidgetName();
     if (args)
       {
       this->Script("frame %s %s", wname, args);

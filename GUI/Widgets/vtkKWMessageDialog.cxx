@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.62");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.63");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -98,7 +98,14 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 {
-  // invoke super method
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("MessageDialog already created");
+    return;
+    }
+
   this->Superclass::Create(app,args);
   
   this->MessageDialogFrame->Create(app, "");

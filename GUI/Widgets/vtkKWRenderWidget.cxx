@@ -33,7 +33,7 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.72");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.73");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -213,31 +213,20 @@ void vtkKWRenderWidget::SetDistanceUnits(const char* _arg)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 {
-  char *local;
-  const char *wname;
-  
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("Render widget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
-  local = new char[strlen(args)+100];
-  
-  this->SetApplication(app);
-  
-  wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, args);
-  
-  sprintf(local, "%s -rw Addr=%p", args, this->RenderWindow);
-
   // Create the VTK Tk render widget in VTKWidget
 
-  this->Script("vtkTkRenderWidget %s %s",
-               this->VTKWidget->GetWidgetName(), local);
-  this->VTKWidget->SetApplication(app);
+  char *local = new char[(args ? strlen(args) : 0) + 100];
+  sprintf(local, "%s -rw Addr=%p", (args ? args : ""), this->RenderWindow);
+
+  this->VTKWidget->Create(app, "vtkTkRenderWidget", local);
 
   this->Script("grid rowconfigure %s 0 -weight 1",
                this->GetWidgetName());

@@ -15,13 +15,8 @@
 #include "vtkKWSplitFrame.h"
 #include "vtkObjectFactory.h"
 
-
-
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.19");
-
-
-
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.20");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -81,22 +76,14 @@ void vtkKWSplitFrame::SetOrientationToVertical()
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(
+        app, "frame", "-borderwidth 0 -relief flat -width 200 -height 100"))
     {
-    vtkErrorMacro("SplitFrame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat -width 200 -height 100",
-               wname);
 
   this->Frame1->Create(app,"frame","-borderwidth 0 -relief flat");
   this->Separator->Create(app,"frame","-borderwidth 2 -relief raised");
@@ -108,7 +95,6 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
                this->Separator->GetWidgetName(), this->GetTclName());
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
                this->GetWidgetName(), this->GetTclName());
-
 
   // Setup the cursor to indication an action associatyed with the separator. 
 #ifdef _WIN32

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.19");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -45,18 +45,13 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "toplevel", NULL))
     {
-    vtkErrorMacro("Dialog already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // Create the toplevel
-
-  this->Script("toplevel %s", this->GetWidgetName());
 
   this->Script("wm withdraw %s", this->GetWidgetName());
   this->Script("wm overrideredirect %s 1", this->GetWidgetName());
@@ -64,8 +59,8 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
   // Create and pack the canvas
 
   this->Canvas->Create(app, "-borderwidth 0 -highlightthickness 0");
-  this->Script("%s config %s", 
-               this->Canvas->GetWidgetName(), args);
+  this->Canvas->ConfigureOptions(args);
+
   this->Script("pack %s -side top -fill both -expand y",
                this->Canvas->GetWidgetName());
 

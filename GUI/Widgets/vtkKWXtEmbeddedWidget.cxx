@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWXtEmbeddedWidget);
-vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.10");
+vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.11");
 
 int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -43,26 +43,22 @@ void vtkKWXtEmbeddedWidget::Display()
 
 void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "toplevel", args))
     {
-    vtkErrorMacro("Dialog already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  const char* wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   if(this->WindowId)
     {
-    this->Script("toplevel %s %s -use 0x%x",wname,args, this->WindowId);
+    this->Script("%s config -use 0x%x", wname, this->WindowId);
     }
   else
     {
-    this->Script("toplevel %s %s",wname,args); 
-    this->Script("wm withdraw %s",wname);
+    this->Script("wm withdraw %s", wname);
     }
 }
 

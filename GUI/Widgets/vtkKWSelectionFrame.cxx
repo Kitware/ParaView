@@ -22,7 +22,7 @@
 #include "vtkKWIcon.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.19");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -80,22 +80,15 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
-  
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", args))
     {
-    vtkErrorMacro("Selection frame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  // create the top level
 
-  wname = this->GetWidgetName();
-  this->Script("frame %s %s -bd 3 -relief ridge", wname, (args ? args : ""));
+  this->Script("%s config -bd 3 -relief ridge",  this->GetWidgetName());
 
   // The title bar
 
@@ -182,17 +175,26 @@ void vtkKWSelectionFrame::Bind()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
-         << " <ButtonPress-1> {" << this->GetTclName() 
-         << " SelectCallback}" << endl;
+  if (this->TitleBar && this->TitleBar->IsCreated())
+    {
+    tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
+           << " <ButtonPress-1> {" << this->GetTclName() 
+           << " SelectCallback}" << endl;
+    }
 
-  tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
-         << " <ButtonPress-1> {" << this->GetTclName() 
-         << " SelectCallback}" << endl;
+  if (this->SelectionList && this->SelectionList->IsCreated())
+    {
+    tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
+           << " <ButtonPress-1> {" << this->GetTclName() 
+           << " SelectCallback}" << endl;
+    }
 
-  tk_cmd << "bind " << this->Title->GetWidgetName() 
-         << " <ButtonPress-1> {" << this->GetTclName() 
-         << " SelectCallback}" << endl;
+  if (this->Title && this->Title->IsCreated())
+    {
+    tk_cmd << "bind " << this->Title->GetWidgetName() 
+           << " <ButtonPress-1> {" << this->GetTclName() 
+           << " SelectCallback}" << endl;
+    }
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -209,14 +211,23 @@ void vtkKWSelectionFrame::UnBind()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
-         << " <ButtonPress-1> {}" << endl;
+  if (this->TitleBar && this->TitleBar->IsCreated())
+    {
+    tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
+           << " <ButtonPress-1> {}" << endl;
+    }
 
-  tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
-         << " <ButtonPress-1> {}" << endl;
+  if (this->SelectionList && this->SelectionList->IsCreated())
+    {
+    tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
+           << " <ButtonPress-1> {}" << endl;
+    }
 
-  tk_cmd << "bind " << this->Title->GetWidgetName() 
-         << " <ButtonPress-1> {}" << endl;
+  if (this->Title && this->Title->IsCreated())
+    {
+    tk_cmd << "bind " << this->Title->GetWidgetName() 
+           << " <ButtonPress-1> {}" << endl;
+    }
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());

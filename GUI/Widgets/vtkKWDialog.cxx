@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.38");
+vtkCxxRevisionMacro(vtkKWDialog, "1.39");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -170,42 +170,38 @@ void vtkKWDialog::OK()
 //----------------------------------------------------------------------------
 void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to set the appropriate flags then create manually
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Dialog already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   if (this->MasterWindow)
     {
     this->Script("toplevel %s -class %s %s",
                  wname,
                  this->MasterWindow->GetWindowClass(),
-                 (args?args:""));
+                 (args ? args : ""));
     }
   else
     {
-    this->Script("toplevel %s %s",wname,(args?args:""));
+    this->Script("toplevel %s %s" ,wname, (args ? args : ""));
     }
-  this->Script("wm title %s \"%s\"",wname,this->TitleString);
-  this->Script("wm iconname %s \"Dialog\"",wname);
+
+  this->Script("wm title %s \"%s\"", wname , this->TitleString);
+  this->Script("wm iconname %s \"Dialog\"", wname);
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
                wname, this->GetTclName());
-  this->Script("wm withdraw %s",wname);
+  this->Script("wm withdraw %s", wname);
+
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
                  this->MasterWindow->GetWidgetName());
     }
-
 }
 
 //----------------------------------------------------------------------------

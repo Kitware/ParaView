@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.26");
+vtkCxxRevisionMacro(vtkKWExtent, "1.27");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -59,21 +59,15 @@ vtkKWExtent::~vtkKWExtent()
 //----------------------------------------------------------------------------
 void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  // Set the application
-
-  if (this->IsCreated())
+  if (!this->Superclass::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("Extent already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -bd 0 %s", wname, (args ? args : ""));
+  this->ConfigureOptions(args);
 
   this->XRange->SetParent(this);
   this->XRange->ShowLabelOn();

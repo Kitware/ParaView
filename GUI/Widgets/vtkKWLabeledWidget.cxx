@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.13");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -64,22 +64,18 @@ int vtkKWLabeledWidget::HasLabel()
 //----------------------------------------------------------------------------
 void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->Superclass::Create(
+        app, "frame", "-relief flat -bd 0 -highlightthickness 0"))
     {
-    vtkErrorMacro("LabeledWidget widget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetApplication(app);
+  this->ConfigureOptions(args);
 
-  // Create the container frame
-
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
-               this->GetWidgetName(), args ? args : "");
-
-  // Create the label now if it has to be shown now
+  // Create the label subwidget now if it has to be shown now
 
   if (this->ShowLabel)
     {

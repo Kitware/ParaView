@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.129");
+vtkCxxRevisionMacro(vtkKWView, "1.130");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -480,6 +480,7 @@ void vtkKWView::CreateViewProperties()
   this->HeaderButton->SetText("Display Header Annotation");
   this->HeaderButton->SetBalloonHelpString("Toggle the visibility of the header text");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
+
   this->HeaderColor->SetParent(this->HeaderDisplayFrame);
   this->HeaderColor->Create(app, "");
   this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
@@ -490,6 +491,7 @@ void vtkKWView::CreateViewProperties()
                this->HeaderButton->GetWidgetName());
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->HeaderColor->GetWidgetName());
+
   this->HeaderLabel->SetParent(this->HeaderEntryFrame);
   this->HeaderLabel->Create(app, "");
   this->HeaderLabel->SetTextOption("Header:");
@@ -511,7 +513,6 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
 
-  
   this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
   this->GeneralProperties->ScrollableOn();
   this->GeneralProperties->Create(app,0);
@@ -647,7 +648,7 @@ void vtkKWView::ShowViewProperties()
   this->ParentWindow->ShowProperties();
   
   // make sure we have an applicaiton
-  if (!this->IsCreated())
+  if (!this->GetApplication())
     {
     vtkErrorMacro("attempt to update properties without an application set");
     }
@@ -668,6 +669,7 @@ void vtkKWView::ShowViewProperties()
     {
     this->CreateViewProperties();
     }
+
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->PackProperties();
@@ -1564,7 +1566,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.129 $");
+  this->ExtractRevision(os,"$Revision: 1.130 $");
 }
 
 //----------------------------------------------------------------------------
