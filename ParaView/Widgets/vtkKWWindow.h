@@ -95,6 +95,14 @@ public:
   // without an argument it will open a file dialog.
   void LoadScript();
   void LoadScript(const char *name);
+
+  // Description:
+  // Popup the vtk warning message
+  void WarningMessage(const char* message);
+  
+  // Description:
+  // Popup the vtk error message
+  void ErrorMessage(const char* message);
   
   // Description:
   // Allow windows to get at the different menu entries. In some

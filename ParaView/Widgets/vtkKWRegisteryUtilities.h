@@ -147,6 +147,9 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkKWObject
   private:
   char *TopLevel;  
   int Locked;
+private:
+  vtkKWRegisteryUtilities(const vtkKWRegisteryUtilities&); // Not implemented
+  void operator=(const vtkKWRegisteryUtilities&); // Not implemented
 };
 
 #endif

@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
+#include "vtkKWLabel.h"
 #include "vtkKWImageLabel.h"
 #include "icons.h"
 
@@ -60,7 +61,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->MessageDialogFrame = vtkKWWidget::New();
   this->MessageDialogFrame->SetParent(this);
   this->CommandFunction = vtkKWMessageDialogCommand;
-  this->Label = vtkKWWidget::New();
+  this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->MessageDialogFrame);
   this->ButtonFrame = vtkKWWidget::New();
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
@@ -99,7 +100,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->vtkKWDialog::Create(app,args);
   
   this->MessageDialogFrame->Create(app,"frame","");
-  this->Label->Create(app,"label","");
+  this->Label->SetLineType(vtkKWLabel::MultiLine);
+  this->Label->SetWidth(300);
+  this->Label->Create(app,"");
   this->ButtonFrame->Create(app,"frame","");
   
   switch (this->Style)
@@ -180,8 +183,11 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
 void vtkKWMessageDialog::SetText(const char *txt)
 {
+  this->Label->SetLabel(txt);
+  /*
   this->Script("%s configure -text {%s}",
                this->Label->GetWidgetName(),txt);
+  */
 }
 
 int vtkKWMessageDialog::Invoke()
@@ -211,6 +217,7 @@ int vtkKWMessageDialog::Invoke()
     this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
 		 x, y);
     }
+  this->Script("wm resizable %s 0 0", this->GetWidgetName());
 
   return vtkKWDialog::Invoke();
 }

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWDialog.h"
 class vtkKWApplication;
 class vtkKWImageLabel;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
@@ -124,7 +125,7 @@ protected:
   int Default;
 
   vtkKWWidget *MessageDialogFrame;
-  vtkKWWidget *Label;
+  vtkKWLabel *Label;
   vtkKWWidget *ButtonFrame;
   vtkKWWidget *OKButton;
   vtkKWWidget *CancelButton;  

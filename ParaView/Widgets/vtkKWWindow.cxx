@@ -949,7 +949,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.65 $");
+  this->ExtractRevision(os,"$Revision: 1.66 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1232,4 +1232,20 @@ int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey,
     res = atoi(buffer);
     }
   return res;
+}
+
+void vtkKWWindow::WarningMessage(const char* message)
+{
+  vtkKWMessageDialog::PopupMessage(this->GetApplication(),
+				   this, vtkKWMessageDialog::Warning,
+				   "VTK Warning",
+				   message);
+}
+
+void vtkKWWindow::ErrorMessage(const char* message)
+{
+  vtkKWMessageDialog::PopupMessage(this->GetApplication(),
+				   this, vtkKWMessageDialog::Error,
+				   "VTK Error",
+				   message);
 }
