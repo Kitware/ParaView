@@ -254,7 +254,7 @@ public:
   // Description:
   // Make the Accept button turn red/white when one of the parameters 
   // has changed.
-  void SetAcceptButtonColorToRed();
+  void SetAcceptButtonColorToGreen();
   void SetAcceptButtonColorToWhite();
   
   // Description:

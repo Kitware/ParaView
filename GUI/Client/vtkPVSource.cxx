@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.352");
+vtkCxxRevisionMacro(vtkPVSource, "1.353");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2135,16 +2135,16 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToRed()
+void vtkPVSource::SetAcceptButtonColorToGreen()
 {
   if (this->AcceptButtonRed)
     {
     return;
     }
   this->AcceptButtonRed = 1;
-  this->Script("%s configure -background red1",
+  this->Script("%s configure -background #17b27e",
                this->AcceptButton->GetWidgetName());
-  this->Script("%s configure -activebackground red1",
+  this->Script("%s configure -activebackground #17b27e",
                this->AcceptButton->GetWidgetName());
 }
 
@@ -2224,7 +2224,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
     }
 
   // Accept button is always red when a source is first created.
-  clone->SetAcceptButtonColorToRed();
+  clone->SetAcceptButtonColorToGreen();
 
   return VTK_OK;
 }
