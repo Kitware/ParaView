@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.538");
+vtkCxxRevisionMacro(vtkPVWindow, "1.539");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2588,8 +2588,16 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
   else
     {
-    *file << endl << "$Ren1 UpdateVTKObjects; $Ren1 StillRender" << endl;
-    *file << "$Ren1 WriteImage {" << imageFileName << "}\n";
+    *file << endl << "$Ren1 UpdateVTKObjects" << endl;
+    if (imageFileName)
+      {
+      *file << "$Ren1 WriteImage {" << imageFileName << "}\n";
+      }
+    else
+      {
+      *file << "$Ren1 StillRender" << endl;
+      }
+
     }
 //   else
 //     { // Just do one frame.
