@@ -5,8 +5,11 @@ set IsoStep 0.001
 
 
 
-
 # ------------------  Loop through depth showing salinity -------------
+
+$pvExtractGrid SetVisibility 1
+$pvWindow SetCurrentPVSource $pvExtractGrid
+update
 
 # Setup color map to show Salinity.
 [$pvExtractGridOutput GetColorMenu] SetValue {Point Salinity}
@@ -21,6 +24,7 @@ $pvContOutput ChangeActorColor 1 0 0
 
 # Loop over all of the depth values.
 for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
+    puts "Salt depth $i"
     [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
     $pvExtractGrid UpdateParameterWidgets
     $pvExtractGrid AcceptCallback
@@ -50,12 +54,13 @@ $pvExtractGridOutput SetScalarBarOrientationToHorizontal
 $pvExtractGridOutput SetCubeAxesVisibility 0
 
 # set the continent color to match the Temperature of 0.
-#$pvContOutput ChangeActorColor 0 [expr 180.0/255.0] 1.0
-$pvContOutput ChangeActorColor 0 [expr 175.0/255.0] 1.0
+#$pvContOutput ChangeActorColor 0 [expr 175.0/255.0] 1.0
+$pvContOutput ChangeActorColor 0 [expr 170.0/255.0] 1.0
 
 
 # Loop over all of the depth values.
 for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
+    puts "Temperature depth $i"
     [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
     $pvExtractGrid UpdateParameterWidgets
     $pvExtractGrid AcceptCallback
@@ -84,11 +89,11 @@ set cam [Ren1 GetActiveCamera]
 $cam SetFocalPoint 0 0 0
 
 for {set i 0} {$i < 360} { set i [expr $i + $RotationStep]} {
+    puts "Rotate $i"
     $cam Azimuth $RotationStep
     RenWin1 Render
 }
 
-}
 # --------------- Iterate through Salinity IsoSurfaces.----------
 
 $pvFloor SetVisibility 1
@@ -97,11 +102,13 @@ $pvContour SetVisibility 1
 $pvExtractGrid SetVisibility 0
 
 $pvWindow SetCurrentPVSource $pvContour
+update
 
-
-for {set i 0.035} {$i < 0.039} { set i [expr $i + $IsoStep]} {
+for {set i 0.035} {$i <= 0.039} { set i [expr $i + $IsoStep]} {
+    puts "Contour value $i"
     [$pvContour GetVTKSource] SetValue 0 $i
-    RenWin1 Render
+    $pvExtractGrid UpdateParameterWidgets
+    $pvExtractGrid AcceptCallback
 }
 
 $pvContour SetVisibility 0

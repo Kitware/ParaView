@@ -1435,6 +1435,15 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   pvApp->BroadcastScript("%s SetOutput %s", calc->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      calc->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   calc->Delete();
   pvd->Delete();
   
@@ -1466,7 +1475,15 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   vtkPVData *pvd;
   const char* outputDataType;
   int numMenus, i;
+  vtkPVData *current;
   
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("No input.");
+    return NULL;
+    }
+
   // Determine the output type.
   outputDataType = "vtkPolyData";
   
@@ -1488,7 +1505,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   cutPlane->SetApplication(pvApp);
   cutPlane->SetVTKSource(s, tclName);
-  cutPlane->SetNthPVInput(0, this->GetCurrentPVData());
+  cutPlane->SetNthPVInput(0, current);
   cutPlane->SetName(tclName);
   cutPlane->SetInterface(this->CutPlaneInterface);
 
@@ -1511,6 +1528,15 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   pvApp->BroadcastScript("%s SetOutput %s", cutPlane->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      cutPlane->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   cutPlane->Delete();
   pvd->Delete();
   
@@ -1541,9 +1567,9 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   vtkPVThreshold *threshold;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
-  vtkPVData *current;
   const char* outputDataType;
   int numMenus, i;
+  vtkPVData *current;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1568,7 +1594,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   threshold->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   threshold->SetApplication(pvApp);
   threshold->SetVTKSource(s, tclName);
-  threshold->SetNthPVInput(0, this->GetCurrentPVData());
+  threshold->SetNthPVInput(0, current);
   threshold->SetName(tclName);
   threshold->SetInterface(this->ThresholdInterface);
 
@@ -1592,6 +1618,15 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   pvApp->BroadcastScript("%s SetOutput %s", threshold->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      threshold->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   threshold->Delete();
   pvd->Delete();
   
@@ -1623,6 +1658,15 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   vtkPVData *pvd;
   const char* outputDataType;
   int numMenus, i;
+  vtkPVData *current;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot threshold; no input");
+    return NULL;
+    }
   
   // Determine the output type.
   outputDataType = "vtkUnstructuredGrid";
@@ -1645,7 +1689,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   clipPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   clipPlane->SetApplication(pvApp);
   clipPlane->SetVTKSource(s, tclName);
-  clipPlane->SetNthPVInput(0, this->GetCurrentPVData());
+  clipPlane->SetNthPVInput(0, current);
   clipPlane->SetName(tclName);
   clipPlane->SetInterface(this->ClipPlaneInterface);
 
@@ -1668,6 +1712,15 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   pvApp->BroadcastScript("%s SetOutput %s", clipPlane->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      clipPlane->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   clipPlane->Delete();
   pvd->Delete();
   
@@ -1729,7 +1782,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
-  contour->SetNthPVInput(0, this->GetCurrentPVData());
+  contour->SetNthPVInput(0, current);
   contour->SetName(tclName);
 
   this->GetMainView()->AddComposite(contour);
@@ -1750,8 +1803,17 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   // Connect the source and data.
   contour->SetNthPVOutput(0, pvd);
   pvApp->BroadcastScript("%s SetOutput %s", contour->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
+			 pvd->GetVTKDataTclName());  
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      contour->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   contour->Delete();
   pvd->Delete();
   
@@ -1809,7 +1871,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   glyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   glyph->SetApplication(pvApp);
   glyph->SetVTKSource(s, tclName);
-  glyph->SetNthPVInput(0, this->GetCurrentPVData());
+  glyph->SetNthPVInput(0, current);
   glyph->SetName(tclName);
 
   this->GetMainView()->AddComposite(glyph);
@@ -1833,6 +1895,15 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvApp->BroadcastScript("%s SetOutput %s", glyph->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      glyph->GetVTKSourceTclName(), current->GetVTKDataTclName());
+
   glyph->Delete();
   pvd->Delete();
   
@@ -1890,8 +1961,8 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   probe->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   probe->SetApplication(pvApp);
   probe->SetVTKSource(s, tclName);
-  probe->SetProbeSourceTclName(this->GetCurrentPVData()->GetVTKDataTclName());
-  probe->SetPVProbeSource(this->GetCurrentPVData());
+  probe->SetProbeSourceTclName(current->GetVTKDataTclName());
+  probe->SetPVProbeSource(current);
   probe->SetName(tclName);
 
   this->GetMainView()->AddComposite(probe);
@@ -1911,6 +1982,15 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   probe->SetNthPVOutput(0, pvd);
   pvApp->BroadcastScript("%s SetOutput %s", probe->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
+
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+    pvApp->BroadcastScript(
+      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+      probe->GetVTKSourceTclName(), current->GetVTKDataTclName());
 
   probe->Delete();
   pvd->Delete();
