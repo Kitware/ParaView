@@ -1,5 +1,42 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
+   <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty 
+         name="NumberOfProcesses" 
+         command="SetNumberOfProcesses" 
+         number_of_elements="1"
+         default_values="1" > 
+      </IntVectorProperty>         
+   <!-- End AllToN -->
+   </SourceProxy>
+
+   <SourceProxy name="Balance" class="vtkBalancedRedistributePolyData">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End Balance -->
+   </SourceProxy>
+
    <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
       <InputProperty
          name="Input"
@@ -2332,6 +2369,22 @@
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End StreamTracer -->
+   </SourceProxy>
+
+   <SourceProxy name="StructuredGridOutlineFilter" 
+                class="vtkStructuredGridOutlineFilter">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkStructuredGrid"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End Balance -->
    </SourceProxy>
 
    <SourceProxy name="Pick" class="vtkPickFilter">
