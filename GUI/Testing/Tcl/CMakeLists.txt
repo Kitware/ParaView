@@ -204,7 +204,7 @@ REMOVE (PROJECT_TESTS
   TestDemo
   TestPackage
   Write
-  XdmfRead
+#  XdmfRead
 )
 
 # for each test add a batch test that will possibly run in mpi mode

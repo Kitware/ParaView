@@ -46,7 +46,41 @@ $kw(vtkTemp18) SetCameraState 9.004 1.696 -2.043  1.162 1.000 -1.000  -0.143 0.8
 $kw(vtkTemp18) SetCameraState 0.597 -1.103 -8.637  1.162 1.000 -1.000  -0.467 0.861 -0.202
 $kw(vtkTemp2) ResetCameraCallback
 
-source [file join [file dirname [info script]] Compare.tcl]
-Compare $Application $argv $argc
+# Fix the size of the image.
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
+update
+[[$Application GetMainWindow] GetMainView] ForceRender
+
+set didRegression 0
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+       set didRegression 1
+    }
+}
+
+if { ! $didRegression } {
+
+    set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
+    $colorMaps InitTraversal
+    while { 1 } {
+        set colorMap [$colorMaps GetNextItemAsObject]
+        if { $colorMap == {} } {
+            break
+        }
+        $colorMap SetScalarBarVisibility 0
+    }
+    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+        if {[lindex $argv $i] == "-BT"} {
+            source [lindex $argv [expr $i + 1]]
+        }
+    }
+}
+
+#source [file join [file dirname [info script]] Compare.tcl]
+#Compare $Application $argv $argc
    
 $Application Exit
