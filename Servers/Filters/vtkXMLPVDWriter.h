@@ -92,10 +92,10 @@ protected:
   int WriteCollectionFileIfRequested();
   
   // Make a directory.
-  int MakeDirectory(const char* name);
+  void MakeDirectory(const char* name);
   
   // Remove a directory.
-  int RemoveDirectory(const char* name);
+  void RemoveDirectory(const char* name);
   
   // Internal implementation details.
   vtkXMLPVDWriterInternals* Internal;  
