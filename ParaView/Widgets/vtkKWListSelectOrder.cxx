@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.4");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -40,6 +40,7 @@ vtkKWListSelectOrder::vtkKWListSelectOrder()
   this->RemoveAllButton = vtkKWPushButton::New();
   this->UpButton = vtkKWPushButton::New();
   this->DownButton = vtkKWPushButton::New();
+  this->EllipsisCommand = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -54,6 +55,8 @@ vtkKWListSelectOrder::~vtkKWListSelectOrder()
   this->RemoveAllButton->Delete();
   this->UpButton->Delete();
   this->DownButton->Delete();
+
+  this->SetEllipsisCommand(0);
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +141,7 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side left -expand true -fill both",
     frame->GetWidgetName());
   frame->Delete();
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
@@ -163,37 +167,49 @@ void vtkKWListSelectOrder::AddElement(vtkKWListBox* l1, vtkKWListBox* l2,
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::AddSourceElement(const char* element, int force /* = 0 */)
 {
+  this->RemoveEllipsis();
   this->AddElement(this->SourceList, this->FinalList, element, force);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::AddFinalElement(const char* element, int force /* = 0 */)
 {
+  this->RemoveEllipsis();
   this->AddElement(this->FinalList, this->SourceList, element, force);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::AddCallback()
 {
+  this->RemoveEllipsis();
   this->MoveSelectedList(this->SourceList, this->FinalList);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::AddAllCallback()
 {
+  this->RemoveEllipsis();
   this->MoveWholeList(this->SourceList, this->FinalList);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::RemoveCallback() 
 {
+  this->RemoveEllipsis();
   this->MoveSelectedList(this->FinalList, this->SourceList);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::RemoveAllCallback()
 {
+  this->RemoveEllipsis();
   this->MoveWholeList(this->FinalList, this->SourceList);
+  this->DisplayEllipsis();
 }
 
 //----------------------------------------------------------------------------
@@ -297,6 +313,10 @@ void vtkKWListSelectOrder::MoveList(vtkKWListBox* l1, vtkKWListBox* l2,
 //----------------------------------------------------------------------------
 int vtkKWListSelectOrder::GetNumberOfElementsOnSourceList()
 {
+  if ( this->EllipsisDisplayed )
+    {
+    return 0;
+    }
   return this->SourceList->GetNumberOfItems();
 }
 
@@ -309,6 +329,10 @@ int vtkKWListSelectOrder::GetNumberOfElementsOnFinalList()
 //----------------------------------------------------------------------------
 const char* vtkKWListSelectOrder::GetElementFromSourceList(int idx)
 {
+  if ( this->EllipsisDisplayed )
+    {
+    return 0;
+    }
   return this->SourceList->GetItem(idx);
 }
 
@@ -321,6 +345,10 @@ const char* vtkKWListSelectOrder::GetElementFromFinalList(int idx)
 //----------------------------------------------------------------------------
 int vtkKWListSelectOrder::GetElementIndexFromSourceList(const char* element)
 {
+  if ( this->EllipsisDisplayed )
+    {
+    return -1;
+    }
   return this->SourceList->GetItemIndex(element);
 }
 
@@ -335,12 +363,57 @@ void vtkKWListSelectOrder::RemoveItemsFromSourceList()
 {
   this->SourceList->DeleteAll();
   this->Modified();
+  this->DisplayEllipsis();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListSelectOrder::RemoveItemsFromFinalList()
 {
   this->FinalList->DeleteAll();
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::DisplayEllipsis()
+{
+  if ( this->SourceList->GetNumberOfItems() > 0 )
+    {
+    return;
+    }
+  this->SourceList->InsertEntry(0, "...");
+  this->SourceList->GetListbox()->SetBind(this, "<Double-1>", "EllipsisCallback");
+  this->EllipsisDisplayed = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::RemoveEllipsis()
+{
+  if ( !this->EllipsisDisplayed )
+    {
+    return;
+    }
+  this->SourceList->DeleteAll();
+  this->SourceList->GetListbox()->UnsetBind("<Double-1>");
+  this->EllipsisDisplayed = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::EllipsisCallback()
+{
+  if ( !this->EllipsisCommand )
+    {
+    return;
+    }
+  this->Script(this->EllipsisCommand);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::SetEllipsisCommand(vtkKWObject* obj, const char* command)
+{
+  ostrstream str;
+  str << obj->GetTclName() << " " << command << ends;
+  this->SetEllipsisCommand(str.str());
+  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

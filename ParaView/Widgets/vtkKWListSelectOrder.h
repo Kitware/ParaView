@@ -77,6 +77,13 @@ public:
   virtual void UpCallback();
   virtual void DownCallback();
 
+  // Description:
+  // Callback for ellipsis.
+  void EllipsisCallback();
+  vtkSetStringMacro(EllipsisCommand);
+  vtkGetStringMacro(EllipsisCommand);
+  void SetEllipsisCommand(vtkKWObject* obj, const char* command);
+
 protected:
   vtkKWListSelectOrder();
   ~vtkKWListSelectOrder();
@@ -96,6 +103,12 @@ protected:
   void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
   void ShiftItems(vtkKWListBox* l1, int down);
   void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
+
+  char* EllipsisCommand;
+  int EllipsisDisplayed;
+
+  void DisplayEllipsis();
+  void RemoveEllipsis();
   
 private:
   vtkKWListSelectOrder(const vtkKWListSelectOrder&); // Not implemented
