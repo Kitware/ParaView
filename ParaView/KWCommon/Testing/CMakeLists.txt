@@ -11,6 +11,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
            ${VTK_HEADER_TESTING_PY}
 	   "${KWCommon_SOURCE_DIR}"
            icons.h
+           vtkKWEvent.h
            vtkQueue.h
            vtkVector.h
            vtkLinkedList.h

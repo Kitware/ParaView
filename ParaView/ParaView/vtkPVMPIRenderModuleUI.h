@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVMPIRenderModuleUI : public vtkPVCompositeRenderModuleUI
 {
 public:
   static vtkPVMPIRenderModuleUI* New();
-  vtkTypeRevisionMacro(vtkPVMPIRenderModuleUI,vtkPVLODRenderModuleUI);
+  vtkTypeRevisionMacro(vtkPVMPIRenderModuleUI,vtkPVCompositeRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
