@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.14");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -155,6 +155,9 @@ void vtkPVBoxWidget::ResetInternal()
     //this->SetPositionGUI(this->StoredPosition);
     //this->SetRotationGUI(this->StoredRotation);
     //this->SetScaleGUI(this->StoredScale);
+    if ( this->StoredRotation[0] < 0 ) { this->StoredRotation[0] += 360; }
+    if ( this->StoredRotation[1] < 0 ) { this->StoredRotation[1] += 360; }
+    if ( this->StoredRotation[2] < 0 ) { this->StoredRotation[2] += 360; }
     this->OrientationScale[0]->SetValue(this->StoredRotation[0]);
     this->OrientationScale[1]->SetValue(this->StoredRotation[1]);
     this->OrientationScale[2]->SetValue(this->StoredRotation[2]);
@@ -223,6 +226,9 @@ void vtkPVBoxWidget::Trace(ofstream *file)
     << this->PositionGUI[0] << " "
     << this->PositionGUI[1] << " "
     << this->PositionGUI[2] << endl;
+  if ( this->RotationGUI[0] < 0 ) { this->RotationGUI[0] += 360; }
+  if ( this->RotationGUI[1] < 0 ) { this->RotationGUI[1] += 360; }
+  if ( this->RotationGUI[2] < 0 ) { this->RotationGUI[2] += 360; }
   *file << "$kw(" << this->GetTclName() << ") SetOrientation "
     << this->RotationGUI[0] << " "
     << this->RotationGUI[1] << " "
@@ -601,6 +607,12 @@ void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
       py == this->RotationGUI[1] && 
       pz == this->RotationGUI[2] ) )
     {
+    if ( this->RotationGUI[0] < 0 ) { this->RotationGUI[0] += 360; }
+    if ( this->RotationGUI[1] < 0 ) { this->RotationGUI[1] += 360; }
+    if ( this->RotationGUI[2] < 0 ) { this->RotationGUI[2] += 360; }
+    if ( px < 0 ) { px += 360; }
+    if ( py < 0 ) { py += 360; }
+    if ( pz < 0 ) { pz += 360; }
     this->OrientationScale[0]->SetValue(px);
     this->OrientationScale[1]->SetValue(py);
     this->OrientationScale[2]->SetValue(pz);
@@ -774,6 +786,9 @@ void vtkPVBoxWidget::UpdateFromBox()
       orientation[1] == this->RotationGUI[1] && 
       orientation[2] == this->RotationGUI[2] ) )
     {
+    if ( orientation[0] < 0 ) { orientation[0] += 360; }
+    if ( orientation[1] < 0 ) { orientation[1] += 360; }
+    if ( orientation[2] < 0 ) { orientation[2] += 360; }
     this->OrientationScale[0]->SetValue(orientation[0]);
     this->OrientationScale[1]->SetValue(orientation[1]);
     this->OrientationScale[2]->SetValue(orientation[2]);

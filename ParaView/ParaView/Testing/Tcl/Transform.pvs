@@ -16,10 +16,28 @@ $pv(vtkTemp43) SetBackgroundColor 0 0 0
 set kw(vtkTemp2) [$Application GetMainWindow]
 set kw(vtkTemp18) [$kw(vtkTemp2) GetMainView]
 set kw(vtkTemp601) [$kw(vtkTemp2) CreatePVSource SphereSource]
+set kw(vtkTemp912) [$kw(vtkTemp601) GetPVWidget {Center}]
+$kw(vtkTemp912) SetValue 0 0 0
+set kw(vtkTemp917) [$kw(vtkTemp601) GetPVWidget {Radius}]
+$kw(vtkTemp917) SetValue 0.5
+set kw(vtkTemp920) [$kw(vtkTemp601) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp920) SetValue 8
+set kw(vtkTemp923) [$kw(vtkTemp601) GetPVWidget {Start Theta}]
+$kw(vtkTemp923) SetValue 0
+set kw(vtkTemp926) [$kw(vtkTemp601) GetPVWidget {End Theta}]
+$kw(vtkTemp926) SetValue 360
+set kw(vtkTemp929) [$kw(vtkTemp601) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp929) SetValue 8
+set kw(vtkTemp932) [$kw(vtkTemp601) GetPVWidget {Start Phi}]
+$kw(vtkTemp932) SetValue 0
+set kw(vtkTemp935) [$kw(vtkTemp601) GetPVWidget {End Phi}]
+$kw(vtkTemp935) SetValue 180
 $kw(vtkTemp601) AcceptCallback
 set kw(vtkTemp741) [$kw(vtkTemp2) CreatePVSource TransformFilter]
 set kw(vtkTemp792) [$kw(vtkTemp741) GetPVWidget {Transform Widget}]
 set kw(vtkTemp752) [$kw(vtkTemp792) GetPVWidget {Box}]
+$kw(vtkTemp752) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp752) SetOrientation 0.000000 0.000000 0.000000
 $kw(vtkTemp752) SetTranslate 0.000000 0.000000 0.000000
 $kw(vtkTemp752) SetOrientation 0.000000 0.000000 0.000000
 $kw(vtkTemp792) SetCurrentValue {Box}
@@ -29,78 +47,96 @@ $kw(vtkTemp752) SetOrientation 0 0 0
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.000000 0.000000 0.000000
-$kw(vtkTemp752) SetOrientation -13.109400 -12.981400 -1.472070
+$kw(vtkTemp752) SetOrientation 346.890594 347.018585 358.527924
+$kw(vtkTemp752) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp752) SetOrientation 346.890594 347.018585 358.527924
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1 1 1
 $kw(vtkTemp752) SetTranslate 0 0 0
-$kw(vtkTemp752) SetOrientation -13.1094 -12.9814 -1.47207
+$kw(vtkTemp752) SetOrientation 346.891 347.019 358.528
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.229072 0.215597 0.000000
-$kw(vtkTemp752) SetOrientation -13.109400 -12.981400 -1.472070
+$kw(vtkTemp752) SetOrientation 346.890594 347.018585 358.527924
+$kw(vtkTemp752) SetTranslate 0.229072 0.215597 0.000000
+$kw(vtkTemp752) SetOrientation 346.890594 347.018585 358.527924
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1 1 1
 $kw(vtkTemp752) SetTranslate 0.229072 0.215597 0
-$kw(vtkTemp752) SetOrientation -13.1094 -12.9814 -1.47207
+$kw(vtkTemp752) SetOrientation 346.891 347.019 358.528
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.229071 0.215597 0.000000
-$kw(vtkTemp752) SetOrientation 15.605300 -47.321800 -0.427341
+$kw(vtkTemp752) SetOrientation 15.605300 312.678192 359.572662
+$kw(vtkTemp752) SetTranslate 0.229071 0.215597 0.000000
+$kw(vtkTemp752) SetOrientation 15.605300 312.678192 359.572662
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1 1 1
 $kw(vtkTemp752) SetTranslate 0.229071 0.215597 0
-$kw(vtkTemp752) SetOrientation 15.6053 -47.3218 -0.427341
+$kw(vtkTemp752) SetOrientation 15.6053 312.678 359.573
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.227748 0.038182 -0.049554
-$kw(vtkTemp752) SetOrientation 15.605300 -47.321800 -0.427341
+$kw(vtkTemp752) SetOrientation 15.605300 312.678192 359.572662
+$kw(vtkTemp752) SetTranslate 0.227748 0.038182 -0.049554
+$kw(vtkTemp752) SetOrientation 15.605300 312.678192 359.572662
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1 0.622106 1
 $kw(vtkTemp752) SetTranslate 0.227748 0.0381824 -0.049554
-$kw(vtkTemp752) SetOrientation 15.6053 -47.3218 -0.427341
+$kw(vtkTemp752) SetOrientation 15.6053 312.678 359.573
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.046803 -0.060706 0.051984
-$kw(vtkTemp752) SetOrientation 2.466150 -153.757996 27.441900
+$kw(vtkTemp752) SetOrientation 2.466150 206.242004 27.441900
+$kw(vtkTemp752) SetTranslate 0.046803 -0.060706 0.051984
+$kw(vtkTemp752) SetOrientation 2.466150 206.242004 27.441900
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1.47152 0.622106 1
 $kw(vtkTemp752) SetTranslate 0.0468033 -0.060706 0.0519836
-$kw(vtkTemp752) SetOrientation 2.46615 -153.758 27.4419
+$kw(vtkTemp752) SetOrientation 2.46615 206.242 27.4419
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate -0.014511 0.055927 -0.003386
-$kw(vtkTemp752) SetOrientation -22.792500 -152.901001 27.731199
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
+$kw(vtkTemp752) SetTranslate -0.014511 0.055927 -0.003386
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1.47152 0.328897 1
 $kw(vtkTemp752) SetTranslate -0.0145115 0.055927 -0.0033862
-$kw(vtkTemp752) SetOrientation -22.7925 -152.901 27.7312
+$kw(vtkTemp752) SetOrientation 337.207 207.099 27.7312
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate 0.019274 0.127920 0.110849
-$kw(vtkTemp752) SetOrientation -22.792500 -152.901001 27.731199
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
+$kw(vtkTemp752) SetTranslate 0.019274 0.127920 0.110849
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 1.47152 0.328897 1.27838
 $kw(vtkTemp752) SetTranslate 0.0192737 0.12792 0.110849
-$kw(vtkTemp752) SetOrientation -22.7925 -152.901 27.7312
+$kw(vtkTemp752) SetOrientation 337.207 207.099 27.7312
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate -0.038640 0.238084 0.058550
-$kw(vtkTemp752) SetOrientation -22.792500 -152.901001 27.731199
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
+$kw(vtkTemp752) SetTranslate -0.038640 0.238084 0.058550
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
 $kw(vtkTemp792) SetCurrentValue {Box}
-$kw(vtkTemp752) SetScale 4.68907 0.771105 4.07364
+$kw(vtkTemp752) SetScale 4.68907 0.77792 4.07364
 $kw(vtkTemp752) SetTranslate -0.0386403 0.238084 0.0585505
-$kw(vtkTemp752) SetOrientation -22.7925 -152.901 27.7312
+$kw(vtkTemp752) SetOrientation 337.207 207.099 27.7312
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 0.000 0.000 3.411  0.000 0.000 0.000  0.000 1.000 0.000
 $kw(vtkTemp752) SetTranslate -0.081127 0.318901 0.020184
-$kw(vtkTemp752) SetOrientation -22.792500 -152.901001 27.731199
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
+$kw(vtkTemp752) SetTranslate -0.081127 0.318901 0.020184
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 4.68907 0.567934 4.07364
 $kw(vtkTemp752) SetTranslate -0.0811266 0.318901 0.0201836
-$kw(vtkTemp752) SetOrientation -22.7925 -152.901 27.7312
+$kw(vtkTemp752) SetOrientation 337.207 207.099 27.7312
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 2.025 -0.314 2.727  0.000 0.000 0.000  -0.006 0.993 0.118
 $kw(vtkTemp18) SetCameraState 2.025 -0.314 2.727  0.000 0.000 0.000  -0.006 0.993 0.118
@@ -108,30 +144,52 @@ $kw(vtkTemp2) ResetCameraCallback
 $kw(vtkTemp18) SetCameraState 1.223 7.835 12.030  -0.127 0.229 -0.201  -0.219 0.839 -0.498
 $kw(vtkTemp18) SetCameraState 1.223 7.835 12.030  -0.127 0.229 -0.201  -0.219 0.839 -0.498
 $kw(vtkTemp752) SetTranslate -0.032454 0.226316 0.064137
-$kw(vtkTemp752) SetOrientation -22.792500 -152.901001 27.731199
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
+$kw(vtkTemp752) SetTranslate -0.032454 0.226316 0.064137
+$kw(vtkTemp752) SetOrientation 337.207489 207.098999 27.731199
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 4.68907 0.33518 4.07364
 $kw(vtkTemp752) SetTranslate -0.0324539 0.226316 0.0641371
-$kw(vtkTemp752) SetOrientation -22.7925 -152.901 27.7312
+$kw(vtkTemp752) SetOrientation 337.207 207.099 27.7312
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 2.753 14.135 -0.457  -0.304 0.008 0.127  -0.950 0.215 0.226
 $kw(vtkTemp18) SetCameraState 2.753 14.135 -0.457  -0.304 0.008 0.127  -0.950 0.215 0.226
 $kw(vtkTemp752) SetTranslate -0.032454 0.226316 0.064137
-$kw(vtkTemp752) SetOrientation -22.690399 -130.750000 100.824997
+$kw(vtkTemp752) SetOrientation 337.309601 229.250000 100.824997
+$kw(vtkTemp752) SetTranslate -0.032454 0.226316 0.064137
+$kw(vtkTemp752) SetOrientation 337.309601 229.250000 100.824997
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 4.68907 0.33518 4.07364
 $kw(vtkTemp752) SetTranslate -0.0324538 0.226316 0.0641371
-$kw(vtkTemp752) SetOrientation -22.6904 -130.75 100.825
+$kw(vtkTemp752) SetOrientation 337.31 229.25 100.825
 $kw(vtkTemp741) AcceptCallback
 $kw(vtkTemp18) SetCameraState 2.753 14.135 -0.457  -0.304 0.008 0.127  -0.950 0.215 0.226
 $kw(vtkTemp752) SetTranslate -0.114573 -0.121283 0.413184
-$kw(vtkTemp752) SetOrientation -22.690399 -130.750000 100.824997
+$kw(vtkTemp752) SetOrientation 337.309601 229.250000 100.824997
+$kw(vtkTemp752) SetTranslate -0.114573 -0.121283 0.413184
+$kw(vtkTemp752) SetOrientation 337.309601 229.250000 100.824997
 $kw(vtkTemp792) SetCurrentValue {Box}
 $kw(vtkTemp752) SetScale 3.66458 0.33518 4.07364
 $kw(vtkTemp752) SetTranslate -0.114573 -0.121283 0.413184
-$kw(vtkTemp752) SetOrientation -22.6904 -130.75 100.825
+$kw(vtkTemp752) SetOrientation 337.31 229.25 100.825
 $kw(vtkTemp741) AcceptCallback
 set kw(vtkTemp902) [$kw(vtkTemp2) CreatePVSource SphereSource]
+set kw(vtkTemp1228) [$kw(vtkTemp902) GetPVWidget {Center}]
+$kw(vtkTemp1228) SetValue 0 0 0
+set kw(vtkTemp1233) [$kw(vtkTemp902) GetPVWidget {Radius}]
+$kw(vtkTemp1233) SetValue 0.5
+set kw(vtkTemp1236) [$kw(vtkTemp902) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp1236) SetValue 8
+set kw(vtkTemp1239) [$kw(vtkTemp902) GetPVWidget {Start Theta}]
+$kw(vtkTemp1239) SetValue 0
+set kw(vtkTemp1242) [$kw(vtkTemp902) GetPVWidget {End Theta}]
+$kw(vtkTemp1242) SetValue 360
+set kw(vtkTemp1245) [$kw(vtkTemp902) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp1245) SetValue 8
+set kw(vtkTemp1248) [$kw(vtkTemp902) GetPVWidget {Start Phi}]
+$kw(vtkTemp1248) SetValue 0
+set kw(vtkTemp1251) [$kw(vtkTemp902) GetPVWidget {End Phi}]
+$kw(vtkTemp1251) SetValue 180
 $kw(vtkTemp902) AcceptCallback
 $kw(vtkTemp18) SetCameraState 4.062 -13.824 -0.015  0.149 0.100 0.277  0.638 0.164 0.752
 $kw(vtkTemp18) SetCameraState 4.384 -6.162 12.264  0.292 0.045 -0.146  0.931 -0.092 -0.353
@@ -158,14 +216,24 @@ $kw(vtkTemp18) SetCameraState 9.820 7.290 -7.618  0.192 -0.112 0.243  0.678 -0.1
 $kw(vtkTemp18) SetCameraState 4.418 5.725 -12.462  0.293 -0.058 0.140  0.942 0.049 0.331
 $kw(vtkTemp18) SetCameraState 4.418 5.725 -12.462  0.293 -0.058 0.140  0.942 0.049 0.331
 set kw(vtkTemp1093) [$kw(vtkTemp1042) GetPVWidget {Transform Widget}]
-$kw(vtkTemp1093) SetCurrentValue {Box}
 set kw(vtkTemp1053) [$kw(vtkTemp1093) GetPVWidget {Box}]
+$kw(vtkTemp1053) SetTranslate -0.419011 0.062386 -0.519649
+$kw(vtkTemp1053) SetOrientation 19.118299 34.882599 16.694300
+$kw(vtkTemp1093) SetCurrentValue {Box}
 $kw(vtkTemp1053) SetScale 0.999999 1 2.34566
 $kw(vtkTemp1053) SetTranslate -0.419011 0.0623864 -0.519649
 $kw(vtkTemp1053) SetOrientation 19.1183 34.8826 16.6943
 $kw(vtkTemp1042) AcceptCallback
 $kw(vtkTemp18) SetCameraState 5.710 -4.599 -12.403  0.274 0.015 0.183  0.927 0.141 0.348
 set kw(vtkTemp1203) [$kw(vtkTemp2) CreatePVSource CylinderSource]
+set kw(vtkTemp1209) [$kw(vtkTemp1203) GetPVWidget {Resolution}]
+$kw(vtkTemp1209) SetValue 6
+set kw(vtkTemp1547) [$kw(vtkTemp1203) GetPVWidget {Height}]
+$kw(vtkTemp1547) SetValue 1
+set kw(vtkTemp1550) [$kw(vtkTemp1203) GetPVWidget {Radius}]
+$kw(vtkTemp1550) SetValue 0.5
+set kw(vtkTemp1553) [$kw(vtkTemp1203) GetPVWidget {Center}]
+$kw(vtkTemp1553) SetValue 0 0 0
 $kw(vtkTemp1203) AcceptCallback
 $kw(vtkTemp18) SetCameraState 1.354 14.318 0.879  0.262 -0.090 0.178  0.720 -0.088 0.689
 set kw(vtkTemp1335) [$kw(vtkTemp2) CreatePVSource TransformFilter]
@@ -176,20 +244,24 @@ $kw(vtkTemp18) SetCameraState 14.078 3.058 0.246  -0.005 -0.249 0.216  0.141 -0.
 $kw(vtkTemp18) SetCameraState 14.078 3.058 0.246  -0.005 -0.249 0.216  0.141 -0.608 0.781
 $kw(vtkTemp18) SetCameraState 14.078 3.058 0.246  -0.005 -0.249 0.216  0.141 -0.608 0.781
 set kw(vtkTemp1386) [$kw(vtkTemp1335) GetPVWidget {Transform Widget}]
-$kw(vtkTemp1386) SetCurrentValue {Box}
 set kw(vtkTemp1346) [$kw(vtkTemp1386) GetPVWidget {Box}]
+$kw(vtkTemp1346) SetTranslate -0.145848 0.667504 -0.592606
+$kw(vtkTemp1346) SetOrientation 319.063904 84.151199 12.325300
+$kw(vtkTemp1386) SetCurrentValue {Box}
 $kw(vtkTemp1346) SetScale 1 2.80888 1
 $kw(vtkTemp1346) SetTranslate -0.145848 0.667504 -0.592606
-$kw(vtkTemp1346) SetOrientation -40.9361 84.1512 12.3253
+$kw(vtkTemp1346) SetOrientation 319.064 84.1512 12.3253
 $kw(vtkTemp1335) AcceptCallback
 $kw(vtkTemp18) SetCameraState 4.078 6.438 -12.228  0.295 -0.094 0.113  0.963 -0.057 0.265
 $kw(vtkTemp18) SetCameraState 4.078 6.438 -12.228  0.295 -0.094 0.113  0.963 -0.057 0.265
 $kw(vtkTemp18) SetCameraState 1.859 13.745 -3.903  0.313 -0.082 0.062  0.956 -0.023 0.293
 $kw(vtkTemp18) SetCameraState 1.859 13.745 -3.903  0.313 -0.082 0.062  0.956 -0.023 0.293
+$kw(vtkTemp1346) SetTranslate -1.182560 0.747156 -0.718984
+$kw(vtkTemp1346) SetOrientation 296.916992 48.571098 316.967407
 $kw(vtkTemp1386) SetCurrentValue {Box}
 $kw(vtkTemp1346) SetScale 1 2.80888 0.999999
 $kw(vtkTemp1346) SetTranslate -1.18256 0.747156 -0.718984
-$kw(vtkTemp1346) SetOrientation -63.083 48.5711 -43.0326
+$kw(vtkTemp1346) SetOrientation 296.917 48.5711 316.967
 $kw(vtkTemp1335) AcceptCallback
 $kw(vtkTemp18) SetCameraState 4.060 2.670 -13.564  0.294 -0.068 0.132  0.965 -0.012 0.263
 $kw(vtkTemp18) SetCameraState 4.060 2.670 -13.564  0.294 -0.068 0.132  0.965 -0.012 0.263
@@ -198,21 +270,24 @@ $kw(vtkTemp18) SetCameraState 12.414 4.069 6.078  0.086 -0.301 -0.103  0.373 -0.
 $kw(vtkTemp18) SetCameraState 12.414 4.069 6.078  0.086 -0.301 -0.103  0.373 -0.924 -0.090
 $kw(vtkTemp18) SetCameraState 12.414 4.069 6.078  0.086 -0.301 -0.103  0.373 -0.924 -0.090
 $kw(vtkTemp18) SetCameraState 12.414 4.069 6.078  0.086 -0.301 -0.103  0.373 -0.924 -0.090
+$kw(vtkTemp1346) SetTranslate -0.548829 2.014560 -2.852840
+$kw(vtkTemp1346) SetOrientation 302.626495 29.113100 313.286194
 $kw(vtkTemp1386) SetCurrentValue {Box}
 $kw(vtkTemp1346) SetScale 1.06277 2.98212 0.999999
 $kw(vtkTemp1346) SetTranslate -0.548829 2.01456 -2.85284
-$kw(vtkTemp1346) SetOrientation -57.3735 29.1131 -46.7138
+$kw(vtkTemp1346) SetOrientation 302.626 29.1131 313.286
 $kw(vtkTemp1335) AcceptCallback
 $kw(vtkTemp18) SetCameraState -4.137 13.795 0.422  0.312 0.034 0.102  0.842 0.261 0.471
 $kw(vtkTemp18) SetCameraState -4.137 13.795 0.422  0.312 0.034 0.102  0.842 0.261 0.471
+$kw(vtkTemp1346) SetTranslate 0.223114 2.252890 -2.371950
+$kw(vtkTemp1346) SetOrientation 302.626495 29.113100 313.286194
 $kw(vtkTemp1386) SetCurrentValue {Box}
 $kw(vtkTemp1346) SetScale 1.06277 2.98212 0.999999
 $kw(vtkTemp1346) SetTranslate 0.223114 2.25289 -2.37195
-$kw(vtkTemp1346) SetOrientation -57.3735 29.1131 -46.7138
+$kw(vtkTemp1346) SetOrientation 302.626 29.1131 313.286
 $kw(vtkTemp1335) AcceptCallback
 $kw(vtkTemp18) SetCameraState 5.931 6.025 -11.667  0.260 0.007 0.203  0.819 0.248 0.517
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1203)
-set kw(vtkTemp1209) [$kw(vtkTemp1203) GetPVWidget {Resolution}]
 $kw(vtkTemp1209) SetValue 10
 $kw(vtkTemp1203) AcceptCallback
 $kw(vtkTemp18) SetCameraState 5.147 7.370 -11.260  0.284 -0.078 0.148  0.921 -0.003 0.390
@@ -221,8 +296,10 @@ $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1335)
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1203)
 set kw(vtkTemp1496) [$kw(vtkTemp2) CreatePVSource TransformFilter]
 set kw(vtkTemp1547) [$kw(vtkTemp1496) GetPVWidget {Transform Widget}]
-$kw(vtkTemp1547) SetCurrentValue {Box}
 set kw(vtkTemp1507) [$kw(vtkTemp1547) GetPVWidget {Box}]
+$kw(vtkTemp1507) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp1507) SetOrientation 0.000000 0.000000 0.000000
+$kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 1 1
 $kw(vtkTemp1507) SetTranslate 0 0 0
 $kw(vtkTemp1507) SetOrientation 0 0 0
@@ -231,55 +308,69 @@ $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1335)
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1496)
 $kw(vtkTemp18) SetCameraState 5.147 7.370 -11.260  0.284 -0.078 0.148  0.921 -0.003 0.390
 $kw(vtkTemp18) SetCameraState 5.147 7.370 -11.260  0.284 -0.078 0.148  0.921 -0.003 0.390
+$kw(vtkTemp1507) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp1507) SetOrientation 333.550293 229.261993 194.292999
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 1 1
 $kw(vtkTemp1507) SetTranslate 0 0 0
-$kw(vtkTemp1507) SetOrientation -26.4497 -130.738 -165.707
+$kw(vtkTemp1507) SetOrientation 333.55 229.262 194.293
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 5.147 7.370 -11.260  0.284 -0.078 0.148  0.921 -0.003 0.390
+$kw(vtkTemp1507) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp1507) SetOrientation 295.449799 312.257690 298.701904
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 1 1
 $kw(vtkTemp1507) SetTranslate 0 0 0
-$kw(vtkTemp1507) SetOrientation -64.5502 -47.7423 -61.2981
+$kw(vtkTemp1507) SetOrientation 295.45 312.258 298.702
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 9.970 8.950 5.301  0.095 -0.280 0.146  0.319 -0.699 0.640
 $kw(vtkTemp18) SetCameraState 9.970 8.950 5.301  0.095 -0.280 0.146  0.319 -0.699 0.640
 $kw(vtkTemp18) SetCameraState 9.970 8.950 5.301  0.095 -0.280 0.146  0.319 -0.699 0.640
+$kw(vtkTemp1507) SetTranslate 1.777620 0.101146 -3.290790
+$kw(vtkTemp1507) SetOrientation 295.449799 312.257690 298.701904
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 4.1341 1
 $kw(vtkTemp1507) SetTranslate 1.77762 0.101146 -3.29079
-$kw(vtkTemp1507) SetOrientation -64.5502 -47.7423 -61.2981
+$kw(vtkTemp1507) SetOrientation 295.45 312.258 298.702
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 6.202 4.281 -12.281  0.225 -0.219 0.101  0.842 -0.489 0.229
 $kw(vtkTemp18) SetCameraState 6.202 4.281 -12.281  0.225 -0.219 0.101  0.842 -0.489 0.229
+$kw(vtkTemp1507) SetTranslate 1.503870 0.053902 -3.440110
+$kw(vtkTemp1507) SetOrientation 295.449799 312.257690 298.701904
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 4.1341 1
 $kw(vtkTemp1507) SetTranslate 1.50387 0.0539025 -3.44011
-$kw(vtkTemp1507) SetOrientation -64.5502 -47.7423 -61.2981
+$kw(vtkTemp1507) SetOrientation 295.45 312.258 298.702
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 4.229 6.511 -12.138  0.259 -0.198 0.048  0.913 -0.400 0.077
 $kw(vtkTemp18) SetCameraState 4.229 6.511 -12.138  0.259 -0.198 0.048  0.913 -0.400 0.077
 $kw(vtkTemp18) SetCameraState 4.229 6.511 -12.138  0.259 -0.198 0.048  0.913 -0.400 0.077
 $kw(vtkTemp18) SetCameraState 4.229 6.511 -12.138  0.259 -0.198 0.048  0.913 -0.400 0.077
+$kw(vtkTemp1507) SetTranslate 1.503870 0.053902 -3.440110
+$kw(vtkTemp1507) SetOrientation 298.478394 316.618195 303.076385
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 1 4.1341 1
 $kw(vtkTemp1507) SetTranslate 1.50387 0.0539025 -3.44011
-$kw(vtkTemp1507) SetOrientation -61.5216 -43.3818 -56.9236
+$kw(vtkTemp1507) SetOrientation 298.478 316.618 303.076
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 11.091 0.400 9.189  0.067 -0.284 -0.153  0.257 -0.938 -0.234
 $kw(vtkTemp18) SetCameraState 11.091 0.400 9.189  0.067 -0.284 -0.153  0.257 -0.938 -0.234
+$kw(vtkTemp1507) SetTranslate 1.503870 0.053902 -3.440110
+$kw(vtkTemp1507) SetOrientation 307.782013 326.934998 301.050995
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 0.999999 4.1341 1
 $kw(vtkTemp1507) SetTranslate 1.50387 0.0539025 -3.44011
-$kw(vtkTemp1507) SetOrientation -52.218 -33.065 -58.949
+$kw(vtkTemp1507) SetOrientation 307.782 326.935 301.051
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState -4.846 5.881 -12.228  0.250 -0.178 -0.121  0.797 -0.335 -0.503
 $kw(vtkTemp18) SetCameraState -10.886 -7.554 5.659  -0.007 -0.117 -0.308  -0.267 -0.334 -0.904
 $kw(vtkTemp18) SetCameraState -10.886 -7.554 5.659  -0.007 -0.117 -0.308  -0.267 -0.334 -0.904
+$kw(vtkTemp1507) SetTranslate 1.503870 0.053903 -3.440110
+$kw(vtkTemp1507) SetOrientation 305.719208 330.863007 309.414001
 $kw(vtkTemp1547) SetCurrentValue {Box}
 $kw(vtkTemp1507) SetScale 0.999999 4.1341 1
 $kw(vtkTemp1507) SetTranslate 1.50387 0.0539026 -3.44011
-$kw(vtkTemp1507) SetOrientation -54.2808 -29.137 -50.586
+$kw(vtkTemp1507) SetOrientation 305.719 330.863 309.414
 $kw(vtkTemp1496) AcceptCallback
 $kw(vtkTemp18) SetCameraState 8.057 -11.343 3.744  0.230 0.236 0.009  0.838 0.540 -0.081
 $kw(vtkTemp18) SetCameraState 1.645 -14.114 2.387  0.309 0.101 0.055  0.994 0.100 0.038
@@ -300,8 +391,10 @@ $kw(vtkTemp18) SetCameraState -12.907 3.988 -5.010  0.100 -0.188 -0.251  0.204 -
 $kw(vtkTemp18) SetCameraState -12.867 4.469 -4.699  0.089 -0.187 -0.256  0.176 -0.378 -0.909
 $kw(vtkTemp18) SetCameraState -12.867 4.469 -4.699  0.089 -0.187 -0.256  0.176 -0.378 -0.909
 set kw(vtkTemp1708) [$kw(vtkTemp1657) GetPVWidget {Transform Widget}]
-$kw(vtkTemp1708) SetCurrentValue {Box}
 set kw(vtkTemp1668) [$kw(vtkTemp1708) GetPVWidget {Box}]
+$kw(vtkTemp1668) SetTranslate -0.503070 0.307294 -1.516010
+$kw(vtkTemp1668) SetOrientation 53.686100 144.147995 128.307007
+$kw(vtkTemp1708) SetCurrentValue {Box}
 $kw(vtkTemp1668) SetScale 0.982795 1.64112 1
 $kw(vtkTemp1668) SetTranslate -0.50307 0.307294 -1.51601
 $kw(vtkTemp1668) SetOrientation 53.6861 144.148 128.307
@@ -312,13 +405,17 @@ set kw(vtkTemp1818) [$kw(vtkTemp2) CreatePVSource TransformFilter]
 $kw(vtkTemp18) SetCameraState 6.743 -12.721 0.543  0.261 0.200 0.011  0.889 0.441 -0.124
 $kw(vtkTemp18) SetCameraState -7.882 -10.751 5.468  0.251 -0.003 0.213  0.740 -0.256 0.622
 set kw(vtkTemp1869) [$kw(vtkTemp1818) GetPVWidget {Transform Widget}]
-$kw(vtkTemp1869) SetCurrentValue {Box}
 set kw(vtkTemp1829) [$kw(vtkTemp1869) GetPVWidget {Box}]
+$kw(vtkTemp1829) SetTranslate 0.180159 0.013146 -1.875250
+$kw(vtkTemp1829) SetOrientation 0.000000 0.000000 0.000000
+$kw(vtkTemp1869) SetCurrentValue {Box}
 $kw(vtkTemp1829) SetScale 1 1 1
 $kw(vtkTemp1829) SetTranslate 0.180159 0.0131457 -1.87525
 $kw(vtkTemp1829) SetOrientation 0 0 0
 $kw(vtkTemp1818) AcceptCallback
 $kw(vtkTemp18) SetCameraState -7.882 -10.751 5.468  0.251 -0.003 0.213  0.740 -0.256 0.622
+$kw(vtkTemp1829) SetTranslate 0.180159 0.013146 -1.875250
+$kw(vtkTemp1829) SetOrientation 15.060600 13.918900 45.274899
 $kw(vtkTemp1869) SetCurrentValue {Box}
 $kw(vtkTemp1829) SetScale 1 0.999999 1
 $kw(vtkTemp1829) SetTranslate 0.180159 0.0131457 -1.87525
@@ -328,54 +425,68 @@ $kw(vtkTemp18) SetCameraState 7.061 9.383 -8.348  0.256 -0.174 0.114  0.880 -0.3
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp1203)
 set kw(vtkTemp1979) [$kw(vtkTemp2) CreatePVSource TransformFilter]
 set kw(vtkTemp2030) [$kw(vtkTemp1979) GetPVWidget {Transform Widget}]
-$kw(vtkTemp2030) SetCurrentValue {Box}
 set kw(vtkTemp1990) [$kw(vtkTemp2030) GetPVWidget {Box}]
+$kw(vtkTemp1990) SetTranslate 0.000000 0.000000 0.000000
+$kw(vtkTemp1990) SetOrientation 0.000000 0.000000 0.000000
+$kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate 0 0 0
 $kw(vtkTemp1990) SetOrientation 0 0 0
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState 7.061 9.383 -8.348  0.256 -0.174 0.114  0.880 -0.303 0.366
 $kw(vtkTemp18) SetCameraState 7.061 9.383 -8.348  0.256 -0.174 0.114  0.880 -0.303 0.366
+$kw(vtkTemp1990) SetTranslate -1.388510 0.156519 -0.939930
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate -1.38851 0.156519 -0.93993
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -7.787 -2.079 11.943  0.215 0.222 0.114  0.653 0.526 0.544
 $kw(vtkTemp18) SetCameraState -7.787 -2.079 11.943  0.215 0.222 0.114  0.653 0.526 0.544
+$kw(vtkTemp1990) SetTranslate -0.765729 1.030230 -0.348713
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate -0.765729 1.03023 -0.348713
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -9.214 -3.409 -10.540  0.021 0.325 -0.049  -0.182 0.966 -0.183
 $kw(vtkTemp18) SetCameraState -9.214 -3.409 -10.540  0.021 0.325 -0.049  -0.182 0.966 -0.183
+$kw(vtkTemp1990) SetTranslate 0.082935 1.200110 -1.156310
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate 0.0829347 1.20011 -1.15631
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -10.797 1.139 9.473  -0.046 0.279 -0.169  -0.180 0.942 -0.285
 $kw(vtkTemp18) SetCameraState -10.797 1.139 9.473  -0.046 0.279 -0.169  -0.180 0.942 -0.285
+$kw(vtkTemp1990) SetTranslate -0.330126 1.142610 -1.611750
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate -0.330126 1.14261 -1.61175
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -9.817 1.608 -10.423  0.185 0.267 -0.058  0.339 0.917 -0.209
 $kw(vtkTemp18) SetCameraState -9.817 1.608 -10.423  0.185 0.267 -0.058  0.339 0.917 -0.209
+$kw(vtkTemp1990) SetTranslate -0.380389 1.148080 -1.562540
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate -0.380389 1.14808 -1.56254
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -12.450 7.252 0.019  0.203 0.241 -0.097  0.479 0.867 -0.136
 $kw(vtkTemp18) SetCameraState 10.744 3.870 8.786  0.130 0.092 -0.289  0.602 0.179 -0.778
 $kw(vtkTemp18) SetCameraState 10.744 3.870 8.786  0.130 0.092 -0.289  0.602 0.179 -0.778
+$kw(vtkTemp1990) SetTranslate -0.323680 1.164940 -1.635890
+$kw(vtkTemp1990) SetOrientation 359.712402 359.218262 358.821899
 $kw(vtkTemp2030) SetCurrentValue {Box}
 $kw(vtkTemp1990) SetScale 1 1 1
 $kw(vtkTemp1990) SetTranslate -0.32368 1.16494 -1.63589
-$kw(vtkTemp1990) SetOrientation -0.287588 -0.781745 -1.1781
+$kw(vtkTemp1990) SetOrientation 359.712 359.218 358.822
 $kw(vtkTemp1979) AcceptCallback
 $kw(vtkTemp18) SetCameraState -1.752 -8.856 11.230  0.285 0.141 0.087  0.924 0.197 0.328
 
