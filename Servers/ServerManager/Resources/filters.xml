@@ -127,7 +127,7 @@
         command="SetConstraintMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Parallel"/>
          <Entry value="1" text="Perpendicular"/>
          <Entry value="2" text="PerpendicularScale"/>
@@ -509,7 +509,7 @@
         command="SetCurvatureType" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Gaussian"/>
          <Entry value="1" text="Mean"/>
        </EnumerationDomain>
@@ -582,7 +582,7 @@
         command="SetBoundaryMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Assign cells uniquely"/>
          <Entry value="1" text="Duplicate cells"/>
          <Entry value="2" text="Divide cells"/>
@@ -817,7 +817,7 @@
         command="SetAttributeMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="point_data"/>
          <Entry value="1" text="cell_data"/>
        </EnumerationDomain>
@@ -918,7 +918,7 @@
         command="SetDimensionality" 
         number_of_elements="1"
         default_values="3" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="2" text="Two"/>
          <Entry value="3" text="Three"/>
        </EnumerationDomain>
@@ -957,7 +957,7 @@
         command="SetDimensionality" 
         number_of_elements="1"
         default_values="3" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="2" text="Two"/>
          <Entry value="3" text="Three"/>
        </EnumerationDomain>
@@ -1422,7 +1422,7 @@
         command="SetPlane" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="X Min"/>
          <Entry value="1" text="Y Min"/>
          <Entry value="2" text="Z Min"/>
@@ -1830,7 +1830,7 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain name="range"/>
+        <DoubleRangeDomain name="range" min="0"/>
         <BoundsDomain name="bounds">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
@@ -1843,7 +1843,7 @@
         command="SetVaryRadius" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Off"/>
          <Entry value="1" text="By Scalar"/>
          <Entry value="2" text="By Vector"/>
@@ -2273,7 +2273,7 @@
         command="SetScaleMode" 
         number_of_elements="1"
         default_values="1" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="scalar"/>
          <Entry value="1" text="vector"/>
          <Entry value="2" text="vector_components"/>
@@ -2460,7 +2460,7 @@
         command="SetMaximumPropagationUnit" 
         number_of_elements="1"
         default_values="1" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
        </EnumerationDomain>
@@ -2484,7 +2484,7 @@
         command="SetInitialIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
@@ -2504,7 +2504,7 @@
         command="SetIntegrationDirection" 
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="FORWARD"/>
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
@@ -2516,7 +2516,7 @@
         command="SetIntegratorType" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Runge-Kutta 2"/>
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
@@ -2536,7 +2536,7 @@
         command="SetMinimumIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
@@ -2556,7 +2556,7 @@
         command="SetMaximumIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
@@ -2632,7 +2632,7 @@
         command="SetPickCell" 
         number_of_elements="1"
         default_values="1" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Point"/>
          <Entry value="1" text="Cell"/>
        </EnumerationDomain>
@@ -2643,7 +2643,7 @@
         command="SetUseIdToPick" 
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="On"/>
          <Entry value="1" text="Off"/>
        </EnumerationDomain>
