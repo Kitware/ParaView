@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.1.2.1");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.1.2.2");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -245,7 +245,7 @@ int vtkKWDirectoryUtilities::FileIsDirectory(const char* name)
 }
 
 //----------------------------------------------------------------------------
-char** vtkKWDirectoryUtilities::GetSystemPath()
+const char*const* vtkKWDirectoryUtilities::GetSystemPath()
 {
   if(this->SystemPath)
     {

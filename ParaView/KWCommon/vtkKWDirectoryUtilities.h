@@ -39,6 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkKWDirectoryUtilities - Platform independent directory handling.
+// .SECTION Description
+// vtkKWDirectoryUtilities provides a set of tools for platform
+// independent handling of directories, environment variables, and
+// program locations.
 
 #ifndef __vtkKWDirectoryUtilities_h
 #define __vtkKWDirectoryUtilities_h
@@ -51,15 +56,52 @@ public:
   vtkTypeRevisionMacro(vtkKWDirectoryUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);  
   static vtkKWDirectoryUtilities* New();
-
+  
+  // Description:
+  // Get an environment variable with the given name.  Returns 0 if
+  // the variable does not exist.
   const char* GetEnv(const char* key);
+  
+  // Description:
+  // Get the current working directory.
   const char* GetCWD();
+  
+  // Description:
+  // Convert a path to UNIX-style slashes.  Backslashes are replaced
+  // with forward slashes.  Trailing slashes are removed, and leading
+  // tildas ("~") are replaced with the home directory if the HOME
+  // environment variable is set.
   const char* ConvertToUnixSlashes(const char* path);
+  
+  // Description:
+  // Tests the existence of a file.  Returns 1 for exists, 0 otherwise.
   int FileExists(const char* filename);
+  
+  // Description:
+  // Tests whether a file is a directory.  Returns 1 for yes, 0 for no.
   int FileIsDirectory(const char* name);
-  char** GetSystemPath();
+  
+  //BTX
+  
+  // Description:
+  // Get the system path from the PATH environment variable.  Returns
+  // an array of pointers to each path entry.  The list is terminated
+  // by a 0 pointer.
+  const char*const* GetSystemPath();
+  //ETX
+  
+  // Description:
+  // Find a program with the given name.  Returns the full path to the
+  // executable file, including its name.  If the program is not
+  // found, 0 is returned.
   const char* FindProgram(const char* name);
+  
+  // Description:
+  // Get the given directory in a simplified full path format.
   const char* CollapseDirectory(const char* dir);
+  
+  // Description:
+  // Find the location of the executable from the value of argv[0].
   const char* FindSelfPath(const char* argv0);
   
 protected:
