@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.24");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.25");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -410,7 +410,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         fontSize++;
         for (i = 0; i < 4; i++)
           {
-          this->TextMapper[i]->SetFontSize(fontSize);
+          this->TextMapper[i]->GetTextProperty()->SetFontSize(fontSize);
           this->TextMapper[i]->GetSize(viewport, tempi + i * 2);
           }
         height_02 = tempi[1] + tempi[5];
@@ -432,7 +432,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         fontSize--;
         for (i = 0; i < 4; i++)
           {
-          this->TextMapper[i]->SetFontSize(fontSize);
+          this->TextMapper[i]->GetTextProperty()->SetFontSize(fontSize);
           this->TextMapper[i]->GetSize(viewport, tempi + i * 2);
           }
         height_02 = tempi[1] + tempi[5];
