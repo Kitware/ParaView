@@ -172,7 +172,6 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
     help = label;
     }
   this->Application->SimpleScript(str.str());
-  cout << "Str: <<" << str.str() << ">>" << endl;
   delete [] str.str();
   this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
 	       label, help);
