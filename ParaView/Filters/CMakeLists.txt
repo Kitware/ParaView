@@ -5,9 +5,11 @@ SET(Filters_SRCS
   vtkBoxClipDataSet.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
+  vtkExtractCells.cxx
   vtkGroup.cxx
   vtkKdTree.cxx
   vtkMergeArrays.cxx
+  vtkMergeCells.cxx
   vtkMultiOut2.cxx
   vtkMultiOut3.cxx
   vtkMultiOut.cxx
@@ -29,6 +31,8 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
+  vtkPlanesIntersection.cxx
+  vtkPointsProjectedHull.cxx
   vtkStructuredCacheFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
@@ -40,12 +44,7 @@ IF(VTK_USE_MPI)
     vtkAllToNRedistributePolyData.cxx
     #vtkBalancedRedistributePolyData.cxx
     vtkDistributedDataFilter.cxx
-    vtkExtractCells.cxx
-    vtkKdTree.cxx
-    vtkMergeCells.cxx
     vtkPKdTree.cxx
-    vtkPlanesIntersection.cxx
-    vtkPointsProjectedHull.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
     )
