@@ -18,7 +18,7 @@ SET (ROLLUP_URL "http://${DROP_SITE}/cgi-bin/paraview-rollup-dashboard.sh")
 SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
 SET (CVS_WEB_CVSROOT "ParaView")
 SET (USE_DOXYGEN "On")
-SET (DOXYGEN_URL "http://${PROJECT_URL}/doc" )
+SET (DOXYGEN_URL "${PROJECT_URL}/doc" )
 SET (GNATS_WEB_URL "http://${DROP_SITE}/cgi-bin/gnatsweb.pl/ParaView")
 SET (USE_GNATS "On")
 
