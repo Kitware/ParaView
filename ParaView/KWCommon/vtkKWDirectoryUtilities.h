@@ -110,9 +110,17 @@ public:
   static const char* GetFilenameName(const char *filename, char *name);
 
   // Description:
-  // Extract the extension of a given filename and write it to 'ext'.
+  // Extract the extension of a given filename (excluding the dot '.')
+  // and write it to 'ext'.
   // Return a pointer to the extension (i.e. 'ext').
   static const char* GetFilenameExtension(const char *filename, char *ext);
+
+  // Description:
+  // Remove the extension of a given filename (including the dot '.') 
+  // and write it to 'name'.
+  // Return a pointer to the name (i.e. 'name').
+  static const char* GetFilenameWithoutExtension(
+    const char *filename, char *name);
 
   // Description:
   // Try to locate the file 'filename' in the directory 'dir'.
