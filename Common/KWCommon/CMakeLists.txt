@@ -19,7 +19,6 @@ SET( KWCommon_SRCS
   vtkCornerAnnotation.cxx
   vtkKWArguments.cxx
   vtkKWDirectoryUtilities.cxx
-  vtkKWEvent.cxx
   vtkKWGenericMovieWriter.cxx
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx

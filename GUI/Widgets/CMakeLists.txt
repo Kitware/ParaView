@@ -33,6 +33,8 @@ SET( KWWidgets_SRCS
   vtkKWDialog.cxx 
   vtkKWEntry.cxx 
   vtkKWEntrySet.cxx 
+  vtkKWEvent.cxx
+  vtkKWEventMap.cxx
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
   vtkKWGenericRenderWindowInteractor.cxx
@@ -135,6 +137,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWTkUtilities.cxx
   vtkKWWidgetCollection.cxx
   vtkKWWindowCollection.cxx
+  vtkKWEvent.cxx
   WRAP_EXCLUDE
   )
 
