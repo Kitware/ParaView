@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.216");
+vtkCxxRevisionMacro(vtkPVData, "1.217");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -136,6 +136,7 @@ vtkPVData::vtkPVData()
   this->TypeLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
+  this->MemorySizeLabel = vtkKWLabel::New();
   
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
   this->BoundsDisplay->ShowHideFrameOn();
@@ -233,6 +234,9 @@ vtkPVData::~vtkPVData()
   
   this->NumPointsLabel->Delete();
   this->NumPointsLabel = NULL;
+  
+  this->MemorySizeLabel->Delete();
+  this->MemorySizeLabel = NULL;
   
   this->BoundsDisplay->Delete();
   this->BoundsDisplay = NULL;
@@ -988,6 +992,9 @@ void vtkPVData::CreateProperties()
   this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
   this->NumPointsLabel->Create(this->Application, "");
   
+  this->MemorySizeLabel->SetParent(this->StatsFrame->GetFrame());
+  this->MemorySizeLabel->Create(this->Application, "");
+
   this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
   this->BoundsDisplay->Create(this->Application, "");
   
@@ -995,10 +1002,11 @@ void vtkPVData::CreateProperties()
   this->ExtentDisplay->Create(this->Application, "");
   this->ExtentDisplay->SetLabel("Extents");
   
-  this->Script("pack %s %s %s -side top -anchor nw",
+  this->Script("pack %s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
-               this->NumPointsLabel->GetWidgetName());
+               this->NumPointsLabel->GetWidgetName(),
+               this->MemorySizeLabel->GetWidgetName());
 
   this->Script("pack %s %s -fill x -expand t -pady 2", 
                this->StatsFrame->GetWidgetName(),
@@ -1155,6 +1163,11 @@ void vtkPVData::UpdatePropertiesInternal()
   this->NumPointsLabel->SetLabel(numpts.str());
   numpts.rdbuf()->freeze(0);
   
+  ostrstream memsize;
+  memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
+  this->NumCellsLabel->SetLabel(memsize.str());
+  memsize.rdbuf()->freeze(0);
+
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
   if (this->CubeAxesTclName)
@@ -1514,9 +1527,9 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
     }
 
   // Number of component restriction.
-  if (arrayInfo->GetNumberOfComponents() != 1 &&
-      arrayInfo->GetNumberOfComponents() != 3)
+  if (arrayInfo->GetNumberOfComponents() != 3)
     { // I would like to have two as an option also ...
+    // One component causes more trouble than it is worth.
     this->MapScalarsCheck->SetState(1);
     this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
@@ -1881,10 +1894,7 @@ void vtkPVData::SetAmbient(float ambient)
 
 
 //----------------------------------------------------------------------------
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// I would like to get rid of this method.  
-// It is no longer needed to set scalar range.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Set up the default UI values.  Data information is valid by this time.
 void vtkPVData::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1912,9 +1922,39 @@ void vtkPVData::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  if (this->GetPVSource()->GetDataInformation()->GetDataSetType() == VTK_POLY_DATA)
+  // Choose the representation based on the data.
+  // Polydata is always surface.
+  // Structured data is surface when 2d, outline when 3d.
+  int dataSetType = this->GetPVSource()->GetDataInformation()->GetDataSetType();
+  if (dataSetType == VTK_POLY_DATA)
     {
     this->SetRepresentation("Surface");
+    }
+  else if (dataSetType == VTK_STRUCTURED_GRID || 
+           dataSetType == VTK_RECTILINEAR_GRID ||
+           dataSetType == VTK_IMAGE_DATA)
+    {
+    int* ext = this->GetPVSource()->GetDataInformation()->GetExtent();
+    if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+      {
+      this->SetRepresentation("Surface");
+      }
+    else
+      {
+      this->SetRepresentation("Outline");
+      }
+    }
+  else if (dataSetType == VTK_UNSTRUCTURED_GRID)
+    {
+    if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() < 1000000)
+      {
+      this->SetRepresentation("Surface");
+      }
+    else
+      {
+      this->GetPVApplication()->GetMainWindow()->SetStatusText("Using outline for large unstructured grid.");
+      this->SetRepresentation("Outline");
+      }
     }
   else
     {

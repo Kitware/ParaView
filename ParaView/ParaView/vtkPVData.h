@@ -340,6 +340,7 @@ protected:
   vtkKWLabel *TypeLabel;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
+  vtkKWLabel *MemorySizeLabel;
   vtkKWLabel *ExtentLabel;
   
   vtkKWBoundsDisplay *BoundsDisplay;
