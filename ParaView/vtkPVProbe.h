@@ -86,10 +86,6 @@ public:
   virtual void AcceptCallback();
   
   // Description:
-  // Called when the delete button is pressed.
-  virtual void DeleteCallback();
-
-  // Description:
   // Callbacks for Dimensionality menu
   void UsePoint();
   void UseLine();

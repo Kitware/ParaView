@@ -116,6 +116,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
+  int numMenus, i;
   
   // Before we do anything, let see if we can determine the output type.
   outputDataType = this->GetOutputClassName();
@@ -323,6 +324,27 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvd->Delete();
 
   ++this->InstanceCount;
+
+  this->Script("%s index end", this->PVWindow->GetMenu()->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->PVWindow->GetMenu()->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->PVWindow->GetCalculatorButton()->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->PVWindow->GetThresholdButton()->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->PVWindow->GetContourButton()->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->PVWindow->GetGlyphButton()->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->PVWindow->GetProbeButton()->GetWidgetName());  
+  
   return pvs;
 } 
 

@@ -892,6 +892,8 @@ void vtkPVSource::AcceptCallback()
   char methodAndArg[256];
   int numSources;
   vtkPVSource *source;
+  int numMenus;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   window = this->GetWindow();
 
@@ -975,6 +977,26 @@ void vtkPVSource::AcceptCallback()
 #else
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif
+
+
+  this->Script("%s index end", window->GetMenu()->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state normal",
+                 window->GetMenu()->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state normal",
+               window->GetCalculatorButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetThresholdButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetContourButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetGlyphButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetProbeButton()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1004,10 +1026,12 @@ void vtkPVSource::DeleteCallback()
 {
   vtkPVData *ac;
   vtkPVSource *prev;
-  int i;
+  int i, numMenus;
   int numSources;
   char methodAndArg[256];
   vtkPVSource *source;
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   if ( ! this->Initialized)
     {
@@ -1087,6 +1111,25 @@ void vtkPVSource::DeleteCallback()
 
   // I hope this will delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
+
+  this->Script("%s index end", window->GetMenu()->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state normal",
+                 window->GetMenu()->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state normal",
+               window->GetCalculatorButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetThresholdButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetContourButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetGlyphButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetProbeButton()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

@@ -1006,6 +1006,7 @@ void vtkPVWindow::CalculatorCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
+  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1056,6 +1057,26 @@ void vtkPVWindow::CalculatorCallback()
   pvd->Delete();
   
   ++instanceCount;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1070,6 +1091,7 @@ void vtkPVWindow::ThresholdCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
+  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1121,6 +1143,26 @@ void vtkPVWindow::ThresholdCallback()
   pvd->Delete();
   
   ++instanceCount;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1135,6 +1177,7 @@ void vtkPVWindow::ContourCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
+  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1190,6 +1233,26 @@ void vtkPVWindow::ContourCallback()
   pvd->Delete();
   
   ++instanceCount;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1204,6 +1267,7 @@ void vtkPVWindow::GlyphCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
+  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1256,6 +1320,26 @@ void vtkPVWindow::GlyphCallback()
   pvd->Delete();
   
   ++instanceCount;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

@@ -429,12 +429,13 @@ void vtkPVProbe::SetInteractor()
 
 void vtkPVProbe::AcceptCallback()
 {
+  int i;
+
   // call the superclass's method
   this->vtkPVSource::AcceptCallback();
   
   vtkPVWindow *window = this->GetWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numMenus, i;
   
   if (this->Dimensionality == 0)
     {
@@ -539,25 +540,6 @@ void vtkPVProbe::AcceptCallback()
 		 this->XYPlotTclName);
     this->GetWindow()->GetMainView()->Render();
     }
-
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
-  this->Script("%s configure -state normal",
-               window->GetCalculatorButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetThresholdButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetContourButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetGlyphButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetProbeButton()->GetWidgetName());
 }
 
 void vtkPVProbe::UpdateProbe()
@@ -730,35 +712,6 @@ void vtkPVProbe::Deselect(vtkKWView *view)
     }
   
   this->vtkPVSource::Deselect(view);
-}
-
-void vtkPVProbe::DeleteCallback()
-{
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  int i, numMenus;
-  
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
-  this->Script("%s configure -state normal",
-               window->GetCalculatorButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetThresholdButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetContourButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetGlyphButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetProbeButton()->GetWidgetName()); 
-
-  // call the superclass
-  this->vtkPVSource::DeleteCallback();  
 }
 
 void vtkPVProbe::UsePoint()
