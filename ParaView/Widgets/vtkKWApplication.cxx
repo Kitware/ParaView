@@ -74,7 +74,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.102");
+vtkCxxRevisionMacro(vtkKWApplication, "1.103");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -88,6 +88,8 @@ vtkKWApplication::vtkKWApplication()
   this->CommandFunction = vtkKWApplicationCommand;
   
   this->ApplicationName = vtkString::Duplicate("Kitware");
+  this->MajorVersion = 1;
+  this->MinorVersion = 0;
   this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
   this->ApplicationReleaseName = vtkString::Duplicate("unknown");
   
@@ -1131,6 +1133,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ApplicationName: " << this->GetApplicationName() << endl;
+  os << indent << "MajorVersion: " << this->MajorVersion << endl;
+  os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "ApplicationReleaseName: " 
      << this->GetApplicationReleaseName() << endl;
   os << indent << "ApplicationVersionName: " 

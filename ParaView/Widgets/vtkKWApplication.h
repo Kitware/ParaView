@@ -126,6 +126,12 @@ public:
   vtkGetStringMacro(ApplicationName);
 
   // Description:
+  // ParaView version is always MajorVersion.MinorVersion.
+  // Change these in the constructor.
+  vtkGetMacro(MajorVersion, int);
+  vtkGetMacro(MinorVersion, int);
+
+  // Description:
   // Set/Get the ApplicationVersionName - this is the name + version number
   void SetApplicationVersionName(const char *);
   vtkGetStringMacro(ApplicationVersionName);
@@ -282,9 +288,12 @@ protected:
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
   vtkKWWindowCollection *Windows;
+
   char *ApplicationName;
   char *ApplicationVersionName;
   char *ApplicationReleaseName;
+  int MajorVersion;
+  int MinorVersion;
 
   // For Balloon help
   vtkKWWidget *BalloonHelpWindow;
