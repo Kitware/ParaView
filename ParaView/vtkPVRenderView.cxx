@@ -296,7 +296,7 @@ void vtkPVRenderViewEndRender(void *arg)
     {
     pdata = new float[numPixels];
     zdata = new float[numPixels];
-    vtkTreeComposite(rv->GetRenderWindow(), controller, 0, zdata, pdata);
+    vtkTreeComposite(rv->GetRenderWindow(), controller, 1, zdata, pdata);
     
     delete [] zdata;
     delete [] pdata;    
@@ -848,7 +848,7 @@ void vtkPVRenderView::RenderHack()
     float *pdata, *zdata;
     pdata = new float[numPixels];
     zdata = new float[numPixels];
-    vtkTreeComposite(renWin, controller, 0, zdata, pdata);
+    vtkTreeComposite(renWin, controller, 1, zdata, pdata);
     delete [] zdata;
     delete [] pdata;
     }
