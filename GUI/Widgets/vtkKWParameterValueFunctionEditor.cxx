@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.31");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.32");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -117,7 +117,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->SetValueTicksFormat(this->GetParameterTicksFormat());
   this->ParameterEntryFormat        = NULL;
 
-#if 1
+#if 0
   this->FrameBackgroundColor[0]     = 0.25;
   this->FrameBackgroundColor[1]     = 0.56;
   this->FrameBackgroundColor[2]     = 0.77;
