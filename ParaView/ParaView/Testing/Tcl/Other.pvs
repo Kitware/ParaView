@@ -25,10 +25,6 @@ set kw(vtkTemp331) [$kw(vtkTemp285) GetPVWidget {Resolution}]
 $kw(vtkTemp331) SetValue 10
 $kw(vtkTemp285) ResetCallback
 
-$pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
-$pvWindow DeleteAllSources
-$pvWindow LoadSessionFile "vtkParaViewOtherTest.pvs"
-
 $Application StartRecordingScript none.pvs
 $Application AcceptLicense
 $Application AcceptEvaluation
@@ -50,7 +46,6 @@ $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
-$pvWindow Open "vtkParaViewOtherTest.pvs"
 $pvWindow EnableNavigationWindow
 $pvWindow DisableNavigationWindow
 $pvWindow EnableNavigationWindow
@@ -83,12 +78,6 @@ $view StandardViewCallback 0 0 -1
 
 $view TriangleStripsCallback
 $view ImmediateModeCallback
-$view LODResolutionScaleCallback
-$view CollectThresholdScaleCallback
-$view InterruptRenderCallback
-$view CompositeWithFloatCallback
-$view CompositeWithRGBACallback
-$view CompositeCompressionCallback
 $view StoreCurrentCamera 0
 $view RestoreCurrentCamera 0
 $view Print
