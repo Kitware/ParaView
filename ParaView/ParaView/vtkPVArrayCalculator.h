@@ -47,12 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVArrayCalculator_h
 
 #include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVStringEntry.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkArrayCalculator.h"
+
+class vtkKWLabel;
+class vtkKWLabeledFrame;
+class vtkKWMenuButton;
+class vtkKWOptionMenu;
+class vtkKWPushButton;
+class vtkKWWidget;
+class vtkPVStringEntry;
 
 class VTK_EXPORT vtkPVArrayCalculator : public vtkPVSource
 {

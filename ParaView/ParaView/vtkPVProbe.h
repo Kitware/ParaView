@@ -47,13 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProbe_h
 
 #include "vtkPVSource.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWRadioButton.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkPVData.h"
-#include "vtkPVArrayMenu.h"
 
+class vtkKWCheckButton;
+class vtkKWLabel;
+class vtkKWLabel;
+class vtkKWLabeledEntry;
+class vtkKWOptionMenu;
+class vtkKWWidget;
+class vtkPVArrayMenu;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {

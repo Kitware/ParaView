@@ -56,6 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSource.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWCheckButton.h"
+#include "vtkPVData.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
