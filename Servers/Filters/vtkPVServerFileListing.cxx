@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.3");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -299,8 +299,15 @@ int vtkPVServerFileListing::FileIsDirectory(const char* dirname)
 int vtkPVServerFileListing::FileIsReadable(const char* name)
 {
 #if defined(_WIN32)
+  // If the INVALID_FILE_ATTRIBUTES macro is not available then
+  // GetFileAttributes returns 0xFFFFFFFF on failure.  It is safe to
+  // just define this macro here because this is the end of a .cxx file.
+# ifndef INVALID_FILE_ATTRIBUTES
+#  define INVALID_FILE_ATTRIBUTES 0xFFFFFFFF
+# endif
   DWORD atts = GetFileAttributes(name);
-  if((atts & FILE_ATTRIBUTE_NORMAL) ||
+  if((atts != INVALID_FILE_ATTRIBUTES) &&
+     (atts & FILE_ATTRIBUTE_NORMAL) ||
      (!(atts & FILE_ATTRIBUTE_HIDDEN) &&
       !(atts & FILE_ATTRIBUTE_SYSTEM) &&
       !(atts & FILE_ATTRIBUTE_DIRECTORY)))
