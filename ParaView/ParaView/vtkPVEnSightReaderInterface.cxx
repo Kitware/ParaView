@@ -179,7 +179,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
         outputTclName, tclName, i);
       }
     pvd = vtkPVData::New();
-    pvd->SetApplication(pvApp);
+    pvd->SetPVApplication(pvApp);
     pvd->SetVTKData(d, outputTclName);
 
     pvs = vtkPVSource::New();

@@ -61,7 +61,12 @@ public:
   // Description:
   // This also creates the parallel vtk objects for the composite.
   // (actor, mapper, ...)
-  void SetApplication(vtkPVApplication *pvApp);
+  void SetPVApplication(vtkPVApplication *pvApp);
+  
+  void SetApplication(vtkKWApplication *)
+    {
+      vtkErrorMacro("vtkPVData::SetApplication should not be used. Use SetPVApplcation instead.");
+    }
   
   // Description:
   // Just like in vtk data objects, this method makes a data object

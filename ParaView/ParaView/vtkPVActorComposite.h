@@ -130,13 +130,6 @@ public:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
 
-  virtual void SetApplication(vtkPVApplication *pvApp)
-    {this->vtkKWActorComposite::SetApplication(pvApp);}
-  virtual void SetApplication(vtkKWApplication *a) 
-    {a=a;vtkErrorMacro("Hidden Method");}
-
-
-  
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
   // Description:

@@ -196,7 +196,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", this->RootName, this->InstanceCount);
   // Create the object through tcl on all processes.
   d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));

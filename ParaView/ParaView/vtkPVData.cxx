@@ -96,7 +96,7 @@ vtkPVData* vtkPVData::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetApplication(vtkPVApplication *pvApp)
+void vtkPVData::SetPVApplication(vtkPVApplication *pvApp)
 {
   this->CreateParallelTclObjects(pvApp);
   this->vtkPVActorComposite::SetApplication(pvApp);

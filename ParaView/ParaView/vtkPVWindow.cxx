@@ -707,7 +707,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   //pvs->CreateProperties();
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   // Create the object through tcl on all processes.
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphArrowOutput"));
   pvd->SetVTKData(d, "pvGlyphArrowOutput");
@@ -731,7 +731,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   //pvs->CreateProperties();
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   // Create the object through tcl on all processes.
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphConeOutput"));
   pvd->SetVTKData(d, "pvGlyphConeOutput");
@@ -755,7 +755,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   //pvs->CreateProperties();
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   // Create the object through tcl on all processes.
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphSphereOutput"));
   pvd->SetVTKData(d, "pvGlyphSphereOutput");
@@ -1660,7 +1660,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "Calculator", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -1743,7 +1743,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "CutPlane", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -1821,7 +1821,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "Threshold", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -1904,7 +1904,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "ClipPlane", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -1989,7 +1989,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "Contour", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -2067,7 +2067,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "Glyph", instanceCount);
   // Create the object through tcl on all processes.
 
@@ -2145,7 +2145,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
   sprintf(tclName, "%sOutput%d", "Probe", instanceCount);
   // Create the object through tcl on all processes.
 

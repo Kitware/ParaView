@@ -167,7 +167,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
   // Create the output.
   pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
+  pvd->SetPVApplication(pvApp);
 
   outputTclName = new char[strlen(tclName)+7+10];
   sprintf(outputTclName, "%sOutput", tclName);
