@@ -41,33 +41,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVProbe.h"
 
-#include "vtkArrayMap.txx"
 #include "vtkIdTypeArray.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWCompositeCollection.h"
-#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
 #include "vtkKWOptionMenu.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVLineWidget.h"
-#include "vtkPVPointWidget.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkSource.h"
-#include "vtkStringList.h"
+#include "vtkString.h"
 #include "vtkTclUtil.h"
+#include "vtkSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.69");
+vtkCxxRevisionMacro(vtkPVProbe, "1.70");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -83,37 +77,14 @@ vtkPVProbe::vtkPVProbe()
 
   this->ScalarArrayMenu = vtkPVArrayMenu::New();
 
-  this->DimensionalityMenu = vtkKWOptionMenu::New();
-  this->DimensionalityLabel = vtkKWLabel::New();
-  
   this->SelectedPointFrame = vtkKWWidget::New();
   this->SelectedPointLabel = vtkKWLabel::New();
-  this->SelectedXEntry = vtkKWLabeledEntry::New();
-  this->SelectedYEntry = vtkKWLabeledEntry::New();
-  this->SelectedZEntry = vtkKWLabeledEntry::New();
   this->PointDataLabel = vtkKWLabel::New();
   
-  this->EndPoint1Frame = vtkKWWidget::New();
-  this->EndPoint1Label = vtkKWLabel::New();
-  this->End1XEntry = vtkKWLabeledEntry::New();
-  this->End1YEntry = vtkKWLabeledEntry::New();
-  this->End1ZEntry = vtkKWLabeledEntry::New();
-  
-  this->EndPoint2Frame = vtkKWWidget::New();
-  this->EndPoint2Label = vtkKWLabel::New();
-  this->End2XEntry = vtkKWLabeledEntry::New();
-  this->End2YEntry = vtkKWLabeledEntry::New();
-  this->End2ZEntry = vtkKWLabeledEntry::New();
-  
-  this->DivisionsEntry = vtkKWLabeledEntry::New();
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
 
-  this->LineWidget = vtkPVLineWidget::New();
-  this->PointWidget = vtkPVPointWidget::New();
   
   this->ProbeFrame = vtkKWWidget::New();
-
-  this->Dimensionality = -1;
   
   this->XYPlotTclName = NULL;
   
@@ -123,65 +94,18 @@ vtkPVProbe::vtkPVProbe()
   
   this->ReplaceInputOff();
   this->InputMenu = 0;
-  this->NumberOfLineDivisions = 10;
-  int cc;
-  for ( cc = 0; cc < 3; cc ++ )
-    {
-    this->EndPoint1[cc] = 0;
-    this->EndPoint2[cc] = 0;
-    this->PointPosition[cc] = 0;
-    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVProbe::~vtkPVProbe()
 {
-  this->DimensionalityLabel->Delete();
-  this->DimensionalityLabel = NULL;
-  this->DimensionalityMenu->Delete();
-  this->DimensionalityMenu = NULL;
-  
   this->SelectedPointLabel->Delete();
   this->SelectedPointLabel = NULL;
-  this->SelectedXEntry->Delete();
-  this->SelectedXEntry = NULL;
-  this->SelectedYEntry->Delete();
-  this->SelectedYEntry = NULL;
-  this->SelectedZEntry->Delete();
-  this->SelectedZEntry = NULL;
   this->SelectedPointFrame->Delete();
   this->SelectedPointFrame = NULL;
   this->PointDataLabel->Delete();
-  this->PointDataLabel = NULL;
-
-  this->EndPoint1Label->Delete();
-  this->EndPoint1Label = NULL;
-  this->End1XEntry->Delete();
-  this->End1XEntry = NULL;
-  this->End1YEntry->Delete();
-  this->End1YEntry = NULL;
-  this->End1ZEntry->Delete();
-  this->End1ZEntry = NULL;
-  this->EndPoint1Frame->Delete();
-  this->EndPoint1Frame = NULL;
+  this->PointDataLabel = NULL;  
   
-  this->EndPoint2Label->Delete();
-  this->EndPoint2Label = NULL;
-  this->End2XEntry->Delete();
-  this->End2XEntry = NULL;
-  this->End2YEntry->Delete();
-  this->End2YEntry = NULL;
-  this->End2ZEntry->Delete();
-  this->End2ZEntry = NULL;
-  this->EndPoint2Frame->Delete();
-  this->EndPoint2Frame = NULL;
-  
-  this->LineWidget->Delete();
-  this->PointWidget->Delete();
-  
-  this->DivisionsEntry->Delete();
-  this->DivisionsEntry = NULL;
-
   this->ShowXYPlotToggle->Delete();
   this->ShowXYPlotToggle = NULL;
   
@@ -230,8 +154,6 @@ void vtkPVProbe::UpdateScalars()
 //----------------------------------------------------------------------------
 void vtkPVProbe::CreateProperties()
 {
-  float bounds[6];
-  vtkKWWidget *frame;
   vtkPVApplication* pvApp = this->GetPVApplication();
   char tclName[100];
   
@@ -264,35 +186,14 @@ void vtkPVProbe::CreateProperties()
     this->ScalarArrayMenu->SetInputMenu(this->InputMenu);
     }
 
+  this->Script("pack %s", this->ScalarArrayMenu->GetWidgetName());
+  this->ScalarArrayMenu->Update();
 
-  frame = vtkKWWidget::New();
-  frame->SetParent(this->GetParameterFrame()->GetFrame());
-  frame->Create(pvApp, "frame", "");
-  
-  this->DimensionalityLabel->SetParent(frame);
-  this->DimensionalityLabel->Create(pvApp, "");
-  this->DimensionalityLabel->SetLabel("Probe Dimensionality:");
-  
-  this->DimensionalityMenu->SetParent(frame);
-  this->DimensionalityMenu->Create(pvApp, "");
-  this->DimensionalityMenu->AddEntryWithCommand("Point", this, "UsePoint");
-  this->DimensionalityMenu->AddEntryWithCommand("Line", this, "UseLine");
-  this->DimensionalityMenu->SetValue("Point");
-  
-  this->Script("pack %s %s -side left",
-               this->DimensionalityLabel->GetWidgetName(),
-               this->DimensionalityMenu->GetWidgetName());
-  
-  this->GetPVInput()->GetBounds(bounds);
-  
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
   
-  this->Script("pack %s %s",
-               frame->GetWidgetName(),
+  this->Script("pack %s",
                this->ProbeFrame->GetWidgetName());
-  
-  frame->Delete();
 
   // widgets for points
   this->SelectedPointFrame->SetParent(this->ProbeFrame);
@@ -303,184 +204,22 @@ void vtkPVProbe::CreateProperties()
   this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
   this->SelectedPointLabel->Create(pvApp, "");
   this->SelectedPointLabel->SetLabel("Point");
-  this->SelectedXEntry->SetParent(this->SelectedPointFrame);
-  this->SelectedXEntry->Create(pvApp);
-  this->SelectedXEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->SelectedXEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->SelectedXEntry->GetEntry()->GetWidgetName());
-  this->SelectedXEntry->SetValue((bounds[0]+bounds[1])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
-               this->SelectedXEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  
-  this->SelectedYEntry->SetParent(this->SelectedPointFrame);
-  this->SelectedYEntry->Create(pvApp);
-  this->SelectedYEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->SelectedYEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->SelectedYEntry->GetEntry()->GetWidgetName());
-  this->SelectedYEntry->SetValue((bounds[2]+bounds[3])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
-               this->SelectedYEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
 
-  this->SelectedZEntry->SetParent(this->SelectedPointFrame);
-  this->SelectedZEntry->Create(pvApp);
-  this->SelectedZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->SelectedZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->SelectedZEntry->GetEntry()->GetWidgetName());
-  this->SelectedZEntry->SetValue((bounds[4]+bounds[5])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
-               this->SelectedZEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("pack %s %s %s %s -side left",
-               this->SelectedPointLabel->GetWidgetName(),
-               this->SelectedXEntry->GetWidgetName(),
-               this->SelectedYEntry->GetWidgetName(),
-               this->SelectedZEntry->GetWidgetName());
+  this->Script("pack %s -side left",
+               this->SelectedPointLabel->GetWidgetName());
   
   this->PointDataLabel->SetParent(this->ProbeFrame);
   this->PointDataLabel->Create(pvApp, "");
 
-  // widgets for lines
-  this->EndPoint1Frame->SetParent(this->ProbeFrame);
-  this->EndPoint1Frame->Create(pvApp, "frame", "");
-  
-  this->EndPoint1Label->SetParent(this->EndPoint1Frame);
-  this->EndPoint1Label->Create(pvApp, "");
-  this->EndPoint1Label->SetLabel("End Point 1");
-  this->End1XEntry->SetParent(this->EndPoint1Frame);
-  this->End1XEntry->Create(pvApp);
-  this->End1XEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End1XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End1XEntry->GetEntry()->GetWidgetName());
-  this->End1XEntry->SetValue((bounds[0]+bounds[1])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
-               this->End1XEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->End1YEntry->SetParent(this->EndPoint1Frame);
-  this->End1YEntry->Create(pvApp);
-  this->End1YEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End1YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End1YEntry->GetEntry()->GetWidgetName());
-  this->End1YEntry->SetValue((bounds[2]+bounds[3])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
-               this->End1YEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->End1ZEntry->SetParent(this->EndPoint1Frame);
-  this->End1ZEntry->Create(pvApp);
-  this->End1ZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End1ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End1ZEntry->GetEntry()->GetWidgetName());
-  this->End1ZEntry->SetValue((bounds[4]+bounds[5])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
-               this->End1ZEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("pack %s %s %s %s -side left",
-               this->EndPoint1Label->GetWidgetName(),
-               this->End1XEntry->GetWidgetName(),
-               this->End1YEntry->GetWidgetName(),
-               this->End1ZEntry->GetWidgetName());
-  
-  this->EndPoint2Frame->SetParent(this->ProbeFrame);
-  this->EndPoint2Frame->Create(pvApp, "frame", "");
-  
-  this->EndPoint2Label->SetParent(this->EndPoint2Frame);
-  this->EndPoint2Label->Create(pvApp, "");
-  this->EndPoint2Label->SetLabel("End Point 2");
-  this->End2XEntry->SetParent(this->EndPoint2Frame);
-  this->End2XEntry->Create(pvApp);
-  this->End2XEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End2XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End2XEntry->GetEntry()->GetWidgetName());
-  this->End2XEntry->SetValue((bounds[0]+bounds[1])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
-               this->End2XEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->End2YEntry->SetParent(this->EndPoint2Frame);
-  this->End2YEntry->Create(pvApp);
-  this->End2YEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End2YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End2YEntry->GetEntry()->GetWidgetName());
-  this->End2YEntry->SetValue((bounds[2]+bounds[3])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
-               this->End2YEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->End2ZEntry->SetParent(this->EndPoint2Frame);
-  this->End2ZEntry->Create(pvApp);
-  this->End2ZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->End2ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  this->Script("%s configure -width 10",
-               this->End2ZEntry->GetEntry()->GetWidgetName());
-  this->End2ZEntry->SetValue((bounds[4]+bounds[5])*0.5, 4);
-  this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
-               this->End2ZEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("pack %s %s %s %s -side left",
-               this->EndPoint2Label->GetWidgetName(),
-               this->End2XEntry->GetWidgetName(),
-               this->End2YEntry->GetWidgetName(),
-               this->End2ZEntry->GetWidgetName());
-  
-  this->DivisionsEntry->SetParent(this->ProbeFrame);
-  this->DivisionsEntry->Create(pvApp);
-  this->DivisionsEntry->SetLabel("Number of Line Divisions:");
-  this->DivisionsEntry->SetValue(10);
-  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
-               this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
-  
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
   this->ShowXYPlotToggle->Create(pvApp, "-text \"Show XY-Plot\"");
   this->ShowXYPlotToggle->SetState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToRed}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
 
-  this->LineWidget->SetPVSource(this);
-  this->LineWidget->SetParent(this->ProbeFrame);
-  this->LineWidget->Create(pvApp);
-  this->AddPVWidget(this->LineWidget);
-  this->LineWidget->SetModifiedCommand(this->GetTclName(),
-                                       "SetAcceptButtonColorToRed");
-  this->LineWidget->SetObjectTclName(this->GetTclName());
-  this->LineWidget->SetPoint1VariableName("EndPoint1");
-  this->LineWidget->SetPoint2VariableName("EndPoint2");
-  this->LineWidget->SetResolutionVariableName("NumberOfLineDivisions");
+  this->Script("pack %s",
+               this->ShowXYPlotToggle->GetWidgetName());
 
-  this->PointWidget->SetPVSource(this);
-  this->PointWidget->SetParent(this->ProbeFrame);
-  this->PointWidget->Create(pvApp);
-  this->AddPVWidget(this->PointWidget);
-  this->PointWidget->SetModifiedCommand(this->GetTclName(),
-                                       "SetAcceptButtonColorToRed");
-  this->PointWidget->SetObjectVariable(this->GetTclName(), "PointPosition");
-  
-  this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
-
-  this->UsePoint();
-  
   sprintf(tclName, "XYPlot%d", this->InstanceCount);
   this->SetXYPlotTclName(tclName);
   pvApp->BroadcastScript("vtkXYPlotActor %s", this->XYPlotTclName);
@@ -491,14 +230,9 @@ void vtkPVProbe::CreateProperties()
   this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
   this->Script("%s SetXTitle {Line Divisions}", this->XYPlotTclName);
 
-  this->SetEndPoint1(bounds[0], bounds[2], bounds[4]);
-  this->SetEndPoint2(bounds[1], bounds[3], bounds[5]);
-  this->SetPointPosition((bounds[0]+bounds[1])/2, 
-                         (bounds[2]+bounds[3])/2, 
-                         (bounds[4]+bounds[5])/2);
-  this->SetNumberOfLineDivisions(10);
-  this->LineWidget->PlaceWidget();
-  this->PointWidget->PlaceWidget();
+  pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
+                        this->GetVTKSourceTclName());
+                        
 }
 
 //----------------------------------------------------------------------------
@@ -508,9 +242,6 @@ void vtkPVProbe::AcceptCallbackInternal()
   const char *arrayName = this->ScalarArrayMenu->GetValue();
   int component;
   
-  this->LineWidget->Accept();
-  this->PointWidget->Accept();
-
   // This can't be an accept command because this calls SetInput for
   // the vtkProbeFilter, and vtkPVSource::AcceptCallbackInternal
   // expects that the input has already been set.
@@ -518,39 +249,32 @@ void vtkPVProbe::AcceptCallbackInternal()
   
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->Dimensionality == 0)
-    {
-    pvApp->AddTraceEntry("$kw(%s) UsePoint", this->GetTclName());
-    }
-  else
-    {
-    pvApp->AddTraceEntry("$kw(%s) UseLine", this->GetTclName());
-    pvApp->AddTraceEntry("$kw(%s) UpdateScalars", this->GetTclName());
-    pvApp->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
-                         this->GetTclName(),
-                         this->ShowXYPlotToggle->GetState());
-    }
+  pvApp->AddTraceEntry("$kw(%s) UpdateScalars", this->GetTclName());
+  pvApp->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
+                       this->GetTclName(),
+                       this->ShowXYPlotToggle->GetState());
   
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
   
   vtkPVWindow *window = this->GetPVWindow();
   
-  if (this->Dimensionality == 0)
+  int error;
+  vtkPolyData *probeOutput = (vtkPolyData *)
+    (vtkTclGetPointerFromObject(this->GetNthPVOutput(0)->GetVTKDataTclName(),
+                                "vtkPolyData", pvApp->GetMainInterp(),
+                                error));
+
+  vtkPointData *pd = probeOutput->GetPointData();
+    
+  int numArrays = pd->GetNumberOfArrays();
+  vtkDataArray *array;
+
+  if (this->GetDimensionality() == 0)
     {
     // update the ui to see the point data for the probed point
-    int error;
-    vtkPolyData *probeOutput = (vtkPolyData *)
-      (vtkTclGetPointerFromObject(this->GetNthPVOutput(0)->GetVTKDataTclName(),
-                                  "vtkPolyData", pvApp->GetMainInterp(),
-                                  error));
-
-    vtkPointData *pd = probeOutput->GetPointData();
-    
-    int numArrays = pd->GetNumberOfArrays();
     
     vtkIdType j, numComponents;
-    vtkDataArray *array;
     char label[256]; // this may need to be longer
     char arrayData[256];
     char tempArray[32];
@@ -597,38 +321,65 @@ void vtkPVProbe::AcceptCallbackInternal()
         }
       }
     this->PointDataLabel->SetLabel(label);
+    this->Script("pack %s", this->PointDataLabel->GetWidgetName());
     }
-  else if (this->Dimensionality == 1)
+  else if (this->GetDimensionality() == 1)
     {
-    component = this->ScalarArrayMenu->GetSelectedComponent();
-    if (component > 1)
-      {
-      this->Script("%s SetYTitle {%s %d}", this->XYPlotTclName, 
-                   arrayName, component);
-      }
-    else
-      {
-      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, arrayName);
-      }
+    this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
     this->Script("%s RemoveAllInputs", this->XYPlotTclName);
-    this->Script("%s AddInput %s %s %d", this->XYPlotTclName,
-                 this->GetPVOutput()->GetVTKDataTclName(), 
-                 arrayName, component);
-        
-    // Color by the choosen array in the output.
+    component = this->ScalarArrayMenu->GetSelectedComponent();
+    this->Script("%s SetYTitle {}", this->XYPlotTclName);
+      
+    this->Script("%s PlotPointsOn", this->XYPlotTclName);
+    this->Script("%s PlotLinesOn", this->XYPlotTclName);
+    this->Script("[%s GetProperty] SetColor 1 .8 .8", this->XYPlotTclName);
+    this->Script("[%s GetProperty] SetPointSize 2", this->XYPlotTclName);
+    this->Script("%s SetLegendPosition 0.4 0.6", this->XYPlotTclName);
+    this->Script("%s SetLegendPosition2 0.5 0.25", this->XYPlotTclName);
+    
+    float cstep = 1.0 / numArrays;
+    float ccolor = 0;
+    for ( i = 0; i < numArrays; i++)
+      {
+      array = pd->GetArray(i);
+      arrayName = array->GetName();
+      this->Script("%s AddInput %s %s %d", this->XYPlotTclName,
+                   this->GetPVOutput()->GetVTKDataTclName(), 
+                   arrayName, component);
+      this->Script("%s SetPlotLabel %d \"%s\"", this->XYPlotTclName, i, arrayName);
+      float r, g, b;
+      this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
+      this->Script("%s SetPlotColor %d %f %f %f", 
+                   this->XYPlotTclName, i,
+                   r, g, b);
+      ccolor += cstep;
+      
+      // Color by the choosen array in the output.
+      // The menu's not changing, but It is going to replaced soon.
+      // For now I will put this here.
+      char tmp[256];
+      sprintf(tmp, "Point %s %d", arrayName, component);
+      this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
+      }
     this->GetPVOutput()->ColorByPointFieldComponent(arrayName, component);
-    // The menu's not changing, but It is going to replaced soon.
-    // For now I will put this here.
-    char tmp[256];
-    sprintf(tmp, "Point %s %d", arrayName, component);
-    this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
-
+    
+    if ( numArrays > 1 )
+      {
+      this->Script("%s LegendOn", this->XYPlotTclName);
+      }
+    else 
+      {
+      this->Script("%s LegendOff", this->XYPlotTclName);
+      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, arrayName);
+      this->Script("%s SetPlotColor 0 1 1 1", this->XYPlotTclName);
+     }
     if (this->ShowXYPlotToggle->GetState())
       {
       this->Script("%s AddActor %s",
                    window->GetMainView()->GetRendererTclName(),
                    this->XYPlotTclName);
       }
+    
     window->GetMainView()->Render();
     }
 }
@@ -649,54 +400,7 @@ void vtkPVProbe::UpdateProbe()
     {
     vtkErrorMacro("No vtkMultiProcessController");
     return;
-    }
-  
-  vtkPolyData *probeOutput, *remoteProbeOutput = vtkPolyData::New();
-  int error, i, k, numProcs, numComponents;
-  vtkIdType numPoints;
-  vtkIdType numRemotePoints = 0;
-  vtkIdType j, pointId;
-  vtkIdTypeArray *validPoints = vtkIdTypeArray::New();
-  vtkPointData *pointData, *remotePointData;
-  float *tuple;
-  char *outputTclName;
-  
-  if (this->Dimensionality == 0)
-    {
-    pvApp->BroadcastScript("vtkPolyData probeInput");
-    pvApp->BroadcastScript("vtkIdList pointList");
-    pvApp->BroadcastScript("pointList Allocate 1 1");
-    pvApp->BroadcastScript("pointList InsertNextId 0");
-    pvApp->BroadcastScript("vtkPoints points");
-    pvApp->BroadcastScript("points Allocate 1 1");
-    pvApp->BroadcastScript("points InsertNextPoint %f %f %f",
-                           this->PointPosition[0],
-                           this->PointPosition[1],
-                           this->PointPosition[2]);
-    pvApp->BroadcastScript("probeInput Allocate 1 1");
-    pvApp->BroadcastScript("probeInput SetPoints points");
-    pvApp->BroadcastScript("probeInput InsertNextCell 1 pointList");
-    pvApp->BroadcastScript("%s SetInput probeInput",
-                           this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("pointList Delete");
-    pvApp->BroadcastScript("points Delete");
-    pvApp->BroadcastScript("probeInput Delete");
-    }
-  else if (this->Dimensionality == 1)
-    {
-    pvApp->BroadcastScript("vtkLineSource line");
-    pvApp->BroadcastScript("line SetPoint1 %f %f %f",
-                           this->EndPoint1[0], this->EndPoint1[1],
-                           this->EndPoint1[2]);
-    pvApp->BroadcastScript("line SetPoint2 %f %f %f",
-                           this->EndPoint2[0], this->EndPoint2[1],
-                           this->EndPoint2[2]);
-    pvApp->BroadcastScript("line SetResolution %d",
-                           this->NumberOfLineDivisions);
-    pvApp->BroadcastScript("%s SetInput [line GetOutput]",
-                           this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("line Delete");  
-    }
+    }  
 
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
                this->GetPVRenderView()->GetRendererTclName(),
@@ -709,54 +413,11 @@ void vtkPVProbe::UpdateProbe()
                  this->XYPlotTclName);
     this->GetPVRenderView()->Render();
     }    
-  
-  this->GetNthPVOutput(0)->Update();
-  
-  pvApp->BroadcastScript("$Application SendProbeData %s",
-                         this->GetVTKSourceTclName());
-
-  outputTclName = this->GetNthPVOutput(0)->GetVTKDataTclName();
-  
-  probeOutput =
-    (vtkPolyData*)(vtkTclGetPointerFromObject(outputTclName, "vtkPolyData",
-                                              pvApp->GetMainInterp(), error));
-  pointData = probeOutput->GetPointData();  
-  numPoints = probeOutput->GetNumberOfPoints();
-  numProcs = controller->GetNumberOfProcesses();
-  numComponents = pointData->GetNumberOfComponents();
-  tuple = new float[numComponents];
-  
-  for (i = 1; i < numProcs; i++)
-    {
-    controller->Receive(&numRemotePoints, 1, i, 1970);
-    if (numRemotePoints > 0)
-      {
-      controller->Receive(validPoints, i, 1971);
-      controller->Receive(remoteProbeOutput, i, 1972);
-      
-      remotePointData = remoteProbeOutput->GetPointData();
-      for (j = 0; j < numRemotePoints; j++)
-        {
-        pointId = validPoints->GetValue(j);
-        
-        remotePointData->GetTuple(pointId, tuple);
-        
-        for (k = 0; k < numComponents; k++)
-          {
-          this->Script("[%s GetPointData] SetComponent %d %d %f",
-                       outputTclName, pointId, k, tuple[k]);
-          }
-        }
-      }
-    }  
-
-  delete [] tuple;
-  validPoints->Delete();
-  remoteProbeOutput->Delete();
 }
 
 void vtkPVProbe::Deselect(int doPackForget)
 {
+  this->ScalarArrayMenu->Update();
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
                this->GetPVRenderView()->GetRendererTclName(),
                this->XYPlotTclName);
@@ -770,81 +431,6 @@ void vtkPVProbe::Deselect(int doPackForget)
     }
   
   this->vtkPVSource::Deselect(doPackForget);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::UsePoint()
-{
-  this->Dimensionality = 0;
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->ProbeFrame->GetWidgetName());
-  this->Script("pack %s %s %s",
-               this->SelectedPointFrame->GetWidgetName(),
-               this->PointDataLabel->GetWidgetName(),
-               this->PointWidget->GetWidgetName());
-  this->Script("pack forget %s", this->ScalarArrayMenu->GetWidgetName());
-  this->LineWidget->Deselect();
-  this->PointWidget->Select();
-  this->DimensionalityMenu->SetCurrentEntry("Point");
-  this->SetAcceptButtonColorToRed();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::UseLine()
-{
-  this->Dimensionality = 1;
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->ProbeFrame->GetWidgetName());
-
-  this->Script("pack %s -side top -fill x -expand t -after %s",
-               this->ScalarArrayMenu->GetWidgetName(),
-               this->InputMenu->GetWidgetName());
-  this->ScalarArrayMenu->Update();
-
-  this->Script("pack %s %s",
-               this->ShowXYPlotToggle->GetWidgetName(),
-               this->LineWidget->GetWidgetName());    
-  this->PointWidget->Deselect();
-  this->LineWidget->Select();
-  this->DimensionalityMenu->SetCurrentEntry("Line");
-  this->SetAcceptButtonColorToRed();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetSelectedPoint(float point[3])
-{
-  this->SelectedXEntry->SetValue(point[0], 4);
-  this->SelectedYEntry->SetValue(point[1], 4);
-  this->SelectedZEntry->SetValue(point[2], 4);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetEndPoint1(float point[3])
-{
-  this->End1XEntry->SetValue(point[0], 4);
-  this->End1YEntry->SetValue(point[1], 4);
-  this->End1ZEntry->SetValue(point[2], 4);
-  this->EndPoint1[0] = point[0];
-  this->EndPoint1[1] = point[1];
-  this->EndPoint1[2] = point[2];
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetEndPoint2(float point[3])
-{
-  this->End2XEntry->SetValue(point[0], 4);
-  this->End2YEntry->SetValue(point[1], 4);
-  this->End2ZEntry->SetValue(point[2], 4);
-  this->EndPoint2[0] = point[0];
-  this->EndPoint2[1] = point[1];
-  this->EndPoint2[2] = point[2];
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetNumberOfLineDivisions(int i)
-{
-  this->NumberOfLineDivisions = i;
-  this->DivisionsEntry->SetValue(i);
 }
 
 //----------------------------------------------------------------------------
@@ -866,7 +452,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   char *tempName;
   vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
-  if (this->Dimensionality == 0)
+  if (this->GetDimensionality() == 0)
     {
     *file << "vtkIdList pointList\n";
     *file << "\tpointList Allocate 1 1\n";
@@ -900,7 +486,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   
   *file << this->VTKSource->GetClassName() << " "
         << this->GetVTKSourceTclName() << "\n";
-  if (this->Dimensionality == 0)
+  if (this->GetDimensionality() == 0)
     {
     *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput\n";
     }
@@ -943,7 +529,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
           << " GetOutput]\n\n";
     }
   
-  if (this->Dimensionality == 1)
+  if (this->GetDimensionality() == 1)
     {    
     if (this->ShowXYPlotToggle->GetState())
       {
@@ -961,19 +547,6 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProbe::SetPointPosition(float point[3])
-{
-  int cc;
-  for ( cc = 0; cc < 3; cc ++ )
-    {
-    this->PointPosition[cc] = point[cc];
-    }
-  this->SelectedXEntry->SetValue(point[0], 3);
-  this->SelectedYEntry->SetValue(point[1], 3);
-  this->SelectedZEntry->SetValue(point[2], 3);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVProbe::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 {
   int retVal = this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
@@ -982,18 +555,95 @@ int vtkPVProbe::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVProbe::GetDimensionality()
+{
+  const char* input = this->Script("%s GetInput", this->GetVTKSourceTclName());
+  const char* name = 0;
+  if ( vtkString::Length(input) > 0 )
+    {
+    name = this->Script("[ %s GetSource ] GetClassName", input);
+    }
+  if ( vtkString::Equals(name, "vtkLineSource") )
+    {
+    return 1;
+    }
+  return 0;
+}
+
+
+void vtkPVProbe::HSVtoRGB(float h, float s, float v, float *r, float *g, float *b)
+{
+  float R, G, B;
+  float max = 1.0;
+  float third = max / 3.0;
+  float temp;
+
+  // compute rgb assuming S = 1.0;
+  if (h >= 0.0 && h <= third) // red -> green
+    {
+    G = h/third;
+    R = 1.0 - G;
+    B = 0.0;
+    }
+  else if (h >= third && h <= 2.0*third) // green -> blue
+    {
+    B = (h - third)/third;
+    G = 1.0 - B;
+    R = 0.0;
+    }
+  else // blue -> red
+    {
+    R = (h - 2.0 * third)/third;
+    B = 1.0 - R;
+    G = 0.0;
+    }
+        
+  // add Saturation to the equation.
+  s = s / max;
+  //R = S + (1.0 - S)*R;
+  //G = S + (1.0 - S)*G;
+  //B = S + (1.0 - S)*B;
+  // what happend to this?
+  R = s*R + (1.0 - s);
+  G = s*G + (1.0 - s);
+  B = s*B + (1.0 - s);
+      
+  // Use value to get actual RGB 
+  // normalize RGB first then apply value
+  temp = R + G + B; 
+  //V = 3 * V / (temp * max);
+  // and what happend to this?
+  v = 3 * v / (temp);
+  R = R * v;
+  G = G * v;
+  B = B * v;
+      
+  // clip below 255
+  //if (R > 255.0) R = max;
+  //if (G > 255.0) G = max;
+  //if (B > 255.0) B = max;
+  // mixed constant 255 and max ?????
+  if (R > max)
+    {
+    R = max;
+    }
+  if (G > max)
+    {
+    G = max;
+    }
+  if (B > max)
+    {
+    B = max;
+    }
+  *r = R;
+  *g = G;
+  *b = B;
+}
+//----------------------------------------------------------------------------
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
-  os << indent << "NumberOfLineDivisions: " 
-     << this->NumberOfLineDivisions << endl;
-  os << indent << "EndPoint1: " << this->EndPoint1[0] << ", " 
-     << this->EndPoint1[1] << ", " << this->EndPoint1[2] << endl;
-  os << indent << "EndPoint2: " << this->EndPoint2[0] << ", " 
-     << this->EndPoint2[1] << ", " << this->EndPoint2[2] << endl;
-  os << indent << "PointPosition: " << this->PointPosition[0] << ", " 
-     << this->PointPosition[1] << ", " << this->PointPosition[2] << endl;
 }

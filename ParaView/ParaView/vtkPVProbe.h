@@ -51,12 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWCheckButton;
 class vtkKWLabel;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkPVArrayMenu;
-class vtkPVLineWidget;
-class vtkPVPointWidget;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -82,49 +79,6 @@ public:
   virtual void Deselect() { this->Deselect(1); }
   virtual void Deselect(int doPackForget);
 
-  // Description:
-  // Callbacks for Dimensionality menu
-  void UsePoint();
-  void UseLine();
-
-  // Description:
-  // Set the entries for SelectedPoint, EndPoint1, and EndPoint2.
-  void SetSelectedPoint(float point[3]);
-  void SetEndPoint1(float point[3]);
-  void SetEndPoint2(float point[3]);
-  void SetEndPoint1(float x, float y, float z) 
-    { 
-    float p[3]; 
-    p[0] = x; p[1] = y; p[2] = z;
-    this->SetEndPoint1(p);
-    }
-  void SetEndPoint2(float x, float y, float z) 
-    { 
-    float p[3]; 
-    p[0] = x; p[1] = y; p[2] = z;
-    this->SetEndPoint2(p);
-    }
-  vtkGetVector3Macro(EndPoint1, float);
-  vtkGetVector3Macro(EndPoint2, float);
-
-  void SetPointPosition(float point[3]);
-  void SetPointPosition(float x, float y, float z)
-    {
-    float p[3];
-    p[0] = x; p[1] = y; p[2] = z;
-    this->SetPointPosition(p);
-    }
-  vtkGetVector3Macro(PointPosition, float);
-
-  // Description:
-  // Get the dimensionality of the input to vtkProbeFilter.
-  vtkGetMacro(Dimensionality, int);
-
-  // Description:
-  // Set and get the number of line divisions.
-  void SetNumberOfLineDivisions(int);
-  vtkGetMacro(NumberOfLineDivisions, int);
-  
   // Description:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   void SaveInTclScript(ofstream *file);
@@ -160,39 +114,20 @@ protected:
 
   vtkKWWidget *SelectedPointFrame;
   vtkKWLabel *SelectedPointLabel;
-  vtkKWLabeledEntry *SelectedXEntry;
-  vtkKWLabeledEntry *SelectedYEntry;
-  vtkKWLabeledEntry *SelectedZEntry;  
   vtkKWLabel *PointDataLabel;
   
-  vtkKWWidget *EndPoint1Frame;
-  vtkKWLabel *EndPoint1Label;
-  vtkKWLabeledEntry *End1XEntry;
-  vtkKWLabeledEntry *End1YEntry;
-  vtkKWLabeledEntry *End1ZEntry;
-  vtkKWWidget *EndPoint2Frame;
-  vtkKWLabel *EndPoint2Label;
-  vtkKWLabeledEntry *End2XEntry;
-  vtkKWLabeledEntry *End2YEntry;
-  vtkKWLabeledEntry *End2ZEntry;
   vtkKWCheckButton *ShowXYPlotToggle;
-  vtkKWLabeledEntry *DivisionsEntry;
-
-  vtkPVLineWidget *LineWidget;
-  vtkPVPointWidget *PointWidget;
   
   int Dimensionality; // point = 0, line = 1
   
   char* XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
 
+  int GetDimensionality();
+
   int InstanceCount;
 
-  float EndPoint1[3];
-  float EndPoint2[3];
-  int NumberOfLineDivisions;
-
-  float PointPosition[3];
+  void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 
