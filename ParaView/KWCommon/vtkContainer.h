@@ -100,6 +100,10 @@ static inline int vtkContainerCompareMethod(short d1, short d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(int d1, int d2)
 { return vtkContainerDefaultCompare(d1,d2); }
+#ifdef VTK_USE_64BIT_IDS
+static inline int vtkContainerCompareMethod(vtkIdType d1, vtkIdType d2)
+{ return vtkContainerDefaultCompare(d1,d2); }
+#endif
 static inline int vtkContainerCompareMethod(long d1, long d2)
 { return vtkContainerDefaultCompare(d1,d2); }
 static inline int vtkContainerCompareMethod(unsigned char d1, unsigned char d2)
@@ -130,6 +134,10 @@ static inline short vtkContainerCreateMethod(short d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline int vtkContainerCreateMethod(int d1)
 { return vtkContainerDefaultCreate(d1); }
+#ifdef VTK_USE_64BIT_IDS
+static inline int vtkContainerCreateMethod(vtkIdType d1)
+{ return vtkContainerDefaultCreate(d1); }
+#endif
 static inline long vtkContainerCreateMethod(long d1)
 { return vtkContainerDefaultCreate(d1); }
 static inline unsigned char vtkContainerCreateMethod(unsigned char d1)
@@ -154,6 +162,9 @@ static inline void vtkContainerDeleteMethod(vtkObjectBase* d1)
 static inline void vtkContainerDeleteMethod(char) {}
 static inline void vtkContainerDeleteMethod(short) {}
 static inline void vtkContainerDeleteMethod(int) {}
+#ifdef VTK_USE_64BIT_IDS
+static inline void vtkContainerDeleteMethod(vtkIdType) {}
+#endif
 static inline void vtkContainerDeleteMethod(long) {}
 static inline void vtkContainerDeleteMethod(unsigned char) {}
 static inline void vtkContainerDeleteMethod(unsigned short) {}
