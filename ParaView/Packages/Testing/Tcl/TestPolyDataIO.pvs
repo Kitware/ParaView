@@ -34,8 +34,8 @@ $kw(vtkTemp295) AcceptCallback
 set kw(vtkTemp1000) [Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
-set fileName "sPolyData.vtp"
-if {$nprocs > 1} { set fileName "sPolyData.pvtp" }
+set fileName "testPolyData.vtp"
+if {$nprocs > 1} { set fileName "testPolyData.pvtp" }
 
 # Write the vtkPolyData.
 $kw(vtkTemp1) WriteVTKFile $fileName
