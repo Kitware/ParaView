@@ -442,9 +442,7 @@
                  help="An XML file containing part and material descriptions and mapping to element blocks." />
 
 
-    <Scale label="TimeStep"
-           trace_name="TimeStep"
-           property="TimeStep"
+    <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."
            range_source="TimeStepRange" />
