@@ -87,9 +87,6 @@ void vtkPVPolyDataSource::InitializePVOutput(int idx)
   outputTclName = NULL;
   output->Clone(this->GetPVApplication());
   this->SetNthPVOutput(idx, output);
-
-  output->Clone(this->GetPVApplication());
-  this->SetNthPVOutput(idx, output);
   
   input = this->vtkPVSource::GetNthPVInput(0);
   if (input != NULL)
