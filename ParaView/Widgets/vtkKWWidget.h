@@ -150,10 +150,6 @@ public:
   // Set focus to this widget.
   void Focus();
 
-  // Description: a method to create a callback string from a KWObject.
-  // The caller is resposible for deleting the returned string.  
-  char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
-
   // Description:
   // Get the containing vtkKWWindow for this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
@@ -393,6 +389,16 @@ protected:
   virtual void SetDragAndDropBindings();
   virtual void RemoveDragAndDropBindings();
   virtual void DeleteDragAndDropTargets();
+
+  // This method can be used to create
+  // A method to set a callback function on object.  The first argument is
+  // the command (string) to set, the second is the KWObject that will have
+  // the method called on it. The third is the name of the method to be
+  // called and any arguments in string form. 
+  // The calling is done via TCL wrappers for the KWObject.
+  // If the command (string) is not NULL, it is deallocated first.
+  virtual void SetObjectMethodCommand(
+    char **command, vtkKWObject *object, const char *method);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

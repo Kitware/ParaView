@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.76");
+vtkCxxRevisionMacro(vtkKWWidget, "1.77");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -250,7 +250,10 @@ void vtkKWWidget::UnRegister(vtkObjectBase *o)
 //----------------------------------------------------------------------------
 void vtkKWWidget::Focus()
 {
-  this->Script( "focus %s", this->GetWidgetName() );
+  if (this->IsCreated())
+    {
+    this->Script("focus %s", this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -293,20 +296,41 @@ void vtkKWWidget::SetBindAll(const char *event, const char *command)
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
-  char* command = this->CreateCommand(CalledObject, CommandString);
-  this->Application->SimpleScript(command);
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, CalledObject, CommandString);
+  this->Script("%s configure -command {%s}",
+               this->GetWidgetName(), command);
   delete [] command;
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * CommandString)
+void vtkKWWidget::SetObjectMethodCommand(
+  char **command, 
+  vtkKWObject *object, 
+  const char *method)
 {
-  ostrstream event;
-  event << this->GetWidgetName() << " configure -command {" 
-        << (CalledObject?CalledObject->GetTclName():"")
-        << " " << CommandString << "} " << ends;
+  if (*command)
+    {
+    delete [] *command;
+    *command = NULL;
+    }
 
-  return event.str();
+  ostrstream command_str;
+  if (object)
+    {
+    command_str << object->GetTclName() << " ";
+    }
+  if (method)
+    {
+    command_str << method;
+    }
+  command_str << ends;
+  *command = command_str.str();
 }
 
 //----------------------------------------------------------------------------
@@ -349,7 +373,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.76 $");
+  this->ExtractRevision(os,"$Revision: 1.77 $");
 }
 
 //----------------------------------------------------------------------------
