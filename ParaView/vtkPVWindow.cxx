@@ -1475,8 +1475,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCornerFactor");
   mInt->SetGetCommand("GetCornerFactor");
   mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("The relative size of the corners
-  // to the length of the corresponding bounds. (0.001 -> 0.5)");
+  mInt->SetBalloonHelp("The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -2774,8 +2773,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCornerFactor");
   mInt->SetGetCommand("GetCornerFactor");
   mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("The relative size of the corners
-  // to the length of the corresponding bounds. (0.001 -> 0.5)");
+  mInt->SetBalloonHelp("The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
