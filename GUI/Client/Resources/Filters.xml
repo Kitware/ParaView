@@ -1458,6 +1458,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
              class="vtkPointSet"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
+               id="im1"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1468,6 +1469,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
             value="BoxTransform">
       <BoxWidget use_label="0"
                  trace_name="Box"
+                 input_menu="im1"
                  help="Adjusts the parameters of the box to clip with."/>
       </Item>
     </SelectWidget>
@@ -1653,6 +1655,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
             value="Sphere">
       <SphereWidget trace_name="Sphere"
                     use_label="0"
+                    input_menu="im1"
                     help="Adjusts the parameters of the sphere to cut with."/>
       </Item>
     </SelectWidget>
@@ -1701,12 +1704,14 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
             value="Sphere">
         <SphereWidget use_label="0"
                       trace_name="Sphere"
+                      input_menu="im1"
                       help="Adjusts the parameters of the sphere to clip with."/>
       </Item>
       <Item label="Box"
             value="Box">
         <BoxWidget use_label="0"
                    trace_name="Box"
+                   input_menu="im1"
                    help="Adjusts the parameters of the box to clip with."/>
       </Item>
       <Item label="Scalars">
