@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkImageFlip.h"
+#include "vtkBase64Utility.h"
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -52,10 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "tk.h"
+#include "zlib.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.5");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -104,6 +106,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   const unsigned char *pixels, 
                                   int width, int height,
                                   int pixel_size,
+                                  unsigned long buffer_length,
                                   const char *blend_with_name)
 {
   // Find the photo
@@ -121,7 +124,64 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
   Tk_PhotoBlank(photo);
 #endif
-  
+
+  unsigned long nb_of_raw_bytes = width * height * pixel_size;
+  const unsigned char *data_ptr = pixels;
+
+  // If the buffer_lenth has been provided, and if it's different than the
+  // expected size of the raw image buffer, than it might have been compressed
+  // using zlib and/or encoded in base64. In that case, decode and/or
+  // uncompress the buffer.
+
+  int base64 = 0;
+  unsigned char *base64_buffer;
+
+  int zlib = 0;
+  unsigned char *zlib_buffer;
+
+  if (buffer_length && buffer_length != nb_of_raw_bytes)
+    {
+    // Is it a base64 stream (i.e. not zlib for the moment) ?
+
+    if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
+      {
+      base64_buffer = new unsigned char [buffer_length];
+      buffer_length = vtkBase64Utility::Decode(data_ptr, 0, 
+                                               base64_buffer, buffer_length);
+      if (buffer_length == 0)
+        {
+        vtkGenericWarningMacro(<< "Error decoding base64 stream");
+        delete [] base64_buffer;
+        return 0;
+        }
+      base64 = 1;
+      data_ptr = base64_buffer;
+      }
+    
+    // Is it zlib ?
+
+    if (buffer_length != nb_of_raw_bytes &&
+        data_ptr[0] == 0x78 && data_ptr[1] == 0xDA)
+      {
+      unsigned long zlib_buffer_length = nb_of_raw_bytes;
+      zlib_buffer = new unsigned char [zlib_buffer_length];
+      if (uncompress(zlib_buffer, &zlib_buffer_length, 
+                     data_ptr, buffer_length) != Z_OK ||
+          zlib_buffer_length != nb_of_raw_bytes)
+        {
+        vtkGenericWarningMacro(<< "Error decoding zlib stream");
+        delete [] zlib_buffer;
+        if (base64)
+          {
+          delete [] base64_buffer;
+          }
+        return 0;
+        }
+      zlib = 1;
+      data_ptr = zlib_buffer;
+      }
+    }
+
   // Set block struct
 
   Tk_PhotoImageBlock sblock;
@@ -136,7 +196,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 
   if (pixel_size == 3)
     {
-    sblock.pixelPtr = const_cast<unsigned char *>(pixels);
+    sblock.pixelPtr = const_cast<unsigned char *>(data_ptr);
     }
   else 
     {
@@ -163,13 +223,13 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       {
       for (xx=0; xx < width; xx++)
         {
-        float alpha = static_cast<float>(*(pixels + 3)) / 255.0;
+        float alpha = static_cast<float>(*(data_ptr + 3)) / 255.0;
         
-        *(pp)     = static_cast<int>(r * (1 - alpha) + *(pixels)     * alpha);
-        *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(pixels + 1) * alpha);
-        *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(pixels + 2) * alpha);
+        *(pp)     = static_cast<int>(r * (1 - alpha) + *(data_ptr)    * alpha);
+        *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(data_ptr+ 1) * alpha);
+        *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(data_ptr+ 2) * alpha);
 
-        pixels += pixel_size;
+        data_ptr += pixel_size;
         pp += 3;
         }
       }
@@ -181,9 +241,21 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
 #endif
 
+  // Free mem
+
   if (pixel_size != 3)
     {
     delete [] sblock.pixelPtr;
+    }
+
+  if (base64)
+    {
+    delete [] base64_buffer;
+    }
+
+  if (zlib)
+    {
+    delete [] zlib_buffer;
     }
 
   return 1;
@@ -214,13 +286,17 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   flip->SetFilteredAxis(1);
   flip->Update();
 
+  int width = ext[1] - ext[0] + 1;
+  int height = ext[3] - ext[2] + 1;
+  int pixel_size = image->GetNumberOfScalarComponents();
+
   int res = vtkKWTkUtilities::UpdatePhoto(
     interp,
     photo_name,
     static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
-    ext[1] - ext[0] + 1, 
-    ext[3] - ext[2] + 1,
-    image->GetNumberOfScalarComponents(),
+    width, height,
+    pixel_size,
+    width * height * pixel_size,
     blend_with_name);
 
   flip->Delete();

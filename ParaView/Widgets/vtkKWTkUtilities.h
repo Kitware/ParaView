@@ -82,6 +82,7 @@ public:
                          const unsigned char *pixels, 
                          int width, int height,
                          int pixel_size,
+                         unsigned long buffer_length = 0,
                          const char *blend_with_name = 0);
 
   static int UpdatePhoto(Tcl_Interp *interp,

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.19");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.20");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -84,6 +84,7 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
                                      this->ImageDataName,
                                      data, 
                                      width, height, pixel_size,
+                                     width * height * pixel_size,
                                      this->GetWidgetName()))
     {
     vtkWarningMacro("Error updating Tk photo " << this->ImageDataName);
