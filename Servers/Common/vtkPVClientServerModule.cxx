@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVClientServerModule.h"
-
+#include "vtkPVServerInformation.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.8");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -255,6 +255,15 @@ void vtkPVClientServerModule::Initialize()
 
     // attempt to initialize render server connection to data server
     this->InitializeRenderServer();
+    // Juggle the compositing flag to let server in on the decision
+    // whether to allow compositing / rendering on the server.
+    // This might better be handled in the render module initialize method.
+    // Find out if the server supports compositing.
+    vtkPVServerInformation* serverInfo = vtkPVServerInformation::New();
+    this->GatherInformation(serverInfo, this->GetProcessModuleID());
+    this->ServerInformation->AddInformation(serverInfo);
+    serverInfo->Delete();
+    serverInfo = NULL;
       
     this->ReturnValue = this->GUIHelper->
       RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);

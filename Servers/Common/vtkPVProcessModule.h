@@ -40,6 +40,7 @@ class vtkClientServerStream;
 class vtkSocketController;
 class vtkKWApplication;
 class vtkProcessModuleGUIHelper;
+class vtkPVServerInformation;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
@@ -174,6 +175,11 @@ public:
   vtkSetStringMacro(RenderServerHostName);
 
   // Description:
+  // Server information was initially developed to query the
+  // server whether it supports remote rendering.
+  vtkPVServerInformation* GetServerInformation() { return this->ServerInformation;}
+
+  // Description:
   // We need to get the data path for the demo on the server.
   const char* GetDemoPath();
 
@@ -225,6 +231,7 @@ protected:
   int AlwaysSSH;
   float LogThreshold;
   char* DemoPath;
+  vtkPVServerInformation* ServerInformation;
   vtkProcessModuleGUIHelper* GUIHelper;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

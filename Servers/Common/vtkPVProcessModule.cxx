@@ -38,6 +38,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkTimerLog.h"
 #include "vtkProcessModuleGUIHelper.h"
+#include "vtkPVServerInformation.h"
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -45,7 +46,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.12");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -67,6 +68,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->LogThreshold = 0;
   this->DemoPath = 0;
   this->GUIHelper = 0;
+  this->ServerInformation = vtkPVServerInformation::New();
   this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
 }
@@ -84,6 +86,7 @@ vtkPVProcessModule::~vtkPVProcessModule()
   this->SetUsername(0);
   this->SetDemoPath(0);
   this->FinalizeInterpreter();
+  this->ServerInformation->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -242,6 +245,17 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     } 
   os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
   os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
+
+  if (this->ServerInformation)
+    {
+    os << indent << "ServerInformation:\n";
+    vtkIndent i2 = indent.GetNextIndent();
+    this->ServerInformation->PrintSelf(os, i2);
+    }
+  else
+    {
+    os << indent << "ServerInformation: NULL\n";
+    }
 }
 
 //----------------------------------------------------------------------------

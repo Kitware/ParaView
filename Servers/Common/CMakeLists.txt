@@ -16,6 +16,7 @@ SET(Common_SRCS
   vtkPVDataInformation.cxx
   vtkPVArrayInformation.cxx
   vtkPVClassNameInformation.cxx
+  vtkPVServerInformation.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkPVProgressHandler.cxx
