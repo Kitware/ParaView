@@ -92,7 +92,7 @@ public:
 	}
       return (strcmp(fullfile, this->FullFile) == 0);
     }
-  int InsertToMenu(int pos, vtkKWMenu *menu);
+  int InsertToMenu(int pos, const char* menuEntry, vtkKWMenu *menu);
   void SetFile(const char *file)
     {
       if ( this->File )
@@ -178,7 +178,8 @@ vtkKWWindowMenuEntry::~vtkKWWindowMenuEntry()
   this->TotalCount --;
 }
 
-int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
+int vtkKWWindowMenuEntry::InsertToMenu( int pos, const char* menuEntry,
+					vtkKWMenu *menu )
 {
   if ( this->File && this->Target && this->Command )
     {
@@ -186,7 +187,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
     file[0] = pos + '0';
     ostrstream str;
     str << this->Command << " \"" << this->FullFile << "\"" << ends;
-    menu->InsertCommand( menu->GetIndex("Close") - 1, 
+    menu->InsertCommand( menu->GetIndex(menuEntry) - 1, 
 			 file, this->Target, str.str(), 0 );
     delete [] file;
     delete [] str.str();
@@ -277,6 +278,8 @@ vtkKWWindow::vtkKWWindow()
   this->SetScriptType("Tcl");
 
   this->InExit = 0;
+
+  this->RecentFilesMenuTag =0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -295,6 +298,7 @@ vtkKWWindow::~vtkKWWindow()
       }
     this->RecentFiles->Delete();
     }
+  this->SetRecentFilesMenuTag(0);
   this->Notebook->Delete();
   this->SetPropertiesParent(NULL);
   this->SetSelectedView(NULL);
@@ -894,15 +898,23 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     }
 }
 
-void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
+void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
 {
   char KeyNameP[10];
   char CmdNameP[10];
   int i;
   char File[1024];
   char Cmd[1024];
+  if ( menuEntry )
+    {
+    this->SetRecentFilesMenuTag(menuEntry);
+    }
+  else
+    {
+    this->SetRecentFilesMenuTag("Close");
+    }
   this->GetMenuFile()->InsertSeparator(
-    this->GetMenuFile()->GetIndex("Close") - 1);
+    this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);
 
   for (i = this->NumberOfRecentFiles-1; i >=0; i--)
     {
@@ -919,7 +931,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 	}
       }
     }
-  this->UpdateRecentMenu(key);
+  this->UpdateRecentMenu(NULL);
 }
 
 void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
@@ -928,7 +940,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
   if ( this->RealNumberOfMRUFiles == 0 )
     {
     this->GetMenuFile()->InsertSeparator(
-      this->GetMenuFile()->GetIndex("Close") - 1);    
+      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);    
     }
   this->InsertRecentFileToMenu(name, target, command);
   this->UpdateRecentMenu(key);
@@ -959,7 +971,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.74 $");
+  this->ExtractRevision(os,"$Revision: 1.75 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -988,7 +1000,7 @@ void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
   for ( cc = 0; cc < this->RealNumberOfMRUFiles; cc ++ )
     {
     this->GetMenuFile()->DeleteMenuItem(
-      this->GetMenuFile()->GetIndex("Close") - 2);
+      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 2);
     }
   this->RealNumberOfMRUFiles = 0;
   if ( this->RecentFiles )
@@ -999,7 +1011,8 @@ void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
       vtkKWWindowMenuEntry *kc;
       if ( ( kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc) ) )
 	{
-	kc->InsertToMenu(cc, this->GetMenuFile());
+	kc->InsertToMenu(cc, this->GetRecentFilesMenuTag(),
+			 this->GetMenuFile());
 	this->RealNumberOfMRUFiles ++;
 	}
       }

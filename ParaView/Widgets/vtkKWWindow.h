@@ -144,10 +144,11 @@ public:
   void UnRegister(vtkObject *o);
 
   // Description::
-  // Add to the menu a list of recently used files. Specify a key,
-  // which if it is null it will just use the classname. The command
+  // Add to the menu a list of recently used files. Specify a menu entry,
+  // which will be used to position menu. Pick NULL if you want to use
+  // "Close". The command
   // is the command to execute when a file is selected.
-  virtual void AddRecentFilesToMenu(char *key, vtkKWObject *target);
+  virtual void AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target);
   virtual void AddRecentFile(char *key, char *name, vtkKWObject *target,
                              const char *command);
   
@@ -279,6 +280,13 @@ protected:
   void StoreRecentMenuToRegistery(char *key);
 
   unsigned int NumberOfRecentFiles;
+
+  // Description:
+  // This is the menu entry that recent files will be above.
+  // If it is null, then pick "Close"
+  vtkSetStringMacro(RecentFilesMenuTag);
+  vtkGetStringMacro(RecentFilesMenuTag);
+  char *RecentFilesMenuTag;
   
   int ExitDialog();
 
