@@ -308,6 +308,24 @@ void vtkKWMenu::DeleteMenuItem(const char* menuitem)
   this->Script("set {%sHelpArray(%s)} {}", this->GetWidgetName(), menuitem);
 }
 
+void vtkKWMenu::DeleteAllMenuItems()
+{
+  int i, last;
+  
+  this->Script("%s index end", this->GetWidgetName());
+  if (strcmp("none", this->GetApplication()->GetMainInterp()->result) == 0)
+    {
+    return;
+    }
+  
+  last = vtkKWObject::GetIntegerResult(this->Application);
+  
+  for (i = last; i >= 0; --i)
+    {
+    this->DeleteMenuItem(i);
+    }
+}
+
 int vtkKWMenu::GetIndex(const char* menuname)
 {
   this->Script("%s index {%s}", this->GetWidgetName(), menuname);
