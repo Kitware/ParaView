@@ -68,7 +68,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.16");
+vtkCxxRevisionMacro(vtkPKdTree, "1.17");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -2149,7 +2149,7 @@ int vtkPKdTree::AllocateAndZeroFieldArrayMinMax()
     MakeList(this->CellDataMax, double, iNumCellArrays);
     if (this->CellDataMax == NULL) goto doneError5;
 
-    MakeList(this->CellDataName, const char *, iNumCellArrays);
+    MakeList(this->CellDataName, char *, iNumCellArrays);
     if (this->CellDataName == NULL) goto doneError5;
     }
 
@@ -2163,7 +2163,7 @@ int vtkPKdTree::AllocateAndZeroFieldArrayMinMax()
     MakeList(this->PointDataMax, double, iNumPointArrays);
     if (this->PointDataMax == NULL) goto doneError5;
 
-    MakeList(this->PointDataName, const char *, iNumPointArrays);
+    MakeList(this->PointDataName, char *, iNumPointArrays);
     if (this->PointDataName == NULL) goto doneError5;
     }
 
@@ -2787,28 +2787,32 @@ int vtkPKdTree::FindLocalArrayIndex(const char *n, const char **names, int len)
 int vtkPKdTree::GetCellArrayGlobalRange(const char *n, float range[2])
 {
   int index = 
-    vtkPKdTree::FindLocalArrayIndex(n, this->CellDataName, this->NumCellArrays);
+    vtkPKdTree::FindLocalArrayIndex(n, (const char **)this->CellDataName,
+                                    this->NumCellArrays);
 
   return this->GetCellArrayGlobalRange(index, range);
 }
 int vtkPKdTree::GetCellArrayGlobalRange(const char *n, double range[2])
 {
   int index = 
-    vtkPKdTree::FindLocalArrayIndex(n, this->CellDataName, this->NumCellArrays);
+    vtkPKdTree::FindLocalArrayIndex(n, (const char **)this->CellDataName,
+                                    this->NumCellArrays);
 
   return this->GetCellArrayGlobalRange(index, range);
 }
 int vtkPKdTree::GetPointArrayGlobalRange(const char *n, float range[2])
 {
   int index = 
-    vtkPKdTree::FindLocalArrayIndex(n, this->PointDataName, this->NumPointArrays);
+    vtkPKdTree::FindLocalArrayIndex(n, (const char **)this->PointDataName,
+                                    this->NumPointArrays);
 
   return this->GetPointArrayGlobalRange(index, range);
 }
 int vtkPKdTree::GetPointArrayGlobalRange(const char *n, double range[2])
 {
   int index = 
-    vtkPKdTree::FindLocalArrayIndex(n, this->PointDataName, this->NumPointArrays);
+    vtkPKdTree::FindLocalArrayIndex(n, (const char **)this->PointDataName,
+                                    this->NumPointArrays);
 
   return this->GetPointArrayGlobalRange(index, range);
 }

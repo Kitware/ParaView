@@ -352,8 +352,8 @@ private:
   double *CellDataMax;
   double *PointDataMin;
   double *PointDataMax;
-  const char **CellDataName;
-  const char **PointDataName;
+  char **CellDataName;
+  char **PointDataName;
   int NumCellArrays;
   int NumPointArrays; 
 
