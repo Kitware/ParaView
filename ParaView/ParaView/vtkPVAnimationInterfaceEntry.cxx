@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -250,7 +250,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
 
   this->SourceLabel->SetLabel("Source");
-  this->MethodLabel->SetLabel("Method");
+  this->MethodLabel->SetLabel("Parameter");
   pvApp->Script("grid %s %s -sticky news -pady 2 -padx 2", 
     this->SourceLabel->GetWidgetName(), this->SourceMenuButton->GetWidgetName());
   pvApp->Script("grid %s %s -sticky news -pady 2 -padx 2", 

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.50");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.50.2.1");
 
 
 
@@ -192,7 +192,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                this->Label->GetWidgetName());
   if ( this->GetDialogName() )
     {
-    this->CheckButton->SetText("Do not show this dialog any more.");
+    this->CheckButton->SetText("Do not show this dialog anymore.");
     this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                  this->CheckButton->GetWidgetName());
     }
