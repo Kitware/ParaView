@@ -24,23 +24,7 @@ set kw(vtkTemp606) [$kw(vtkTemp582) GetPVWidget {Filename}]
 $kw(vtkTemp606) SetValue "${DataDir}/Data/Test1.xmf"
 $kw(vtkTemp582) AcceptCallback
 $kw(vtkTemp18) SetCameraState 10.265 5.720 -1.159  1.500 1.000 -1.000  -0.406 0.735 -0.544
-set kw(vtkTemp770) [$kw(vtkTemp2) CreatePVSource Clip]
-$kw(vtkTemp18) SetCameraState 10.265 5.720 -1.159  1.500 1.000 -1.000  -0.406 0.735 -0.544
-set kw(vtkTemp819) [$kw(vtkTemp770) GetPVWidget {Clip Function}]
-$kw(vtkTemp819) SetCurrentValue {Plane}
-set kw(vtkTemp783) [$kw(vtkTemp819) GetPVWidget {Plane}]
-$kw(vtkTemp783) SetCenter 1.5 1 -1
-$kw(vtkTemp783) SetNormal -0.766 -0.632 -0.114
-$kw(vtkTemp770) AcceptCallback
-$kw(vtkTemp18) SetCameraState 1.441 3.455 8.649  1.500 1.000 -1.000  -0.284 0.929 -0.238
-set kw(vtkTemp932) [$kw(vtkTemp2) CreatePVSource Clip]
-$kw(vtkTemp18) SetCameraState 1.441 3.455 8.649  1.500 1.000 -1.000  -0.284 0.929 -0.238
-set kw(vtkTemp981) [$kw(vtkTemp932) GetPVWidget {Clip Function}]
-$kw(vtkTemp981) SetCurrentValue {Plane}
-set kw(vtkTemp945) [$kw(vtkTemp981) GetPVWidget {Plane}]
-$kw(vtkTemp945) SetCenter 1.5 1 -1
-$kw(vtkTemp945) SetNormal -0.089 0.645 0.759
-$kw(vtkTemp932) AcceptCallback
+
 $kw(vtkTemp18) SetCameraState -0.450 7.144 -8.589  1.500 1.000 -1.000  -0.968 0.003 0.251
 $kw(vtkTemp2) ResetCameraCallback
 set kw(vtkTemp1094) [$kw(vtkTemp2) CreatePVSource Glyph]
@@ -54,7 +38,6 @@ $kw(vtkTemp1107) SetScaleMode {Scalar}
 $kw(vtkTemp1107) SetScalars {DataTwo}
 $kw(vtkTemp1094) AcceptCallback
 $kw(vtkTemp1094) DeleteCallback
-$kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp932)
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp582)
 $kw(vtkTemp18) SetCameraState 9.087 1.279 -1.442  1.162 1.000 -1.000  -0.021 -0.629 -0.777
 $kw(vtkTemp18) SetCameraState 7.797 -2.031 2.139  1.162 1.000 -1.000  0.112 -0.586 -0.802
@@ -64,7 +47,7 @@ $kw(vtkTemp1228) AcceptCallback
 $kw(vtkTemp18) SetCameraState 9.056 1.841 -1.218  1.162 1.000 -1.000  -0.054 0.255 -0.966
 $kw(vtkTemp18) SetCameraState -1.828 -4.819 -5.501  1.162 1.000 -1.000  -0.474 0.678 -0.562
 $kw(vtkTemp18) SetCameraState 2.600 -0.066 -8.737  1.162 1.000 -1.000  -0.410 0.890 -0.199
-$kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp932)
+$kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp582)
 set kw(vtkTemp1346) [$kw(vtkTemp2) CreatePVSource ShrinkFilter]
 $kw(vtkTemp1346) AcceptCallback
 $kw(vtkTemp18) SetCameraState 9.004 1.696 -2.043  1.162 1.000 -1.000  -0.143 0.850 -0.508
