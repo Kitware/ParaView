@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPickDisplay);
-vtkCxxRevisionMacro(vtkPVPickDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVPickDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -57,13 +57,13 @@ vtkPVPickDisplay::~vtkPVPickDisplay()
     if (pm && this->DuplicateID.ID)
       {
       pm->DeleteStreamObject(this->DuplicateID);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToRenderServerClientAndServer();
       }
     this->DuplicateID.ID = 0;
     if (pm && this->UpdateSuppressorID.ID)
       {
       pm->DeleteStreamObject(this->UpdateSuppressorID);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToRenderServerClientAndServer();
       }
     this->UpdateSuppressorID.ID = 0;
     if (this->PointLabelMapperID.ID)
@@ -118,7 +118,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Create the fliter wich duplicates the data on all processes.
   this->DuplicateID = pm->NewStreamObject("vtkMPIDuplicateUnstructuredGrid");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
   if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
@@ -138,17 +138,19 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->DuplicateID << "SetSocketController"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
   stream << vtkClientServerStream::Invoke << this->DuplicateID << "GetOutput" 
-         <<  vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
+         <<  vtkClientServerStream::End
+         << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "SetInput" << vtkClientServerStream::LastResult 
          << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
 
   // Create point labels.
   this->PointLabelMapperID = pm->NewStreamObject("vtkLabeledDataMapper");
@@ -182,7 +184,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->UpdateSuppressorID << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 
@@ -281,11 +283,7 @@ void vtkPVPickDisplay::Update()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
            << "ForceUpdate" << vtkClientServerStream::End;
-    // We need to tell the plot to regenerate.
-    //stream << vtkClientServerStream::Invoke 
-    //       << this->XYPlotActorID
-    //       << "Modified" << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToRenderServerClientAndServer();
     this->GeometryIsValid = 1;
     }
 }
@@ -322,7 +320,7 @@ void vtkPVPickDisplay::RemoveAllCaches()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 
@@ -336,11 +334,7 @@ void vtkPVPickDisplay::CacheUpdate(int idx, int total)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "CacheUpdate" << idx << total << vtkClientServerStream::End;
-  // I don't like calling Modified directly, but I need the scalars to be
-  // remapped through the lookup table, and this causes that to happen.
-  //stream << vtkClientServerStream::Invoke << this->MapperID << "Modified"
-  //       << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 
@@ -352,6 +346,5 @@ void vtkPVPickDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Part: " << this->Part << endl;
   os << indent << "PVApplication: " << this->PVApplication << endl;
   os << indent << "UpdateSuppressorID: " << this->UpdateSuppressorID.ID << endl;
-  //  os << indent << "XYPlotActorID: " << this->XYPlotActorID.ID << endl;
 }
 
