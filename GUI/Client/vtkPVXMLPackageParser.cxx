@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.39");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.40");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -440,7 +440,6 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     if (proxy)
       {
       pvm->SetProxy(proxy);
-      proxy->Delete();
       }
     }
   

@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.373");
+vtkCxxRevisionMacro(vtkPVSource, "1.374");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -186,7 +186,7 @@ vtkPVSource::~vtkPVSource()
     {
     proxm->UnRegisterProxy(this->GetName());
     }
-  this->Proxy = 0;
+  this->SetProxy(0);
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -2207,7 +2207,6 @@ void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
   proxm->RegisterProxy(module_group, clone->GetName(), clone->Proxy);
-  clone->Proxy->Delete();
 
 }
 
