@@ -31,6 +31,7 @@
 
 class vtkDataArray;
 class vtkEmptyCell;
+class vtkImageData;
 class vtkLine;
 class vtkPixel;
 class vtkVertex;
@@ -257,6 +258,7 @@ protected:
 
 private:
   void InternalUniformGridCopy(vtkUniformGrid *src);
+  void InternalUniformGridCopy(vtkImageData *src);
 private:
   vtkUniformGrid(const vtkUniformGrid&);  // Not implemented.
   void operator=(const vtkUniformGrid&);  // Not implemented.

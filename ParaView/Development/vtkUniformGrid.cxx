@@ -21,6 +21,7 @@
 #include "vtkDataArray.h"
 #include "vtkEmptyCell.h"
 #include "vtkGenericCell.h"
+#include "vtkImageData.h"
 #include "vtkLargeInteger.h"
 #include "vtkLine.h"
 #include "vtkObjectFactory.h"
@@ -31,7 +32,7 @@
 #include "vtkVertex.h"
 #include "vtkVoxel.h"
 
-vtkCxxRevisionMacro(vtkUniformGrid, "1.2");
+vtkCxxRevisionMacro(vtkUniformGrid, "1.3");
 vtkStandardNewMacro(vtkUniformGrid);
 
 vtkCxxSetObjectMacro(vtkUniformGrid,
@@ -946,13 +947,21 @@ unsigned long vtkUniformGrid::GetActualMemorySize()
 //----------------------------------------------------------------------------
 void vtkUniformGrid::ShallowCopy(vtkDataObject *dataObject)
 {
-  vtkUniformGrid *imageData = vtkUniformGrid::SafeDownCast(dataObject);
+  vtkUniformGrid *ugData = vtkUniformGrid::SafeDownCast(dataObject);
 
-  if ( imageData != NULL )
+  if ( ugData )
     {
-    this->InternalUniformGridCopy(imageData);
-    this->PointVisibility->ShallowCopy(imageData->PointVisibility);
-    this->CellVisibility->ShallowCopy(imageData->CellVisibility);
+    this->InternalUniformGridCopy(ugData);
+    this->PointVisibility->ShallowCopy(ugData->PointVisibility);
+    this->CellVisibility->ShallowCopy(ugData->CellVisibility);
+    }
+  else
+    {
+    vtkImageData *imageData = vtkImageData::SafeDownCast(dataObject);
+    if (imageData)
+      {
+      this->InternalUniformGridCopy(imageData);
+      }
     }
 
   // Do superclass
@@ -962,13 +971,21 @@ void vtkUniformGrid::ShallowCopy(vtkDataObject *dataObject)
 //----------------------------------------------------------------------------
 void vtkUniformGrid::DeepCopy(vtkDataObject *dataObject)
 {
-  vtkUniformGrid *imageData = vtkUniformGrid::SafeDownCast(dataObject);
+  vtkUniformGrid *ugData = vtkUniformGrid::SafeDownCast(dataObject);
 
-  if ( imageData != NULL )
+  if ( ugData != NULL )
     {
-    this->InternalUniformGridCopy(imageData);
-    this->PointVisibility->DeepCopy(imageData->PointVisibility);
-    this->CellVisibility->DeepCopy(imageData->CellVisibility);
+    this->InternalUniformGridCopy(ugData);
+    this->PointVisibility->DeepCopy(ugData->PointVisibility);
+    this->CellVisibility->DeepCopy(ugData->CellVisibility);
+    }
+  else
+    {
+    vtkImageData *imageData = vtkImageData::SafeDownCast(dataObject);
+    if (imageData)
+      {
+      this->InternalUniformGridCopy(imageData);
+      }
     }
 
   // Do superclass
@@ -990,6 +1007,21 @@ void vtkUniformGrid::InternalUniformGridCopy(vtkUniformGrid *src)
     }
 }
 
+void vtkUniformGrid::InternalUniformGridCopy(vtkImageData *src)
+{
+  int idx;
+
+  float origin[3];
+  float spacing[3];
+  src->GetOrigin(origin);
+  src->GetSpacing(spacing);
+  this->SetExtent(src->GetExtent());
+  for (idx = 0; idx < 3; ++idx)
+    {
+    this->Origin[idx] = origin[idx];
+    this->Spacing[idx] = spacing[idx];
+    }
+}
 
 
 //----------------------------------------------------------------------------

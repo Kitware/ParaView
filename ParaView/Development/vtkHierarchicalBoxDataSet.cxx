@@ -24,7 +24,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.3");
+vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.4");
 vtkStandardNewMacro(vtkHierarchicalBoxDataSet);
 
 //----------------------------------------------------------------------------
@@ -130,8 +130,16 @@ void vtkHierarchicalBoxDataSet::GenerateVisibilityArrays()
     vtkHierarchicalDataSetInternal::LevelDataSetsIterator ldx;
     for (ldx = ldataSets.begin(); ldx != ldataSets.end(); ldx++)
       {
+      if (! *ldx )
+        {
+        continue;
+        }
       vtkAMRBox coarsebox = 
         static_cast<vtkHBDSNode*>(*ldx)->Box;
+      if (this->BoxInternal->RefinementRatios.size() <= levelIdx)
+        {
+        continue;
+        }
       coarsebox.Coarsen(this->BoxInternal->RefinementRatios[levelIdx]);
       boxes.push_back(coarsebox);
       }
