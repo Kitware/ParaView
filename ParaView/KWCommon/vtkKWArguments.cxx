@@ -43,10 +43,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/set>
+#ifdef _MSC_VER
+#pragma warning (push, 1)
+#pragma warning (disable: 4702)
+#endif
+
+#include <vector>
+#include <map>
+#include <string>
+#include <set>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //----------------------------------------------------------------------------
 //============================================================================
@@ -77,7 +86,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.8");
+vtkCxxRevisionMacro(vtkKWArguments, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()

@@ -47,8 +47,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 #include "vtkKWListBox.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#ifdef _MSC_VER
+#pragma warning (push, 1)
+#pragma warning (disable: 4702)
+#endif
+
+#include <vector>
+#include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //----------------------------------------------------------------------------
 //============================================================================
@@ -70,7 +79,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.24");
+vtkCxxRevisionMacro(vtkKWEntry, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
