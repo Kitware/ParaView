@@ -171,7 +171,10 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-  
+  this->ScalarBar->SetLookupTable(this->Mapper->GetLookupTable());
+  pvApp->BroadcastScript("%s SetLookupTable [%s GetLookupTable]", 
+                         this->LODMapperTclName, this->MapperTclName);
+ 
   // Get rid of previous object created by the superclass.
   if (this->Actor)
     {
@@ -620,7 +623,7 @@ void vtkPVActorComposite::ChangeColorMap()
                            this->MapperTclName);
     }
   
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 void vtkPVActorComposite::ResetColorRange()

@@ -432,12 +432,21 @@ void vtkPVSource::UpdateScalarsMenu()
 {
   int i, defaultSet = 0;
   vtkFieldData *fd;
-  
+  const char *arrayName;
+
   if (this->GetNumberOfPVInputs() == 0)
     {
     return;
     }
   
+  // Set up some logic to set the default array if this is the first pass.
+  // Retain previous value if not.
+  arrayName = this->ScalarOperationMenu->GetValue();
+  if (arrayName && arrayName[0] != '\0')
+    {
+    defaultSet = 1;
+    } 
+
   fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
   
   if (fd)
@@ -451,11 +460,18 @@ void vtkPVSource::UpdateScalarsMenu()
                                                        this, "ChangeScalars");
         if (!defaultSet)
           {
-          this->ScalarOperationMenu->SetValue(fd->GetArrayName(i));
-          defaultSet = 1;
+          arrayName = fd->GetArrayName(i);
+          if (arrayName && arrayName[0] != '\0')
+            {
+            defaultSet = 1;
+            } 
           }
         }
       }
+    }
+  if (defaultSet)
+    {
+    this->ScalarOperationMenu->SetValue(arrayName);
     }
 }
 
@@ -582,7 +598,7 @@ void vtkPVSource::Select(vtkKWView *v)
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->View->GetPropertiesParent()->GetWidgetName());
   this->Script("pack %s -side top -fill x",
-               ((vtkPVRenderView*)this->View)->GetNavigationFrame()->GetWidgetName());
+               this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
 
@@ -743,8 +759,9 @@ void vtkPVSource::AcceptCallback()
   window->GetMenuProperties()->CheckRadioButton(
     window->GetMenuProperties(), "Radio", 2);
   this->UpdateProperties();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 
+  // Update the selection menu.
   window->GetSelectMenu()->DeleteAllMenuItems();
   numSources = window->GetSources()->GetNumberOfItems();
   
@@ -2361,4 +2378,10 @@ void vtkPVSource::ChangeAcceptButtonColor()
 void vtkPVSource::EntryChanged(float vtkNotUsed(f1), float vtkNotUsed(f2))
 {
   this->ChangeAcceptButtonColor();
+}
+
+//----------------------------------------------------------------------------
+vtkPVRenderView* vtkPVSource::GetPVRenderView()
+{
+  return vtkPVRenderView::SafeDownCast(this->GetView());
 }
