@@ -883,11 +883,17 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.55 $");
+  this->ExtractRevision(os,"$Revision: 1.56 $");
 }
 
 int vtkKWWindow::ExitDialog()
 {
+  // Removing the default handler while we are displaying exit dialog.
+  // Note that using wm protocol %s WM_DELETE_WINDOW {} installs
+  // the default handlers, that's why we put the ; there.
+  this->Script("wm protocol %s WM_DELETE_WINDOW {;}",
+               this->GetWidgetName());
+
   ostrstream title;
   title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
   char* ttl = title.str();
@@ -899,6 +905,11 @@ int vtkKWWindow::ExitDialog()
     this->GetApplication(), vtkKWMessageDialog::Question,
     ttl, msg);
 
+  if (!ret)
+    {
+    this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
+		 this->GetWidgetName(), this->GetTclName());
+    }
   delete[] msg;
   delete[] ttl;
  
