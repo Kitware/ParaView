@@ -31,7 +31,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkDoubleArray.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.22");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.23");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -105,7 +105,6 @@ void vtkDesktopDeliveryClient::SetRenderWindow(vtkRenderWindow *renWin)
 float vtkDesktopDeliveryClient::GetZBufferValue(int x, int y)
 {
   float z;
-  int pArg[3];
 
   if (this->UseCompositing == 0)
     {
@@ -120,6 +119,7 @@ float vtkDesktopDeliveryClient::GetZBufferValue(int x, int y)
   
   // TODO:
   // This first int is to check for byte swapping.
+//  int pArg[3];
 //  pArg[0] = 1;
 //  pArg[1] = x;
 //  pArg[2] = y;
