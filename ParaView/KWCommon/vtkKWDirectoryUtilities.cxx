@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.7");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.8");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -499,7 +499,7 @@ const char* vtkKWDirectoryUtilities::FindSelfPath(const char* argv0)
 const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, 
                                                      char *path)
 {
-  if ( !filename | strlen(filename) == 0 )
+  if ( !filename || strlen(filename) == 0 )
     {
     path[0] = 0;
     return path;
@@ -524,7 +524,7 @@ const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename,
 const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename, 
                                                      char *name)
 {
-  if ( !filename | strlen(filename) == 0 )
+  if ( !filename || strlen(filename) == 0 )
     {
     name[0] = 0;
     return name;
@@ -550,7 +550,7 @@ const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename,
 const char* vtkKWDirectoryUtilities::GetFilenameExtension(const char *filename, 
                                                           char *ext)
 {
-  if ( !filename | strlen(filename) == 0 )
+  if ( !filename || strlen(filename) == 0 )
     {
     ext[0] = 0;
     return ext;
