@@ -259,6 +259,14 @@
      <SubProxy>
        <Proxy name="camera" class="vtkCamera">
          <DoubleVectorProperty
+           name="CameraFocalPointInfo"
+           command="GetFocalPoint"
+           number_of_elements="3"
+           information_only="1"
+           default_values="0 0 0">
+           <SimpleDoubleInformationHelper/>
+         </DoubleVectorProperty>
+         <DoubleVectorProperty
            name="CameraPosition"
            command="SetPosition"
            number_of_elements="3"
