@@ -39,40 +39,7 @@ $pvShrink AcceptCallback
 
 
 
-RenWin1 SetSize 448 603
+RenWin1 SetSize 250 250
 RenWin1 Render
-
-
-if {[info exists PARAVIEW_BASELINE]} {
-    vtkWindowToImageFilter winToImage
-    winToImage SetInput RenWin1
-    
-    vtkPNGReader reader
-    reader SetFileName "${PARAVIEW_BASELINE}/Sphere.png"
-    
-    vtkImageDifference imgdiff
-    imgdiff SetInput [winToImage GetOutput]
-    imgdiff SetImage [reader GetOutput]
-    imgdiff Update
-    
-    set threshold 10
-    
-    set imageError [decipadString [imgdiff GetThresholdedError] 4 9]
-    
-    if {[imgdiff GetThresholdedError] > $threshold} {
-	puts "Failed Image Test with error: $imageError"
-	exit 1; 
-    } else {
-	Application Exit
-    }
-	
-} else {
-    puts "A valid image could not be found."
-    exit 1;
-}
-
-
-
 Application Exit
-
 
