@@ -172,11 +172,13 @@ void vtkKWRenderView::SetupMemoryRendering(int x, int y, void *cd)
     {
     cd = this->RenderWindow->GetGenericContext();
     }
-  ((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
-#elseif
+  vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
+#else
   if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
     {
-    ((vtkMesaRenderWindow*)(this->RenderWindow))->SetOffScreenRendering(1);
+    vtkMesaRenderWindow::
+      SafeDownCast(this->RenderWindow)->SetOffScreenRendering(1);
     } 
 #endif
 }
@@ -184,11 +186,13 @@ void vtkKWRenderView::SetupMemoryRendering(int x, int y, void *cd)
 void vtkKWRenderView::ResumeScreenRendering() 
 {
 #ifdef _WIN32
-  ((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->ResumeScreenRendering();
-#elseif
+  vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
+#else
   if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
     {
-    ((vtkMesaRenderWindow*)(this->RenderWindow))->SetOffScreenRendering(0);
+    vtkMesaRenderWindow::
+      SafeDownCast(this->RenderWindow)->SetOffScreenRendering(0);
     } 
 #endif
 }
@@ -196,7 +200,8 @@ void vtkKWRenderView::ResumeScreenRendering()
 void *vtkKWRenderView::GetMemoryDC()
 {
 #ifdef _WIN32	
-  return (void *)((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->GetMemoryDC();
+  return (void *)vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->GetMemoryDC();
 #endif
   return NULL;
 }
@@ -204,7 +209,8 @@ void *vtkKWRenderView::GetMemoryDC()
 unsigned char *vtkKWRenderView::GetMemoryData()
 {
 #ifdef _WIN32	
-  return ((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->GetMemoryData();
+  return vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->GetMemoryData();
 #endif
   return NULL;
 }
@@ -672,5 +678,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.5 $");
+  this->ExtractRevision(os,"$Revision: 1.6 $");
 }

@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 
 #ifdef WIN32
-#include "vtkRenderWindow.h"
+#include "vtkWin32OpenGLRenderWindow.h"
 #else
 #include "vtkMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
@@ -108,7 +108,7 @@ void vtkCompositeImagePair(float *localZdata, float *localPdata,
 }
 
 
-#define pow2(j) (1 << j)
+#define vtkTCPow2(j) (1 << (j))
 
 
 //----------------------------------------------------------------------------
@@ -163,12 +163,12 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 
   for (i = 0; i < logProcs; i++) 
     {
-    if ((myId % (int)pow2(i)) == 0) 
+    if ((myId % (int)vtkTCPow2(i)) == 0) 
       { // Find participants
-      if ((myId % (int)pow2(i+1)) < pow2(i)) 
+      if ((myId % (int)vtkTCPow2(i+1)) < vtkTCPow2(i)) 
         {
 	// receivers
-	id = myId+pow2(i);
+	id = myId+vtkTCPow2(i);
 	
 	// only send or receive if sender or receiver id is valid
 	// (handles non-power of 2 cases)
@@ -186,7 +186,7 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 	}
       else 
 	{
-	id = myId-pow2(i);
+	id = myId-vtkTCPow2(i);
 	if (id < numProcs) 
 	  {
 	  //cerr << i << " sender: " << myId << " sends data to "
