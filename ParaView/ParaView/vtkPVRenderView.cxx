@@ -45,15 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDummyRenderWindow.h"
 #include "vtkDummyRenderer.h"
 #include "vtkKWChangeColorButton.h"
-#include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -137,6 +138,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateFrame = vtkKWWidget::New();
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
+
+  this->InteractorStyleControl = vtkPVInteractorStyleControl::New();
 
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;
@@ -259,6 +262,8 @@ vtkPVRenderView::~vtkPVRenderView()
   
   this->CompositeCompressionCheck->Delete();
   this->CompositeCompressionCheck = NULL;
+
+  this->InteractorStyleControl->Delete();
   
   this->ReductionCheck->Delete();
   this->ReductionCheck = NULL;
@@ -804,6 +809,12 @@ void vtkPVRenderView::CreateViewProperties()
                this->FrameRateFrame->GetWidgetName());
 
 #endif
+
+  this->InteractorStyleControl->SetParent(this->GeneralProperties);
+  this->InteractorStyleControl->Create(pvapp, 0);
+
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->InteractorStyleControl->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

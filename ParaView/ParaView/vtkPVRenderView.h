@@ -58,11 +58,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 
 class vtkKWLabel;
-class vtkKWScale;
 class vtkKWPushButton;
+class vtkKWScale;
 class vtkLabeledFrame;
 class vtkPVApplication;
 class vtkPVData;
+class vtkPVInteractorStyleControl;
 class vtkPVNavigationWindow;
 class vtkPVSource;
 class vtkPVTreeComposite;
@@ -317,6 +318,8 @@ protected:
 
   // For the renderer in a separate toplevel window.
   vtkKWWidget *TopLevelRenderWindow;
+
+  vtkPVInteractorStyleControl *InteractorStyleControl;
 
   int DisableRenderingFlag;
 

@@ -39,6 +39,7 @@ vtkPVGlyph3D.cxx
 vtkPVInputMenu.cxx 
 vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
+vtkPVInteractorStyleControl.cxx
 vtkPVInteractorStyleFly.cxx
 vtkPVLODActor.cxx
 vtkPVLabel.cxx
