@@ -100,8 +100,8 @@ void vtkPVRenderViewEndRender(void *arg)
   vtkRenderWindow *renWin = rv->GetRenderWindow();
   vtkMultiProcessController *controller;
   int *windowSize;
-  int length, numPixels;
-  int id, numProcs;
+  int numPixels;
+  int numProcs;
   float *pdata, *zdata;    
   
   windowSize = renWin->GetSize();

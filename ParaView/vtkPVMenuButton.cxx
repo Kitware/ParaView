@@ -87,3 +87,8 @@ void vtkPVMenuButton::AddCommand(const char* label, vtkKWObject* Object,
 {
   this->Menu->AddCommand(label, Object, MethodAndArgString, help);
 }
+
+vtkKWMenu* vtkPVMenuButton::GetMenu()
+{
+  return this->Menu;
+}

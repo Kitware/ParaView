@@ -296,18 +296,18 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
     if ((myId % (int)pow2(i)) == 0) 
       { // Find participants
       if ((myId % (int)pow2(i+1)) < pow2(i)) 
-	{
-	// receivers
-	id = myId+pow2(i);
+        {
+	      // receivers
+	      id = myId+pow2(i);
 
-	// only send or receive if sender or receiver id is valid
-	// (handles non-power of 2 cases)
-	if (id < numProcs) 
-	  {
-	  //cerr << "phase " << i << " receiver: " << myId 
-	  //     << " receives data from " << id << endl;
-	  controller->Receive(remoteZdata, zdata_size, id, 99);
-	  controller->Receive(remotePdata, pdata_size, id, 99);
+	      // only send or receive if sender or receiver id is valid
+	      // (handles non-power of 2 cases)
+	      if (id < numProcs) 
+          {
+	        //cerr << "phase " << i << " receiver: " << myId 
+	        //     << " receives data from " << id << endl;
+	        controller->Receive(remoteZdata, zdata_size, id, 99);
+	        controller->Receive(remotePdata, pdata_size, id, 99);
 
 	  // notice the result is stored as the local data
 	  vtkCompositeImagePair(localZdata, localPdata, remoteZdata, remotePdata, 

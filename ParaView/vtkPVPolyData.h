@@ -57,8 +57,9 @@ public:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
   void SetComposite(vtkPVComposite *pvComp);
   
-  void SetupShrinkSlider();
   void Shrink();
+  void Elevation();
+  void Contour();
   
 protected:
   vtkPVPolyData();
@@ -70,8 +71,6 @@ protected:
 
   vtkKWLabel *Label;
   vtkPVMenuButton *FiltersMenuButton;
-  vtkKWScale *ShrinkFactorScale;
-  vtkKWWidget *Accept;
   vtkDataSet *Data;
   vtkPolyDataMapper *Mapper;
   vtkActor *Actor;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVShrinkPolyData.h
+  Module:    vtkPVElevationFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,38 +26,63 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVShrinkPolyData_h
-#define __vtkPVShrinkPolyData_h
+#ifndef __vtkPVElevationFilter_h
+#define __vtkPVElevationFilter_h
 
 #include "vtkKWLabel.h"
-#include "vtkShrinkPolyData.h"
+#include "vtkElevationFilter.h"
+#include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkPVSource.h"
 
 
-class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVSource
+class VTK_EXPORT vtkPVElevationFilter : public vtkPVSource
 {
 public:
-  static vtkPVShrinkPolyData* New();
-  vtkTypeMacro(vtkPVShrinkPolyData,vtkPVSource);
+  static vtkPVElevationFilter* New();
+  vtkTypeMacro(vtkPVElevationFilter, vtkPVSource);
 
   void Create(vtkKWApplication *app, char *args);
-  
-  void ShrinkFactorChanged();
 
-  vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
+  vtkGetObjectMacro(Elevation, vtkElevationFilter);
+  
+  void ElevationParameterChanged();
   
 protected:
-  vtkPVShrinkPolyData();
-  ~vtkPVShrinkPolyData();
-  vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
-  void operator=(const vtkPVShrinkPolyData&) {};
+  vtkPVElevationFilter();
+  ~vtkPVElevationFilter();
+  vtkPVElevationFilter(const vtkPVElevationFilter&) {};
+  void operator=(const vtkPVElevationFilter&) {};
     
   vtkKWLabel *Label;
+  
+  vtkKWLabel *LowPointLabel;
+  vtkKWLabel *HighPointLabel;
+  vtkKWLabel *RangeLabel;
+  vtkKWWidget *LowPointFrame;
+  vtkKWWidget *HighPointFrame;
+  vtkKWWidget *RangeFrame;
+  
+  vtkKWEntry *LowPointXEntry;
+  vtkKWEntry *LowPointYEntry;
+  vtkKWEntry *LowPointZEntry;
+  vtkKWEntry *HighPointXEntry;
+  vtkKWEntry *HighPointYEntry;
+  vtkKWEntry *HighPointZEntry;
+  vtkKWEntry *RangeMinEntry;
+  vtkKWEntry *RangeMaxEntry;
+  vtkKWLabel *LowPointXLabel;
+  vtkKWLabel *LowPointYLabel;
+  vtkKWLabel *LowPointZLabel;
+  vtkKWLabel *HighPointXLabel;
+  vtkKWLabel *HighPointYLabel;
+  vtkKWLabel *HighPointZLabel;
+  vtkKWLabel *RangeMinLabel;
+  vtkKWLabel *RangeMaxLabel;
+  
   vtkKWWidget *Accept;
-  vtkKWScale *ShrinkFactorScale;
 
-  vtkShrinkPolyData *Shrink;
+  vtkElevationFilter *Elevation;
 };
 
 #endif

@@ -28,10 +28,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVComposite.h"
 #include "vtkPVShrinkPolyData.h"
+#include "vtkPVElevationFilter.h"
+#include "vtkPVContourFilter.h"
 #include "vtkKWView.h"
 
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 
@@ -54,12 +57,6 @@ vtkPVPolyData::vtkPVPolyData()
   this->Actor = vtkActor::New();
   
   this->Composite = vtkPVComposite::New();
-  
-  this->ShrinkFactorScale = vtkKWScale::New();
-  this->ShrinkFactorScale->SetParent(this);
-  
-  this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
 }
 
 vtkPVPolyData::~vtkPVPolyData()
@@ -77,9 +74,6 @@ vtkPVPolyData::~vtkPVPolyData()
   
   this->Actor->Delete();
   this->Actor = NULL;
-  
-  this->ShrinkFactorScale->Delete();
-  this->ShrinkFactorScale = NULL;
 }
 
 vtkPVPolyData* vtkPVPolyData::New()
@@ -87,22 +81,9 @@ vtkPVPolyData* vtkPVPolyData::New()
   return new vtkPVPolyData();
 }
 
-void vtkPVPolyData::SetupShrinkSlider()
-{
-  //set up slider to get amt to shrink by
-  this->ShrinkFactorScale->Create(this->Application,
-				  "-showvalue 1 -resolution 0.1");
-  this->ShrinkFactorScale->SetRange(0, 1);
-  this->Script("pack %s", this->ShrinkFactorScale->GetWidgetName());
-  
-  this->Accept->Create(this->Application, "button",
-		       "-text Accept");
-  this->Accept->SetCommand(this, "Shrink");
-  this->Script("pack %s", this->Accept->GetWidgetName());
-}
-
 void vtkPVPolyData::Shrink()
 {
+  //shrink factor defaults to 0.5, which seems reasonable
   vtkPVShrinkPolyData *shrink;
   vtkPVPolyData *pd;
   vtkPVComposite *newComp;
@@ -133,6 +114,85 @@ void vtkPVPolyData::Shrink()
   newComp->Delete();
 }
 
+void vtkPVPolyData::Elevation()
+{
+  vtkPVElevationFilter *elevation;
+  vtkPVPolyData *pd;
+  vtkPVComposite *newComp;
+  float *bounds;
+  float low[3], high[3];
+  
+  bounds = this->GetPolyData()->GetBounds();
+  low[0] = 0;
+  low[1] = 0;
+  low[2] = bounds[4];
+  high[0] = 0;
+  high[1] = 0;
+  high[2] = bounds[5];
+  
+  elevation = vtkPVElevationFilter::New();
+  elevation->GetElevation()->SetInput(this->GetPolyData());
+  elevation->GetElevation()->SetLowPoint(low);
+  elevation->GetElevation()->SetHighPoint(high);
+  
+  pd = vtkPVPolyData::New();
+  pd->SetPolyData(elevation->GetElevation()->GetPolyDataOutput());
+  
+  newComp = vtkPVComposite::New();
+  newComp->SetData(pd);
+  newComp->SetSource(elevation);
+  
+  vtkPVWindow *window = this->Composite->GetWindow();
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties(this->Application, "");
+  this->Composite->GetView()->AddComposite(newComp);
+  this->Composite->GetProp()->VisibilityOff();
+  
+  newComp->SetWindow(window);
+  
+  window->SetCurrentDataComposite(newComp);
+  
+  pd->Composite->GetView()->Render();
+  
+  pd->Delete();
+  newComp->Delete();
+}
+
+void vtkPVPolyData::Contour()
+{
+  vtkPVContourFilter *contour;
+  vtkPVPolyData *pd;
+  vtkPVComposite *newComp;
+  float *range;
+  
+  contour = vtkPVContourFilter::New();
+  contour->GetContour()->SetInput(this->GetPolyData());
+  
+  range = this->GetPolyData()->GetScalarRange();
+  contour->GetContour()->SetValue(0, (range[1]-range[0])/2.0);
+  
+  pd = vtkPVPolyData::New();
+  pd->SetPolyData(contour->GetContour()->GetOutput());
+    
+  newComp = vtkPVComposite::New();
+  newComp->SetData(pd);
+  newComp->SetSource(contour);
+  
+  vtkPVWindow *window = this->Composite->GetWindow();
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties(this->Application, "");
+  this->Composite->GetView()->AddComposite(newComp);
+  this->Composite->GetProp()->VisibilityOff();
+  
+  newComp->SetWindow(window);
+  
+  window->SetCurrentDataComposite(newComp);
+  
+  pd->Composite->GetView()->Render();
+  
+  pd->Delete();
+  newComp->Delete();
+}
 
 void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
 {
@@ -151,12 +211,29 @@ void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
   this->Label->Create(app, "");
   this->Label->SetLabel("vtkPVPolyData label");
   this->Script("pack %s", this->Label->GetWidgetName());
+
+  this->GetPolyData()->Update();
   
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(app, "");
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
-				      "SetupShrinkSlider");
+				      "Shrink");
+  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
+				      "Elevation");
+  this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
+				      "Contour");
+  if (this->GetPolyData()->GetPointData()->GetScalars() == NULL)
+    {
+    this->Script("%s entryconfigure 3 -state disabled",
+		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s entryconfigure 3 -state normal",
+		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
+    }
+  
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
   
   this->Mapper->SetInput(this->GetPolyData());

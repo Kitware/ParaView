@@ -70,12 +70,15 @@ void vtkPVComposite::SetWindow(vtkPVWindow *window)
     {
     vtkPVWindow *tmp = this->Window;
     this->Window = NULL;
-    tmp->UnRegister(this);
+    //Register and UnRegister are commented out because including
+    //these lines causes ParaView to crash when you try to exit.
+    //We think it is probably some weirdness with reference counting.
+//    tmp->UnRegister(this);
     }
   if (window)
     {
     this->Window = window;
-    window->Register(this);
+//    window->Register(this);
     }
 }
 

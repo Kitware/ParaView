@@ -50,6 +50,8 @@ public:
   void AddCommand(const char* label, vtkKWObject* Object,
 		  const char* MethodAndArgString , const char* help = 0);
   
+  vtkKWMenu* GetMenu();
+  
 protected:
   vtkPVMenuButton();
   ~vtkPVMenuButton();

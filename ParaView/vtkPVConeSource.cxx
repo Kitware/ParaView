@@ -122,15 +122,14 @@ void vtkPVConeSource::Create(vtkKWApplication *app, char *args)
   this->Accept->Create(this->Application, "button",
 	                     "-text Accept");
   this->Accept->SetCommand(this, "ConeParameterChanged");
-  this->Script("pack %s", this->Accept->GetWidgetName());
-  this->Script("pack %s %s %s %s %s %s %s", 
+  this->Script("pack %s %s %s %s %s %s %s",
+	       this->Accept->GetWidgetName(),
                this->RadiusLabel->GetWidgetName(),
                this->RadiusEntry->GetWidgetName(),
                this->HeightLabel->GetWidgetName(),
                this->HeightEntry->GetWidgetName(),
                this->ResolutionLabel->GetWidgetName(),
-               this->ResolutionEntry->GetWidgetName(),
-               this->Accept->GetWidgetName());
+               this->ResolutionEntry->GetWidgetName());
 }
 
 void vtkPVConeSource::ConeParameterChanged()

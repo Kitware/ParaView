@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVShrinkPolyData.cxx
+  Module:    vtkPVContourFilter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,29 +26,32 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVShrinkPolyData.h"
+#include "vtkPVContourFilter.h"
 #include "vtkKWApplication.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
 
-int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
+			      int argc, char *argv[]);
 
-vtkPVShrinkPolyData::vtkPVShrinkPolyData()
+vtkPVContourFilter::vtkPVContourFilter()
 {
-  this->CommandFunction = vtkPVShrinkPolyDataCommand;
+  this->CommandFunction = vtkPVContourFilterCommand;
   
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this);
-  this->ShrinkFactorScale = vtkKWScale::New();
-  this->ShrinkFactorScale->SetParent(this);
-  this->Shrink = vtkShrinkPolyData::New();
+  this->ContourValueEntry = vtkKWEntry::New();
+  this->ContourValueEntry->SetParent(this);
+  this->ContourValueLabel = vtkKWLabel::New();
+  this->ContourValueLabel->SetParent(this);
+  
+  this->Contour = vtkContourFilter::New();
 }
 
-vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
+vtkPVContourFilter::~vtkPVContourFilter()
 {
   this->Label->Delete();
   this->Label = NULL;
@@ -56,24 +59,26 @@ vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
   this->Accept->Delete();
   this->Accept = NULL;
   
-  this->ShrinkFactorScale->Delete();
-  this->ShrinkFactorScale = NULL;
+  this->ContourValueEntry->Delete();
+  this->ContourValueEntry = NULL;
+  this->ContourValueLabel->Delete();
+  this->ContourValueLabel = NULL;
   
-  this->Shrink->Delete();
-  this->Shrink = NULL;
+  this->Contour->Delete();
+  this->Contour = NULL;
 }
 
-vtkPVShrinkPolyData* vtkPVShrinkPolyData::New()
+vtkPVContourFilter* vtkPVContourFilter::New()
 {
-  return new vtkPVShrinkPolyData();
+  return new vtkPVContourFilter();
 }
 
-void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
-{  
+void vtkPVContourFilter::Create(vtkKWApplication *app, char *args)
+{
   // must set the application
   if (this->Application)
     {
-    vtkErrorMacro("vtkPVShrinkPolyData already created");
+    vtkErrorMacro("vtkPVContourFilter already created");
     return;
     }
   this->SetApplication(app);
@@ -82,26 +87,28 @@ void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
   this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkShrinkPolyData label");
+  this->Label->SetLabel("vtkContourFilter label");
   
   this->Script("pack %s", this->Label->GetWidgetName());
   
-  this->ShrinkFactorScale->Create(this->Application,
-			    "-showvalue 1 -resolution 0.1");
-  this->ShrinkFactorScale->SetRange(0, 1);
-  this->ShrinkFactorScale->SetValue(this->GetShrink()->GetShrinkFactor());
+  this->ContourValueLabel->Create(this->Application, "");
+  this->ContourValueLabel->SetLabel("Contour Value:");
+  this->ContourValueEntry->Create(this->Application, "");
+  this->ContourValueEntry->SetValue(this->GetContour()->GetValue(0), 2);
   
   this->Accept->Create(this->Application, "button", "-text Accept");
-  this->Accept->SetCommand(this, "ShrinkFactorChanged");
-  this->Script("pack %s %s", this->ShrinkFactorScale->GetWidgetName(),
-	this->Accept->GetWidgetName());
+  this->Accept->SetCommand(this, "ContourValueChanged");
+  this->Script("pack %s", this->Accept->GetWidgetName());
+  this->Script("pack %s %s -side left -anchor w",
+	       this->ContourValueLabel->GetWidgetName(),
+	       this->ContourValueEntry->GetWidgetName());
 }
 
-void vtkPVShrinkPolyData::ShrinkFactorChanged()
+void vtkPVContourFilter::ContourValueChanged()
 {  
-  this->Shrink->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
-  this->Shrink->Modified();
-  this->Shrink->Update();
+  this->Contour->SetValue(0, this->ContourValueEntry->GetValueAsFloat());
+  this->Contour->Modified();
+  this->Contour->Update();
   
   this->Composite->GetView()->Render();
 }

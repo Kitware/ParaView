@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVShrinkPolyData.h
+  Module:    vtkPVContourFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,38 +26,40 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVShrinkPolyData_h
-#define __vtkPVShrinkPolyData_h
+#ifndef __vtkPVContourFilter_h
+#define __vtkPVContourFilter_h
 
 #include "vtkKWLabel.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWScale.h"
+#include "vtkContourFilter.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 #include "vtkPVSource.h"
 
 
-class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVSource
+class VTK_EXPORT vtkPVContourFilter : public vtkPVSource
 {
 public:
-  static vtkPVShrinkPolyData* New();
-  vtkTypeMacro(vtkPVShrinkPolyData,vtkPVSource);
+  static vtkPVContourFilter* New();
+  vtkTypeMacro(vtkPVContourFilter, vtkPVSource);
 
   void Create(vtkKWApplication *app, char *args);
   
-  void ShrinkFactorChanged();
+  void ContourValueChanged();
 
-  vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
+  vtkGetObjectMacro(Contour, vtkContourFilter);
   
 protected:
-  vtkPVShrinkPolyData();
-  ~vtkPVShrinkPolyData();
-  vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
-  void operator=(const vtkPVShrinkPolyData&) {};
+  vtkPVContourFilter();
+  ~vtkPVContourFilter();
+  vtkPVContourFilter(const vtkPVContourFilter&) {};
+  void operator=(const vtkPVContourFilter&) {};
     
   vtkKWLabel *Label;
   vtkKWWidget *Accept;
-  vtkKWScale *ShrinkFactorScale;
+  vtkKWEntry *ContourValueEntry;
+  vtkKWLabel *ContourValueLabel;
 
-  vtkShrinkPolyData *Shrink;
+  vtkContourFilter  *Contour;
 };
 
 #endif

@@ -189,6 +189,22 @@ SOURCE=.\vtkPVConeSourceTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVContourFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVContourFilterTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVElevationFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVElevationFilterTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVMenuButton.cxx
 # End Source File
 # Begin Source File
@@ -479,6 +495,46 @@ SOURCE=.\vtkPVConeSource.h
 # Begin Custom Build
 InputPath=.\vtkPVConeSource.h
 InputName=vtkPVConeSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVContourFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVContourFilter.h
+InputName=vtkPVContourFilter
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVElevationFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVElevationFilter.h
+InputName=vtkPVElevationFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
