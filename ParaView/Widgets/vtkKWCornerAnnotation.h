@@ -56,6 +56,7 @@ class vtkKWCheckButton;
 class vtkKWGenericComposite;
 class vtkKWScale;
 class vtkKWText;
+class vtkKWTextProperty;
 class vtkKWView;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
@@ -110,18 +111,23 @@ public:
   void SetMaximumLineHeight(float);
   float GetMaximumLineHeight();
   void MaximumLineHeightCallback();
+  void MaximumLineHeightEndCallback();
 
   // Description:
   // Get at the underlying vtkCornerAnnotationClass
   vtkGetObjectMacro(CornerProp,vtkCornerAnnotation);
   
+  // Description:
+  // GUI components access
+  vtkGetObjectMacro(TextProperty, vtkKWTextProperty);
+
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
 
-  vtkKWWidget            *CornerDisplayFrame;
-  vtkKWChangeColorButton *CornerColor;
-  vtkKWCheckButton       *CornerButton;
+  vtkKWTextProperty *TextProperty;
+
+  vtkKWCheckButton       *CornerVisibilityButton;
 
   vtkKWWidget            *CornerTopFrame;
   vtkKWWidget            *CornerBottomFrame;
