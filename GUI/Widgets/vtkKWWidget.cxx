@@ -14,7 +14,6 @@
 
 #include "vtkKWWidget.h"
 
-#include "vtkImageData.h"
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
@@ -22,16 +21,12 @@
 #include "vtkKWWindow.h"
 #include "vtkKWDragAndDropHelper.h"
 #include "vtkObjectFactory.h"
-#include "vtkPNGWriter.h"
-#include "vtkWindows.h"
 
 #include <kwsys/SystemTools.hxx>
 
-#include "X11/Xutil.h"
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.114");
+vtkCxxRevisionMacro(vtkKWWidget, "1.115");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -460,8 +455,7 @@ const char* vtkKWWidget::GetType()
 {
   if (this->IsCreated())
     {
-    this->Script("winfo class %s", this->GetWidgetName());
-    return this->GetApplication()->GetMainInterp()->result;
+    return this->Script("winfo class %s", this->GetWidgetName());
     }
   return "None";
 }
@@ -581,9 +575,7 @@ int vtkKWWidget::GetStateOption()
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
-  vtkKWTkUtilities::GetBackgroundColor(this->GetApplication()->GetMainInterp(),
-                                       this->GetWidgetName(), 
-                                       r, g, b);
+  vtkKWTkUtilities::GetBackgroundColor(this, r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -615,10 +607,7 @@ void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
 {
-  vtkKWTkUtilities::GetOptionColor(this->GetApplication()->GetMainInterp(),
-                                   this->GetWidgetName(), 
-                                   "-fg",
-                                   r, g, b);
+  vtkKWTkUtilities::GetOptionColor(this, "-fg", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -769,7 +758,8 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
     // Check if we have that encoding
     
     Tcl_Encoding tcl_encoding = 
-      Tcl_GetEncoding(this->GetApplication()->GetMainInterp(), tcl_encoding_name);
+      Tcl_GetEncoding(
+        this->GetApplication()->GetMainInterp(), tcl_encoding_name);
     if (tcl_encoding != NULL)
       {
       Tcl_FreeEncoding(tcl_encoding);
@@ -1051,7 +1041,7 @@ void vtkKWWidget::SetImageOption(const unsigned char* data,
   this->Script("catch {destroy %s}", image_name.str());
 #endif
   
-  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                      image_name.str(),
                                      data, 
                                      width, height, pixel_size,
@@ -1142,265 +1132,12 @@ void vtkKWWidget::ConfigureOptions(const char* opts)
   this->Script("%s configure %s", this->GetWidgetName(), opts);
 }
 
-/*
- *--------------------------------------------------------------
- *
- * TkImageGetColor --
- *
- *  This procedure converts a pixel value to three floating
- *      point numbers, representing the amount of red, green, and 
- *      blue in that pixel on the screen.  It makes use of colormap
- *      data passed as an argument, and should work for all Visual
- *      types.
- *
- *  This implementation is bogus on Windows because the colormap
- *  data is never filled in.  Instead all postscript generated
- *  data coming through here is expected to be RGB color data.
- *  To handle lower bit-depth images properly, XQueryColors
- *  must be implemented for Windows.
- *
- * Results:
- *  Returns red, green, and blue color values in the range 
- *      0 to 1.  There are no error returns.
- *
- * Side effects:
- *  None.
- *
- *--------------------------------------------------------------
- */
-
-/*
- * The following definition is used in generating postscript for images
- * and windows.
- */
-
-struct vtkKWWidgetTkColormapData {  /* Hold color information for a window */
-  int separated;    /* Whether to use separate color bands */
-  int color;      /* Whether window is color or black/white */
-  int ncolors;    /* Number of color values stored */
-  XColor *colors;    /* Pixel value -> RGB mappings */
-  int red_mask, green_mask, blue_mask;  /* Masks and shifts for each */
-  int red_shift, green_shift, blue_shift;  /* color band */
-};
-
-static void
-vtkKWWidgetTkImageGetColor(vtkKWWidgetTkColormapData* 
-#ifdef WIN32
-#else
-                           cdata
-#endif
-                           ,
-                           unsigned long pixel, 
-                           double *red, 
-                           double *green, 
-                           double *blue)
-#ifdef WIN32
-
-/*
- * We could just define these instead of pulling in windows.h.
-#define GetRValue(rgb)  ((BYTE)(rgb))
-#define GetGValue(rgb)  ((BYTE)(((WORD)(rgb)) >> 8))
-#define GetBValue(rgb)  ((BYTE)((rgb)>>16))
-*/
-
-{
-  *red   = (double) GetRValue(pixel) / 255.0;
-  *green = (double) GetGValue(pixel) / 255.0;
-  *blue  = (double) GetBValue(pixel) / 255.0;
-}
-#else
-{
-  if (cdata->separated) {
-    int r = (pixel & cdata->red_mask) >> cdata->red_shift;
-    int g = (pixel & cdata->green_mask) >> cdata->green_shift;
-    int b = (pixel & cdata->blue_mask) >> cdata->blue_shift;
-    *red   = cdata->colors[r].red / 65535.0;
-    *green = cdata->colors[g].green / 65535.0;
-    *blue  = cdata->colors[b].blue / 65535.0;
-  } else {
-    *red   = cdata->colors[pixel].red / 65535.0;
-    *green = cdata->colors[pixel].green / 65535.0;
-    *blue  = cdata->colors[pixel].blue / 65535.0;
-  }
-}
-#endif
-
 //----------------------------------------------------------------------------
 int vtkKWWidget::TakeScreenDump(const char* fname,
-  int top, int bottom, int left, int right)
+                                int top, int bottom, int left, int right)
 {
-  if ( !this->IsCreated() )
-    {
-    return 0;
-    }
-  const char* w = this->GetWidgetName();
-  return this->TakeScreenDump(w, fname,
-    top, bottom, left, right);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname,
-  int top, int bottom, int left, int right)
-{
-  int res = 0;
-  if ( !fname )
-    {
-    return 0;
-    }
-  if ( !wname )
-    {
-    return 0;
-    }
-
-  const char* dims 
-    = this->Script(
-      "list "
-      "[ winfo rootx %s ] "
-      "[ winfo rooty %s ] "
-      "[ winfo width %s ] "
-      "[ winfo height %s ]",
-      wname, wname, wname, wname);
-  if ( !dims )
-    {
-    return 0;
-    }
-
-  int xx, yy, ww, hh;
-  xx = yy = ww = hh = 0;
-  if ( sscanf(dims, "%d %d %d %d", &xx, &yy, &ww, &hh) != 4 )
-    {
-    return 0;
-    }
-
-  xx -= left;
-  yy -= top;
-  ww += left + right;
-  hh += top + bottom;
-
-  Tk_Window image_window;
-
-  image_window = Tk_MainWindow (this->GetApplication()->GetMainInterp());
-  Display *dpy = Tk_Display(image_window);
-  int screen = DefaultScreen(dpy);
-  Window win=RootWindow(dpy, screen);
-
-  XImage *ximage = XGetImage(dpy, win, xx, yy,
-    (unsigned int)ww, (unsigned int)hh, AllPlanes, XYPixmap);
-  if ( !ximage )
-    {
-    return 0;
-    }
-  unsigned int buffer_size = ximage->bytes_per_line * ximage->height;
-  if (ximage->format != ZPixmap)
-    {
-    buffer_size = ximage->bytes_per_line * ximage->height * ximage->depth;
-    }
-
-  vtkKWWidgetTkColormapData cdata;
-  Colormap cmap;
-  Visual *visual;
-  int i, ncolors;
-  cmap = Tk_Colormap(image_window);
-  visual = Tk_Visual(image_window);
-
-  /*
-   * Obtain information about the colormap, ie the mapping between
-   * pixel values and RGB values.  The code below should work
-   * for all Visual types.
-   */
-
-  ncolors = visual->map_entries;
-  cdata.colors = (XColor *) ckalloc(sizeof(XColor) * ncolors);
-  cdata.ncolors = ncolors;
-
-  if (visual->c_class == DirectColor || visual->c_class == TrueColor) 
-    {
-    cdata.separated = 1;
-    cdata.red_mask = visual->red_mask;
-    cdata.green_mask = visual->green_mask;
-    cdata.blue_mask = visual->blue_mask;
-    cdata.red_shift = 0;
-    cdata.green_shift = 0;
-    cdata.blue_shift = 0;
-    while ((0x0001 & (cdata.red_mask >> cdata.red_shift)) == 0)
-      cdata.red_shift ++;
-    while ((0x0001 & (cdata.green_mask >> cdata.green_shift)) == 0)
-      cdata.green_shift ++;
-    while ((0x0001 & (cdata.blue_mask >> cdata.blue_shift)) == 0)
-      cdata.blue_shift ++;
-    for (i = 0; i < ncolors; i ++)
-      cdata.colors[i].pixel =
-        ((i << cdata.red_shift) & cdata.red_mask) |
-        ((i << cdata.green_shift) & cdata.green_mask) |
-        ((i << cdata.blue_shift) & cdata.blue_mask);
-    } 
-  else 
-    {
-    cdata.separated=0;
-    for (i = 0; i < ncolors; i ++)
-      cdata.colors[i].pixel = i;
-    }
-  if (visual->c_class == StaticGray || visual->c_class == GrayScale)
-    {
-    cdata.color = 0;
-    }
-  else
-    {
-    cdata.color = 1;
-    }
-
-  XQueryColors(Tk_Display(image_window), cmap, cdata.colors, ncolors);
-
-  /*
-   * Figure out which color level to use (possibly lower than the 
-   * one specified by the user).  For example, if the user specifies
-   * color with monochrome screen, use gray or monochrome mode instead. 
-   */
-
-  int level = 2;
-  if (!cdata.color && level == 2) 
-    {
-    level = 1;
-    }
-
-  if (!cdata.color && cdata.ncolors == 2) 
-    {
-    level = 0;
-    }
-
-
-  vtkImageData* id = vtkImageData::New();
-  id->SetDimensions(ww, hh, 1);
-  id->SetScalarTypeToUnsignedChar();
-  id->SetNumberOfScalarComponents(3);
-  id->AllocateScalars();
-
-  unsigned char* ptr = (unsigned char*) id->GetScalarPointer();
-  int x, y;
-  for (y = 0; y < hh; y++) 
-    {
-    for (x = 0; x < ww; x++) 
-      {
-      double red, green, blue;
-      vtkKWWidgetTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y-1),
-        &red, &green, &blue);
-      ptr[0] = (unsigned char)(255 * red);
-      ptr[1] = (unsigned char)(255 * green);
-      ptr[2] = (unsigned char)(255 * blue);
-      ptr += 3;
-      }
-    }
-  vtkPNGWriter *writer = vtkPNGWriter::New();
-  writer->SetInput(id);
-  writer->SetFileName(fname);
-  writer->Write();
-  writer->Delete();
-  id->Delete();
-
-  XDestroyImage(ximage);
-  res = 1; 
-
-  return res;
+  return vtkKWTkUtilities::TakeScreenDump(
+    this, fname, top, bottom, left, right);
 }
 
 //----------------------------------------------------------------------------
