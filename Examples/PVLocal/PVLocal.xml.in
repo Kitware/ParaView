@@ -1,0 +1,29 @@
+<ModuleInterfaces>
+ <Library name="PVLocal" directory="@LIBRARY_OUTPUT_PATH@"/>
+ <Module name="LocalConeSource" menu_name="LocalCone" root_name="LocalCone"
+         module_type="Source"
+         long_help="3D cone of a given radius and height."
+         short_help="Create a 3D cone of a given radius and height">
+  <Source class="vtkLocalConeSource"/>
+  <Scale variable="Resolution" trace_name="Resolution"
+         default_value="6" resolution="1" range="0 512"
+         display_entry="1" display_value="0" entry_and_label_on_top="0"
+         help="Set the number of faces on this cone" />
+  <ThumbWheel variable="Radius" trace_name="Radius"
+              resolution="0.01" minimum_value="0" default_value="0.5"
+              help="Set the radius of the widget part of the cone" />
+  <ThumbWheel variable="Height" trace_name="Height"
+              resolution="0.01" minimum_value="0" default_value="1"
+              help="Set the height of the cone" />
+  <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
+                 help="Set whether to draw the base of the cone" />
+  <Documentation>
+The Cone source can be used to add a polygonal cone to the 3D scene. The Cone source has the following parameters:
+Resolution: This value indicates the number of divisions around the cone. The higher this number, the closer the polygonal approximation will come to representing a cone, and the more polygons it will contain. The default resolution is 6.
+Radius: This is the radius of the cone. The default value is 0.5.
+Height: This is the height of the cone. The default value is 1.0.
+Capping: This check box indicates whether the cone is capped (i.e., there is a polygon closing off the wide end of the cone) or open. By default the cone is capped.
+The output of the Cone source is polygonal data.
+  </Documentation>
+ </Module>
+</ModuleInterfaces>
