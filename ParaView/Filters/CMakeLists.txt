@@ -21,6 +21,7 @@ SET(Filters_SRCS
   vtkPVImageGradient.cxx
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
+  vtkPVLinearExtrusionFilter.cxx
   vtkPVRibbonFilter.cxx
   vtkPVThresholdFilter.cxx
   vtkPVUpdateSuppressor.cxx

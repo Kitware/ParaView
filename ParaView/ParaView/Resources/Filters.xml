@@ -605,7 +605,7 @@
           module_type="Filter"
           long_help="This filter creates a swept surface defined by translating the input along a vector."
           short_help="Generate a linear swept surface.">
-    <Filter class="vtkPLinearExtrusionFilter">
+    <Filter class="vtkPVLinearExtrusionFilter">
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
