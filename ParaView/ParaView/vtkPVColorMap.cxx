@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.29");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.30");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -924,7 +924,6 @@ int vtkPVColorMap::MatchArrayName(const char* str, int numberOfComponents)
   return 0;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarTitleEntryCallback()
 {
@@ -934,43 +933,37 @@ void vtkPVColorMap::ScalarBarTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
-                      this->GetTclName(), 
-                      name);
-  this->SetScalarBarTitleNoTrace(name);
-}
+  if (this->ScalarBarTitle == NULL && name == NULL) 
+    { 
+    return;
+    }
 
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
-{
-  if ( this->ScalarBarTitle == NULL && name == NULL) 
+  if (this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle, name))) 
     { 
     return;
     }
-  if ( this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle,name))) 
-    { 
-    return;
-    }
+
   if (this->ScalarBarTitle) 
     { 
     delete [] this->ScalarBarTitle; 
     this->ScalarBarTitle = NULL;
     }
+
   if (name)
     {
-    this->ScalarBarTitle = new char[strlen(name)+1];
-    strcpy(this->ScalarBarTitle,name);
+    this->ScalarBarTitle = new char[strlen(name) + 1];
+    strcpy(this->ScalarBarTitle, name);
     } 
 
   this->ScalarBarTitleEntry->SetValue(name);
 
+  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
+                      this->GetTclName(), name);
+
   this->UpdateScalarBarTitle();
+
+  this->Modified();
 }
-
-
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarVectorTitleEntryCallback()
@@ -981,59 +974,85 @@ void vtkPVColorMap::ScalarBarVectorTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarVectorTitle(const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
-                      this->GetTclName(), 
-                      name);
-  this->SetScalarBarVectorTitleNoTrace(name);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarVectorTitleNoTrace(const char* name)
-{
-  char *vectorTitle = NULL;
-
-  // Copy string.
-  if (name != NULL)
-    {
-    vectorTitle = new char[strlen(name)+1];
-    strcpy(vectorTitle, name);
-    }
-
   if (this->VectorMode == vtkPVColorMap::MAGNITUDE)
     {
+    if (this->VectorMagnitudeTitle == NULL && name == NULL) 
+      { 
+      return;
+      }
+
+    if (this->VectorMagnitudeTitle && name && 
+        (!strcmp(this->VectorMagnitudeTitle, name)))
+      {
+      return;
+      }
+
     if (this->VectorMagnitudeTitle)
       {
-      delete this->VectorMagnitudeTitle;
+      delete [] this->VectorMagnitudeTitle;
+      this->VectorMagnitudeTitle = NULL;
       }
-    this->VectorMagnitudeTitle = vectorTitle;
-    vectorTitle = NULL;
+
+    if (name)
+      {
+      this->VectorMagnitudeTitle = new char[strlen(name) + 1];
+      strcpy(this->VectorMagnitudeTitle, name);
+      }
+
+    this->ScalarBarVectorTitleEntry->SetValue(name);
+
+    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+                        this->GetTclName(), name);
+
+    this->UpdateScalarBarTitle();
+
+    this->Modified();
     }
   else
     {
-    // this check should not be necessary, but why not ...
-    if (this->VectorComponentTitles != NULL)
+    if (this->VectorComponentTitles == NULL)
       {
-      if (this->VectorComponentTitles[this->VectorComponent] != NULL)
-        {
-        delete [] this->VectorComponentTitles[this->VectorComponent];
-        }
-      this->VectorComponentTitles[this->VectorComponent] = vectorTitle;
-      vectorTitle = NULL;
+      return;
       }
+
+    if (this->VectorComponentTitles[this->VectorComponent] == NULL && 
+        name == NULL) 
+      { 
+      return;
+      }
+
+    if (this->VectorComponentTitles[this->VectorComponent] && 
+        name && 
+        (!strcmp(this->VectorComponentTitles[this->VectorComponent], name)))
+      {
+      return;
+      }
+
+    if (this->VectorComponentTitles[this->VectorComponent])
+      {
+      delete [] this->VectorComponentTitles[this->VectorComponent];
+      this->VectorComponentTitles[this->VectorComponent] = NULL;
+      }
+
+    if (name)
+      {
+      this->VectorComponentTitles[this->VectorComponent] = 
+        new char[strlen(name) + 1];
+      strcpy(this->VectorComponentTitles[this->VectorComponent], name);
+      }
+    
+    this->ScalarBarVectorTitleEntry->SetValue(name);
+
+    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+                        this->GetTclName(), name);
+
     this->UpdateVectorComponentMenu();
-    }
-  // I am going though alot of trouble to eliminate leaks for a condition
-  // that will neve occur.
-  if (vectorTitle)
-    {
-    delete [] vectorTitle;
-    vectorTitle = NULL;
-    }
 
-  this->UpdateScalarBarTitle();
+    this->UpdateScalarBarTitle();
+
+    this->Modified();
+    }
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarLabelFormatEntryCallback()
@@ -1075,12 +1094,15 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
 
   if (this->ScalarBar != NULL && this->ScalarBarLabelFormat != NULL)
     {
-    this->ScalarBar->GetScalarBarActor()->SetLabelFormat(this->ScalarBarLabelFormat);
+    this->ScalarBar->GetScalarBarActor()->SetLabelFormat(
+      this->ScalarBarLabelFormat);
     if (this->PVRenderView)
       {
       this->PVRenderView->EventuallyRender();
       }
     }
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

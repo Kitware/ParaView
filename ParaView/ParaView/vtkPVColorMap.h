@@ -98,7 +98,6 @@ public:
   // (e.g. Temperature). Currently it also indicates the arrays mapped
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
-  void SetScalarBarTitleNoTrace(const char* Name);
   const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
 
   // Description:
@@ -192,7 +191,6 @@ public:
   // For setting the title suffix for vectors.
   void ScalarBarVectorTitleEntryCallback();
   void SetScalarBarVectorTitle(const char* name);
-  void SetScalarBarVectorTitleNoTrace(const char* name);
 
   // Description:
   // This method is called when the user changes the format of the scalar bar

@@ -178,6 +178,7 @@ public:
   // Set the transparency of the actor.
   void SetOpacity(float f);
   void OpacityChangedCallback();
+  void OpacityChangedEndCallback();
 
   // Description:
   // Create the properties object, called by UpdateProperties.
@@ -295,7 +296,9 @@ public:
   // Description:
   // Callbacks for point size and line width sliders.
   void ChangePointSize();
+  void ChangePointSizeEndCallback();
   void ChangeLineWidth();
+  void ChangeLineWidthEndCallback();
 
   // Description:
   // Access to option menus for scripting.

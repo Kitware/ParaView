@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.166");
+vtkCxxRevisionMacro(vtkPVData, "1.167");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1241,6 +1241,8 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->PointSizeScale->GetEntry()->GetWidgetName());
   this->PointSizeScale->SetCommand(this, "ChangePointSize");
+  this->PointSizeScale->SetEndCommand(this, "ChangePointSizeEndCallback");
+  this->PointSizeScale->SetEntryCommand(this, "ChangePointSizeEndCallback");
   this->PointSizeScale->SetBalloonHelpString(
     "If your dataset contains points/verticies, "
     "this scale adjusts the diameter of the rendered points.");
@@ -1264,6 +1266,8 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->LineWidthScale->GetEntry()->GetWidgetName());
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
+  this->LineWidthScale->SetEndCommand(this, "ChangeLineWidthEndCallback");
+  this->LineWidthScale->SetEntryCommand(this, "ChangeLineWidthEndCallback");
   this->LineWidthScale->SetBalloonHelpString(
     "If your dataset containes lines/edges, "
     "this scale adjusts the width of the rendered lines.");
@@ -1377,6 +1381,8 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->Opacity->GetEntry()->GetWidgetName());
   this->Opacity->SetCommand(this, "OpacityChangedCallback");
+  this->Opacity->SetEndCommand(this, "OpacityChangedEndCallback");
+  this->Opacity->SetEntryCommand(this, "OpacityChangedEndCallback");
   this->Opacity->SetBalloonHelpString(
     "Set the opacity of the dataset's geometry.  "
     "Artifacts may appear in translucent geomtry "
@@ -2641,13 +2647,18 @@ void vtkPVData::ChangePointSize()
                            this->PointSizeScale->GetValue());
     }
   
-  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
-                      (int)(this->PointSizeScale->GetValue()));
-
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVData::ChangePointSizeEndCallback()
+{
+  this->ChangePointSize();
+  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
+                      (int)(this->PointSizeScale->GetValue()));
 } 
 
 //----------------------------------------------------------------------------
@@ -2662,17 +2673,19 @@ void vtkPVData::ChangeLineWidth()
                            this->LineWidthScale->GetValue());
     }
 
-  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
-                      (int)(this->LineWidthScale->GetValue()));
-
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
 }
 
-
-
+//----------------------------------------------------------------------------
+void vtkPVData::ChangeLineWidthEndCallback()
+{
+  this->ChangeLineWidth();
+  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
+                      (int)(this->LineWidthScale->GetValue()));
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
@@ -2853,16 +2866,21 @@ void vtkPVData::GetColorRange(float *range)
 //----------------------------------------------------------------------------
 void vtkPVData::OpacityChangedCallback()
 {
-  float val = this->Opacity->GetValue();
-
   this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
-                                            this->PropTclName, val);
-  this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(),
-                      val);
+                                            this->PropTclName, 
+                                            this->Opacity->GetValue());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::OpacityChangedEndCallback()
+{
+  this->OpacityChangedCallback();
+  this->AddTraceEntry("$kw(%s) SetOpacity %f", 
+                      this->GetTclName(), this->Opacity->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -2989,7 +3007,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.166 $");
+  this->ExtractRevision(os,"$Revision: 1.167 $");
 }
 
 //----------------------------------------------------------------------------
