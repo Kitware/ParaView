@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.48");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.49");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -269,6 +269,8 @@ void vtkPVVectorEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkKWEntry *entry;
   float scalars[6];
+
+  this->Superclass::AcceptInternal(sourceID);
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
