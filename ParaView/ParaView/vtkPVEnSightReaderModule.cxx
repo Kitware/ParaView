@@ -49,12 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.41");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
 {
-  this->AddFileEntry = 0;
+  this->AddFileEntry = 1;
   this->PackFileEntry = 0;
 }
 
