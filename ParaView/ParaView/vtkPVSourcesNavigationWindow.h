@@ -77,7 +77,7 @@ public:
 
   // Description:
   // Regenerate the display and re-assign bindings.
-  void Update(vtkPVSource *currentSource);
+  void Update(vtkPVSource *currentSource, int nobind);
 
   // Description:
   // Highlight the object.
@@ -110,7 +110,7 @@ protected:
   // Description:
   // This method is called at beginning of the Update method. The
   // subclass is supposed to overwrite it.
-  virtual void ChildUpdate(vtkPVSource* currentSource);
+  virtual void ChildUpdate(vtkPVSource* currentSource, int NoBind);
 
   // Description:
   // This method is called at the end of Update method. If the

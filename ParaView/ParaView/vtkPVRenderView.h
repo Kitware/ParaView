@@ -67,12 +67,11 @@ class vtkLabeledFrame;
 class vtkPVApplication;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
-class vtkPVNavigationWindow;
-class vtkPVSelectionWindow;
 class vtkPVSource;
 class vtkPVSourceList;
 class vtkPVTreeComposite;
 class vtkPVWindow;
+class vtkPVSourcesNavigationWindow;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -163,7 +162,7 @@ public:
 
   // Description:
   // Update the navigation window for a particular source
-  void UpdateNavigationWindow(vtkPVSource *currentSource);
+  void UpdateNavigationWindow(vtkPVSource *currentSource, int nobind);
 
   // Description:
   // Get the frame for the navigation window
@@ -317,10 +316,6 @@ protected:
   char *RenderWindowTclName;
   vtkSetStringMacro(RenderWindowTclName);  
   
-  vtkKWLabeledFrame *NavigationFrame;
-  vtkKWWidget       *NavigationCanvas;
-  vtkKWWidget       *NavScrollBar;
-
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 
@@ -349,10 +344,9 @@ protected:
 
   vtkKWSplitFrame *SplitFrame;
 
-  vtkPVNavigationWindow *NavigationWindow;
-
-  vtkKWLabeledFrame* SelectionFrame;
-  vtkPVSourceList* SelectionWindow;
+  vtkKWLabeledFrame* NavigationFrame;
+  vtkPVSourcesNavigationWindow* NavigationWindow;
+  vtkPVSourcesNavigationWindow* SelectionWindow;
   
   int EventuallyRenderFlag;
   char* RenderPending;

@@ -74,14 +74,14 @@ protected:
   vtkPVSourceList();
   ~vtkPVSourceList();
 
-  virtual void ChildUpdate(vtkPVSource*);
+  virtual void ChildUpdate(vtkPVSource*, int NoBind);
   virtual void PostChildUpdate();
 
   // Description:
   // Create a Tk widget
   virtual void ChildCreate();
 
-  int UpdateSource(vtkPVSource *comp, int y, int in, int current);
+  int UpdateSource(vtkPVSource *comp, int y, int in, int current, int NoBind);
 
   // Description:
   // The assembly that is displayed in the editor.

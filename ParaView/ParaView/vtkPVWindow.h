@@ -430,6 +430,12 @@ public:
   vtkPVSource* GetSourceFromName(const char*);
   void AddToNamesToSources(const char* name, vtkPVSource* source);
 
+  // Description:
+  // These methods enable and disable the navigation window and
+  // selection window.
+  void EnableNavigationWindow();
+  void DisableNavigationWindow();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

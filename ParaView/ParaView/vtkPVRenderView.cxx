@@ -112,9 +112,6 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->SplitFrame = vtkKWSplitFrame::New();
 
-  this->NavigationWindow = vtkPVNavigationWindow::New();
-  this->NavigationFrame = vtkKWLabeledFrame::New();
-
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
 
@@ -162,6 +159,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->Composite                = 0;
 
   this->DisableRenderingFlag = 0;
+  this->NavigationFrame = vtkKWLabeledFrame::New();
+  this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
 
   this->ShowSelectionWindow = 0;
@@ -621,6 +620,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindow->Create(this->Application, 0); 
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
+  this->SelectionWindow->SetWidth(341);
   this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
 
@@ -1023,17 +1023,16 @@ void vtkPVRenderView::ReductionCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
+void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource, 
+                                             int nobind)
 {
   if (this->NavigationWindow)
     {
-    this->NavigationWindow->Update(currentSource);
+    this->NavigationWindow->Update(currentSource, nobind);
     }
   if (this->SelectionWindow)
     {
-    vtkPVWindow *pvWin = this->GetPVWindow();
-    this->SelectionWindow->Update(currentSource,
-                                  pvWin->GetSourceList("Sources"));
+    this->SelectionWindow->Update(currentSource, nobind);
     }
 }
 
@@ -1777,7 +1776,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.175 $");
+  this->ExtractRevision(os,"$Revision: 1.176 $");
 }
 
 //------------------------------------------------------------------------------

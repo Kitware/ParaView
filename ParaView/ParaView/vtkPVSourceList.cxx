@@ -173,7 +173,7 @@ void vtkPVSourceList::EditColor(int )
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
+void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
 {
   this->CurrentSource = current;
   vtkPVSource *comp;
@@ -203,7 +203,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
       {
       lasty = y;
       }
-    y = this->UpdateSource(comp, y, in, (current == comp));
+    y = this->UpdateSource(comp, y, in, (current == comp), NoBind);
     if ( current == comp )
       {
       thisy = y;
@@ -238,7 +238,8 @@ void vtkPVSourceList::PostChildUpdate()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current)
+int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
+                                  int NoBind)
 {
   int compIdx, x, yNext; 
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
@@ -284,7 +285,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current)
         }
       }
     }
-  if (result)
+  if (result && !NoBind)
     {
     tmp = vtkString::Duplicate(result);
     this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d 1}",
@@ -306,12 +307,16 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current)
   result = this->Application->GetMainInterp()->result;
   tmp = new char[strlen(result)+1];
   strcpy(tmp,result);
-  this->Script("%s bind %s <ButtonPress-1> {%s Pick %d}",
-               this->Canvas->GetWidgetName(), tmp,
-               this->GetTclName(), compIdx);
-  this->Script("%s bind %s <ButtonPress-3> {%s DisplayModulePopupMenu %s %%X %%Y }",
-               this->Canvas->GetWidgetName(), tmp,
-               this->GetTclName(), comp->GetTclName());
+  if ( !NoBind )
+    {
+    this->Script("%s bind %s <ButtonPress-1> {%s Pick %d}",
+                 this->Canvas->GetWidgetName(), tmp,
+                 this->GetTclName(), compIdx);
+    this->Script("%s bind %s <ButtonPress-3> "
+                 "{%s DisplayModulePopupMenu %s %%X %%Y }",
+                 this->Canvas->GetWidgetName(), tmp,
+                 this->GetTclName(), comp->GetTclName());
+    }
   
 // Get the bounding box for the name. We may need to highlight it.
   this->Script( "%s bbox %s",this->Canvas->GetWidgetName(), tmp);

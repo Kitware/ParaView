@@ -97,8 +97,6 @@ void vtkPVSourcesNavigationWindow::CalculateBBox(vtkKWWidget* canvas,
 const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, ...)
 {
   char event[16000];
-  char* result, *retVal;
-  
   va_list var_args;
   va_start(var_args, format);
   vsprintf(event, format, var_args);
@@ -108,7 +106,7 @@ const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, .
 }
 
 //------------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource* currentSource)
+void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*,int)
 {
   cout << "Subclass should do this." << endl;
   cout << "I am " << this->GetClassName() << endl;
@@ -116,12 +114,12 @@ void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource* currentSource)
 }
 
 //------------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource)
+void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind)
 {
   // Clear the canvas
   this->Script("%s delete all", this->Canvas->GetWidgetName());
 
-  this->ChildUpdate(currentSource);
+  this->ChildUpdate(currentSource, nobind);
 
   this->Reconfigure();
 }

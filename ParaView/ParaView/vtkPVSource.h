@@ -330,6 +330,10 @@ public:
   vtkGetStringMacro(ModuleName);
 
   // Description:
+  // This method returns the input source as a Tcl string.
+  vtkPVSource* GetInputPVSource();
+
+  // Description:
   // Check whether the source has been initialized 
   // (Accept has been called at least one)
   vtkGetMacro(Initialized, int);
@@ -349,6 +353,11 @@ protected:
                                        vtkPVSourceCollection* sources);
 
   vtkPVRenderView* GetPVRenderView();
+
+  // Description:
+  // Grab and ungrab focus focus.
+  void GrabFocus();
+  void UnGrabFocus();
   
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
@@ -425,6 +434,9 @@ protected:
   
   // Flag for whether we are currently in AcceptCallback.
   int AcceptCallbackFlag;
+
+  // Flag to tell whether the source is grabbed or not.
+  int SourceGrabbed;
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 

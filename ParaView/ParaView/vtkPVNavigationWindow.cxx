@@ -65,13 +65,12 @@ vtkPVNavigationWindow::~vtkPVNavigationWindow()
 }
 
 
-void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
+void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
 {
   vtkPVSource *source;
   vtkPVData **inputs = currentSource->GetPVInputs();
   vtkPVData **outputs;
   int numInputs, xMid, yMid=0, y, i;
-  int bbox[4];
   int bboxIn[4], bboxOut[4], bboxSource[4];
   vtkPVData *moreOut;
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
@@ -82,10 +81,13 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
     this->Canvas->GetWidgetName(), 170, 10, currentSource->GetName(),font);
   char* tmp = vtkString::Duplicate(res);
   
-  this->Script("%s bind %s <ButtonPress-3> "
-               "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-               this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-               currentSource->GetTclName());
+  if ( !NoBind )
+    {
+    this->Script("%s bind %s <ButtonPress-3> "
+                 "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                 this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                 currentSource->GetTclName());
+    }
   // Get the bounding box for the name.
   this->CalculateBBox(this->Canvas, tmp, bboxSource);
   delete [] tmp;
@@ -112,20 +114,23 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
         tmp = vtkString::Duplicate(res);
         
         this->CalculateBBox(this->Canvas, tmp, bboxIn);
-        this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSourceCallback %s}",
-                     this->Canvas->GetWidgetName(), tmp,
-                     currentSource->GetPVWindow()->GetTclName(), 
-                     source->GetTclName());
-        this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
-                     this->Canvas->GetWidgetName(), tmp,
+        if ( !NoBind )
+          {
+          this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSourceCallback %s}",
+                       this->Canvas->GetWidgetName(), tmp,
+                       currentSource->GetPVWindow()->GetTclName(), 
+                       source->GetTclName());
+          this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+                       this->Canvas->GetWidgetName(), tmp,
+                       this->GetTclName(), tmp);
+          this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+                       this->Canvas->GetWidgetName(), tmp,
                      this->GetTclName(), tmp);
-        this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
-                     this->Canvas->GetWidgetName(), tmp,
-                     this->GetTclName(), tmp);
-        this->Script("%s bind %s <ButtonPress-3> "
-                     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-                     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-                     source->GetTclName());
+          this->Script("%s bind %s <ButtonPress-3> "
+                       "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                       this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                       source->GetTclName());
+          }
         
         delete [] tmp;
         tmp = 0;
@@ -228,20 +233,23 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
         
         // Get the bounding box for the name.
         this->CalculateBBox(this->Canvas, tmp, bboxOut);
-        this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
-                     this->Canvas->GetWidgetName(), tmp,
-                     currentSource->GetPVWindow()->GetTclName(), 
-                     source->GetTclName());
-        this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
-                     this->Canvas->GetWidgetName(), tmp,
-                     this->GetTclName(), tmp);
-        this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
-                     this->Canvas->GetWidgetName(), tmp,
-                     this->GetTclName(), tmp); 
-        this->Script("%s bind %s <ButtonPress-3> "
-                     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-                     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-                     source->GetTclName());
+        if ( !NoBind )
+          {
+          this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
+                       this->Canvas->GetWidgetName(), tmp,
+                       currentSource->GetPVWindow()->GetTclName(), 
+                       source->GetTclName());
+          this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+                       this->Canvas->GetWidgetName(), tmp,
+                       this->GetTclName(), tmp);
+          this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+                       this->Canvas->GetWidgetName(), tmp,
+                       this->GetTclName(), tmp); 
+          this->Script("%s bind %s <ButtonPress-3> "
+                       "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                       this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                       source->GetTclName());
+          }
         delete [] tmp;
         tmp = NULL;
         

@@ -135,6 +135,8 @@ vtkPVSource::vtkPVSource()
   this->HideParametersPage = 0;
   
   this->AcceptCallbackFlag = 0;
+
+  this->SourceGrabbed = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -219,6 +221,17 @@ vtkPVSource::~vtkPVSource()
   this->SetSourceClassName(0);
 
   this->SetModuleName(0);
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVSource::GetInputPVSource()
+{
+  vtkPVData* data = this->GetPVInput();
+  if ( data )
+    {
+    return data->GetPVSource();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -470,13 +483,34 @@ void vtkPVSource::CreateProperties()
   frame->Delete();  
   
   // Isolate events to this window until accept or reset is pressed.
-  this->Script("grab set %s", this->MainParameterFrame->GetWidgetName());
   
   this->UpdateProperties();
   
+  this->GrabFocus();
   //this->UpdateParameterWidgets();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::GrabFocus()
+{
+  this->SourceGrabbed = 1;
+  //this->Script("grab set %s", this->MainParameterFrame->GetWidgetName());
+  this->GetPVWindow()->DisableToolbarButtons();
+  this->GetPVWindow()->DisableMenus();
+  this->GetPVRenderView()->UpdateNavigationWindow(this, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UnGrabFocus()
+{
+  //this->Script("grab release %s", 
+  //this->MainParameterFrame->GetWidgetName());    
+  this->GetPVWindow()->EnableToolbarButtons();
+  this->GetPVWindow()->EnableMenus();
+  this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
+  this->SourceGrabbed = 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Select()
@@ -739,8 +773,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     // Remove the local grab
-    this->Script("grab release %s", 
-                 this->MainParameterFrame->GetWidgetName());    
+    this->UnGrabFocus();
     this->Initialized = 1;
     }
 
@@ -808,8 +841,7 @@ void vtkPVSource::DeleteCallback()
   if ( ! this->Initialized)
     {
     // Remove the local grab
-    this->Script("grab release %s", 
-                 this->MainParameterFrame->GetWidgetName()); 
+    this->UnGrabFocus();
     this->Script("update");   
     this->Initialized = 1;
     }
@@ -1041,7 +1073,7 @@ void vtkPVSource::UpdateProperties()
                    this->DeleteButton->GetWidgetName());
       }
   
-  this->GetPVRenderView()->UpdateNavigationWindow(this);
+  this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
   
   // I do not know why the inputs have to be updated.
   // I am changing it to output as an experiment.
@@ -1716,7 +1748,7 @@ void vtkPVSource::SerializeToken(istream& is, const char token[1024])
       }
     this->SetNumberOfPVInputs(cor);
     }
-  else if ( vtkString::Equals(token, "Input") )
+  else if ( vtkString::Equals(token, "Input--does-not-work") )
     {
     int cor = 0;
     if (! (is >> cor) )
@@ -1743,6 +1775,7 @@ void vtkPVSource::SerializeToken(istream& is, const char token[1024])
       }
     this->SetNthPVInput(cor, isource->GetPVOutput());
     this->UpdateParameterWidgets();
+    this->Accept(0,0);
     }
   else if ( vtkString::Equals(token, "Widgets") )
     {
@@ -1794,7 +1827,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.222 $");
+  this->ExtractRevision(os,"$Revision: 1.223 $");
 }
 
 //----------------------------------------------------------------------------

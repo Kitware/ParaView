@@ -2441,6 +2441,18 @@ void vtkPVWindow::EnableSelectMenu()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::EnableNavigationWindow()
+{
+  this->MainView->GetNavigationFrame()->EnabledOff();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DisableNavigationWindow()
+{
+  this->MainView->GetNavigationFrame()->EnabledOn();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
   int numMenus;
@@ -3217,7 +3229,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.332 $");
+  this->ExtractRevision(os,"$Revision: 1.333 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3246,7 +3258,7 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
     if ( scit->GetKey(name) == VTK_OK && name &&
          scit->GetData(col) == VTK_OK )
       {
-      if ( vtkString::Equals(name, "Sources") )
+      if ( col->GetNumberOfItems() > 0 && vtkString::Equals(name, "Sources") )
         {
         os << indent << "SourceList " << name << endl;
         os << nindent << "{" << endl;
@@ -3290,8 +3302,10 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
           }
         }
       }
+    vtkPVSource* inputsource = source->GetInputPVSource();
     os << indent << "Module " << source->GetName() << " " 
-       << source->GetModuleName() << " ";
+       << source->GetModuleName() << " " 
+       << (inputsource?inputsource->GetTclName():"None") << " ";
     source->Serialize(os, indent.GetNextIndent());
     writtenMap->SetItem(static_cast<void*>(source), 1);
     }
@@ -3365,6 +3379,19 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
           {
           vtkErrorMacro("Problem Parsing session file");
           return;
+          }
+        char inputname[1024];
+        inputname[0] = 0;
+        is >> inputname;
+        if ( !inputname[0] )
+          {
+          vtkErrorMacro("Problem Parsing session file");
+          return;
+          }
+        if ( !vtkString::Equals(inputname, "None") )
+          {
+          vtkPVSource *inputsource = this->GetSourceFromName(inputname);
+          this->SetCurrentPVSourceCallback(inputsource);
           }
         vtkPVSource *source = this->CreatePVSource(
           modulename, sourcelistname);
