@@ -137,15 +137,18 @@ public:
 
   // Description:
   // Event handlers and useful interactions
-  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {};
   virtual void AButtonPress(int /*num*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                            int /*shift*/) {}
-  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
+                            int /*shift*/) {};
+  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {};
   virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                         int /*shift*/, char* /*keysym*/) {}
+                         int /*shift*/, char* /*keysym*/) {};
   virtual void Exposed();
-  virtual void Configure(int /*width*/, int /*height*/) {}
-  virtual void Enter(int /*x*/, int /*y*/) {}
+  virtual void Configure(int /*width*/, int /*height*/) {};
+  virtual void Enter(int /*x*/, int /*y*/) {};
+
+  virtual void FocusInCallback();
+  virtual void FocusOutCallback();
 
   // Description:
   // Convenience method to set the visibility of all annotations.

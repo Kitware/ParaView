@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.57");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.58");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -294,6 +294,12 @@ void vtkKWRenderWidget::SetupBindings()
   
     this->Script("bind %s <Enter> {%s Enter %%x %%y}",
                  wname, tname);
+
+    this->Script("bind %s <FocusIn> {%s FocusInCallback}", 
+                 wname, tname);
+
+    this->Script("bind %s <FocusOut> {%s FocusOutCallback}", 
+                 wname, tname);
     }
 
   if (this->IsCreated())
@@ -314,6 +320,9 @@ void vtkKWRenderWidget::RemoveBindings()
   
     this->Script("bind %s <Expose> {}", wname);
     this->Script("bind %s <Enter> {}", wname);
+
+    this->Script("bind %s <FocusIn> {}", wname);
+    this->Script("bind %s <FocusOut> {}", wname);
     }
 
   if (this->IsCreated())
@@ -467,6 +476,18 @@ void vtkKWRenderWidget::Exposed()
   this->Script("update");
   this->Render();
   this->InExpose = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::FocusInCallback()
+{
+  this->InvokeEvent(vtkKWEvent::FocusInEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::FocusOutCallback()
+{
+  this->InvokeEvent(vtkKWEvent::FocusOutEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
