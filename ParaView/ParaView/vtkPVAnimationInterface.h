@@ -57,6 +57,12 @@ class vtkPVSource;
 class vtkPVWindow;
 class vtkPVWidget;
 class vtkPVApplication;
+class vtkCollection;
+class vtkCollectionIterator;
+
+//BTX
+class vtkPVAnimationInterfaceEntry;
+//ETX
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
@@ -78,6 +84,10 @@ public:
   vtkGetMacro(TimeStep, float);
   void SetCurrentTime(float time);
   float GetCurrentTime();
+
+  void SetTimeStart(int idx, float t);
+  void SetTimeEnd(int idx, float t);
+  void SetTimeStep(int idx, float t);
 
   // Description:
   // Callback that starts an animation.
@@ -116,23 +126,8 @@ public:
   vtkGetObjectMacro(Window, vtkPVWindow);
 
   // Description:
-  // The object which is being manipulated to produce the animation.
-  // No reference counting here because of loops (leak).
-  virtual void SetPVSource(vtkPVSource *source);
-  vtkGetObjectMacro(PVSource,vtkPVSource);
-
-  // Description:
-  // Rebuild the source menu to select the current source list.
-  void UpdateSourceMenu();
-
-  // Description:
-  // Rebuild the method menu to select which method will be used.
-  void UpdateMethodMenu();
-
-  // Description:
   // Access to the interface from scripts.
   void SetScriptCheckButtonState(int);
-  void SetScript(const char* script);
   void SetLabelAndScript(const char *label, const char* script);
   const char *GetScript();
 
@@ -154,12 +149,6 @@ public:
   // Description:
   // Method callback to toggle between source/method and script editor.
   void ScriptCheckButtonCallback();
-
-  // Description:
-  // This method gets called when the user types in the script
-  // editor.  All it does is invalidate the method menu value
-  // which may be invalid.
-  void ScriptEditorCallback();
 
   // Description:
   // This method gets called when the loop button is pressed
@@ -200,6 +189,25 @@ public:
   int GetCacheGeometry();
   void SetCacheGeometry(int flag);
 
+  // Description:
+  // Add an empty source item
+  void AddEmptySourceItem();
+  void UpdateEntries();
+  void DeleteSourceItem(int item);
+  void UpdateSourceMenu(int idx);
+  void UpdateMethodMenu(int idx);
+  void SetPVSource(vtkPVSource *source, int idx);
+
+  void SetLastEntryIndex(int);
+  void ShowEntryInFrame(int idx);
+  void UpdateNewScript();
+  void SetTypeToInt();
+  void PrepareAnimationInterface(vtkPVWindow* win);
+
+//BTX
+  vtkPVAnimationInterfaceEntry* GetSourceEntry(int idx);
+//ETX
+
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -229,6 +237,10 @@ protected:
   float TimeEnd;
   float TimeStep;
 
+  float MinTime;
+  float MinStep;
+  float MaxTime;
+
   int StopFlag;
   int InPlay;
   int Loop;
@@ -241,13 +253,6 @@ protected:
   vtkKWWidget *ScriptCheckButtonFrame;
   vtkKWCheckButton *ScriptCheckButton;
   vtkKWText *ScriptEditor;
-  vtkKWWidget *SourceMethodFrame;
-  vtkKWLabel *SourceLabel;
-  vtkKWMenuButton *SourceMenuButton;
-
-  // Menu Showing all of the possible methods of the selected source.
-  vtkKWLabel*        MethodLabel;
-  vtkKWMenuButton*   MethodMenuButton;
 
   // The source selected.
   vtkPVSource *PVSource;
@@ -256,12 +261,32 @@ protected:
   // The formated string to evaluate.
   char *ScriptString;
 
+  vtkSetStringMacro(NewScriptString);
+  char* NewScriptString;
+
   // Should be a better way (menu?)
   vtkKWLabeledFrame* SaveFrame;
   vtkKWWidget*       SaveButtonFrame;
   vtkKWPushButton*   SaveImagesButton;
   vtkKWPushButton*   SaveGeometryButton;
   vtkKWCheckButton*  CacheGeometryCheck;
+
+  // Even newer interface ------------------------------------------
+  // Collection of animation entries
+  vtkCollection* AnimationEntries;
+  vtkCollectionIterator* AnimationEntriesIterator;
+  vtkKWLabeledFrame* AnimationEntriesFrame;
+  vtkKWPushButton* AddItemButton;
+  vtkKWPushButton* DeleteItemButton;
+  vtkKWFrame* AnimationEntryInformation;
+  vtkKWMenuButton* AnimationEntriesMenu;
+  int InShowEntryInFrame;
+
+  // Description:
+  // Empty the entry frame
+  void EmptyEntryFrame();
+
+  int LastEntryIndex;
 
   vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
   void operator=(const vtkPVAnimationInterface&); // Not implemented

@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.453");
+vtkCxxRevisionMacro(vtkPVWindow, "1.454");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3467,18 +3467,7 @@ void vtkPVWindow::ShowAnimationProperties()
   this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowAnimationProperties",
                                           this->GetTclName());
 
-  this->AnimationInterface->UpdateSourceMenu();
-
-  // Try to find a good default value for the source.
-  if (this->AnimationInterface->GetPVSource() == NULL)
-    {
-    vtkPVSource *pvs = this->GetCurrentPVSource();
-    if (pvs == NULL && this->GetSourceList("Sources")->GetNumberOfItems() > 0)
-      {
-      pvs = (vtkPVSource*)this->GetSourceList("Sources")->GetItemAsObject(0);
-      }
-    this->AnimationInterface->SetPVSource(pvs);
-    }
+  this->AnimationInterface->PrepareAnimationInterface(this);
 
   // Bring up the properties panel
   this->ShowProperties();
