@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.5");
 
 
 //----------------------------------------------------------------------------
@@ -133,8 +133,8 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     vtkErrorMacro("Can be added only to one render module.");
     return;
     }
-  vtkSMProxyProperty* pp; 
   /*
+  vtkSMProxyProperty* pp; 
   pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -147,14 +147,26 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
   */
   rm->AddPropToRenderer2D(this->CubeAxesProxy);
 
-  // TODO:
-  // Set using stream...get the active camera.
-  pp = vtkSMProxyProperty::SafeDownCast(
-    this->CubeAxesProxy->GetProperty("Camera"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(rm->GetActiveCameraProxy());
-  this->CubeAxesProxy->UpdateVTKObjects();
-
+  // We don't set the Camera proxy for the cube axes actor using 
+  // properties since the Camera Proxy provided by the RenderModule is only 
+  // on the CLIENT, and CubeAxesActor needs the camera on the servers as well.
+  vtkClientServerStream stream;
+  vtkSMProxy* renderer = rm->GetRenderer2DProxy();
+  for (unsigned int i=0; i < this->CubeAxesProxy->GetNumberOfIDs(); i++)
+    {
+    stream << vtkClientServerStream::Invoke
+      << renderer->GetID(0)
+      << "GetActiveCamera" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << this->CubeAxesProxy->GetID(i)
+      << "SetCamera" << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->CubeAxesProxy->GetServers(), stream);
+    }
   this->RenderModuleProxy = rm;
 }
 
