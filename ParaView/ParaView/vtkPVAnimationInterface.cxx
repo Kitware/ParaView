@@ -47,7 +47,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
-#include "vtkPVWindowToImageFilter.h"
+#include "vtkWindowToImageFilter.h"
 #include "vtkCompleteArrays.h"
 
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.113");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.114");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1253,7 +1253,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext) 
 {
-  vtkPVWindowToImageFilter* winToImage;
+  vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer;
   char *fileName;
   int fileCount;
@@ -1261,8 +1261,8 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 
   this->AddTraceEntry("$kw(%s) SaveImages {%s} {%s}",
                       this->GetTclName(), fileRoot, ext);
-  winToImage = vtkPVWindowToImageFilter::New();
-  winToImage->SetInput(this->GetPVApplication()->GetRenderModule());
+  winToImage = vtkWindowToImageFilter::New();
+  winToImage->SetInput(this->View->GetRenderWindow());
   if (strcmp(ext,"jpg") == 0)
     {
     writer = vtkJPEGWriter::New();
@@ -1297,7 +1297,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     sprintf(fileName, "%s%04d.%s", fileRoot, fileCount, ext);
     writer->SetFileName(fileName);
     winToImage->Modified();
-    winToImage->ShouldRenderOff();
+    winToImage->ShouldRerenderOff();
     writer->Write();
     if (writer->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
       {
