@@ -1235,7 +1235,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     }
   else
     {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->SetMoveEventInformationFlipY(x, y);
     this->GenericInteractor->MouseMoveEvent();
     }
 }

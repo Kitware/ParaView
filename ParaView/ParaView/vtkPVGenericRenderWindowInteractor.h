@@ -59,6 +59,10 @@ public:
   void SetPVRenderView(vtkPVRenderView *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
 
+  // Description:
+  // Set the event onformation, but remember keys from before.
+  void SetMoveEventInformationFlipY(int x, int y);
+
   virtual void Render();
   
 protected:

@@ -75,6 +75,15 @@ void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderView *view)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SetMoveEventInformationFlipY(
+  int x, int y)
+{
+  this->SetEventInformationFlipY(x, y, this->ControlKey, this->ShiftKey,
+                                 this->KeyCode, this->RepeatCount,
+                                 this->KeySym);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::Render()
 {
   if ( ! this->PVRenderView)
