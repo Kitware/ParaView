@@ -150,7 +150,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkHybrid vtkParallel vtkKWCommon)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkHybridCS vtkParallelCS vtkKWCommon)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
