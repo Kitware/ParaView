@@ -185,8 +185,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   controller->SetNumberOfProcesses(1);
 #endif
   
-  controller->CreateOutputWindow();
-  
+  if (controller->GetNumberOfProcesses() > 1)
+    {
+    controller->CreateOutputWindow();
+    }
+
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));

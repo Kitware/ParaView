@@ -214,6 +214,9 @@ protected:
   double InteractiveRenderTime;
   double StillCompositeTime;
   double InteractiveCompositeTime;
+
+  // For the renderer in a separate toplevel window.
+  vtkKWWidget *TopLevelRenderWindow;
 };
 
 

@@ -74,6 +74,19 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
+    {
+    this->TopLevelRenderWindow = vtkKWWidget::New();
+    this->TopLevelRenderWindow->SetParent(this->Frame);
+    this->VTKWidget->SetParent(NULL);
+    this->VTKWidget->SetParent(this->TopLevelRenderWindow);
+    }
+  else
+    {
+    this->TopLevelRenderWindow = NULL;
+    }
+    
+
   this->CommandFunction = vtkPVRenderViewCommand;
   
   this->Interactive = 0;
@@ -198,6 +211,12 @@ vtkPVRenderView::~vtkPVRenderView()
     this->Script("after cancel %s", this->RenderPending);
     }
   this->SetRenderPending(NULL);
+
+  if (this->TopLevelRenderWindow)
+    {
+    this->TopLevelRenderWindow->Delete();
+    this->TopLevelRenderWindow = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -342,6 +361,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                  this->ControlFrame->GetWidgetName());
     }
   
+  // Separate window for the renderer.
+  if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
+    {
+    this->TopLevelRenderWindow->Create(app, "toplevel", "");
+    this->Script("wm title %s ParaView", this->TopLevelRenderWindow->GetWidgetName());
+    }
+
   // add the -rw argument
   sprintf(local,"%s -rw Addr=%p",args,this->RenderWindow);
   this->Script("vtkTkRenderWidget %s %s",
