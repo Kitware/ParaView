@@ -372,8 +372,8 @@
       <IntVectorProperty
         name="DrawPlane"
         command="SetDrawPlane"
-        number_of_elements="1"
         update_self="1"
+        number_of_elements="1"
         default_values="0" />
       <IntVectorProperty
         name="Visibility"
@@ -479,12 +479,6 @@
               <Group name="matrices"/>
             </ProxyGroupDomain>
           </ProxyProperty>
-          <DoubleVectorProperty
-            name="Matrix"
-            command="SetMatrix"
-            number_of_elements="16"
-            argument_is_array="1"
-            default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
         </Proxy>
       </SubProxy>
     </BoxWidgetProxy>

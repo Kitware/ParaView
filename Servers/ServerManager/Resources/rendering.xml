@@ -172,6 +172,7 @@
                     update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="rendering"/>
+          <Group name="3d_widgets"/>
         </ProxyGroupDomain>
      </ProxyProperty>
 
