@@ -51,7 +51,12 @@ proc FindString { InFile SearchString } {
 }
 
 # Get all files that match expression
-set files [ glob $FileExpression ]
+if [ catch { [ set files [ glob $FileExpression ] ] } result ] {
+    regsub {\\\*} $FileExpression "*" FileExpression
+    if [ catch { [ set files [ glob $FileExpression ] ] } nresult ] {
+	puts "Cannot expand the expression: \"$FileExpression\""
+    }
+}
 
 set count 0
 foreach { a } $files {
@@ -67,3 +72,5 @@ if { $count > 0 } {
     puts "Found \"$SearchMessage\" $count times"
     exit 1
 }
+
+exit 0
