@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.60");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -747,8 +747,11 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     vtkPVXMLElement* we = item->GetNestedElement(0);
     vtkPVWidget* widget = this->GetPVWidgetFromParser(we, parser);
-    this->AddItem(itemLabel, widget, itemValue);
-    widget->Delete();
+    if (widget)
+      {
+      this->AddItem(itemLabel, widget, itemValue);
+      widget->Delete();
+      }
     }
   
   return 1;
