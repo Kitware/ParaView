@@ -43,18 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "KitwareLogo.h"
 #include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWImageLabel.h"
-#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkKWMenu.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
-#include "vtkKWRegisteryUtilities.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
@@ -66,8 +65,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
+#define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.108");
+vtkCxxRevisionMacro(vtkKWWindow, "1.109");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -292,6 +292,9 @@ vtkKWWindow::vtkKWWindow()
   this->RecentFilesMenuTag =0;
 
   this->ExitDialogWidget = 0;
+
+  this->DialogSettingsFrame = 0;
+  this->DialogSettingsConfirmExitCheck = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -669,6 +672,17 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->PropertiesHidden = 0;
   this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
                                     "OnToggleProperties", 1 );
+
+  // Window properties / Application settings (leading to preferences)
+
+  this->CreateDefaultPropertiesParent();
+
+  this->Notebook->SetParent(this->GetPropertiesParent());
+  this->Notebook->Create(this->Application,"");
+  this->Notebook->AlwaysShowTabsOn();
+
+  this->CreatePreferencesProperties();
+  
   // Help menu
 
   this->MenuHelp->SetTearOff(0);
@@ -734,6 +748,80 @@ void vtkKWWindow::OnToggleProperties()
     {
     this->HideProperties();
     }
+}
+
+void vtkKWWindow::ShowWindowProperties()
+{
+  this->ShowProperties();
+  
+  // forget current props
+  this->Script("pack forget [pack slaves %s]",
+               this->Notebook->GetParent()->GetWidgetName());  
+
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+}
+
+void vtkKWWindow::CreatePreferencesProperties()
+{
+  // The "Preferences" notebook page
+
+  vtkKWIcon *ico = vtkKWIcon::New();
+  ico->SetImageData(vtkKWIcon::ICON_PREFERENCES);
+  this->Notebook->AddPage(VTK_KW_PREFERENCES_PAGE_LABEL, 
+                          "Set the application preferences", ico);
+  ico->Delete();
+
+  // The "Dialog settings" frame (GUI settings)
+
+  if (!this->DialogSettingsFrame)
+    {
+    this->DialogSettingsFrame = vtkKWLabeledFrame::New();
+    }
+
+  this->DialogSettingsFrame->SetParent(
+    this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
+  this->DialogSettingsFrame->Create(this->Application);
+  this->DialogSettingsFrame->SetLabel("Dialog settings");
+  this->DialogSettingsFrame->ShowHideFrameOn();
+  
+  // Confirm on exit ?
+
+  if (!this->DialogSettingsConfirmExitCheck)
+    {
+    this->DialogSettingsConfirmExitCheck = vtkKWCheckButton::New();
+    }
+
+  this->DialogSettingsConfirmExitCheck->SetParent(
+    this->DialogSettingsFrame->GetFrame());
+  this->DialogSettingsConfirmExitCheck->Create(
+    this->Application, "-text {Confirm on exit}");
+  this->DialogSettingsConfirmExitCheck->SetState(
+    this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME) == 1 ? 0 : 1);
+  this->DialogSettingsConfirmExitCheck->SetCommand(
+    this, "OnDialogSettingsChange");
+  this->DialogSettingsConfirmExitCheck->SetBalloonHelpString(
+    "A confirmation dialog will be presented to the user on exit.");
+
+  // Pack inside the frame
+
+  this->Script("pack %s -side top -anchor w -expand no -fill none",
+               this->DialogSettingsConfirmExitCheck->GetWidgetName());
+
+  // Pack the frame
+
+  this->Script(
+    "pack %s -side top -anchor w -expand y -fill x -padx 2 -pady 2",
+    this->DialogSettingsFrame->GetWidgetName());
+}
+
+void vtkKWWindow::OnDialogSettingsChange()
+{
+ if (this->DialogSettingsConfirmExitCheck)
+   {
+   this->Application->SetMessageDialogResponse(
+     VTK_KW_EXIT_DIALOG_NAME, this->DialogSettingsConfirmExitCheck->GetState() ? 0 : 1);
+   }
 }
 
 void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
@@ -972,7 +1060,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.108 $");
+  this->ExtractRevision(os,"$Revision: 1.109 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -997,7 +1085,7 @@ int vtkKWWindow::ExitDialog()
   dlg2->SetOptions(
      vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
-  dlg2->SetDialogName("ExitApplication");
+  dlg2->SetDialogName(VTK_KW_EXIT_DIALOG_NAME);
   dlg2->Create(this->GetApplication(),"");
   dlg2->SetText( msg );
   dlg2->SetTitle( ttl );
@@ -1007,6 +1095,12 @@ int vtkKWWindow::ExitDialog()
 
   delete[] msg;
   delete[] ttl;
+
+  if (this->DialogSettingsConfirmExitCheck)
+    {
+    this->DialogSettingsConfirmExitCheck->SetState(
+      this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME) == 1 ? 0 : 1);
+    }
  
   return ret;
 }

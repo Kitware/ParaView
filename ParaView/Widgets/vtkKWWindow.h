@@ -50,14 +50,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWCheckButton;
 class vtkKWFrame;
 class vtkKWImageLabel;
 class vtkKWLabel;
+class vtkKWLabeledFrame;
 class vtkKWLoadSaveDialog;
 class vtkKWMenu;
 class vtkKWMessageDialog;
 class vtkKWNotebook;
 class vtkKWProgressGauge;
+class vtkKWRadioButton;
 class vtkKWSplitFrame;
 class vtkKWView;
 class vtkKWViewCollection;
@@ -66,6 +69,8 @@ class vtkKWViewCollection;
 class vtkKWWindowMenuEntry;
 template<class DType> class vtkVector;
 //ETX
+
+#define VTK_KW_PREFERENCES_PAGE_LABEL "Preferences"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -151,8 +156,11 @@ public:
   // the window level.
   vtkGetObjectMacro(PropertiesParent,vtkKWWidget);
   void SetPropertiesParent(vtkKWWidget*);
-  
   void CreateDefaultPropertiesParent();
+
+  // Description:
+  // Create preferences properties page in the notebook.
+  void CreatePreferencesProperties();
 
   // Description:
   // Provide hide/show functionality of properties
@@ -160,6 +168,10 @@ public:
   void ShowProperties();
   void OnToggleProperties();
   
+  // Description:
+  // Callback to display window properties (usually, application settings)
+  void ShowWindowProperties();
+
   // Description::
   // Override Unregister since widgets have loops.
   virtual void UnRegister(vtkObjectBase *o);
@@ -283,6 +295,10 @@ public:
   // purposes.
   void PrintRecentFiles();
   
+  // Description:
+  // Callback to handle dialog settings change
+  void OnDialogSettingsChange();
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -307,47 +323,56 @@ protected:
   // Display the exit dialog.
   int ExitDialog();
 
-  vtkKWNotebook *Notebook;
 
   virtual void CreateStatusImage();
 
   int NumberOfMRUFiles;
   int RealNumberOfMRUFiles;
-  vtkKWView *SelectedView;
+
+  vtkKWNotebook *Notebook;
+
+  vtkKWView           *SelectedView;
   vtkKWViewCollection *Views;
+  vtkKWSplitFrame     *MiddleFrame; // Contains view frame & properties parent.
+
   vtkKWMenu *Menu;
   vtkKWMenu *MenuFile;
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuView;
   vtkKWMenu *MenuWindow;
   vtkKWMenu *MenuHelp;
+  vtkKWMenu *PageMenu;
+
   vtkKWWidget *StatusFrame;
   vtkKWWidget *StatusImage;
+
+  vtkKWProgressGauge *ProgressGauge;
+  vtkKWWidget        *ProgressFrame;
+
+  vtkKWFrame      *TrayFrame;
+  vtkKWImageLabel *TrayImage;
+
   vtkKWLabel *StatusLabel;
-  vtkKWProgressGauge* ProgressGauge;
-  vtkKWWidget* ProgressFrame;
-  vtkKWFrame*  TrayFrame;
-  vtkKWImageLabel* TrayImage;
-  char        *StatusImageName;
-  vtkKWSplitFrame *MiddleFrame; // Contains view frame and properties parent.
+  char       *StatusImageName;
+
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *ViewFrame;
   vtkKWWidget *ToolbarFrame;
-  float      PrintTargetDPI;
-  vtkKWMenu *PageMenu;
-  char *ScriptExtension;
-  char *ScriptType;
-
-  int SupportHelp;
-  char *WindowClass;
-  int PromptBeforeClose;
-
-  int InExit;
 
   vtkKWMessageDialog *ExitDialogWidget;
 
-  int PropertiesHidden;
+  float PrintTargetDPI;
+  char  *ScriptExtension;
+  char  *ScriptType;
+  int   SupportHelp;
+  char  *WindowClass;
+  int   PromptBeforeClose;
+  int   InExit;
+  int   PropertiesHidden;
 
+  vtkKWLabeledFrame *DialogSettingsFrame;
+  vtkKWCheckButton  *DialogSettingsConfirmExitCheck;
+  
 //BTX
   // Description:
   // This vector holds the list of most recently used files.
