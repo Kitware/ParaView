@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.9");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -67,6 +67,7 @@ vtkPVGroupInputsWidget::vtkPVGroupInputsWidget()
   
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
+  this->Inputs = vtkPVSourceCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +77,8 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
   this->PartSelectionList = NULL;
   this->PartLabelCollection->Delete();
   this->PartLabelCollection = NULL;
+  this->Inputs->Delete();
+  this->Inputs = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -106,6 +109,42 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
   this->ModifiedFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::ResetInternal(const char*)
+{
+  int idx;
+  vtkPVWindow *pvWin;
+  vtkPVSourceCollection *sources;
+  vtkPVSource *pvs;
+
+  pvWin = this->PVSource->GetPVWindow();
+  sources = pvWin->GetSourceList("Sources");
+
+  this->PartSelectionList->DeleteAll();
+  idx = 0;
+  sources->InitTraversal();
+  while ( (pvs = sources->GetNextPVSource()) )
+    {
+    this->PartSelectionList->InsertEntry(idx, pvs->GetName());
+    ++idx;
+    }
+
+  // Set visible inputs to selected.
+  idx = 0;
+  sources->InitTraversal();
+  while ( (pvs = sources->GetNextPVSource()) )
+    {
+    if (pvs->GetVisibility())
+      {
+      this->PartSelectionList->SetSelectState(idx, 1);
+      }
+    ++idx;
+    }
+
+  // Because list box does not notify us when it is modified ...
+  //this->ModifiedFlag = 0;
 }
 
 
@@ -157,6 +196,9 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
     this->Inactivate();
     }
 
+  // Keep a list of selected inputs for later use.
+  this->Inputs->RemoveAllItems();
+
   // Now loop through the input mask setting the selection states.
   pvApp->BroadcastScript("%s RemoveAllInputs",
                          vtkSourceTclName);
@@ -173,6 +215,9 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
     state = this->PartSelectionList->GetSelectState(idx);
     if (state)
       {
+      // Keep a list of selected inputs for later use.
+      this->Inputs->AddItem(pvs);
+
       this->PVSource->SetPVInput(count++, pvs);
       // SetPVinput does all this for us.
       // Special replace input feature.
@@ -195,32 +240,9 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::SetSelectState(int idx, int val)
-{
-  this->PartSelectionList->SetSelectState(idx, val);
-}
-
-
-//---------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Trace(ofstream *file)
-{
-  int idx, num;
-
-  if ( ! this->InitializeTrace(file))
-    {
-    return;
-    }
-
-  num = this->PartSelectionList->GetNumberOfItems();
-  for (idx = 0; idx < num; ++idx)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetSelectState "
-          << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::ResetInternal(const char*)
+// Used only before the first accept.  Not used by any call back.
+// Used by tracing and saving state
+void vtkPVGroupInputsWidget::SetSelectState(vtkPVSource *input, int val)
 {
   int idx;
   vtkPVWindow *pvWin;
@@ -230,30 +252,53 @@ void vtkPVGroupInputsWidget::ResetInternal(const char*)
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");
 
-  this->PartSelectionList->DeleteAll();
-  idx = 0;
+  // Find the source in the list.
   sources->InitTraversal();
+  idx = 0;
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    this->PartSelectionList->InsertEntry(idx, pvs->GetName());
-    ++idx;
-    }
-
-  // Set visible inputs to selected.
-  idx = 0;
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    if (pvs->GetVisibility())
+    pvs = sources->GetNextPVSource();
+    if (pvs == input)
       {
-      this->PartSelectionList->SetSelectState(idx, 1);
+      this->PartSelectionList->SetSelectState(idx, val);
+      return;
       }
     ++idx;
     }
 
-  // Because list box does not notify us when it is modified ...
-  //this->ModifiedFlag = 0;
+  if (val == 1)
+    {
+    vtkErrorMacro("Could not find source: " << input->GetName());
+    }
 }
+
+
+//---------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::Trace(ofstream *file)
+{
+  vtkPVSource *pvs;
+
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+ 
+  this->Inputs->InitTraversal();
+  while ( (pvs = this->Inputs->GetNextPVSource()) )
+    {
+    if ( ! pvs->InitializeTrace(file))
+      {
+      vtkErrorMacro("Could not initialize trace for object.");
+      }
+    else
+      {
+      *file << "$kw(" << this->GetTclName() << ") SetSelectState $kw("
+            << pvs->GetTclName()  << ") 1" << endl;
+      }
+    }
+}
+
 
 
 //----------------------------------------------------------------------------

@@ -54,6 +54,7 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
 class vtkCollection;
+class vtkPVSourceCollection;
 
 class VTK_EXPORT vtkPVGroupInputsWidget : public vtkPVWidget
 {
@@ -71,10 +72,6 @@ public:
   void SaveInBatchScript(ofstream *file);
 
   // Description:
-  // Access metod necessary for scripting.
-  void SetSelectState(int idx, int val);
-
-  // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK filter.
   virtual void AcceptInternal(const char* vtkSourceTclName);
@@ -87,14 +84,20 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Access metod necessary for scripting.
+  void SetSelectState(vtkPVSource* input, int val);
+
 protected:
   vtkPVGroupInputsWidget();
   ~vtkPVGroupInputsWidget();
 
+  vtkPVSourceCollection *Inputs;
 
   vtkKWListBox* PartSelectionList;
   // Labels get substituted for list box after accept is called.
   vtkCollection* PartLabelCollection;
+
 
   // Called to inactivate widget (after accept is called).
   void Inactivate();

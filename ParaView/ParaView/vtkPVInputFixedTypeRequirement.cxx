@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.3");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
@@ -77,8 +77,8 @@ int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSou
     {
     return 0;
     }
-  if (pvs == NULL)
-    {
+  if (pvs->GetPVOutput() == NULL)
+    { // Proto has no output and needs no matching.
     return 1;
     }
 

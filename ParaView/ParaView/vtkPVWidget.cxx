@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVWidget, "1.32");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -122,6 +122,8 @@ void vtkPVWidget::SetAcceptedCommand(const char* cmdObject,
 void vtkPVWidget::Accept()
 {
   int num, idx;
+  int modFlag = this->GetModifiedFlag();
+
 
   if (this->PVSource == NULL)
     {
@@ -130,8 +132,16 @@ void vtkPVWidget::Accept()
     return;
     }
 
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->AcceptInternal(this->PVSource->GetVTKSourceTclName(idx));
+    }
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
   // Putting this here simplifies subclasses AcceptInternal methods.
-  if (this->GetModifiedFlag())
+  if (modFlag)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     ofstream* file = pvApp->GetTraceFile();
@@ -139,12 +149,6 @@ void vtkPVWidget::Accept()
       {
       this->Trace(file);
       }
-    }
-
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->AcceptInternal(this->PVSource->GetVTKSourceTclName(idx));
     }
 
   // Suppress reset just allows the widget to set its own default value.
@@ -431,7 +435,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
 }
 
 //-----------------------------------------------------------------------------
