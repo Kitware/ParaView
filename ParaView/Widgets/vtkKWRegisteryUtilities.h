@@ -93,7 +93,7 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkKWObject
 
   enum {
     READONLY,
-    READWRITE,
+    READWRITE
   };
 
   protected:

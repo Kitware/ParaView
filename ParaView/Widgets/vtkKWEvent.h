@@ -89,7 +89,7 @@ class vtkKWEvent
     ContourAnnotationChangeColorEvent,
     ContourAnnotationChangeLineWidthEvent,
     // PV
-    InitializeTraceEvent,
+    InitializeTraceEvent
   };
 };
 
