@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -134,6 +134,11 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       obj->SetSpecularPower(c_idx, fval);
       }
 
+    if (comp_elem->GetScalarAttribute("DisableGradientOpacity", ival))
+      {
+      obj->SetDisableGradientOpacity(c_idx, ival);
+      }
+
     // Gray or Color Transfer Function
     
     int gtf_was_set = 0;
@@ -212,7 +217,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
           comp_elem, 
           vtkXMLVolumePropertyWriter::GetGradientOpacityElementName()))
       {
-      vtkPiecewiseFunction *gotf = obj->GetGradientOpacity(c_idx);
+      vtkPiecewiseFunction *gotf = obj->GetStoredGradientOpacity(c_idx);
       if (gotf)
         {
         xmlpfr->SetObject(gotf);
@@ -224,7 +229,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       }
     if (!gotf_was_set)
       {
-      obj->SetScalarOpacity(c_idx, NULL);
+      obj->SetGradientOpacity(c_idx, NULL);
       }
     }
 
