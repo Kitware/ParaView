@@ -59,9 +59,6 @@ $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState 39.338 4.455 37.614  15.000 15.000 15.000  -0.619 0.201 0.760
 $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)
-set kw(vtkTemp414) [$kw(vtkTemp400) GetPVWidget {Vector Mode}]
-$kw(vtkTemp414) SetCurrentValue {1}
-$kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState -19.041 13.331 7.694  15.000 15.000 15.000  0.066 0.862 -0.503
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp349)
 $kw(vtkTemp21) SetCameraState 44.193 3.649 -0.294  15.000 15.000 15.000  0.143 0.906 -0.399
