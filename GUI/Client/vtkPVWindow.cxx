@@ -107,9 +107,6 @@
 #include "vtkKWToolbarSet.h"
 
 #include "vtkPVAnimationManager.h"
-#ifdef _WIN32
-# include "vtkKWRegisteryUtilities.h"
-#endif
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -143,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.670");
+vtkCxxRevisionMacro(vtkPVWindow, "1.671");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

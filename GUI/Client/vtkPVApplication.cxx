@@ -92,7 +92,6 @@
 #include "vtkPVGUIClientOptions.h"
 
 #ifdef _WIN32
-#include "vtkKWRegisteryUtilities.h"
 
 #include "ParaViewRC.h"
 
@@ -112,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.340");
+vtkCxxRevisionMacro(vtkPVApplication, "1.341");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
