@@ -49,6 +49,8 @@
     $pvWarp ChangeVectors
     $normalsOutput ColorByPointFieldComponent thickness1 0
 
+    RenWin1 SetSize 300 300
+
     for {set i 1} {$i <= 10} {incr i 1} {
 	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
 	$pvWarp ChangeVectors
@@ -76,5 +78,7 @@
 
     }
 
-    RenWin1 Render
+    source $DataDir/Utility/rtImage.tcl
+    pvImageTest $DataDir/Baseline/BlowTest.png 10
+
     Application Exit

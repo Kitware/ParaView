@@ -1,5 +1,5 @@
     set DataDir "@PARAVIEW_DATA_ROOT@"
-
+    
     # hack to get the window.
     set pvWindow [lindex [vtkPVWindow ListInstances] 0]
     
@@ -43,6 +43,7 @@
     $elevOutput SetVisibility 1
     $extractOutput SetVisibility 1
     
+    RenWin1 SetSize 300 300
     for {set i 0} {$i < 100} {incr i 1} {
 	set camera [Ren1 GetActiveCamera]
 	$camera Azimuth 10
@@ -51,8 +52,6 @@
 
     }
     
-    RenWin1 Render
-
     source $DataDir/Utility/rtImage.tcl
     pvImageTest $DataDir/Baseline/SphereTest.png 10
    
