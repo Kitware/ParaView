@@ -64,7 +64,7 @@
 #include "vtkKWMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.111");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.112");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2555,7 +2555,10 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
     case vtkKWEvent::WidgetModifiedEvent:
       // the only things that have changed are the positions.
       // since we have no GUI for positions, we don't have any work to do here.
-      this->RenderView();
+      //this->RenderView();
+      // We don;t call EventuallyRender since that leads to 
+      // non-smooth movement.
+      this->GetPVApplication()->GetMainWindow()->GetInteractor()->Render();
       this->Modified();
       break;
 
