@@ -126,8 +126,6 @@ class VTK_EXPORT vtkKWEvent
     MiddleMouseOptionChangedEvent,
     MouseBindingChangedEvent,
     MouseOperationsChangedEvent,
-    MultiPassStillRenderEndEvent,
-    MultiPassStillRenderStageChangedEvent,
     NotebookHidePageEvent,
     NotebookPinPageEvent,
     NotebookRaisePageEvent,

@@ -116,8 +116,6 @@ static const char *vtkKWEventStrings[] = {
   "MiddleMouseOptionChangedEvent",
   "MouseBindingChangedEvent",
   "MouseOperationsChangedEvent",
-  "MultiPassStillRenderEndEvent",
-  "MultiPassStillRenderStageChangedEvent",
   "NotebookHidePageEvent",
   "NotebookPinPageEvent",
   "NotebookRaisePageEvent",
