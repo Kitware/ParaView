@@ -181,10 +181,8 @@ public:
   void InstallMenu(vtkKWMenu* menu);
 
   // Description:
-  // Callbacks used to set the print quality
-  void OnPrint1(int propagate);
-  void OnPrint2(int propagate);
-  void OnPrint3(int propagate);
+  // Callbacks used to set the print quality.
+  void OnPrint(int propagate, int resolution);
   vtkGetMacro(PrintTargetDPI,float);
   
   // Description:
@@ -288,6 +286,11 @@ public:
 
 //ETX
   
+  // Description:
+  // Print a list of recent files to the standard output for debug
+  // purposes.
+  void PrintRecentFiles();
+  
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -298,7 +301,6 @@ protected:
                               const char *command);
   void UpdateRecentMenu(char *key);
   void StoreRecentMenuToRegistery(char *key);
-  void PrintRecentFiles();
 
   unsigned int NumberOfRecentFiles;
 

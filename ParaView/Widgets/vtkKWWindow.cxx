@@ -693,9 +693,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
   // now add our own menu options 
   this->Script( "set %s 0", rbv );
-  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1 1", 0);
-  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2 1", 1);
-  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3 1", 0);
+  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint 1 0", 0);
+  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint 1 1", 1);
+  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint 1 2", 0);
   delete [] rbv;
   // add the Print option
   this->MenuFile->AddCascade("Page Setup", this->PageMenu,8);
@@ -726,43 +726,19 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     }
 }
 
-void vtkKWWindow::OnPrint1(int propagate) 
+void vtkKWWindow::OnPrint(int propagate, int res)
 {
-  this->PrintTargetDPI = 100;
+  int dpis[] = { 100, 150, 300 };
+  this->PrintTargetDPI = dpis[res];
   if ( propagate )
     {
-    float dpi = 1;
+    float dpi = res;
     this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
     }
   else
     {
-    this->PageMenu->Invoke( this->PageMenu->GetIndex("100 DPI") );
-    }
-}
-void vtkKWWindow::OnPrint2(int propagate) 
-{
-  this->PrintTargetDPI = 150;
-  if ( propagate )
-    {
-    float dpi = 2;
-    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
-    }
-  else
-    {
-    this->PageMenu->Invoke( this->PageMenu->GetIndex("150 DPI") );
-    }
-}
-void vtkKWWindow::OnPrint3(int propagate) 
-{
-  this->PrintTargetDPI = 300;
-  if ( propagate )
-    {
-    float dpi = 3;
-    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
-    }
-  else
-    {
-    this->PageMenu->Invoke( this->PageMenu->GetIndex("300 DPI") );
+    char array[][20] = { "100 DPI", "150 DPI", "300 DPI" };
+    this->PageMenu->Invoke( this->PageMenu->GetIndex(array[res]) );
     }
 }
 
@@ -1016,7 +992,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.102 $");
+  this->ExtractRevision(os,"$Revision: 1.103 $");
 }
 
 int vtkKWWindow::ExitDialog()
