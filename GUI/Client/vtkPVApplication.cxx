@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.272");
+vtkCxxRevisionMacro(vtkPVApplication, "1.273");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -412,6 +412,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->ApplicationInitialized = 0;
   this->MachinesFileName = 0;
   this->ProgressEnabled = 0;
   this->ProgressRequests = 0;
@@ -1279,10 +1280,13 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
   return 0;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVApplication::Start(int argc, char*argv[])
+void vtkPVApplication::Initialize()
 {
+  if ( this->ApplicationInitialized )
+    {
+    return;
+    }
 
   if ( ! this->ProcessModule )
     {
@@ -1298,30 +1302,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
-
-  // set the font size to be small
-#ifdef _WIN32
-  this->Script("option add *font {{Tahoma} 8}");
-#else
-  // Specify a font only if there isn't one in the database
-  this->Script(
-    "toplevel .tmppvwindow -class ParaView;"
-    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
-    "option add *font "
-    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
-    "destroy .tmppvwindow");
-  this->Script("option add *highlightThickness 0");
-  this->Script("option add *highlightBackground #ccc");
-  this->Script("option add *activeBackground #eee");
-  this->Script("option add *activeForeground #000");
-  this->Script("option add *background #ccc");
-  this->Script("option add *foreground #000");
-  this->Script("option add *Entry.background #ffffff");
-  this->Script("option add *Text.background #ffffff");
-  this->Script("option add *Button.padX 6");
-  this->Script("option add *Button.padY 3");
-  this->Script("option add *selectColor #666");
-#endif
 
 #ifdef VTK_USE_MANGLED_MESA
   if (this->UseSoftwareRendering)
@@ -1345,6 +1325,37 @@ void vtkPVApplication::Start(int argc, char*argv[])
       vtkImagingFactory::SetUseMesaClasses(0);
       }
     }
+#endif
+  this->ApplicationInitialized = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::Start(int argc, char*argv[])
+{
+  this->Initialize();
+
+  // set the font size to be small
+#ifdef _WIN32
+  this->Script("option add *font {{Tahoma} 8}");
+#else
+  // Specify a font only if there isn't one in the database
+  this->Script(
+    "toplevel .tmppvwindow -class ParaView;"
+    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
+    "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
+    "destroy .tmppvwindow");
+  this->Script("option add *highlightThickness 0");
+  this->Script("option add *highlightBackground #ccc");
+  this->Script("option add *activeBackground #eee");
+  this->Script("option add *activeForeground #000");
+  this->Script("option add *background #ccc");
+  this->Script("option add *foreground #000");
+  this->Script("option add *Entry.background #ffffff");
+  this->Script("option add *Text.background #ffffff");
+  this->Script("option add *Button.padX 6");
+  this->Script("option add *Button.padY 3");
+  this->Script("option add *selectColor #666");
 #endif
 
 

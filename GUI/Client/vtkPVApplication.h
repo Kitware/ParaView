@@ -108,6 +108,10 @@ public:
   //BTX
   static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
   //ETX
+  
+  // Description:
+  // Perform internal PV Application initialization.
+  void Initialize();
 
 //BTX
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
@@ -505,6 +509,8 @@ protected:
   vtkPVProgressHandler* ProgressHandler;
   int ProgressEnabled;
   int ProgressRequests;
+
+  int ApplicationInitialized;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
