@@ -242,6 +242,14 @@ public:
     this->Zoom(r);
     }
 
+  // Description:
+  // The name of a cue depends on the PVSource's name. 
+  // For trace to work reliably, the cue's name must be 
+  // constructed on using the PVSource (not it's name).
+  // This returns the tcl script/string that evaluates the
+  // name correctly at runtime.
+  const char* GetTclNameCommand();
+
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
@@ -301,6 +309,9 @@ protected:
   int ShowTimeLine;
 
   char* Name;
+  char* TclNameCommand;
+  vtkSetStringMacro(TclNameCommand);
+
   int Focus;
 
   int Virtual;

@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.7");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -126,7 +126,7 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
   child->SetTraceReferenceObject(this);
   
   ostrstream str;
-  str << "GetChild \"" << child->GetName() << "\"" << ends;
+  str << "GetChild \"" << child->GetTclNameCommand() << "\"" << ends;
   child->SetTraceReferenceCommand(str.str());
   str.rdbuf()->freeze(0);
 

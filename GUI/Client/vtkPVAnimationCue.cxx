@@ -46,6 +46,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkKWRange.h"
 
+#include <vtkstd/string>
 #define VTK_PV_ANIMATON_ENTRY_HEIGHT 20
 
 /* 
@@ -74,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.8");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.9");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -141,6 +142,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
 
   this->PropertyStatusManager = NULL;
   this->Name = NULL;
+  this->TclNameCommand = 0;
 }
 
 
@@ -183,6 +185,7 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
     this->PropertyStatusManager = NULL;
     }
   this->SetName(NULL);
+  this->SetTclNameCommand(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1097,6 +1100,33 @@ void vtkPVAnimationCue::UpdateEnableState()
   this->PropagateEnableState(this->TimeLineContainer);
   this->PropagateEnableState(this->TimeLineFrame);
   this->PropagateEnableState(this->TimeLine);
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVAnimationCue::GetTclNameCommand()
+{
+  this->SetTclNameCommand(0);
+  if (!this->Name || !this->PVSource)
+    {
+    return this->TclNameCommand;
+    }
+
+  vtkstd::string str = vtkstd::string(this->Name);
+  vtkstd::string::size_type sindex = str.find(this->PVSource->GetName());
+  if (sindex == vtkstd::string::npos)
+    {
+    vtkErrorMacro("Cue name does not have source name in it!");
+    return this->TclNameCommand;
+    }
+
+  ostrstream command;
+  command << "[$kw(" << this->PVSource->GetTclName() << ") GetName]" << ends;
+  
+  str.replace(sindex, strlen(this->PVSource->GetName()),  command.str());
+  command.rdbuf()->freeze(0);
+
+  this->SetTclNameCommand(str.c_str());
+  return this->TclNameCommand;
 }
 
 //-----------------------------------------------------------------------------
