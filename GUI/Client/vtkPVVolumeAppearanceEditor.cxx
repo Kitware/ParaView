@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.20");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.21");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -479,10 +479,6 @@ void vtkPVVolumeAppearanceEditor::SaveState(ofstream *file)
   vtkColorTransferFunction* color = kwcolor->GetColorTransferFunction();
   double *rgb = color->GetDataPointer();
 
-  // Access the vtkPiecewiseFunction:
-  vtkClientServerID volumeOpacityID =
-    this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
-
   // 1. ScalarOpacity
   for(int j=0; j<func->GetSize(); j++)
     {
@@ -493,16 +489,11 @@ void vtkPVVolumeAppearanceEditor::SaveState(ofstream *file)
     }
 
   //2. ScalarOpacityUnitDistance
-  vtkClientServerID volumePropertyID =
-    this->PVSource->GetPartDisplay()->GetVolumePropertyProxy()->GetID(0);
   *file << "$kw(" << this->GetTclName() << ") "
     << "SetScalarOpacityUnitDistance " << unitDistance
     << endl;
 
   //3. Color Ramp, similar to ScalarOpacity
-  vtkClientServerID volumeColorID =
-    this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0);
-
   for(int k=0; k<color->GetSize(); k++)
     {
     *file << "$kw(" << this->GetTclName() << ") "
