@@ -357,7 +357,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
     newData = vtkPVPolyData::New();
     newData->Clone(pvApp);
     this->SetOutput(newData);
-    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    a = this->GetInput()->GetAssignment();
     newData->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();

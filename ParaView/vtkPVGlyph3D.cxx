@@ -253,7 +253,7 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);
-    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    a = this->GetInput()->GetAssignment();
     pvd->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();

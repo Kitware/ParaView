@@ -31,6 +31,7 @@ vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
 vtkPVElevationFilter \
+vtkPVExtentTranslator \
 vtkPVGlyph3D \
 vtkPVImage \
 vtkPVImageClip \
@@ -39,7 +40,6 @@ vtkPVImageSlice \
 vtkPVImageTextureFilter \
 vtkPVMenuButton \
 vtkPVPolyData \
-vtkPVPolyDataMapper \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \

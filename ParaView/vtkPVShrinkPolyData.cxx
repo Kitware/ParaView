@@ -130,7 +130,7 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);
-    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    a = this->GetInput()->GetAssignment();
     pvd->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();
     ac = this->GetPVData()->GetActorComposite();

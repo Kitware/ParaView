@@ -75,6 +75,7 @@ public:
   // The mapper needs to know what the assignment is.
   void SetAssignment(vtkPVAssignment *a);
 
+  
 protected:
   vtkPVActorComposite();
   ~vtkPVActorComposite();

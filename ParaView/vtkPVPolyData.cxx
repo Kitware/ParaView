@@ -96,7 +96,7 @@ void vtkPVPolyData::Glyph()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVGlyph3D *glyph;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-
+  
   glyph = vtkPVGlyph3D::New();
   glyph->Clone(pvApp);
   
