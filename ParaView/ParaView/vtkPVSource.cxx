@@ -365,7 +365,11 @@ void vtkPVSource::CreateProperties()
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
-  
+
+  // For initializing the trace of the notebook.
+  this->GetPropertiesParent()->SetTraceReferenceObject(this);
+  this->GetPropertiesParent()->SetTraceReferenceCommand("GetPropertiesParent");
+
   // Setup the source page of the notebook.
 
   this->DisplayNameLabel->SetParent(this->Properties);
@@ -603,6 +607,10 @@ void vtkPVSource::Accept()
     { // This is the first time, initialize data.    
     vtkPVData *input;
     vtkPVData *ac;
+
+    // All PVSources are initialized automatically.
+    // This is here to avoid traces of widgets before accept is called.
+    this->SetTraceInitialized(1);
     
     ac = this->GetPVOutput(0);
     if (ac == NULL)
@@ -1252,7 +1260,7 @@ void vtkPVSource::InitializePVWidgetTrace(vtkObject* o, unsigned long event,
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPVWidget {%s}]", pvw->GetTclName(),
                        self->GetTclName(), pvw->GetTraceName());
-
+  pvw->TraceInitializedOn();
 }
 
 

@@ -593,6 +593,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // so it has to be done here.
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",
                        this->GetMainView()->GetTclName(), this->GetTclName());
+  this->GetMainView()->SetTraceInitialized(1);
 
   // Set up the button to reset the camera.
   pushButton = vtkKWWidget::New();

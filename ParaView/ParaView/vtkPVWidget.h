@@ -121,8 +121,6 @@ public:
   // Save this widget to a file.  
   virtual void SaveInTclScript(ofstream *file, const char *sourceName);
   
-  virtual int InitializeTrace();  
-
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -146,6 +144,10 @@ protected:
   // There are ssveral ways I could do this.
   // This sets up a widget tree of dependancies.
   vtkCollection *DependantCollection;
+
+  virtual int InitializeTrace();
+
 };
 
 #endif
+

@@ -1392,6 +1392,10 @@ void vtkPVActorComposite::CenterCamera()
   pvApp->BroadcastScript("%s ResetCamera %f %f %f %f %f %f",
                          tclName, bounds[0], bounds[1], bounds[2],
                          bounds[3], bounds[4], bounds[5]);
+
+
+  this->GetPVWindow()->GetRotateCameraInteractor()->
+
   pvApp->BroadcastScript("%s ResetCameraClippingRange", tclName);
   this->GetPVRenderView()->EventuallyRender();
 }

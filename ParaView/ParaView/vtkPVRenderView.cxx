@@ -599,6 +599,12 @@ void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  // Set the color of the interface button.
+  this->BackgroundColor->SetColor(r, g, b);
+  // Since setting the color of the button from a script does
+  // not invoke the callback, We also trace the view.
+  this->AddTraceEntry("$kw(%s) SetBackgroundColor %f %f %f",
+                      this->GetTclName(), r, g, b);
   pvApp->BroadcastScript("%s SetBackground %f %f %f",
                          this->RendererTclName, r, g, b);
   this->EventuallyRender();
