@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.6");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.7");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -210,7 +210,6 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
                                           vtkVolume *volume)
 {
   vtkUnstructuredGrid *input = this->GetInput();
-  vtkIdType numcells = input->GetNumberOfCells();
 
   float last_max_cell_size = this->MaxCellSize;
 
