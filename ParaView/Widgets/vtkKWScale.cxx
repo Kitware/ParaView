@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.30");
+vtkCxxRevisionMacro(vtkKWScale, "1.31");
 
 
 
@@ -131,7 +131,7 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s -padx 0 -pady 0 -bd 0", wname);
+  this->Script("frame %s -bd 0", wname);
   this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no"
                             " -borderwidth 2");
   this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),
