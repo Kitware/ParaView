@@ -121,6 +121,7 @@ REMOVE (PROJECT_TESTS
   MouseInteraction
   TestDemo
   TestPackage
+  XdmfRead
 )
 
 FOREACH (tfile ${PROJECT_TESTS})
