@@ -106,6 +106,11 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Synchronize the width of the first label of the labeled scales. 
+  // The maximum size is found and assigned to each label. 
+  virtual void SynchroniseLabelsMaximumWidth();
+
 protected:
   vtkKWScaleSet();
   ~vtkKWScaleSet();

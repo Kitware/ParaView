@@ -16,14 +16,16 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWScale.h"
+#include "vtkKWLabel.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWScaleSet);
-vtkCxxRevisionMacro(vtkKWScaleSet, "1.5");
+vtkCxxRevisionMacro(vtkKWScaleSet, "1.6");
 
 int vtkvtkKWScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -389,6 +391,41 @@ void vtkKWScaleSet::SetBorderWidth(int bd)
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScaleSet::SynchroniseLabelsMaximumWidth()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  const char **labels = 
+    new const char* [this->Scales->GetNumberOfItems()];
+
+  vtkKWScaleSet::ScaleSlot *scale_slot = NULL;
+  vtkKWScaleSet::ScalesContainerIterator *it = this->Scales->NewIterator();
+
+  int nb = 0;
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(scale_slot) == VTK_OK &&
+        scale_slot->Scale->GetLabel() &&
+        scale_slot->Scale->GetLabel()->IsCreated())
+      {
+      labels[nb++] = 
+        scale_slot->Scale->GetLabel()->GetWidgetName();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
+    this->GetApplication()->GetMainInterp(), nb, labels);
+
+  delete [] labels;
 }
 
 //----------------------------------------------------------------------------
