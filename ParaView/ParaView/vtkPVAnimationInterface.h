@@ -196,7 +196,7 @@ public:
   void UpdateEntries();
   void DeleteSourceItem(int item);
   void UpdateSourceMenu(int idx);
-  void UpdateMethodMenu(int idx);
+  void UpdateMethodMenu(int idx, int samesource=1);
   void SetPVSource(vtkPVSource *source, int idx);
 
   void SetLastEntryIndex(int);

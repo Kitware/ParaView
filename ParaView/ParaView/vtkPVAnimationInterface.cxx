@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.65");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.66");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -192,27 +192,25 @@ public:
     {
     char index[100];
     sprintf(index, "Action %d", idx);
-    /*
     vtkstd::string label;
     label = index;
     if ( this->SourceMenuButton->GetButtonText() && 
-      strlen(this->SourceMenuButton->GetButtonText()) > 0 )
+      strlen(this->SourceMenuButton->GetButtonText()) > 0 &&
+      strcmp(this->SourceMenuButton->GetButtonText(), "None") != 0 )
       {
+      label += " (";
       label += this->SourceMenuButton->GetButtonText();
+      label += ")";
       }
-    else
-      {
-      label += "Empty";
-      }
+    /*
     if ( this->MethodMenuButton->GetButtonText() &&
       strlen(this->MethodMenuButton->GetButtonText()) ) 
       {
       label += "_";
       label += this->MethodMenuButton->GetButtonText();
       }
+      */
     this->SetLabel(label.c_str());
-    */
-    this->SetLabel(index);
     }
 
   void Create(vtkPVApplication* pvApp, const char*)
@@ -1218,7 +1216,7 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source, int idx)
     this->AddTraceEntry("$kw(%s) SetPVSource {} %d", this->GetTclName(), idx);
     }
 
-  this->UpdateMethodMenu(idx);
+  this->UpdateMethodMenu(idx, 0);
   this->ShowEntryInFrame(idx);
 }
 
@@ -1482,7 +1480,7 @@ const char* vtkPVAnimationInterface::GetScript()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::UpdateMethodMenu(int idx)
+void vtkPVAnimationInterface::UpdateMethodMenu(int idx, int samesource /* = 1 */)
 {
   vtkPVWidgetCollection *pvWidgets;
   vtkPVWidget *pvw;
@@ -1494,6 +1492,10 @@ void vtkPVAnimationInterface::UpdateMethodMenu(int idx)
   menu->DeleteAllMenuItems();
 
   entry->GetMethodMenuButton()->SetButtonText("None");
+  if ( !samesource )
+    {
+    entry->SetCurrentMethod(0);
+    }
   if (entry->GetPVSource() == NULL)
     {
     return;
@@ -1526,7 +1528,7 @@ void vtkPVAnimationInterface::UpdateMethodMenu(int idx)
       menu->SetEntryCommand(cc, command.c_str());
       }
     }
-  if ( entry->GetCurrentMethod() )
+  if ( samesource && entry->GetCurrentMethod() )
     {
     entry->GetMethodMenuButton()->SetButtonText(entry->GetCurrentMethod());
     }
@@ -1995,7 +1997,15 @@ void vtkPVAnimationInterface::ShowEntryInFrame(int idx)
   this->Script("pack %s -side top -expand 1 -fill x -fill y", entry->GetWidgetName());
   char buffer[1024];
   sprintf(buffer, "DeleteSourceItem %d", idx);
-  this->DeleteItemButton->SetCommand(this, buffer);
+  if ( this->AnimationEntries->GetNumberOfItems() <= 1 )
+    {
+    this->DeleteItemButton->EnabledOff();
+    }
+  else
+    {
+    this->DeleteItemButton->SetCommand(this, buffer);
+    this->DeleteItemButton->EnabledOn();
+    }
   entry->CreateLabel(idx);
   this->AnimationEntriesMenu->SetButtonText(entry->GetLabel());
   this->EnabledOn();
