@@ -128,11 +128,6 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   int GetPrinting() {return this->Printing;};
   vtkSetMacro(Printing,int);
   
-  // Description:
-  // Set/Get the last position of the mouse.
-  vtkSetVector2Macro(LastPosition,int);
-  vtkGetVector2Macro(LastPosition,int);
-
   // Description;
   // Set the parent window if used so that additional
   // features may be enabled. The parent window is the vtkKWWindow
@@ -391,7 +386,6 @@ protected:
   int InExpose;
   int SharedPropertiesParent;
   float Center[2];
-  int LastPosition[2];
   vtkKWWindow *ParentWindow;
   vtkKWCompositeCollection *Composites;
   vtkKWWidget *PropertiesParent;

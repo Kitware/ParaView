@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.125");
+vtkCxxRevisionMacro(vtkKWView, "1.126");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1555,7 +1555,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.125 $");
+  this->ExtractRevision(os,"$Revision: 1.126 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1720,7 +1720,6 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InExpose: " << this->GetInExpose() << endl;
   os << indent << "InteractiveUpdateRate: " 
      << this->GetInteractiveUpdateRate() << endl;
-  os << indent << "LastPosition: " << this->GetLastPosition() << endl;
   os << indent << "MenuEntryHelp: " << this->GetMenuEntryHelp() 
      << endl;
   os << indent << "MenuEntryName: " << this->GetMenuEntryName() 
