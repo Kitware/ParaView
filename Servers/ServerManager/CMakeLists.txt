@@ -94,7 +94,6 @@ IF (PARAVIEW_USE_ICE_T)
   SET(ServerManager_SRCS 
     ${ServerManager_SRCS}
     vtkPVDeskTopRenderModule.cxx
-    vtkPVIceTDisplayRenderModule.cxx
     vtkPVIceTRenderModule.cxx
     )
 ENDIF (PARAVIEW_USE_ICE_T)
