@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------s
@@ -1589,8 +1589,10 @@ void vtkSMPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
      << this->ColorProperty->GetElement(2) << endl;
   
   os << indent << "ProcessModule: "    << this->ProcessModule         << endl;
+  os << indent << "ColorField: " << this->ColorField << endl;
   os << indent << "DirectColorFlag: "  << this->GetDirectColorFlag()       << endl;
   os << indent << "InterpolateColorsFlag: " << this->GetInterpolateColorsFlag() << endl;
+  os << indent << "OpacityUnitDistance: " << this->OpacityUnitDistance << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorProxy << endl;
   
   os << indent << "VolumeProxy: "            << this->VolumeProxy            << endl;
