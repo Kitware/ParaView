@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.13");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.14");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -437,7 +437,6 @@ void vtkCTHFractal::AddTestArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkDoubleArray* array = vtkDoubleArray::New();
   int blockId;
   double* arrayPtr;
@@ -446,12 +445,6 @@ void vtkCTHFractal::AddTestArray()
 
   array->Allocate(numCells);
   array->SetNumberOfTuples(numCells);
-  if (numCells != numBlocks*numCellsPerBlock)
-    {
-    vtkErrorMacro("Cell count error.");
-    array->Delete();
-    return;
-    }
   arrayPtr = (double*)(array->GetPointer(0));
 
   origin = output->GetTopLevelOrigin();
@@ -487,7 +480,6 @@ void vtkCTHFractal::AddFractalArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkDoubleArray* array = vtkDoubleArray::New();
   int blockId;
   double* arrayPtr;
@@ -500,12 +492,6 @@ void vtkCTHFractal::AddFractalArray()
 
   array->Allocate(numCells);
   array->SetNumberOfTuples(numCells);
-  if (numCells != numBlocks*numCellsPerBlock)
-    {
-    vtkErrorMacro("Cell count error.");
-    array->Delete();
-    return;
-    }
   arrayPtr = (double*)(array->GetPointer(0));
 
   // hack
@@ -526,15 +512,11 @@ void vtkCTHFractal::AddFractalArray()
     fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
     fractalSource->Update();
     fractal = fractalSource->GetOutput()->GetPointData()->GetScalars();
-    if (fractal->GetNumberOfTuples() != numCellsPerBlock)
-      {
-      vtkErrorMacro("point to cell mismatch.");
-      }
     fractalPtr = (float*)(fractal->GetVoidPointer(0));
 
     //memcpy(arrayPtr, fractalPtr, sizeof(float)*numCellsPerBlock);
     //arrayPtr += numCellsPerBlock;
-    for (int i = 0; i < numCellsPerBlock; ++i)
+    for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
       {
       // Change fractal into volume fraction (iso surface at 0.5).
       *arrayPtr++ = *fractalPtr++ / (2.0 * this->FractalValue);
@@ -554,22 +536,15 @@ void vtkCTHFractal::AddBlockIdArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkIntArray* blockArray = vtkIntArray::New();
   int blockId;
   int blockCellId;
 
   blockArray->Allocate(numCells);
-  if (numCells != numBlocks*numCellsPerBlock)
-    {
-    vtkErrorMacro("Cell count error.");
-    blockArray->Delete();
-    return;
-    }
 
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-    for (blockCellId = 0; blockCellId < numCellsPerBlock; ++blockCellId)
+    for (blockCellId = 0; blockCellId < output->GetNumberOfCellsForBlock(blockId); ++blockCellId)
       {
       blockArray->InsertNextValue(blockId);
       }
@@ -587,7 +562,6 @@ void vtkCTHFractal::AddDepthArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkIntArray* depthArray = vtkIntArray::New();
   int blockId;
   int blockCellId;
@@ -595,18 +569,12 @@ void vtkCTHFractal::AddDepthArray()
   int depth;
 
   depthArray->Allocate(numCells);
-  if (numCells != numBlocks*numCellsPerBlock)
-    {
-    vtkErrorMacro("Cell count error.");
-    depthArray->Delete();
-    return;
-    }
 
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     spacing = output->GetBlockSpacing(blockId);
     depth = this->Levels->GetValue(blockId);
-    for (blockCellId = 0; blockCellId < numCellsPerBlock; ++blockCellId)
+    for (blockCellId = 0; blockCellId < output->GetNumberOfCellsForBlock(blockId); ++blockCellId)
       {
       depthArray->InsertNextValue(depth);
       }
@@ -623,7 +591,6 @@ void vtkCTHFractal::AddGhostLevelArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
   int blockId;
   int dims[3];
@@ -633,12 +600,6 @@ void vtkCTHFractal::AddGhostLevelArray()
 
   array->SetNumberOfTuples(numCells);
   ptr = (unsigned char*)(array->GetVoidPointer(0));
-  if (numCells != numBlocks*numCellsPerBlock)
-    {
-    vtkErrorMacro("Cell count error.");
-    array->Delete();
-    return;
-    }
 
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {

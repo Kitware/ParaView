@@ -35,7 +35,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.8");
+vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.9");
 vtkStandardNewMacro(vtkCTHAMRCellToPointData);
 
 //----------------------------------------------------------------------------
@@ -310,8 +310,7 @@ double vtkCTHAMRCellToPointDataComputeSharedPoint(int blockId, vtkIdList* blockL
   double epsilon;
   double origin[3];
   double outside[3];
-  int numPtsPerBlock = output->GetNumberOfPointsPerBlock();
-  int numCellsPerBlock = input->GetNumberOfCellsPerBlock();
+  //int numPtsPerBlock = output->GetNumberOfPointsPerBlock();
   int i, id, num;
   int x0, x1, y0, y1, z0, z1;
   double dx, dy, dz;
@@ -327,7 +326,8 @@ double vtkCTHAMRCellToPointDataComputeSharedPoint(int blockId, vtkIdList* blockL
   spacing = input->GetBlockSpacing(blockId);
   // Assume x, y and z spacing are the same.
   weight = 1.0/spacing[0];
-  id = (blockId * numCellsPerBlock) + x + y*cIncY + z*cIncZ;
+  // Charles this may be wrong but it effects a lot of code so punting
+  id = (blockId * input->GetNumberOfCellsForBlock(0)) + x + y*cIncY + z*cIncZ;
   if (x > 0 && y > 0 && z > 0)
     {
     sumWeight += weight;
@@ -427,7 +427,7 @@ double vtkCTHAMRCellToPointDataComputeSharedPoint(int blockId, vtkIdList* blockL
         // This is not necessary if point lies on neighbors grid.
         if (dx > epsilon || dy > epsilon || dz > epsilon)
           {
-          T* cornerPoint = pPoint + id*numPtsPerBlock + x + y*pIncY + z*pIncZ;
+          T* cornerPoint = pPoint + id*output->GetNumberOfPointsForBlock(id) + x + y*pIncY + z*pIncZ;
           // Since there are only six cases (3 edges and 3 faces),
           // just have a condition for each.
           if (dx > epsilon && dy <= epsilon && dz <= epsilon)
@@ -483,7 +483,7 @@ double vtkCTHAMRCellToPointDataComputeSharedPoint(int blockId, vtkIdList* blockL
             for (x = x0; x <= x1; ++x)
               {
               sumWeight += weight;
-              sum += weight*pCell[id*numCellsPerBlock 
+              sum += weight*pCell[id*input->GetNumberOfCellsForBlock(id) 
                                   + x + y*cIncY + z*cIncZ];
               }
             }

@@ -67,8 +67,8 @@ public:
   // Description:
   // Athough CTH has a contant number of cells per block, we would have to get
   // rid of this method if this data object were used for anything else.
-  vtkIdType GetNumberOfCellsPerBlock();
-  vtkIdType GetNumberOfPointsPerBlock();
+  vtkIdType GetNumberOfCellsForBlock(int blockId);
+  vtkIdType GetNumberOfPointsForBlock(int blockId);
   double *GetPoint(vtkIdType ptId);
   void GetPoint(vtkIdType id, double x[3]);
   vtkCell *GetCell(vtkIdType cellId);
