@@ -109,7 +109,8 @@ void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
     }
 }
 
-void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia)
+void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
+                                      vtkImageMapToWindowLevelColors *wl)
 {
   int i;
   char *text, *text2;
@@ -121,10 +122,10 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia)
     {
     image = ia->GetSliceNumber();
     }
-  if (this->WindowLevel)
+  if (wl)
     {
-    window = this->WindowLevel->GetWindow();
-    level = this->WindowLevel->GetLevel();    
+    window = wl->GetWindow();
+    level = wl->GetLevel();    
     }
   
   // search for tokens, replace and then assign to TextMappers
@@ -251,6 +252,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
   
   // is there an image actor ?
   vtkImageActor *ia = 0;  
+  vtkImageMapToWindowLevelColors *wl = this->WindowLevel;
   vtkPropCollection *pc = viewport->GetProps();
   int numProps = pc->GetNumberOfItems();
   for (i = 0; i < numProps; i++)
@@ -258,6 +260,11 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     ia = vtkImageActor::SafeDownCast(pc->GetItemAsObject(i));
     if (ia)
       {
+      if (!wl)
+        {
+        wl = vtkImageMapToWindowLevelColors::SafeDownCast(
+          ia->GetInput()->GetSource());
+        }
       break;
       }
     }  
@@ -266,14 +273,14 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
   if ( (this->GetMTime() > this->BuildTime) ||
        (ia && (ia != this->LastImageActor || 
                ia->GetMTime() > this->BuildTime)) ||
-       (this->WindowLevel && this->WindowLevel->GetMTime() > this->BuildTime))
+       (wl && wl->GetMTime() > this->BuildTime))
     {
     int *vSize = viewport->GetSize();
     int maxX, Y1, Y2;
     vtkDebugMacro(<<"Rebuilding text");
     
     // replace text
-    this->ReplaceText(ia);
+    this->ReplaceText(ia,wl);
     
     // get the viewport size in display coordinates
     this->LastSize[0] = vSize[0];

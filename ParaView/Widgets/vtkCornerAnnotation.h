@@ -128,7 +128,7 @@ protected:
   int MinimumFontSize;
   
   // search for replacable tokens and replace
-  void ReplaceText(vtkImageActor *ia);
+  void ReplaceText(vtkImageActor *ia,  vtkImageMapToWindowLevelColors *wl);
 private:
 };
 
