@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.377");
+vtkCxxRevisionMacro(vtkPVWindow, "1.378");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3342,7 +3342,14 @@ void vtkPVWindow::DisplayCommandPrompt()
   if ( ! this->TclInteractor )
     {
     this->TclInteractor = vtkKWTclInteractor::New();
-    this->TclInteractor->SetTitle("Command Prompt");
+    ostrstream title;
+    if (this->Application && *this->Application->GetApplicationName())
+      {
+      title << this->Application->GetApplicationName() << " : ";
+      }
+    title << "Command Prompt" << ends;
+    this->TclInteractor->SetTitle(title.str());
+    title.rdbuf()->freeze(0);
     this->TclInteractor->SetMasterWindow(this);
     this->TclInteractor->Create(this->GetPVApplication());
     }
@@ -3752,7 +3759,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.377 $");
+  this->ExtractRevision(os,"$Revision: 1.378 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4145,4 +4152,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
      << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
   os << indent << "Interaction: " << (this->Interaction?"on":"off") << endl;
+  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
 }

@@ -476,6 +476,11 @@ public:
   //BTX
   vtkLinkedList<vtkPVReaderModule*>* GetReaderList() { return this->ReaderList; }
   //ETX
+
+  // Description:
+  // Access to the Tcl interactor.
+  vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
