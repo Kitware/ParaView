@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWSimpleEntryDialog.h"
 
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkObjectFactory.h"
@@ -42,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.2");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.3");
 
 int vtkKWSimpleEntryDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);

@@ -35,13 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWDialog.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.35");
+vtkCxxRevisionMacro(vtkKWDialog, "1.36");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -67,6 +68,8 @@ vtkKWDialog::~vtkKWDialog()
   this->SetMasterWindow(0);
 }
 
+#include "vtkKWMessageDialog.h"
+
 //----------------------------------------------------------------------------
 int vtkKWDialog::Invoke()
 {
@@ -77,6 +80,7 @@ int vtkKWDialog::Invoke()
   int width, height;
 
   int x, y;
+
   if (this->InvokeAtPointer)
     {
     sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
@@ -113,9 +117,8 @@ int vtkKWDialog::Invoke()
       }
     }
 
-  sscanf(this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]", 
-                      this->GetWidgetName(), this->GetWidgetName()), 
-         "%d %d", &width, &height);
+  width = this->GetWidth();
+  height = this->GetHeight();
 
   if (x > width / 2)
     {
@@ -263,6 +266,28 @@ void vtkKWDialog::SetTitle( const char* title )
     {
     this->SetTitleString(title);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDialog::GetWidth()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  return atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWDialog::GetHeight()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  return atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------

@@ -66,11 +66,11 @@ public:
   // Display the dialog in a non-modal manner.
   virtual void Display();
 
-  // Description::
+  // Description:
   // Close this Dialog
   virtual void Cancel();
 
-  // Description::
+  // Description:
   // Close this Dialog
   virtual void OK();
 
@@ -85,21 +85,21 @@ public:
 
   // Description:
   // Play beep when the dialog is displayed
-  vtkSetClampMacro( Beep, int, 0, 1 );
-  vtkBooleanMacro( Beep, int );
-  vtkGetMacro( Beep, int );
+  vtkSetClampMacro(Beep, int, 0, 1);
+  vtkBooleanMacro(Beep, int);
+  vtkGetMacro(Beep, int);
 
   // Description:
   // Sets the beep type
-  vtkSetMacro( BeepType, int );
-  vtkGetMacro( BeepType, int );
+  vtkSetMacro(BeepType, int);
+  vtkGetMacro(BeepType, int);
 
   // Description:
   // Invoke the dialog centered at the mouse pointer position (default is
   // either screen center or window center)
   vtkSetClampMacro(InvokeAtPointer, int, 0, 1);
   vtkBooleanMacro(InvokeAtPointer, int);
-  vtkGetMacro(InvokeAtPointer, int );
+  vtkGetMacro(InvokeAtPointer, int);
 
   // Description:
   // Set the title of the dialog. Default is "Kitware Dialog".
@@ -112,6 +112,11 @@ public:
   // system supports this)
   void SetMasterWindow(vtkKWWindow* win);
   vtkKWWindow *GetMasterWindow();
+
+  // Description:
+  // Convenience method to guess the width/height of the dialog.
+  virtual int GetWidth();
+  virtual int GetHeight();
 
 protected:
   // Description:

@@ -154,9 +154,9 @@ public:
 
   // Description:
   // Retrieve the frame where the message is.
-  vtkGetObjectMacro(TopFrame, vtkKWWidget);
-  vtkGetObjectMacro(MessageDialogFrame, vtkKWWidget);
-  vtkGetObjectMacro(BottomFrame, vtkKWWidget);
+  vtkGetObjectMacro(TopFrame, vtkKWFrame);
+  vtkGetObjectMacro(MessageDialogFrame, vtkKWFrame);
+  vtkGetObjectMacro(BottomFrame, vtkKWFrame);
 
   // Description:
   // Set the icon on the message dialog.
@@ -172,6 +172,11 @@ public:
   // Close this Dialog (for the third button)
   virtual void Other();
 
+  // Description:
+  // Convenience method to guess the width/height of the dialog.
+  virtual int GetWidth();
+  virtual int GetHeight();
+
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
@@ -185,18 +190,18 @@ protected:
   vtkSetStringMacro(DialogText);
   vtkGetStringMacro(DialogText);
 
-  vtkKWWidget     *TopFrame;
-  vtkKWWidget     *MessageDialogFrame;
-  vtkKWWidget     *BottomFrame;
-  vtkKWLabel      *Label;
-  vtkKWWidget     *ButtonFrame;
-  vtkKWWidget     *OKButton;
-  vtkKWWidget     *CancelButton;  
-  vtkKWWidget     *OtherButton;  
-  vtkKWLabel      *Icon;
-  vtkKWWidget     *OKFrame;
-  vtkKWWidget     *CancelFrame;
-  vtkKWWidget     *OtherFrame;
+  vtkKWFrame       *TopFrame;
+  vtkKWFrame       *MessageDialogFrame;
+  vtkKWFrame       *BottomFrame;
+  vtkKWLabel       *Label;
+  vtkKWFrame       *ButtonFrame;
+  vtkKWWidget      *OKButton;
+  vtkKWWidget      *CancelButton;  
+  vtkKWWidget      *OtherButton;  
+  vtkKWLabel       *Icon;
+  vtkKWFrame       *OKFrame;
+  vtkKWFrame       *CancelFrame;
+  vtkKWFrame       *OtherFrame;
   vtkKWCheckButton *CheckButton;
 
   // Description:

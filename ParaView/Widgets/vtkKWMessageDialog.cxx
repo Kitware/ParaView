@@ -35,16 +35,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWMessageDialog.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWIcon.h"
 #include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
+#include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.56");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.57");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -53,11 +54,11 @@ int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
-  this->MessageDialogFrame = vtkKWWidget::New();
+  this->MessageDialogFrame = vtkKWFrame::New();
   this->MessageDialogFrame->SetParent(this);
-  this->TopFrame = vtkKWWidget::New();
+  this->TopFrame = vtkKWFrame::New();
   this->TopFrame->SetParent(this->MessageDialogFrame);
-  this->BottomFrame = vtkKWWidget::New();
+  this->BottomFrame = vtkKWFrame::New();
   this->BottomFrame->SetParent(this->MessageDialogFrame);
   
   this->CommandFunction = vtkKWMessageDialogCommand;
@@ -65,13 +66,13 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Label->SetParent(this->MessageDialogFrame);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this->MessageDialogFrame);
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
-  this->OKFrame = vtkKWWidget::New();
+  this->OKFrame = vtkKWFrame::New();
   this->OKFrame->SetParent(this->ButtonFrame);
-  this->CancelFrame = vtkKWWidget::New();
+  this->CancelFrame = vtkKWFrame::New();
   this->CancelFrame->SetParent(this->ButtonFrame);  
-  this->OtherFrame = vtkKWWidget::New();
+  this->OtherFrame = vtkKWFrame::New();
   this->OtherFrame->SetParent(this->ButtonFrame);  
   this->OKButton = vtkKWWidget::New();
   this->OKButton->SetParent(this->OKFrame);
@@ -121,9 +122,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
   
-  this->MessageDialogFrame->Create(app,"frame","");
-  this->TopFrame->Create(app,"frame","");
-  this->BottomFrame->Create(app,"frame","");
+  this->MessageDialogFrame->Create(app, "");
+  this->TopFrame->Create(app, "");
+  this->BottomFrame->Create(app, "");
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
   this->Label->Create(app,"");
@@ -132,7 +133,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->Label->SetLabel(this->DialogText);
     }
   this->CheckButton->Create(app, "");
-  this->ButtonFrame->Create(app,"frame","");
+  this->ButtonFrame->Create(app, "");
   
   int one_b = (this->Style == vtkKWMessageDialog::Message) ? 1 : 0;
   int two_b = (this->Style == vtkKWMessageDialog::YesNo || 
@@ -162,7 +163,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 1)
     {
-    this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
+    this->OKFrame->Create(app, "-borderwidth 3 -relief flat");
     this->OKButton->Create(app,"button","-width 16");
     this->OKButton->SetTextOption(this->OKButtonText);
     this->OKButton->SetCommand(this, "OK");
@@ -173,7 +174,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 3)
     {
-    this->OtherFrame->Create(app,"frame","-borderwidth 3 -relief flat");
+    this->OtherFrame->Create(app, "-borderwidth 3 -relief flat");
     this->OtherButton->Create(app,"button", "-width 16");
     this->OtherButton->SetTextOption(this->OtherButtonText);
     this->OtherButton->SetCommand(this, "Other");
@@ -184,7 +185,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 2)
     {
-    this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
+    this->CancelFrame->Create(app, "-borderwidth 3 -relief flat");
     this->CancelButton->Create(app,"button", "-width 16");
     this->CancelButton->SetTextOption(this->CancelButtonText);
     this->CancelButton->SetCommand(this, "Cancel");
@@ -474,6 +475,94 @@ void vtkKWMessageDialog::Other()
   this->Script("wm withdraw %s",this->GetWidgetName());
   this->ReleaseGrab();
   this->Done = 3;  
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetWidth()
+{
+  int width = this->Superclass::GetWidth();
+
+  if (!this->IsCreated())
+    {
+    return width;
+    }
+
+  // GetWidth() is called by vtkKWDialog when it's time to center the
+  // dialog. Unfortunately, since the widget has not been mapped at that
+  // time, 'winfo width' will most probably return 1, and 'winfo reqwidth'
+  // will return the default size of the toplevel. Let's try to help a bit
+  // by checking the size of the internal frames (which width can be set
+  // explicitly).
+
+  if (this->TopFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->TopFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  if (this->MessageDialogFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->MessageDialogFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  if (this->BottomFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->BottomFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  return width;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetHeight()
+{
+  int height = this->Superclass::GetHeight();
+
+  if (!this->IsCreated())
+    {
+    return height;
+    }
+
+  // GetHeight() is called by vtkKWDialog when it's time to center the
+  // dialog. Unfortunately, since the widget has not been mapped at that
+  // time, 'winfo height' will most probably return 1, and 'winfo reqheight'
+  // will return the default size of the toplevel. Let's try to help a bit
+  // by checking the size of the internal frames (which height can be set
+  // explicitly).
+
+  if (this->TopFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->TopFrame->GetWidgetName()));
+    }
+
+  if (this->MessageDialogFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->MessageDialogFrame->GetWidgetName()));
+    }
+
+  if (this->BottomFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->BottomFrame->GetWidgetName()));
+    }
+
+  return height;
 }
 
 //----------------------------------------------------------------------------
