@@ -47,22 +47,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledLabel );
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.2");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.3");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWLabeledLabel::vtkKWLabeledLabel()
 {
   this->CommandFunction = vtkKWLabeledLabelCommand;
 
   this->Label1 = vtkKWLabel::New();
-  this->Label1->SetParent(this);
-
   this->Label2 = vtkKWLabel::New();
-  this->Label2->SetParent(this);
 }
 
+//----------------------------------------------------------------------------
 vtkKWLabeledLabel::~vtkKWLabeledLabel()
 {
   this->Label1->Delete();
@@ -72,12 +71,10 @@ vtkKWLabeledLabel::~vtkKWLabeledLabel()
   this->Label2 = NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledLabel::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("LabeledLabel already created");
     return;
@@ -85,11 +82,15 @@ void vtkKWLabeledLabel::Create(vtkKWApplication *app)
 
   this->SetApplication(app);
 
-  // create the top level
-  wname = this->GetWidgetName();
+  // Create the top level
+
+  const char *wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
+  this->Label1->SetParent(this);
   this->Label1->Create(app, "");
+
+  this->Label2->SetParent(this);
   this->Label2->Create(app, "");
 
   this->Script("pack %s %s -side left -anchor nw", 
@@ -98,7 +99,33 @@ void vtkKWLabeledLabel::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetEnabled(int e)
+{
+  // Propagate first (since objects can be modified externally, they might
+  // not be in synch with this->Enabled)
+
+  if (this->IsCreated())
+    {
+    this->Label1->SetEnabled(e);
+    this->Label2->SetEnabled(e);
+    }
+
+  // Then update internal Enabled ivar, although it is not of much use here
+
+  if (this->Enabled == e)
+    {
+    return;
+    }
+
+  this->Enabled = e;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWLabeledLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Label1: " << this->Label1 << endl;
+  os << indent << "Label2: " << this->Label2 << endl;
 }

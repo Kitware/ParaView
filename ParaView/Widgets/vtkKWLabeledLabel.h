@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkKWLabeledLabel - an entry with a label
 // .SECTION Description
-// The LabeledLabel creates an entry with a label in front of it; both are
+// The LabeledLabel creates a label with another label in front of it; both are
 // contained in a frame
 
 
@@ -66,9 +66,13 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // get the internal labels
-  vtkKWLabel *GetLabel1() { return this->Label1; }
-  vtkKWLabel *GetLabel2() { return this->Label2; }
+  // Get the internal objects
+  vtkGetObjectMacro(Label1, vtkKWLabel);
+  vtkGetObjectMacro(Label2, vtkKWLabel);
+
+  // Description:
+  // Set or get enabled state.
+  virtual void SetEnabled(int);
 
 protected:
   vtkKWLabeledLabel();
