@@ -57,6 +57,9 @@ The output of the 2D Glyph source is polygonal data.
   <LabeledToggle label="TwoDimensional" trace_name="TwoDimensional" 
                  property="TwoDimensional"
                  help="Generate a 2D AMR fractal." />
+  <LabeledToggle label="Asymetric" trace_name="Asymetric" 
+                 property="Asymetric"
+                 help="Some blocks have X dimension larger by 2." />
 </Module>
 <!-- #endif -->
 

@@ -119,10 +119,6 @@ The flow integration fitler  integrates the dot product of a point flow vector f
                   property="AddVolumeArrayName"
                   help="Select the cells attributes to convert to point attributes."/>
 
-    <LabeledToggle label="IgnoreGhostLevels"
-                   property="IgnoreGhostLevels"
-                   trace_name="IgnoreGhostLevels"
-                   help="Alternative algorithm" />
   </Module>
 
   <Module name="CTHAMRContour"
@@ -152,10 +148,6 @@ The flow integration fitler  integrates the dot product of a point flow vector f
                trace_name="Scalars"
                input_menu="im"
                help="Choose which scalar array you want to contour."/>
-    <LabeledToggle label="IgnoreGhostLevels"
-                   property="IgnoreGhostLevels"
-                   trace_name="IgnoreGhostLevels"
-                   help="Alternative algorithm" />
     <ScalarRangeLabel id="srl"
                       property="ContourValues"
                       trace_name="ScalarRangeLabel"
@@ -727,10 +719,6 @@ The line can be specified interactively using the 3D line widget. See section 7.
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <LabeledToggle label="IgnoreGhostLevels"
-                   property="IgnoreGhostLevels"
-                   trace_name="IgnoreGhostLevels"
-                   help="Alternative algorithm" />
     <SelectArrays filter_arrays="On"
                   deactivate="On"
                   field="Cell"
