@@ -137,12 +137,13 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s",wname);
-  this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no");
+  this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no"
+			    " -borderwidth 2");
   this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),args);
-  this->Script("%s configure -resolution %f",
+  this->Script("%s configure -resolution %f -highlightthickness 0",
                this->ScaleWidget->GetWidgetName(),this->Resolution);
   this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
-  this->Script("pack %s -side bottom -fill x -expand yes",
+  this->Script("pack %s -side bottom -fill x -expand yes -pady 0 -padx 0",
                this->ScaleWidget->GetWidgetName());
 
   this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
@@ -176,7 +177,7 @@ void vtkKWScale::DisplayEntry()
   this->Entry->Create(this->Application,"-width 10");
   this->Script("bind %s <Return> {%s EntryValueChanged}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side right", this->Entry->GetWidgetName());
+  this->Script("pack %s -side right -padx 2", this->Entry->GetWidgetName());
 }
 
 void vtkKWScale::DisplayLabel(const char *name)

@@ -59,7 +59,7 @@ vtkKWNotebook::vtkKWNotebook()
 {
   this->CommandFunction = vtkKWNotebookCommand;
   this->Height = 30;
-  this->Pad = 0;
+  this->Pad = 1;
   this->NumberOfPages = 0;
   this->Buttons = NULL;
   this->Icons   = NULL;
@@ -188,9 +188,9 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   this->GetBackgroundColor(&r, &g, &b); 
   sprintf(this->ForegroundColor, "#%02x%02x%02x", r, g, b);
   
-  r = static_cast<int>( r * 0.97 );
-  g = static_cast<int>( g * 0.97 );
-  b = static_cast<int>( b * 0.97 );
+  r = static_cast<int>( r * 0.99 );
+  g = static_cast<int>( g * 0.99 );
+  b = static_cast<int>( b * 0.99 );
   sprintf(this->BackgroundColor, "#%02x%02x%02x", r, g, b);  
 }
 
@@ -211,7 +211,7 @@ void vtkKWNotebook::Raise(int num)
 		   this->Frames[this->Current]->GetWidgetName());
       this->Script("%s configure -disabledforeground black -state normal",
 		   this->Buttons[this->Current]->GetWidgetName());
-      this->Script("%s configure -bg %s -height 2 "
+      this->Script("%s configure -bg %s -height 1 "
 		   "-highlightcolor %s -activebackground %s",
 		   this->Buttons[this->Current]->GetWidgetName(),
 		   this->BackgroundColor, this->BackgroundColor,
@@ -228,7 +228,7 @@ void vtkKWNotebook::Raise(int num)
     this->Script("pack %s -fill both -anchor n",
                  this->Frames[num]->GetWidgetName());
     this->Script("%s configure -disabledforeground black -state disabled"
-		 " -bg %s -height 1",
+		 " -bg %s -height 2",
 		 this->Buttons[num]->GetWidgetName(), this->ForegroundColor);
     if ( this->Icons[num] )
       {
@@ -274,8 +274,8 @@ void vtkKWNotebook::Raise(int num)
 #else
   ;
 #endif
-  int y0 = yb +  y  + height - bw - h0;
-  int w0 = width - (bw * 2);
+  int y0 = yb +  y  + height - bw - h0+2;
+  int w0 = width - (bw * 2)+1;
 
 
 
@@ -425,7 +425,7 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
     this->Titles[this->NumberOfPages], this->BorderWidth,
     this->GetTclName(),this->NumberOfPages, this->BackgroundColor);
 
-  this->Script("pack %s -side left -pady 0 -padx %d -fill y",
+  this->Script("pack %s -side left -pady 0 -padx %d",
                this->Buttons[this->NumberOfPages]->GetWidgetName(),
                this->Pad);
   this->Script("bind %s  <Configure> {%s RaiseCurrent}",
@@ -438,24 +438,31 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
 		 this->Icons[this->NumberOfPages]->GetWidgetName(),
 		 this->Buttons[this->NumberOfPages]->GetWidgetName(),
 #ifdef _WIN32
-		 -3, 0
+		 -3, -1
 #else
 		 +1, 1
 #endif
       );   
-    this->Script("bind %s  <ButtonRelease-1> {%s invoke}",
+    this->Script("bind %s  <Button-1> {%s invoke}",
 		 this->Icons[this->NumberOfPages]->GetWidgetName(),
 		 this->Buttons[this->NumberOfPages]->GetWidgetName());    
     }
 #endif  
+  this->Script("bind %s  <Button-1> {%%W invoke}",
+	       this->Buttons[this->NumberOfPages]->GetWidgetName());    
   this->NumberOfPages++;
   
   if (this->NumberOfPages == 2)
     {
-#ifdef _WIN32    
-    int h0 = 3;
-#else
+#ifndef OLD_NOTEBOOK_STYLE
+# ifdef _WIN32 
+    int h0 = 4;
+# else
     int h0 = this->BorderWidth * 2;
+# endif
+
+#else
+    int h0 = 1;
 #endif
     
     this->Script("place %s -x 10 -y 0 -relwidth 1.0 -height %d",
