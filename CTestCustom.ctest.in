@@ -3,3 +3,14 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   TestSetGet
   otherPrint-ParaView
   )
+
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "tcl8.4.5/[^/]+/../[^/]+/[^.]+.c:"
+  "tcl8.4.5/[^/]+/[^/]+/[^.]+.c:"
+  "tcl8.4.5/[^/]+/[^/]+.c:"
+  "tk8.4.5/[^/]+/../[^/]+/[^.]+.c:"
+  "tk8.4.5/[^/]+/[^/]+/[^.]+.c:"
+  "tk8.4.5/[^/]+/[^/]+.c:"
+  )
+
