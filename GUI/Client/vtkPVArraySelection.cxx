@@ -41,7 +41,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.55");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.56");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -54,7 +54,6 @@ vtkPVArraySelection::vtkPVArraySelection()
 {
   this->CommandFunction = vtkPVArraySelectionCommand;
   
-  this->AttributeName = 0;
   this->LabelText = 0;
   
   this->LabeledFrame = vtkKWLabeledFrame::New();
@@ -75,7 +74,6 @@ vtkPVArraySelection::vtkPVArraySelection()
 //----------------------------------------------------------------------------
 vtkPVArraySelection::~vtkPVArraySelection()
 {
-  this->SetAttributeName(0);
   this->SetLabelText(0);
 
   this->LabeledFrame->Delete();
@@ -125,29 +123,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
     }
   else
     {
-    if (strcmp(this->AttributeName, "Point") == 0)
-      {
-      this->LabeledFrame->SetLabel("Point Arrays");
-      }
-    else if (strcmp(this->AttributeName, "Cell") == 0)
-      {
-      this->LabeledFrame->SetLabel("Cell Arrays");
-      }
-    else 
-      {
-      ostrstream str;
-      if ( this->AttributeName && this->AttributeName[0] )
-        {
-        str << this->AttributeName;
-        }
-      else
-        {
-        str << "Unnamed";
-        }
-      str << " Arrays" << ends;
-      this->LabeledFrame->SetLabel(str.str());
-      str.rdbuf()->freeze(0);
-      }
+    this->LabeledFrame->SetLabel(this->TraceName);
     }
   app->Script("pack %s -fill x -expand t -side top",
               this->LabeledFrame->GetWidgetName());
@@ -546,7 +522,6 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
   vtkPVArraySelection* pvas = vtkPVArraySelection::SafeDownCast(clone);
   if (pvas)
     {
-    pvas->SetAttributeName(this->AttributeName);
     pvas->SetLabelText(this->LabelText);
     }
   else 
@@ -561,17 +536,6 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
   
-  const char* attribute_name = element->GetAttribute("attribute_name");
-  if(attribute_name)
-    {
-    this->SetAttributeName(attribute_name);
-    }
-  else
-    {
-    vtkErrorMacro("No attribute_name specified.");
-    return 0;
-    }
-
   const char* label_text = element->GetAttribute("label_text");
   if(label_text)
     {
@@ -615,7 +579,5 @@ void vtkPVArraySelection::UpdateEnableState()
 void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "AttributeName: " 
-     << (this->AttributeName?this->AttributeName:"none") << endl;
   os << indent << "LabelText: " << (this->LabelText?this->LabelText:"none") << endl;
 }

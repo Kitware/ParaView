@@ -51,12 +51,6 @@ public:
   virtual void ResetInternal();
 
   // Description:
-  // This specifies whether to ues Cell or Point data.
-  // Options are "Cell" or "Point".  Possible "Field" in the future.
-  vtkSetStringMacro(AttributeName);
-  vtkGetStringMacro(AttributeName);
-
-  // Description:
   // Used to change the label of the widget. If not specified,
   // the label is constructed using the AttributeName
   vtkSetStringMacro(LabelText);
@@ -115,7 +109,6 @@ protected:
   virtual void SetReaderSelectionsFromProperty();
 
   char* LabelText;
-  char* AttributeName;
   
   vtkKWLabeledFrame* LabeledFrame;
   
