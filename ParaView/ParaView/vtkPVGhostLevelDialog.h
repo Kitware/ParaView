@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVDataSetFileEntry.h
+  Module:    vtkPVGhostLevelDialog.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,55 +39,70 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVDataSetFileEntry - File entry that checks type.
+// .NAME vtkPVGhostLevelDialog - asks the user which ghostlevel he wants
 // .SECTION Description
-// This file entry will accept VTK files.  First time any VTK file
-// will do.  Once a file is picked, then any following file has to have 
-// the same data type.
+// Asks the user which ghostlevel he wants.
+// .SECTION See Also
+// vtkPVApplication
 
-#ifndef __vtkPVDataSetFileEntry_h
-#define __vtkPVDataSetFileEntry_h
+#ifndef __vtkPVGhostLevelDialog_h
+#define __vtkPVGhostLevelDialog_h
 
-#include "vtkPVFileEntry.h"
+#include "vtkKWDialog.h"
 
-class vtkPDataSetReader;
+class vtkKWFrame;
+class vtkKWLabel;
+class vtkKWWidget;
 
-class VTK_EXPORT vtkPVDataSetFileEntry : public vtkPVFileEntry
+class VTK_EXPORT vtkPVGhostLevelDialog : public vtkKWDialog
 {
 public:
-  static vtkPVDataSetFileEntry* New();
-  vtkTypeRevisionMacro(vtkPVDataSetFileEntry, vtkPVFileEntry);
+  static vtkPVGhostLevelDialog* New();
+  vtkTypeRevisionMacro(vtkPVGhostLevelDialog,vtkKWDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
+  // Create a Tk widget
+  void Create(vtkKWApplication *app, const char *args);
 
-//BTX
   // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVDataSetFileEntry* ClonePrototype(vtkPVSource* pvSource,
-                                        vtkArrayMap<vtkPVWidget*, 
-                                        vtkPVWidget*>* map);
-//ETX
+  // GhostLevel selected by the user. SetGhostLevel is for
+  // internal use only.
+  void SetGhostLevel(int level);
+  vtkGetMacro(GhostLevel, int);
+
+  // Description:
+  // Invoke the dialog and display it in a modal manner. 
+  // This method returns a zero if the dilaog was killed or 
+  // canceled, nonzero otherwise. After Invoke(), the
+  // ghostlevel chosen by the user can by obtained with
+  // GetGhostLevel
+  virtual int Invoke();
 
 protected:
-  vtkPVDataSetFileEntry();
-  ~vtkPVDataSetFileEntry();
-  
-  vtkPDataSetReader *TypeReader;
-  int Type;
+  vtkPVGhostLevelDialog();
+  ~vtkPVGhostLevelDialog();
 
-  vtkPVDataSetFileEntry(const vtkPVDataSetFileEntry&); // Not implemented
-  void operator=(const vtkPVDataSetFileEntry&); // Not implemented
-  
-  int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+  int GhostLevel;
+
+  vtkKWWidget* Separator;
+  vtkKWLabel*  Label;
+  vtkKWFrame*  ButtonFrame;
+
+  vtkKWWidget *SelFrame1;
+  vtkKWWidget *SelFrame2;
+  vtkKWWidget *SelFrame3;
+
+  vtkKWWidget* SelButton1;
+  vtkKWWidget* SelButton2;
+  vtkKWWidget* SelButton3;
+
+private:
+  vtkPVGhostLevelDialog(const vtkPVGhostLevelDialog&); // Not implemented
+  void operator=(const vtkPVGhostLevelDialog&); // Not implemented
 };
 
+
 #endif
+
+

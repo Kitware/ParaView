@@ -41,19 +41,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVDataSetFileEntry.h"
 
-#include "vtkDataSetReader.h"
+#include "vtkPDataSetReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.5");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
 {
-  this->TypeReader = vtkDataSetReader::New();
+  this->TypeReader = vtkPDataSetReader::New();
   this->Type = -1;
 }
 

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.15");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -156,7 +156,7 @@ void vtkPVReaderModule::AddExtension(const char* ext)
 //----------------------------------------------------------------------------
 const char* vtkPVReaderModule::RemovePath(const char* fname)
 {
-  char* ptr = strrchr(fname, '/');
+  const char* ptr = strrchr(fname, '/');
   if ( ptr )
     {
     if ( ptr[1] != '\0' )
@@ -188,7 +188,7 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
     clone = 0;
     return VTK_ERROR;
     }
-  this->Script("%s Set%s %s", clone->GetVTKSourceTclName(), 
+  this->Script("%s Set%s {%s}", clone->GetVTKSourceTclName(), 
                clone->FileEntry->GetVariableName(), fname);
 
   const char* ext = this->ExtractExtension(fname);

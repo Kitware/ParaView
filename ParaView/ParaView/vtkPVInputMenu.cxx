@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.35");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
@@ -489,6 +489,28 @@ void vtkPVInputMenu::ClearEntries()
 { 
   this->Menu->ClearEntries();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::CompleteArrays()
+{
+  vtkPVSource* pvs = this->GetCurrentValue();
+  vtkDataSet*  data;
+
+  if (pvs == NULL)
+    {
+    return;
+    }
+  data = pvs->GetPVOutput()->GetVTKData();
+  if (data == NULL)
+    {
+    return;
+    }
+
+  this->GetPVApplication()->CompleteArrays(data, 
+                      pvs->GetPVOutput()->GetVTKDataTclName());
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)

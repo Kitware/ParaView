@@ -17,111 +17,65 @@
   latest release or access the current development distribution through
   CVS. 
 
-  <h2>Latest Release (0.2)</h2>
+  <h2>Latest Release (0.6)</h2>
   <ul><b>Pre-compiled binaries:</b><p>
     <li>PVSetup.exe:
-         intended for Windows users :
+         Windows installer (single and multi-processor (mpich 1.2.4) binaries ) :
         <a href="http://www.paraview.org/Release/PVSetup.exe">
         http</a>, 
         <a href="ftp://public.kitware.com/pub/paraview/PVSetup.exe">
         ftp</a>
+    <li>PVLinux.tar.gz:
+         Linux binaries (single and multi-processor (mpich 1.2.4) ) :
+        <a href="http://www.paraview.org/Release/PVLinux.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/PVLinux.tar.gz">
+        ftp</a>
+    <li>PVIrix.tar.gz:
+         SGI Irix 6.5 binaries :
+        <a href="http://www.paraview.org/Release/PVIrix.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/PVIrix.tar.gz">
+        ftp</a>
+    <li>PVHPUX.tar.gz:
+         HP-UX 10.20 binaries :
+        <a href="http://www.paraview.org/Release/PVHPUX.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/PVHPUX.tar.gz">
+        ftp</a>
+    <li>PVSunOS.tar.gz:
+         SunOS 5.7 (ultra sparc) binaries :
+        <a href="http://www.paraview.org/Release/PVSunOS.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/PVSunOS.tar.gz">
+        ftp</a>
   </ul>
   <ul><b>Source code archives:</b><p>
-    We recommend using ParaViewComplete since it contains the appropriate
-    snapshot of VTK and Tcl/Tk 8.2.3 required to build VTK. However, If you
-    want to compile ParaView against VTK you built separately, you can
-    download ParaView alone (make sure that you use Tcl/Tk 8.2.3, other
-    versions will not work). If you have not already done so, you will need
-    to download and compile/install <a href="http://www.cmake.org">
-    CMake</a> to compile ParaView. Also, on Windows, you will have to install
-    the HTML Help library from Microsoft. See
-    <a href="http://msdn.microsoft.com">http://msdn.microsoft.com</a>.
-    If you are not using ParaViewComplete, you will also need Tcl/Tk 8.2.3
-    which can be downloaded <a href="ftp://ftp.scriptics.com/pub/tcl/tcl8_2">here</a>.
-    <li>ParaViewComplete-0-2.tar.gz: Unix style, gzip'ed, contains
-        ParaView, VTK and Tcl/Tk 8.2.3:
-        <a href="http://www.paraview.org/Release/ParaViewComplete-0-2.tar.gz">
+    <li>ParaViewComplete06.tar.gz: Unix style, gzip'ed, contains
+        ParaView, VTK and Tcl/Tk 8.3.2:
+        <a href="http://www.paraview.org/Release/ParaViewComplete06.tar.gz">
         http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete-0-2.tar.gz">
+        <a href=
+        "ftp://public.kitware.com/pub/paraview/ParaViewComplete06.tar.gz">
         ftp</a>
-    <li>ParaViewComplete-0-2.tar.Z: Unix style, compresseded, contains
-        ParaView, VTK and Tcl/Tk 8.2.3:
-        <a href="http://www.paraview.org/Release/ParaViewComplete-0-2.tar.Z">
+    <li>ParaViewComplete06.zip: a zip archive for Windows platforms,
+        contains ParaView, VTK and Tcl/Tk 8.3.2:
+        <a href="http://www.paraview.org/Release/ParaViewComplete06.zip">
         http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete-0-2.tar.Z">
-        ftp</a>
-    <li>ParaViewComplete-0-2.zip: a zip archive for Windows platforms,
-        contains ParaView, VTK and Tcl/Tk 8.2.3:
-        <a href="http://www.paraview.org/Release/ParaViewComplete-0-2.zip">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete-0-2.zip">
-        ftp</a>
-    <li>ParaView-0-2.tar.gz: Unix style, gzip'ed, contains
-        ParaView only, you will have to download VTK and Tcl/Tk 8.2.3
-        separately:
-        <a href="http://www.paraview.org/Release/ParaView-0-2.tar.gz">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaView-0-2.tar.gz">
-        ftp</a>
-    <li>ParaView-0-2.tar.Z: Unix style, compresseded, contains
-        ParaView only, you will have to download VTK and Tcl/Tk 8.2.3
-        separately:
-        <a href="http://www.paraview.org/Release/ParaView-0-2.tar.Z">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaView-0-2.tar.Z">
-        ftp</a>
-    <li>ParaView-0-2.zip: a zip archive for Windows platforms, contains
-        ParaView only, you will have to download VTK and Tcl/Tk 8.2.3
-        separately:
-        <a href="http://www.paraview.org/Release/ParaView-0-2.zip">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/ParaView-0-2.zip">
-        ftp</a>
-    <li>VTK-0-2.tar.gz: Unix style, gzip'ed, contains
-        VTK snapshot for ParaView 0.2:
-        <a href="http://www.paraview.org/Release/VTK-PV-0-2.tar.gz">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/VTK-PV-0-2.tar.gz">
-        ftp</a>
-    <li>VTK-0-2.tar.Z: Unix style, compresseded, contains
-        VTK snapshot for ParaView 0.2:
-        <a href="http://www.paraview.org/Release/VTK-PV-0-2.tar.Z">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/VTK-PV-0-2.tar.Z">
-        ftp</a>
-    <li>VTK-0-2.zip: a zip archive for Windows platforms, contains
-        VTK snapshot for ParaView 0.2:
-        <a href="http://www.paraview.org/Release/VTK-PV-0-2.zip">
-        http</a>, 
-        <a href="ftp://public.kitware.com/pub/paraview/VTK-PV-0-2.zip">
+        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete06.zip">
         ftp</a>
   </ul>
   <ul><b>CVS:</b><p>
-    <li>ParaViewComplete: contains ParaView, VTK and Tcl/Tk 8.2.3:
+    <li>ParaViewComplete: contains ParaView, VTK and Tcl/Tk 8.3.2:
         <p>
         <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b>
         (respond with password paraview)
         <p>
         Follow this command by checking out the source code:<p>
-        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaViewComplete</b>
-    <li>ParaView: contains ParaView,  you will have to download VTK and
-        Tcl/Tk 8.2.3 separately:
-        <p>
-        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b>
-        (respond with password paraview)
-        <p>
-        Follow this command by checking out the source code:<p>
-        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaView</b>
-    <li>VTK: VTK snapshot for ParaView 0.2:
-        <p>
-        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login</b>
-        (respond with password vtk)
-        <p>
-        Follow this command by checking out the source code:<p>
-        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 VTK</b>
+        <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-6 ParaViewComplete</b>
   </ul>
   <h2>Current development distribution</h2>
-  Download ParaView Complete (contains ParaView, VTK and Tcl/Tk 8.2.3)
+  Download ParaView Complete (contains ParaView, VTK and Tcl/Tk 8.3.2)
   source via CVS access: 
     <p>
     <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b><br>
@@ -131,7 +85,7 @@
     <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co ParaViewComplete</b>
     <p>
   Alternatively, if you already have VTK, download ParaView source alone via
-  CVS access (you will need Tcl/Tk 8.2.3, other versions will not work): 
+  CVS access (you will need Tcl/Tk 8.3.2, other versions will not work): 
     <p>
     <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b><br>
     (respond with password paraview)

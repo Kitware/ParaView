@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.217");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.218");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -329,17 +329,15 @@ vtkPVRenderView::~vtkPVRenderView()
   this->LODFrame = NULL;
 
   // Tree Composite
-  if (this->Composite)
+  if (this->CompositeTclName && pvApp)
     {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
-      }
-    else
-      {
-      this->Composite->Delete();
-      }
+    pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
     this->SetCompositeTclName(NULL);
+    this->Composite = NULL;
+    }
+  else if (this->Composite)
+    {
+    this->Composite->Delete();
     this->Composite = NULL;
     }
   
@@ -565,7 +563,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
       }
     }
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-                         this->RendererTclName);
+                           this->RendererTclName);
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
                          this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
@@ -600,18 +598,20 @@ void vtkPVRenderView::PrepareForDelete()
                              this->LODThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
-#ifdef VTK_USE_MPI
-    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
-                             this->CollectThreshold);
-    pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
-                             this->InterruptRenderCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-                             this->CompositeWithFloatCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-                             this->CompositeWithRGBACheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-                             this->CompositeCompressionCheck->GetState());
-#endif
+
+    if (this->Composite)
+      {
+      pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
+                               this->CollectThreshold);
+      pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
+                               this->InterruptRenderCheck->GetState());
+      pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
+                               this->CompositeWithFloatCheck->GetState());
+      pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+                               this->CompositeWithRGBACheck->GetState());
+      pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
+                               this->CompositeCompressionCheck->GetState());
+      }
 
     // If it's the last win, save the size of the nav frame
 
@@ -1313,7 +1313,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Parallel rendering parameters
 
-  if (pvapp->GetController()->GetNumberOfProcesses() > 1)
+  if (pvapp->GetController()->GetNumberOfProcesses() > 1 && this->Composite)
     {
     this->ParallelRenderParametersFrame->SetParent( 
       this->GeneralProperties->GetFrame() );
@@ -1705,7 +1705,6 @@ void vtkPVRenderView::ResetCameraClippingRange()
     }
   else
     {
-    // If not parallel, forward to the renderer.
     this->GetRenderer()->ResetCameraClippingRange();
     }
 }
@@ -2618,7 +2617,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.217 $");
+  this->ExtractRevision(os,"$Revision: 1.218 $");
 }
 
 //------------------------------------------------------------------------------

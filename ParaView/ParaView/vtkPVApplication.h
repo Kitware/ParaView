@@ -175,6 +175,8 @@ public:
   // This will create arrays if they exist on other processes.
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
   void SendCompleteArrays(vtkMapper *mapper);
+  void CompleteArrays(vtkDataSet *data, char *dataTclName);
+  void SendCompleteArrays(vtkDataSet *data);
 
   // Description:
   // Since ParaView has only one window, we might as well provide access to it.
@@ -267,6 +269,12 @@ public:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
+  // Description:
+  // This is used (Unix only) to obtain the path of the executable.
+  // This path is used to locate demos etc.
+  vtkGetStringMacro(Argv0);
+  vtkSetStringMacro(Argv0);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -320,6 +328,7 @@ protected:
 
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
+  char* Argv0;
 
   //BTX
   enum

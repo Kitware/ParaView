@@ -1,9 +1,4 @@
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/Demos/Demo1.pvs.in
-${PARAVIEW_BINARY_DIR}/Demos/Demo1.pvs @ONLY)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/Demos/Demo2.pvs.in
-${PARAVIEW_BINARY_DIR}/Demos/Demo2.pvs @ONLY)
-
-INSTALL_FILES(/share/ParaView/Demos .pvs ${PARAVIEW_BINARY_DIR}/Demos/Demo1)
+INSTALL_FILES(/share/ParaView/Demos .pvs Demo1)
+INSTALL_FILES(/share/ParaView/Demos .xyz combbin postbin)
+INSTALL_FILES(/share/ParaView/Demos .q combbin postbin)
+INSTALL_FILES(/share/ParaView/Demos .vtk blow quadric)

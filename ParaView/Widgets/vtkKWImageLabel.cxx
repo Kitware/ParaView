@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.20");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.21");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -74,6 +74,13 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
                                    int width, int height,
                                    int pixel_size)
 {
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
+  // This work-around is put here to "fix" what looks like a bug
+  // in Tk. Without this, there seems to be some weird problems
+  // with Tk picking some alpha values for some colors.
+  this->SetImageDataName(0);
+#endif
+
   if (!this->ImageDataName)
     {
     this->Script("image create photo -width %d -height %d", width, height);
@@ -106,6 +113,7 @@ void vtkKWImageLabel::SetImageDataName (const char* _arg)
 
   if (this->ImageDataName) 
     { 
+    this->Script("catch {destroy %s}", this->ImageDataName);
     delete [] this->ImageDataName; 
     }
 

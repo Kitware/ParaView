@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.81");
+vtkCxxRevisionMacro(vtkPVProbe, "1.82");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -532,7 +532,15 @@ int vtkPVProbe::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 //----------------------------------------------------------------------------
 int vtkPVProbe::GetDimensionality()
 {
-  const char* input = this->Script("%s GetInput", this->GetVTKSourceTclName());
+  const char* sourceName = this->GetVTKSourceTclName();
+  if (!sourceName)
+    {
+    return 0;
+    }
+  
+  const char* input = 
+    this->Script("%s GetInput", this->GetVTKSourceTclName());
+
   const char* name = 0;
   if ( vtkString::Length(input) > 0 )
     {

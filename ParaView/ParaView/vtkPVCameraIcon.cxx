@@ -47,17 +47,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageResample.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkPNGWriter.h"
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.6");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
+#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -79,6 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVGhostLevelDialog.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
@@ -125,7 +127,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.393");
+vtkCxxRevisionMacro(vtkPVWindow, "1.394");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -282,6 +284,9 @@ vtkPVWindow::vtkPVWindow()
 
   this->ShowSourcesLongHelpCheckButton = vtkKWCheckButton::New();
   this->ShowSourcesLongHelp = 1;
+
+  this->MenusDisabled = 0;
+  this->ToolbarButtonsDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1546,7 +1551,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  //this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
+  this->MenuHelp->AddSeparator();
+  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
 }
 
 
@@ -1554,10 +1560,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 void vtkPVWindow::PlayDemo()
 {
   int found=0;
-  int foundData=0;
 
   char temp1[1024];
-  char temp2[1024];
 
   struct stat fs;
 
@@ -1565,56 +1569,70 @@ void vtkPVWindow::PlayDemo()
 
   // First look in the registery
   char loc[1024];
-  char temp[1024];
   
-  vtkKWRegisteryUtilities *reg = this->GetApplication()->GetRegistery();
-  sprintf(temp, "%i", this->GetApplication()->GetApplicationKey());
-  reg->SetTopLevel(temp);
-  if (reg->ReadValue("Inst", loc, "Loc"))
+  vtkKWApplication* app = this->GetApplication();
+  vtkKWRegisteryUtilities *reg = app->GetRegistery();
+  if (!app->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
+    {
+    app->GetRegistery()->SetGlobalScope(1);
+    }
+
+  if (app->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
     {
     sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
-    sprintf(temp2,"%s/Data/blow.vtk",loc);
+    if (stat(temp1, &fs) == 0) 
+      {
+      int len=strlen(loc);
+      for(int i=0; i<len; i++)
+        {
+        if (loc[i] == '\\') { loc[i] = '/';}
+        }
+      this->Script("set DemoDir %s/Demos", loc);
+      this->LoadScript(temp1);
+      found=1;
+      }
     }
+  app->GetRegistery()->SetGlobalScope(0);
 
-  // first make sure the file exists, this prevents an empty file from
-  // being created on older compilers
-  if (stat(temp2, &fs) == 0) 
-    {
-    foundData=1;
-    this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
-    }
+#else
 
-  if (stat(temp1, &fs) == 0) 
+  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
+  const char* selfPath = util->FindSelfPath(
+    this->GetPVApplication()->GetArgv0());
+  const char* relPath = "../share/ParaView/Demos";
+  char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
+  sprintf(newPath, "%s/%s", selfPath, relPath);
+
+  char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
+  sprintf(demoFile, "%s/Demo1.pvs", newPath);
+
+  if (stat(demoFile, &fs) == 0) 
     {
-    this->LoadScript(temp1);
+    this->Script("set DemoDir %s", newPath);
+    this->LoadScript(demoFile);
     found=1;
     }
 
+  delete[] demoFile;
+  delete[] newPath;
+  util->Delete();
+
 #endif // _WIN32  
 
-  // Look in binary and installation directories
-
-  const char** dir;
-  for(dir=VTK_PV_DEMO_PATHS; !foundData && *dir; ++dir)
+  if (!found)
     {
-    if (!foundData)
+    // Look in binary and installation directories
+    const char** dir;
+    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
       {
-      sprintf(temp2, "%s/Data/blow.vtk", *dir);
-      if (stat(temp2, &fs) == 0) 
+      sprintf(temp1, "%s/Demo1.pvs", *dir);
+      if (stat(temp1, &fs) == 0) 
         {
-        foundData=1;
-        this->Application->Script("set tmpPvDataDir %s/Data", *dir);
+        this->Script("set DemoDir %s", *dir);
+        this->LoadScript(temp1);
+        found=1;
+        break;
         }
-      }
-    }
-
-  for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
-    {
-    sprintf(temp1, "%s/Demos/Demo1.pvs", *dir);
-    if (stat(temp1, &fs) == 0) 
-      {
-      this->LoadScript(temp1);
-      found=1;
       }
     }
 
@@ -1688,6 +1706,7 @@ void vtkPVWindow::OpenCallback()
 
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "OpenPath");
+  loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExt(".vtk");
@@ -2226,6 +2245,7 @@ void vtkPVWindow::WriteData()
   
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
+  saveDialog->SetParent(this);
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
@@ -2244,11 +2264,19 @@ void vtkPVWindow::WriteData()
     // Write the file.
     if(parallel)
       {
+      vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
+      dlg->Create(this->Application, "");
+      dlg->SetMasterWindow(this);
+      dlg->SetTitle("Select ghost levels");
+
       // See if the user wants to save any ghost levels.
-      this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} "
-                   "{How many ghost levels would you like to save?} "
-                   "{} 0 0 1 2");
-      int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
+      int ghostLevel = 0;
+
+      if ( dlg->Invoke() )
+        {
+        ghostLevel = dlg->GetGhostLevel();
+        }
+      dlg->Delete();
       if (ghostLevel >= 0)
         {
         this->WriteVTKFile(filename, ghostLevel);
@@ -2295,6 +2323,7 @@ void vtkPVWindow::ExportVTKScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "ExportVTKLastPath");
+  exportDialog->SetParent(this);
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save VTK Script");
@@ -3056,6 +3085,12 @@ void vtkPVWindow::DisableNavigationWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
+  if (this->MenusDisabled)
+    {
+    return;
+    }
+  this->MenusDisabled = 1;
+
   // First store the state of all menu items.
   this->Menu->StoreMenuState(this->MenuState);
 
@@ -3071,13 +3106,23 @@ void vtkPVWindow::DisableMenus()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableMenus()
 {
+  if (!this->MenusDisabled)
+    {
+    return;
+    }
   // Now restore the state of all menu items
   this->Menu->RestoreMenuState(this->MenuState);
+  this->MenusDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButtons()
 {
+  if (this->ToolbarButtonsDisabled)
+    {
+    return;
+    }
+  this->ToolbarButtonsDisabled = 1;
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
   while ( !it->IsDoneWithTraversal() )
@@ -3117,7 +3162,7 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
-  if (this->CurrentPVData == NULL)
+  if (this->CurrentPVData == NULL || !this->ToolbarButtonsDisabled)
     {
     return;
     }
@@ -3142,6 +3187,8 @@ void vtkPVWindow::EnableToolbarButtons()
     it->GoToNextItem();
     }
   it->Delete();
+
+  this->ToolbarButtonsDisabled = 0;
 
 
 }
@@ -3285,6 +3332,7 @@ void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->SetParent(this);
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
@@ -3350,6 +3398,12 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
   if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
+    if (grabFocus)
+      {
+      this->DisableToolbarButtons();
+      this->DisableMenus();
+      }
+
     // Make the cloned source current only if it is going into
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
@@ -3363,6 +3417,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
     if (success != VTK_OK)
       {
+      this->EnableToolbarButtons();
+      this->EnableMenus();
       vtkErrorMacro("Cloning operation for " << moduleName
                     << " failed.");
       return 0;
@@ -3370,6 +3426,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
     if (!clone)
       {
+      this->EnableToolbarButtons();
+      this->EnableMenus();
       return 0;
       }
     
@@ -3468,6 +3526,7 @@ int vtkPVWindow::OpenPackage()
   int res = 0;
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "PackagePath");
+  loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExt(".xml");
@@ -3856,7 +3915,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.393 $");
+  this->ExtractRevision(os,"$Revision: 1.394 $");
 }
 
 //----------------------------------------------------------------------------

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.28");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
@@ -558,6 +558,9 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     vtkErrorMacro("Input menu has not been set.");
     return;
     } 
+
+  this->InputMenu->CompleteArrays();
+
   ds = this->InputMenu->GetVTKData();
   if (ds == NULL)
     {

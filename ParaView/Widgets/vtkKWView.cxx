@@ -98,7 +98,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.89");
+vtkCxxRevisionMacro(vtkKWView, "1.90");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -958,6 +958,7 @@ void vtkKWView::SaveAsImage()
   
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
+  dlg->SetParent(this->GetWindow());
   dlg->Create(this->Application,"");  
   dlg->Invoke();
   path = dlg->GetFileName();
@@ -1490,7 +1491,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.89 $");
+  this->ExtractRevision(os,"$Revision: 1.90 $");
 }
 
 //----------------------------------------------------------------------------

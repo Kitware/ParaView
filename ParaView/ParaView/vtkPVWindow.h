@@ -658,6 +658,10 @@ protected:
   vtkKWCheckButton *ShowSourcesLongHelpCheckButton;
   int ShowSourcesLongHelp;
 
+  // To avoid disabling menus multiple times.
+  int MenusDisabled;
+  int ToolbarButtonsDisabled;
+
 private:
 
 //BTX

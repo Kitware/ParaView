@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.35");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.36");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -592,7 +592,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarVectorTitleEntry->SetWidth(
     this->ScalarBarTitleEntry->GetWidth() / 2);
   this->ScalarBarVectorTitleEntry->Create(this->Application, "");
-  this->Script("bind %s <KeyPress-Return> {%s ScalarBarVectorTitleEntryCallback}",
+  this->Script(
+    "bind %s <KeyPress-Return> {%s ScalarBarVectorTitleEntryCallback}",
                this->ScalarBarVectorTitleEntry->GetWidgetName(),
                this->GetTclName());
   this->Script("bind %s <FocusOut> {%s ScalarBarVectorTitleEntryCallback}",
@@ -748,7 +749,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->SetColorSchemeToRedBlue();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateVectorComponentMenu()
@@ -947,6 +947,7 @@ void vtkPVColorMap::SetArrayName(const char* str)
     this->SetTraceReferenceCommand(str2);
     delete [] str2;
     }
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1150,6 +1151,18 @@ void vtkPVColorMap::UpdateLookupTable()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+
+  // The a hue is arbitrary, make is consistent
+  // so we do not get unexpected interpolated hues.
+  if (this->StartHSV[1] == 0.0)
+    {
+    this->StartHSV[0] = this->EndHSV[0];
+    }
+  if (this->EndHSV[1] == 0.0)
+    {
+    this->EndHSV[0] = this->StartHSV[0];
+    }
+
   pvApp->BroadcastScript("%s SetNumberOfTableValues %d", this->LookupTableTclName,
                          this->NumberOfColors);
 
@@ -1243,6 +1256,7 @@ void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
   rgb[1] = g;
   rgb[2] = b;
   this->RGBToHSV(rgb, hsv);
+
   this->StartHSV[0] = hsv[0];
   this->StartHSV[1] = hsv[1];
   this->StartHSV[2] = hsv[2];
@@ -1292,6 +1306,9 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
+  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
+
   if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
     {
     return;
@@ -1300,14 +1317,12 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
   this->ScalarRange[0] = min;
   this->ScalarRange[1] = max;
 
-  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
-  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
-
   pvApp->BroadcastScript("%s SetTableRange %f %f", 
                          this->LookupTableTclName, min, max);
   //this->Script("%s Build", this->LookupTableTclName);
   //this->Script("%s Modified", this->LookupTableTclName);
 
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1339,6 +1354,8 @@ void vtkPVColorMap::SetVectorComponent(int component)
 
   pvApp->BroadcastScript("%s SetVectorComponent %d", 
                          this->LookupTableTclName, component);
+
+  this->Modified();
 }
 
 
@@ -1519,6 +1536,8 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
       this->ScalarBar->SetEnabled(0);
       }
     }
+
+  this->Modified();
 }
 
 
@@ -1684,6 +1703,15 @@ void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
     hsv[2] = 0.0;
     return;
     }
+
+  if (rgb[0] == rgb[1] && rgb[1] == rgb[2])
+    {
+    hsv[2] = rgb[0];
+    hsv[1] = 0.0;
+    hsv[0] = 0.0;
+    return;
+    }
+
   if (rgb[0] >= rgb[1] && rgb[1] >= rgb[2])
     { // case 0
     val = rgb[0];

@@ -149,6 +149,12 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // Complete arrays on process 0.  VTK filters do not fill out arrays
+  // if data is empty.  This method makes sure process 0 data hgas all
+  // the arrays for filling out array menu entries.
+  void CompleteArrays();
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();

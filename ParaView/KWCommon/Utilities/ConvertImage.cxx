@@ -90,8 +90,8 @@ long int modified_time(const char *filename)
 //----------------------------------------------------------------------------
 const char* name(const char *filename)
 {
-  char *forward = strrchr(filename, '/');
-  char *backward = strrchr(filename, '\\');
+  const char *forward = strrchr(filename, '/');
+  const char *backward = strrchr(filename, '\\');
   if (forward || backward)
     {
     return ((forward > backward) ? forward : backward) + 1;

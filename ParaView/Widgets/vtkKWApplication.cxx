@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.98");
+vtkCxxRevisionMacro(vtkKWApplication, "1.99");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -139,7 +139,8 @@ vtkKWApplication::vtkKWApplication()
     this->BalloonHelpWindow->Create(
       this, "toplevel", "-background black -borderwidth 1 -relief flat");
     this->BalloonHelpLabel->Create(
-      this, "label", "-background LightYellow -justify left -wraplength 2i");
+      this, "label", "-background LightYellow -foreground black -justify left "
+                     "-wraplength 2i");
     this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
                  this->BalloonHelpWindow->GetWidgetName());
@@ -1043,12 +1044,10 @@ int vtkKWApplication::LoadScript(const char* filename)
   // add this window as a variable
   if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
     {
-    vtkErrorMacro("\n    Script: \n" << filename << "\n    Returned Error on line "
+    vtkErrorMacro("\n    Script: \n" << filename 
+                  << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n      "  
                   << Tcl_GetStringResult(this->MainInterp) << endl);
-    cout << "\n    Script: \n" << filename << "\n    Returned Error on line "
-         << this->MainInterp->errorLine << ": \n      "  
-         << Tcl_GetStringResult(this->MainInterp) << endl;
     res = 0;
     this->SetExitStatus(1);
     }

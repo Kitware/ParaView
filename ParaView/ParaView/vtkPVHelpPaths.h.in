@@ -1,0 +1,8 @@
+#ifndef VTK_HELP_PATHS
+# define VTK_HELP_PATHS
+
+# ifdef _WIN32
+static const char* VTK_PV_HELP_PATHS[] = { "${PARAVIEW_SOURCE_DIR}/Documentation", 0};
+# endif
+
+#endif
