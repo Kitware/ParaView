@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.392");
+vtkCxxRevisionMacro(vtkPVSource, "1.393");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1073,7 +1073,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-    int fixme;
+    //Law int fixme;
     // Quick fix to get paraview working again.  What does initiailze do?
     // Could we update instead.
     this->Notebook->GetDisplayGUI()->Initialize();
@@ -1313,6 +1313,9 @@ void vtkPVSource::DeleteCallback()
     // Cube axes is controled by this source so we could handle it.
     // Point label visibility has not been made into a display yet ...
     this->Notebook->GetDisplayGUI()->DeleteCallback();
+    
+    // Deleted source was leaving the accept button green.
+    this->Notebook->SetAcceptButtonColorToUnmodified();
     }
 
   // Just in case cursor was left in a funny state.
@@ -1449,9 +1452,10 @@ void vtkPVSource::UpdateParameterWidgets()
 }
 
 //----------------------------------------------------------------------------
+// get rid of this method
 void vtkPVSource::RaiseSourcePage()
 {
-  this->Notebook->Raise("Source");
+  int fixme;  // Get rid of this method.
 }
 
 //----------------------------------------------------------------------------
@@ -2283,6 +2287,14 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
     {
     this->GetPVWindow()->SetCurrentPVSourceCallback(this);
     } 
+    
+  // Show the source page, and hide the display and information pages.
+  if (this->Notebook)
+    {
+    this->Notebook->Raise("Parameters");
+    this->Notebook->HidePage("Display");
+    this->Notebook->HidePage("Information");
+    }    
 
   return VTK_OK;
 }
