@@ -94,7 +94,6 @@ void vtkPVApplication::RemoteScript(int id, char *format, ...)
 void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 {
   int length;
-  char *resultStr;
 
   // send string to evaluate.
   length = strlen(str) + 1;

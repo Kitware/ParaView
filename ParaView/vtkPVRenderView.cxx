@@ -32,7 +32,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderSlave.h"
+
+#ifdef WIN32
+#include "vtkRenderWindow.h"
+#else
 #include "vtkMesaRenderWindow.h"
+#endif
 
 #include "vtkTimerLog.h"
 

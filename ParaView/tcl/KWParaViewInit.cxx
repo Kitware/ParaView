@@ -1,7 +1,4 @@
 #include "vtkTclUtil.h"
-int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkDummyRenderWindowInteractorNewCommand();
 int vtkInteractorStyleCameraCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleCameraNewCommand();
@@ -41,9 +38,6 @@ ClientData vtkPVSlaveNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
-int vtkPVMesaRenderWindowCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVMesaRenderWindowNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -72,8 +66,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
-  vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
-                  vtkDummyRenderWindowInteractorCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
                   vtkInteractorStyleCameraCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
@@ -100,7 +92,5 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
-  vtkTclCreateNew(interp,"vtkPVMesaRenderWindow", vtkPVMesaRenderWindowNewCommand,
-                  vtkPVMesaRenderWindowCommand);
   return TCL_OK;
 }

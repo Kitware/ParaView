@@ -32,7 +32,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTclUtil.h"
 
 
-extern "C" {void vtkPVSlaveStart(vtkMultiProcessController *controller);}
+extern "C" int Vtktcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkcontribtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkpatentedtcl_Init(Tcl_Interp *interp);
+
+extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+
 
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
@@ -46,6 +55,91 @@ struct vtkPVArgs
 
 
 
+void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
+		      int remoteProcessId)
+{
+  vtkPVSlave *self = (vtkPVSlave *)(localArg);
+
+  self->SimpleScript((char*)remoteArg);
+}
+
+
+
+// We will start the rmi loop, and let an RMI initialize the slave.
+void vtkPVSlaveStart(vtkMultiProcessController *controller)
+{
+
+  Tcl_Interp *interp = Tcl_CreateInterp();
+
+  if (Tcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Tcl error\n";
+    }
+#ifndef WIN32
+  if (Vtkcommontcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Common error\n";
+    }
+    
+  if (Vtkgraphicstcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Graphics error\n";
+    }
+  if (Vtkimagingtcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Imaging error\n";
+    }
+  if (Vtkcontribtcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Contrib error\n";
+    }
+  if (Vtkpatentedtcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Patented error\n";
+    }
+#endif
+
+  if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init KWWidgets error\n";
+    }
+  if (Vtkkwparaviewtcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init KWParaView error\n";
+    }
+
+  // Set up the slave object.
+  
+  if (Tcl_Eval(interp, "vtkPVSlave Slave") != TCL_OK)
+    {
+    cerr << "Error returned from tcl script.\n" << interp->result << endl;
+    }
+  int    error;
+  vtkPVSlave *slave = (vtkPVSlave *)(vtkTclGetPointerFromObject("Slave","vtkPVSlave",interp,error));
+  //cerr << "Interp: " << interp << " has slave " << slave << endl;
+  
+  if (slave == NULL)
+    {
+    vtkGenericWarningMacro("Could not get slave pointer.");
+    return;
+    }
+  
+  slave->SetController(controller);
+  slave->SetInterp(interp);
+  // This may not be needed.  I do not like that the slave numbering scheme is divided
+  // Betwee this object and ParaView.cxx
+  slave->SetNumberOfSlaves(controller->GetNumberOfProcesses()-1);
+  slave->SetSlaveId(controller->GetLocalProcessId());
+
+  
+  controller->AddRMI(vtkPVSlaveScript, (void *)(slave), VTK_PV_SLAVE_SCRIPT_RMI_TAG);  
+  
+  controller->ProcessRMIs();
+}
+
+
+
+
 // Each process starts with this method.  One process is designated as "master" 
 // and starts the application.  The other processes are slaves to the application.
 void Process_Init(vtkMultiProcessController *controller, void *arg )
@@ -55,8 +149,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
-  
-  sleep(myId);
   
   if (myId == 0)
     { // The last process is for UI.
@@ -138,12 +230,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   controller->Initialize(argc, argv);
 
 
-  Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+  Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
   vtkPVApplication *app = vtkPVApplication::New();
   app->SetController(controller);
   app->Script("wm withdraw .");
     
-  app->Start(pvArgs->argc,pvArgs->argv);
+  app->Start(argc,argv);
   app->Delete();
   
   controller->Delete();

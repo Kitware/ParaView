@@ -27,9 +27,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVRenderSlave.h"
+
+#ifndef WIN32
 #include "vtkPVMesaRenderWindow.h"
 #include "vtkMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
+#else
+#include "vtkWin32OpenGLRenderWindow.h"
+#include "vtkRenderer.h"
+#endif
+
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
 
@@ -54,12 +61,27 @@ int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderSlave::vtkPVRenderSlave()
 {
+#ifdef WIN32
+  vtkWin32OpenGLRenderWindow *renderWindow;
+  vtkRenderer *renderer;
+
+  renderWindow = vtkWin32OpenGLRenderWindow::New();
+  // Win32 have SetupmemoryRendering.
+  // We are not going to run this app on win32 in parallel.
+  //renderWindow->SetOffScreenRendering(1);
+  renderer = vtkRenderer::New();
+  renderWindow->AddRenderer(renderer);
+
+  //this->CommandFunction = vtkPVRenderSlaveCommand;
+  this->PVSlave = NULL;
+  this->RenderWindow = renderWindow;
+  this->Renderer = renderer;
+
+#else
   vtkMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;
 
   mesaRenderWindow = vtkMesaRenderWindow::New();
-  //mesaRenderWindow->DoubleBufferOff();
-  //mesaRenderWindow->SwapBuffersOff();
   mesaRenderWindow->SetOffScreenRendering(1);
   mesaRenderer = vtkMesaRenderer::New();
   mesaRenderWindow->AddRenderer(mesaRenderer);
@@ -68,6 +90,7 @@ vtkPVRenderSlave::vtkPVRenderSlave()
   this->PVSlave = NULL;
   this->RenderWindow = mesaRenderWindow;
   this->Renderer = mesaRenderer;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -168,7 +191,6 @@ void vtkPVRenderSlave::TransmitBounds()
 // Jim's composite stuff
 
 
-#include "vtkMesaRenderWindow.h"
 #include "vtkMultiProcessController.h"
 
 // Results are put in the local data.
@@ -230,7 +252,6 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
   int total_pixels;
   int pdata_size, zdata_size;
   int myId, numProcs;
-  unsigned char *overlay;
   int i, id;
   
 
@@ -253,18 +274,12 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
     } 
   else 
     {
+#ifndef WIN32
     // Condition is here until we fix the resize bug in vtkMesarenderWindow.
-    if (myId == 0)
-      {
-      localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
-	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
-      }
-    else
-      {
-      localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
-	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
-      }
+    localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
+      	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
     pdata_size = total_pixels;
+#endif
     }
   
   double doubleLogProcs = log((double)numProcs)/log((double)2);
@@ -322,9 +337,11 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
       } 
     else 
       {
+#ifndef WIN32
       ((vtkMesaRenderWindow *)renWin)-> \
-	SetRGBACharPixelData(0,0, windowSize[0]-1, \
+	         SetRGBACharPixelData(0,0, windowSize[0]-1, \
 			     windowSize[1]-1,(unsigned char*)localPdata,0);
+#endif
       }
     }
 }

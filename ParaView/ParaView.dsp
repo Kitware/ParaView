@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\Widgets\Debug\vtkKWWidgetsTcl.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"d:/Kw/Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /implib:"d:/Kw/Debug/vtkKWParaViewTcl.lib" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
+# ADD LINK32 ..\..\vtkbin\Debug\lib\vtktcl.lib ..\Widgets\Debug\vtkKWWidgetsTcl.lib ..\..\vtkbin\Debug\lib\vtkPatented.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"d:/Kw/Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /implib:"d:/Kw/Debug/vtkKWParaViewTcl.lib" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -98,6 +98,14 @@ SOURCE=.\tcl\KWParaViewInit.cxx
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCamera.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCameraTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -165,6 +173,38 @@ SOURCE=.\vtkPVApplicationTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVComposite.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVCompositeTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImage.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImagePlaneComponent.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImagePlaneComponentTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageReader.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageReaderTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVRenderSlave.cxx
 # End Source File
 # Begin Source File
@@ -202,6 +242,26 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractor.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCamera.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleCamera.h
+InputName=vtkInteractorStyleCamera
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -363,6 +423,86 @@ InputName=vtkPVApplication
 # Begin Custom Build
 InputPath=.\vtkPVApplication.h
 InputName=vtkPVApplication
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVComposite.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVComposite.h
+InputName=vtkPVComposite
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImage.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImage.h
+InputName=vtkPVImage
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImagePlaneComponent.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImagePlaneComponent.h
+InputName=vtkPVImagePlaneComponent
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageReader.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImageReader.h
+InputName=vtkPVImageReader
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
