@@ -75,7 +75,7 @@ IF(RUN_WITH_MPI)
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -D ${PVClientTestData}
       -C ${PVCompareImages}
-      -B ${PVClientTestData}/Baseline/${tfile}.png
+      -V ${PVClientTestData}/Baseline/${tfile}.png
       ${PARAVIEW_MPI_POSTFLAGS})
     IF (PARAVIEW_TEST_COMPOSITING)
       ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI ${VTK_MPIRUN_EXE} ${PARAVIEW_MPI_PREFLAGS}
