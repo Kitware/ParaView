@@ -803,7 +803,7 @@ void vtkPVSource::AcceptCallback()
 #endif  
 
 
-  this->GetPVApplication()->AddTraceEntry("$trace(%s) AcceptCallback",
+  this->GetPVApplication()->AddTraceEntry("$pv(%s) AcceptCallback",
                                           this->GetTclName());
 }
 
@@ -862,7 +862,7 @@ void vtkPVSource::DeleteCallback()
     }
   
   // Save this action in the trace file.
-  this->GetPVApplication()->AddTraceEntry("$trace(%s) DeleteCallback",
+  this->GetPVApplication()->AddTraceEntry("$pv(%s) DeleteCallback",
                                           this->GetTclName());
 
   // Remove this source from the inputs users collection.

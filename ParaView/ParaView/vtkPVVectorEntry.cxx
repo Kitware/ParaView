@@ -183,13 +183,13 @@ void vtkPVVectorEntry::Accept()
   
     if ( ! this->TraceInitialized)
       {
-      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
                            this->GetTclName(), this->PVSource->GetTclName(),
                            this->Name);
       this->TraceInitialized = 1;
       }
 
-    *traceFile << "$trace(" << this->GetTclName() << ") SetValue";
+    *traceFile << "$pv(" << this->GetTclName() << ") SetValue";
     num = this->Entries->GetNumberOfItems();
     for (idx = 0; idx < num; ++idx)
       {

@@ -159,13 +159,13 @@ void vtkPVLabeledToggle::Accept()
     {  
     if ( ! this->TraceInitialized)
       {
-      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
                            this->GetTclName(), this->PVSource->GetTclName(),
                            this->Name);
       this->TraceInitialized = 1;
       }
 
-    pvApp->AddTraceEntry("$trace(%s) SetState %d", this->GetTclName(), 
+    pvApp->AddTraceEntry("$pv(%s) SetState %d", this->GetTclName(), 
                          this->CheckButton->GetState());
     }
 

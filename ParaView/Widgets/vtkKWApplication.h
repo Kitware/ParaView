@@ -102,6 +102,7 @@ public:
   // Add a window to this application.
   void AddWindow(vtkKWWindow *w);
   vtkKWWindowCollection *GetWindows();
+  vtkKWWindow *GetMainWindow();
   
   // Description:
   // Set/Get the ApplicationName
@@ -152,6 +153,7 @@ public:
   // This can be esed to trace the actions of the user.
   // It only works when the TraceFile has been set.
   void AddTraceEntry(char *format, ...);
+  ofstream *GetTraceFile() {return this->TraceFile;}
 //ETX
 
 protected:

@@ -221,13 +221,13 @@ void vtkPVInputMenu::Accept()
     {  
     if ( ! this->TraceInitialized)
       {
-      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
                            this->GetTclName(), this->PVSource->GetTclName(),
                            this->Name);
       this->TraceInitialized = 1;
       }
 
-    pvApp->AddTraceEntry("$trace(%s) SetCurrentValue $trace(%s)", 
+    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
                          this->GetTclName(), 
                          this->CurrentValue->GetTclName());
     }

@@ -104,6 +104,11 @@ public:
   // Description:
   // This is a special list of precreated sources that can be used to glyph.
   vtkKWCompositeCollection *GetGlyphSources();
+
+  // Description:
+  // This access method is needed for scripts that modify the glyph source.
+  // It indexes the sources by name.
+  vtkPVSource *GetGlyphSource(char* name);
     
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);

@@ -91,8 +91,6 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
     delete [] this->GlyphVectorMode;
     this->GlyphVectorMode = NULL;
     }
- 
- 
   
   this->ScaleModeLabel->Delete();
   this->ScaleModeLabel = NULL;

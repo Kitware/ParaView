@@ -141,7 +141,7 @@ vtkPVApplication::vtkPVApplication()
 
   this->ExitStatus = 0;
 
-  this->TraceFile = new ofstream("ParaViewTrace.txt", ios::out);
+  this->TraceFile = new ofstream("ParaViewTrace.tcl", ios::out);
   if (this->TraceFile && this->TraceFile->fail())
     {
     delete this->TraceFile;
@@ -356,13 +356,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
   ui->Create(this,"");
-
-  this->AddTraceEntry("set trace(%s) [Application GetMainWindow]",
-                      ui->GetTclName());
-  // We have to set this variable after the window variable is set,
-  // so it has to be done here.
-  this->AddTraceEntry("set trace(%s) [$trace(%s) GetMainView]",
-                       ui->GetMainView()->GetTclName(), ui->GetTclName());
 
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
