@@ -25,6 +25,7 @@
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHierarchicalBoxOutlineFilter.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -38,7 +39,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.39");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.40");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -51,6 +52,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->UseStrips = 0;
   this->GenerateCellNormals = 1;
   this->NumberOfRequiredInputs = 0;
+  this->SetNumberOfInputPorts(1);
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
   this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
 
@@ -589,6 +591,18 @@ void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
   
   this->OutlineFlag = 1;
   this->DataSetExecute(input);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::FillInputPortInformation(int port,
+                                                  vtkInformation* info)
+{
+  if(!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
+  info->Set(vtkInformation::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  return 1;
 }
 
 //----------------------------------------------------------------------------

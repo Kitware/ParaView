@@ -114,6 +114,8 @@ protected:
   // The observer to report progress from the internal readers.
   vtkCallbackCommand* InternalProgressObserver;
 
+  virtual int FillInputPortInformation(int, vtkInformation*);
+
   private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented
