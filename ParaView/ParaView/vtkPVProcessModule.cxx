@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.12");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.13");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -143,7 +143,7 @@ int vtkPVProcessModule::Start(int argc, char **argv)
 
   this->ClientServerStream = new vtkClientServerStream;
   this->ClientInterpreter = vtkClientServerInterpreter::New();
-  this->ClientInterpreter->SetLogFile("c:/pvClient.out");
+  this->ClientInterpreter->SetLogFile("pvClient.out");
   vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
   this->GetStream()
     << vtkClientServerStream::Assign
