@@ -12,15 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMPIMToNSocketConnection - class to create socket connections
-// between to servers .SECTION Description vtkMPIMToNSocketConnection is a
+// .NAME vtkMPIMToNSocketConnection - class to create socket connections between two servers 
+//
+// .SECTION Description vtkMPIMToNSocketConnection is a
 // class used to create socket connections between the render and data
 // servers.  This used for example when data is on a super computer (SGI,
 // IBM, etc) and Rendering on a Linux cluster with hardware graphics support.
 // This problem is known as the "M" to "N" geometry load redistribution
-// problem.  It addresses the common case where there is a signinficante
+// problem.  It addresses the common case where there is a significante
 // mismatch in the size of large parallel computing resources and the often
-// smaller parallel hardward-accelerated rendering resources.  The larger
+// smaller parallel hardward-accelerated rendering resources. The larger
 // number of processors on the compute servers are called M, and the smaller
 // number of rendering processors are call N.  This class is used to create N
 // vtkSocketCommunicator's that connect the first N of the M processes on the
