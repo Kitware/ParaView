@@ -25,7 +25,7 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.26");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -76,9 +76,13 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::ResetInternal()
 {
-  if (!this->AcceptCalled)
+  if ( !this->AcceptCalled )
     {
     this->ActualPlaceWidget();
+    return;
+    }
+  if ( this->SuppressReset || !this->ModifiedFlag)
+    {
     return;
     }
   vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(

@@ -30,19 +30,25 @@ public:
 
   // Description:
   // Get/Set the Center
-  void SetCenter(double x, double y, double z);
+  vtkSetVector3Macro(Center,double);
   vtkGetVector3Macro(Center,double);
 
   // Description:
   // Get/Set the Radius
-  void SetRadius(double radius);
+  vtkSetMacro(Radius,double);
   vtkGetMacro(Radius,double);
 
   virtual void SaveInBatchScript(ofstream *file);
+
+  virtual void UpdateVTKObjects();
 protected:
   vtkSMSphereWidgetProxy();
   ~vtkSMSphereWidgetProxy();
 
+  // Description:
+  // Overloaded to update the property values before saving state
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);

@@ -29,6 +29,7 @@
 class vtkCamera;
 class vtkRenderWindow;
 class vtkSMProxy;
+class vtkPVRenderModule;
 //BTX
 struct vtkSMDisplayWindowProxyInternals;
 //ETX
@@ -61,7 +62,11 @@ public:
   // Given the x and y size of the render windows, reposition them
   // in a tile of n columns.
   void TileWindows(int xsize, int ysize, int nColumns);
-  
+ 
+  // Description:
+  // Updates self before the inputs
+  virtual void UpdateSelfAndAllInputs(); 
+
 //BTX
   // Description:
   // If there is a local camera object with given index, return it.
@@ -80,7 +85,12 @@ public:
   // Obtain the renderer/interactor proxy. Needed by vtkSMDisplayerProxy
   vtkSMProxy* GetRendererProxy() { return this->GetSubProxy("renderer"); }
   vtkSMProxy* GetInteractorProxy() { return this->GetSubProxy("interactor");}
-  
+//BTX 
+  // Description:
+  // Get/Set RenderModule
+  vtkGetObjectMacro(RenderModule,vtkPVRenderModule);
+  void SetRenderModule(vtkPVRenderModule* rm);
+//ETX
 protected:
   vtkSMDisplayWindowProxy();
   ~vtkSMDisplayWindowProxy();
@@ -89,8 +99,13 @@ protected:
   // Create all VTK objects including the ones for sub-proxies.
   virtual void CreateVTKObjects(int numObjects);
 
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
   vtkSMProxy* WindowToImage;
 
+  // Description:
+  // RenderModule ivar is set, the on creating the RenderWindow
+  // we set the RenderWindow on the RenderModule->Interactor
+  vtkPVRenderModule* RenderModule;
 private:
 
   vtkSMDisplayWindowProxyInternals* DWInternals;

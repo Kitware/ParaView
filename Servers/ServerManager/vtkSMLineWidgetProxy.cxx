@@ -20,9 +20,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkKWEvent.h"
 #include "vtkCommand.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
@@ -42,63 +43,37 @@ vtkSMLineWidgetProxy::~vtkSMLineWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::SetPoint1(double x, double y, double z)
+void vtkSMLineWidgetProxy::UpdateVTKObjects()
 {
-  this->Point1[0] = x;
-  this->Point1[1] = y;
-  this->Point1[2] = z;
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
+  this->Superclass::UpdateVTKObjects();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream str;
+  unsigned int cc;
+  unsigned int numObjects = this->GetNumberOfIDs();
+  for (cc=0; cc < numObjects; cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                  <<  id
-                  << "SetPoint1" << this->Point1[0] << this->Point1[1] 
-                  <<  this->Point1[2]
-                  << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                  << id
-                  << "SetAlignToNone" <<  vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    str << vtkClientServerStream::Invoke 
+        <<  id
+        << "SetPoint1" << this->Point1[0] << this->Point1[1] 
+        <<  this->Point1[2]
+        << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke 
+        <<  id
+        << "SetPoint2" << this->Point2[0] << this->Point2[1] 
+        <<  this->Point2[2]
+        << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke 
+        << this->GetID(cc)
+        << "SetResolution" << this->Resolution
+        << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke 
+        << id
+        << "SetAlignToNone" <<  vtkClientServerStream::End;
     }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::SetPoint2(double x, double y, double z)
-{
-  this->Point2[0] = x;
-  this->Point2[1] = y;
-  this->Point2[2] = z;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
+  if (str.GetNumberOfMessages() > 0)
     {
-    vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                  <<  id
-                  << "SetPoint2" << this->Point2[0] << this->Point2[1] 
-                  <<  this->Point2[2]
-                  << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                  << id
-                  << "SetAlignToNone" <<  vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
-    }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::SetResolution(int res)
-{
-  this->Resolution = res;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc <this->GetNumberOfIDs(); cc++)
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetID(cc)
-                    << "SetResolution" << this->Resolution
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    pm->SendStream(this->Servers,str,0);
     }
   this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
 }
@@ -132,12 +107,32 @@ void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void
     return;
     }
   double val[3];
+  //Update the iVars to reflect the VTK object state
   widget->GetPoint1(val);
-  this->SetPoint1(val[0],val[1],val[2]);
-  
+  this->SetPoint1(val);
   widget->GetPoint2(val);
-  this->SetPoint2(val[0],val[1],val[2]);
+  this->SetPoint2(val);
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg, event, p);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file, 
+  vtkIndent indent)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Point1"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Point1);
+    }
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Point2"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Point2);
+    }
+  this->Superclass::SaveState(name,file,indent);
 }
 
 //----------------------------------------------------------------------------

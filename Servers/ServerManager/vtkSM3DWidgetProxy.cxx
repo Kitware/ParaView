@@ -23,7 +23,7 @@
 #include "vtkInteractorObserver.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -49,19 +49,16 @@ void vtkSM3DWidgetProxy::InitializeObservers(vtkInteractorObserver* widget3D)
 }
 
 //----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::PlaceWidget(double bds[6])
 {
   unsigned int cc;
-  if (bds[0] == this->Bounds[0] &&
-    bds[1] == this->Bounds[1] &&
-    bds[2] == this->Bounds[2] &&
-    bds[3] == this->Bounds[3] &&
-    bds[4] == this->Bounds[4] &&
-    bds[5] == this->Bounds[5])
-    {
-    return;
-    }
-  
+    
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   for(cc=0; cc < this->GetNumberOfIDs(); cc++)
     {

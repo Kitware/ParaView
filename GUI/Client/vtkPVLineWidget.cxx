@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.56");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -406,16 +406,12 @@ void vtkPVLineWidget::ActualPlaceWidget()
     y = bds[3]; 
     z = (bds[4]+bds[5])/2;
     this->SetPoint2(x, y, z);
+    this->PlaceWidget(bds);
     }
   else
     {
-    bds[0] = bds[2] = bds[4] = 0.0;
-    bds[1] = bds[3] = bds[5] = 1.0;
-    }
-
-  if (this->WidgetProxy)
-    {
-    this->WidgetProxy->PlaceWidget(bds);
+    this->SetPoint1(-0.5,0,0);
+    this->SetPoint2(0.5,0,0);
     }
 }
 
@@ -472,11 +468,12 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ResetInternal()
 {
-  if (this->SuppressReset)
+  if ( !this->AcceptCalled )
     {
+    this->ActualPlaceWidget();
     return;
     }
-  if ( ! this->ModifiedFlag || !this->AcceptCalled)
+  if (this->SuppressReset || !this->ModifiedFlag)
     {
     return;
     }

@@ -24,7 +24,7 @@
 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.3");
 
 //===========================================================================
 //***************************************************************************
@@ -75,6 +75,31 @@ void vtkSMInteractorObserverProxy::InitializeObservers(vtkInteractorObserver* wd
     wdg->AddObserver(vtkCommand::InteractionEvent, this->Observer);
     wdg->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
     wdg->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMInteractorObserverProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
+  
+  if ( !this->RendererInitialized || !this->InteractorInitialized)
+    {
+    return;
+    }
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream str;
+  unsigned int cc;
+  unsigned int numObjects = this->GetNumberOfIDs();
+  for(cc=0;cc < numObjects; cc++)
+    {
+    str << vtkClientServerStream::Invoke << this->GetID(cc)
+      << "SetEnabled" << this->Enabled << vtkClientServerStream::End;
+    }
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers,str,0);
     }
 }
 
@@ -145,24 +170,6 @@ void vtkSMInteractorObserverProxy::SetInteractor(vtkClientServerID interactorID)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMInteractorObserverProxy::SetEnabled(int enable)
-{
-  this->Enabled = enable;
-  if ( !this->RendererInitialized || !this->InteractorInitialized)
-    {
-    return;
-    }
-  
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
-      << "SetEnabled" << enable << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMInteractorObserverProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* dw)
 {
   vtkSMProxy* rendererProxy = dw->GetRendererProxy();
@@ -171,6 +178,7 @@ void vtkSMInteractorObserverProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* d
     vtkErrorMacro("No renderer available.");
     return;
     }
+  //TODO: verify this
   vtkClientServerID id = rendererProxy->GetID(0);
   this->SetCurrentRenderer(id);
 
@@ -183,11 +191,15 @@ void vtkSMInteractorObserverProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* d
   id = interactorProxy->GetID(0);
   this->SetInteractor(id);
   this->SetEnabled(this->Enabled);
+  this->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMInteractorObserverProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "RendererInitialized: " << this->RendererInitialized << endl;
+  os << indent << "InteractorInitialized: " << this->InteractorInitialized << endl;
 }
 

@@ -51,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -203,6 +203,7 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
   if ( !this->AcceptCalled)
     {
     this->ActualPlaceWidget();
+    this->SetNormalInternal(0,0,1);
     }
 
   if ( ! this->ModifiedFlag || this->SuppressReset)

@@ -24,10 +24,15 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDisplayerProxy.h"
+#include "vtkPVRenderModule.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkRenderWindowInteractor.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.17");
+vtkCxxSetObjectMacro(vtkSMDisplayWindowProxy,RenderModule,vtkPVRenderModule);
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -45,12 +50,13 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
   this->WindowToImage->SetServers(vtkProcessModule::CLIENT);
   
   this->DWInternals = new vtkSMDisplayWindowProxyInternals;
-
+  this->RenderModule = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::~vtkSMDisplayWindowProxy()
 {
+  this->SetRenderModule(0);
   this->WindowToImage->Delete();
   delete this->DWInternals;
 }
@@ -115,6 +121,24 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
       }
     }
 
+  vtkSMProxy* interactorProxy = this->GetSubProxy("interactor");
+  if (!interactorProxy)
+    {
+    vtkErrorMacro("No interactor sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    //Set the RenderWindow on the interactor
+    for(i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke
+          << interactorProxy->GetID(i)
+          << "SetRenderWindow"
+          << this->GetID(i)
+          << vtkClientServerStream::End;
+      }
+    }
   vtkSMProxy* compositeProxy = this->GetSubProxy("composite");
   if (!compositeProxy)
     {
@@ -170,10 +194,97 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
   
 
   pm->SendStream(this->WindowToImage->Servers, str, 0);
-
-
+  
+  if(this->RenderModule && this->GetSubProxy("interactor") && numObjects > 0)
+    { //set interactor on the render module
+    vtkSMProxy* interactorProxy = this->GetSubProxy("interactor");
+    this->RenderModule->SetInteractorID(interactorProxy->GetID(0));
+    }
 }
 
+//---------------------------------------------------------------------------
+void vtkSMDisplayWindowProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
+{
+  //Update the Camera positions and call superclass method.
+
+  vtkProcessModule *pm =vtkProcessModule::GetProcessModule();
+  vtkSMProxy* cameraProxy = this->GetSubProxy("camera");
+  vtkCamera* camera = (cameraProxy)? vtkCamera::SafeDownCast(
+      pm->GetObjectFromID(cameraProxy->GetID(0))) : 0;
+  if (camera)
+    {
+    double position[3], focalpoint[3], viewup[3];
+    double angle, clip_range[2];
+    vtkSMDoubleVectorProperty *dvp;
+    camera->GetPosition(position);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("CameraPosition"));
+    if (dvp)
+      {
+      dvp->SetElements(position);
+      }
+      
+    camera->GetFocalPoint(focalpoint);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("CameraFocalPoint"));
+    if (dvp)
+      {
+      dvp->SetElements(focalpoint);
+      }
+    
+    camera->GetViewUp(viewup);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("CameraViewUp"));
+    if (dvp)
+      {
+      dvp->SetElements(viewup);
+      }
+    
+    camera->GetClippingRange(clip_range);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("CameraClippingRange"));
+    if (dvp)
+      {
+      dvp->SetElements(clip_range);
+      }
+    
+    angle = camera->GetViewAngle();
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("CameraViewAngle"));
+    if (dvp)
+      {
+      dvp->SetElements1(angle);
+      }
+    }
+  else
+    {
+    vtkErrorMacro("No camera. Cannot save camera state correctly");
+    }
+  this->Superclass::SaveState(name,file,indent);
+}
+//---------------------------------------------------------------------------
+void vtkSMDisplayWindowProxy::UpdateSelfAndAllInputs()
+{
+  //Updates self before the inputs
+  this->CreateVTKObjects(1);
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  if (this->GetSubProxy("interactor"))
+    {
+    vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
+      pm->GetObjectFromID(this->GetSubProxy("interactor")->GetID(0)));
+    if (iren)
+      {
+      vtkInteractorStyleTrackballCamera *istyle = vtkInteractorStyleTrackballCamera::New();
+      iren->SetInteractorStyle(istyle);
+      istyle->Delete();
+      }
+    }
+  else
+    {
+    vtkErrorMacro("No interactor in configuration. Cannot set interactor style");
+    }
+  this->Superclass::UpdateSelfAndAllInputs();
+}
 //---------------------------------------------------------------------------
 void vtkSMDisplayWindowProxy::TileWindows(int xsize, int ysize, int nColumns)
 {
@@ -183,7 +294,7 @@ void vtkSMDisplayWindowProxy::TileWindows(int xsize, int ysize, int nColumns)
   if (!compositeProxy)
     {
     vtkErrorMacro("No composite sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
+      "the configuration file defines it.");
     }
   else
     {
@@ -191,10 +302,10 @@ void vtkSMDisplayWindowProxy::TileWindows(int xsize, int ysize, int nColumns)
     for (unsigned i=0; i<numObjects; i++)
       {
       str << vtkClientServerStream::Invoke 
-          << compositeProxy->GetID(i) 
-          << "TileWindows" 
-          << xsize << ysize << nColumns
-          << vtkClientServerStream::End;
+        << compositeProxy->GetID(i) 
+        << "TileWindows" 
+        << xsize << ysize << nColumns
+        << vtkClientServerStream::End;
       }
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream(compositeProxy->Servers, str, 0);
@@ -204,7 +315,7 @@ void vtkSMDisplayWindowProxy::TileWindows(int xsize, int ysize, int nColumns)
 
 //---------------------------------------------------------------------------
 void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
-                                         const char* writerName)
+  const char* writerName)
 {
   if (!filename || !writerName)
     {
@@ -218,33 +329,33 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
 
   imageWriter->SetVTKClassName(writerName);
   imageWriter->CreateVTKObjects(1);
-  
-  str << vtkClientServerStream::Invoke 
-      << this->WindowToImage->GetID(0) 
-      << "GetOutput" 
-      << vtkClientServerStream::End;
-  
-  str << vtkClientServerStream::Invoke 
-      << imageWriter->GetID(0) 
-      << "SetInput" 
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke 
-      << this->WindowToImage->GetID(0) 
-      << "Modified" 
-      << vtkClientServerStream::End;
+    << this->WindowToImage->GetID(0) 
+    << "GetOutput" 
+    << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke 
-      << imageWriter->GetID(0) 
-      << "SetFileName" 
-      << filename
-      << vtkClientServerStream::End;
+    << imageWriter->GetID(0) 
+    << "SetInput" 
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke 
-      << imageWriter->GetID(0) 
-      << "Write" 
-      << vtkClientServerStream::End;
+    << this->WindowToImage->GetID(0) 
+    << "Modified" 
+    << vtkClientServerStream::End;
+
+  str << vtkClientServerStream::Invoke 
+    << imageWriter->GetID(0) 
+    << "SetFileName" 
+    << filename
+    << vtkClientServerStream::End;
+
+  str << vtkClientServerStream::Invoke 
+    << imageWriter->GetID(0) 
+    << "Write" 
+    << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(imageWriter->Servers, str, 0);
@@ -277,7 +388,7 @@ vtkRenderWindow* vtkSMDisplayWindowProxy::GetRenderWindow()
   if (pm && this->GetNumberOfIDs() > 0)
     {
     return vtkRenderWindow::SafeDownCast(
-        pm->GetObjectFromID(this->GetID(0)));
+      pm->GetObjectFromID(this->GetID(0)));
     }
   return 0;
 }
@@ -307,37 +418,6 @@ void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMProxy* display)
     {
     dProxy->AddToDisplayWindow(this);
     }
-  /*
-  vtkSMProxy* actorProxy = display->GetSubProxy("actor");
-  if (!actorProxy)
-    {
-    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
-    return;
-    }
-
-  vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
-  if (!rendererProxy)
-    {
-    vtkErrorMacro("No renderer sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
-    return;
-    }
-
-  vtkClientServerStream str;
-  int numActors = actorProxy->GetNumberOfIDs();
-  for (int i=0; i<numActors; i++)
-    {
-    str << vtkClientServerStream::Invoke 
-        << rendererProxy->GetID(0) 
-        << "AddActor" 
-        << actorProxy->GetID(i)
-        << vtkClientServerStream::End;
-    }
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, str, 0);
-  str.Reset();
-  */
 }
 
 //---------------------------------------------------------------------------
@@ -348,8 +428,8 @@ void vtkSMDisplayWindowProxy::StillRender()
   for (int i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
-        << this->GetID(i) << "Render"
-        << vtkClientServerStream::End;
+      << this->GetID(i) << "Render"
+      << vtkClientServerStream::End;
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   // Call render on the client only. The composite manager should
@@ -369,4 +449,5 @@ void vtkSMDisplayWindowProxy::InteractiveRender()
 void vtkSMDisplayWindowProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderModule: " << this->RenderModule << endl;
 }

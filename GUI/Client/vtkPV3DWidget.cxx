@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.61");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.62");
 
 //===========================================================================
 //***************************************************************************
@@ -337,11 +337,12 @@ void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
   //Interactive rendering enabling/disabling code should eventually
   //move to the SM3DWidget
-  if ( event == vtkCommand::StartInteractionEvent )
+  
+  if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
     {
     this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
     }
-  else if ( event == vtkCommand::EndInteractionEvent )
+  else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
     {
     this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
     }

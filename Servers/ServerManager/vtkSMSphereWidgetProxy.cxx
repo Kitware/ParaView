@@ -19,8 +19,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkKWEvent.h"
 #include "vtkSphereWidget.h"
+#include "vtkSMDoubleVectorProperty.h"
+
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -36,35 +38,30 @@ vtkSMSphereWidgetProxy::~vtkSMSphereWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::SetCenter(double x, double y, double z)
+void vtkSMSphereWidgetProxy::UpdateVTKObjects()
 {
-  this->Center[0] = x;
-  this->Center[1] = y;
-  this->Center[2] = z;
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                    << "SetCenter" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
-    }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
-}
+  this->Superclass::UpdateVTKObjects();
 
-//----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::SetRadius(double radius)
-{
-  this->Radius = radius;
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
+  vtkClientServerStream str;
+  unsigned int cc;
+  unsigned int numObjects = this->GetNumberOfIDs();
+  for (cc=0; cc < numObjects; cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                  << "SetRadius" << this->Radius
-                  << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    str << vtkClientServerStream::Invoke << id
+        << "SetCenter" 
+        << this->Center[0]
+        << this->Center[1]
+        << this->Center[2]
+        << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke << id
+        << "SetRadius" << this->Radius
+        << vtkClientServerStream::End;
+    }
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers,str,0);
     }
   this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
 }
@@ -77,14 +74,38 @@ void vtkSMSphereWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,vo
     {
     return;
     }
+  //Update iVars to reflect the state of the VTK object
   double val[3];
   widget->GetCenter(val); 
-  this->SetCenter(val[0], val[1], val[2]);
+  this->SetCenter(val);
+    
   double rad = widget->GetRadius();
   this->SetRadius(rad);
+  
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg, event, p);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMSphereWidgetProxy::SaveState(const char* name, ostream* file, 
+  vtkIndent indent)
+{
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Center"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Center);
+    }
+    
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Radius"));
+  if (dvp)
+    {
+    dvp->SetElements1(this->Radius);
+    }
+  this->Superclass::SaveState(name,file,indent);
+}
+  
 //----------------------------------------------------------------------------
 void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
 {

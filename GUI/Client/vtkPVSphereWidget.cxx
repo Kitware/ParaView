@@ -43,7 +43,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -135,14 +135,7 @@ void vtkPVSphereWidget::CenterResetCallback()
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ActualPlaceWidget()
 {
-  double center[3];
-  double radius;
-  this->WidgetProxy->UpdateInformation();
-  this->GetCenterInternal(center);
-  radius = this->GetRadiusInternal();
   this->Superclass::ActualPlaceWidget();
-  this->SetCenterInternal(center);
-  this->SetRadiusInternal(radius);
 }
 
 //----------------------------------------------------------------------------
@@ -151,6 +144,7 @@ void vtkPVSphereWidget::ResetInternal()
   if( !this->AcceptCalled)
     {
     this->ActualPlaceWidget();
+    this->Superclass::ResetInternal();
     return;
     }
   if ( ! this->ModifiedFlag || this->SuppressReset)

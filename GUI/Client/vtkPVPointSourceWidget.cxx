@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.37");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -242,7 +242,7 @@ void vtkPVPointSourceWidget::ResetInternal()
     }
   else
     {
-    this->PositionResetCallback();
+    this->ActualPlaceWidget();
     }
 
   this->RadiusWidget->ResetInternal();

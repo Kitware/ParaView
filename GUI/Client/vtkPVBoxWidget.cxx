@@ -51,7 +51,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -465,7 +465,13 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
     this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
     this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
-      "<KeyRelease>", "TranslateKeyPressCallback");
+      "<Key>", "SetValueChanged");
+    //EntryCommand is called on <Return> and <FocusOut>
+    this->TranslateThumbWheel[cc]->SetEntryCommand(this, "SetTranslate");
+    //Command is called when the value is changed  
+    this->TranslateThumbWheel[cc]->SetCommand(this, "SetValueChanged");
+    //EndCommand is called when Thumbwheel/Scale motion is stopped
+    this->TranslateThumbWheel[cc]->SetEndCommand(this,"SetTranslate");
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
@@ -479,7 +485,11 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->ScaleThumbWheel[cc]->ExpandEntryOn();
     this->ScaleThumbWheel[cc]->GetEntry()->SetWidth(5);
     this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
-      "<KeyRelease>", "ScaleKeyPressCallback");
+      "<Key>", "SetValueChanged");
+    //EntryCommand is called on <Return> and <FocusOut>
+    this->ScaleThumbWheel[cc]->SetEntryCommand(this,"SetScale");
+    this->ScaleThumbWheel[cc]->SetCommand(this, "SetValueChanged");
+    this->ScaleThumbWheel[cc]->SetEndCommand(this, "SetScale");
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
 
@@ -494,12 +504,15 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->OrientationScale[cc]->ExpandEntryOn();
     this->OrientationScale[cc]->GetEntry()->SetWidth(5);
     this->OrientationScale[cc]->GetEntry()->SetBind(this,
-      "<KeyRelease>", "OrientationKeyPressCallback");
+      "<Key>", "SetValueChanged");
+    //EntryCommand is called on <Return> and <FocusOut>
+    this->OrientationScale[cc]->SetEntryCommand(this,"SetOrientation");
+    this->OrientationScale[cc]->SetCommand(this, "SetValueChanged");
+    this->OrientationScale[cc]->SetEndCommand(this, "SetOrientation");
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
     }
-  this->EnableCallbacks();
   int button_pady = 1;
   this->Script("grid %s %s %s %s -sticky news -pady %d",
     this->TranslateLabel->GetWidgetName(),
@@ -584,131 +597,60 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::EnableCallbacks()
+void vtkPVBoxWidget::SetScale()
 {
+  if (!this->ValueChanged)
+    {
+    return;
+    }
+  double val[3];
   int cc;
-  for(cc=0 ; cc < 3 ; cc++)
+  for ( cc = 0; cc < 3; cc++)
     {
-    this->TranslateThumbWheel[cc]->SetCommand(this, "TranslateCallback");
-    //this->TranslateThumbWheel[cc]->SetEndCommand(this, "TranslateEndCallback");
-    this->TranslateThumbWheel[cc]->SetEntryCommand(this,"TranslateCallback");
-
-    this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
-    //this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
-    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleCallback");
-
-    this->OrientationScale[cc]->SetCommand(this, "OrientationCallback");
-    //this->OrientationScale[cc]->SetEndCommand(this, "OrientationEndCallback");
-    this->OrientationScale[cc]->SetEntryCommand(this,"OrientationCallback");
+    val[cc] = atof(this->ScaleThumbWheel[cc]->GetEntry()->GetValue());
     }
+  this->SetScale(val[0],val[1],val[2]);
+  this->Render();
+  this->ModifiedCallback();
+  this->ValueChanged = 0;
 }
+
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::DisableCallbacks()
+void vtkPVBoxWidget::SetTranslate()
 {
+  if ( !this->ValueChanged )
+    {
+    return;
+    }
+  double val[3];
   int cc;
-  for(cc=0; cc < 3; cc++)
+  for ( cc = 0; cc < 3; cc++)
     {
-    this->TranslateThumbWheel[cc]->SetCommand(NULL, NULL);
-    this->TranslateThumbWheel[cc]->SetEndCommand(NULL, NULL);
-    this->TranslateThumbWheel[cc]->SetEntryCommand(NULL,NULL);
-
-    this->ScaleThumbWheel[cc]->SetCommand(NULL, NULL);
-    this->ScaleThumbWheel[cc]->SetEndCommand(NULL, NULL);
-    this->ScaleThumbWheel[cc]->SetEntryCommand(NULL, NULL);
-
-    this->OrientationScale[cc]->SetCommand(NULL, NULL);
-    this->OrientationScale[cc]->SetEndCommand(NULL,NULL);
-    this->OrientationScale[cc]->SetEntryCommand(NULL,NULL);
+    val[cc] = atof(this->TranslateThumbWheel[cc]->GetEntry()->GetValue());
     }
-}
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::ScaleCallback()
-{
-  this->GetScaleFromGUI();
-  this->SetScaleInternal(this->ScaleGUI[0], this->ScaleGUI[1],
-    this->ScaleGUI[2]);
+  this->SetTranslate(val[0],val[1],val[2]);
   this->Render();
   this->ModifiedCallback();
+  this->ValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::TranslateCallback()
+void vtkPVBoxWidget::SetOrientation()
 {
-  this->GetPositionFromGUI();
-  this->SetTranslateInternal(this->PositionGUI[0],this->PositionGUI[1],
-    this->PositionGUI[2]);
+  if (!this->ValueChanged)
+    {
+    return;
+    }
+  double val[3];
+  int cc;
+  for ( cc = 0; cc < 3; cc++)
+    {
+    val[cc] = atof(this->OrientationScale[cc]->GetEntry()->GetValue());
+    }
+  this->SetOrientation(val[0],val[1],val[2]);
   this->Render();
   this->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::OrientationCallback()
-{
-  this->GetRotationFromGUI();
-  this->SetOrientationInternal(this->RotationGUI[0], this->RotationGUI[1],
-    this->RotationGUI[2]);
-  this->Render();
-  this->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::ScaleEndCallback()
-{
-  this->SetScale(this->GetScaleFromGUI());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::TranslateEndCallback()
-{
-  this->SetTranslate(this->GetPositionFromGUI());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::OrientationEndCallback()
-{
-  this->SetOrientation(this->GetRotationFromGUI());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::ScaleKeyPressCallback()
-{
-  const char* pos0 = this->ScaleThumbWheel[0]->GetEntry()->GetValue();
-  const char* pos1 = this->ScaleThumbWheel[1]->GetEntry()->GetValue();
-  const char* pos2 = this->ScaleThumbWheel[2]->GetEntry()->GetValue();
-  if ( *pos0 && *pos1 && *pos2 )
-    {
-    this->ScaleThumbWheel[0]->EntryCallback();
-    this->ScaleThumbWheel[1]->EntryCallback();
-    this->ScaleThumbWheel[2]->EntryCallback();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::TranslateKeyPressCallback()
-{
-  const char* pos0 = this->TranslateThumbWheel[0]->GetEntry()->GetValue();
-  const char* pos1 = this->TranslateThumbWheel[1]->GetEntry()->GetValue();
-  const char* pos2 = this->TranslateThumbWheel[2]->GetEntry()->GetValue();
-  if ( *pos0 && *pos1 && *pos2 )
-    {
-    this->TranslateThumbWheel[0]->EntryCallback();
-    this->TranslateThumbWheel[1]->EntryCallback();
-    this->TranslateThumbWheel[2]->EntryCallback();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::OrientationKeyPressCallback()
-{
-  const char* pos0 = this->OrientationScale[0]->GetEntry()->GetValue();
-  const char* pos1 = this->OrientationScale[1]->GetEntry()->GetValue();
-  const char* pos2 = this->OrientationScale[2]->GetEntry()->GetValue();
-  if ( *pos0 && *pos1 && *pos2 )
-    {
-    this->OrientationScale[0]->EntryValueCallback();
-    this->OrientationScale[1]->EntryValueCallback();
-    this->OrientationScale[2]->EntryValueCallback();
-    }
+  this->ValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -768,6 +710,8 @@ void vtkPVBoxWidget::SetOrientation(double px, double py, double pz)
 void vtkPVBoxWidget::SetScale(double px, double py, double pz)
 {
   this->SetScaleInternal(px, py, pz);
+  this->AddTraceEntry("$kw(%s) SetScale %f %f %f",
+    this->GetTclName(), px, py, pz);  
 }
 
 //----------------------------------------------------------------------------
@@ -781,7 +725,6 @@ void vtkPVBoxWidget::SetTranslate(double px, double py, double pz)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::UpdateFromBox()
 {
-  this->DisableCallbacks();
   this->WidgetProxy->UpdateInformation();
 
   vtkSMDoubleVectorProperty *dvpScale = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -818,7 +761,6 @@ void vtkPVBoxWidget::UpdateFromBox()
     this->OrientationScale[1]->SetValue(orientation[1]);
     this->OrientationScale[2]->SetValue(orientation[2]);
     }
-  this->EnableCallbacks();
 }
 
 //----------------------------------------------------------------------------
@@ -854,10 +796,6 @@ void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {//case to update the display values from iVars
     this->UpdateFromBox();
-    if ( this->GetPVSource()->GetPVRenderView() )
-      {
-      this->GetPVSource()->GetPVRenderView()->EventuallyRender();
-      }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }

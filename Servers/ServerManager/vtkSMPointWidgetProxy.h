@@ -27,16 +27,21 @@ public:
   vtkTypeRevisionMacro(vtkSMPointWidgetProxy, vtkSM3DWidgetProxy);
   void PrintSelf(ostream &os,vtkIndent indent);
 
-  void SetPosition(double x, double y, double z);
+  vtkSetVector3Macro(Position,double);
   vtkGetVector3Macro(Position,double);
  
   virtual void SaveInBatchScript(ofstream *file);
 
+  virtual void UpdateVTKObjects();
 protected:
 //BTX
   vtkSMPointWidgetProxy();
   ~vtkSMPointWidgetProxy();
 
+  // Description:
+  // Overloaded to update the property values before saving state
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);

@@ -30,13 +30,22 @@ public:
   vtkTypeRevisionMacro(vtkSMInteractorObserverProxy, vtkSMDisplayerProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void SetEnabled(int enable);
+  // Description:
+  // Get/Set Enabled state of the InteractorObserver
+  vtkSetMacro(Enabled,int);
+  vtkGetMacro(Enabled,int);
 
   virtual void SaveInBatchScript(ofstream *) { };
 
   // Description:
   // Adds this displayer to the Display window proxy
   virtual void AddToDisplayWindow(vtkSMDisplayWindowProxy* dw);
+
+   // Description:
+   // Update the VTK object on the server by pushing the values of all 
+   // modifed properties (un-modified properties are ignored). If the 
+   // object has not been created, it will be created first.
+   virtual void UpdateVTKObjects();
 
 protected:
 //BTX

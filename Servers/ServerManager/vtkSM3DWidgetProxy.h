@@ -42,6 +42,12 @@ public:
     { this->SetEnabled(visible); } 
 
   virtual void SaveInBatchScript(ofstream *file);
+
+   // Description:
+   // Update the VTK object on the server by pushing the values of all 
+   // modifed properties (un-modified properties are ignored). If the 
+   // object has not been created, it will be created first.
+   virtual void UpdateVTKObjects();
 protected:
   //BTX
   vtkSM3DWidgetProxy();

@@ -26,17 +26,17 @@ public:
   static vtkSMImplicitPlaneWidgetProxy* New();
   vtkTypeRevisionMacro(vtkSMImplicitPlaneWidgetProxy, vtkSM3DWidgetProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-    
-  void SetCenter(double x, double y, double z);
+ 
+  vtkSetVector3Macro(Center,double);  
   vtkGetVector3Macro(Center,double);
   
-  void SetNormal(double x, double y, double z);
+  vtkSetVector3Macro(Normal,double);
   vtkGetVector3Macro(Normal,double);
   
   // Description:
   // Send a SetDrawPlane event to the server.
-  void SetDrawPlane(int val);
- 
+  vtkSetMacro(DrawPlane,int);
+  
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
@@ -45,10 +45,15 @@ public:
   // Hence, we have to explicitly position the center.
   virtual void PlaceWidget(double bds[6]);
 
+  virtual void UpdateVTKObjects();
 protected:
   vtkSMImplicitPlaneWidgetProxy();
   ~vtkSMImplicitPlaneWidgetProxy();
-  
+ 
+  // Description:
+  // Overloaded to update the property values before saving state
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
@@ -58,6 +63,20 @@ protected:
   double  Center[3];
   double  Normal[3];
   int     DrawPlane;
+
+  // Description:
+  // These are the center and normal that were last set on the VTK object on the Server.
+  // This is used to determine if the Center/Normal changed has changed when 
+  // UpdateVTKObjects() is called. The WidgetModifiedEvent is raised only if they are 
+  // changed. This intricacy is needed since, we don't wnat the WidgetModifiedEvent 
+  // invoked when only the DrawPlane status is modified. 
+  // Otherwise we get problems like the Accept button
+  // remaining green even after Accept is called etc.
+  double LastCenter[3];
+  double LastNormal[3];
+  vtkSetVector3Macro(LastCenter,double);
+  vtkSetVector3Macro(LastNormal,double); 
+
 private:
   vtkSMImplicitPlaneWidgetProxy(const vtkSMImplicitPlaneWidgetProxy&); // Not implemented
   void operator=(const vtkSMImplicitPlaneWidgetProxy&); // Not implemented

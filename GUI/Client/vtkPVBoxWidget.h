@@ -63,16 +63,11 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // These are callbacks for the transformation of the box.
-  void ScaleCallback();
-  void TranslateCallback();
-  void OrientationCallback();
-  void ScaleEndCallback();
-  void TranslateEndCallback();
-  void OrientationEndCallback();
-  void ScaleKeyPressCallback();
-  void TranslateKeyPressCallback();
-  void OrientationKeyPressCallback();
+  // Callbacks to update the values from the GUI.
+  // These methods do nothing is this->ValueChanged is not set
+  void SetTranslate();
+  void SetOrientation();
+  void SetScale();
 
   // Description:
   // Set the box
@@ -103,10 +98,7 @@ public:
   // Description:
   // Provide access to the proxies used by this widget.
   // BoxTransform == BoxTransformProxy
-  // BoxMatrix == BoxMatrixProxy
   // Box == BoxProxy
-  // BoxPoints == BoxPointsProxy
-  // BoxNormals == BoxNormalsProxy
   vtkSMProxy* GetProxyByName(const char* name);
  
   // Description:
@@ -142,18 +134,8 @@ protected:
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
   // Description:
-  // Get iVar values from vtkRMBoxWidget object and update the GUI.
+  // Get iVar values from vtkSMBoxWidgetProxy object and update the GUI.
   void UpdateFromBox();
-
-  // Description:
-  // Enables/Disables invoking of callbacks of the ThumbWheel/Scale.
-  // It makes sense to disable callbacks (which are responsible to update
-  // the internal state of the widget) when the ThumbWheel/Scale values 
-  // are being updated using the internal state itself i.e. UpdateFromBox()
-  // EnableCallbacks() sets the callback methods, while
-  // DisableCallbacks() sets them to NULL
-  void EnableCallbacks();
-  void DisableCallbacks();
 
   vtkKWFrame*        ControlFrame;
   vtkKWLabel*        TranslateLabel;

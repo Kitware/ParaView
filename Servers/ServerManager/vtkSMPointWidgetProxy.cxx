@@ -19,9 +19,10 @@
 #include "vtkKWEvent.h"
 #include "vtkClientServerStream.h"
 #include "vtkPickPointWidget.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -54,20 +55,26 @@ void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPointWidgetProxy::SetPosition(double x, double y, double z)
-{ 
-  this->Position[0] = x;
-  this->Position[1] = y;
-  this->Position[2] = z;
+void vtkSMPointWidgetProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0;cc<this->GetNumberOfIDs(); cc++)
+  vtkClientServerStream str;
+  unsigned int cc;
+  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    str << vtkClientServerStream::Invoke 
                     << id
-                    << "SetPosition" << x << y << z 
+                    << "SetPosition" 
+                    << this->Position[0]
+                    << this->Position[1]
+                    << this->Position[2]
                     << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    }
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers,str,0);
     }
   this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
 }
@@ -83,10 +90,24 @@ void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,voi
     }
   double val[3];
   widget->GetPosition(val); 
+  //Update ivars to reflect the VTK object values
   this->SetPosition(val[0], val[1], val[2]);
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMPointWidgetProxy::SaveState(const char* name, ostream* file, 
+  vtkIndent indent)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Position"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Position);
+    }
+  this->Superclass::SaveState(name,file,indent);
+}
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::SaveInBatchScript(ofstream *file)
 {

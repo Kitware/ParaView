@@ -20,10 +20,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkKWEvent.h"
 #include "vtkCommand.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -31,6 +33,9 @@ vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->Normal[0] = this->Normal[2] = 0.0;
   this->Normal[1] = 1.0;
+  this->LastCenter[0] = this->LastCenter[1] = this->LastCenter[2] = 0.0;
+  this->LastNormal[0] = this->LastNormal[2] = 0.0;
+  this->LastNormal[1] = 1.0;
   this->DrawPlane = 0;
   this->SetVTKClassName("vtkImplicitPlaneWidget");
 }
@@ -88,9 +93,15 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
 //----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::PlaceWidget(double bds[6])
 {
+  double normal[3];
+  this->GetNormal(normal);
   this->Superclass::PlaceWidget(bds);
-  this->SetCenter((bds[0]+bds[1])/2,
-    (bds[2]+bds[3])/2, (bds[4]+bds[5])/2);
+  double center[3];
+  center[0] = (bds[0]+bds[1])/2;
+  center[1] = (bds[2]+bds[3])/2;
+  center[2] = (bds[4]+bds[5])/2;
+  this->SetCenter(center);
+  this->SetNormal(normal);
 }
 
 //----------------------------------------------------------------------------
@@ -101,69 +112,112 @@ void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long e
     {
     return;
     }
-  double val[3];
-  widget->GetOrigin(val); 
-  this->SetCenter(val[0], val[1], val[2]);
-  widget->GetNormal(val);
-  this->SetNormal(val[0], val[1], val[2]);
+  double center[3],normal[3];
+  widget->GetOrigin(center); 
+  widget->GetNormal(normal);
+  //Just set the iVars
+  this->SetCenter(center);
+  this->SetLastCenter(center);
+  this->SetNormal(normal);
+  this->SetLastNormal(normal);
   if (!widget->GetDrawPlane() && event == vtkCommand::InteractionEvent)
     { 
     this->SetDrawPlane(1);
+    this->UpdateVTKObjects();
     }
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::SetCenter(double x, double y, double z)
+void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
 {
-  this->Center[0] = x;
-  this->Center[1] = y;
-  this->Center[2] = z;
+  this->Superclass::UpdateVTKObjects();
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream str;
+  int trigger_event = 0;
   for(unsigned int cc=0; cc<this->GetNumberOfIDs();cc++)
     { 
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << id << "SetOrigin" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    if (this->Center[0] != this->LastCenter[0]
+      || this->Center[1] != this->LastCenter[1]
+      || this->Center[2] != this->LastCenter[2])
+      {
+      trigger_event = 1;
+      str << vtkClientServerStream::Invoke 
+        << id << "SetOrigin" 
+        << this->Center[0] 
+        << this->Center[1] 
+        << this->Center[2]
+        << vtkClientServerStream::End;
+      }
+    if (this->Normal[0] != this->LastNormal[0]
+      || this->Normal[1] != this->LastNormal[1]
+      || this->Normal[2] != this->LastNormal[2])
+      {
+      trigger_event = 1;
+      str << vtkClientServerStream::Invoke 
+        << id << "SetNormal"
+        << this->Normal[0]
+        << this->Normal[1]
+        << this->Normal[2]
+        << vtkClientServerStream::End;
+      }
+    str << vtkClientServerStream::Invoke 
+      << id << "SetDrawPlane" 
+      << this->DrawPlane
+      << vtkClientServerStream::End;
     }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::SetNormal(double x, double y, double z)
-{
-  this->Normal[0] = x;
-  this->Normal[1] = y;
-  this->Normal[2] = z;
-
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0; cc<this->GetNumberOfIDs();cc++)
-    { 
-    vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << id << "SetNormal" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
-    } 
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::SetDrawPlane(int val)
-{
-  this->DrawPlane = val;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0; cc<this->GetNumberOfIDs();cc++)
+  if (str.GetNumberOfMessages() > 0)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetID(cc)<< "SetDrawPlane" << val
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    pm->SendStream(this->Servers,str,0);
+    }
+  if (trigger_event)
+    {
+    this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkSMImplicitPlaneWidgetProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
+{
+  vtkSMDoubleVectorProperty* dvp;
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Center"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Center);
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property 'Center'");
+    }
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Normal"));
+  if (dvp)
+    {
+    dvp->SetElements(this->Normal);
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property 'Normal'");
+    }
+
+  vtkSMIntVectorProperty * ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("DrawPlane"));
+  if (ivp)
+    {
+    ivp->SetElements1(this->DrawPlane);
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property 'DrawPlane'");
+    }
+  this->Superclass::SaveState(name,file,indent);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::SaveInBatchScript(ofstream *file)
@@ -189,7 +243,7 @@ void vtkSMImplicitPlaneWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << "  [$pvTemp" << id.ID << " GetProperty DrawPlane] "
       << "SetElements1 " << this->DrawPlane 
       << endl;
-    
+
     *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
     *file << endl;
     }
@@ -203,4 +257,5 @@ void vtkSMImplicitPlaneWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
     << "," << this->Center[2] << endl;
   os << indent << "Normal: " << this->Normal[0] << ", " << this->Normal[1]
     << "," << this->Normal[2] << endl;
+  os << indent << "DrawPlane: " << this->DrawPlane << endl;
 }

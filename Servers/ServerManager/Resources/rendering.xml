@@ -227,7 +227,7 @@
        </Proxy>
      </SubProxy>
      <SubProxy>
-       <Proxy name="interactor" class="vtkRenderWindowInteractor">
+       <Proxy name="interactor" class="vtkGenericRenderWindowInteractor">
          <!--no properties for the time being -->
        </Proxy>
      </SubProxy>
