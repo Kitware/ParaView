@@ -61,15 +61,15 @@ public:
     PROGRESS_EVENT_TAG = 31415
     };
 
-  static inline ServerFlags GetRootId(ServerFlags serverId)
+  static inline int GetRootId(int serverId)
     {
       if (serverId > RENDER_SERVER)
         {
         vtkGenericWarningMacro("Server ID correspond to either data or "
                                "render server");
-        return  static_cast<ServerFlags>(0);
+        return 0;
         }
-      return static_cast<ServerFlags>(serverId << 1);
+      return serverId << 1;
     }
 //ETX
   
