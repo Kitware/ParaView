@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.40");
+vtkCxxRevisionMacro(vtkKWDialog, "1.41");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -293,5 +293,6 @@ void vtkKWDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Beep: " << this->GetBeep() << endl;
   os << indent << "BeepType: " << this->GetBeepType() << endl;
   os << indent << "InvokeAtPointer: " << this->GetInvokeAtPointer() << endl;
+  os << indent << "HasBeenMapped: " << this->GetHasBeenMapped() << endl;
 }
 
