@@ -345,6 +345,11 @@ IF(WIN32 AND TK_RESOURCE_FILE)
 ENDIF(WIN32 AND TK_RESOURCE_FILE)
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+
+SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
+  "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
+MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
+
 CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/pvTestDriverConfig.h.in
   ${PVGUI_BINARY_DIR}/Client/pvTestDriverConfig.h
   ESCAPE_QUOTES)

@@ -544,12 +544,19 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
 #ifdef PV_TEST_CLEAN_COMMAND
   // If any executable did not exit properly, run a user-specified
-  // cleanup command.
+  // command to cleanup leftover processes.  This is needed for tests
+  // that fail when running in MPI mode.
+  //
+  // For example: "killall -9 rsh paraview"
+  //
   if(kwsysProcess_GetState(client) != kwsysProcess_State_Exited ||
      kwsysProcess_GetState(server) != kwsysProcess_State_Exited ||
      kwsysProcess_GetState(renderServer) != kwsysProcess_State_Exited)
     {
-    system(PV_TEST_CLEAN_COMMAND);
+    if(strlen(PV_TEST_CLEAN_COMMAND) > 0)
+      {
+      system(PV_TEST_CLEAN_COMMAND);
+      }
     }
 #endif
   // Get the results.
