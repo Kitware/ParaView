@@ -98,6 +98,12 @@ public:
     { this->SetRelativeVisibleParameterRange(range[0], range[1]); };
 
   // Description:
+  // Hide the parameter range UI.
+  vtkBooleanMacro(HideParameterRange, int);
+  virtual void SetHideParameterRange(int);
+  vtkGetMacro(HideParameterRange, int);
+
+  // Description:
   // Set/Get the whole value range.
   virtual float* GetWholeValueRange();
   virtual void SetWholeValueRange(float r0, float r1);
@@ -130,6 +136,12 @@ public:
     { this->GetRelativeVisibleValueRange(range[0], range[1]); };
   virtual void SetRelativeVisibleValueRange(float range[2]) 
     { this->SetRelativeVisibleValueRange(range[0], range[1]); };
+
+  // Description:
+  // Hide the value range UI.
+  vtkBooleanMacro(HideValueRange, int);
+  virtual void SetHideValueRange(int);
+  vtkGetMacro(HideValueRange, int);
 
   // Description:
   // Set/Get the canvas height in pixels (i.e. the drawable region)
@@ -319,7 +331,8 @@ public:
   vtkGetObjectMacro(Canvas, vtkKWWidget);
   vtkGetObjectMacro(TitleFrame, vtkKWFrame);
   vtkGetObjectMacro(InfoFrame, vtkKWFrame);
-  vtkGetObjectMacro(InfoLabel, vtkKWLabeledLabel);
+  vtkGetObjectMacro(RangeLabel, vtkKWLabel);
+  vtkGetObjectMacro(PointLabel, vtkKWLabeledLabel);
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -336,6 +349,8 @@ protected:
   vtkKWParameterValueFunctionEditor();
   ~vtkKWParameterValueFunctionEditor();
 
+  int   HideParameterRange;
+  int   HideValueRange;
   int   CanvasHeight;
   int   CanvasWidth;
   int   LockEndPointsParameter;
@@ -373,7 +388,8 @@ protected:
   vtkKWRange        *ValueRange;
   vtkKWFrame        *TitleFrame;
   vtkKWFrame        *InfoFrame;
-  vtkKWLabeledLabel *InfoLabel;
+  vtkKWLabel        *RangeLabel;
+  vtkKWLabeledLabel *PointLabel;
 
   //BTX
   enum 
@@ -431,7 +447,7 @@ protected:
   // Description:
   // Update the info label according to the current visible parameter and
   // value ranges
-  virtual void UpdateInfoLabelWithRange();
+  virtual void UpdateRangeLabelWithRange();
 
   // Description:
   // Convenience method to look for a tag in the Canvas. 
@@ -457,7 +473,7 @@ protected:
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y) = 0;
   virtual int  MoveFunctionPointToParameter(int id,float parameter,int i=0)=0;
   virtual int  RemoveFunctionPoint(int id) = 0;
-  virtual void UpdateInfoLabelWithFunctionPoint(int id) = 0;
+  virtual void UpdatePointLabelWithFunctionPoint(int id) = 0;
   virtual unsigned long GetFunctionMTime() = 0;
 
   // Synchronization callbacks

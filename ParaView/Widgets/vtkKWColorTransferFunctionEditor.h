@@ -110,13 +110,13 @@ protected:
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y);
   virtual int  MoveFunctionPointToParameter(int id, float parameter, int i=0);
   virtual int  RemoveFunctionPoint(int id);
-  virtual void UpdateInfoLabelWithFunctionPoint(int id);
+  virtual void UpdatePointLabelWithFunctionPoint(int id);
   virtual unsigned long GetFunctionMTime();
 
   // Description:
   // Update the info label according to the current visible parameter and
   // value ranges
-  virtual void UpdateInfoLabelWithRange();
+  virtual void UpdateRangeLabelWithRange();
 
   // Description:
   // Update the enable state. This should propagate similar calls to the

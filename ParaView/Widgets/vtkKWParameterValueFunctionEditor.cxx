@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.12");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -76,6 +76,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 {
   int i;
 
+  this->HideParameterRange      = 0;
+  this->HideValueRange          = 0;
   this->CanvasHeight            = 50;
   this->CanvasWidth             = 0;
   this->LockEndPointsParameter  = 0;
@@ -110,7 +112,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ValueRange              = vtkKWRange::New();
   this->TitleFrame              = vtkKWFrame::New();
   this->InfoFrame               = vtkKWFrame::New();
-  this->InfoLabel               = vtkKWLabeledLabel::New();
+  this->RangeLabel              = vtkKWLabel::New();
+  this->PointLabel              = vtkKWLabeledLabel::New();
 
   this->Icons                   = new vtkKWImageLabel* [VTK_KW_RANGE_NB_ICONS];
   for (i = 0; i < VTK_KW_RANGE_NB_ICONS; i++)
@@ -232,10 +235,16 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     this->InfoFrame = NULL;
     }
 
-  if (this->InfoLabel)
+  if (this->PointLabel)
     {
-    this->InfoLabel->Delete();
-    this->InfoLabel = NULL;
+    this->PointLabel->Delete();
+    this->PointLabel = NULL;
+    }
+
+  if (this->RangeLabel)
+    {
+    this->RangeLabel->Delete();
+    this->RangeLabel = NULL;
     }
 
   for (i = 0; i < VTK_KW_RANGE_NB_ICONS; i++)
@@ -402,18 +411,27 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
   // Create the label (i.e. title)
 
   this->Label->SetParent(this->TitleFrame);
-  this->Label->Create(app, "-anchor w");
+  this->Label->Create(app, "-anchor w -bd 0");
+
+  // Create the range label
+
+  this->RangeLabel->SetParent(this->TitleFrame);
+  this->RangeLabel->Create(app, "-bd 0");
 
   // Create the info frame
 
   this->InfoFrame->SetParent(this);
   this->InfoFrame->Create(app, "");
 
-  // Create the range label
+  // Create the point label
 
-  this->InfoLabel->SetParent(this->InfoFrame);
-  this->InfoLabel->Create(app, "");
-  this->InfoLabel->SetLabelAnchor(vtkKWWidget::ANCHOR_W);
+  this->PointLabel->SetParent(this->InfoFrame);
+  this->PointLabel->Create(app, "");
+  this->PointLabel->SetLabelAnchor(vtkKWWidget::ANCHOR_W);
+  this->Script("%s config -bd 0", 
+               this->PointLabel->GetLabel()->GetWidgetName());
+  this->Script("%s config -bd 0", 
+               this->PointLabel->GetLabel2()->GetWidgetName());
 
   // Create some icons
 
@@ -446,7 +464,7 @@ void vtkKWParameterValueFunctionEditor::Update()
 {
   this->UpdateEnableState();
 
-  this->UpdateInfoLabelWithRange();
+  this->UpdateRangeLabelWithRange();
 
   this->RedrawCanvas();
 }
@@ -489,10 +507,16 @@ void vtkKWParameterValueFunctionEditor::Pack()
   if (this->ShowLabel)
     {
     tk_cmd << "pack " << this->Label->GetWidgetName() 
-           << " -side left -expand y -fill x" << endl;
+           << " -side left -fill x -padx 0" << endl;
     tk_cmd << this->Label->GetWidgetName() << " config -anchor w" << endl;
     }
 
+  // Range label
+
+  tk_cmd << "pack " << this->RangeLabel->GetWidgetName() 
+         << " -side left -fill x -padx 0" << endl;
+  tk_cmd << this->RangeLabel->GetWidgetName() << " config -anchor w" << endl;
+  
   // Canvas ([------])
 
   tk_cmd << "grid " << this->Canvas->GetWidgetName() 
@@ -500,11 +524,17 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   // Ranges (P, V)
 
-  tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
-         << " -row 2 -column 0 -columnspan 2 -sticky ew -pady 2" << endl;
+  if (!this->HideParameterRange)
+    {
+    tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
+           << " -row 2 -column 0 -columnspan 2 -sticky ew -pady 2" << endl;
+    }
 
-  tk_cmd << "grid " << this->ValueRange->GetWidgetName() 
-         << " -row 1 -column 2 -sticky ns -padx 2" << endl;
+  if (!this->HideValueRange)
+    {
+    tk_cmd << "grid " << this->ValueRange->GetWidgetName() 
+           << " -row 1 -column 2 -sticky ns -padx 2" << endl;
+    }
 
   // Info frame (I)
 
@@ -513,9 +543,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   this->InfoFrame->UnpackChildren();
 
-  // Info label
+  // Point label
 
-  tk_cmd << "pack " << this->InfoLabel->GetWidgetName() 
+  tk_cmd << "pack " << this->PointLabel->GetWidgetName() 
          << " -side left -expand y -fill x" << endl;
   
   // Make sure it will resize properly
@@ -653,6 +683,22 @@ void vtkKWParameterValueFunctionEditor::SetRelativeVisibleParameterRange(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHideParameterRange(int arg)
+{
+  if (this->HideParameterRange == arg)
+    {
+    return;
+    }
+
+  this->HideParameterRange = arg;
+
+  this->Modified();
+
+  this->Pack();
+  this->UpdateRangeLabelWithRange();
+}
+
+//----------------------------------------------------------------------------
 float* vtkKWParameterValueFunctionEditor::GetWholeValueRange()
 {
   return this->ValueRange->GetWholeRange();
@@ -697,6 +743,22 @@ void vtkKWParameterValueFunctionEditor::SetRelativeVisibleValueRange(
 
   // VisibleValueRangeChangingCallback is invoked automatically 
   // by the line above
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHideValueRange(int arg)
+{
+  if (this->HideValueRange == arg)
+    {
+    return;
+    }
+
+  this->HideValueRange = arg;
+
+  this->Modified();
+
+  this->Pack();
+  this->UpdateRangeLabelWithRange();
 }
 
 //----------------------------------------------------------------------------
@@ -1016,9 +1078,14 @@ void vtkKWParameterValueFunctionEditor::UpdateEnableState()
     this->InfoFrame->SetEnabled(this->Enabled);
     }
 
-  if (this->InfoLabel)
+  if (this->RangeLabel)
     {
-    this->InfoLabel->SetEnabled(this->Enabled);
+    this->RangeLabel->SetEnabled(this->Enabled);
+    }
+
+  if (this->PointLabel)
+    {
+    this->PointLabel->SetEnabled(this->Enabled);
     }
 
   if (this->Enabled)
@@ -1052,9 +1119,14 @@ void vtkKWParameterValueFunctionEditor::SetBalloonHelpString(
     this->ValueRange->SetBalloonHelpString(string);
     }
 
-  if (this->InfoLabel)
+  if (this->RangeLabel)
     {
-    this->InfoLabel->SetBalloonHelpString(string);
+    this->RangeLabel->SetBalloonHelpString(string);
+    }
+
+  if (this->PointLabel)
+    {
+    this->PointLabel->SetBalloonHelpString(string);
     }
 }
 
@@ -1078,9 +1150,14 @@ void vtkKWParameterValueFunctionEditor::SetBalloonHelpJustification(int j)
     this->ValueRange->SetBalloonHelpJustification(j);
     }
 
-  if (this->InfoLabel)
+  if (this->RangeLabel)
     {
-    this->InfoLabel->SetBalloonHelpJustification(j);
+    this->RangeLabel->SetBalloonHelpJustification(j);
+    }
+
+  if (this->PointLabel)
+    {
+    this->PointLabel->SetBalloonHelpJustification(j);
     }
 }
 
@@ -1325,7 +1402,7 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
   // Try to save the selection before (eventually) creating new points
 
   int s_x = 0, s_y = 0;
-  if (nb_points_changed && this->HasSelection() >= 0)
+  if (nb_points_changed && this->HasSelection())
     {
     int item_id = atoi(
       this->Script("%s find withtag %s",canv,VTK_KW_RANGE_SELECTED_POINT_TAG));
@@ -1365,7 +1442,7 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
 
   // Try to restore the selection
 
-  if (nb_points_changed && this->HasSelection() >= 0)
+  if (nb_points_changed && this->HasSelection())
     {
     int p_x = 0, p_y = 0;
     for (i = 0; i < nb_points; i++)
@@ -1403,22 +1480,25 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 
   this->SelectedPoint = id;
 
+  // Add the selection tag to the point, raise the point
+
   if (this->IsCreated())
     {
     const char *canv = this->Canvas->GetWidgetName();
 
-    // Add the selection tag to the point, raise the point
-
     this->Script("%s addtag %s withtag p%d",
                  canv, VTK_KW_RANGE_SELECTED_POINT_TAG, this->SelectedPoint);
-
     this->Script("%s raise %s all",
                  canv, VTK_KW_RANGE_SELECTED_POINT_TAG);
-
-    // Draw the selected point accordingly  and update its aspect
-
-    this->RedrawCanvasPoint(this->SelectedPoint);
     }
+
+  // Draw the selected point accordingly and update its aspect
+  
+  this->RedrawCanvasPoint(this->SelectedPoint);
+
+  // Show the selected point description in the point label
+
+  this->UpdatePointLabelWithFunctionPoint(this->SelectedPoint);
 
   this->InvokeSelectionChangedCommand();
 }
@@ -1431,28 +1511,30 @@ void vtkKWParameterValueFunctionEditor::ClearSelection()
     return;
     }
 
-  if (!this->IsCreated())
-    {
-    this->SelectedPoint = -1;
-    }
-  else
+  // Remove the selection tag from the selected point
+
+  if (this->IsCreated())
     {
     const char *canv = this->Canvas->GetWidgetName();
 
-    // Remove the selection tag from the selected point
-
     this->Script("%s dtag p%d %s",
                  canv, this->SelectedPoint, VTK_KW_RANGE_SELECTED_POINT_TAG);
-
-    // Deselect
-
-    int old_selection = this->SelectedPoint;
-    this->SelectedPoint = -1;
-
-    // Redraw the point that used to be selected and update its aspect
-
-    this->RedrawCanvasPoint(old_selection);
     }
+
+  // Deselect
+
+  int old_selection = this->SelectedPoint;
+  this->SelectedPoint = -1;
+
+  // Redraw the point that used to be selected and update its aspect
+
+  this->RedrawCanvasPoint(old_selection);
+
+  // Show the selected point description in the point label
+  // Since nothing is selected, the expect side effect is to clear the
+  // point label
+
+  this->UpdatePointLabelWithFunctionPoint(this->SelectedPoint);
 
   this->InvokeSelectionChangedCommand();
 }
@@ -1518,32 +1600,46 @@ int vtkKWParameterValueFunctionEditor::CanvasHasTag(const char *tag,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::UpdateInfoLabelWithRange()
+void vtkKWParameterValueFunctionEditor::UpdateRangeLabelWithRange()
 {
-  if (!this->IsCreated() || !this->InfoLabel || !this->InfoLabel->IsAlive())
+  if (!this->IsCreated() || !this->RangeLabel || !this->RangeLabel->IsAlive())
     {
     return;
     }
+
+  ostrstream ranges;
+  int nb_ranges = 0;
 
   float *param = GetVisibleParameterRange();
-  float *value = GetVisibleValueRange();
-  if (!param || !value)
+  if (param && !this->HideParameterRange)
     {
-    return;
+    char format[1024], range[1024];
+    sprintf(format, "[%%.%df, %%.%df]",
+            this->ParameterRange->GetEntriesResolution(),
+            this->ParameterRange->GetEntriesResolution());
+    sprintf(range, format, param[0], param[1]);
+    ranges << range;
+    nb_ranges++;
     }
 
-  char format[1024];
-  sprintf(format, "[%%.%df, %%.%df] x [%%.%df, %%.%df]",
-          this->ParameterRange->GetEntriesResolution(),
-          this->ParameterRange->GetEntriesResolution(),
-          this->ValueRange->GetEntriesResolution(),
-          this->ValueRange->GetEntriesResolution());
+  float *value = GetVisibleValueRange();
+  if (value && !this->HideValueRange)
+    {
+    char format[1024], range[1024];
+    sprintf(format, "[%%.%df, %%.%df]",
+            this->ValueRange->GetEntriesResolution(),
+            this->ValueRange->GetEntriesResolution());
+    sprintf(range, format, value[0], value[1]);
+    if (nb_ranges)
+      {
+      ranges << " x ";
+      }
+    ranges << range;
+    }
 
-  char range[1024];
-  sprintf(range, format, param[0], param[1], value[0], value[1]);
-  this->InfoLabel->SetLabel2(range);
-  this->InfoLabel->GetLabel()->SetImageDataName(
-    this->Icons[ICON_AXES]->GetImageDataName());
+  ranges << ends;
+  this->RangeLabel->SetLabel(ranges.str());
+  ranges.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1723,9 +1819,13 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
   
   // Make sure only one of those editors has a selected point from now
   
-  if (a->HasSelection() >= 0)
+  if (a->HasSelection())
     {
     b->ClearSelection();
+    }
+  else if (b->HasSelection())
+    {
+    a->ClearSelection();
     }
   
   int events[] = 
@@ -1782,11 +1882,11 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
   
   // Make sure those editors have the same selected point from now
   
-  if (a->GetSelectedPoint() >= 0)
+  if (a->HasSelection())
     {
     b->SelectPoint(a->GetSelectedPoint());
     }
-  else if (b->GetSelectedPoint() >= 0)
+  else if (b->HasSelection())
     {
     a->SelectPoint(b->GetSelectedPoint());
     }
@@ -1876,7 +1976,7 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
     // Synchronize Single selection
 
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
-      if (pvfe->GetSelectedPoint() >= 0)
+      if (pvfe->HasSelection())
         {
         self->ClearSelection();
         }
@@ -1902,7 +2002,7 @@ void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
     // Synchronize Same selection
 
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
-      if (pvfe->GetSelectedPoint() >= 0)
+      if (pvfe->HasSelection())
         {
         self->SelectPoint(pvfe->GetSelectedPoint());
         }
@@ -1923,7 +2023,7 @@ void vtkKWParameterValueFunctionEditor::ConfigureCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingCallback()
 {
-  this->UpdateInfoLabelWithRange();
+  this->UpdateRangeLabelWithRange();
   this->RedrawCanvas();
 
   this->InvokeVisibleRangeChangingCommand();
@@ -1935,7 +2035,7 @@ void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedCallback()
 {
-  this->UpdateInfoLabelWithRange();
+  this->UpdateRangeLabelWithRange();
   this->RedrawCanvas();
 
   this->InvokeVisibleRangeChangedCommand();
@@ -1947,7 +2047,7 @@ void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangingCallback()
 {
-  this->UpdateInfoLabelWithRange();
+  this->UpdateRangeLabelWithRange();
   this->RedrawCanvas();
 
   this->InvokeVisibleRangeChangingCommand();
@@ -1956,7 +2056,7 @@ void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangingCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangedCallback()
 {
-  this->UpdateInfoLabelWithRange();
+  this->UpdateRangeLabelWithRange();
   this->RedrawCanvas();
 
   this->InvokeVisibleRangeChangedCommand();
@@ -2037,11 +2137,6 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   this->GetFunctionPointCanvasCoordinates(this->SelectedPoint, c_x, c_y);
   this->LastSelectCanvasCoordinates[0] = c_x;
   this->LastSelectCanvasCoordinates[1] = c_y;
-
-  // Show the selected point description in the info label
-
-  this->InfoLabel->GetLabel()->SetImageDataName("");
-  this->UpdateInfoLabelWithFunctionPoint(this->SelectedPoint);
 }
 
 //----------------------------------------------------------------------------
@@ -2154,28 +2249,28 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 
   if (warn_delete)
     {
-    this->InfoLabel->GetLabel()->SetImageDataName(
+    this->PointLabel->GetLabel()->SetImageDataName(
       this->Icons[ICON_TRASHCAN]->GetImageDataName());
     }
   else
     {
     if (move_h_only && move_v_only)
       {
-      this->InfoLabel->GetLabel()->SetImageDataName("");
+      this->PointLabel->GetLabel()->SetImageDataName("");
       }
     else if (move_h_only)
       {
-      this->InfoLabel->GetLabel()->SetImageDataName(
+      this->PointLabel->GetLabel()->SetImageDataName(
         this->Icons[ICON_MOVE_H]->GetImageDataName());
       }
     else if (move_v_only)
       {
-      this->InfoLabel->GetLabel()->SetImageDataName(
+      this->PointLabel->GetLabel()->SetImageDataName(
         this->Icons[ICON_MOVE_V]->GetImageDataName());
       }
     else
       {
-      this->InfoLabel->GetLabel()->SetImageDataName(
+      this->PointLabel->GetLabel()->SetImageDataName(
         this->Icons[ICON_MOVE]->GetImageDataName());
       }
     }
@@ -2184,8 +2279,6 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 
   this->MoveFunctionPointToCanvasCoordinates(
     this->SelectedPoint, c_x, c_y);
-
-  this->UpdateInfoLabelWithFunctionPoint(this->SelectedPoint);
 
   // Invoke the commands/callbacks
 
@@ -2196,8 +2289,6 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 {
-  this->UpdateInfoLabelWithRange();
-
   if (!this->HasSelection())
     {
     return;
@@ -2226,6 +2317,10 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
     this->InvokePointMovedCommand(this->SelectedPoint);
     this->InvokeFunctionChangedCommand();
     }
+
+  // Remove any interaction icon
+
+  this->PointLabel->GetLabel()->SetImageDataName("");
 }
 
 //----------------------------------------------------------------------------
@@ -2250,7 +2345,8 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "ValueRange: "<< this->ValueRange << endl;
   os << indent << "TitleFrame: "<< this->TitleFrame << endl;
   os << indent << "InfoFrame: "<< this->InfoFrame << endl;
-  os << indent << "InfoLabel: "<< this->InfoLabel << endl;
+  os << indent << "RangeLabel: "<< this->RangeLabel << endl;
+  os << indent << "PointLabel: "<< this->PointLabel << endl;
   os << indent << "SelectedPoint: "<< this->SelectedPoint << endl;
   os << indent << "PointColor: ("
      << this->PointColor[0] << ", " 

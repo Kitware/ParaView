@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.10");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.11");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -299,6 +299,10 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   else
     {
     this->RedrawCanvasPoint(id);
+    if (new_id == this->SelectedPoint)
+      {
+      this->UpdatePointLabelWithFunctionPoint(new_id);
+      }
     }
 
   return 1;
@@ -355,6 +359,10 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToParameter(
   else
     {
     this->RedrawCanvasPoint(new_id);
+    if (new_id == this->SelectedPoint)
+      {
+      this->UpdatePointLabelWithFunctionPoint(new_id);
+      }
     }
 
   return 1;
@@ -391,11 +399,16 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
+void vtkKWColorTransferFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+  if (!this->IsCreated())
     {
+    return;
+    }
+  
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+    {
+    this->PointLabel->SetLabel2("");
     return;
     }
 
@@ -404,7 +417,7 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
   float *rgb = point + 1;
 
   char format[1024];
-  sprintf(format, "%%d: [%%.%df, (%%.2f, %%.2f, %%.2f)]",
+  sprintf(format, "%%d: (%%.%df; %%.2f, %%.2f, %%.2f)",
           this->ParameterRange->GetEntriesResolution());
   
   char range[1024];
@@ -418,7 +431,7 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
     {
     sprintf(range, format, id, parameter, rgb[0], rgb[1], rgb[2]);
     }
-  this->InfoLabel->SetLabel2(range);
+  this->PointLabel->SetLabel2(range);
 }
 
 //----------------------------------------------------------------------------
@@ -439,7 +452,7 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app,
 
   // Add the color space option menu
 
-  this->ColorSpaceOptionMenu->SetParent(this->InfoFrame);
+  this->ColorSpaceOptionMenu->SetParent(this->TitleFrame);
   this->ColorSpaceOptionMenu->Create(app, "-padx 1 -pady 1");
   this->ColorSpaceOptionMenu->IndicatorOff();
   this->ColorSpaceOptionMenu->SetBalloonHelpString(
@@ -479,7 +492,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
   if (this->ColorSpaceOptionMenu->IsCreated())
     {
     tk_cmd << "pack " << this->ColorSpaceOptionMenu->GetWidgetName() 
-           << " -side left -fill x" << endl;
+           << " -side left -fill x -padx 0" << endl;
     }
   
   tk_cmd << ends;
@@ -534,48 +547,31 @@ void vtkKWColorTransferFunctionEditor::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithRange()
+void vtkKWColorTransferFunctionEditor::UpdateRangeLabelWithRange()
 {
-  if (!this->IsCreated() || !this->InfoLabel || !this->InfoLabel->IsAlive())
+  if (!this->IsCreated() || !this->RangeLabel || !this->RangeLabel->IsAlive())
     {
     return;
     }
+
+  ostrstream ranges;
+  int nb_ranges = 0;
 
   float *param = GetVisibleParameterRange();
-  if (!param)
+  if (param && !this->HideParameterRange)
     {
-    return;
+    char format[1024], range[1024];
+    sprintf(format, "[%%.%df, %%.%df]",
+            this->ParameterRange->GetEntriesResolution(),
+            this->ParameterRange->GetEntriesResolution());
+    sprintf(range, format, param[0], param[1]);
+    ranges << range;
+    nb_ranges++;
     }
 
-  char format[1024];
-  sprintf(format, "[%%.%df, %%.%df] x",
-          this->ParameterRange->GetEntriesResolution(),
-          this->ParameterRange->GetEntriesResolution());
-
-  char range[1024];
-  if (this->ColorTransferFunction)
-    {
-    if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_RGB)
-      {
-      sprintf(range, format, param[0], param[1], "RGB");
-      }
-    else if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
-      {
-      sprintf(range, format, param[0], param[1], "HSV");
-      }
-    else
-      {
-      sprintf(range, format, param[0], param[1], "Unknown");
-      }
-    }
-  else
-    {
-    sprintf(range, format, param[0], param[1], "Unknown");
-    }
-
-  this->InfoLabel->SetLabel2(range);
-  this->InfoLabel->GetLabel()->SetImageDataName(
-    this->Icons[ICON_AXES]->GetImageDataName());
+  ranges << ends;
+  this->RangeLabel->SetLabel(ranges.str());
+  ranges.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

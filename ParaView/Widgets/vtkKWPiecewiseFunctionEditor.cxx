@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.10");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -311,6 +311,10 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   else
     {
     this->RedrawCanvasPoint(new_id);
+    if (new_id == this->SelectedPoint)
+      {
+      this->UpdatePointLabelWithFunctionPoint(new_id);
+      }
     }
 
   // In window-level mode, the first and second point are value-constrained
@@ -384,6 +388,10 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToParameter(
   else
     {
     this->RedrawCanvasPoint(new_id);
+    if (new_id == this->SelectedPoint)
+      {
+      this->UpdatePointLabelWithFunctionPoint(new_id);
+      }
     }
 
   // In window-level mode, the first and second point are value-constrained
@@ -440,24 +448,29 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
+void vtkKWPiecewiseFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+  if (!this->IsCreated())
     {
+    return;
+    }
+  
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+    {
+    this->PointLabel->SetLabel2("");
     return;
     }
 
   float *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
 
   char format[1024];
-  sprintf(format, "%%d: [%%.%df, %%.%df]",
+  sprintf(format, "%%d: (%%.%df; %%.%df)",
           this->ParameterRange->GetEntriesResolution(),
           this->ValueRange->GetEntriesResolution());
 
   char range[1024];
   sprintf(range, format, id, point[0], point[1]);
-  this->InfoLabel->SetLabel2(range);
+  this->PointLabel->SetLabel2(range);
 }
 
 //----------------------------------------------------------------------------
