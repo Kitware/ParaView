@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVPlaneWidget.h
+  Module:    vtkPVImplicitPlaneWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,17 +39,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVPlaneWidget - A widget to manipulate an implicit plane.
+// .NAME vtkPVImplicitPlaneWidget - A widget to manipulate an implicit plane.
 // .SECTION Description
 // This widget creates and manages its own vtkPlane on each process.
 // I could not descide whether to include the bounds display or not. 
 // (I did not.) 
 
 
-#ifndef __vtkPVPlaneWidget_h
-#define __vtkPVPlaneWidget_h
+#ifndef __vtkPVImplicitPlaneWidget_h
+#define __vtkPVImplicitPlaneWidget_h
 
-#include "vtkPVImplicitPlaneWidget.h"
+#include "vtkPV3DWidget.h"
 
 class vtkPVSource;
 class vtkKWEntry;
@@ -57,14 +57,25 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkPVPlaneWidget : public vtkPVImplicitPlaneWidget
+class VTK_EXPORT vtkPVImplicitPlaneWidget : public vtkPV3DWidget
 {
 public:
-  static vtkPVPlaneWidget* New();
-  vtkTypeMacro(vtkPVPlaneWidget, vtkPVImplicitPlaneWidget);
+  static vtkPVImplicitPlaneWidget* New();
+  vtkTypeMacro(vtkPVImplicitPlaneWidget, vtkPV3DWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
     
+  // Description:
+  // Callback that set the center to the middle of the bounds.
+  void CenterResetCallback();
+
+  // Descript:
+  // Callbacks to set the normal.
+  void NormalCameraCallback();
+  void NormalXCallback();
+  void NormalYCallback();
+  void NormalZCallback();
+
   // Description:
   // Called when the PVSources reset button is called.
   virtual void Reset();
@@ -80,7 +91,7 @@ public:
 
   // Description:
   // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
+  virtual void SaveInTclScript(ofstream *file);
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -92,16 +103,19 @@ public:
   // a new instance of the same type as the current object
   // using NewInstance() and then copy some necessary state 
   // parameters.
-  vtkPVPlaneWidget* ClonePrototype(vtkPVSource* pvSource,
-                                   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  vtkPVImplicitPlaneWidget* ClonePrototype(vtkPVSource* pvSource,
+                                           vtkArrayMap<vtkPVWidget*, 
+                                           vtkPVWidget*>* map);
 //ETX
 
-  void SetCenter(float,float,float);
-  void SetNormal(float,float,float);
+  void SetCenter();
+  virtual void SetCenter(float,float,float);
+  void SetNormal();
+  virtual void SetNormal(float,float,float);
 
 protected:
-  vtkPVPlaneWidget();
-  ~vtkPVPlaneWidget();
+  vtkPVImplicitPlaneWidget();
+  ~vtkPVImplicitPlaneWidget();
 
   // Description:
   // Call creation on the child.
@@ -111,12 +125,29 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
+  vtkKWEntry *CenterEntry[3];
+  vtkKWPushButton *CenterResetButton;
+
+  vtkKWEntry *NormalEntry[3];
+
+  vtkKWWidget *NormalButtonFrame;
+  vtkKWPushButton *NormalCameraButton;
+  vtkKWPushButton *NormalXButton;
+  vtkKWPushButton *NormalYButton;
+  vtkKWPushButton *NormalZButton;
+  vtkKWLabel* Labels[2];
+  vtkKWLabel* CoordinateLabel[3];
+
+  char *PlaneTclName;
+  vtkSetStringMacro(PlaneTclName);
+
+
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
 private:
-  vtkPVPlaneWidget(const vtkPVPlaneWidget&); // Not implemented
-  void operator=(const vtkPVPlaneWidget&); // Not implemented
+  vtkPVImplicitPlaneWidget(const vtkPVImplicitPlaneWidget&); // Not implemented
+  void operator=(const vtkPVImplicitPlaneWidget&); // Not implemented
 };
 
 #endif

@@ -36,6 +36,7 @@ vtkPVExtractGeometryByScalar.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGlyph3D.cxx 
+vtkPVImplicitPlaneWidget.cxx
 vtkPVInputMenu.cxx 
 vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
