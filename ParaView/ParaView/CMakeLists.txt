@@ -81,6 +81,7 @@ vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
 vtkPVThreshold.cxx 
 vtkPVTimerLogDisplay.cxx
+vtkPVTraceFileDialog.cxx
 vtkPVTrackballMoveActor.cxx
 vtkPVTrackballPan.cxx
 vtkPVTrackballRoll.cxx

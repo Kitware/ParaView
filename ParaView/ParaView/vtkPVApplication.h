@@ -258,6 +258,9 @@ public:
   vtkSetMacro(NumberOfPipes, int);
   vtkGetMacro(NumberOfPipes, int);
 
+  // Description:
+  // The name of the trace file.
+  vtkGetStringMacro(TraceFileName);
 
 protected:
   vtkPVApplication();
@@ -304,6 +307,11 @@ protected:
                               int& index);
   static int IsParaViewScriptFile(const char* arg);
   char* CreateHelpString();
+  int CheckForTraceFile(char* name, unsigned int len);
+  void SaveTraceFile(const char* fname);
+
+  vtkSetStringMacro(TraceFileName);
+  char* TraceFileName;
 
   //BTX
   enum

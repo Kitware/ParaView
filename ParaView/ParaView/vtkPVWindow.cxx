@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.5");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.6");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3224,7 +3224,8 @@ void vtkPVWindow::SaveTrace()
 //----------------------------------------------------------------------------
 int vtkPVWindow::SaveTrace(const char* filename)
 {
-  ofstream *trace = this->GetPVApplication()->GetTraceFile();
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  ofstream *trace = pvApp->GetTraceFile();
 
   if (vtkString::Length(filename) <= 0)
     {
@@ -3240,7 +3241,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
   char buffer[bufferSize];
 
   ofstream newTrace(filename);
-  ifstream oldTrace("ParaViewTrace.pvs");
+  ifstream oldTrace(pvApp->GetTraceFileName());
   
   while(oldTrace)
     {
@@ -3253,7 +3254,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
 
   if (trace)
     {
-    trace->open("ParaViewTrace.pvs", ios::in | ios::app );
+    trace->open(pvApp->GetTraceFileName(), ios::in | ios::app );
     }
   return 1;
 }
@@ -3771,7 +3772,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.6 $");
 }
 
 //----------------------------------------------------------------------------

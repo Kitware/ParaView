@@ -52,13 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
+#include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWMessageDialog.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkPVTraceFileDialog.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
@@ -99,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.6");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.7");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -290,6 +292,30 @@ vtkPVApplication::vtkPVApplication()
     {
     this->ShowSplashScreen = 1;
     }
+
+  this->TraceFileName = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication::~vtkPVApplication()
+{
+  if ( this->AboutDialog )
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = 0;
+    }
+  this->SetController(NULL);
+  if ( this->TraceFile )
+    {
+    delete this->TraceFile;
+    this->TraceFile = 0;
+    }
+  if (this->TraceFileName)
+    {
+    unlink(this->TraceFileName);
+    }
+  this->SetGroupFileName(0);
+  this->SetTraceFileName(0);
 }
 
 
@@ -323,24 +349,6 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   this->Controller = c;
 
   this->NumberOfPipes = 1;
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication::~vtkPVApplication()
-{
-  if ( this->AboutDialog )
-    {
-    this->AboutDialog->Delete();
-    this->AboutDialog = 0;
-    }
-  this->SetController(NULL);
-  if ( this->TraceFile )
-    {
-    delete this->TraceFile;
-    this->TraceFile = 0;
-    }
-  unlink("ParaViewTrace.pvs");
-  this->SetGroupFileName(0);
 }
 
 
@@ -573,6 +581,68 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 { 
   char* envstr = vtkString::Duplicate(str);
   putenv(envstr);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
+{
+  char buf[256];
+  if ( vtkDirectory::GetCurrentWorkingDirectory(buf, 256) )
+    {
+    vtkDirectory* dir = vtkDirectory::New();
+    if ( !dir->Open(buf) )
+      {
+      dir->Delete();
+      return 0;
+      }
+    int retVal = 0;
+    int numFiles = dir->GetNumberOfFiles();
+    int len = strlen("ParaViewTrace");
+    for(int i=0; i<numFiles; i++)
+      {
+      const char* fname = dir->GetFile(i);
+      if ( strncmp(fname, "ParaViewTrace", len) == 0 )
+        {
+        retVal = 1;
+        strncpy(name, fname, maxlen);
+        break;
+        }
+      }
+    dir->Delete();
+    return retVal;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SaveTraceFile(const char* fname)
+{
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->GetMainWindow()->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->Create(this, 0);
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save ParaView Trace");
+  exportDialog->SetDefaultExt(".pvs");
+  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0 )
+    {
+    if (rename(fname, exportDialog->GetFileName()) != 0)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        this->GetApplication(), this->GetMainWindow(),
+        "Error Saving", "Could not save trace file.",
+        vtkKWMessageDialog::ErrorIcon);
+      }
+    else
+      {
+      this->GetMainWindow()->SaveLastPath(exportDialog, "SaveTracePath");
+      }
+    }
+  exportDialog->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -873,49 +943,71 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
 
+  // Check if there is an existing ParaViewTrace file.
+  if (this->ShowSplashScreen)
+    {
+    this->SplashScreen->SetProgressMessage("Looking for old trace files...");
+    }
+  char traceName[128];
+  int foundTrace = this->CheckForTraceFile(traceName, 128);
+
   if (this->ShowSplashScreen)
     {
     this->SplashScreen->Hide();
     }
 
-  // Open the trace file.
-  struct stat fs;
-
-  if (stat("ParaViewTrace.pvs", &fs) == 0 && ! this->RunningParaViewScript) 
+  // If there is already an existing trace file, ask the
+  // user what she wants to do with it.
+  if (foundTrace && ! this->RunningParaViewScript) 
     {
-    vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
-    dlg2->SetStyleToOkCancel();
-    dlg2->SetOptions(
-      vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | 
-      vtkKWMessageDialog::YesDefault );
+    vtkPVTraceFileDialog *dlg2 = vtkPVTraceFileDialog::New();
     dlg2->SetMasterWindow(ui);
-    dlg2->SetOKButtonText("Save");
-    dlg2->SetCancelButtonText("Overwrite");
     dlg2->Create(this,"");
-    dlg2->SetText( 
-      "Are you sure you want to overwrite the tracefile?\n\n"
-      "A tracefile called ParaViewTrace.pvs was found in "
-      "the current directory. This might mean that ParaView crashed "
-      "previously and failed to delete it. This tracefile can be useful "
-      "in tracing the problem." );
-    dlg2->SetTitle("Overwrite");
+    ostrstream str;
+    str << "Do you want to save the existing tracefile?\n\n"
+        << "A tracefile called " << traceName << " was found in "
+        << "the current directory. This might mean that there is "
+        << "another instance of ParaView running or ParaView crashed "
+        << "previously and failed to delete it.\n"
+        << "If ParaView crashed previously, this tracefile can "
+        << "be useful in tracing the problem and you should consider "
+        << "saving it.\n"
+        << "If there is another instance of ParaView running, select "
+        << "\"Do Nothing\" to avoid potential problems."
+        << ends;
+    dlg2->SetText(str.str());
+    str.rdbuf()->freeze(0);
+    dlg2->SetTitle("Tracefile found");
     dlg2->SetIcon();
     int shouldSave = dlg2->Invoke();
     dlg2->Delete();
-    if (shouldSave)
+    if (shouldSave == 2)
       {
-      ui->SaveTrace();
+      this->SaveTraceFile(traceName);
+      }
+    else if (shouldSave == 1)
+      {
+      unlink(traceName);
       }
     }
 
-  if (this->TraceFile && this->TraceFile->fail())
+  // Open the trace file.
+  int count = 0;
+  struct stat fs;
+  while(1)
     {
-    delete this->TraceFile;
-    this->TraceFile = NULL;
+    ostrstream str;
+    str << "ParaViewTrace" << count++ << ".pvs" << ends;
+    if ( stat(str.str(), &fs) != 0 || count >= 10 )
+      {
+      this->SetTraceFileName(str.str());
+      str.rdbuf()->freeze(0);
+      break;
+      }
+    str.rdbuf()->freeze(0);
     }
 
-
-  this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
+  this->TraceFile = new ofstream(this->TraceFileName, ios::out);
     
   // Initialize a couple of variables in the trace file.
   this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
@@ -1163,6 +1255,7 @@ void vtkPVApplication::StartRecordingScript(char *filename)
   this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
                       this->GetMainWindow()->GetTclName());
   this->GetMainWindow()->SetTraceInitialized(1);
+  this->SetTraceFileName(filename);
 }
 
 //----------------------------------------------------------------------------
@@ -1628,8 +1721,12 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
-  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") << endl;
-  os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") << endl;
+  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") 
+     << endl;
+  os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
+     << endl;
+  os << indent << "TraceFileName: " 
+     << (this->TraceFileName ? this->TraceFileName : "(none)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

@@ -106,7 +106,7 @@ file delete -force out.txt
 #  if {[catch {set channel [open test.tmp w]}] == 0 } {
 #     close $channel
 #     file delete -force test.tmp
-#     source "ParaViewTrace.pvs"
+#     source "[$Application GetTraceFileName]"
 #  }
 
 $kw(vtkTemp44) SetCameraState -1.425 1.244 7.301  -0.500 0.000 0.000  0.018 0.986 -0.166
