@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.7");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.8");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -64,6 +64,7 @@ vtkXMLObjectReader::~vtkXMLObjectReader()
 //----------------------------------------------------------------------------
 void vtkXMLObjectReader::CreateXMLParser()
 {
+  this->DestroyXMLParser();
   if(!this->XMLParser)
     {
     this->XMLParser = vtkXMLDataParser::New();
