@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.9");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.10");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1712,7 +1712,7 @@ void vtkPVData::DrawPoints()
         { 
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
-          << part->GetPartDisplay()->GetPropertyID()
+          << part->GetGeometryID()
           << "SetUseOutline" << 0 << vtkClientServerStream::End;
         pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
@@ -1780,7 +1780,7 @@ void vtkPVData::DrawSurface()
         { 
         pm->GetStream() 
           << vtkClientServerStream::Invoke
-          << part->GetPartDisplay()->GetPropertyID()
+          << part->GetGeometryID()
           << "SetUseOutline" << 0 << vtkClientServerStream::End;
         pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
