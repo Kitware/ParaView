@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModule::vtkPVMultiDisplayRenderModule()
@@ -143,7 +143,10 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalMemory = 0;
   int localRender;
+
   vtkPVProcessModule* pm = this->ProcessModule;
+
+  //pm->SendPrepareProgress();
 
   // Find out whether we are going to render localy.
   this->Displays->InitTraversal();
@@ -174,19 +177,17 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
 
-  if (this->ProcessModule && this->CompositeID.ID != 0)
+  if (pm && this->CompositeID.ID)
     {
     pm->GetStream() 
       << vtkClientServerStream::Invoke 
-      << this->CompositeID
-      << "SetImageReductionFactor" << 1 
+      << this->CompositeID << "SetImageReductionFactor" << 1 
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
     }
 
   // Switch the compositer to local/composite mode.
   // This is cheap since we only change the client.
-  this->LocalRender = localRender;
   if (this->CompositeID.ID)
     {
     if (localRender)
@@ -205,21 +206,30 @@ void vtkPVMultiDisplayRenderModule::StillRender()
         << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT);
       }
+    // Save this so we know where to get the z buffer (for picking?).
+    this->LocalRender = localRender;
     }  
 
-  // Still Render can get called some funky ways.
+  // This was to fix a clipping range bug. Still Render can get called some 
+  // funky ways.  Some do not reset the clipping range.
   // Interactive renders get called through the PVInteractorStyles
-  // which cal ResetCameraClippingRange on the Renderer.
+  // which call ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
 
+  // This used to be the way LODs (geometry and pixel redection) we choosen.
+  // Geometry LODs are now choosen globally to simplify the process.
+  // The algorithm in the render window was too complex and often
+  // made bad choices.  Most composite ImageReduction values
+  // are constant (for interactive render)and just directly choosen by the user.
+  // We can make make the choice more sophisticated in the future.
   this->RenderWindow->SetDesiredUpdateRate(0.002);
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   this->ProcessModule->SetGlobalLODFlag(0);
 
   // This is the only thing I believe makes a difference
-  // for this sublcass !!!!!!
+  // for this subclass !!!!!!
   if ( ! localRender)
     {
     // A bit of a hack to have client use LOD 
@@ -237,6 +247,8 @@ void vtkPVMultiDisplayRenderModule::StillRender()
     {
     this->ProcessModule->SetGlobalLODFlagInternal(0);
     }
+
+  //pm->SendCleanupPendingProgress();
 }
 
 

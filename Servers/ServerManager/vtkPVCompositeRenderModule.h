@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVCompositeRenderModule - Uses composite manager and collection.
 // .SECTION Description
-// This render manager if for parallel execution using MPI.
+// This render manager is for parallel execution using MPI.
 // It creates a special vtkPVPartDisplay (todo) that collects small
 // geometry for local rendering.  It also manages reduction factor
 // which renders and composites a small window then magnifies for final

@@ -13,6 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVCompositeRenderModule.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
 #include "vtkPVTreeComposite.h"
@@ -27,12 +28,8 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.4");
 
-
-
-//***************************************************************************
-//===========================================================================
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
@@ -41,12 +38,12 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->CompositeThreshold = 20.0;
 
   this->Composite                = 0;
-  this->CompositeID.ID    = 0;
+  this->CompositeID.ID           = 0;
   this->InteractiveCompositeTime = 0;
   this->StillCompositeTime       = 0;
 
-  this->CollectionDecision = -1;
-  this->LODCollectionDecision = -1;
+  this->CollectionDecision      = -1;
+  this->LODCollectionDecision   = -1;
 
   this->ReductionFactor = 2;
   this->SquirtLevel = 0;
@@ -82,11 +79,9 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 {
-  vtkPVLODPartDisplay* pDisp;
-
-  pDisp = vtkPVCompositePartDisplay::New();
+  vtkPVLODPartDisplay* pDisp = vtkPVCompositePartDisplay::New();
   pDisp->SetProcessModule(this->ProcessModule);
-  pDisp->SetLODResolution(this->LODResolution);
+  pDisp->SetLODResolution(this->LODResolution); //this line differ from vtkPVMultiDisplayRenderModule
   return pDisp;
 }
 
@@ -163,6 +158,7 @@ void vtkPVCompositeRenderModule::StillRender()
     }
 
   // Switch the compositer to local/composite mode.
+  // This is cheap since we only change the client.
   if (this->CompositeID.ID)
     {
     if (localRender)
@@ -201,10 +197,11 @@ void vtkPVCompositeRenderModule::StillRender()
   this->RenderWindow->SetDesiredUpdateRate(0.002);
 
   this->ProcessModule->SetGlobalLODFlag(0);
-  vtkTimerLog::MarkStartEvent("Still Render");
 
+  vtkTimerLog::MarkStartEvent("Still Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Still Render");
+
   pm->SendCleanupPendingProgress();
 }
 
