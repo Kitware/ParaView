@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.57");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.58");
 
 
 //----------------------------------------------------------------------------
@@ -125,7 +125,10 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
 
   if (this->CurrentValue)
     {
-    this->Menu->SetValue(this->CurrentValue->GetName());
+    char* label = this->GetPVApplication()->GetTextRepresentation(
+      this->CurrentValue);
+    this->Menu->SetValue(label);
+    delete[] label;
     }
   else
     {
@@ -160,9 +163,10 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "MenuEntryCallback %s", pvs->GetTclName());
 
-  this->Menu->AddEntryWithCommand(pvs->GetName(), 
-                                  this, methodAndArgs);
-
+  char* label = this->GetPVApplication()->GetTextRepresentation(pvs);
+  this->Menu->AddEntryWithCommand(label, this, methodAndArgs);
+  delete[] label;
+  
   // If there is not an input yet, default to the first in the list.
   // Primarily for glyph source input default.
   if (this->CurrentValue == NULL)
