@@ -252,30 +252,24 @@ int vtkKWMessageDialog::Invoke()
   this->Script("update idletasks");
 
   int res = vtkKWDialog::Invoke();
-  cout << "Dialog: " << this->DialogName << " rem: " 
-       << this->GetRememberMessage() << " res: " << res << endl;
   if ( this->DialogName && this->GetRememberMessage() )
     {
     int ires = res;
     if ( this->Options & vtkKWMessageDialog::RememberYes )
       {
-      cout << "Remember yes" << endl;
       ires = 1;
       }
     else if ( this->Options & vtkKWMessageDialog::RememberNo )
       {
-      cout << "RememberNo" << endl;
       ires = -1;
       }
     else
       {
-      cout << "Remember both" << endl;
       if ( !ires )
 	{
 	ires = -1;
 	}
       }
-    //cout << "Ires: " << ires << endl;
     this->Application->SetMessageDialogResponse(this->DialogName, ires);
     }
   return res;
@@ -384,6 +378,5 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
 int vtkKWMessageDialog::GetRememberMessage()
 {
   int res = this->CheckButton->GetState();
-  cout << "Remember message: " << res << endl;
   return res;
 }
