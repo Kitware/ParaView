@@ -464,6 +464,15 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
     }
 }
 
+void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  pvApp->BroadcastScript("%s SetBackground %f %f %f",
+                         this->RendererTclName, r, g, b);
+  this->Render();
+}
+
 //----------------------------------------------------------------------------
 // a litle more complex than just "bind $widget <Expose> {%W Render}"
 // we have to handle all pending expose events otherwise they que up.

@@ -143,6 +143,10 @@ public:
   // Save the renderer and render window to a file.
   void Save(ofstream *file);
   void AddActorsToFile(ofstream *file);
+
+  // Description:
+  // Change the background color.
+  void SetBackgroundColor(float r, float g, float b);
   
 protected:
 
