@@ -119,13 +119,7 @@ IF (PARAVIEW_CAN_BUILD)
  SET (KWWIDGETS_BINARY_DIR ${PARAVIEW_BINARY_DIR}/Widgets)
  SUBDIRS(KWCommon Widgets Utilities ParaView Demos)
 
- # Provide option for building packages.
- OPTION(PARAVIEW_BUILD_PACKAGES
-        "Build provided ParaView packages. (EXPERIMENTAL)" OFF)
- MARK_AS_ADVANCED(PARAVIEW_BUILD_PACKAGES)
- IF(PARAVIEW_BUILD_PACKAGES)
-  SUBDIRS(Packages)
- ENDIF(PARAVIEW_BUILD_PACKAGES)
+ SUBDIRS(Packages)
 
  SUBDIR_DEPENDS(ParaView Widgets)
  SUBDIRS(Config)
