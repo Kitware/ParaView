@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.18");
+vtkCxxRevisionMacro(vtkKWRange, "1.19");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -549,6 +549,7 @@ void vtkKWRange::SetWholeRange(float r0, float r1)
   this->ConstraintRanges();
 
   this->RedrawCanvas();
+  this->UpdateEntriesValue();
 }
 
 //----------------------------------------------------------------------------
@@ -588,14 +589,7 @@ void vtkKWRange::SetRange(float r0, float r1)
       this->RedrawSlider(pos[1], vtkKWRange::SLIDER_INDEX_2);
       }
 
-    for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
-      {
-      if (this->Entries[i] && this->Entries[i]->IsCreated() &&
-          old_range[i] != this->Range[i])
-        {
-        this->Entries[i]->SetValue(this->Range[i], this->EntriesResolution);
-        }
-      }
+    this->UpdateEntriesValue();
     }
 
   // Invoke callback if needed
@@ -683,6 +677,18 @@ void vtkKWRange::ConstraintResolution()
 }
 
 // ---------------------------------------------------------------------------
+void vtkKWRange::UpdateEntriesValue()
+{
+  for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
+    {
+    if (this->Entries[i] && this->Entries[i]->IsCreated())
+      {
+      this->Entries[i]->SetValue(this->Range[i], this->EntriesResolution);
+      }
+    }
+}
+
+// ---------------------------------------------------------------------------
 void vtkKWRange::UpdateEntriesResolution()
 {
   if (fabs(this->Resolution) >= 1.0)
@@ -706,13 +712,7 @@ void vtkKWRange::UpdateEntriesResolution()
       }
     }
 
-  for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
-    {
-    if (this->Entries[i] && this->Entries[i]->IsCreated())
-      {
-      this->Entries[i]->SetValue(this->Range[i], this->EntriesResolution);
-      }
-    }
+  this->UpdateEntriesValue();
 }
 
 //----------------------------------------------------------------------------

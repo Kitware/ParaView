@@ -315,6 +315,7 @@ protected:
 
   virtual void CreateEntries();
   virtual void CreateZoomButtons();
+  virtual void UpdateEntriesValue();
   virtual void UpdateEntriesResolution();
   virtual void ConstraintResolution();
 
