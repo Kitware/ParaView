@@ -160,6 +160,11 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // An interface for saving a widget into a script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+
 };
 
 #endif

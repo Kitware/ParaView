@@ -591,6 +591,8 @@ protected:
 
   int LODResolution;
 
+  int UpdateSourceInBatch;
+
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
   void operator=(const vtkPVSource&); // Not implemented

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -568,12 +568,13 @@ void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* source
     *file << this->Script("concat $%s_files", sourceTclName);
     *file << "}" << endl;
 
-    *file << "\t" << sourceTclName << " SetFileName [ lindex $" 
-          << sourceTclName << "_files " << this->TimeStep << "]\n";
+    *file << "\t" << sourceTclName << " Set" << this->VariableName 
+          << " [ lindex $" << sourceTclName << "_files " << this->TimeStep 
+          << "]\n";
     }
   else
     {
-    *file << "\t" << sourceTclName << " SetFileName {" 
+    *file << "\t" << sourceTclName << " Set" << this->VariableName << " {" 
           << this->Entry->GetValue() << "}\n";
     }
 }

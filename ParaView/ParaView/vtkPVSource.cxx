@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.295");
+vtkCxxRevisionMacro(vtkPVSource, "1.296");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -174,6 +174,8 @@ vtkPVSource::vtkPVSource()
   this->Prototype = 0;
 
   this->LODResolution = 50;
+
+  this->UpdateSourceInBatch = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1820,6 +1822,17 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
       }
     }
 
+  // Sub-classes which need to update the source before
+  // connecting it to other objects should set UpdateSourceInBatch
+  // to 1 (for example, vtkPVEnSightReaderModule)
+  if (this->UpdateSourceInBatch)
+    {
+    for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+      {
+      *file << this->GetVTKSourceTclName(sourceIdx) << " Update\n";
+      }
+    }
+
   // Add the mapper, actor, scalar bar actor ...
   this->GetPVOutput()->SaveInBatchScript(file);
 }
@@ -2631,7 +2644,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.295 $");
+  this->ExtractRevision(os,"$Revision: 1.296 $");
 }
 
 //----------------------------------------------------------------------------
