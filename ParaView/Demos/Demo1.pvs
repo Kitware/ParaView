@@ -863,16 +863,17 @@ proc extract_run {} {
     $extract(vtkTemp24) SetCameraState -20.670 -21.233 30.605  24.238 11.733 29.298  -0.048 0.105 0.993
     $extract(vtkTemp1) ShowAnimationProperties
     set extract(vtkTemp106) [$extract(vtkTemp1) GetAnimationInterface]
-    $extract(vtkTemp106) SetPVSource $extract(vtkTemp478) 0 
+    set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
+    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp478) 
     $Application BroadcastSimpleScript "set extract_tcl_name [$extract(vtkTemp478) GetVTKSourceTclName]"
-    $extract(vtkTemp106) SetLabelAndScript {X Axis} {$extract_tcl_name SetVOI [expr int($pvTime)] [expr int($pvTime)] 0 32 0 24; after 100}
+    $extract(vtkTemp1032) SetLabelAndScript {X Axis} {$extract_tcl_name SetVOI [expr int($pvTime)] [expr int($pvTime)] 0 32 0 24; after 100}
     $extract(vtkTemp106) SetCurrentTime 0
-    $extract(vtkTemp106) SetTimeEnd {56.000000}
+    $extract(vtkTemp1032) SetTimeEnd {56.000000}
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp478)
     $extract(vtkTemp1) ShowAnimationProperties
-    $extract(vtkTemp106) SetTimeSpan 56
-    $extract(vtkTemp106) SetTimeStart 0 0.0
-    $extract(vtkTemp106) SetTimeEnd 0 56.0
+    $extract(vtkTemp106) SetNumberOfFrames 56
+    $extract(vtkTemp1032) SetTimeStart 0.0
+    $extract(vtkTemp1032) SetTimeEnd 56.0
 
     $extract(vtkTemp106) SetCurrentTime 1
     $extract(vtkTemp106) SetCurrentTime 2
@@ -940,11 +941,11 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 54
     $extract(vtkTemp106) SetCurrentTime 55
     $extract(vtkTemp106) SetCurrentTime 56
-    $extract(vtkTemp106) SetLabelAndScript {Y Axis} {$extract_tcl_name SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
+    $extract(vtkTemp1032) SetLabelAndScript {Y Axis} {$extract_tcl_name SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
     $extract(vtkTemp106) SetCurrentTime 0
-    $extract(vtkTemp106) SetTimeSpan 32
-    $extract(vtkTemp106) SetTimeStart 0 0.0
-    $extract(vtkTemp106) SetTimeEnd 0 32.0
+    $extract(vtkTemp106) SetNumberOfFrames 32
+    $extract(vtkTemp1032) SetTimeStart 0.0
+    $extract(vtkTemp1032) SetTimeEnd 32.0
     $extract(vtkTemp106) SetCurrentTime 1
     $extract(vtkTemp106) SetCurrentTime 2
     $extract(vtkTemp106) SetCurrentTime 3
@@ -977,15 +978,15 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 30
     $extract(vtkTemp106) SetCurrentTime 31
     $extract(vtkTemp106) SetCurrentTime 32
-    $extract(vtkTemp106) SetLabelAndScript {Z Axis} {$extract_tcl_name SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
+    $extract(vtkTemp1032) SetLabelAndScript {Z Axis} {$extract_tcl_name SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
 
     if $pvDemoShouldStop {
         return
     }
 
-    $extract(vtkTemp106) SetTimeSpan 24
-    $extract(vtkTemp106) SetTimeStart 0 0.0
-    $extract(vtkTemp106) SetTimeEnd 0 24.0
+    $extract(vtkTemp106) SetNumberOfFrames 24
+    $extract(vtkTemp1032) SetTimeStart 0.0
+    $extract(vtkTemp1032) SetTimeEnd 24.0
     $extract(vtkTemp106) SetCurrentTime 0
     $extract(vtkTemp106) SetCurrentTime 1
     $extract(vtkTemp106) SetCurrentTime 2
@@ -1018,12 +1019,13 @@ proc extract_run {} {
 
     $extract(vtkTemp615) SetVisibility 0
     $extract(vtkTemp598) SetVisibility 1
-    $extract(vtkTemp106) SetTimeSpan 7
-    $extract(vtkTemp106) SetTimeStart 0 0.0
-    $extract(vtkTemp106) SetTimeEnd 0 7.0
-    $extract(vtkTemp106) SetPVSource $extract(vtkTemp598) 0
+    $extract(vtkTemp106) SetNumberOfFrames 7
+    $extract(vtkTemp1032) SetTimeStart 0.0
+    $extract(vtkTemp1032) SetTimeEnd 7.0
+    set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
+    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp598)
     $Application BroadcastSimpleScript "set cut_tcl_name [$extract(vtkTemp598) GetVTKSourceTclName]"
-    $extract(vtkTemp106) SetLabelAndScript {Cut Values} {$cut_tcl_name SetValue 0 $pvTime}
+    $extract(vtkTemp1032) SetLabelAndScript {Cut Values} {$cut_tcl_name SetValue 0 $pvTime}
     $extract(vtkTemp106) SetCurrentTime 0
     update
     $extract(vtkTemp106) SetCurrentTime 1
@@ -1191,14 +1193,15 @@ proc iso_run {} {
     }
     #$iso(vtkTemp1) ShowAnimationProperties
     set iso(vtkTemp106) [$iso(vtkTemp1) GetAnimationInterface]
-    $iso(vtkTemp106) SetPVSource $iso(vtkTemp449) 0
-    $iso(vtkTemp106) SetTimeSpan 100
-    $iso(vtkTemp106) SetTimeStart 0 0.0
-    $iso(vtkTemp106) SetTimeEnd 0 100.0
+    set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
+    $iso(vtkTemp1032) SetPVSource $iso(vtkTemp449)
+    $iso(vtkTemp106) SetNumberOfFrames 100
+    $iso(vtkTemp1032) SetTimeStart 0.0
+    $iso(vtkTemp1032) SetTimeEnd 100.0
 
-    $iso(vtkTemp106) SetTimeEnd {0.600000}
+    $iso(vtkTemp1032) SetTimeEnd 0.600000
     $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp449) GetVTKSourceTclName]"
-    $iso(vtkTemp106) SetLabelAndScript {Contour Values} {$iso_tcl_name SetValue 0 $pvTime}
+    $iso(vtkTemp1032) SetLabelAndScript {Contour Values} {$iso_tcl_name SetValue 0 $pvTime}
 
     if $pvDemoShouldStop {
         return
@@ -1330,14 +1333,15 @@ proc iso_run {} {
     }
 
 
-    $iso(vtkTemp106) SetPVSource $iso(vtkTemp739) 0
-    $iso(vtkTemp106) SetTimeSpan 29
-    $iso(vtkTemp106) SetTimeStart 0 0.0
-    $iso(vtkTemp106) SetTimeEnd 0 29.0
+    set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
+    $iso(vtkTemp1032) SetPVSource $iso(vtkTemp739)
+    $iso(vtkTemp106) SetNumberOfFrames 29
+    $iso(vtkTemp1032) SetTimeStart 0.0
+    $iso(vtkTemp1032) SetTimeEnd 29.0
     $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp739) GetVTKSourceTclName]"
-    $iso(vtkTemp106) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
+    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
     $iso(vtkTemp106) SetCurrentTime 0
-    $iso(vtkTemp106) SetTimeEnd {29.000000}
+    $iso(vtkTemp1032) SetTimeEnd 29.000000
     $iso(vtkTemp106) SetCurrentTime 1; after 100
     $iso(vtkTemp106) SetCurrentTime 2; after 100
     $iso(vtkTemp106) SetCurrentTime 3; after 100

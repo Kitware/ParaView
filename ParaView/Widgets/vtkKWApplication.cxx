@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.128");
+vtkCxxRevisionMacro(vtkKWApplication, "1.129");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -362,7 +362,6 @@ const char* vtkKWApplication::ScriptInternal(const char* format,
                   << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n"  
                   << Tcl_GetStringResult(this->MainInterp) << endl);
-    abort();
     }
   
   // Free the buffer from the heap if we allocated it.
