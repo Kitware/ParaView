@@ -1,5 +1,4 @@
 SOURCE_FILES( ParaView_SRCS
-vtkAVIWriter
 vtkCameraInteractor 
 vtkInteractor 
 vtkKWBoundsDisplay
