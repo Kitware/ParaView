@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.7");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -242,6 +242,7 @@ const char* vtkSMPropertyAdaptor::GetRangeMinimum(unsigned int idx)
       sprintf(this->Minimum, "%g", min);
       return this->Minimum;
       }
+    return 0;
     }
 
   if (this->IntRangeDomain)
@@ -253,29 +254,9 @@ const char* vtkSMPropertyAdaptor::GetRangeMinimum(unsigned int idx)
       sprintf(this->Minimum, "%d", min);
       return this->Minimum;
       }
+    return 0;
     }
 
-/*
-  if (this->StringListRangeDomain)
-    {
-    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
-    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
-      {
-      sprintf(this->Minimum, "%d", 0);
-      return this->Minimum;
-      }
-    else
-      {
-      int exists;
-      int min = this->StringListRangeDomain->GetMinimum(idx, exists);
-      if (exists)
-        {
-        sprintf(this->Minimum, "%d", min);
-        return this->Minimum;
-        }
-      }
-    }
-*/
   return 0;
 }
 
@@ -291,6 +272,7 @@ const char* vtkSMPropertyAdaptor::GetRangeMaximum(unsigned int idx)
       sprintf(this->Maximum, "%g", max);
       return this->Maximum;
       }
+    return 0;
     }
 
   if (this->IntRangeDomain)
@@ -302,29 +284,8 @@ const char* vtkSMPropertyAdaptor::GetRangeMaximum(unsigned int idx)
       sprintf(this->Maximum, "%d", max);
       return this->Maximum;
       }
+    return 0;
     }
-
-/*
-  if (this->StringListRangeDomain)
-    {
-    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
-    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
-      {
-      sprintf(this->Maximum, "%d", 0);
-      return this->Maximum;
-      }
-    else
-      {
-      int exists;
-      int max = this->StringListRangeDomain->GetMaximum(idx, exists);
-      if (exists)
-        {
-        sprintf(this->Maximum, "%d", max);
-        return this->Maximum;
-        }
-      }
-    }
-*/
 
   return 0;
 }
@@ -626,7 +587,7 @@ int vtkSMPropertyAdaptor::SetSelectionValue(unsigned int idx, const char* value)
         {
         if (strcmp(this->StringVectorProperty->GetElement(i), name)==0)
           {
-          this->StringVectorProperty->SetElement(i+1, value);
+          return this->StringVectorProperty->SetElement(i+1, value);
           }
         }
       }
