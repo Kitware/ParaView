@@ -1456,7 +1456,9 @@
      <IntVectorProperty 
         name="TimeStepRangeInfo"
         command="GetTimeStepRange"
-        information_only="1"/>
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStep"
