@@ -129,10 +129,10 @@ private:
   void SetPlaneEquations();
   void ComputeRegionVertices();
 
-  const void planesMatrix(int p1, int p2, int p3, double M[3][3]);
-  const int duplicate(double testv[3]);
-  const void planesRHS(int p1, int p2, int p3, double r[3]);
-  const int outsideRegion(double v[3]);
+  void planesMatrix(int p1, int p2, int p3, double M[3][3]) const;
+  int duplicate(double testv[3]) const;
+  void planesRHS(int p1, int p2, int p3, double r[3]) const;
+  int outsideRegion(double v[3]);
 
   static double EvaluatePlaneEquation(double *x, double *p);
   static void PlaneEquation(double *n, double *x, double *p);
