@@ -57,21 +57,6 @@ public:
   const char* GetLabel();
 
   // Description:
-  // This is one value that lets this widget interact with its associated 
-  // object.  This specifies the name of the input (i.e Input, Source ...).
-  // Most of the time this value should be set to "Input".
-  // It defaults to NULL.
-  vtkSetStringMacro(InputName);
-  vtkGetStringMacro(InputName);
-  
-  // Description:
-  // This is one value that lets this widget interact with its associated 
-  // object.  This specifies the type of the attribute (i.e Scalars, Vectors ...).
-  // It defaults to NULL.
-  vtkSetMacro(AttributeType, int);
-  vtkGetMacro(AttributeType, int);
-
-  // Description:
   // This input menu supplies the data set.
   virtual void SetInputMenu(vtkPVInputMenu*);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
@@ -149,10 +134,6 @@ protected:
   // This is where we get the data object arrays to populate our menu.
   vtkPVInputMenu *InputMenu;
   vtkPVFieldMenu *FieldMenu;
-
-  // These are options that allow the widget to interact with its associated object.
-  char*       InputName;
-  int         AttributeType;
 
   // Subwidgets.
   vtkKWLabel *Label;

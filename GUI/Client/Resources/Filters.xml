@@ -625,8 +625,8 @@ This filter operates on polygonal data and produces polygonal output.
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputScalars"
-               attribute_type="Scalars" label="Scalars"
+    <ArrayMenu property="SelectInputScalars"
+               label="Scalars"
                trace_name="ArrayMenu"
                input_menu="im"
                help="Select the input scalars to process."/>
@@ -657,8 +657,8 @@ The Gradient filter computes the gradient vector at each point in an image or vo
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputScalars"
-               attribute_type="Scalars" label="Scalars"
+    <ArrayMenu property="SelectInputScalars"
+               label="Scalars"
                trace_name="ArrayMenu"
                input_menu="im"
                help="Select the input scalars to process."/>
@@ -810,8 +810,7 @@ The Input menu allows the user to select the data set to which this filter will 
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputScalars"
-               attribute_type="Scalars"
+    <ArrayMenu property="SelectInputScalars"
                label="Scalars"
                trace_name="Scalars"
                input_menu="im"
@@ -1158,15 +1157,13 @@ The Reflection filter reflects the input data set across the specified plane. If
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputVectors"
+    <ArrayMenu property="SelectInputVectors"
                trace_name="Vectors"
-               attribute_type="Vectors"
                label="Vectors"
                input_menu="im"
                help="Select the input normals to process."/>
-    <ArrayMenu input_name="Input" property="SelectInputScalars"
+    <ArrayMenu property="SelectInputScalars"
                trace_name="Scalars"
-               attribute_type="Scalars"
                label="Scalars"
                input_menu="im"
                help="Select the input scalars to process."/>
@@ -1552,8 +1549,7 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputScalars"
-               attribute_type="Scalars"
+    <ArrayMenu property="SelectInputScalars"
                trace_name="Scalars"
                label="Scalars"
                input_menu="im"
@@ -1604,8 +1600,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputVectors"
-               attribute_type="Vectors"
+    <ArrayMenu property="SelectInputVectors"
                trace_name="Vectors"
                label="Vectors"
                input_menu="im"
@@ -1732,8 +1727,6 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           </Item>
           <Item id="it3">
           <ArrayMenu id="am1" property="SelectInputScalars"
-                     input_name="Input"
-                     attribute_type="Scalars"
                      trace_name="Scalars"
                      label="Scalars"
                      help="Choose the clipping scalar array."
@@ -1784,8 +1777,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
                property="AttributeMode"
                help="Choose cell or point field to threshold." />
     <ArrayMenu id="am" property="SelectInputScalars"
-               input_name="Input"
-               attribute_type="Scalars"
                trace_name="Scalars"
                label="Scalars"
                field_menu="fm"
@@ -1837,8 +1828,6 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                help="Set the input to this filter." />
     // Do not change the tracename of the array menu, it is used by vtkPVContour
     <ArrayMenu id="am" property="SelectInputScalars"
-               input_name="Input"
-               attribute_type="Scalars"
                label="Scalars"
                trace_name="Scalars"
                input_menu="im"
@@ -2013,8 +2002,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input" property="SelectInputVectors"
-               attribute_type="Vectors"
+    <ArrayMenu property="SelectInputVectors"
                trace_name="Vectors"
                label="Vectors"
                input_menu="im"

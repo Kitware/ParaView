@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.61");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -46,9 +46,6 @@ vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
 vtkPVArrayMenu::vtkPVArrayMenu()
 {
   this->ArrayName = NULL;
-
-  this->InputName = NULL;
-  this->AttributeType = 0;
 
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = vtkKWOptionMenu::New();
@@ -61,8 +58,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 vtkPVArrayMenu::~vtkPVArrayMenu()
 {
   this->SetArrayName(NULL);
-
-  this->SetInputName(NULL);
 
   this->Label->Delete();
   this->Label = NULL;
@@ -238,12 +233,7 @@ void vtkPVArrayMenu::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
 {
-  const char* attributeName;
-
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-
-  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
-    this->AttributeType);
 
   if (sourceID.ID == 0)
     {
@@ -254,8 +244,7 @@ void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
 
   ostrstream cmd_with_warning_C4701;
   cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                         << "Select" << this->InputName << attributeName
-                         << "] SetElement 0 " ;
+                         << this->SMPropertyName << "] SetElement 0 " ;
   if (this->ArrayName)
     {
     cmd_with_warning_C4701 << "{" << this->ArrayName << "}" << endl;
@@ -458,8 +447,6 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVArrayMenu* pvam = vtkPVArrayMenu::SafeDownCast(clone);
   if (pvam)
     {
-    pvam->SetInputName(this->InputName);
-    pvam->SetAttributeType(this->AttributeType);
     pvam->SetLabel(this->Label->GetLabel());
     if (this->InputMenu)
       {
@@ -540,37 +527,6 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     imw->Delete();
     }
   
-  // Setup the InputName.
-  const char* input_name = element->GetAttribute("input_name");
-  if(input_name)
-    {
-    this->SetInputName(input_name);
-    }
-  else
-    {
-    this->SetInputName("Input");
-    }
-  
-  // Search for attribute type with matching name.
-  const char* attribute_type = element->GetAttribute("attribute_type");
-  unsigned int i = vtkDataSetAttributes::NUM_ATTRIBUTES;
-  if(attribute_type)
-    {
-    for(i=0;i < vtkDataSetAttributes::NUM_ATTRIBUTES;++i)
-      {
-      if(strcmp(vtkDataSetAttributes::GetAttributeTypeAsString(i),
-                attribute_type) == 0)
-        {
-        this->SetAttributeType(i);
-        break;
-        }
-      }
-    }
-  if(i == vtkDataSetAttributes::NUM_ATTRIBUTES)
-    {
-    this->SetAttributeType(vtkDataSetAttributes::SCALARS);
-    }
-  
   return 1;
 }
 
@@ -595,9 +551,6 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ArrayName: " << (this->ArrayName?this->ArrayName:"none") 
-     << endl;
-  os << indent << "AttributeType: " << this->GetAttributeType() << endl;
-  os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
      << endl;
   if (this->InputMenu)
     {
