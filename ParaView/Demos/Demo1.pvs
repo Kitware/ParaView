@@ -91,6 +91,8 @@ proc clip_run {} {
         return
     }
 
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale }}
+
     ChangeDemoText "Running Clip Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only) "
 
     $clip(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -849,6 +851,8 @@ proc extract_run {} {
         return
     }
 
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 0.8}}
+
     ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $extract(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -1197,6 +1201,8 @@ proc iso_run {} {
         return
     }
 
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 0.8}}
+
     ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
 
     $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -1521,6 +1527,8 @@ proc stream_run { } {
     if $pvDemoShouldStop {
         return
     }
+
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
 
     ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators (currently, streamlines are not available in parallel, this feature is under development). The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
 
@@ -3351,6 +3359,8 @@ proc threshold_run {} {
         return
     }
 
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
+
     ChangeDemoText "Running Threshold Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $threshold(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -3412,6 +3422,8 @@ proc warp_run {} {
     if $pvDemoShouldStop {
         return
     }
+
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.1}}
 
     ChangeDemoText "Running Warp Demo :\n The points in a dataset can be warped (displaced) with scalars (given a user defined displacement vector) or with vectors (unavailable for rectilinear grids)."
 
