@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.13");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -128,7 +128,7 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   while(!this->Iterator->IsDoneWithTraversal())
     {
     this->Iterator->GetData(val);
-    if (strcmp(ext, val) == 0)
+    if (ext && strcmp(ext, val) == 0)
       {
 //        // The extension matches, see if the reader can read the file.
 //        this->Script("%s vtkPVReaderModuleCanReadFileTemp",
@@ -174,7 +174,10 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
                clone->FileEntry->GetVariableName(), fname);
 
   const char* ext = this->ExtractExtension(fname);
-  clone->FileEntry->SetExtension(ext+1);
+  if (ext)
+    {
+    clone->FileEntry->SetExtension(ext+1);
+    }
   clone->UpdateParameterWidgets();
 
   if (clone)

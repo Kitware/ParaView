@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.156");
+vtkCxxRevisionMacro(vtkPVData, "1.157");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -196,7 +196,6 @@ vtkPVData::vtkPVData()
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
 
-  this->RenderOnlyLocally = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -826,39 +825,36 @@ void vtkPVData::GetBounds(float bounds[6])
 
   this->VTKData->GetBounds(bounds);
 
-  if (!this->RenderOnlyLocally)
+  pvApp->BroadcastScript("$Application SendDataBounds %s", 
+                         this->VTKDataTclName);
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
     {
-    pvApp->BroadcastScript("$Application SendDataBounds %s", 
-                           this->VTKDataTclName);
-    
-    num = controller->GetNumberOfProcesses();
-    for (id = 1; id < num; ++id)
+    controller->Receive(tmp, 6, id, 1967);
+    if (tmp[0] < bounds[0])
       {
-      controller->Receive(tmp, 6, id, 1967);
-      if (tmp[0] < bounds[0])
-        {
-        bounds[0] = tmp[0];
-        }
-      if (tmp[1] > bounds[1])
-        {
-        bounds[1] = tmp[1];
-        }
-      if (tmp[2] < bounds[2])
-        {
-        bounds[2] = tmp[2];
-        }
-      if (tmp[3] > bounds[3])
-        {
-        bounds[3] = tmp[3];
-        }
-      if (tmp[4] < bounds[4])
-        {
-        bounds[4] = tmp[4];
-        }
-      if (tmp[5] > bounds[5])
-        {
-        bounds[5] = tmp[5];
-        }
+      bounds[0] = tmp[0];
+      }
+    if (tmp[1] > bounds[1])
+      {
+      bounds[1] = tmp[1];
+      }
+    if (tmp[2] < bounds[2])
+      {
+      bounds[2] = tmp[2];
+      }
+    if (tmp[3] > bounds[3])
+      {
+      bounds[3] = tmp[3];
+      }
+    if (tmp[4] < bounds[4])
+      {
+      bounds[4] = tmp[4];
+      }
+    if (tmp[5] > bounds[5])
+      {
+      bounds[5] = tmp[5];
       }
     }
 }
@@ -879,17 +875,14 @@ int vtkPVData::GetNumberOfCells()
 
   numCells = this->VTKData->GetNumberOfCells();
 
-  if (!this->RenderOnlyLocally)
+  pvApp->BroadcastScript("$Application SendDataNumberOfCells %s", 
+                         this->VTKDataTclName);
+  
+  numProcs = controller->GetNumberOfProcesses();
+  for (id = 1; id < numProcs; ++id)
     {
-    pvApp->BroadcastScript("$Application SendDataNumberOfCells %s", 
-                           this->VTKDataTclName);
-    
-    numProcs = controller->GetNumberOfProcesses();
-    for (id = 1; id < numProcs; ++id)
-      {
-      controller->Receive(&tmp, 1, id, 1968);
-      numCells += tmp;
-      }
+    controller->Receive(&tmp, 1, id, 1968);
+    numCells += tmp;
     }
   return numCells;
 }
@@ -910,17 +903,14 @@ int vtkPVData::GetNumberOfPoints()
 
   numPoints = this->VTKData->GetNumberOfPoints();
   
-  if (!this->RenderOnlyLocally)
+  pvApp->BroadcastScript("$Application SendDataNumberOfPoints %s", 
+                         this->VTKDataTclName);
+  
+  numProcs = controller->GetNumberOfProcesses();
+  for (id = 1; id < numProcs; ++id)
     {
-    pvApp->BroadcastScript("$Application SendDataNumberOfPoints %s", 
-                           this->VTKDataTclName);
-    
-    numProcs = controller->GetNumberOfProcesses();
-    for (id = 1; id < numProcs; ++id)
-      {
-      controller->Receive(&tmp, 1, id, 1969);
-      numPoints += tmp;
-      }
+    controller->Receive(&tmp, 1, id, 1969);
+    numPoints += tmp;
     }
   return numPoints;
 }
@@ -1387,16 +1377,13 @@ void vtkPVData::UpdateProperties()
   // the data, not the rendered geometry.
   // It the solution communication in the PVLodActor?
   int numberOfPoints = this->GetNumberOfPoints();
-  if ( ! this->RenderOnlyLocally )
+  if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
     {
-    if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
-      {
-      pvApp->BroadcastScript("%s EnableLODOn", this->PropTclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s EnableLODOff", this->PropTclName);
-      }
+    pvApp->BroadcastScript("%s EnableLODOn", this->PropTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s EnableLODOff", this->PropTclName);
     }
 
   if (this->PVColorMap)
@@ -2589,7 +2576,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "PVColorMap: NULL\n";
     }
-  os << indent << "RenderOnlyLocally: " << (this->RenderOnlyLocally?"on":"off") << endl;
   os << indent << "VTKData: " << this->GetVTKData() << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "PVRenderView: " << this->PVRenderView << endl;
@@ -2755,7 +2741,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.156 $");
+  this->ExtractRevision(os,"$Revision: 1.157 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2902,8 +2888,6 @@ void vtkPVData::SerializeToken(istream& is, const char token[1024])
     }
   else
     {
-    //cout << "Unknown Token for " << this->GetClassName() << ": " 
-    //     << token << endl;
     this->Superclass::SerializeToken(is,token);  
     }
 }
@@ -2937,32 +2921,29 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
 
   array->GetRange(range, 0);  
 
-  if (!this->RenderOnlyLocally)
+  pvApp->BroadcastScript("$Application SendDataArrayRange %s %d {%s} %d",
+                         this->GetVTKDataTclName(),
+                         pointDataFlag, array->GetName(), component);
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; id++)
     {
-    pvApp->BroadcastScript("$Application SendDataArrayRange %s %d {%s} %d",
-                           this->GetVTKDataTclName(),
-                           pointDataFlag, array->GetName(), component);
-    
-    num = controller->GetNumberOfProcesses();
-    for (id = 1; id < num; id++)
+    controller->Receive(temp, 2, id, 1976);
+    // try to protect against invalid ranges.
+    if (range[0] > range[1])
       {
-      controller->Receive(temp, 2, id, 1976);
-      // try to protect against invalid ranges.
-      if (range[0] > range[1])
+      range[0] = temp[0];
+      range[1] = temp[1];
+      }
+    else if (temp[0] <= temp[1])
+      {
+      if (temp[0] < range[0])
         {
         range[0] = temp[0];
-        range[1] = temp[1];
         }
-      else if (temp[0] <= temp[1])
+      if (temp[1] > range[1])
         {
-        if (temp[0] < range[0])
-          {
-          range[0] = temp[0];
-          }
-        if (temp[1] > range[1])
-          {
-          range[1] = temp[1];
-          }
+        range[1] = temp[1];
         }
       }
     }

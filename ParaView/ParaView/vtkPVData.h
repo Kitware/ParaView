@@ -342,12 +342,6 @@ public:
   void ForceUpdate(vtkPVApplication* pvApp);
 
   // Description:
-  // Tells PVData to only use the data in the first
-  // process to render and to compute array ranges etc.
-  vtkGetMacro(RenderOnlyLocally, int);
-  vtkSetMacro(RenderOnlyLocally, int);
-  
-  // Description:
   // Called by vtkPVSource::DeleteCallback().
   void DeleteCallback();
   
@@ -503,10 +497,6 @@ protected:
   float PreviousDiffuse;
   float PreviousSpecular;
   int PreviousWasSolid;
-
-  // Tells PVData to only use the data in the first
-  // process to render and to compute array ranges etc.
-  int RenderOnlyLocally;
 
   vtkPolyDataMapper *Mapper;
 
