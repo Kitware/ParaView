@@ -64,10 +64,10 @@
 #include "vtkPVConfig.h"
 
 #ifdef PARAVIEW_PLUS_BUILD
+# include "vtkMPEG2Writer.h"
 # ifdef _WIN32
 #  include "vtkAVIWriter.h"
 # else
-//#  include "vtkMPEG2Writer.h"
 #  include "vtkMovieWriter.h"
 # endif
 #endif
@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.162");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.163");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1224,9 +1224,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 #ifdef PARAVIEW_PLUS_BUILD
 # ifdef _WIN32
   ostr << " {{AVI movie file} {.avi}}";
-# else
-  ostr << " {{MPEG movie file} {.mpg}}";
 # endif
+  ostr << " {{MPEG movie file} {.mpg}}";
 #endif
   ostr << ends;
 
@@ -1413,7 +1412,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext,
-                                         int width, int height, int vtkNotUsed(aspectRatio) /* = 0 */)
+                                         int width, int height, 
+                                         int aspectRatio)
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
@@ -1463,19 +1463,16 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     awriter = vtkAVIWriter::New();
     }
-# else
+# endif
   else if (strcmp(ext, "mpg") == 0)
     {
-    //awriter = vtkMPEG2Writer::New();
-    awriter = vtkMovieWriter::New();
-    /*
-    if ( aspectRatio > 0 && aspectRatio <= 4 )
-      {
-      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
-      }
-      */
+    awriter = vtkMPEG2Writer::New();
+    //awriter = vtkMovieWriter::New();
+//    if ( aspectRatio > 0 && aspectRatio <= 4 )
+//      {
+//      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
+//      }
     }
-# endif
 #endif
   else
     {
