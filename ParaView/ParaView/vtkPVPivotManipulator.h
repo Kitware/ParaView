@@ -39,10 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVPivotManipulator - Fly camera towards or away from the object
+// .NAME vtkPVPivotManipulator - Change the center of manipulation.
 // .SECTION Description
-// vtkPVPivotManipulator allows the user to interactively manipulate the
-// camera, the viewpoint of the scene.
+// vtkPVPivotManipulator allows the user to interactively manipulate
+// the center of manipulation. If the user clicks on the object, the
+// point on the object will be selected.
 
 #ifndef __vtkPVPivotManipulator_h
 #define __vtkPVPivotManipulator_h
@@ -75,19 +76,24 @@ public:
   // same mechanism is used as for other widgets and they do Set/Get
   void SetResetCenterOfRotation();
 
+  void SetCenterOfRotation(float x, float y, float z);
+  void SetCenterOfRotation(float* x);
+  vtkGetVector3Macro(CenterOfRotation, float);
+
 protected:
   vtkPVPivotManipulator();
   ~vtkPVPivotManipulator();
 
   // Description:
   // Set the center of rotation.
-  void SetCenterOfRotation(float x, float y, float z);
+  void SetCenterOfRotationInternal(float x, float y, float z);
 
   // Description:
   // Pick at position x, y
   void Pick(vtkRenderer*, int x, int y);
 
   vtkPVWorldPointPicker *Picker;
+  float CenterOfRotation[3];
 
   vtkPVPivotManipulator(const vtkPVPivotManipulator&); // Not implemented
   void operator=(const vtkPVPivotManipulator&); // Not implemented

@@ -39,9 +39,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVInteractorStyleControl - a frame with a scroll bar
+// .NAME vtkPVInteractorStyleControl - a control widget for manipulators
 // .SECTION Description
-// The ScrollableFrame creates a frame with an attached scrollbar
+// This widget defines a user interface for controling interactor
+// style. It defines nine menus for different button and keyboard
+// combinations and bind a manipulator for each one of them. It also
+// provides a simple user interface for some manipulators.
+// 
 
 
 #ifndef __vtkPVInteractorStyleControl_h
@@ -56,6 +60,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkPVCameraManipulator;
+class vtkPVInteractorStyleControlCommand;
 class vtkPVWidget;
 
 //BTX
@@ -137,10 +142,15 @@ public:
   // Description:
   // Callback for widget to call when user modifies UI.
   void ChangeArgument(const char* name, const char* widget);
+  void ResetWidget(vtkPVCameraManipulator*, const char* name, const char* manipulator);
 
   // Description
-  // This is hack to convert it to Tcl.
+  // This is hack to convert the current manipulator to Tcl variable.
   vtkGetObjectMacro(CurrentManipulator, vtkPVCameraManipulator);
+
+  // Description:
+  // This method is called when one of the manipulator is modified.
+  void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
 
 protected:
   vtkPVInteractorStyleControl();
@@ -152,6 +162,9 @@ protected:
   vtkKWFrame *ArgumentsFrame;
   vtkKWFrame *MenusFrame;
 
+  vtkPVInteractorStyleControlCommand *Observer;
+
+  int InEvent;
 
   vtkCollection *ManipulatorCollection;
   char* DefaultManipulator;
@@ -163,8 +176,7 @@ protected:
   typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> 
     ManipulatorMapIterator;
   typedef vtkArrayMap<const char*,vtkPVWidget*> WidgetsMap;
-  typedef vtkArrayMap<const char*,ArrayStrings*>
-    MapStringToArrayStrings;
+  typedef vtkArrayMap<const char*,ArrayStrings*> MapStringToArrayStrings;
 
   ManipulatorMap*          Manipulators;
   WidgetsMap*              Widgets;

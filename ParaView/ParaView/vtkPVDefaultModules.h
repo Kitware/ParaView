@@ -706,6 +706,8 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  </Manipulator>\n"
 "\n"
 "  <Manipulator name=\"Center\" types=\"3D\" class=\"vtkPVPivotManipulator\">\n"
+"    <VectorEntry variable=\"CenterOfRotation\" type=\"int\" length=\"3\" \n"
+"                 help=\"Reset the center of rotation\"/>\n"
 "    <PushButton variable=\"ResetCenterOfRotation\" label=\"Reset Center Of Rotation\"\n"
 "                 help=\"Reset the center of rotation\"/>\n"
 "  </Manipulator>\n"

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPivotManipulator.h"
 
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
@@ -50,12 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.1");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.2");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
 {
   this->Picker = vtkPVWorldPointPicker::New();
+  this->SetCenterOfRotation(0,0,0);
 }
 
 //-------------------------------------------------------------------------
@@ -65,8 +67,8 @@ vtkPVPivotManipulator::~vtkPVPivotManipulator()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVPivotManipulator::OnButtonDown(int x, int y, vtkRenderer *ren,
-                                    vtkRenderWindowInteractor* rwi)
+void vtkPVPivotManipulator::OnButtonDown(int, int, vtkRenderer *ren,
+                                         vtkRenderWindowInteractor* rwi)
 {
   if ( !this->Application )
     {
@@ -101,9 +103,10 @@ void vtkPVPivotManipulator::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVPivotManipulator::OnButtonUp(int, int, vtkRenderer*,
+void vtkPVPivotManipulator::OnButtonUp(int x, int y, vtkRenderer* ren,
                                        vtkRenderWindowInteractor*)
 {
+  this->Pick(ren, x, y);
   this->Picker->SetComposite(0);
 }
 
@@ -126,7 +129,22 @@ void vtkPVPivotManipulator::Pick(vtkRenderer* ren, int x, int y)
 }
 
 //-------------------------------------------------------------------------
+void vtkPVPivotManipulator::SetCenterOfRotation(float* f)
+{
+  this->SetCenterOfRotation(f[0], f[1], f[2]);
+}
+
+//-------------------------------------------------------------------------
 void vtkPVPivotManipulator::SetCenterOfRotation(float x, float y, float z)
+{
+  this->CenterOfRotation[0] = x;
+  this->CenterOfRotation[1] = y;
+  this->CenterOfRotation[2] = z;
+  this->SetCenterOfRotationInternal(x,y,z);
+}
+
+//-------------------------------------------------------------------------
+void vtkPVPivotManipulator::SetCenterOfRotationInternal(float x, float y, float z)
 {
   vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
   if ( !app )
@@ -141,6 +159,9 @@ void vtkPVPivotManipulator::SetCenterOfRotation(float x, float y, float z)
     window->GetCenterZEntry()->SetValue(z, 3);
     window->CenterEntryCallback();
     }
+  const char* argument = "CenterOfRotation";
+  void* calldata = const_cast<char*>(argument);
+  this->InvokeEvent(vtkKWEvent::ManipulatorModifiedEvent, calldata);
 }
 
 //-------------------------------------------------------------------------
@@ -155,6 +176,8 @@ void vtkPVPivotManipulator::SetResetCenterOfRotation()
   if (window)
     {
     window->ResetCenterCallback();
+    float *center = this->GetCenter();
+    this->SetCenterOfRotation(center);
     }
 }
 

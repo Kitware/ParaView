@@ -45,7 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMapIterator.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -55,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVPushButton.h"
 #include "vtkPVScale.h"
+#include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
@@ -65,10 +68,42 @@ vtkStandardNewMacro( vtkPVInteractorStyleControl );
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
 
+//===========================================================================
+//***************************************************************************
+class vtkPVInteractorStyleControlCommand : public vtkCommand
+{
+public:
+  static vtkPVInteractorStyleControlCommand *New() 
+    {return new vtkPVInteractorStyleControlCommand;};
+
+  vtkPVInteractorStyleControlCommand()
+    {
+      this->InteractorStyleControl = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->InteractorStyleControl )
+        {
+        this->InteractorStyleControl->ExecuteEvent(wdg, event, calldata);
+        }
+    }
+
+  vtkPVInteractorStyleControl* InteractorStyleControl;
+};
+//***************************************************************************
+//===========================================================================
+
+//------------------------------------------------------------------------------
 vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 {
+  this->InEvent = 0;
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->LabeledFrame->SetParent(this);
+
+  this->Observer = vtkPVInteractorStyleControlCommand::New();
+  this->Observer->InteractorStyleControl = this;
   
   int cc;
 
@@ -97,6 +132,22 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 //------------------------------------------------------------------------------
 vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
 {
+  if ( this->ManipulatorCollection )
+    {
+    vtkCollectionIterator *it = this->ManipulatorCollection->NewIterator();
+    it->InitTraversal();
+    while(!it->IsDoneWithTraversal())
+      {
+      vtkPVCameraManipulator* m = static_cast<vtkPVCameraManipulator*>(
+        it->GetObject());
+      m->RemoveObserver(this->Observer);
+      it->GoToNextItem();
+      }
+    it->Delete();
+    this->SetManipulatorCollection(0);
+    }
+  // So that events will not be called.
+  this->InEvent = 1;
   this->StoreRegistery();
   int cc;
   if ( this->LabeledFrame )
@@ -114,11 +165,12 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->Manipulators->Delete();
   this->Widgets->Delete();
   this->Arguments->Delete();
-  this->SetManipulatorCollection(0);
+
   this->SetDefaultManipulator(0);
   this->SetRegisteryName(0);
   
   this->ArgumentsFrame->Delete();
+  this->Observer->Delete();
 }
 
 //------------------------------------------------------------------------------
@@ -198,13 +250,52 @@ void vtkPVInteractorStyleControl::UpdateMenus()
               }
             }
           }
-        this->Script("pack %s -fill y -expand true -side top",
+        this->Script("pack %s -fill x -expand true -side top",
                      widget->GetWidgetName());
         }
       it->GoToNextItem();
       }
     it->Delete();
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::ExecuteEvent(vtkObject* wdg, unsigned long event, 
+                                               void* calldata)
+{
+  if ( this->InEvent )
+    {
+    return;
+    }
+  this->InEvent = 1;
+
+  const char* argument = static_cast<char*>(calldata);
+
+  vtkPVCameraManipulator* manipulator = static_cast<vtkPVCameraManipulator*>(wdg);
+  const char* name = manipulator->GetManipulatorName();
+  
+  vtkPVInteractorStyleControl::ArrayStrings *strings = 0;
+  this->Arguments->GetItem(argument, strings);
+  if ( strings )
+    {
+    vtkPVInteractorStyleControl::ArrayStrings::IteratorType *vit
+      = strings->NewIterator();
+    vit->InitTraversal();
+    while ( !vit->IsDoneWithTraversal() )
+      {
+      const char* mname = 0;
+      if ( vit->GetData(mname) == VTK_OK && mname )
+        {
+        if ( vtkString::Equals(name, mname) )
+          {
+          this->ResetWidget(manipulator, argument, name);
+          }
+        }
+      vit->GoToNextItem();
+      }
+    vit->Delete();
+    }
+  this->InEvent = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -229,6 +320,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     }
   vtkPVScale* scale = vtkPVScale::SafeDownCast(widget);
   vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(widget);
+  vtkPVVectorEntry* vectorEntry = vtkPVVectorEntry::SafeDownCast(widget);
   char* value = 0;
   if ( scale )
     {
@@ -240,6 +332,21 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
   else if ( pushButton )
     {
     value = vtkString::Duplicate("");
+    }
+  else if ( vectorEntry )
+    {
+    int cc;
+    float f[6];
+    vectorEntry->GetValue(f, vectorEntry->GetVectorLength());
+    ostrstream str;
+    str << "{";
+    for ( cc = 0; cc < vectorEntry->GetVectorLength(); cc ++ )
+      {
+      str << f[cc] << " ";
+      }
+    str << "}" <<ends;
+    value = vtkString::Duplicate(str.str());
+    str.rdbuf()->freeze(0);
     }
   else
     {
@@ -263,21 +370,10 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
         {
         vtkPVCameraManipulator* cman 
           = static_cast<vtkPVCameraManipulator*>(cit->GetObject());
-        int mouse = cman->GetButton() - 1;
-        int key = 0;
-        if ( cman->GetShift() )
-          {
-          key = 1;
-          }
-        if ( cman->GetControl() )
-          {
-          key = 2;
-          }
-        const char* sman = this->Menus[mouse + key * 3]->GetValue();
-        if ( vtkString::Equals(smanipulator, sman) )
+        if ( vtkString::Equals(smanipulator, cman->GetManipulatorName()) )
           {
           this->CurrentManipulator = cman;
-          this->Script("[ %s GetCurrentManipulator ] Set%s %s", 
+          this->Script("eval [ %s GetCurrentManipulator ] Set%s %s", 
                        this->GetTclName(), name, value );
           this->CurrentManipulator = 0;
           found = 1;
@@ -292,7 +388,8 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
 
   if ( found )
     {
-    if ( vtkString::Length(value) > 0 )
+    // This is a hack. 
+    if ( vtkString::Length(value) > 0 && !vectorEntry ) 
       {
       const char* val = this->Application->EvaluateString("%s", value);
       char *rname = vtkString::Append("Manipulator", name);      
@@ -330,6 +427,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
     return;
     }
 
+  // Figure out mouse and keys layout
   int mouse = pos % 3;
   int key = static_cast<int>(pos / 3);
   int shift = (key == 1);
@@ -344,10 +442,12 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
     vtkPVCameraManipulator* access 
       = static_cast<vtkPVCameraManipulator*>(it->GetObject());
     
+    // Find previous one that matches the layout
     if ( access->GetButton() == mouse+1 &&
          access->GetShift() == shift &&
          access->GetControl() == control )
       {
+      // If this is the same one, then just assign it.
       if ( vtkString::Equals(access->GetClassName(), 
                              manipulator->GetClassName()) )
         {
@@ -355,6 +455,9 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
         }
       else
         {
+        // Otherwise remove it
+        access->SetApplication(0);
+        access->RemoveObserver(this->Observer);
         this->ManipulatorCollection->RemoveItem(access);
         }
       break;
@@ -364,13 +467,17 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
     }  
   it->Delete();
   
+  // If this is new one, then clone it
   if ( !clone )
     {
     clone = manipulator->NewInstance();
     clone->SetApplication(this->Application);
     this->ManipulatorCollection->AddItem(clone); 
     clone->Delete();
+    clone->AddObserver(vtkKWEvent::ManipulatorModifiedEvent, this->Observer);
+    clone->SetManipulatorName(name);
     }
+  // Set the mouse and key layout
   clone->SetButton(mouse+1);
   clone->SetShift(shift);
   clone->SetControl(control);
@@ -527,13 +634,13 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   frame->Delete();
   this->Script("pack %s -expand true -fill both -side top", 
                frame->GetWidgetName());
-  this->Script("pack %s -expand true -fill both", 
+  this->Script("pack %s -expand true -fill x -side top", 
                this->LabeledFrame->GetWidgetName());
   this->UpdateMenus();
 
   this->ArgumentsFrame->SetParent(this->LabeledFrame->GetFrame());
   this->ArgumentsFrame->Create(this->Application, 0);
-  this->Script("pack %s -expand true -fill both -side top", 
+  this->Script("pack %s -expand true -fill x -side top", 
                this->ArgumentsFrame->GetWidgetName());
 }
 
@@ -542,7 +649,9 @@ void vtkPVInteractorStyleControl::ReadRegistery()
 {
   if ( !this->Application || !this->RegisteryName )
     {
-    vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
+    vtkErrorMacro("Application and type of Interactor Style Controler"
+                  " have to be defined");
+    return;
     }
   int cc;
   char manipulator[100];
@@ -614,6 +723,43 @@ void vtkPVInteractorStyleControl::AddArgument(
     {
     // if not add it.
     strings->AppendItem(manipulator);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man, 
+                                              const char* name, const char* manipulator)
+{
+  vtkPVWidget *pw = 0;
+  this->Widgets->GetItem(name, pw);
+  if ( !pw )
+    {
+    return;
+    }
+  //vtkPVScale* scale = vtkPVScale::SafeDownCast(pw);
+  vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(pw);
+  vtkPVVectorEntry* vectorEntry = vtkPVVectorEntry::SafeDownCast(pw);
+  if ( pushButton )
+    {
+    return;
+    }
+  if ( vectorEntry )
+    {
+    this->CurrentManipulator = man;
+    this->Script("[ %s GetCurrentManipulator ] Get%s", this->GetTclName(),
+                 name);
+    strstream str;
+    str << this->Application->GetMainInterp()->result << ends;
+    float f[6] = { 0, 0, 0, 0, 0, 0 };
+    int cc;
+    for ( cc = 0; cc < vectorEntry->GetVectorLength(); cc ++ )
+      {
+      float fn = 0;
+      str >> fn;
+      f[cc] = fn;
+      }
+    vectorEntry->SetValue(f, vectorEntry->GetVectorLength());
+    this->CurrentManipulator = 0;
     }
 }
 
