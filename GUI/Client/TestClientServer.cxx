@@ -68,7 +68,7 @@ inline void SeparateArguments(const char* str, vtkstd::vector<vtkstd::string>& f
 {
   vtkstd::string arg = str;
   vtkstd::string::size_type pos1 = 0;
-  vtkstd::string::size_type pos2 = arg.find(" ");
+  vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
@@ -78,7 +78,7 @@ inline void SeparateArguments(const char* str, vtkstd::vector<vtkstd::string>& f
     {
     flags.push_back(arg.substr(pos1, pos2-pos1));
     pos1 = pos2+1;
-    pos2 = arg.find(" ", pos1+1);
+    pos2 = arg.find_first_of(" ;", pos1+1);
     } 
   flags.push_back(arg.substr(pos1, pos2-pos1));
 }
