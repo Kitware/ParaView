@@ -218,6 +218,9 @@
            label="Time step" trace_name="TimeStep"
            display_entry="1" display_value="0"
            help="Set the current timestep."/>
+    <ArraySelection label_text="Cell Arrays"
+                    property="CellArrayStatus"
+                    trace_name="CellArrays"/>
   </Module>
   <Module name="plyreader"
           class="vtkPVReaderModule" root_name="PLY"
