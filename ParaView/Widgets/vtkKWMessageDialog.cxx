@@ -80,6 +80,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWWidget::New();
   this->Icon->SetParent(this);
+  this->Default = NoneDefault;
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
@@ -129,6 +130,8 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                    this->CancelButton->GetWidgetName());
       break;
     }
+
+  
   
   this->Script("pack %s -side bottom -fill x -pady 4",
                this->ButtonFrame->GetWidgetName());
@@ -145,6 +148,22 @@ void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->Script("%s configure -text {%s}",
                this->Label->GetWidgetName(),txt);
+}
+
+int vtkKWMessageDialog::Invoke()
+{
+  if ( this->Default == YesDefault )
+    {
+    this->OKButton->SetBind(this, "<Return>", "OK");
+    this->SetBind(this, "<Return>", "OK");
+    }
+  else if( this->Default == NoDefault )
+    {
+    this->CancelButton->SetBind(this, "<Return>", "Cancel");
+    this->SetBind(this, "<Return>", "Cancel");
+    }  
+
+  return vtkKWDialog::Invoke();
 }
 
 void vtkKWMessageDialog::SetIcon( int ico )
@@ -168,6 +187,8 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, unsigned int icon, 
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon( icon );
+  dlg2->BeepOn();
+  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
   dlg2->Invoke();
   dlg2->Delete();
 }
@@ -180,6 +201,8 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, unsigned int icon, con
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon( icon );
+  dlg2->BeepOn();
+  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
   int ret = dlg2->Invoke();
   dlg2->Delete();
   return ret;
@@ -192,6 +215,8 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, unsigned int icon, 
   dlg2->SetText( message );
   dlg2->SetTitle( title );
   dlg2->SetIcon( icon );
+  dlg2->BeepOn();
+  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
   int ret = dlg2->Invoke();
   dlg2->Delete();
   return ret;

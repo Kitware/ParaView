@@ -65,6 +65,10 @@ public:
 	Warning,
 	Question,
 	Info};
+
+  enum {NoneDefault = 0,
+	YesDefault = 1,
+	NoDefault = 2};
 	
   //ETX
   
@@ -79,6 +83,16 @@ public:
   // Description:
   // Set the icon in the message dialog
   void SetIcon(int);
+
+  // Description:
+  // Invoke the dialog and display it in a modal manner. 
+  // This method returns a zero if the dilaog was killed or 
+  // canceled, nonzero otherwise.
+  virtual int Invoke();
+
+  // Description:
+  // Set the default button
+  vtkSetClampMacro(Default, int, 0, 2);
 
   // Description:
   // Set the style of the message box
@@ -99,6 +113,7 @@ protected:
   void operator=(const vtkKWMessageDialog&) {};
 
   int Style;
+  int Default;
 
   vtkKWWidget *MessageDialogFrame;
   vtkKWWidget *Label;
