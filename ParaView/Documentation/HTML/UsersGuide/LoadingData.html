@@ -22,9 +22,34 @@
 <!-- End NavBar -->
 <h1>Loading Data</h1>
 
-ParaView can read several different data formats: VTK, parallel VTK,
-EnSight, POP, STL, and particle files.  To load a data file into ParaView,
-first go to the File menu and click "Open Data File".
+ParaView can read several different data formats: VTK, parallel VTK (PVTK),
+EnSight, POP, STL, PLOT3D, and particle files.  To load a data file into
+ParaView, first go to the File menu and click "Open Data File".
+
+<ul>
+<li>
+Choose VTK to load any of the data set types that are native to VTK (polydata,
+rectilinear grid, image data, structured grid, and unstructured grid).
+</li>
+<li>
+PVTK handles the same types of data as VTK, but the data set has been broken
+into pieces and the pieces saved to different files.
+</li>
+<li>
+Data files created by EnSight can be loaded into ParaView by choosing the
+appropriate .case file.  ASCII and binary data sets from versions 6 and 7
+(or Gold) are handled.  Each EnSight part is loaded as a separate data object
+in ParaView.  ParaView does not currently load parallel EnSight files.
+</li>
+<li>
+POP data files contain ocean climate modelling data sets created by the
+Parallel Ocean Project (POP) at Los Alamos National Laboratory.  The reader
+converts the data from images to a structured grid.
+</li>
+<li>
+STL files are ASCII or binary stereo lithography data sets.
+</li>
+</ul>
 
 <p>
 <center>
@@ -44,8 +69,19 @@ select the appropriate file, and click "Open".
 To open a particle file or a PLOT3D file, select the ParticleReader or
 PLOT3DReader, respectively, from the VTK | Sources menu.  These readers are
 not available from the file dialog box.  This is because they were added to
-ParaView as ordinary VTK filters.  (See section on Adding Filters.)
+ParaView as ordinary VTK filters.  (See section on 
+<a href="AddingFilters.html">Adding Filters</a>.)
 
+<ul>
+<li>
+The particle reader reads raw particle data and one data array.
+</li>
+<li>
+The PLOT3D reader reads PLOT3D data files.  PLOT3D is a computer graphics
+programs designed to visualize the grids and solutions of computational
+fluid dynamics.
+</li>
+<\ul>
 <p>
 <center>
 <img alt="Particle Reader" src="Images/particleReader.jpg">
@@ -53,8 +89,9 @@ ParaView as ordinary VTK filters.  (See section on Adding Filters.)
 <p>
 
 If the data is composed of 3D cells, an outline of the data will be drawn
-in the render window.  Click on the "Display" tab to view and change the
-parameters determining how the data is displayed.
+in the render window.  Otherwise the data will be displayed as a surface.
+Click on the "Display" tab to view and change the parameters determining how
+the data is displayed.
 
 <p>
 <center>
