@@ -75,7 +75,12 @@ public:
   // Description:
   // Set the range of the scale.
   void SetRange(float min, float max);
-
+  
+  // Description:
+  // Turn on display of the entry box widget that lets the user entry
+  // an exact value.
+  void DisplayEntry();
+  
   // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.

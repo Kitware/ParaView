@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.16");
+vtkCxxRevisionMacro(vtkPVScale, "1.16.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -121,6 +121,12 @@ void vtkPVScale::SetResolution(float res)
 void vtkPVScale::SetRange(float min, float max)
 {
   this->Scale->SetRange(min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::DisplayEntry()
+{
+  this->Scale->DisplayEntry();
 }
 
 //----------------------------------------------------------------------------
@@ -194,7 +200,7 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
 
   if (sourceTclName && this->VariableName)
     {
-    pvApp->BroadcastScript("%s Set%s %d", 
+    pvApp->BroadcastScript("%s Set%s %g", 
                            sourceTclName,
                            this->VariableName, 
                            this->GetValue());
