@@ -37,7 +37,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
 #include "vtkFastGeometryFilter.h"
-//#include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
 #include "vtkScalarBarActor.h"
 #include "vtkTimerLog.h"
@@ -220,13 +219,7 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->RepresentationMenu = NULL;
   
   this->SetInput(NULL);
-  
-  //if (this->TextureFilter != NULL)
-  //{
-  // this->TextureFilter->Delete();
-  //this->TextureFilter = NULL;
-  //}
-  
+    
   this->ScalarBar->Delete();
   this->ScalarBar = NULL;
   
@@ -303,10 +296,6 @@ void vtkPVActorComposite::CreateProperties()
   this->YRangeLabel->Create(this->Application, "");
   this->ZRangeLabel->SetParent(this->Properties);
   this->ZRangeLabel->Create(this->Application, "");
-  
-  //this->ColorByCellCheck->SetParent(this->Properties);
-  //this->ColorByCellCheck->Create(this->Application, "-text {Color By Cell Data:}");
-  //this->ColorByCellCheck->SetCommand(this, "ColorByCellCheckCallBack");
   
   this->AmbientScale->SetParent(this->Properties);
   this->AmbientScale->Create(this->Application, "-showvalue 1");

@@ -53,6 +53,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVContour.h"
 #include "vtkPVGlyph3D.h"
 
+#include "vtkKWInteractor.h"
+#include "vtkKWFlyInteractor.h"
+#include "vtkKWRotateCameraInteractor.h"
+#include "vtkKWTranslateCameraInteractor.h"
+#include "vtkKWInteractor.h"
+
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
 {
@@ -76,10 +82,13 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
   this->SourcesMenu = vtkKWMenu::New();
-  this->Toolbar = vtkKWToolbar::New();
-  this->ResetCameraButton = vtkKWPushButton::New();
-  this->CameraStyleButton = vtkKWPushButton::New();
+  this->InteractorToolbar = vtkKWToolbar::New();
 
+  this->FlyInteractor = vtkKWFlyInteractor::New();
+  this->RotateCameraInteractor = vtkKWRotateCameraInteractor::New();
+  this->TranslateCameraInteractor = vtkKWTranslateCameraInteractor::New();
+
+  this->Toolbar = vtkKWToolbar::New();
   this->CalculatorButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
@@ -93,17 +102,23 @@ vtkPVWindow::vtkPVWindow()
   
   this->SourceInterfaces = vtkCollection::New();
   this->CurrentPVData = NULL;
+  //this->CurrentInteractor = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  this->InteractorToolbar->Delete();
+  this->InteractorToolbar = NULL;
   this->Toolbar->Delete();
   this->Toolbar = NULL;
-  this->ResetCameraButton->Delete();
-  this->ResetCameraButton = NULL;
-  this->CameraStyleButton->Delete();
-  this->CameraStyleButton = NULL;
+
+  this->FlyInteractor->Delete();
+  this->FlyInteractor = NULL;
+  this->RotateCameraInteractor->Delete();
+  this->RotateCameraInteractor = NULL;
+  this->TranslateCameraInteractor->Delete();
+  this->TranslateCameraInteractor = NULL;
   
   this->CalculatorButton->Delete();
   this->CalculatorButton = NULL;
@@ -138,6 +153,11 @@ vtkPVWindow::~vtkPVWindow()
   this->SourcesMenu = NULL;
   
   this->SetCurrentPVData(NULL);
+  //if (this->CurrentInteractor != NULL)
+  //  {
+  //  this->CurrentInteractor->UnRegister(this);
+  //  this->CurrentInteractor = NULL;
+  //  }
 }
 
 
@@ -145,6 +165,9 @@ vtkPVWindow::~vtkPVWindow()
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
   vtkPVSourceInterface *sInt;
+  vtkKWInteractor *interactor;
+  vtkKWRadioButton *button;
+  vtkKWWidget *pushButton;
   
   // invoke super method first
   this->vtkKWWindow::Create(app,"");
@@ -197,12 +220,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
+  this->InteractorToolbar->SetParent(this->GetToolbarFrame());
+  this->InteractorToolbar->Create(app);
+
   this->Toolbar->SetParent(this->GetToolbarFrame());
   this->Toolbar->Create(app); 
 
-  this->ResetCameraButton->SetParent(this->Toolbar);
-  this->ResetCameraButton->Create(app, "-text ResetCamera");
-  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
+
   
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-text Calculator");
@@ -220,8 +244,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GlyphButton->Create(app, "-text Glyph");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
 
-  this->Script("pack %s %s %s %s %s -side left -pady 0 -fill none -expand no",
-               this->ResetCameraButton->GetWidgetName(),
+  this->Script("pack %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
@@ -236,7 +259,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 //  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
 //	       this->SourceListButton->GetWidgetName(),
 //	       this->CameraStyleButton->GetWidgetName());
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
+               this->InteractorToolbar->GetWidgetName(),
                this->Toolbar->GetWidgetName());
   
   this->CreateDefaultPropertiesParent();
@@ -256,13 +280,79 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // create the main view
   // we keep a handle to them as well
   this->CreateMainView((vtkPVApplication*)app);
+
+  // Set up the button to reset the camera.
+  pushButton = vtkKWWidget::New();
+  pushButton->SetParent(this->InteractorToolbar);
+  pushButton->Create(app, "button", "-image KWResetViewButton -bd 0");
+  pushButton->SetCommand(this, "ResetCameraCallback");
+  this->Script( "pack %s -side left -fill none -expand no",
+                pushButton->GetWidgetName());
+  pushButton->SetBalloonHelpString(
+    "Reset the view to show all the visible parts.");
+  pushButton->Delete();
+  pushButton = NULL;
+
+  // set up the interactors
+  interactor = this->FlyInteractor;
+  interactor->SetParent(this->GetToolbarFrame());
+  interactor->SetRenderView(this->GetMainView());
+  interactor->Create(this->Application, "");
+  button = vtkKWRadioButton::New();
+  button->SetParent(this->InteractorToolbar);
+  button->Create(app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton -bd 0");
+  button->SetBalloonHelpString(
+    "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
+  this->Script("%s configure -command {%s SetInteractor %s}", 
+               button->GetWidgetName(), this->MainView->GetTclName(), 
+               interactor->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               button->GetWidgetName());
+  interactor->SetToolbarButton(button);
+  button->Delete();
+  button = NULL;
+
+  interactor = this->RotateCameraInteractor;
+  interactor->SetParent(this->GetToolbarFrame());
+  interactor->SetRenderView(this->GetMainView());
+  interactor->Create(this->Application, "");
+  button = vtkKWRadioButton::New();
+  button->SetParent(this->InteractorToolbar);
+  button->Create(app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton -bd 0");
+  button->SetBalloonHelpString(
+    "Rotate View Mode\n   Left Button: Rotate. This depends on where you click on the screen. Near the center of rotation gives XY rotation (view coordinates). Far from the center gives you Z roll.\n   Right Button: Behaves like translate view mode.");
+  this->Script("%s configure -command {%s SetInteractor %s}", 
+               button->GetWidgetName(), this->MainView->GetTclName(), 
+               interactor->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               button->GetWidgetName());
+  interactor->SetToolbarButton(button);
+  button->Delete();
+  button = NULL;
+
+  interactor = this->TranslateCameraInteractor;
+  interactor->SetParent(this->GetToolbarFrame());
+  interactor->SetRenderView(this->GetMainView());
+  interactor->Create(this->Application, "");
+  button = vtkKWRadioButton::New();
+  button->SetParent(this->InteractorToolbar);
+  button->Create(app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton -bd 0");
+  button->SetBalloonHelpString(
+    "Translate View Mode\n   Left button: Translate. This depends on where you click on the screen. Near the middle of the screen gives you XY translation. Near the top or bottom of the screen gives you zoom along Z.\n   Right Button: Zoom.");
+  this->Script("%s configure -command {%s SetInteractor %s}", 
+               button->GetWidgetName(), this->MainView->GetTclName(), 
+               interactor->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               button->GetWidgetName());
+  interactor->SetToolbarButton(button);
+  button->Delete();
+  button = NULL;
+
+
+
   
   this->Script( "wm deiconify %s", this->GetWidgetName());
   
-  // Setup an interactor style.
-  //  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
-  //  this->MainView->SetInteractorStyle(style);
-  this->MainView->SetInteractorStyle(this->CameraStyle);
 }
 
 
@@ -284,14 +374,6 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->SetupBindings();
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::UseCameraStyle()
-{
-  this->GetMainView()->SetInteractorStyle(this->CameraStyle);
 }
 
 
@@ -1907,3 +1989,5 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt = NULL;
 
 }
+
+

@@ -1,0 +1,92 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkKWRotateCameraInteractor.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+
+All rights reserved. No part of this software may be reproduced, distributed,
+or modified, in any form or by any means, without permission in writing from
+Kitware Inc.
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
+DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
+EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
+"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+=========================================================================*/
+// .NAME vtkKWRotateCameraInteractor
+// .SECTION Description
+// This widget gets displayed when rotate mode is selected.
+
+#ifndef __vtkKWRotateCameraInteractor_h
+#define __vtkKWRotateCameraInteractor_h
+
+#include "vtkKWInteractor.h"
+#include "vtkCameraInteractor.h"
+class vtkKWCenterOfRotation;
+
+
+class VTK_EXPORT vtkKWRotateCameraInteractor : public vtkKWInteractor
+{
+public:
+  static vtkKWRotateCameraInteractor* New() {return new vtkKWRotateCameraInteractor;};
+  vtkTypeMacro(vtkKWRotateCameraInteractor,vtkKWInteractor);
+
+  // Description:
+  // Create a Tk widget
+  virtual void Create(vtkKWApplication *app, char *args);
+
+  // Description:
+  // When the active interactor is changed, these methods allow
+  // it to change its state.  This may similar to a composite.
+  void Select();
+  void Deselect();
+
+  // When camera changes, we need to recompute the center of rotation.
+  void CameraMovedNotify();
+
+  // Description:
+  // We need to tell the center of rotation widget the render view.
+  void SetRenderView(vtkPVRenderView *view);
+
+  void AButtonPress(int num, int x, int y);
+  void AButtonRelease(int num, int x, int y);
+  void Button1Motion(int x, int y);
+  void Button3Motion(int x, int y);
+
+  void MotionCallback(int x, int y);
+
+protected: 
+  vtkKWRotateCameraInteractor();
+  ~vtkKWRotateCameraInteractor();
+  vtkKWRotateCameraInteractor(const vtkKWRotateCameraInteractor&) {};
+  void operator=(const vtkKWRotateCameraInteractor&) {};
+
+  vtkKWCenterOfRotation *CenterUI;
+
+  // The vtk object which manipulates the camera.
+  // Maybe this should go in the RenderView instead of having a different one
+  // for each interactor.
+  vtkCameraInteractor *Interactor;
+
+  // This is here to get around thae fact that we do not have a good Roll cursor.
+  void UpdateRollCursor(double px, double py);
+
+  int CursorState;
+};
+
+
+#endif
+
+

@@ -42,14 +42,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVRenderView_h
 
 #include "vtkKWView.h"
-#include "vtkInteractorStyle.h"
 #include "vtkTreeComposite.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 
 class vtkPVApplication;
-
+class vtkKWInteractor;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -64,24 +63,6 @@ public:
   // Description:
   // Create the TK widgets associated with the view.
   void Create(vtkKWApplication *app, const char *args);
-
-  // Description:
-  // The events will be forwarded to this style object,
-  void SetInteractorStyle(vtkInteractorStyle *style);
-  vtkGetObjectMacro(InteractorStyle, vtkInteractorStyle);
-
-  // Description:
-  // These are the event handlers that UIs can use or override.
-  void AButtonPress(int num, int x, int y);
-  void AButtonRelease(int num, int x, int y);
-  void Button1Motion(int x, int y);
-  void Button2Motion(int x, int y);
-  void Button3Motion(int x, int y);
-  void AKeyPress(char key, int x, int y);
-
-  // Description:
-  // Special binding added to this subclass.
-  void MotionCallback(int x, int y);
 
   // Description:
   // Compute the bounding box of all the visibile props
@@ -113,6 +94,7 @@ public:
   // Description:
   // Composites
   void Render();
+  void EventuallyRender() {this->Render();}
   
   // Description:
   // Update all the actors.
@@ -144,6 +126,18 @@ public:
   // Description:
   // Get the frame for the navigation window
   vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
+  
+  void AButtonPress(int num, int x, int y);
+  void AButtonRelease(int num, int x, int y);
+  void Button1Motion(int x, int y);
+  void Button2Motion(int x, int y);
+  void Button3Motion(int x, int y);
+
+  // Description:
+  // Bound events are forwarded to this interactor.
+  void SetInteractor(vtkKWInteractor *interactor);
+  vtkKWInteractor *GetInteractor() 
+    {return this->CurrentInteractor;}
 
   // Description:
   // Save the renderer and render window to a file.
@@ -156,9 +150,6 @@ protected:
   ~vtkPVRenderView();
   vtkPVRenderView(const vtkPVRenderView&) {};
   void operator=(const vtkPVRenderView&) {};
-
-  vtkInteractorStyle *InteractorStyle;
-  vtkRenderWindowInteractor *Interactor;
 
   int Interactive;
 
@@ -174,6 +165,8 @@ protected:
   
   vtkKWLabeledFrame *NavigationFrame;
   vtkKWWidget       *NavigationCanvas;
+
+  vtkKWInteractor *CurrentInteractor;
 
 };
 

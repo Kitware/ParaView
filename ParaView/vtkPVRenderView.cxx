@@ -31,9 +31,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPolyDataMapper.h"
 
 #include "vtkPVRenderView.h"
+#include "vtkKWInteractor.h"
 #include "vtkPVApplication.h"
 #include "vtkMultiProcessController.h"
-#include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 
 #include "vtkKWEventNotifier.h"
@@ -67,8 +67,6 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVRenderView::vtkPVRenderView()
 {
   this->CommandFunction = vtkPVRenderViewCommand;
-  this->InteractorStyle = NULL;
-  this->Interactor = vtkDummyRenderWindowInteractor::New();
   
   this->Interactive = 0;
   
@@ -76,6 +74,8 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->NavigationFrame = vtkKWLabeledFrame::New();
   this->NavigationCanvas = vtkKWWidget::New();
+  
+  this->CurrentInteractor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -89,10 +89,10 @@ void PVRenderViewAbortCheck(void *arg)
     return;
     }
   
-  if (me->ShouldIAbort() == 2)
-    {
-    me->GetRenderWindow()->SetAbortRender(1);
-    }
+  //if (me->ShouldIAbort() == 2)
+  //  {
+  //  me->GetRenderWindow()->SetAbortRender(1);
+  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -130,15 +130,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 vtkPVRenderView::~vtkPVRenderView()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  
-  this->SetInteractorStyle(NULL);
-
-  // We are having problems with renderWindow being deleted after the RenderWidget.
-  this->Interactor->SetRenderWindow(NULL);
-
-  this->Interactor->Delete();
-  this->Interactor = NULL;
   
   pvApp->BroadcastScript("%s Delete", this->RendererTclName);
   this->SetRendererTclName(NULL);
@@ -156,6 +147,12 @@ vtkPVRenderView::~vtkPVRenderView()
   this->NavigationFrame = NULL;
   this->NavigationCanvas->Delete();
   this->NavigationCanvas = NULL;
+
+  if (this->CurrentInteractor != NULL)
+    {
+    this->CurrentInteractor->UnRegister(this);
+    this->CurrentInteractor = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -203,26 +200,6 @@ vtkRenderWindow *vtkPVRenderView::GetRenderWindow()
   return this->RenderWindow;
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
-{
-  if (this->Interactor)
-    {
-    this->Interactor->SetRenderWindow(this->GetRenderer()->GetRenderWindow());
-    this->Interactor->SetInteractorStyle(style);
-    }
-  if (this->InteractorStyle)
-    {
-    this->InteractorStyle->UnRegister(this);
-    this->InteractorStyle = NULL;
-    }
-  if (style)
-    {
-    this->InteractorStyle = style;
-    style->Register(this);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
@@ -280,11 +257,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                this->VTKWidget->GetWidgetName(),local);
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->VTKWidget->GetWidgetName());
-
-
-  // Styles need motion events.
-  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
-               this->VTKWidget->GetWidgetName(), this->GetTclName());
   
   // Expose.
   this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
@@ -527,129 +499,52 @@ void vtkPVRenderView::ResetCameraClippingRange()
   this->GetRenderer()->ResetCameraClippingRange();
 }
 
-//----------------------------------------------------------------------------
-// Called by a binding, so I must flip y.
-void vtkPVRenderView::MotionCallback(int x, int y)
-{
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
 
-  if (this->InteractorStyle)
-    {
-    this->InteractorStyle->OnMouseMove(0, 0, x, y);
-    }
-}
-
-
+    
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AButtonPress(int num, int x, int y)
 {
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
-
-  this->Interactive = 1;
-  this->Application->GetEventNotifier()->
-    InvokeCallbacks( "InteractiveRenderStart",  
-  		     this->GetWindow(), "" );
-  
-  if (this->InteractorStyle)
+  if (this->CurrentInteractor)
     {
-    if (num == 1)
-      {
-      this->InteractorStyle->OnLeftButtonDown(0, 0, x, y);
-      }
-    if (num == 2)
-      {
-      this->InteractorStyle->OnMiddleButtonDown(0, 0, x, y);
-      }
-    if (num == 3)
-      {
-      this->InteractorStyle->OnRightButtonDown(0, 0, x, y);
-      }
+    this->CurrentInteractor->AButtonPress(num, x, y);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AButtonRelease(int num, int x, int y)
 {
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
-
-  this->Interactive = 0;
-  this->Application->GetEventNotifier()->
-    InvokeCallbacks( "InteractiveRenderEnd",  
-  		     this->GetWindow(), "" );
-  
-  if (this->InteractorStyle)
+  if (this->CurrentInteractor)
     {
-    if (num == 1)
-      {
-      this->InteractorStyle->OnLeftButtonUp(0, 0, x, y);
-      }
-    if (num == 2)
-      {
-      this->InteractorStyle->OnMiddleButtonUp(0, 0, x, y);
-      }
-    if (num == 3)
-      {
-      this->InteractorStyle->OnRightButtonUp(0, 0, x, y);
-      }
+    this->CurrentInteractor->AButtonRelease(num, x, y);
     }
-  this->Render();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Button1Motion(int x, int y)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
-
-  if (this->InteractorStyle)
+  if (this->CurrentInteractor)
     {
-    // Make sure all pipelines update.
-    // Reset camera causes an update on process 0.
-    this->Update();
-    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    this->CurrentInteractor->Button1Motion(x, y);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Button2Motion(int x, int y)
 {
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
-
-  if (this->InteractorStyle)
+  if (this->CurrentInteractor)
     {
-    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    this->CurrentInteractor->Button2Motion(x, y);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Button3Motion(int x, int y)
 {
-  int *size = this->GetRenderer()->GetSize();
-  y = size[1] - y;
-
-  if (this->InteractorStyle)
+  if (this->CurrentInteractor)
     {
-    this->InteractorStyle->OnMouseMove(0, 0, x, y);
+    this->CurrentInteractor->Button3Motion(x, y);
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AKeyPress(char key, int x, int y)
-{
-  x = y;
-
-  if (this->InteractorStyle)
-    {
-    this->InteractorStyle->OnChar(0, 0, key, 1);
-    }
-}
-
-
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVRenderView::GetPVApplication()
@@ -738,7 +633,7 @@ void vtkPVRenderView::StartRender()
   transmitTime = this->GetComposite()->GetTransmitTime();
   
   timePerPixel = (getBuffersTime + setBuffersTime +
-		  (transmitTime * reductionFactor * reductionFactor)) / area;
+          (transmitTime * reductionFactor * reductionFactor)) / area;
 
   newReductionFactor = sqrt(area * timePerPixel / renderTime);
   this->GetComposite()->SetReductionFactor(newReductionFactor);
@@ -756,6 +651,35 @@ void vtkPVRenderView::Render()
   this->StartRender();
   this->RenderWindow->Render();
   this->RenderWindow->SetDesiredUpdateRate(10.0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
+{
+  vtkKWInteractor *old = this->CurrentInteractor;
+
+  if (old == interactor)
+    {
+    return;
+    }
+  if (interactor)
+    {
+    interactor->Register(this);
+    }
+  this->CurrentInteractor = interactor;
+
+
+  // Now let the interactors do their thing.
+  if (old)
+    {
+    old->Deselect();
+    old->UnRegister(this);
+    }
+  if (interactor)
+    {
+    interactor->Select();
+    }
+
 }
 
 void vtkPVRenderView::Save(ofstream *file)

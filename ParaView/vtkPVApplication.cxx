@@ -38,6 +38,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkKWResetViewButton.h"
+#include "vtkKWFlyButton.h"
+#include "vtkKWRotateViewButton.h"
+#include "vtkKWTranslateViewButton.h"
+#include "vtkKWPickCenterButton.h"
+#include "vtkOutputWindow.h"
+
+
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
@@ -86,6 +94,9 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationName("ParaView");
 
   this->Controller = NULL;
+
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+
 
   // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
   /// of Application.  Lets force it.
@@ -200,6 +211,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
   
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
+
+  this->CreateButtonPhotos();
   ui->Create(this,"");
   
   if (argc > 1 && argv[1])
@@ -303,6 +316,58 @@ void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
     }
   this->Controller->Send(range, 2, 0, 1969);
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CreateButtonPhotos()
+{
+  this->CreatePhoto("KWResetViewButton", KW_RESET_VIEW_BUTTON, 
+              KW_RESET_VIEW_BUTTON_WIDTH, KW_RESET_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("KWTranslateViewButton", KW_TRANSLATE_VIEW_BUTTON, 
+              KW_TRANSLATE_VIEW_BUTTON_WIDTH, KW_TRANSLATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("KWActiveTranslateViewButton", KW_ACTIVE_TRANSLATE_VIEW_BUTTON, 
+              KW_ACTIVE_TRANSLATE_VIEW_BUTTON_WIDTH, KW_ACTIVE_TRANSLATE_VIEW_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWFlyButton", KW_FLY_BUTTON, 
+              KW_FLY_BUTTON_WIDTH, KW_FLY_BUTTON_HEIGHT);
+  this->CreatePhoto("KWActiveFlyButton", KW_ACTIVE_FLY_BUTTON, 
+              KW_ACTIVE_FLY_BUTTON_WIDTH, KW_ACTIVE_FLY_BUTTON_HEIGHT);
+  this->CreatePhoto("KWRotateViewButton", KW_ROTATE_VIEW_BUTTON, 
+              KW_ROTATE_VIEW_BUTTON_WIDTH, KW_ROTATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("KWActiveRotateViewButton", KW_ACTIVE_ROTATE_VIEW_BUTTON, 
+              KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("KWPickCenterButton", KW_PICK_CENTER_BUTTON, 
+              KW_PICK_CENTER_BUTTON_WIDTH, KW_PICK_CENTER_BUTTON_HEIGHT);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CreatePhoto(char *name, unsigned char *data, 
+                                    int width, int height)
+{
+  Tk_PhotoHandle photo;
+  Tk_PhotoImageBlock block;
+
+  this->Script("image create photo %s -height %d -width %d", 
+               name, width, height);
+  block.width = width;
+  block.height = height;
+  block.pixelSize = 3;
+  block.pitch = block.width*block.pixelSize;
+  block.offset[0] = 0;
+  block.offset[1] = 1;
+  block.offset[2] = 2;
+  block.pixelPtr = data;
+
+  photo = Tk_FindPhoto(this->GetMainInterp(), name);
+  if (!photo)
+    {
+    vtkWarningMacro("error looking up color ramp image");
+    return;
+    }  
+  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
+
+}
+
 
 //============================================================================
 // Make instances of sources.

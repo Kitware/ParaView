@@ -97,6 +97,14 @@ SOURCE=.\tcl\KWParaViewInit.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkCameraInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCameraInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkClipPlane.cxx
 # End Source File
 # Begin Source File
@@ -142,6 +150,10 @@ SOURCE=.\vtkImageOutlineFilter.cxx
 # Begin Source File
 
 SOURCE=.\vtkImageOutlineFilterTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractor.cxx
 # End Source File
 # Begin Source File
 
@@ -201,11 +213,55 @@ SOURCE=.\vtkInteractorStyleSphereTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWCenterOfRotation.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWCenterOfRotationTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWFlyInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWFlyInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWRenderView.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWRenderViewTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWRotateCameraInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWRotateCameraInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWTranslateCameraInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWTranslateCameraInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -405,6 +461,26 @@ SOURCE=.\vtkStringListTcl.cxx
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\vtkCameraInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkCameraInteractor.h
+InputName=vtkCameraInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkClipPlane.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -532,6 +608,26 @@ InputName=vtkImageOutlineFilter
 # Begin Custom Build
 InputPath=.\vtkImageOutlineFilter.h
 InputName=vtkImageOutlineFilter
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractor.h
+InputName=vtkInteractor
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -692,6 +788,74 @@ InputName=vtkInteractorStyleSphere
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWCenterOfRotation.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWCenterOfRotation.h
+InputName=vtkKWCenterOfRotation
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWFlyButton.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWFlyInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWFlyInteractor.h
+InputName=vtkKWFlyInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWInteractor.h
+InputName=vtkKWInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWPickCenterButton.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWRenderView.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -709,6 +873,58 @@ InputName=vtkKWRenderView
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWResetViewButton.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWRotateCameraInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWRotateCameraInteractor.h
+InputName=vtkKWRotateCameraInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWRotateViewButton.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWTranslateCameraInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWTranslateCameraInteractor.h
+InputName=vtkKWTranslateCameraInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWTranslateViewButton.h
 # End Source File
 # Begin Source File
 

@@ -42,6 +42,7 @@ class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
+class vtkKWInteractor;
 
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
@@ -83,10 +84,7 @@ public:
   vtkGetObjectMacro(CurrentPVData, vtkPVData);
   
   vtkKWCompositeCollection *GetSources();
-  
-  // tcl callbacks for changing the interactor style
-  void UseCameraStyle();
-  
+    
   vtkGetObjectMacro(SourcesMenu, vtkKWMenu);
   
   // Description:
@@ -139,10 +137,14 @@ protected:
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   
-  vtkKWToolbar *Toolbar;
-  vtkKWPushButton *ResetCameraButton;
+  vtkKWToolbar *InteractorToolbar;
   vtkKWPushButton *CameraStyleButton;
+  vtkKWInteractor *FlyInteractor;
+  vtkKWInteractor *RotateCameraInteractor;
+  vtkKWInteractor *TranslateCameraInteractor;
 
+
+  vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;

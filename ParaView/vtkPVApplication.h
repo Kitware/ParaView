@@ -117,6 +117,8 @@ protected:
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
   
+  void CreateButtonPhotos();
+  void CreatePhoto(char *name, unsigned char *data, int width, int height);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
   
