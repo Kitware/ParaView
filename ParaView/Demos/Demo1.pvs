@@ -3684,7 +3684,7 @@ if ![info exists DemoDir] {
         wm deiconify .control
         .control.main.stop configure -state normal
         .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
-        #grab .control.main.stop
+        grab .control.main.stop
 
         clip_init
         extract_init
@@ -3753,7 +3753,7 @@ if ![info exists DemoDir] {
 
         catch {$clip(vtkTemp24) EventuallyRender}
 
-        #grab release .control.main.stop
+        grab release .control.main.stop
         wm withdraw .control
 
         wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
