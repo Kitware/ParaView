@@ -96,6 +96,10 @@ public:
   virtual int GetWidth();
   virtual int GetHeight();
 
+  // Description:
+  // Return if the dialog has ever been mapped (deiconified)
+  vtkGetMacro(HasBeenMapped, int);
+
 protected:
   // Description:
   // Set the title string of the dialog window. Should be called before
@@ -105,6 +109,9 @@ protected:
   vtkKWDialog();
   ~vtkKWDialog();
 
+  void DeIconify();
+  void Withdraw();
+
   vtkKWWindow* MasterWindow;
 
   char *TitleString;
@@ -113,6 +120,7 @@ protected:
   int BeepType;
   int InvokeAtPointer;
   int GrabDialog;
+  int HasBeenMapped;
 
 private:
   vtkKWDialog(const vtkKWDialog&); // Not implemented

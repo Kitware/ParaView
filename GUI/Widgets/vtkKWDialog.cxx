@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.39");
+vtkCxxRevisionMacro(vtkKWDialog, "1.40");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -37,6 +37,8 @@ vtkKWDialog::vtkKWDialog()
   this->MasterWindow = 0;
   this->InvokeAtPointer = 0;
   this->GrabDialog = 1;
+
+  this->HasBeenMapped = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -107,11 +109,10 @@ int vtkKWDialog::Invoke()
     y -= height / 2;
     }
 
-  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-               x, y);
+  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), x, y);
 
   // map the window
-  this->Script("wm deiconify %s",this->GetWidgetName());
+  this->DeIconify();
 
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
@@ -144,7 +145,7 @@ void vtkKWDialog::Display()
   this->Done = 0;
 
   // map the window
-  this->Script("wm deiconify %s",this->GetWidgetName());
+  this->DeIconify();
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
   this->Grab();
@@ -153,7 +154,7 @@ void vtkKWDialog::Display()
 //----------------------------------------------------------------------------
 void vtkKWDialog::Cancel()
 {
-  this->Script("wm withdraw %s",this->GetWidgetName());
+  this->Withdraw();
   this->ReleaseGrab();
 
   this->Done = 1;  
@@ -162,9 +163,28 @@ void vtkKWDialog::Cancel()
 //----------------------------------------------------------------------------
 void vtkKWDialog::OK()
 {
-  this->Script("wm withdraw %s",this->GetWidgetName());
+  this->Withdraw();
   this->ReleaseGrab();
   this->Done = 2;  
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDialog::DeIconify()
+{
+  if (this->IsCreated())
+    {
+    this->Script("wm deiconify %s", this->GetWidgetName());
+    this->HasBeenMapped = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWDialog::Withdraw()
+{
+  if (this->IsCreated())
+    {
+    this->Script("wm withdraw %s", this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -191,11 +211,13 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
     this->Script("toplevel %s %s" ,wname, (args ? args : ""));
     }
 
-  this->Script("wm title %s \"%s\"", wname , this->TitleString);
   this->Script("wm iconname %s \"Dialog\"", wname);
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
                wname, this->GetTclName());
-  this->Script("wm withdraw %s", wname);
+
+  this->SetTitle(this->TitleString);
+
+  this->Withdraw();
 
   if (this->MasterWindow)
     {
