@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.4");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.5");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -584,7 +584,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
 #else
-  this->Script("option add *font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
+  // Specify a font only if there isn't one in the database
+  this->Script(
+    "toplevel .tmppvwindow -class ParaView;"
+    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
+    "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
+    "destroy .tmppvwindow");
   this->Script("option add *highlightThickness 0");
   this->Script("option add *highlightBackground #ccc");
   this->Script("option add *activeBackground #eee");

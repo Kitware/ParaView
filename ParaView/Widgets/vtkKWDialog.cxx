@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.25");
+vtkCxxRevisionMacro(vtkKWDialog, "1.25.2.1");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -196,7 +196,17 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s %s",wname,(args?args:""));
+  if (this->MasterWindow)
+    {
+    this->Script("toplevel %s -class %s %s",
+                 wname,
+                 this->MasterWindow->GetWindowClass(),
+                 (args?args:""));
+    }
+  else
+    {
+    this->Script("toplevel %s %s",wname,(args?args:""));
+    }
   this->Script("wm title %s \"%s\"",wname,this->TitleString);
   this->Script("wm iconname %s \"Dialog\"",wname);
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
