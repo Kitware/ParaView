@@ -2800,9 +2800,7 @@ void vtkPVWindow::SaveTrace()
     return;
     }
   
-  ofstream *newTrace;
-  ifstream *oldTrace;
-  char *filename, line[100];
+  char *filename;
   
   this->Script("tk_getSaveFile -filetypes {{{ParaView Script} {.pvs}}} -defaultextension .pvs");
   filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
@@ -2816,20 +2814,21 @@ void vtkPVWindow::SaveTrace()
   
   trace->close();
   
-  oldTrace = new ifstream("ParaViewTrace.pvs");
-  newTrace = new ofstream(filename);
+  const int bufferSize = 4096;
+  char buffer[bufferSize];
+
+  ofstream newTrace("ParaViewTrace.pvs");
+  ifstream oldTrace(filename);
   
-  while ( ! oldTrace->eof())
+  while(oldTrace)
     {
-    oldTrace->getline(line, 100);
-    *newTrace << line << endl;
+    oldTrace.read(buffer, bufferSize);
+    if(oldTrace.gcount())
+      {
+      newTrace.write(buffer, oldTrace.gcount());
+      }
     }
-  
-  oldTrace->close();
-  newTrace->close();
-  delete oldTrace;
-  delete newTrace;
-  
+
   trace->open("ParaViewTrace.pvs", ios::in | ios::app);
 }
 
