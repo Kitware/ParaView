@@ -116,6 +116,8 @@ public:
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
+
+  void Render();
   
   vtk3DWidget* Widget3D;
   vtkPV3DWidgetObserver* Observer;

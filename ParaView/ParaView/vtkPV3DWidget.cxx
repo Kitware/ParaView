@@ -292,6 +292,20 @@ int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement*,
 }
 
 //----------------------------------------------------------------------------
+void vtkPV3DWidget::Render()
+{
+  if ( this->Placed )
+    {
+    vtkPVGenericRenderWindowInteractor* iren = 
+      this->PVSource->GetPVWindow()->GetGenericInteractor();
+    if(iren)
+      {
+      iren->Render();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
