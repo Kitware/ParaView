@@ -32,7 +32,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.31");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -53,14 +53,12 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   this->RadiusWidget->SetParent(this);
   this->RadiusWidget->SetTraceReferenceObject(this);
   this->RadiusWidget->SetTraceReferenceCommand("GetRadiusWidget");
-  this->RadiusProperty = NULL;
   
   this->NumberOfPointsWidget = vtkPVVectorEntry::New();
   this->NumberOfPointsWidget->SetParent(this);
   this->NumberOfPointsWidget->SetTraceReferenceObject(this);
   this->NumberOfPointsWidget->SetTraceReferenceCommand(
     "GetNumberOfPointsWidget");
-  this->NumberOfPointsProperty = NULL;
   
   // Start out modified so that accept will set the source
   this->ModifiedFlag = 1;
@@ -78,15 +76,6 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
   this->PointWidget->Delete();
   this->RadiusWidget->Delete();
   this->NumberOfPointsWidget->Delete();
-  if (this->RadiusProperty)
-    {
-    this->RadiusProperty->Delete();
-    }
-  if (this->NumberOfPointsProperty)
-    {
-    this->NumberOfPointsProperty->Delete();
-    }
-  
   this->SetInputMenu(NULL);
 }
 
@@ -203,9 +192,6 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToModified");
   
   this->NumberOfPointsWidget->Create(app);
-  this->NumberOfPointsProperty =
-    this->NumberOfPointsWidget->CreateAppropriateProperty();
-  this->NumberOfPointsProperty->SetWidget(this->NumberOfPointsWidget);
   float numPts = static_cast<float>(this->DefaultNumberOfPoints);
   this->NumberOfPointsWidget->SetValue(&numPts, 1);
   if (this->ShowEntries)
@@ -282,6 +268,23 @@ void vtkPVPointSourceWidget::AcceptRadiusAndNumberOfPointsInternal()
                     << this->RadiusWidget->GetEntry(0)->GetValueAsFloat()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
+    this->RadiusWidget->SetAcceptCalled(1);
+    this->NumberOfPointsWidget->SetAcceptCalled(1);
+    }
+  
+  vtkSMDoubleVectorProperty *prop1 = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->RadiusWidget->GetSMProperty());
+  if (prop1)
+    {
+    prop1->SetElement(0, this->RadiusWidget->GetEntry(0)->GetValueAsFloat());
+    }
+  
+  vtkSMIntVectorProperty *prop2 = vtkSMIntVectorProperty::SafeDownCast(
+    this->NumberOfPointsWidget->GetSMProperty());
+  if (prop2)
+    {
+    prop2->SetElement(0, this->NumberOfPointsWidget->GetEntry(0)->
+                      GetValueAsInt());
     }
 }
 
@@ -373,6 +376,13 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     this->RadiusWidget->SetSMPropertyName(radius_property);
     }
   
+  const char *num_points_property =
+    element->GetAttribute("number_of_points_property");
+  if (num_points_property)
+    {
+    this->NumberOfPointsWidget->SetSMPropertyName(num_points_property);
+    }
+  
   return 1;
 }
 
@@ -398,6 +408,8 @@ void vtkPVPointSourceWidget::CopyProperties(
     psw->GetRadiusWidget()->SetSMPropertyName(
       this->RadiusWidget->GetSMPropertyName());
     psw->GetNumberOfPointsWidget()->SetDataType(VTK_INT);
+    psw->GetNumberOfPointsWidget()->SetSMPropertyName(
+      this->NumberOfPointsWidget->GetSMPropertyName());
     }
 }
 

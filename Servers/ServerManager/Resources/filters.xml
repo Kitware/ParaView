@@ -2248,6 +2248,12 @@
         </BoundsDomain>
      </DoubleVectorProperty>
 
+     <IntVectorProperty
+        name="NumberOfPoints"
+        number_of_elements="1"
+        default_values="100"
+        information_only="1"/>
+
      <IntVectorProperty 
         name="MaximumPropagationUnit" 
         command="SetMaximumPropagationUnit" 

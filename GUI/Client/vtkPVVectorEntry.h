@@ -144,6 +144,10 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
+  // Description:
+  // Set the AcceptCalled flag (vtkPVPointSourceWidget needs access to it.)
+  vtkSetMacro(AcceptCalled, int);
+
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
