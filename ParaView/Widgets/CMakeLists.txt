@@ -56,6 +56,7 @@ vtkKWRadioButtonSet.cxx
 vtkKWRange.cxx 
 vtkKWRenderWidget.cxx 
 vtkKWSaveImageDialog.cxx 
+vtkKWScalarBarAnnotation.cxx 
 vtkKWScale.cxx 
 vtkKWScaleSet.cxx 
 vtkKWSegmentedProgressGauge.cxx
@@ -114,6 +115,7 @@ IF (NOT DO_NOT_BUILD_XML_RW)
   )
 ELSE (NOT DO_NOT_BUILD_XML_RW)
   SET_SOURCE_FILES_PROPERTIES(
+	vtkKWScalarBarAnnotation.cxx 
     vtkKWCornerAnnotation.cxx 
     vtkKWHeaderAnnotation.cxx 
     COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
