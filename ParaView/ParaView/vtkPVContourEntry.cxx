@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.23");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.24");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -476,6 +476,7 @@ vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVContourEntry::SafeDownCast(clone);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone, 
                                        vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -505,14 +506,22 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
   
-  const char* label = element->GetAttribute("label");
-  if(!label)
+  const char* attr;
+
+  attr = element->GetAttribute("label");
+  if(!attr)
     {
     vtkErrorMacro("No label attribute.");
     return 0;
     }
-  this->SetLabel(label);
+  this->SetLabel(attr);
   
+  attr = element->GetAttribute("initial_value");
+  if(attr)
+    {
+    this->AddValue(atof(attr));
+    }
+
   return 1;
 }
 
