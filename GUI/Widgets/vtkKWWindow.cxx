@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.208");
+vtkCxxRevisionMacro(vtkKWWindow, "1.209");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -828,7 +828,7 @@ void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, 
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* toolbar,
+void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* ,
   const char* name, int flag)
 {
   if (this->ToolbarsMenu)
