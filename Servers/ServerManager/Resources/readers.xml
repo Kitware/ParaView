@@ -311,6 +311,7 @@
          command="SetTimeValue"
          number_of_elements="1"
          default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <StringVectorProperty
@@ -569,6 +570,7 @@
          command="SetTimeValue"
          number_of_elements="1"
          default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <StringVectorProperty

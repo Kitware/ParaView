@@ -158,8 +158,8 @@
       <Item name="big endian" value="0"/>
       <Item name="little endian" value="1"/>
     </SelectionList>
-    <SelectTimeSet label="Select time value"
-                   trace_name="TimeSet" set_command="SetTimeValue"/>
+    <SelectTimeSet label="Select time value" property="SetTimeValue"
+                   trace_name="TimeSet"/>
     <ArraySelection attribute_name="Point"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
@@ -314,7 +314,7 @@
     <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectTimeSet label="Select time value"
                    trace_name="TimeSet"
-                   set_command="SetTimeValue"/>
+                   property="SetTimeValue"/>
     <ArraySelection attribute_name="Point"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
