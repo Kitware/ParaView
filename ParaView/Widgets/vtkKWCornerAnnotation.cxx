@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.45");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.46");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -766,7 +766,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.45 $");
+  this->ExtractRevision(os,"$Revision: 1.46 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -818,4 +818,5 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "RenderWidget: " << this->GetRenderWidget() << endl;
   os << indent << "TextPropertyWidget: " << this->TextPropertyWidget << endl;
+  os << indent << "MaximumLineHeightScale: " << this->MaximumLineHeightScale << endl;
 }
