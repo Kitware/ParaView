@@ -448,11 +448,20 @@
                  init_source="FilePattern"
                  trace_name="file_pattern"
                  help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
+
+    
     <VectorEntry variable="FileRange"
                  label="Range of files" type="int"
                  trace_name="file_range"
                  length="2"
                  help="Range of files that are loaded" />
+    <StringEntry variable="XMLFileName"
+                 label="XML File"
+                 init_source="XMLFileName"
+                 trace_name="xml_file"
+                 help="An XML file containing part and material descriptions and mapping to element blocks." />
+
+
     <Scale variable="TimeStep"
            type="int"
            label="Time step" trace_name="TimeStep"
@@ -463,8 +472,23 @@
                     attribute_name="Cell" />
     <ArraySelection trace_name="point_array_sel"
                     attribute_name="Point" />
-    <ArraySelection trace_name="block_sel"
-                    attribute_name="Block"/>
+
+    <SelectWidget type="int" 
+                  variable="DisplayType"
+                  trace_name="DisplayType">
+      <Item label="Blocks" value="1">
+        <ArraySelection trace_name="block_sel"
+                        attribute_name="Block"/>
+      </Item>
+      <Item label="Parts" value="2">
+        <ArraySelection trace_name="part_sel"
+                        attribute_name="Part"/>
+      </Item>
+      <Item label="Materials" value="3">
+        <ArraySelection trace_name="material_sel"
+                        attribute_name="Material"/>
+      </Item>
+    </SelectWidget>
     <LabeledToggle label="Block Ids"
                    variable="GenerateBlockIdCellArray"
                    trace_name="block_ids"
