@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -149,6 +149,8 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
     comp_elem->SetFloatAttribute("Specular", obj->GetSpecular(c_idx));
     comp_elem->SetFloatAttribute(
       "SpecularPower", obj->GetSpecularPower(c_idx));
+    comp_elem->SetIntAttribute(
+      "DisableGradientOpacity", obj->GetDisableGradientOpacity(c_idx));
     
     // Gray or Color Transfer Function
 
@@ -185,7 +187,7 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
 
     // Gradient Opacity
 
-    vtkPiecewiseFunction *gotf = obj->GetGradientOpacity(c_idx);
+    vtkPiecewiseFunction *gotf = obj->GetStoredGradientOpacity(c_idx);
     if (gotf)
       {
       xmlpfw->SetObject(gotf);
