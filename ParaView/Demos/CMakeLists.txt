@@ -1,0 +1,3 @@
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/Demos/Demo1.tcl.in
+${PARAVIEW_BINARY_DIR}/Demos/Demo1.tcl @ONLY)

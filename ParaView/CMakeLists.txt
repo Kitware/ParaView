@@ -76,7 +76,7 @@ ENDIF (PARAVIEW_CAN_BUILD)
 
 IF (PARAVIEW_CAN_BUILD)
 
- SUBDIRS(Widgets Utilities/Expat ParaView)
+ SUBDIRS(Widgets Utilities/Expat ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
 
  OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
