@@ -15,7 +15,7 @@ IF (VTK_USE_MPI)
 ENDIF (VTK_USE_MPI)
 
 SET(PROJECT_TESTS 
-		 SimplePackage TestPolyDataIO)
+		 SimplePackage TestPolyDataIO TestUnstructuredGridIO)
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
