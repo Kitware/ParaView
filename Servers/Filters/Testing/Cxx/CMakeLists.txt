@@ -3,13 +3,22 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/VTK/Rendering/Testing/Cxx/
   )
 
+
 SET(ServersFilters_SRCS
-  TestContinuousClose3D
   ServersFiltersPrintSelf
   TestCTH
-  TestPVFilters
   TestMPI
+  TestSort
   )
+
+IF (VTK_DATA_ROOT)
+  SET(ServersFilters_SRCS
+    ${ServersFilters_SRCS}
+    TestContinuousClose3D
+    TestPVFilters
+    )
+ENDIF (VTK_DATA_ROOT)
+
 
 IF(VTK_USE_MPI)
   SET(ServersFilters_SRCS
@@ -18,10 +27,6 @@ IF(VTK_USE_MPI)
     )
 ENDIF(VTK_USE_MPI)
 
-SET(ServersFiltersImage_SRCS
-  TestProjectedTetrahedra
-  TestSort
-)
 
 FOREACH(name ${ServersFilters_SRCS})
   ADD_EXECUTABLE(${name} ${name}.cxx)
@@ -31,12 +36,19 @@ FOREACH(name ${ServersFilters_SRCS})
   TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
 ENDFOREACH(name)
 
-FOREACH(name ${ServersFiltersImage_SRCS})
-  ADD_EXECUTABLE(${name} ${name}.cxx)
-  ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
-    -D ${VTK_DATA_ROOT}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${ParaView_SOURCE_DIR}/Data/Baseline/${name}.png
+
+
+IF (VTK_DATA_ROOT)
+  SET(ServersFiltersImage_SRCS
+    TestProjectedTetrahedra
     )
-  TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
-ENDFOREACH(name)
+  FOREACH(name ${ServersFiltersImage_SRCS})
+    ADD_EXECUTABLE(${name} ${name}.cxx)
+    ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
+      -D ${VTK_DATA_ROOT}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${ParaView_SOURCE_DIR}/Data/Baseline/${name}.png
+      )
+    TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
+  ENDFOREACH(name)
+ENDIF (VTK_DATA_ROOT)
