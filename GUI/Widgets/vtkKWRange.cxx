@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.34");
+vtkCxxRevisionMacro(vtkKWRange, "1.35");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -98,8 +98,8 @@ vtkKWRange::vtkKWRange()
   this->EndCommand          = NULL;
   this->EntriesCommand      = NULL;
 
-  this->CanvasFrame         = vtkKWFrame::New();
-  this->Canvas              = vtkKWCanvas::New();
+  this->CanvasFrame         = NULL;
+  this->Canvas              = NULL;
 
   for (i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
@@ -189,9 +189,17 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
 
   // Now we need the canvas
 
+  if (!this->CanvasFrame)
+    {
+    this->CanvasFrame = vtkKWFrame::New();
+    }
   this->CanvasFrame->SetParent(this);
   this->CanvasFrame->Create(app, "");
 
+  if (!this->Canvas)
+    {
+    this->Canvas = vtkKWCanvas::New();
+    }
   this->Canvas->SetParent(this->CanvasFrame);
   this->Canvas->Create(app, "-bd 0 -highlightthickness 0 -width 0 -height 0");
 
@@ -299,7 +307,7 @@ void vtkKWRange::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->CanvasFrame->UnpackSiblings();
 
   // Repack everything
 
@@ -339,16 +347,16 @@ void vtkKWRange::Pack()
 
   // Label
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
     row = this->LabelPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
       (this->LabelPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
     col = this->LabelPosition == vtkKWRange::POSITION_ALIGNED ? 0 : 3;
-    tk_cmd << "grid " << this->Label->GetWidgetName() 
+    tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
            << o_row << row << o_col << col
            << (this->LabelPosition != vtkKWRange::POSITION_ALIGNED ? 
                stickydir : (is_horiz ? " -sticky w" : " -sticky n")) << endl;
-    tk_cmd << this->Label->GetWidgetName() << " config -anchor "
+    tk_cmd << this->GetLabel()->GetWidgetName() << " config -anchor "
            << (this->LabelPosition != vtkKWRange::POSITION_ALIGNED ? "c" : 
                (is_horiz ? "w" : "c")) << endl;
     }
@@ -425,7 +433,7 @@ void vtkKWRange::Bind()
 
   // Canvas
 
-  if (this->Canvas->IsCreated())
+  if (this->Canvas && this->Canvas->IsCreated())
     {
     const char *canv = this->Canvas->GetWidgetName();
 
@@ -485,7 +493,7 @@ void vtkKWRange::UnBind()
 
   // Canvas
 
-  if (this->Canvas->IsCreated())
+  if (this->Canvas && this->Canvas->IsCreated())
     {
     const char *canv = this->Canvas->GetWidgetName();
 
@@ -2298,6 +2306,16 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SliderCanPush ? "On" : "Off") << endl;
   os << indent << "AdjustResolution: "
      << (this->AdjustResolution ? "On" : "Off") << endl;
-  os << indent << "Canvas: "<< this->Canvas << endl;
+
+  os << indent << "Canvas: ";
+  if (this->Canvas)
+    {
+    os << endl;
+    this->Canvas->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }
 
