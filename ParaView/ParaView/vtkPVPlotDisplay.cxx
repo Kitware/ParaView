@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -243,7 +243,7 @@ void vtkPVPlotDisplay::SetInput(vtkPVPart* input)
   vtkPVDataInformation* dataInfo = input->GetDataInformation();
   vtkPVDataSetAttributesInformation* pdi = dataInfo->GetPointDataInformation();
   vtkPVArrayInformation* arrayInfo;
-  const char* arrayName;
+  const char* arrayName = 0;
 
   vtkPVApplication *pvApp = this->GetPVApplication();
   if( ! pvApp)
