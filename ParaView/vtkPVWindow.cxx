@@ -59,6 +59,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWTranslateCameraInteractor.h"
 #include "vtkKWInteractor.h"
 
+#include <ctype.h>
+
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
 {
@@ -474,6 +476,7 @@ void vtkPVWindow::Open()
   int position;
   char *endingSlash = NULL;
   char *newRootName;
+  istream *input;
   
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
@@ -482,6 +485,16 @@ void vtkPVWindow::Open()
     {
     return;
     }
+
+  input = new ifstream(openFileName, ios::in);
+  if (input->fail())
+    {
+    vtkErrorMacro("Permission denied for opening " << openFileName);
+    delete input;
+    return;
+    }
+  
+  delete input;
   
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
