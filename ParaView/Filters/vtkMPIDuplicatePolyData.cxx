@@ -17,7 +17,6 @@
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
 #include "vtkMultiProcessController.h"
-#include "vtkMPICommunicator.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkPolyDataReader.h"
 #include "vtkCharArray.h"
@@ -26,8 +25,12 @@
 #include "vtkPolyData.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
+#include "vtkToolkits.h"
+#ifdef VTK_USE_MPI
+#include "vtkMPICommunicator.h"
+#endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.5.2.1");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.5.2.2");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -141,28 +144,13 @@ void vtkMPIDuplicatePolyData::Execute()
     return;
     }
   
-  vtkMPICommunicator *com = NULL;
-  if (this->Controller)
-    {
-    com = vtkMPICommunicator::SafeDownCast(
-      this->Controller->GetCommunicator());
-    }
-  
-  if (com == NULL)
-    { // This will probably lock up.
-    vtkErrorMacro("Could not get MPI communicator.");
-    reader->Delete();
-    reader = NULL;
-    return;
-    }
-  
   // Create the writer.
   vtkPolyDataWriter *writer = vtkPolyDataWriter::New();
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
 
   // Node 0 gathers all the the data and the broadcast it to all procs.
-  this->ServerExecute(com, reader, writer);
+  this->ServerExecute(reader, writer);
 
   reader->Delete();
   reader = NULL;
@@ -174,17 +162,18 @@ void vtkMPIDuplicatePolyData::Execute()
 
 
 //-----------------------------------------------------------------------------
-void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
-                                            vtkPolyDataReader* reader,
+#ifdef VTK_USE_MPI
+void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* reader,
                                             vtkPolyDataWriter* writer)
+#else
+void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
+                                            vtkPolyDataWriter* writer)
+#endif
 {
   int numProcs;
   numProcs = this->Controller->GetNumberOfProcesses();
   vtkPolyData* input;
   vtkPolyData* pd;
-  int idx;
-  int sum;
-  int myId = this->Controller->GetLocalProcessId();
   
   // First marshal our input.
   input = this->GetInput();
@@ -197,46 +186,78 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   int size = writer->GetOutputStringLength();
   char* buf = writer->RegisterAndGetOutputString();
   
-  // Compute the displacements.
-  sum = 0;
+  pd->Delete();
+  pd = NULL;
   
-  // Compute the degenerate input offsets and lengths.
-  // Broadcast our size to all other processes.
-  int* recvLengths = new int[numProcs * 2];
-  // Use a single array for lengths and offsets to avoid
-  // another send to the client.
-  int* recvOffsets = recvLengths+numProcs;
-  com->AllGather(&size, recvLengths, 1);
-  sum = 0;
-  for (idx = 0; idx < numProcs; ++idx)
-    {
-    recvOffsets[idx] = sum;
-    sum += recvLengths[idx];
-    }
-  
-  // Get the marshaled data sets.
-  char* allbuffers = new char[sum];
-  com->AllGatherV(buf, allbuffers, size, recvLengths, recvOffsets);
+#ifdef VTK_USE_MPI
+  int idx;
+  int sum;
+  int myId = this->Controller->GetLocalProcessId();
 
-  if (myId == 0)
+  vtkMPICommunicator *com = NULL;
+  if (this->Controller)
     {
-    // Send the string to the client.
-    this->SocketController->Send(&numProcs, 1, 1, 948344);
-    this->SocketController->Send(recvLengths, numProcs*2, 1, 948345);
-    this->SocketController->Send(allbuffers, sum, 1, 948346);
+    com = vtkMPICommunicator::SafeDownCast(
+      this->Controller->GetCommunicator());
     }
 
-  this->ReconstructOutput(reader, numProcs, allbuffers, 
-                          recvLengths, recvOffsets);
+  if (com)
+    {
+    // Allocate arrays used by the AllGatherV call.
+    int* recvLengths = new int[numProcs * 2];
+    // Use a single array for lengths and offsets to avoid
+    // another send to the client.
+    int* recvOffsets = recvLengths+numProcs;
+  
+    // Compute the degenerate input offsets and lengths.
+    // Broadcast our size to all other processes.
+    com->AllGather(&size, recvLengths, 1);
+
+    // Compute the displacements.
+    sum = 0;
+    for (idx = 0; idx < numProcs; ++idx)
+      {
+      recvOffsets[idx] = sum;
+      sum += recvLengths[idx];
+      }
+  
+    // Gather the marshaled data sets from all procs.
+    char* allbuffers = new char[sum];
+    com->AllGatherV(buf, allbuffers, size, recvLengths, recvOffsets);
+    if (myId == 0)
+      {
+      // Send the string to the client.
+      this->SocketController->Send(&numProcs, 1, 1, 948344);
+      this->SocketController->Send(recvLengths, numProcs*2, 1, 948345);
+      this->SocketController->Send(allbuffers, sum, 1, 948346);
+      }
+    this->ReconstructOutput(reader, numProcs, allbuffers, 
+                            recvLengths, recvOffsets);
+    delete [] allbuffers;
+    allbuffers = NULL;
+    delete [] recvLengths;
+    recvLengths = NULL;
+    // recvOffsets is part of the recvLengths array.
+    recvOffsets = NULL;
+    delete [] buf;
+    buf = NULL;
+    return;
+    }
+
+#endif
+
+  // Server must be a single process!
+  this->SocketController->Send(&numProcs, 1, 1, 948344);
+  int tmp[2];
+  tmp[0] = size;
+  tmp[1] = 0;
+  this->SocketController->Send(tmp, 2, 1, 948345);
+  this->SocketController->Send(buf, size, 1, 948346);
+  // Degenerate reconstruct output.
+  this->GetOutput()->ShallowCopy(input);
 
   delete [] buf;
   buf = NULL;
-  delete [] allbuffers;
-  allbuffers = NULL;
-  delete [] recvLengths;
-  recvLengths = NULL;
-  // recvOffsets is part of the recvLengths array.
-  recvOffsets = NULL;
 }
 
 
@@ -268,6 +289,7 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
     pd->GetCellData()->PassData(output->GetCellData());
     append->AddInput(pd);
     pd->Delete();
+    pd = NULL;
     }
 
   // Append
@@ -279,6 +301,9 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
   pd->CopyStructure(output);
   pd->GetPointData()->PassData(output->GetPointData());
   pd->GetCellData()->PassData(output->GetCellData());
+
+  append->Delete();
+  append = NULL;
 }
 
 
