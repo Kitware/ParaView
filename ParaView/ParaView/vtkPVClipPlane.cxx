@@ -225,6 +225,8 @@ void vtkPVClipPlane::CenterResetCallback()
   this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
   this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
   this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
+
+  this->CenterEntry->ModifiedCallback();
 }
 
 
@@ -258,6 +260,8 @@ void vtkPVClipPlane::NormalCameraCallback()
   this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
   this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
   this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
+
+  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -266,6 +270,8 @@ void vtkPVClipPlane::NormalXCallback()
   this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
   this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
   this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
+
+  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -274,6 +280,8 @@ void vtkPVClipPlane::NormalYCallback()
   this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
   this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
   this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
+
+  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -282,6 +290,8 @@ void vtkPVClipPlane::NormalZCallback()
   this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
   this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
   this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
+
+  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

@@ -3,6 +3,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ClipCut.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ClipCut.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Glyph.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Glyph.tcl)
 
@@ -33,6 +37,9 @@ ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
+ADD_TEST(ClipCut ${PARAVIEW_EXECUTABLE}
+                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ClipCut.tcl)
+
 ADD_TEST(Glyph ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Glyph.tcl)
 
@@ -53,3 +60,7 @@ ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(Extrusion ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
+
+
+
+
