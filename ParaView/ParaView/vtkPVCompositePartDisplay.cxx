@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -144,10 +144,12 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
     }
   this->SetCollectTclName(tclName);
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
-                         this->CollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
-                         this->CollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
+    this->CollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
+    this->CollectTclName);
   //
   // ===== LOD branch:
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
@@ -174,15 +176,19 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
+  pvApp->BroadcastScript(
+   "%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}",
+   this->LODCollectTclName);
+  pvApp->BroadcastScript(
+   "%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
+   this->LODCollectTclName);
    // Handle collection setup with client server.
-  pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-                         this->CollectTclName);
-  pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-                         this->LODCollectTclName);
+  pvApp->BroadcastScript(
+    "%s SetSocketController [ $Application GetSocketController ] ", 
+    this->CollectTclName);
+  pvApp->BroadcastScript(
+    "%s SetSocketController [ $Application GetSocketController ] ", 
+    this->LODCollectTclName);
   // Special condition to signal the client.
   // Because both processes of the Socket controller think they are 0!!!!
   if (pvApp->GetClientMode())

@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.203");
+vtkCxxRevisionMacro(vtkPVApplication, "1.204");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -546,8 +546,6 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
-  "--detach" , "-d",
-  "Detach ParaView from console (for running as server).",
   "--host", "-h",
   "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
   "--user", "",
@@ -1042,43 +1040,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
-  // Create the rendering module here.
-  char* rmClassName;
-  rmClassName = new char[strlen(this->RenderModuleName) + 20];
-  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
-  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
-  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  this->SetRenderModule(rm);
-  rm->SetPVApplication(this);
-  o->Delete();
-  o = NULL;
-  rm = NULL;
-  delete [] rmClassName;
-  rmClassName = NULL;
-
-  vtkstd::vector<vtkstd::string> open_files;
-  // If any of the arguments has a .pvs extension, load it as a script.
-  int i;
-  for (i=1; i < argc; i++)
-    {
-    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
-      {
-      if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
-        {
-        this->SetRenderModule(NULL);
-        this->SetExitStatus(1);
-        this->Exit();
-        return;
-        }
-      else
-        {
-        open_files.push_back(argv[i]);
-        }
-      }
-    }
-
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-
   // set the font size to be small
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
@@ -1130,6 +1091,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     int numProcs = this->ProcessModule->GetNumberOfPartitions();
     int numPipes = 1;
     int id;
+    int fileFound=0;
     // Until I add a user interface to set the number of pipes,
     // just read it from a file.
     ifstream ifs;
@@ -1158,37 +1120,88 @@ void vtkPVApplication::Start(int argc, char*argv[])
       ifs >> numPipes;
       if (numPipes > numProcs) { numPipes = numProcs; }
       if (numPipes < 1) { numPipes = 1; }
-      }
+      this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
 
-    
-    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
-    const char *displayString;
-    displayString = getenv("DISPLAY");
-    if (displayString)
-      {
-      rgDialog->SetDisplayString(0, displayString);
-      }
-    rgDialog->SetNumberOfProcessesInGroup(numPipes);
-    rgDialog->Create(this);
-
-    rgDialog->Invoke();
-    numPipes = rgDialog->GetNumberOfProcessesInGroup();
-    
-    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
-    
-    if (displayString)
-      {    
-      for (id = 1; id < numPipes; ++id)
+      for (id = 0; id < numPipes; ++id)
         {
-        // Format a new display string based on process.
-        displayString = rgDialog->GetDisplayString(id);
+        vtkstd::string display;
+        ifs >> display;
         this->RemoteScript(
           id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-          displayString);
+          display.c_str());
+        }
+      fileFound = 1;
+      }
+
+    
+    if (!fileFound)
+      {
+      vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
+      const char *displayString;
+      displayString = getenv("DISPLAY");
+      if (displayString)
+        {
+        rgDialog->SetDisplayString(0, displayString);
+        }
+      rgDialog->SetNumberOfProcessesInGroup(numPipes);
+      rgDialog->Create(this);
+      
+      rgDialog->Invoke();
+      numPipes = rgDialog->GetNumberOfProcessesInGroup();
+      
+      this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
+      
+      if (displayString)
+        {    
+        for (id = 1; id < numPipes; ++id)
+          {
+          // Format a new display string based on process.
+          displayString = rgDialog->GetDisplayString(id);
+          this->RemoteScript(
+            id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+            displayString);
+          }
+        }
+      rgDialog->Delete();
+      }
+    }
+
+  // Create the rendering module here.
+  char* rmClassName;
+  rmClassName = new char[strlen(this->RenderModuleName) + 20];
+  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
+  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
+  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
+  this->SetRenderModule(rm);
+  rm->SetPVApplication(this);
+  o->Delete();
+  o = NULL;
+  rm = NULL;
+  delete [] rmClassName;
+  rmClassName = NULL;
+
+  vtkstd::vector<vtkstd::string> open_files;
+  // If any of the arguments has a .pvs extension, load it as a script.
+  int i;
+  for (i=1; i < argc; i++)
+    {
+    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
+      {
+      if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
+        {
+        this->SetRenderModule(NULL);
+        this->SetExitStatus(1);
+        this->Exit();
+        return;
+        }
+      else
+        {
+        open_files.push_back(argv[i]);
         }
       }
-    rgDialog->Delete();
     }
+
+  vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // Splash screen ?
 

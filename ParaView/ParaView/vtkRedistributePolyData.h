@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkDataArray;
 class vtkDataSetAttributes;
 class vtkMultiProcessController;
+class vtkSocketController;
 
 class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
 {
@@ -97,6 +98,13 @@ public:
   void SetColorProc(int cp){colorProc = cp;};
   void SetColorProc(){colorProc = 1;};
   int GetColorProc(){return colorProc;};
+
+  // Description:
+  // These are here for ParaView compatibility. Not used.
+  virtual void SetSocketController(vtkSocketController*) {};
+  virtual void SetPassThrough(int) {};
+  virtual int  GetPassThrough() { return 0; };
+  vtkBooleanMacro(PassThrough, int);
 
 protected:
   vtkRedistributePolyData();

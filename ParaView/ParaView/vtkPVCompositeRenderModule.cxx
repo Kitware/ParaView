@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.5");
 
 
 
@@ -135,7 +135,10 @@ void vtkPVCompositeRenderModule::StillRender()
       }
     }
   localRender = 0;
-  if ((float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+  // If using a RenderingGroup (i.e. vtkAllToNPolyData), do not do
+  // local rendering
+  if (!this->PVApplication->GetUseRenderingGroup() &&
+      (float)(totalMemory)/1000.0 < this->GetCollectThreshold())
     {
     localRender = 1;
     }
