@@ -62,11 +62,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.2");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.3");
 
 #ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
-                     vtkMultiProcessController);
+                     vtkMPIController);
 vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
 {
   return this->Controller;
