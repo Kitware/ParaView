@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.14");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.15");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -428,6 +428,7 @@ vtkClientServerInterpreter
       << vtkClientServerStream::Error
       << "Invalid arguments to vtkClientServerStream::Invoke."
       << vtkClientServerStream::End;
+    abort();
     }
   return 0;
 }

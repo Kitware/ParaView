@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.9");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.10");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -105,16 +105,23 @@ vtkPVPart::vtkPVPart()
 //----------------------------------------------------------------------------
 vtkPVPart::~vtkPVPart()
 {  
-  this->SetPartDisplay(NULL);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
+    {
+    pm = pvApp->GetProcessModule();
+    }
 
+  this->SetPartDisplay(NULL);
   // Get rid of the circular reference created by the extent translator.
   // We have a problem with ExtractPolyDataPiece also.
   if (this->VTKDataID.ID != 0)
     {
-    vtkClientServerStream& stream = this->GetPVApplication()->GetProcessModule()->GetStream();
+    vtkClientServerStream& stream = pm->GetStream();
     stream.Reset();
     stream << vtkClientServerStream::Invoke << this->VTKDataID << "SetExtentTranslator" << 0 
            << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }  
     
   this->SetName(NULL);
@@ -123,12 +130,6 @@ vtkPVPart::~vtkPVPart()
   this->DataInformation = NULL;
 
   // Used to be in vtkPVActorComposite........
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = 0;
-  if(pvApp)
-    {
-    pm = pvApp->GetProcessModule();
-    }
 
   if (this->GeometryID.ID != 0)
     {

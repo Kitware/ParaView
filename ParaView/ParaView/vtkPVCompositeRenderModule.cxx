@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.5");
 
 
 
@@ -167,7 +167,7 @@ void vtkPVCompositeRenderModule::StillRender()
     vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetReductionFactor" << 1
+      << this->CompositeID << "SetImageReductionFactor" << 1
       << vtkClientServerStream::End;
     pm->SendStreamToClient();
     if (this->PVApplication->GetClientMode())
@@ -417,7 +417,7 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
     vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetReductionFactor"
+      << this->CompositeID << "SetImageReductionFactor"
       << int(newReductionFactor)
       << vtkClientServerStream::End;
     pm->SendStreamToClient();

@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.17");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.18");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -351,7 +351,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         str << "Add" << inputName << ends;
         stream << vtkClientServerStream::Invoke << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
-        pm->SendStreamToClientAndServer();
+        pm->SendStreamToServer();
         delete []str.str();
         }      
       }
@@ -380,7 +380,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         str << "Set" << inputName << ends;
         stream << vtkClientServerStream::Invoke << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
-        pm->SendStreamToClientAndServer();
+        pm->SendStreamToServer();
         delete [] str.str();
         }
       }
