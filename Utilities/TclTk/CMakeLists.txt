@@ -67,20 +67,6 @@ IF(UNIX)
 
 ELSE(UNIX)
 
-  SET(TCL_TK_WIN_DISTRIB_DIR ${TclTk_SOURCE_DIR}/TclTk8.4.5Win)
-  SET(TCL_LIBRARY ${TCL_TK_WIN_DISTRIB_DIR}/lib/tcl84.lib CACHE INTERNAL
-    "Path to tcl library" FORCE)
-  SET(TCL_LIBRARY_DEBUG ${TCL_TK_WIN_DISTRIB_DIR}/lib/tcl84.lib CACHE INTERNAL
-    "Path to tcl debug library" FORCE)
-  SET(TK_LIBRARY ${TCL_TK_WIN_DISTRIB_DIR}/lib/tk84.lib CACHE INTERNAL
-    "Path to tk library" FORCE)
-  SET(TK_LIBRARY_DEBUG ${TCL_TK_WIN_DISTRIB_DIR}/lib/tk84.lib CACHE INTERNAL
-    "Path to tk debug library" FORCE)
-  SET(TCL_INCLUDE_PATH ${TCL_TK_WIN_DISTRIB_DIR}/include CACHE INTERNAL
-    "Path to tcl include" FORCE)
-  SET(TK_INCLUDE_PATH ${TCL_TK_WIN_DISTRIB_DIR}/include CACHE INTERNAL
-    "Path to tk include" FORCE)
-
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
   # This includes the Tcl/Tk dll, and eventually some support dll
@@ -91,19 +77,41 @@ ELSE(UNIX)
     SET (CONFIG_TYPES .)
   ENDIF (CMAKE_CONFIGURATION_TYPES)
 
-  FOREACH (config ${CONFIG_TYPES})
-    SET (DLLS 
-         TclTk8.4.5Win/bin/tcl84.dll 
-         TclTk8.4.5Win/bin/tk84.dll
-         tkdnd/lib/tkdnd/libtkdnd.dll)
-    FOREACH (dll ${DLLS})
-      GET_FILENAME_COMPONENT (dllname ${dll} NAME)
-      CONFIGURE_FILE(
-        ${TclTk_SOURCE_DIR}/${dll}
-        ${APPLICATION_BINARY_DIR}/bin/${config}/${dllname}
-        COPYONLY)
-    ENDFOREACH (dll)
-  ENDFOREACH (config)
+  SET(TCL_TK_WIN_DISTRIB_DIR ${TclTk_SOURCE_DIR}/TclTk8.4.5Win)
+
+  IF(BUILD_SHARED_LIBS)
+    SET(SUFFIX "")
+    FOREACH(config ${CONFIG_TYPES})
+      SET(DLLS 
+        TclTk8.4.5Win/bin/tcl84.dll 
+        TclTk8.4.5Win/bin/tk84.dll
+        tkdnd/lib/tkdnd/libtkdnd.dll)
+      FOREACH(dll ${DLLS})
+        GET_FILENAME_COMPONENT(dllname ${dll} NAME)
+        CONFIGURE_FILE(
+          ${TclTk_SOURCE_DIR}/${dll}
+          ${APPLICATION_BINARY_DIR}/bin/${config}/${dllname}
+          COPYONLY)
+      ENDFOREACH(dll)
+    ENDFOREACH(config)
+  ELSE (BUILD_SHARED_LIBS)
+    SET(SUFFIX "sx")
+  ENDIF (BUILD_SHARED_LIBS)
+
+  SET(TCL_LIBRARY ${TCL_TK_WIN_DISTRIB_DIR}/lib/tcl84${SUFFIX}.lib CACHE 
+      INTERNAL "Path to tcl library" FORCE)
+  SET(TCL_LIBRARY_DEBUG ${TCL_LIBRARY} CACHE INTERNAL
+    "Path to tcl debug library" FORCE)
+
+  SET(TK_LIBRARY ${TCL_TK_WIN_DISTRIB_DIR}/lib/tk84${SUFFIX}.lib CACHE INTERNAL
+    "Path to tk library" FORCE)
+  SET(TK_LIBRARY_DEBUG ${TK_LIBRARY} CACHE INTERNAL
+    "Path to tk debug library" FORCE)
+
+  SET(TCL_INCLUDE_PATH ${TCL_TK_WIN_DISTRIB_DIR}/include CACHE INTERNAL
+    "Path to tcl include" FORCE)
+  SET(TK_INCLUDE_PATH ${TCL_TK_WIN_DISTRIB_DIR}/include CACHE INTERNAL
+    "Path to tk include" FORCE)
 
 ENDIF(UNIX)
 
