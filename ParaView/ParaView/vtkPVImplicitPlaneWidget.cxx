@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -689,13 +689,13 @@ void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[0]->SetValue(x, 3);
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
+  this->ModifiedFlag = 1;
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->Widget3DTclName, x, y, z);
     }
-  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
