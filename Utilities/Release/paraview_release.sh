@@ -23,7 +23,7 @@
 #
 
 # Release version number.
-TAG="HEAD"
+TAG="ParaView-1-6-1"
 PARAVIEW_VERSION="1.6"
 VERSION="${PARAVIEW_VERSION}.1"
 RELEASE="1"
@@ -41,9 +41,6 @@ CVS_PASS="paraview"
 # Default program names.
 CMAKE="cmake"
 MAKE="make"
-
-TEST_SUBTREE=ParaView
-INSTALL_SUBTREE=ParaView
 
 # ParaView release root directory.
 RELEASE_ROOT_NAME="ParaViewReleaseRoot"
@@ -331,7 +328,7 @@ config()
         echo "${CONFIG_FILE} should specify CC, CXX, and PLATFORM." &&
         return 1
     fi
-    export CC CXX CFLAGS CXXFLAGS PATH LD_LIBRARY_PATH DISPLAY
+    export CC CXX CFLAGS CXXFLAGS LDFLAGS PATH LD_LIBRARY_PATH DISPLAY
 }
 
 #-----------------------------------------------------------------------------
@@ -339,16 +336,25 @@ checkout()
 {
     [ -z "${DONE_checkout}" ] || return 0 ; DONE_checkout="yes"
     config || return 1
-    echo "Exporting ${CVS_MODULE} from cvs ..." &&
+    echo "Updating ${CVS_MODULE} from cvs ..." &&
     (
-        rm -rf ${PROJECT}-${VERSION} &&
-        rm -rf CheckoutTemp &&
-        mkdir CheckoutTemp &&
-        cd CheckoutTemp &&
-        cvs -q -z3 -d $CVSROOT export -r ${TAG} ${CVS_MODULE} &&
-        mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
-        cd .. &&
-        rm -rf CheckoutTemp
+        if [ -d ${PROJECT}-${VERSION}/CVS ]; then
+            cd ${PROJECT}-${VERSION} &&
+            cvs -q -z3 -d $CVSROOT update -dAP -r ${TAG} &&
+            rm -rf Xdmf/Utilities/expat &&
+            rm -rf Xdmf/Utilities/zlib
+        else
+            rm -rf ${PROJECT}-${VERSION} &&
+            rm -rf CheckoutTemp &&
+            mkdir CheckoutTemp &&
+            cd CheckoutTemp &&
+            cvs -q -z3 -d $CVSROOT co -r ${TAG} ${CVS_MODULE} &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
+            mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
+            cd .. &&
+            rm -rf CheckoutTemp
+        fi
     ) >Logs/checkout.log 2>&1 || error_log Logs/checkout.log
 }
 
@@ -384,7 +390,7 @@ source_tarball()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar* &&
-        tar cvf Tarballs/${PROJECT}-${VERSION}.tar ${PROJECT}-${VERSION} &&
+        tar cvf Tarballs/${PROJECT}-${VERSION}.tar --exclude CVS ${PROJECT}-${VERSION} &&
         gzip -c Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.gz &&
         compress -cf Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.Z &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar
@@ -405,7 +411,11 @@ source_zipfile()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.zip &&
-        zip -r Tarballs/${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION}
+        rm -rf Tarballs/${PROJECT}-${VERSION} &&
+        tar c --exclude CVS ${PROJECT}-${VERSION} | (cd Tarballs; tar x) &&
+        cd Tarballs &&
+        zip -r ${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION} &&
+        rm -rf ${PROJECT}-${VERSION}
     ) >Logs/source_zipfile.log 2>&1 || error_log Logs/source_zipfile.log
 }
 
@@ -458,6 +468,7 @@ CMAKE_BUILD_TYPE:STRING=Release
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
 CMAKE_SKIP_RPATH:BOOL=1
 CMAKE_VERBOSE_MAKEFILE:BOOL=TRUE
+VTK_USE_64BIT_IDS:BOOL=OFF
 VTK_USE_HYBRID:BOOL=ON
 VTK_USE_MPI:BOOL=OFF
 VTK_USE_PARALLEL:BOOL=ON
@@ -520,12 +531,15 @@ install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/paraview" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
-        cd "${PROJECT}-${VERSION}-${PLATFORM}/${INSTALL_SUBTREE}" &&
-        ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
+        (
+            cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
+            ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
+        ) &&
+        rm -rf Install/usr/local/include Install/usr/local/lib/vtk
     ) >Logs/install.log 2>&1 || error_log Logs/install.log
 }
 
@@ -534,7 +548,7 @@ strip()
 {
     [ -z "${DONE_strip}" ] || return 0 ; DONE_strip="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Stripping executables ..." &&
     (
         strip Install${PREFIX}/bin/*
@@ -546,7 +560,7 @@ manifest()
 {
     [ -z "${DONE_manifest}" ] || return 0 ; DONE_manifest="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Writing MANIFEST ..." &&
     (
         mkdir -p Install${PREFIX}${DOC_DIR} &&
