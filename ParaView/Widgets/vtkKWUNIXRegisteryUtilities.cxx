@@ -161,7 +161,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
       // Comment
       continue;
       }   
-    for ( cc = 0; cc< strlen(line); cc++ )
+    for ( cc = 0; cc< static_cast<int>(strlen(line)); cc++ )
       {
       if ( line[cc] == '=' )
 	{
@@ -202,7 +202,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
 	{
 	if ( it->Valid() )
 	  {      
-	  unsigned long key = it->GetKey();
+	  //unsigned long key = it->GetKey();
 	  void *value = it->GetData();
 	  if ( value )
 	    {
@@ -261,7 +261,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
 	{
 	if ( it->Valid() )
 	  {      
-	  unsigned long key = it->GetKey();
+	  // unsigned long key = it->GetKey();
 	  void *value = it->GetData();
 	  if ( value )
 	    {
