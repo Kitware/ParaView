@@ -985,7 +985,7 @@ void vtkPVWindow::WriteData()
       }
   
     // See if the user wants to save any ghost levels.
-    this->Script("tk_dialog {Ghost Level Selection} {ParaView PopUp} {How many ghost levels would you like to save?} {} 0 0 1 2");
+    this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} {How many ghost levels would you like to save?} {} 0 0 1 2");
     ghostLevel = this->GetIntegerResult(pvApp);
     if (ghostLevel == -1)
       {
@@ -1372,7 +1372,7 @@ void vtkPVWindow::EnableFilterButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::CalculatorCallback()
+vtkPVSource *vtkPVWindow::CalculatorCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1390,7 +1390,7 @@ void vtkPVWindow::CalculatorCallback()
   if (current == NULL)
     {
     vtkErrorMacro("Cannot determine output type.");
-    return;
+    return NULL;
     }
   outputDataType = current->GetVTKData()->GetClassName();
   
@@ -1401,7 +1401,7 @@ void vtkPVWindow::CalculatorCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   calc = vtkPVArrayCalculator::New();
@@ -1445,10 +1445,12 @@ void vtkPVWindow::CalculatorCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return calc;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::CutPlaneCallback()
+vtkPVSource *vtkPVWindow::CutPlaneCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1474,7 +1476,7 @@ void vtkPVWindow::CutPlaneCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   cutPlane = vtkPVCutPlane::New();
@@ -1519,11 +1521,13 @@ void vtkPVWindow::CutPlaneCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return cutPlane;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ThresholdCallback()
+vtkPVSource *vtkPVWindow::ThresholdCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1541,7 +1545,7 @@ void vtkPVWindow::ThresholdCallback()
   if (current == NULL)
     {
     vtkErrorMacro("Cannot threshold; no input");
-    return;
+    return NULL;
     }
   outputDataType = "vtkUnstructuredGrid";
   
@@ -1552,7 +1556,7 @@ void vtkPVWindow::ThresholdCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   threshold = vtkPVThreshold::New();
@@ -1598,10 +1602,12 @@ void vtkPVWindow::ThresholdCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return threshold;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ClipPlaneCallback()
+vtkPVSource *vtkPVWindow::ClipPlaneCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1627,7 +1633,7 @@ void vtkPVWindow::ClipPlaneCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   clipPlane = vtkPVClipPlane::New();
@@ -1672,11 +1678,13 @@ void vtkPVWindow::ClipPlaneCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return clipPlane;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ContourCallback()
+vtkPVSource *vtkPVWindow::ContourCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1694,7 +1702,7 @@ void vtkPVWindow::ContourCallback()
   if (current == NULL)
     {
     vtkErrorMacro("Cannot determine output type");
-    return;
+    return NULL;
     }
   outputDataType = "vtkPolyData";
   
@@ -1709,7 +1717,7 @@ void vtkPVWindow::ContourCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   contour = vtkPVContour::New();
@@ -1754,10 +1762,13 @@ void vtkPVWindow::ContourCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  // It has not really been deleted.
+  return contour;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::GlyphCallback()
+vtkPVSource *vtkPVWindow::GlyphCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
@@ -1775,7 +1786,7 @@ void vtkPVWindow::GlyphCallback()
   if (current == NULL)
     {
     vtkErrorMacro("Cannot determine output type");
-    return;
+    return NULL;
     }
   outputDataType = "vtkPolyData";
   
@@ -1786,7 +1797,7 @@ void vtkPVWindow::GlyphCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
   
   glyph = vtkPVGlyph3D::New();
@@ -1832,10 +1843,12 @@ void vtkPVWindow::GlyphCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return glyph;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ProbeCallback()
+vtkPVSource *vtkPVWindow::ProbeCallback()
 {
   static int instanceCount = 1;
   char tclName[100];
@@ -1852,7 +1865,7 @@ void vtkPVWindow::ProbeCallback()
   if (current == NULL)
     {
     vtkErrorMacro("No data to use as source for vtkProbeFilter");
-    return;
+    return NULL;
     }
   outputDataType = "vtkPolyData";
   
@@ -1863,7 +1876,7 @@ void vtkPVWindow::ProbeCallback()
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
-    return;
+    return NULL;
     }
 
   pvApp->BroadcastScript("%s SetSpatialMatch 2", tclName);
@@ -1909,6 +1922,8 @@ void vtkPVWindow::ProbeCallback()
                  this->Menu->GetWidgetName(), i);
     }
   this->DisableFilterButtons();
+
+  return probe;
 }
 
 //----------------------------------------------------------------------------

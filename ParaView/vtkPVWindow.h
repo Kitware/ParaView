@@ -149,31 +149,31 @@ public:
   
   // Description:
   // Callback from the calculator button.
-  void CalculatorCallback();
+  vtkPVSource *CalculatorCallback();
   
   // Description:
   // Callback from the CutPlane button.
-  void CutPlaneCallback();
+  vtkPVSource *CutPlaneCallback();
 
   // Description:
   // Callback from the ClipPlane button.
-  void ClipPlaneCallback();
+  vtkPVSource *ClipPlaneCallback();
 
   // Description:
   // Callback from the threshold button.
-  void ThresholdCallback();
+  vtkPVSource *ThresholdCallback();
 
   // Description:
   // Callback from the contour button.
-  void ContourCallback();
+  vtkPVSource *ContourCallback();
 
   // Description:
   // Callback from the glyph button.
-  void GlyphCallback();
+  vtkPVSource *GlyphCallback();
   
   // Description:
   // Callback from the probe button.
-  void ProbeCallback();
+  vtkPVSource *ProbeCallback();
   
   // Description:
   // Callback from the frame rate scale.

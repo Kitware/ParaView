@@ -68,6 +68,11 @@ public:
   void DeleteValueCallback();
   
   // Description:
+  // Convenience methods for scripting.
+  void AddValue(char *val);
+  void DeleteAllValues();
+
+  // Description:
   // Tcl callback for adding the contour values
   void ContourValuesAcceptCallback();
   void ContourValuesResetCallback();
@@ -76,6 +81,10 @@ public:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
   
+  // Description:
+  // Access for scripting.
+  vtkGetObjectMacro(NewValueEntry, vtkKWEntry);
+
 protected:
   vtkPVContour();
   ~vtkPVContour();

@@ -247,6 +247,16 @@ void vtkPVContour::DeleteValueCallback()
   this->ChangeAcceptButtonColor();
 }
 
+void vtkPVContour::AddValue(char *val)
+{
+  this->ContourValuesList->AppendUnique(val);
+}
+
+void vtkPVContour::DeleteAllValues()
+{
+  this->ContourValuesList->DeleteAll();
+}
+
 void vtkPVContour::ContourValuesAcceptCallback()
 {
   int i;

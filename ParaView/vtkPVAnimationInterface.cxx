@@ -337,7 +337,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->SourceLabel->Create(this->Application, "-width 15 -justify right");
   this->SourceLabel->SetLabel("Filter/Source:");
   // Source menu
-  this->SourceMenuButton->Create(app, "");
+  this->SourceMenuButton->Create(app, "-tearoff 0");
   this->SourceMenuButton->SetBalloonHelpString("Select the filter/source whose instance varible will change with time.");
   if (this->PVSource)
     {
@@ -353,7 +353,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->MethodLabel->Create(this->Application, "-width 15 -justify right");
   this->MethodLabel->SetLabel("Variable:");
   // Method menu
-  this->MethodMenuButton->Create(app, "");
+  this->MethodMenuButton->Create(app, "-tearoff 0");
   this->MethodMenuButton->SetButtonText("Method");
   this->MethodMenuButton->SetBalloonHelpString("Select the method that will be called.");
   this->Script("pack %s %s %s %s -side left", this->SourceLabel->GetWidgetName(),

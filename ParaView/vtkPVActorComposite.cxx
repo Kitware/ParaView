@@ -799,6 +799,16 @@ void vtkPVActorComposite::UpdateProperties()
     this->ColorMenu->SetValue("Property");
     this->ColorByProperty();
     }
+
+  // Make sure the visibility check is consistent with out state.
+  if (this->GetVisibility())
+    {
+    this->VisibilityCheck->SetState(1);
+    }
+  else
+    {
+    this->VisibilityCheck->SetState(0);
+    }
 }
 
 //----------------------------------------------------------------------------
