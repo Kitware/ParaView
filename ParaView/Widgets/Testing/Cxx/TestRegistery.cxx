@@ -17,7 +17,7 @@
   cout << "Error, " << x << " != " << y << endl;\
   }
 
-int main(int argc, char *argv)
+int main(int vtkNotUsed(argc), char* vtkNotUsed(argv))
 {
   int res = 0;
   
