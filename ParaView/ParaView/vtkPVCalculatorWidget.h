@@ -98,7 +98,7 @@ public:
   
   // Description:
   // Save this source to a file.
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
+  void SaveInTclScript(ofstream *file);
 
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.20");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.21");
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -180,15 +180,20 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   this->Reset();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Reset()
+{
+  this->Reset(this->VTKReaderTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::Reset(const char* sourceTclName)
 {
   vtkKWCheckButton* checkButton;
   int row = 0;
   
   // See if we need to create new check buttons.
-  this->Script("%s GetFileName", this->VTKReaderTclName);
+  this->Script("%s GetFileName", sourceTclName);
     
   // Filename not set
   if (this->Application->GetMainInterp()->result[0] == '\0')
@@ -207,12 +212,12 @@ void vtkPVArraySelection::Reset()
     this->ArrayCheckButtons->RemoveAllItems();
       
     // Create new check buttons.
-    if (this->VTKReaderTclName)
+    if (sourceTclName)
       {
       int numArrays, idx;
-      this->Script("%s UpdateInformation", this->VTKReaderTclName);
+      this->Script("%s UpdateInformation", sourceTclName);
       this->Script("%s GetNumberOf%sArrays", 
-                   this->VTKReaderTclName, this->AttributeName);
+                   sourceTclName, this->AttributeName);
       numArrays = this->GetIntegerResult(this->Application);
       for (idx = 0; idx < numArrays; ++idx)
         {
@@ -221,7 +226,7 @@ void vtkPVArraySelection::Reset()
         checkButton->Create(this->Application, "");
         this->Script("%s SetText [%s Get%sArrayName %d]", 
                      checkButton->GetTclName(), 
-                     this->VTKReaderTclName, this->AttributeName, idx);
+                     sourceTclName, this->AttributeName, idx);
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
         ++row;
         checkButton->SetCommand(this, "ModifiedCallback");
@@ -243,21 +248,26 @@ void vtkPVArraySelection::Reset()
     //this->Script("%s SetState [%s Get%sArrayStatus {%s}]", 
     //             checkButton->GetTclName(), this->VTKReaderTclName,
     //             this->AttributeName, checkButton->GetText());
-    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
+    this->Script("%s Get%sArrayStatus {%s}", sourceTclName,
                  this->AttributeName, checkButton->GetText());
     checkButton->SetState(this->GetIntegerResult(this->Application));
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Accept()
+{
+  this->Accept(this->VTKReaderTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::Accept(const char* sourceTclName)
 {
   vtkKWCheckButton *check;
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // Create new check buttons.
-  if (this->VTKReaderTclName == NULL)
+  if (sourceTclName == NULL)
     {
     vtkErrorMacro("VTKREader has not been set.");
     }
@@ -272,12 +282,12 @@ void vtkPVArraySelection::Accept()
     {
     // This is only here to try to avoid extra lines in the trace file.
     // We could make every check button a pv widget.
-    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
+    this->Script("%s Get%sArrayStatus {%s}", sourceTclName,
                  this->AttributeName, check->GetText());
     if (this->GetIntegerResult(this->Application) != check->GetState())
       {
       pvApp->BroadcastScript("%s Set%sArrayStatus {%s} %d", 
-                             this->VTKReaderTclName, this->AttributeName, 
+                             sourceTclName, this->AttributeName, 
                              check->GetText(), check->GetState());    
 
       this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(), 

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.2");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -716,8 +716,7 @@ void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::SaveInTclScript(ofstream *file, int interactiveFlag,
-                                           int vtkFlag)
+void vtkPVCalculatorWidget::SaveInTclScript(ofstream *file)
 {
   int i;
   vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));

@@ -82,11 +82,13 @@ public:
   // Methods for setting the value of the VTKReader from the widget.
   // User internally when user hits Accept.
   virtual void Accept();
+  virtual void Accept(const char* sourceTclName);
 
   // Description:
   // Methods for setting the value of the widget from the VTKReader.
   // User internally when user hits Reset.
   virtual void Reset();
+  virtual void Reset(const char* sourceTclName);
 
   // Description:
   // Callback for the AllOn and AllOff buttons.
