@@ -62,7 +62,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.159");
+vtkCxxRevisionMacro(vtkKWApplication, "1.160");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -824,6 +824,14 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 {
   if ( this->InExit )
+    {
+    return;
+    }
+  if ( !widget->IsCreated() )
+    {
+    return;
+    }
+  if ( !widget->GetEnabled() )
     {
     return;
     }
