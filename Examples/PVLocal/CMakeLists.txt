@@ -56,3 +56,7 @@ ENDFOREACH(c)
 # Place the package configuration file into the build tree.
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/PVLocal.xml.in
                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.xml @ONLY IMMEDIATE)
+
+# Place the package configuration file into the build tree.
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/PVLocal.pvsm.in
+               ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pvsm @ONLY IMMEDIATE)
