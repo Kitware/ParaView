@@ -89,6 +89,7 @@ class VTK_EXPORT vtkKWEvent
     IrregularSplineSurfacePropertyChangedEvent,
     IrregularSplineSurfaceRemoveEvent,
     IrregularSplineSurfaceVisibilityChangedEvent,
+    IrregularSplineSurfaceActiveChangedEvent,
     LeftMouseOptionChangedEvent,
     LightActiveChangedEvent,
     LightColorChangedEvent,
