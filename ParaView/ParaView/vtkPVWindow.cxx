@@ -147,7 +147,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.27");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.28");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -986,17 +986,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     "Edit the center of rotation xyz coordinates.");
   this->CenterEntryOpenCloseButton->SetCommand(this, "CenterEntryOpenCallback");
   this->PickCenterToolbar->AddWidget(this->CenterEntryOpenCloseButton);
-  
-  // Creating the center of rotation actor here because we have
-  // the application here.
-  // We do not need to broadcast.  We need Send to root method.
-  // Not local for client server option.
-  this->SetCenterMapperTclName("pvMapperSource");
-  this->SetCenterActorTclName("pvActorSource");
-  this->SetCenterSourceTclName("pvCenterSource");
-  this->SetCenterMapperTclName("pvMapperSource");
-  this->SetCenterActorTclName("pvActorSource");
-  
+
   // Creating the center of rotation actor here because we have the
   // application here.
   this->CenterSourceID = pm->NewStreamObject("vtkAxes");
@@ -4341,7 +4331,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractiveRenderEnabled: " 
      << (this->InteractiveRenderEnabled?"on":"off") << endl;
   os << indent << "AnimationInterface: " << this->AnimationInterface << endl;
-  os << indent << "InteractorTclName: " << (this->InteractorTclName ?
-                                            this->InteractorTclName : "(none)")
-     << endl;
+  os << indent << "InteractorID: " << this->InteractorID << endl;
 }
