@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
@@ -185,7 +185,7 @@ void vtkPVConnectDialog::OK()
     cout << "Store server: " << this->Hostname->GetEntry()->GetValueFromIndex(cc) << endl;
     servers += this->Hostname->GetEntry()->GetValueFromIndex(cc);
     }
-  cout << "Servers: " << servers << endl;
+  cout << "Servers: " << servers.c_str() << endl;
   this->Application->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
 
   this->Superclass::OK();
