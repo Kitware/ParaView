@@ -19,11 +19,12 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.1");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.2");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 vtkPVGlyphFilter::vtkPVGlyphFilter()
 {
+  this->SetColorModeToColorByScalar();
 }
 
 vtkPVGlyphFilter::~vtkPVGlyphFilter()
