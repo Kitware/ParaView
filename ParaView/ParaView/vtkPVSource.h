@@ -88,6 +88,7 @@ class VTK_EXPORT vtkPVSource : public vtkKWObject
 public:
   static vtkPVSource* New();
   vtkTypeMacro(vtkPVSource,vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Get the Window for this class.  This is used for creating input menus.
@@ -278,10 +279,11 @@ public:
   // Description:
   // Needed to clean up properly.
   vtkSetStringMacro(ExtentTranslatorTclName);
+  vtkGetStringMacro(ExtentTranslatorTclName);
 
   // Description:
-  // This flag determines whether a source will make its input invisible or not.
-  // By default, this flag is on.
+  // This flag determines whether a source will make its input invisible 
+  // or not. By default, this flag is on.
   vtkSetMacro(ReplaceInput, int);
   vtkGetMacro(ReplaceInput, int);
   vtkBooleanMacro(ReplaceInput, int);

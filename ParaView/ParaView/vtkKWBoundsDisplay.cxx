@@ -145,7 +145,9 @@ void vtkKWBoundsDisplay::UpdateWidgets()
     }
 }
 
-
-
-
-
+//----------------------------------------------------------------------------
+void vtkKWBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Bounds: " << this->GetBounds();
+}

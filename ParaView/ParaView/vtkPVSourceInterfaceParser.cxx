@@ -722,3 +722,13 @@ SetStandardMethodInterface(const char* element,
     this->PVMethodInterface->SetBalloonHelp(help);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSourceInterfaceParser::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "FileName: " << this->GetFileName() << endl;
+  os << indent << "PVApplication: " << this->GetPVApplication() << endl;
+  os << indent << "PVWindow: " << this->GetPVWindow() << endl;
+  os << indent << "SourceInterfaces: " << this->GetSourceInterfaces() << endl;
+}

@@ -771,3 +771,19 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   sprintf(label, "%d", this->SelectedComponent);
   this->ComponentMenu->SetValue(label);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ArrayName: " << this->GetArrayName();
+  os << indent << "ArrayNumberOfComponents: " << this->GetArrayNumberOfComponents();
+  os << indent << "AttributeType: " << this->GetAttributeType();
+  os << indent << "InputName: " << this->GetInputName();
+  os << indent << "NumberOfComponents: " << this->GetNumberOfComponents();
+  os << indent << "ObjectTclName: " << this->GetObjectTclName();
+  os << indent << "SelectedComponent: " << this->GetSelectedComponent();
+  os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu();
+  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu();
+  os << indent << "ShowScalarRangeLabel: " << this->GetShowScalarRangeLabel();
+}

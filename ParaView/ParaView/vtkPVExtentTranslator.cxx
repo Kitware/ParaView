@@ -174,7 +174,7 @@ int vtkPVExtentTranslator::PieceToExtent()
 //----------------------------------------------------------------------------
 void vtkPVExtentTranslator::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkObject::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Original Source: (" << this->OriginalSource << ")\n";
 }

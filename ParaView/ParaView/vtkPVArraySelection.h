@@ -60,6 +60,7 @@ class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 public:
   static vtkPVArraySelection* New();
   vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // This specifies whether to ues Cell or Point data.

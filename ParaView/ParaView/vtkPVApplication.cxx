@@ -1007,3 +1007,12 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   dlg->Invoke();  
   dlg->Delete();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Controller: " << this->GetController();
+  os << indent << "MajorVersion: " << this->GetMajorVersion();
+  os << indent << "MinorVersion: " << this->GetMinorVersion();
+}

@@ -140,6 +140,9 @@ void vtkPVWidget::SaveInTclScript(ofstream *file)
   file = file;
 }
 
-
-
- 
+//----------------------------------------------------------------------------
+void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
+}

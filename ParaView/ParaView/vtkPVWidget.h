@@ -65,6 +65,7 @@ class VTK_EXPORT vtkPVWidget : public vtkKWWidget
 public:
   static vtkPVWidget* New();
   vtkTypeMacro(vtkPVWidget, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The methods get called when the Accept button is pressed. 

@@ -77,6 +77,7 @@ class VTK_EXPORT vtkKWHashTable : public vtkObject
 public: 
   static vtkKWHashTable *New();
   vtkTypeMacro(vtkKWHashTable,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // This is a prototipe for the hashing function. When 

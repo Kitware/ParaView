@@ -274,3 +274,16 @@ vtkKWHashTableIterator *vtkKWHashTable::Iterator()
   it->Delete();
   return 0;
 }
+
+//----------------------------------------------------------------------------
+void vtkKWHashTable::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Size:              " << this->GetSize() << endl
+     << indent << "Number of buckets: " << this->GetNumberOfBuckets() << endl
+     << indent << "Hash function:     " 
+     << ((this->HashFunction == vtkKWHashTable::HashString) ? 
+	 "Hash String" : "Custom hash function")
+     << ((this->HashFunction == vtkKWHashTable::HashString) ? 
+	 "" : (void *)this->HashFunction) << endl;
+}

@@ -70,6 +70,7 @@ public:
   // Description:
   // Set the fly speed
   vtkSetMacro(Speed, float);
+  vtkGetMacro(Speed, float);
   
 protected:
   vtkPVInteractorStyleFly();

@@ -359,3 +359,13 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "DataType: " << this->GetDataType() << endl;
+  os << indent << "Entries: " << this->GetEntries() << endl;
+  os << indent << "Label: " << this->GetLabel() << endl;
+  os << indent << "ScriptValue: " << this->GetScriptValue() << endl;
+  os << indent << "SubLabels: " << this->GetSubLabels() << endl;
+}

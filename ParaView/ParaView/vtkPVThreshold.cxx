@@ -380,3 +380,10 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
   
   this->GetPVOutput(0)->SaveInTclScript(file);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVThreshold::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "AttributeModeMenu: " << this->GetAttributeModeMenu() << endl;
+}

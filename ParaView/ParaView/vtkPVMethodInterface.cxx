@@ -132,3 +132,13 @@ void vtkPVMethodInterface::SetWidgetType(int type)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMethodInterface::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "BalloonHelp: " << this->GetBalloonHelp() << endl;
+  os << indent << "FileExtension: " << this->GetFileExtension() << endl;
+  os << indent << "Label: " << this->GetLabel() << endl;
+  os << indent << "VariableName: " << this->GetVariableName() << endl;
+  os << indent << "WidgetType: " << this->GetWidgetType() << endl;
+}

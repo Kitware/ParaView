@@ -60,6 +60,7 @@ class VTK_EXPORT vtkPVThreshold : public vtkPVSource
 public:
   static vtkPVThreshold* New();
   vtkTypeMacro(vtkPVThreshold, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source

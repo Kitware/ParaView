@@ -192,3 +192,10 @@ void vtkStringList::Reallocate(int num)
   this->Strings = tmp;
   tmp = NULL;
 }
+
+//----------------------------------------------------------------------------
+void vtkStringList::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "NumberOfStrings: " << this->GetNumberOfStrings() << endl;
+}

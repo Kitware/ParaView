@@ -60,6 +60,7 @@ class VTK_EXPORT vtkPVSourceInterfaceParser : public vtkObject
 public:
   static vtkPVSourceInterfaceParser* New();
   vtkTypeMacro(vtkPVSourceInterfaceParser,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Parse the XML from the given input file.  Returns success or

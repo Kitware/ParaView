@@ -59,6 +59,7 @@ class VTK_EXPORT vtkPVBoundsDisplay : public vtkPVWidget
 public:
   static vtkPVBoundsDisplay* New();
   vtkTypeMacro(vtkPVBoundsDisplay, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

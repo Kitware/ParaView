@@ -59,6 +59,7 @@ class VTK_EXPORT vtkPVInputMenu : public vtkPVWidget
 public:
   static vtkPVInputMenu* New();
   vtkTypeMacro(vtkPVInputMenu, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create the widget.

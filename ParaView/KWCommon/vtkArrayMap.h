@@ -65,6 +65,7 @@ class vtkArrayMap : public vtkAbstractMap<KeyType,DataType>
   friend class vtkArrayMapIterator<KeyType,DataType>;
   
 public:
+  typedef vtkAbstractMap<KeyType,DataType> Superclass;
   typedef vtkArrayMapIterator<KeyType,DataType> IteratorType;
 
   // Cannot use this macro because of the comma in the type name.

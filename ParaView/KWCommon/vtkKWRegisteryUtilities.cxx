@@ -298,3 +298,14 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
     }
   return nstr;
 }
+
+//----------------------------------------------------------------------------
+void vtkKWRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "TopLevel: " << this->GetTopLevel() << endl
+     << indent << "Locked:   " << (this->GetLocked() ? "true" : "false") 
+     << endl
+     << indent << "Opened:   " << (this->GetOpened() ? "true" : "false")
+     << endl;
+}

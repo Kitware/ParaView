@@ -54,6 +54,7 @@ class vtkVector : public vtkAbstractList<DType>
   friend class vtkVectorIterator<DType>;
 
 public:
+  typedef vtkAbstractList<DType> Superclass;
   typedef vtkVectorIterator<DType> IteratorType;
   
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  

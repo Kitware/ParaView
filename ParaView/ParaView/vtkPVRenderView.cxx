@@ -1161,3 +1161,19 @@ void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
 
   *file << "\n";
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ImmediateModeCheck: " << this->GetImmediateModeCheck() << endl;
+  os << indent << "InteractiveCompositeTime: " << this->GetInteractiveCompositeTime() << endl;
+  os << indent << "InteractiveRenderTime: " << this->GetInteractiveRenderTime() << endl;
+  os << indent << "NavigationFrame: " << this->GetNavigationFrame() << endl;
+  os << indent << "RendererTclName: " << this->GetRendererTclName() << endl;
+  os << indent << "StillCompositeTime: " << this->GetStillCompositeTime() << endl;
+  os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
+  os << indent << "TriangleStripsCheck: " << this->GetTriangleStripsCheck() << endl;
+  os << indent << "UseReductionFactor: " << this->GetUseReductionFactor() << endl;
+}
+

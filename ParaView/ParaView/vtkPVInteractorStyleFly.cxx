@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.1");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.2");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------
@@ -250,8 +250,9 @@ void vtkPVInteractorStyleFly::ResetLights()
   light->SetFocalPoint(cam->GetFocalPoint());
 }
 
-//-------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkPVInteractorStyleFly::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os, indent);
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Speed: " << this->GetSpeed() << endl;
 }

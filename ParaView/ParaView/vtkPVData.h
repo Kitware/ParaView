@@ -80,6 +80,7 @@ class VTK_EXPORT vtkPVData : public vtkKWObject
 public:
   static vtkPVData* New();
   vtkTypeMacro(vtkPVData, vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // This also creates the parallel vtk objects for the composite.

@@ -60,6 +60,7 @@ class VTK_EXPORT vtkPVSourceInterface : public vtkKWObject
 public:
   static vtkPVSourceInterface* New();
   vtkTypeMacro(vtkPVSourceInterface, vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // The name of the vtk object created.

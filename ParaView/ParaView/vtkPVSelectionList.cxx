@@ -206,3 +206,10 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CurrentName: " << this->GetCurrentName() << endl;
+  os << indent << "CurrentValue: " << this->GetCurrentValue() << endl;
+}

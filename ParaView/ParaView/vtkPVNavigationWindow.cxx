@@ -403,3 +403,10 @@ void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
 	       this->Canvas->GetWidgetName(), widget,
 	       (onoff ? "red" : "blue") );
 }
+
+//----------------------------------------------------------------------------
+void vtkPVNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Canvas: " << this->GetCanvas() << endl;
+}

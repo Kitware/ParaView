@@ -65,6 +65,7 @@ class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
 public:
   static vtkPVArrayMenu* New();
   vtkTypeMacro(vtkPVArrayMenu, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create the widget.
@@ -174,6 +175,7 @@ public:
   // Direct access to the ArrayName is used internally by the Reset method. 
   // The methods "SetValue" should be used instead of this method.
   vtkSetStringMacro(ArrayName);
+  vtkGetStringMacro(ArrayName);
 
   // Description:
   // These are internal methods that are called when a menu is changed.

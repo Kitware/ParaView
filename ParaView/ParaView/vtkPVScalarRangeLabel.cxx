@@ -186,6 +186,10 @@ void vtkPVScalarRangeLabel::Update()
   this->Label->SetLabel(str);
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVScalarRangeLabel::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
+  os << indent << "Range: " << this->GetRange() << endl;
+}

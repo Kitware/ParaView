@@ -360,4 +360,10 @@ void vtkPVArraySelection::SaveInTclScript(ofstream *file)
     }
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "AttributeName: " << this->GetAttributeName();
+  os << indent << "VTKReaderTclName: " << this->GetVTKReaderTclName();
+}

@@ -67,6 +67,7 @@ class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 public:
   static vtkPVApplication* New();
   vtkTypeMacro(vtkPVApplication,vtkKWApplication);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Start running the main application.

@@ -82,15 +82,6 @@ vtkPVLODActor::~vtkPVLODActor()
   this->Device = NULL;
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkActor::PrintSelf(os,indent);
-
-  
-}
-
 //----------------------------------------------------------------------------
 // We use points as the size of the data, because cells cqan mislead.
 // A good example is verts.  One cell can contain any number of verticies.
@@ -259,3 +250,9 @@ void vtkPVLODActor::ShallowCopy(vtkProp *prop)
   this->vtkActor::ShallowCopy(prop);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "LODMapper: " << this->GetLODMapper() << endl;
+}

@@ -55,6 +55,7 @@ class vtkLinkedList : public vtkAbstractList<DType>
   friend class vtkLinkedListIterator<DType>;
 
 public:
+  typedef vtkAbstractList<DType> Superclass;
   typedef vtkLinkedListIterator<DType> IteratorType;
 
   static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  

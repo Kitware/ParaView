@@ -127,6 +127,11 @@ void vtkPVBoundsDisplay::Update()
   this->Widget->SetBounds(bds);
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "InputMenu: " << this->GetInputMenu();
+  os << indent << "ShowHideFrame: " << this->GetShowHideFrame();
+  os << indent << "Widget: " << this->GetWidget();
+}

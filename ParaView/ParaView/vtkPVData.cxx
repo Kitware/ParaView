@@ -2228,3 +2228,24 @@ void vtkPVData::SaveInTclScript(ofstream *file)
     *file << renTclName << " AddProp " << this->CubeAxesTclName << "\n";
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ColorMapMenu: " << this->GetColorMapMenu();
+  os << indent << "ColorMenu: " << this->GetColorMenu();
+  os << indent << "CubeAxesTclName: " << this->GetCubeAxesTclName();
+  os << indent << "GeometryTclName: " << this->GetGeometryTclName();
+  os << indent << "LODMapperTclName: " << this->GetLODMapperTclName();
+  os << indent << "Mapper: " << this->GetMapper();
+  os << indent << "MapperTclName: " << this->GetMapperTclName();
+  os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers();
+  os << indent << "PVSource: " << this->GetPVSource();
+  os << indent << "PropTclName: " << this->GetPropTclName();
+  os << indent << "PropertiesParent: " << this->GetPropertiesParent();
+  os << indent << "ScalarBarTclName: " << this->GetScalarBarTclName();
+  os << indent << "VTKData: " << this->GetVTKData();
+  os << indent << "VTKDataTclName: " << this->GetVTKDataTclName();
+  os << indent << "View: " << this->GetView();
+}

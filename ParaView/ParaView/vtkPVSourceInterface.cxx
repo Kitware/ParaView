@@ -432,3 +432,17 @@ void vtkPVSourceInterface::SaveInTclScript(ofstream *file, const char *sourceNam
       }
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSourceInterface::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "DataFileName: " << this->GetDataFileName() << endl;
+  os << indent << "DefaultScalars: " << this->GetDefaultScalars() << endl;
+  os << indent << "DefaultVectors: " << this->GetDefaultVectors() << endl;
+  os << indent << "InputClassName: " << this->GetInputClassName() << endl;
+  os << indent << "OutputClassName: " << this->GetOutputClassName() << endl;
+  os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
+  os << indent << "RootName: " << this->GetRootName() << endl;
+  os << indent << "SourceClassName: " << this->GetSourceClassName() << endl;
+}

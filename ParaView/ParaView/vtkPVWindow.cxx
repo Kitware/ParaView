@@ -4186,3 +4186,32 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 //  "</Filter>\n"
 //  "\n"
 //  "</Interfaces>\n";
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CalculatorButton: " << this->GetCalculatorButton() << endl;
+  os << indent << "CenterXEntry: " << this->GetCenterXEntry() << endl;
+  os << indent << "CenterYEntry: " << this->GetCenterYEntry() << endl;
+  os << indent << "CenterZEntry: " << this->GetCenterZEntry() << endl;
+  os << indent << "ClipButton: " << this->GetClipButton() << endl;
+  os << indent << "ContourButton: " << this->GetContourButton() << endl;
+  os << indent << "CurrentPVData: " << this->GetCurrentPVData() << endl;
+  os << indent << "CutButton: " << this->GetCutButton() << endl;
+  os << indent << "ExtractGridButton: " << this->GetExtractGridButton() << endl;
+  os << indent << "ExtractVoidsButton: " << this->GetExtractVoidsButton() << endl;
+  os << indent << "FilterMenu: " << this->GetFilterMenu() << endl;
+  os << indent << "FlyStyle: " << this->GetFlyStyle() << endl;
+  os << indent << "GlyphButton: " << this->GetGlyphButton() << endl;
+  os << indent << "GlyphMenu: " << this->GetGlyphMenu() << endl;
+  os << indent << "InteractorStyleToolbar: " << this->GetInteractorStyleToolbar() << endl;
+  os << indent << "MainView: " << this->GetMainView() << endl;
+  os << indent << "ProbeButton: " << this->GetProbeButton() << endl;
+  os << indent << "RotateCameraStyle: " << this->GetRotateCameraStyle() << endl;
+  os << indent << "SelectMenu: " << this->GetSelectMenu() << endl;
+  os << indent << "SourceMenu: " << this->GetSourceMenu() << endl;
+  os << indent << "ThresholdButton: " << this->GetThresholdButton() << endl;
+  os << indent << "Toolbar: " << this->GetToolbar() << endl;
+  os << indent << "TranslateCameraStyle: " << this->GetTranslateCameraStyle() << endl;
+}

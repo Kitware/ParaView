@@ -731,3 +731,15 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ControlledWidget: " << this->GetControlledWidget();
+  os << indent << "PVSource: " << this->GetPVSource();
+  os << indent << "TimeEnd: " << this->GetTimeEnd();
+  os << indent << "TimeStart: " << this->GetTimeStart();
+  os << indent << "TimeStep: " << this->GetTimeStep();
+  os << indent << "View: " << this->GetView();
+  os << indent << "Window: " << this->GetWindow();
+}

@@ -61,6 +61,7 @@ class VTK_EXPORT vtkPVWizard : public vtkKWWidget
 public:
   static vtkPVWizard* New();
   vtkTypeMacro(vtkPVWizard,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget
@@ -99,7 +100,9 @@ public:
   // Description:
   // A hack to get the data from the reader through Tcl.
   vtkSetObjectMacro(Data, vtkRectilinearGrid);
+  vtkGetObjectMacro(Data, vtkRectilinearGrid);
   vtkSetStringMacro(String);
+  vtkGetStringMacro(String);
 
 protected:
   vtkPVWizard();

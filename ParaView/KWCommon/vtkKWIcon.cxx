@@ -191,3 +191,10 @@ const unsigned char* vtkKWIcon::GetData()
   return this->Data;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWIcon::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Width:  " << this->GetWidth() << endl
+     << indent << "Height: " << this->GetHeight() << endl;
+}

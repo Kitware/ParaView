@@ -55,6 +55,7 @@ if [ catch { [ set files [ glob $FileExpression ] ] } result ] {
     regsub {\\\*} $FileExpression "*" FileExpression
     if [ catch { [ set files [ glob $FileExpression ] ] } nresult ] {
 	puts "Cannot expand the expression: \"$FileExpression\""
+	puts "Error: $nresult"
     }
 }
 

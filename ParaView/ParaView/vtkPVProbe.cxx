@@ -955,3 +955,13 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   
   this->GetPVOutput(0)->SaveInTclScript(file);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CurrentEndPoint: " << this->GetCurrentEndPoint() << endl;
+  os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
+  os << indent << "EndPointMenu: " << this->GetEndPointMenu() << endl;
+  os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
+}

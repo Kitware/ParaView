@@ -66,6 +66,7 @@ class VTK_EXPORT vtkPVMethodInterface : public vtkObject
 public:
   static vtkPVMethodInterface* New();
   vtkTypeMacro(vtkPVMethodInterface, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // This will be used to label the UI.

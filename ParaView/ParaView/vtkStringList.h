@@ -55,6 +55,7 @@ class VTK_EXPORT vtkStringList : public vtkObject
 public:
   static vtkStringList* New();
   vtkTypeMacro(vtkStringList,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
 //BTX
   // Description:

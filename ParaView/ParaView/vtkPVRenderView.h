@@ -71,6 +71,7 @@ class VTK_EXPORT vtkPVRenderView : public vtkKWView
 public:
   static vtkPVRenderView* New();
   vtkTypeMacro(vtkPVRenderView,vtkKWView);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the application right after construction.

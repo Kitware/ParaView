@@ -55,6 +55,7 @@ class VTK_EXPORT vtkPVVectorEntry : public vtkPVObjectWidget
 public:
   static vtkPVVectorEntry* New();
   vtkTypeMacro(vtkPVVectorEntry, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp, char *label, int vectorLength,
               char **subLabels, char *help);

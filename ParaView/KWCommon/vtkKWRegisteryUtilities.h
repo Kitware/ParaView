@@ -50,6 +50,7 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   public:
   static vtkKWRegisteryUtilities* New();
   vtkTypeMacro(vtkKWRegisteryUtilities, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Read a value from the registry.

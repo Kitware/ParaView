@@ -57,7 +57,8 @@ class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
 public:
   static vtkPVAnimationInterface* New();
-  vtkTypeMacro(vtkPVAnimationInterface, vtkPVSource);
+  vtkTypeMacro(vtkPVAnimationInterface, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   void Create(vtkKWApplication *app, char *frameArgs);
@@ -151,6 +152,7 @@ public:
   // this widget will be updated to reflect the new value.
   // The menu sets it here.
   vtkSetObjectMacro(ControlledWidget, vtkPVWidget);
+  vtkGetObjectMacro(ControlledWidget, vtkPVWidget);
 
 protected:
   vtkPVAnimationInterface();

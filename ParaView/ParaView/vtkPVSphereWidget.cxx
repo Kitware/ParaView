@@ -222,6 +222,11 @@ void vtkPVSphereWidget::SaveInTclScript(ofstream *file)
   this->RadiusEntry->SaveInTclScript(file);
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CenterEntry: " << this->GetCenterEntry() << endl;
+  os << indent << "RadiusEntry: " << this->GetRadiusEntry() << endl;
+  os << indent << "SphereTclName: " << this->GetSphereTclName() << endl;
+}

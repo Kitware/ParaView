@@ -335,13 +335,6 @@ vtkPVTreeComposite::~vtkPVTreeComposite()
 
 
 //----------------------------------------------------------------------------
-void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkCompositeManager::PrintSelf(os, indent);
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
 {  
   if (this->EnableAbort == 0)
@@ -796,20 +789,11 @@ vtkPVTreeComposite::~vtkPVTreeComposite()
   this->SetRenderView(NULL);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkCompositeManager::PrintSelf(os, indent);
-}
-
-
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
 {
   this->vtkCompositeManager::CheckForAbortRender();
 }
-
 
 //----------------------------------------------------------------------------
 int vtkPVTreeComposite::CheckForAbortComposite()
@@ -817,11 +801,12 @@ int vtkPVTreeComposite::CheckForAbortComposite()
   return this->vtkCompositeManager::CheckForAbortComposite();
 }
 
-
-
 #endif  // VTK_USE_MPI
 
-
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "EnableAbort: " << this->GetEnableAbort() << endl;
+  os << indent << "RenderView: " << this->GetRenderView() << endl;
+}

@@ -96,3 +96,9 @@ void vtkPVGenericRenderWindowInteractor::Render()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
+}

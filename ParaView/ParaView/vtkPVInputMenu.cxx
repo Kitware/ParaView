@@ -331,3 +331,11 @@ void vtkPVInputMenu::Reset()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "InputName: " << this->GetInputName() << endl;
+  os << indent << "InputType: " << this->GetInputType() << endl;
+  os << indent << "VTKInputName: " << this->GetVTKInputName() << endl;
+}

@@ -59,6 +59,7 @@ class VTK_EXPORT vtkPVScalarRangeLabel : public vtkPVWidget
 public:
   static vtkPVScalarRangeLabel* New();
   vtkTypeMacro(vtkPVScalarRangeLabel, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

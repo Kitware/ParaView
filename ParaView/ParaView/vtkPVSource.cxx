@@ -1746,3 +1746,24 @@ vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
   return vtkPVRenderView::SafeDownCast(this->View);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
+  os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
+  os << indent << "ExtentTranslatorTclName: " << this->GetExtentTranslatorTclName() << endl;
+  os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() << endl;
+  os << indent << "Notebook: " << this->GetNotebook() << endl;
+  os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
+  os << indent << "NumberOfPVOutputs: " << this->GetNumberOfPVOutputs() << endl;
+  os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
+  os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
+  os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
+  os << indent << "VTKSource: " << this->GetVTKSource() << endl;
+  os << indent << "VTKSourceTclName: " << this->GetVTKSourceTclName() << endl;
+  os << indent << "View: " << this->GetView() << endl;
+  os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
+  os << indent << "Widgets: " << this->GetWidgets() << endl;
+}
