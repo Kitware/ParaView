@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.8");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.9");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -570,7 +570,7 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
   "--host", "-h",
-  "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
+  "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
   "--user", "",
   "Tell the client what username to send to server when establishing SSH connection.",
   "--always-ssh", "",
@@ -962,6 +962,18 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       this->SetUsername(newarg);
       }
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-v",
+                                          index) == VTK_OK )
+    {
+    this->ServerMode = 1;
+    }
+
+  if (this->ServerMode || this->ClientMode)
+    {
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
                                             index) == VTK_OK ||
          vtkPVApplication::CheckForArgument(argc, argv, "-h",
@@ -979,18 +991,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       this->SetHostName(newarg);
       }
-    }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-v",
-                                          index) == VTK_OK )
-    {
-    this->ServerMode = 1;
-    }
-
-  if (this->ServerMode || this->ClientMode)
-    {
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--port",
                                             index) == VTK_OK)
       {

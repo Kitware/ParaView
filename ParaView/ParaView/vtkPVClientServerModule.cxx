@@ -217,7 +217,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43.2.3");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43.2.4");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -389,13 +389,13 @@ void vtkPVClientServerModule::Connect()
   vtkCommunicator::SetUseCopy(1);
 #endif
 
+  this->ClientMode = pvApp->GetClientMode();
+
   // Do not try to connect sockets on MPI processes other than root.
   if (myId > 0)
     {
     return;
     }
-
-  this->ClientMode = pvApp->GetClientMode();
 
   // I want to be able to switch which process waits, and which connects.
   // Just a hard way of doing an exclusive or.
@@ -452,7 +452,8 @@ void vtkPVClientServerModule::Connect()
         {  // all the following stuff is for starting the server automatically.
         // This is the "reverse-connection" condition.  
         // For now just fail if connection is not found.
-        vtkErrorMacro("Server error: Could not connect to the client.");
+        vtkErrorMacro("Server error: Could not connect to the client. " 
+                      << this->Hostname << " " << this->Port);
         comm->Delete();
         pvApp->Exit();
         this->ReturnValue = 1;
