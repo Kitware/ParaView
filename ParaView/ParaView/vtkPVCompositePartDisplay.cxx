@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // This should be in subclass.
-    int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+    //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
     pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
     pvApp->BroadcastScript("%s InitializeSchedule %d", tclName,
