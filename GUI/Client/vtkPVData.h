@@ -46,6 +46,7 @@ class vtkPVColorMap;
 class vtkPVSource;
 class vtkPVRenderView;
 class vtkPVDataSetAttributesInformation;
+class vtkPVVolumeAppearanceEditor;
 
 // Try to eliminate this !!!!
 class vtkData;
@@ -205,6 +206,10 @@ public:
   // Called when the user presses the "Edit Color Map" button.
   void EditColorMapCallback();
 
+  // Description:
+  // Called when the user presses the "Edit Volume Appearance" button.
+  void EditVolumeAppearanceCallback();
+
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
@@ -332,6 +337,8 @@ protected:
   // this method will turn its scalar bar visibility off.
   void SetPVColorMap(vtkPVColorMap *colorMap);
 
+  void SetVolumeAppearanceEditor(vtkPVVolumeAppearanceEditor *appearanceEditor);
+  
   //==================================================================
   // Internal versions that do not add to the trace.
   void ColorByPropertyInternal();
@@ -373,6 +380,8 @@ protected:
 
   vtkKWLabel *VolumeScalarsMenuLabel;
   vtkKWOptionMenu *VolumeScalarsMenu;
+
+  vtkKWPushButton *EditVolumeAppearanceButton;
 
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
@@ -432,6 +441,8 @@ protected:
 
   vtkPVColorMap *PVColorMap;
 
+  vtkPVVolumeAppearanceEditor *VolumeAppearanceEditor;
+  
   // Adding point labelling back in.  This only works in single-process mode.
   // This code will be changed/moved when we rework 2D rendering in ParaView.
   vtkKWCheckButton *PointLabelCheck;

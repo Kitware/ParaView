@@ -83,6 +83,7 @@ class vtkPVSource;
 class vtkPVSourceCollection;
 class vtkPVTimerLogDisplay;
 class vtkPVTrackballRoll;
+class vtkPVVolumeAppearanceEditor;
 class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
@@ -411,6 +412,10 @@ public:
                                int numberOfComponents);
 
   // Description:
+  // This method returns the shared volume appearance editor
+  vtkPVVolumeAppearanceEditor *GetVolumeAppearanceEditor();
+  
+  // Description:
   // Return the collection of all colormaps.
   vtkCollection* GetPVColorMaps();
 
@@ -625,6 +630,8 @@ protected:
 
   vtkCollection *PVColorMaps;
 
+  vtkPVVolumeAppearanceEditor *VolumeAppearanceEditor;
+  
   // This can be used to disable the pop-up dialogs if necessary
   // (usually used from inside regression scripts)
   int UseMessageDialog;

@@ -51,6 +51,7 @@
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVVolumeAppearanceEditor.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -82,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.275");
+vtkCxxRevisionMacro(vtkPVData, "1.276");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -144,6 +145,8 @@ vtkPVData::vtkPVData()
   this->VolumeScalarsMenuLabel = vtkKWLabel::New();
   this->VolumeScalarsMenu = vtkKWOptionMenu::New();
   
+  this->EditVolumeAppearanceButton = vtkKWPushButton::New();
+
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
@@ -193,6 +196,8 @@ vtkPVData::vtkPVData()
   this->PointLabelCheck = vtkKWCheckButton::New();
   
   this->VolumeRenderMode = 0;
+  
+  this->VolumeAppearanceEditor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -209,6 +214,12 @@ vtkPVData::~vtkPVData()
     this->PVColorMap = 0;
     }
 
+  if ( this->VolumeAppearanceEditor )
+    {
+    this->VolumeAppearanceEditor->UnRegister(this);
+    this->VolumeAppearanceEditor = NULL;
+    }
+  
   this->SetPVSource(NULL);
 
   if (this->PropertiesParent)
@@ -259,6 +270,9 @@ vtkPVData::~vtkPVData()
   this->VolumeScalarsMenu->Delete();
   this->VolumeScalarsMenu = NULL;
 
+  this->EditVolumeAppearanceButton->Delete();
+  this->EditVolumeAppearanceButton = NULL;
+  
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
@@ -366,6 +380,26 @@ void vtkPVData::SetVisibilityCheckState(int v)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVData::SetVolumeAppearanceEditor(vtkPVVolumeAppearanceEditor *appearanceEditor)
+{
+  if ( this->VolumeAppearanceEditor == appearanceEditor )
+    {
+    return;
+    }
+  
+  if ( this->VolumeAppearanceEditor )
+    {
+    this->VolumeAppearanceEditor->UnRegister(this);
+    this->VolumeAppearanceEditor = NULL;
+    }
+  
+  if ( appearanceEditor )
+    {
+    this->VolumeAppearanceEditor = appearanceEditor;
+    this->VolumeAppearanceEditor->Register(this);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
@@ -623,6 +657,9 @@ void vtkPVData::CreateProperties()
   this->EditColorMapVisible = 0;
 
   // Volume Appearance
+  this->SetVolumeAppearanceEditor(this->GetPVApplication()->GetMainWindow()->
+                                  GetVolumeAppearanceEditor());
+
   this->VolumeAppearanceFrame->SetParent(this->Properties->GetFrame());
   this->VolumeAppearanceFrame->ShowHideFrameOn();
   this->VolumeAppearanceFrame->Create(this->Application, 0);
@@ -640,6 +677,16 @@ void vtkPVData::CreateProperties()
   this->VolumeScalarsMenu->SetBalloonHelpString(
     "Select scalars to view with volume rendering.");
 
+  this->EditVolumeAppearanceButton->
+    SetParent(this->VolumeAppearanceFrame->GetFrame());
+  this->EditVolumeAppearanceButton->Create(this->Application, "");
+  this->EditVolumeAppearanceButton->SetLabel("Edit Volume Appearance...");
+  this->EditVolumeAppearanceButton->
+    SetCommand(this,"EditVolumeAppearanceCallback");
+  this->EditVolumeAppearanceButton->SetBalloonHelpString(
+    "Edit the color and opacity functions for the volume.");
+
+  
   this->Script("grid %s %s -sticky wns",
                this->VolumeScalarsMenuLabel->GetWidgetName(),
                this->VolumeScalarsMenu->GetWidgetName());
@@ -647,6 +694,11 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->VolumeScalarsMenu->GetWidgetName(),
                col_1_padx, button_pady);
+
+  this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
+               this->EditVolumeAppearanceButton->GetWidgetName(),
+               col_1_padx, button_pady);
+
 
   // Display style
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
@@ -1073,6 +1125,20 @@ void vtkPVData::EditColorMapCallback()
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
   this->Script("pack %s -side top -fill both -expand t",
           this->PVColorMap->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::EditVolumeAppearanceCallback()
+{
+  if (this->VolumeAppearanceEditor == NULL)
+    {
+    vtkErrorMacro("Expecting a volume appearance editor");
+    return;
+    }
+  this->Script("pack forget [pack slaves %s]",
+          this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill both -expand t",
+          this->VolumeAppearanceEditor->GetWidgetName());
 }
 
 

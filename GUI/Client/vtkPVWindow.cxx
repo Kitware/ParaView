@@ -81,6 +81,7 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
+#include "vtkPVVolumeAppearanceEditor.h"
 #include "vtkPVWriter.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyData.h"
@@ -124,7 +125,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.554");
+vtkCxxRevisionMacro(vtkPVWindow, "1.555");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -269,6 +270,8 @@ vtkPVWindow::vtkPVWindow()
 
   this->PVColorMaps = vtkCollection::New();
 
+  this->VolumeAppearanceEditor = NULL;
+  
   this->CenterActorVisibility = 1;
 
   this->MenusDisabled = 0;
@@ -372,6 +375,12 @@ vtkPVWindow::~vtkPVWindow()
     {
     this->PVColorMaps->Delete();
     this->PVColorMaps = NULL;
+    }
+  
+  if ( this->VolumeAppearanceEditor )
+    {
+    this->VolumeAppearanceEditor->Delete();
+    this->VolumeAppearanceEditor = NULL;
     }
 }
 
@@ -4093,6 +4102,24 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
 
   return cm;
 }
+
+//-----------------------------------------------------------------------------
+// This is the shared volume appearance editor
+vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
+{
+  if ( !this->VolumeAppearanceEditor )
+    {
+    this->VolumeAppearanceEditor = vtkPVVolumeAppearanceEditor::New();
+    this->VolumeAppearanceEditor->
+      SetParent(this->GetMainView()->GetPropertiesParent());
+    this->VolumeAppearanceEditor->
+      SetPVRenderView(this->GetMainView());
+    this->VolumeAppearanceEditor->Create(this->GetPVApplication());
+    }
+  
+  return this->VolumeAppearanceEditor;
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::AddManipulator(const char* rotypes, const char* name, 
