@@ -2,16 +2,17 @@
 
 #include "vtkCompositeRenderManager.h"
 
-#include <vtkObjectFactory.h>
-#include <vtkCompressCompositer.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkFloatArray.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRendererCollection.h>
-#include <vtkTimerLog.h>
+#include "vtkObjectFactory.h"
+#include "vtkCompressCompositer.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkFloatArray.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
+#include "vtkTimerLog.h"
+#include "vtkMultiProcessController.h"
 
-vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.4");
+vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.5");
 vtkStandardNewMacro(vtkCompositeRenderManager);
 vtkCxxSetObjectMacro(vtkCompositeRenderManager,Compositer,vtkCompositer);
 

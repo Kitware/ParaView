@@ -52,8 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkStringList;
 
-class VTK_EXPORT vtkPVStringAndScalarListWidgetProperty :
-  public vtkPVScalarListWidgetProperty
+class VTK_EXPORT vtkPVStringAndScalarListWidgetProperty : public vtkPVScalarListWidgetProperty
 {
 public:
   static vtkPVStringAndScalarListWidgetProperty* New();

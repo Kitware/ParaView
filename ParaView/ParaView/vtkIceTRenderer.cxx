@@ -8,6 +8,8 @@
 #include "vtkLightCollection.h"
 #include "vtkCommand.h"
 
+#include <GL/ice-t.h>
+
 //******************************************************************
 // Prototypes
 //******************************************************************
@@ -22,7 +24,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.3");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.4");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()

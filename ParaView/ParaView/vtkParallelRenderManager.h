@@ -36,17 +36,14 @@
 #ifndef __vtkParallelRenderManager_h
 #define __vtkParallelRenderManager_h
 
-//#include "vtksnlParallelWin32Header.h"
-
-#include <vtkObject.h>
-
-#include <vtkMultiProcessController.h>
+#include "vtkObject.h"
 
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 class vtkTimerLog;
+class vtkMultiProcessController;
 
 class VTK_EXPORT vtkParallelRenderManager : public vtkObject
 {
