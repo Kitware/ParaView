@@ -34,13 +34,9 @@ $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp582)
 $kw(vtkTemp18) SetCameraState 9.087 1.279 -1.442  1.162 1.000 -1.000  -0.021 -0.629 -0.777
 $kw(vtkTemp18) SetCameraState 7.797 -2.031 2.139  1.162 1.000 -1.000  0.112 -0.586 -0.802
 $kw(vtkTemp18) SetCameraState 1.624 -5.207 -5.932  1.162 1.000 -1.000  0.098 0.624 -0.776
-set kw(vtkTemp1228) [$kw(vtkTemp2) CreatePVSource ShrinkFilter]
-$kw(vtkTemp1228) AcceptCallback
 
-$kw(vtkTemp18) SetCameraState 9.056 1.841 -1.218  1.162 1.000 -1.000  -0.054 0.255 -0.966
-$kw(vtkTemp18) SetCameraState -1.828 -4.819 -5.501  1.162 1.000 -1.000  -0.474 0.678 -0.562
-$kw(vtkTemp18) SetCameraState 2.600 -0.066 -8.737  1.162 1.000 -1.000  -0.410 0.890 -0.199
-$kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp582)
+
+
 set kw(vtkTemp1346) [$kw(vtkTemp2) CreatePVSource ShrinkFilter]
 $kw(vtkTemp1346) AcceptCallback
 
