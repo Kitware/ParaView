@@ -47,7 +47,8 @@ IF(NOT PARAVIEW_NO_HDF5)
   OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use sytstem HDF5" OFF)
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
-IF(ParaViewComplete_BINARY_DIR)  
+IF(ParaViewComplete_BINARY_DIR)
+  SET(VTK_NO_LIBRARY_DEPENDS 1)
   INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/VTKConfig.cmake)
   INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
 ELSE(ParaViewComplete_BINARY_DIR)
@@ -96,7 +97,7 @@ ELSE(ParaViewComplete_BINARY_DIR)
       SET(HDF5_INCLUDE_DIR "${HDF5_INCLUDE_DIR}" CACHE PATH "Location of HDF5 includes" FORCE)
     ENDIF("${HDF5_INCLUDE_DIR}" MATCHES "^ *$")
   ENDIF(XDMF_VTK_DIR)
-  
+
   # if vtk was found include the use vtk file
   IF (VTK_FOUND)
     INCLUDE(${VTK_USE_FILE})
