@@ -806,6 +806,11 @@
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
 
+   <SourceProxy name="TransformFilter" class="vtkTransformFilter">
+     <ProxyProperty name="Transform" command="SetTransform"/>
+   <!-- End TransformFilter -->
+   </SourceProxy>
+
    <SourceProxy name="TriangleFilter" class="vtkTriangleFilter">
    <!-- End TriangleFilter -->
    </SourceProxy>
