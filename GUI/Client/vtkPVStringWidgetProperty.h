@@ -36,6 +36,7 @@ public:
   virtual void AcceptInternal();
   //BTX
   vtkSetMacro(ObjectID, vtkClientServerID);
+  vtkClientServerID GetObjectID() { return this->ObjectID; }
   //ETX
   vtkSetStringMacro(VTKCommand);
   //BTX
