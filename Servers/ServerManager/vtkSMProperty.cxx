@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMProperty, "1.14");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 
@@ -155,6 +155,7 @@ void vtkSMProperty::RemoveAllDependents()
 //---------------------------------------------------------------------------
 void vtkSMProperty::UpdateDependentDomains()
 {
+  // Update own domains
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
@@ -162,6 +163,7 @@ void vtkSMProperty::UpdateDependentDomains()
     this->DomainIterator->Next();
     }
 
+  // Update other dependent domains
   vtkSMPropertyInternals::DependentsVector::iterator iter =
     this->PInternals->Dependents.begin();
   for (; iter != this->PInternals->Dependents.end(); iter++)
@@ -240,6 +242,8 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                      vtkPVXMLElement* element)
 {
+  // Set during xml parsing only. Used in NewProperty() which is
+  // called by domains to get required properties.
   this->SetProxy(proxy);
 
   const char* xmlname = element->GetAttribute("name");
@@ -275,6 +279,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetIsReadOnly(read_only); 
     }
 
+  // Read and create domains.
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* domainEl = element->GetNestedElement(i);

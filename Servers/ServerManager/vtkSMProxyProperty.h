@@ -49,12 +49,28 @@ public:
   // is true but it is more efficient to avoid calling Update until
   // the last proxy is added. To do this, add all proxies with modify=false
   // and call Modified after the last.
+  // This will perform domain checking. If the domain check fails,
+  // the proxy will not be added and 0 will be returned.
+  // Returns 1 on success. If the domain check fails or the property
+  // is read only, returns 0.
+  // All proxies added with AddProxy() will become "consumers" of
+  // the proxy passed to AppendCommandToStream().
   int AddProxy(vtkSMProxy* proxy, int modify);
 
   // Description:
+  // Add an unchecked proxy. Does not modify the property.
+  // Unchecked proxies are used by domains when verifying whether
+  // a value is acceptable. To check if a value is in the domains,
+  // you can do the following:
+  // @verbatim
+  // - RemoveAllUncheckedProxies()
+  // - AddUncheckedProxy(proxy)
+  // - IsInDomains()
+  // @endverbatim
   void AddUncheckedProxy(vtkSMProxy* proxy);
 
   // Description:
+  // Removes all unchecked proxies.
   void RemoveAllUncheckedProxies();
 
   // Description:
@@ -89,6 +105,8 @@ protected:
   // modified properties.
   // Note that if the proxy has multiple IDs, they are all appended to the 
   // command stream.  
+  // All proxies added with AddProxy() will become "consumers" of
+  // the proxy passed to AppendCommandToStream().
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
@@ -101,6 +119,8 @@ protected:
   // Saves the state of the object in XML format. 
   virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
 
+  // Previous proxies are used by the ProxyProperty internally.
+  // 
   // Description:
   void AddPreviousProxy(vtkSMProxy* proxy);
 
