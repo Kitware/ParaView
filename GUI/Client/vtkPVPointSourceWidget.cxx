@@ -32,7 +32,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.30");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -154,7 +154,14 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                                        "SetAcceptButtonColorToModified");
   
   this->RadiusWidget->Create(app);
-  this->RadiusWidget->SetScaleFactor(this->RadiusScaleFactor);
+  if (this->RadiusWidget->GetSMPropertyName())
+    {
+    this->RadiusWidget->SetScaleFactor(this->RadiusScaleFactor);
+    }
+  else
+    {
+    this->RadiusWidget->SetValue(&this->DefaultRadius, 1);
+    }
 
   if (this->ShowEntries)
     {
