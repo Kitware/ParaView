@@ -328,8 +328,8 @@ void vtkKWApplication::Exit()
   return;
 }
     
-#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
-#define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
+#define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.2"
+#define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
 Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
 {
   Tcl_Interp *interp;

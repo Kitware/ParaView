@@ -23,11 +23,11 @@
 //#endif
 #define ET_HAVE_CUSTOM_MAINLOOP 0
 #ifdef HAVE_TCL8_3
-#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.3"
-#define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.3"
+#define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.3"
+#define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.3"
 #else /* HAVE_TCL8_3 */
-#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
-#define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
+#define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.2"
+#define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
 #endif /* HAVE_TCL8_3 */
 #define ET_EXTENSION 0
 #define ET_SHROUD_KEY 0
@@ -8396,18 +8396,6 @@ static char Et_zFile30[] =
 "catch {unset tkPriv(lbAccel,$w)}\n"
 "}\n"
 ;
-static char Et_zFile31[] = 
-"load vtktcl\n"
-"load vtkKWWidgetsTcl\n"
-"load vtkKWWidgetsProTcl\n"
-"load vtkKWVolViewTcl\n"
-"load vtkKWSensorVVTcl\n"
-"\n"
-"wm withdraw .\n"
-"\n"
-"vtkSVVApplication app\n"
-"app Start\n"
-;
 struct EtFile {
   char *zName;
   char *zData;
@@ -8417,73 +8405,72 @@ struct EtFile {
 };
 #ifdef HAVE_TCL8_3
 static struct EtFile Et_FileSet[] = {
-  { "C:/Program Files/Tcl/lib/tcl8.3/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/init.tcl", Et_zFile2, sizeof(Et_zFile2)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/package.tcl", Et_zFile3, sizeof(Et_zFile3)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/parray.tcl", Et_zFile4, sizeof(Et_zFile4)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/safe.tcl", Et_zFile5, sizeof(Et_zFile5)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/tclIndex", Et_zFile6, sizeof(Et_zFile6)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.3/word.tcl", Et_zFile7, sizeof(Et_zFile7)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/bgerror.tcl", Et_zFile8, sizeof(Et_zFile8)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/button.tcl", Et_zFile9, sizeof(Et_zFile9)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/clrpick.tcl", Et_zFile10, sizeof(Et_zFile10)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/comdlg.tcl", Et_zFile11, sizeof(Et_zFile11)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/console.tcl", Et_zFile12, sizeof(Et_zFile12)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/dialog.tcl", Et_zFile13, sizeof(Et_zFile13)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/entry.tcl", Et_zFile14, sizeof(Et_zFile14)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/focus.tcl", Et_zFile15, sizeof(Et_zFile15)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/listbox.tcl", Et_zFile16, sizeof(Et_zFile16)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/menu.tcl", Et_zFile17, sizeof(Et_zFile17)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/msgbox.tcl", Et_zFile18, sizeof(Et_zFile18)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/obsolete.tcl", Et_zFile19, sizeof(Et_zFile19)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/optMenu.tcl", Et_zFile20, sizeof(Et_zFile20)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/palette.tcl", Et_zFile21, sizeof(Et_zFile21)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/safetk.tcl", Et_zFile22, sizeof(Et_zFile22)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/scale.tcl", Et_zFile23, sizeof(Et_zFile23)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/scrlbar.tcl", Et_zFile24, sizeof(Et_zFile24)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/tclIndex", Et_zFile25, sizeof(Et_zFile25)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/tearoff.tcl", Et_zFile26, sizeof(Et_zFile26)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/text.tcl", Et_zFile27, sizeof(Et_zFile27)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.3/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/init.tcl", Et_zFile2, sizeof(Et_zFile2)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/package.tcl", Et_zFile3, sizeof(Et_zFile3)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/parray.tcl", Et_zFile4, sizeof(Et_zFile4)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/safe.tcl", Et_zFile5, sizeof(Et_zFile5)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/tclIndex", Et_zFile6, sizeof(Et_zFile6)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.3/word.tcl", Et_zFile7, sizeof(Et_zFile7)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/bgerror.tcl", Et_zFile8, sizeof(Et_zFile8)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/button.tcl", Et_zFile9, sizeof(Et_zFile9)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/clrpick.tcl", Et_zFile10, sizeof(Et_zFile10)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/comdlg.tcl", Et_zFile11, sizeof(Et_zFile11)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/console.tcl", Et_zFile12, sizeof(Et_zFile12)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/dialog.tcl", Et_zFile13, sizeof(Et_zFile13)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/entry.tcl", Et_zFile14, sizeof(Et_zFile14)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/focus.tcl", Et_zFile15, sizeof(Et_zFile15)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/listbox.tcl", Et_zFile16, sizeof(Et_zFile16)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/menu.tcl", Et_zFile17, sizeof(Et_zFile17)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/msgbox.tcl", Et_zFile18, sizeof(Et_zFile18)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/obsolete.tcl", Et_zFile19, sizeof(Et_zFile19)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/optMenu.tcl", Et_zFile20, sizeof(Et_zFile20)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/palette.tcl", Et_zFile21, sizeof(Et_zFile21)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/safetk.tcl", Et_zFile22, sizeof(Et_zFile22)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/scale.tcl", Et_zFile23, sizeof(Et_zFile23)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/scrlbar.tcl", Et_zFile24, sizeof(Et_zFile24)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/tclIndex", Et_zFile25, sizeof(Et_zFile25)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/tearoff.tcl", Et_zFile26, sizeof(Et_zFile26)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/text.tcl", Et_zFile27, sizeof(Et_zFile27)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.3/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
   { "D:/Kw/vv.tcl", Et_zFile31, sizeof(Et_zFile31)-1, 0, 0 },
 {0, 0}};
 #else /* HAVE_TCL8_3 */
 static struct EtFile Et_FileSet[] = {
-  { "C:/Program Files/Tcl/lib/tcl8.2/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/init.tcl", Et_zFile2, sizeof(Et_zFile2)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/package.tcl", Et_zFile3, sizeof(Et_zFile3)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/parray.tcl", Et_zFile4, sizeof(Et_zFile4)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/safe.tcl", Et_zFile5, sizeof(Et_zFile5)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/tclIndex", Et_zFile6, sizeof(Et_zFile6)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tcl8.2/word.tcl", Et_zFile7, sizeof(Et_zFile7)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/bgerror.tcl", Et_zFile8, sizeof(Et_zFile8)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/button.tcl", Et_zFile9, sizeof(Et_zFile9)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/clrpick.tcl", Et_zFile10, sizeof(Et_zFile10)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/comdlg.tcl", Et_zFile11, sizeof(Et_zFile11)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/console.tcl", Et_zFile12, sizeof(Et_zFile12)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/dialog.tcl", Et_zFile13, sizeof(Et_zFile13)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/entry.tcl", Et_zFile14, sizeof(Et_zFile14)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/focus.tcl", Et_zFile15, sizeof(Et_zFile15)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/listbox.tcl", Et_zFile16, sizeof(Et_zFile16)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/menu.tcl", Et_zFile17, sizeof(Et_zFile17)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/msgbox.tcl", Et_zFile18, sizeof(Et_zFile18)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/obsolete.tcl", Et_zFile19, sizeof(Et_zFile19)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/optMenu.tcl", Et_zFile20, sizeof(Et_zFile20)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/palette.tcl", Et_zFile21, sizeof(Et_zFile21)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/safetk.tcl", Et_zFile22, sizeof(Et_zFile22)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/scale.tcl", Et_zFile23, sizeof(Et_zFile23)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/scrlbar.tcl", Et_zFile24, sizeof(Et_zFile24)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/tclIndex", Et_zFile25, sizeof(Et_zFile25)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/tearoff.tcl", Et_zFile26, sizeof(Et_zFile26)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/text.tcl", Et_zFile27, sizeof(Et_zFile27)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
-  { "C:/Program Files/Tcl/lib/tk8.2/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
-  { "D:/Kw/vv.tcl", Et_zFile31, sizeof(Et_zFile31)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/init.tcl", Et_zFile2, sizeof(Et_zFile2)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/package.tcl", Et_zFile3, sizeof(Et_zFile3)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/parray.tcl", Et_zFile4, sizeof(Et_zFile4)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/safe.tcl", Et_zFile5, sizeof(Et_zFile5)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/tclIndex", Et_zFile6, sizeof(Et_zFile6)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tcl8.2/word.tcl", Et_zFile7, sizeof(Et_zFile7)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/bgerror.tcl", Et_zFile8, sizeof(Et_zFile8)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/button.tcl", Et_zFile9, sizeof(Et_zFile9)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/clrpick.tcl", Et_zFile10, sizeof(Et_zFile10)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/comdlg.tcl", Et_zFile11, sizeof(Et_zFile11)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/console.tcl", Et_zFile12, sizeof(Et_zFile12)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/dialog.tcl", Et_zFile13, sizeof(Et_zFile13)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/entry.tcl", Et_zFile14, sizeof(Et_zFile14)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/focus.tcl", Et_zFile15, sizeof(Et_zFile15)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/listbox.tcl", Et_zFile16, sizeof(Et_zFile16)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/menu.tcl", Et_zFile17, sizeof(Et_zFile17)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/msgbox.tcl", Et_zFile18, sizeof(Et_zFile18)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/obsolete.tcl", Et_zFile19, sizeof(Et_zFile19)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/optMenu.tcl", Et_zFile20, sizeof(Et_zFile20)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/palette.tcl", Et_zFile21, sizeof(Et_zFile21)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/safetk.tcl", Et_zFile22, sizeof(Et_zFile22)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/scale.tcl", Et_zFile23, sizeof(Et_zFile23)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/scrlbar.tcl", Et_zFile24, sizeof(Et_zFile24)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/tclIndex", Et_zFile25, sizeof(Et_zFile25)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/tearoff.tcl", Et_zFile26, sizeof(Et_zFile26)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/text.tcl", Et_zFile27, sizeof(Et_zFile27)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
+  { "/ThisIsNotAPath/Tcl/lib/tk8.2/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
 {0, 0}};
 #endif /* HAVE_TCL8_3 */
 static struct EtFile *Et_FileHashTable[71];
