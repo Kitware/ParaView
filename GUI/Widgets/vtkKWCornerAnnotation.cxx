@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.80");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.81");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -55,8 +55,6 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
   // If in vtkKWView mode, we need to create and maintain the corner prop and
   // composite
-
-  this->InternalCornerAnnotation = NULL;
 
   // GUI
 
@@ -127,11 +125,6 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
   // If in vtkKWView mode, we createed and maintained the corner prop and
   // composite
 
-  if (this->InternalCornerAnnotation)
-    {
-    this->InternalCornerAnnotation->Delete();
-    this->InternalCornerAnnotation = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------

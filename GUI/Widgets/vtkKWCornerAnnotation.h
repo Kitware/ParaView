@@ -146,8 +146,6 @@ protected:
 
   vtkKWRenderWidget       *RenderWidget;
 
-  vtkCornerAnnotation     *InternalCornerAnnotation;
-
   // GUI
 
   int                     PopupTextProperty;
