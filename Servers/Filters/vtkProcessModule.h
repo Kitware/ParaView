@@ -59,6 +59,13 @@ public:
     {
       return *this->ClientServerStream;
     }
+
+  // Description:
+  // Return the client server stream
+  vtkClientServerStream* GetStreamPointer() 
+    {
+      return this->ClientServerStream;
+    }
   
   // Description: 
   // These methods construct/delete a vtk object in the vtkClientServerStream
