@@ -11,6 +11,7 @@ vtkKWSerializer.cxx
 vtkQueue.cxx
 vtkString.cxx
 vtkKWArguments.cxx
+vtkKWRemoteExecute.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
