@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkString, "1.7");
+vtkCxxRevisionMacro(vtkString, "1.8");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -161,8 +161,6 @@ int vtkString::CompareCase(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// Transform the string to lowercase (inplace).
 char* vtkString::ToLower(char *str)
 {
   if (str)
@@ -178,8 +176,6 @@ char* vtkString::ToLower(char *str)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// Transform the string to uppercase (inplace).
 char* vtkString::ToUpper(char *str)
 {
   if (str)
@@ -192,4 +188,65 @@ char* vtkString::ToUpper(char *str)
       }
     }
   return str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::ReplaceChar(char* str, char toreplace, char replacement)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (*ptr == toreplace)
+        {
+        *ptr = replacement;
+        }
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::ReplaceChars(char* str, char *toreplace, char replacement)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      char *ptr2 = toreplace;
+      while (*ptr2)
+        {
+        if (*ptr == *ptr2)
+          {
+          *ptr = replacement;
+          }
+        ++ptr2;
+        }
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
+int vtkString::CountChar(char* str, char c)
+{
+  int count = 0;
+
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (*ptr == c)
+        {
+        ++count;
+        }
+      ++ptr;
+      }
+    }
+  return count;
 }

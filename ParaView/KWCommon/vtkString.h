@@ -93,6 +93,15 @@ public:
   // Transform the string to uppercase (inplace).
   static char* ToUpper(char* str);
 
+  // Description:
+  // Replace a character or some characters in the string (inplace).
+  static char* ReplaceChar(char* str, char toreplace, char replacement);
+  static char* ReplaceChars(char* str, char *toreplace, char replacement);
+
+  // Description:
+  // Return the number of occurence of a char.
+  static int CountChar(char* str, char c);
+
 protected:
   vtkString() {};
   ~vtkString() {};
