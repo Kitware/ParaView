@@ -1000,7 +1000,10 @@ const char* bwidgets1 =
 "    return $varname\n"
 "}\n"
 "\n"
-"\n"
+"\n";
+
+
+const char* bwidgets2 =
 "# ------------------------------------------------------------------------------\n"
 "#  scrollframe.tcl\n"
 "#  This file is part of Unifix BWidget Toolkit\n"
@@ -1143,7 +1146,9 @@ const char* bwidgets1 =
 "    }\n"
 "}\n"
 "\n"
-"\n"
+"\n";
+
+const char* bwidgets3 =
 "# -----------------------------------------------------------------------------\n"
 "#  scrollw.tcl\n"
 "#  This file is part of Unifix BWidget Toolkit\n"
@@ -1464,7 +1469,9 @@ const char* bwidgets1 =
 "    set data(realized) 1\n"
 "    place $grid -anchor nw -x 0 -y 0 -relwidth 1.0 -relheight 1.0\n"
 "}\n"
-"\n"
+"\n";
+
+const char* bwidgets4 =
 "#  tree.tcl\n"
 "#  This file is part of Unifix BWidget Toolkit\n"
 "\n"
@@ -1785,9 +1792,7 @@ const char* bwidgets1 =
 "    return [Widget::cget $path.$node $option]\n"
 "}\n"
 "\n"
-"\n";
-
-const char* bwidgets2 =
+"\n"
 "# ------------------------------------------------------------------------------\n"
 "#  Command Tree::bindText\n"
 "# ------------------------------------------------------------------------------\n"
@@ -2553,14 +2558,12 @@ const char* bwidgets2 =
 "\n"
 "    if { [string compare $dc \"never\"] && ($len || ![string compare $dc \"allways\"]) } {\n"
 "        if { $exp } {\n"
-"            set bmp [file join /home/berk/download/build/bwidget \"images\" \"minus.xbm\"]\n"
+"            set bmp bwminus\n"
 "        } else {\n"
-"            set bmp [file join /home/berk/download/build/bwidget \"images\" \"plus.xbm\"]\n"
+"            set bmp bwplus\n"
 "        }\n"
-"        $path.c create bitmap $x0 $y0 \\\n"
-"            -bitmap     @$bmp \\\n"
-"            -background [$path.c cget -background] \\\n"
-"            -foreground [Widget::getoption $path -linesfill] \\\n"
+"        $path.c create image $x0 $y0 \\\n"
+"            -image     $bmp \\\n"
 "            -tags       \"cross c:$node\" -anchor c\n"
 "    }\n"
 "\n"
@@ -2650,18 +2653,16 @@ const char* bwidgets2 =
 "\n"
 "            if { [string compare $dc \"never\"] && ($len || ![string compare $dc \"allways\"]) } {\n"
 "                if { $exp } {\n"
-"                    set bmp [file join $::BWIDGET::LIBRARY \"images\" \"minus.xbm\"]\n"
+"                    set bmp bwminus\n"
 "                } else {\n"
-"                    set bmp [file join $::BWIDGET::LIBRARY \"images\" \"plus.xbm\"]\n"
+"                    set bmp bwplus\n"
 "                }\n"
 "                if { $idc == \"\" } {\n"
-"                    $path.c create bitmap [expr {$x0-$deltax-5}] $y0 \\\n"
-"                        -bitmap     @$bmp \\\n"
-"                        -background [$path.c cget -background] \\\n"
-"                        -foreground [Widget::getoption $path -linesfill] \\\n"
+"                    $path.c create image [expr {$x0-$deltax-5}] $y0 \\\n"
+"                        -image     $bmp \\\n"
 "                        -tags       \"cross c:$node\" -anchor c\n"
 "                } else {\n"
-"                    $path.c itemconfigure $idc -bitmap @$bmp\n"
+"                    $path.c itemconfigure $idc -image $bmp\n"
 "                }\n"
 "            } else {\n"
 "                $path.c delete $idc\n"
