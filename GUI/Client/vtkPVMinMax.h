@@ -142,15 +142,6 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -191,8 +182,6 @@ protected:
   int MinLabelWidth;
   int MaxLabelWidth;
 
-  vtkPVScalarListWidgetProperty *Property;
-  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

@@ -23,16 +23,16 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.35");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -48,8 +48,6 @@ vtkPVMinMax::vtkPVMinMax()
   this->MinScale = vtkKWScale::New();
   this->MaxScale = vtkKWScale::New();
 
-  this->SetCommand = NULL;
-
   this->MinHelp = 0;
   this->MaxHelp = 0;
 
@@ -62,8 +60,6 @@ vtkPVMinMax::vtkPVMinMax()
   this->MaxLabelWidth = 18;
 
   this->ArrayMenu = NULL;
-
-  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -81,13 +77,10 @@ vtkPVMinMax::~vtkPVMinMax()
   this->MinFrame = NULL;
   this->MaxFrame->Delete();
   this->MaxFrame = NULL;
-  this->SetSetCommand(NULL);
   this->SetMinHelp(0);
   this->SetMaxHelp(0);
 
   this->SetArrayMenu(NULL);
-  
-  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -244,7 +237,8 @@ void vtkPVMinMax::SetMaxValue(float val)
 void vtkPVMinMax::SaveInBatchScript(ofstream *file)
 {
   *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->SetCommand << "] SetElements2 "
+        <<  " GetProperty " 
+        << this->GetSMProperty()->GetXMLName() << "] SetElements2 "
         << this->GetMinValue() << " " << this->GetMaxValue() << endl;
 }
 
@@ -253,13 +247,21 @@ void vtkPVMinMax::Accept()
 {
   int modFlag = this->GetModifiedFlag();
 
-  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+  vtkSMDoubleVectorProperty* dprop = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  if (prop)
+  vtkSMIntVectorProperty* iprop = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (dprop)
     {
-    prop->SetNumberOfElements(2);
-    prop->SetElement(0, this->GetMinValue());
-    prop->SetElement(1, this->GetMaxValue());
+    dprop->SetNumberOfElements(2);
+    dprop->SetElement(0, this->GetMinValue());
+    dprop->SetElement(1, this->GetMaxValue());
+    }
+  else if (iprop)
+    {
+    iprop->SetNumberOfElements(2);
+    iprop->SetElement(0, static_cast<int>(this->GetMinValue()));
+    iprop->SetElement(1, static_cast<int>(this->GetMaxValue()));
     }
   else
     {
@@ -307,17 +309,28 @@ void vtkPVMinMax::ResetInternal()
 {
   if (!this->AcceptCalled)
     {
+    this->GetSMProperty()->UpdateDependentDomains();
     this->Update();
     return;
     }
   if ( this->MinScale->IsCreated() )
     {
-    vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    vtkSMDoubleVectorProperty* dprop = vtkSMDoubleVectorProperty::SafeDownCast(
       this->GetSMProperty());
-    if (prop)
+    if (dprop)
       {
-      this->SetMinValue(prop->GetElement(0));
-      this->SetMaxValue(prop->GetElement(1));
+      this->SetMinValue(dprop->GetElement(0));
+      this->SetMaxValue(dprop->GetElement(1));
+      }
+    else
+      {
+      vtkSMIntVectorProperty* iprop = vtkSMIntVectorProperty::SafeDownCast(
+        this->GetSMProperty());
+      if (iprop)
+        {
+        this->SetMinValue(iprop->GetElement(0));
+        this->SetMaxValue(iprop->GetElement(1));
+        }
       }
     }
 }
@@ -333,29 +346,48 @@ void vtkPVMinMax::Update()
   range[1] = -VTK_LARGE_FLOAT;
 
   vtkSMProperty* prop = this->GetSMProperty();
-  vtkSMDoubleRangeDomain* dom = 0;
+  vtkSMDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
+    dom = prop->GetDomain("range");
     }
+  vtkSMIntRangeDomain *intRangeDomain = 0;
+  vtkSMDoubleRangeDomain *doubleRangeDomain = 0;
   if (dom)
     {
-    int exists;
-    double rg = dom->GetMinimum(0, exists);
-    if (exists)
+    intRangeDomain = vtkSMIntRangeDomain::SafeDownCast(dom);
+    doubleRangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(dom);
+    int minExists = 0, maxExists = 0;
+    if (intRangeDomain)
       {
-      range[0] = rg;
+      int min = intRangeDomain->GetMinimum(0, minExists);
+      int max = intRangeDomain->GetMaximum(0, maxExists);
+      if (minExists)
+        {
+        range[0] = min;
+        }
+      if (maxExists)
+        {
+        range[1] = max;
+        }
       }
-    rg = dom->GetMaximum(0, exists);
-    if (exists)
+    else if (doubleRangeDomain)
       {
-      range[1] = rg;
+      double min = doubleRangeDomain->GetMinimum(0, minExists);
+      double max = doubleRangeDomain->GetMaximum(0, maxExists);
+      if (minExists)
+        {
+        range[0] = min;
+        }
+      if (maxExists)
+        {
+        range[1] = max;
+        }
       }
     }
 
   if (range[0] > range[1])
     {
-    vtkErrorMacro("Invalid Data Range");
     return;
     }
   
@@ -372,7 +404,16 @@ void vtkPVMinMax::Update()
 
   // Find the place value resolution.
   int place = (int)(floor(log10((double)(range[1]-range[0])) - 1.5));
-  double resolution = pow(10.0, (double)(place));
+  double resolution;
+  if (intRangeDomain)
+    {
+    resolution = 1;
+    }
+  else
+    {
+    resolution = pow(10.0, (double)(place));
+    }
+
   // Now find the range at resolution values.
   range[0] = (floor((double)(range[0]) / resolution) * resolution);
   range[1] = (ceil((double)(range[1]) / resolution) * resolution);
@@ -393,6 +434,8 @@ void vtkPVMinMax::Update()
     this->SetMinValue(range[0]);
     this->SetMaxValue(range[1]);
     }
+
+  this->GetSMProperty()->UpdateDependentDomains();
 }
 
 //----------------------------------------------------------------------------
@@ -470,7 +513,6 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     float min, max;
     this->MinScale->GetRange(min, max);
     pvmm->SetRange(min, max);
-    pvmm->SetSetCommand(this->SetCommand);
     pvmm->SetMinValue(this->GetMinValue());
     pvmm->SetMaxValue(this->GetMaxValue());
     }
@@ -488,28 +530,26 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
 
   // Setup the ArrayMenu.
   const char* array_menu = element->GetAttribute("array_menu");
-  if(!array_menu)
+  if(array_menu)
     {
-    vtkErrorMacro("No array_menu attribute.");
-    return 0;
+    vtkPVXMLElement* ame = element->LookupElement(array_menu);
+    if (!ame)
+      {
+      vtkErrorMacro("Couldn't find ArrayMenu element " << array_menu);
+      return 0;
+      }
+    vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+    vtkPVArrayMenu* amw = vtkPVArrayMenu::SafeDownCast(w);
+    if(!amw)
+      {
+      if(w) { w->Delete(); }
+      vtkErrorMacro("Couldn't get ArrayMenu widget " << array_menu);
+      return 0;
+      }
+    amw->AddDependent(this);
+    this->SetArrayMenu(amw);
+    amw->Delete();  
     }
-  vtkPVXMLElement* ame = element->LookupElement(array_menu);
-  if (!ame)
-    {
-    vtkErrorMacro("Couldn't find ArrayMenu element " << array_menu);
-    return 0;
-    }
-  vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
-  vtkPVArrayMenu* amw = vtkPVArrayMenu::SafeDownCast(w);
-  if(!amw)
-    {
-    if(w) { w->Delete(); }
-    vtkErrorMacro("Couldn't get ArrayMenu widget " << array_menu);
-    return 0;
-    }
-  amw->AddDependent(this);
-  this->SetArrayMenu(amw);
-  amw->Delete();  
 
   // Setup the MinimumLabel.
   const char* min_label = element->GetAttribute("min_label");
@@ -547,15 +587,6 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   this->SetMaximumHelp(max_help);
   
-  // Setup the SetCommand.
-  const char* set_command = element->GetAttribute("set_command");
-  if(!set_command)
-    {
-    vtkErrorMacro("No set_command attribute.");
-    return 0;
-    }
-  this->SetSetCommand(set_command);
-  
   return 1;
 }
 
@@ -570,36 +601,6 @@ float vtkPVMinMax::GetMaxValue()
 //----------------------------------------------------------------------------
 float vtkPVMinMax::GetResolution() 
 { return this->MinScale->GetResolution(); }
-
-//----------------------------------------------------------------------------
-void vtkPVMinMax::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    char *cmd = new char[strlen(this->SetCommand)+1];
-    strcpy(cmd, this->SetCommand);
-    int numScalars = 2;
-    this->Property->SetVTKCommands(1, &cmd, &numScalars);
-    float scalars[2];
-    scalars[0] = this->MinScale->GetValue();
-    scalars[1] = this->MaxScale->GetValue();
-    this->Property->SetScalars(2, scalars);
-    delete [] cmd;
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVMinMax::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVMinMax::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::UpdateEnableState()

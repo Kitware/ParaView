@@ -25,12 +25,13 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.44");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.45");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -213,12 +214,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
     }
 
   // Update the reader's information.
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  // Since this is a reader, it is ok to assume that there is on
-  // VTKSource. Hence, the use of index 0.
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
-                  << "UpdateInformation" << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  this->Proxy->UpdateInformation();
   return VTK_OK;
 }
 

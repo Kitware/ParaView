@@ -1814,8 +1814,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             min_label="Lower Threshold"
             max_label="Upper Threshold"
             min_help="Choose the lower value of the threshold"
-            max_help="Choose the upper value of the threshold"
-            set_command="ThresholdBetween"/>
+            max_help="Choose the upper value of the threshold"/>
     <LabeledToggle label="All Scalars"
                    trace_name="AllScalars"
                    property="AllScalars"

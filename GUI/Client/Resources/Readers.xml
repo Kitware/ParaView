@@ -450,11 +450,12 @@
                  help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
 
     
-    <VectorEntry property="FileRange"
-                 label="Range of files" type="int"
-                 trace_name="file_range"
-                 length="2"
-                 help="Range of files that are loaded" />
+    <MinMax trace_name="FileRange"
+            property="FileRange"
+            min_label="First Index"
+            max_label="Last Index"
+            min_help="Choose the index of the first file to be read"
+            max_help="Choose the index of the last file to be read"/>
     <StringEntry property="XMLFileName"
                  label="XML File"
                  init_source="XMLFileName"
