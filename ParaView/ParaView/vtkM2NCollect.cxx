@@ -32,7 +32,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.2");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.3");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -86,8 +86,14 @@ void vtkM2NCollect::ComputeInputUpdateExtents(vtkDataObject *output)
   
 
 //-----------------------------------------------------------------------------
-void vtkM2NCollect::Execute()
+void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
 {
+  if (this->MPIMToNSocketConnection == NULL)
+    {
+    this->Superclass::ExecuteData(outData);
+    return;
+    }
+
   vtkPolyData *input = this->GetInput();
   int bufSize = 0;
   char* buf = NULL;
