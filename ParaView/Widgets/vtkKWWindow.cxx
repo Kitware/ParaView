@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.165");
+vtkCxxRevisionMacro(vtkKWWindow, "1.166");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -648,8 +648,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->GetTitle());
   this->Script("wm iconname %s {%s}",wname,
                app->GetApplicationName());
-  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
-               wname, this->GetTclName());
 
   // Restore window geometry
 
@@ -800,6 +798,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
   this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
 
+  // Udpate the enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWWindow::OnPrint(int propagate, int res)
@@ -1620,9 +1621,28 @@ void vtkKWWindow::UpdateEnableState()
     it->Delete();
     }
 
+  // Update the notebook
+
   if (this->Notebook)
     {
     this->Notebook->SetEnabled(this->Enabled);
+    }
+
+  // Given the state, can we close or not ?
+
+  if (this->IsCreated())
+    {
+    if (this->Enabled)
+      {
+      this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
+                   this->GetWidgetName(), this->GetTclName());
+      }
+    else
+      {
+      this->Script("wm protocol %s WM_DELETE_WINDOW "
+                   "{%s SetStatusText \"Can not close while UI is disabled\"}",
+                   this->GetWidgetName(), this->GetTclName());
+      }
     }
 }
 
