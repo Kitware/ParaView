@@ -13,7 +13,7 @@
                input_name="Input"/>
   </Module>
   <Module name="AllToN"
-          root_name="AllToN" module_type="Filter"
+          root_name="AllToN" module_type="Filter" menu_name="All to N"
           multiprocess_support="multiple_processes"
           long_help="Redistribute data to a subset of available processes."
           short_help="Repartition data filter.">
@@ -90,6 +90,7 @@
   </Module>
   <Module name="CellDataToPointData"
           root_name="CellToPoint"
+          menu_name="Cell Data to Point Data"
           module_type="Filter"
           long_help="Create point attributes by averaging cell attributes."
           short_help="Convert cell data to point data.">
@@ -167,7 +168,7 @@
                    default_value="1"/>
   </Module>
   <Module name="CleanUnstructuredGrid"
-          menu_name="CleanToGrid"
+          menu_name="Clean to Grid"
           root_name="CleanUGrid"
           module_type="Filter"
           long_help="This filter merges points and converts the data set to unstructured grid."
@@ -902,6 +903,7 @@
     -->
   <Module name="PointDataToCellData"
           root_name="PointToCell"
+          menu_name="Point Data to Cell Data"
           module_type="Filter"
           long_help="Create cell attributes by averaging point attributes."
           short_help="Convert point data to cell data.">
@@ -1365,7 +1367,7 @@
                  default_value="10"/>
   </Module>
   <Module name="WarpScalar"
-          menu_name="Warp"
+          menu_name="Warp (scalar)"
           root_name="WarpS"
           default="scalars"
           module_type="Filter"
@@ -1415,6 +1417,7 @@
   </Module>
   <Module name="WarpVector"
           root_name="WarpV"
+          menu_name="Warp (vector)"
           button_image="PVVectorDisplacementButton"
           button_help="Warp (displace) the geometry with a given vector field."
           default="vectors"
@@ -1767,6 +1770,7 @@
   </Module>
   <Module name="StreamTracer"
           root_name="Stream"
+          menu_name="Stream Tracer"
           module_type="Filter"
           replace_input="0"
           button_image="PVStreamTracerButton"
@@ -1960,6 +1964,7 @@
   </Module>
   <Module name="ExtractGrid"
           root_name="ExtractGrid"
+          menu_name="Extract Grid"
           module_type="Filter"
           button_image="PVExtractGridButton"
           replace_input="0"
