@@ -343,7 +343,11 @@ public:
   // eventually perform that check.
   virtual int HasCheckForUpdates();
   virtual void CheckForUpdates();
-  
+
+  // Description:
+  // Convenience method to call UpdateEnableState on all windows
+  virtual void UpdateEnableStateForAllWindows();
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();

@@ -87,7 +87,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.147");
+vtkCxxRevisionMacro(vtkKWApplication, "1.148");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1452,6 +1452,14 @@ void vtkKWApplication::SetLimitedEditionMode(int v)
 
   this->LimitedEditionMode = v;
 
+  this->UpdateEnableStateForAllWindows();
+
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::UpdateEnableStateForAllWindows()
+{
   vtkCollectionIterator *it = this->Windows->NewIterator();
   for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
@@ -1462,8 +1470,6 @@ void vtkKWApplication::SetLimitedEditionMode(int v)
       }
     }
   it->Delete();
-
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
