@@ -1,6 +1,3 @@
-[submodule "ParaViewData1"]
-	path = ParaView/ParaView/data
-	url = git://paraview.org/ParaViewData.git
 [submodule "ParaViewData"]
 	path = ParaView/Data
 	url = git://paraview.org/ParaViewData.git
