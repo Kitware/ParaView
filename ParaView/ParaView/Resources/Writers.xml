@@ -65,5 +65,12 @@
           data_mode_method="SetFileTypeToBinary"
           extension=".vtk"
           file_description="Legacy VTK Files"/>
+#ifdef PARAVIEW_LINK_XDMF
+  <Writer input="vtkDataSet"
+          class="vtkPVWriter"
+          writer="vtkXdmfWriter"
+          extension=".xmf"
+          file_description="Xdmf Data File"/>
+#endif
 </ModuleInterfaces>
 
