@@ -41,17 +41,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVFileEntry.h"
 
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
+#include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWEntry.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVReaderModule.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.19.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -176,8 +177,10 @@ void vtkPVFileEntry::BrowseCallback()
 {
   if (this->Extension)
     {
-    this->Script("%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} {{All files} {*.*}}}]", 
-                 this->GetTclName(), this->Extension);
+    this->Script(
+      "%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} "
+      "{{All files} {*.*}}}]", 
+      this->GetTclName(), this->Extension);
     }
   else
     {
@@ -218,9 +221,20 @@ void vtkPVFileEntry::Accept()
                          this->GetValue());
     }
 
+  const char* fname = this->Entry->GetValue();
+
   pvApp->BroadcastScript("%s Set%s {%s}",
-                         this->ObjectTclName, this->VariableName, 
-                         this->Entry->GetValue());
+                         this->ObjectTclName, this->VariableName, fname);
+
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
+  if (rm && fname && fname[0])
+    {
+    const char* desc = rm->RemovePath(fname);
+    if (desc)
+      {
+      rm->SetDescriptionNoTrace(desc);
+      }
+    }
 
   // The supper does nothing but turn the modified flag off.
   this->vtkPVWidget::Accept();

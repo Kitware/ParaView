@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5.2.1");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -180,6 +180,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         // These are dummy filters (vtkPassThroughFilter) which
         // simply shallow copy their input to their output.
         connection = vtkPVPassThrough::New();
+        connection->SetDescriptionNoTrace(this->GetDescription());
         connection->SetOutputNumber(i);
         connection->SetParametersParent(
           window->GetMainView()->GetSourceParent());

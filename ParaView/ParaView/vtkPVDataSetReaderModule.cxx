@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.1");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -86,51 +86,26 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
 {
   clone = 0;
 
-  char *tclName, *extentTclName, *tmp;
+  char *tclName, *extentTclName;
   char *outputTclName;
   vtkPDataSetReader *s; 
   vtkDataSet *d;
   vtkPVData *pvd;
   vtkPVReaderModule *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  char *extension;
-  int extensionPosition;
-  char *endingSlash = NULL;
-  int slashPosition;
 
-  // Get the root name between the last slash and last period.
-  slashPosition = 0;
-  extensionPosition = vtkString::Length(fname);
-  if ((extension = strrchr(fname, '.')))
-    {
-    extensionPosition = extension - fname;
+  if (this->Name && this->Name[0] != '\0')
+    { 
+    tclName = new char[strlen(this->GetName()) + 10];
+    sprintf(tclName, "%s%d", this->Name, this->PrototypeInstanceCount);
     }
-  if ((endingSlash = strrchr(fname, '/')))
+  else
     {
-    slashPosition = endingSlash - fname + 1;
+    vtkErrorMacro("The prototype must have a name. Cloning aborted.");
+    clone = 0;
+    return VTK_ERROR;
     }
-  tclName = new char[extensionPosition-slashPosition+1+10];
-  strncpy(tclName, fname+slashPosition, extensionPosition-slashPosition);
-  tclName[extensionPosition-slashPosition] = '\0';
 
-  if (isdigit(tclName[0]))
-    {
-    // A VTK object name beginning with a digit is invalid.
-    tmp = new char[strlen(tclName)+3+10];
-    strcpy(tmp, tclName);
-    delete [] tclName;
-    tclName = new char[strlen(tmp)+1+10];
-    sprintf(tclName, "PV%s", tmp);
-    delete [] tmp;
-    }
-  // Append the unique number for the name.
-  tmp = new char[strlen(tclName)+1+10];
-  strcpy(tmp, tclName);
-  delete [] tclName;
-  tclName = new char[strlen(tmp)+1 + (this->PrototypeInstanceCount%10)+1 + 10];
-  sprintf(tclName, "%s%d", tmp, this->PrototypeInstanceCount);
-  delete [] tmp;
-  
   // Create the vtkSource.
   // Create the object through tcl on all processes.
   s = (vtkPDataSetReader *)(pvApp->MakeTclObject(
@@ -147,8 +122,12 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   pvs->SetApplication(pvApp);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
-  pvApp->BroadcastScript("%s SetFileName %s",
-                         tclName, fname);
+  const char* desc = this->RemovePath(fname);
+  if (desc)
+    {
+    pvs->SetDescriptionNoTrace(desc);
+    }
+  pvApp->BroadcastScript("%s SetFileName %s", tclName, fname);
   
   // Add the new Source to the View, and make it current.
   pvs->SetView(this->GetPVWindow()->GetMainView());
@@ -227,6 +206,7 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   // Add a file entry widget.
   vtkPVFileEntry *entry;
   entry = vtkPVDataSetFileEntry::New();
+  entry->SetPVSource(pvs);
   entry->SetParent(pvs->GetParameterFrame()->GetFrame());
   entry->SetObjectVariable(pvs->GetVTKSourceTclName(), "FileName");
   entry->SetModifiedCommand(pvs->GetTclName(), "SetAcceptButtonColorToRed");
