@@ -275,6 +275,7 @@ public:
   // Description:
   // Print the contents of the stream in a human-readable form.
   void Print(ostream&) const;
+  void PrintMessage(ostream&, int message) const;
 
 protected:
   // Write arbitrary data to the stream.  Used internally.

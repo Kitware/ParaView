@@ -1462,40 +1462,46 @@ void vtkClientServerStream::Print(ostream& os) const
 {
   for(int m=0; m < this->GetNumberOfMessages(); ++m)
     {
-    os << "Message " << m << " = ";
-    os << this->GetStringFromCommand(this->GetCommand(m)) << "\n";
-    for(int a=0; a < this->GetNumberOfArguments(m); ++a)
+    this->PrintMessage(os, m);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::PrintMessage(ostream& os, int message) const
+{
+  os << "Message " << message << " = ";
+  os << this->GetStringFromCommand(this->GetCommand(message)) << "\n";
+  for(int a=0; a < this->GetNumberOfArguments(message); ++a)
+    {
+    switch(this->GetArgumentType(message, a))
       {
-      switch(this->GetArgumentType(m, a))
+      VTK_CSS_TEMPLATE_MACRO(value, vtkClientServerStreamPrintValue
+                             (this, os, message, a, T));
+      VTK_CSS_TEMPLATE_MACRO(array, vtkClientServerStreamPrintArray
+                             (this, os, message, a, T));
+      case vtkClientServerStream::string_value:
         {
-        VTK_CSS_TEMPLATE_MACRO(value, vtkClientServerStreamPrintValue
-                               (this, os, m, a, T));
-        VTK_CSS_TEMPLATE_MACRO(array, vtkClientServerStreamPrintArray
-                               (this, os, m, a, T));
-        case vtkClientServerStream::string_value:
-          {
-          const char* arg;
-          this->GetArgument(m, a, &arg);
-          os << "  Argument " << a << " = string_value {" << arg << "}\n";
-          } break;
-        case vtkClientServerStream::id_value:
-          {
-          vtkClientServerID arg;
-          this->GetArgument(m, a, &arg);
-          os << "  Argument " << a << " = id_value {" << arg.ID << "}\n";
-          } break;
-        case vtkClientServerStream::vtk_object_pointer:
-          {
-          vtkObjectBase* arg;
-          this->GetArgument(m, a, &arg);
-          os << "  Argument " << a << " = vtk_object_pointer {"
-             << arg->GetClassName() << " (" << arg << ")}\n";
-          } break;
-        default:
-          {
-          os << "  Argument " << a << " = invalid\n";
-          } break;
-        }
+        const char* arg;
+        this->GetArgument(message, a, &arg);
+        os << "  Argument " << a << " = string_value {" << arg << "}\n";
+        } break;
+      case vtkClientServerStream::id_value:
+        {
+        vtkClientServerID arg;
+        this->GetArgument(message, a, &arg);
+        os << "  Argument " << a << " = id_value {" << arg.ID << "}\n";
+        } break;
+      case vtkClientServerStream::vtk_object_pointer:
+        {
+        vtkObjectBase* arg;
+        this->GetArgument(message, a, &arg);
+        os << "  Argument " << a << " = vtk_object_pointer {"
+           << arg->GetClassName() << " (" << arg << ")}\n";
+        } break;
+      default:
+        {
+        os << "  Argument " << a << " = invalid\n";
+        } break;
       }
     }
 }
