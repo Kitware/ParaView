@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.9");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.10");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -425,6 +425,13 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
   if (this->PVColorMap)
     {
     this->PVColorMap->Register(this);
+    
+    if (this->ScalarBarCheck->IsCreated())
+      {
+      // Let's make those 2 chekbuttons use the same variable name
+      this->ScalarBarCheck->SetVariableName(
+        this->PVColorMap->GetScalarBarCheck()->GetVariableName());
+      }
     }
   
   // Updating properties caused some problems:
@@ -2868,7 +2875,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.10 $");
 }
 
 //----------------------------------------------------------------------------
