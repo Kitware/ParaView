@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.471");
+vtkCxxRevisionMacro(vtkPVWindow, "1.472");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -671,11 +671,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->MenuFile->DeleteMenuItem("Close");
 
-  this->AddRecentFilesMenu(NULL, this);
-
   int clidx = this->GetFileMenuIndex();
-
-  this->MenuFile->InsertSeparator(clidx++);
 
   // Open a data file. Can support multiple file formats (see Open()).
 
@@ -712,6 +708,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "Import Package", this, 
                                 "OpenPackage", 3,
                                 "Import modules defined in a ParaView package ");
+
+  this->MenuFile->InsertSeparator(clidx++);
+  this->AddRecentFilesMenu(NULL, this);
+
 
   /*
   // Open XML package
@@ -3660,6 +3660,8 @@ void vtkPVWindow::LoadScript(const char *name)
   pvApp->SetRunningParaViewScript(1);
   this->vtkKWWindow::LoadScript(name);
   pvApp->SetRunningParaViewScript(0);
+
+  this->AddRecentFile(name, this, "LoadScript");
 }
 
 //-----------------------------------------------------------------------------
