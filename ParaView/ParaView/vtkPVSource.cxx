@@ -1180,8 +1180,7 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 
   vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
 
-  pvApp->Script("%s %s %s", name, method, args);
-  pvApp->BroadcastScript("%s %s %s", name,  method, args);
+  pvApp->BroadcastScript("catch {%s %s %s}", name,  method, args);
 }
 
 //----------------------------------------------------------------------------
