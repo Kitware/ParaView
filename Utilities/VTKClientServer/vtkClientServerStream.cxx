@@ -131,7 +131,8 @@ public:
   // Hold references to vtkObjectBase instances stored in the stream.
   // The object that owns this stream is passed as the argument to
   // Register/UnRegister for objects stored in the stream because the
-  // owner of this stream effectively owns those objects.
+  // owner of this stream effectively owns those objects.  If no owner
+  // is given, then the objects are not referenced.
   struct ObjectsType: vtkstd::vector<vtkObjectBase*>
   {
     typedef vtkstd::vector<vtkObjectBase*> Superclass;
@@ -139,18 +140,24 @@ public:
     ObjectsType(const ObjectsType& r, vtkObjectBase* owner): Superclass(r),
                                                              Owner(owner)
       {
-      for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+      if(this->Owner)
         {
-        (*i)->Register(this->Owner);
+        for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+          {
+          (*i)->Register(this->Owner);
+          }
         }
       }
     ~ObjectsType() { this->Clear(); }
     ObjectsType& operator=(const ObjectsType& that)
       {
         Superclass::operator=(that);
-        for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+        if(this->Owner)
           {
-          (*i)->Register(this->Owner);
+          for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+            {
+            (*i)->Register(this->Owner);
+            }
           }
         return *this;
       }
@@ -160,7 +167,10 @@ public:
       {
       if(obj)
         {
-        obj->Register(this->Owner);
+        if(this->Owner)
+          {
+          obj->Register(this->Owner);
+          }
         this->push_back(obj);
         }
       }
@@ -169,7 +179,10 @@ public:
       {
       for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
         {
-        (*i)->UnRegister(this->Owner);
+        if(this->Owner)
+          {
+          (*i)->UnRegister(this->Owner);
+          }
         }
       this->erase(this->begin(), this->end());
       }
