@@ -1440,13 +1440,14 @@ void vtkPVApplication::DisplayTCLError(const char* message)
 //----------------------------------------------------------------------------
 const char* const vtkPVApplication::LoadComponentProc =
 "namespace eval ::paraview {\n"
-"    proc load_component {name} {\n"
+"    proc load_component {name {optional_paths {}}} {\n"
 "        \n"
 "        global tcl_platform auto_path env\n"
 "        \n"
 "        # First dir is empty, to let Tcl try in the current dir\n"
 "        \n"
-"        set dirs {\"\"}\n"
+"        set dirs $optional_paths\n"
+"        set dirs [concat $dirs {\"\"}]\n"
 "        set ext [info sharedlibextension]\n"
 "        if {$tcl_platform(platform) == \"unix\"} {\n"
 "            set prefix \"lib\"\n"
@@ -1486,7 +1487,6 @@ const char* const vtkPVApplication::LoadComponentProc =
 "        puts stderr \"::paraview::load_component: $name could not be found.\"\n"
 "        \n"
 "        return 1\n"
-"    }   \n"
+"    }\n"
 "    namespace export load_component\n"
 "}\n";
-
