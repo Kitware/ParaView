@@ -77,10 +77,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkStringList.h"
 #include "vtkCollection.h"
+#include "vtkPVAnimationInterface.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.307");
+vtkCxxRevisionMacro(vtkPVSource, "1.308");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1407,6 +1408,8 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *prev = NULL;
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
+
+  window->GetAnimationInterface()->Stop();
 
   if (this->GetPVOutput())
     {  
