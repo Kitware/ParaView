@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.11");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.12");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -597,6 +597,12 @@ const vtkClientServerStream& vtkPVProcessModule::GetLastServerResult()
 const vtkClientServerStream& vtkPVProcessModule::GetLastClientResult()
 {
   return this->GetLastServerResult();
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerInterpreter* vtkPVProcessModule::GetLocalInterpreter()
+{
+  return this->ClientInterpreter;
 }
 
 //----------------------------------------------------------------------------

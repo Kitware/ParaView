@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.10");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.11");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1286,5 +1286,18 @@ void vtkPVClientServerModule::SendLastClientServerResult()
     {
     this->GetSocketController()->Send((char*)(data), length, 1,
                                       VTK_PV_ROOT_RESULT_TAG);
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerInterpreter* vtkPVClientServerModule::GetLocalInterpreter()
+{
+  if(this->ClientMode)
+    {
+    return this->ClientInterpreter;
+    }
+  else
+    {
+    return this->ServerInterpreter;
     }
 }

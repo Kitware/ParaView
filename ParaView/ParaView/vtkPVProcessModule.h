@@ -209,6 +209,12 @@ public:
   // Also reset the vtkClientServerStream object.
   virtual void SendStreamToClientAndServer();
 
+  //BTX
+  // Description:
+  // Get the interpreter actually used on the local process.
+  virtual vtkClientServerInterpreter* GetLocalInterpreter();
+  //ETX
+
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetApplicationID();
   vtkClientServerID GetProcessModuleID();

@@ -176,6 +176,10 @@ public:
 
   //BTX
   // Description:
+  // Get the interpreter actually used on the local process.
+  virtual vtkClientServerInterpreter* GetLocalInterpreter();
+
+  // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
   virtual const vtkClientServerStream& GetLastServerResult();
