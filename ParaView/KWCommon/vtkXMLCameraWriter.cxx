@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkXMLCameraWriter);
-vtkCxxRevisionMacro(vtkXMLCameraWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLCameraWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLCameraWriter, Camera, vtkCamera);
 
@@ -71,7 +71,9 @@ int vtkXMLCameraWriter::Write(ostream &os, vtkIndent vtkNotUsed(indent))
 
   double *dptr;
 
-  os << "<Camera Version=\"$Revision: 1.1 $\"";
+  os << "<Camera Version=\"$Revision: 1.2 $\"";
+
+  os << " ParallelProjection=\"" << this->Camera->GetParallelProjection()<< "\"";
 
   dptr = this->Camera->GetPosition();
   if (dptr)
@@ -101,8 +103,6 @@ int vtkXMLCameraWriter::Write(ostream &os, vtkIndent vtkNotUsed(indent))
   os << " ViewAngle=\"" << this->Camera->GetViewAngle() << "\"";
 
   os << " ParallelScale=\"" << this->Camera->GetParallelScale() << "\"";
-
-  os << " ParallelProjection=\"" << this->Camera->GetParallelProjection()<< "\"";
 
   os << "/>";
 

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkXMLCameraReader);
-vtkCxxRevisionMacro(vtkXMLCameraReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLCameraReader, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLCameraReader, Camera, vtkCamera);
 
@@ -74,7 +74,11 @@ void vtkXMLCameraReader::StartElement(const char *name, const char **args)
 
   for (i = 0; args[i] && args[i + 1]; i += 2)
     {
-    if (!strcmp(args[i], "Position"))
+    if (!strcmp(args[i], "ParallelProjection"))
+      {
+      this->Camera->SetParallelProjection(atoi(args[i + 1]));
+      }
+    else if (!strcmp(args[i], "Position"))
       {
       sscanf(args[i + 1], "%lf %lf %lf", dbuffer3, dbuffer3 + 1, dbuffer3 + 2);
       this->Camera->SetPosition(dbuffer3);
@@ -101,10 +105,6 @@ void vtkXMLCameraReader::StartElement(const char *name, const char **args)
     else if (!strcmp(args[i], "ParallelScale"))
       {
       this->Camera->SetParallelScale(atof(args[i + 1]));
-      }
-    else if (!strcmp(args[i], "ParallelProjection"))
-      {
-      this->Camera->SetParallelProjection(atoi(args[i + 1]));
       }
     }
 }
