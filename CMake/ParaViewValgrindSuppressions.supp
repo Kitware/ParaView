@@ -2532,6 +2532,7 @@
 {
    <insert a suppression name here>
    Memcheck:Param
+   writev(vector[...])
    fun:vgAllRoadsLeadToRome_writev
    fun:__writev
 }
@@ -2542,4 +2543,3 @@
    obj:/lib/libc-2.3.3.so
    fun:__sysconf
 }
-
