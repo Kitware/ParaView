@@ -654,7 +654,11 @@ void vtkPVActorComposite::ResetColorRange()
   this->GetColorRange(range);
   
   this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
-			this->MapperTclName, range[0], range[1]);
+					    this->MapperTclName,
+					    range[0], range[1]);
+  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
+					    this->LODMapperTclName,
+					    range[0], range[1]);
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -726,7 +730,13 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
-  
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
+                         this->LODMapperTclName);
+  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+                         this->LODMapperTclName, name, comp);
+
   this->ScalarBar->SetTitle(name);
   
   this->ResetColorRange();
@@ -743,6 +753,12 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
+                         this->LODMapperTclName);
+  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+                         this->LODMapperTclName, name, comp);
 
   this->ScalarBar->SetTitle(name);  
   
@@ -992,7 +1008,10 @@ void vtkPVActorComposite::SetScalarRange(float min, float max)
 { 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s SetScalarRange %f %f", this->MapperTclName, min, max);
+  pvApp->BroadcastScript("%s SetScalarRange %f %f", this->MapperTclName,
+			 min, max);
+  pvApp->BroadcastScript("%s SetScalarRange %f %f", this->LODMapperTclName,
+			 min, max);
 }
 
 //----------------------------------------------------------------------------
