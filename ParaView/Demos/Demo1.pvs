@@ -1812,7 +1812,7 @@ proc stream2_run { } {
 proc stream_fly {} {
     global DemoDir  pvDemoShouldStop Application streams
 
-    vtkTemp24 SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
+    $streams(vtkTemp24) SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
     update
     $streams(vtkTemp1) ShowCurrentSourcePropertiesCallback
     $streams(vtkTemp24) SetCameraState -22.1904 -24.6379 24.0137  28.2157 33.205 -26.6823  0.409372 0.373015 0.832631 
