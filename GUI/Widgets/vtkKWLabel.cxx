@@ -21,33 +21,32 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.29");
+vtkCxxRevisionMacro(vtkKWLabel, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
 {
-  this->Label    = new char[1];
-  this->Label[0] = 0;
-  this->LineType = vtkKWLabel::SingleLine;
-  this->Width    = 0;
+  this->CommandFunction         = vtkKWLabelCommand;
+
+  this->Label                   = NULL;
+  this->LineType                = vtkKWLabel::SingleLine;
+  this->Width                   = 0;
   this->AdjustWrapLengthToWidth = 0;
-  this->CommandFunction = vtkKWLabelCommand;
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabel::~vtkKWLabel()
 {
-  delete [] this->Label;
+  if (this->Label)
+    {
+    delete [] this->Label;
+    this->Label = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLabel::SetLabel(const char* _arg)
 {
-  if (!_arg)
-    {
-    _arg = "";
-    }
-
   if (this->Label == NULL && _arg == NULL) 
     { 
     return;
@@ -65,7 +64,7 @@ void vtkKWLabel::SetLabel(const char* _arg)
 
   if (_arg)
     {
-    this->Label = new char[strlen(_arg)+1];
+    this->Label = new char[strlen(_arg) + 1];
     strcpy(this->Label, _arg);
     }
   else
@@ -81,14 +80,15 @@ void vtkKWLabel::SetLabel(const char* _arg)
 //----------------------------------------------------------------------------
 void vtkKWLabel::UpdateText()
 {
-  if (this->Label && this->IsCreated())
+  if (this->IsCreated())
     {
-    this->SetTextOption(this->Label);
+    this->SetTextOption(this->Label); // NULL is handled correctly as ""
 
     // Whatever the label, -image always takes precedence, unless it's empty
     // so change it accordingly
     
-    if (this->LineType != vtkKWLabel::MultiLine && *this->Label)
+    if (this->LineType != vtkKWLabel::MultiLine && 
+        this->Label && *this->Label)
       {
       this->Script("%s configure -image {}", this->GetWidgetName());
       }
