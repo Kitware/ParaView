@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.12");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -86,7 +86,6 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
                              this->CompositeWithRGBAFlag);
     pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionFlag);
-
     pvapp->SetRegisteryValue(2, "RunTime", "CompositeThreshold", "%f",
                              this->CompositeThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "ReductionFactor", "%d",
@@ -224,12 +223,6 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     float tmp = this->CompositeThreshold;
     this->CompositeThreshold = -1.0;
     this->SetCompositeThreshold(tmp);
-
-    // hACK
-    if ( ! this->CompositeOptionEnabled)
-      {
-      this->CompositeCheck->EnabledOff();
-      }
 
     pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
                   this->CompositeThresholdLabel->GetWidgetName(), row++);
@@ -420,6 +413,20 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
                  this->CompositeWithFloatCheck->GetWidgetName(),
                  this->CompositeWithRGBACheck->GetWidgetName(),
                  this->CompositeCompressionCheck->GetWidgetName());
+
+    // Consider the command line option that turns compositing off.
+    // This is to avoid compositing when it is not available
+    // on the server.
+    if (pvapp->GetDisableComposite())
+      {
+      this->CompositeOptionEnabled = 0;
+      }
+    if ( ! this->CompositeOptionEnabled)
+      {
+      this->CompositeCheck->SetState(0);
+      this->SetCompositeThreshold(VTK_LARGE_FLOAT);
+      this->CompositeCheck->EnabledOff();
+      }
     }
 }
 

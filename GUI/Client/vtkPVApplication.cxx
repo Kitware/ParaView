@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.273");
+vtkCxxRevisionMacro(vtkPVApplication, "1.274");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -471,6 +471,7 @@ vtkPVApplication::vtkPVApplication()
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->StartEmpty = 0;
+  this->DisableComposite = 0;
   this->PlayDemoFlag = 0;
 
   // GUI style & consistency
@@ -659,6 +660,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix", 
   "--play-demo", "-pd",
   "Run the ParaView demo.",
+  "--disable-composite", "-dc",
+  "Use this option when redering resources are not available on the server.",
   "--help", "",
   "Displays available command line arguments.",
   "" 
@@ -1271,6 +1274,14 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->UseOffscreenRendering = 1;
     }
   
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-composite",
+                                          index) == VTK_OK  ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-dc",
+                                          index) == VTK_OK)
+    {
+    this->DisableComposite = 1;
+    }
+
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--crash-on-errors",
       index) == VTK_OK )
     {
