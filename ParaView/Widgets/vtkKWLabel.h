@@ -61,20 +61,16 @@ public:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, const char *args);
   
-  const char* GetLabel() 
-    {
-      return this->Label;
-    }
-
   // Description:
   // Set the text on the label.
-  void SetLabel(const char*);
+  virtual void SetLabel(const char*);
+  vtkGetStringMacro(Label);
 
   // Description:
   // Set the way label treats long text. 
   // Multiline will wrap text. You have to specify width
   // when using multiline label.
-  void SetLineType(int type);
+  virtual void SetLineType(int type);
 
   // Description:
   // Set/Get width of the label.
@@ -87,14 +83,15 @@ public:
   virtual void SetAdjustWrapLengthToWidth(int);
   vtkGetMacro(AdjustWrapLengthToWidth, int);
   vtkBooleanMacro(AdjustWrapLengthToWidth, int);
-  void AdjustWrapLengthToWidthCallback();
+  virtual void AdjustWrapLengthToWidthCallback();
 
-//BTX
-  enum {
+  //BTX
+  enum 
+  {
     SingleLine,
     MultiLine
   };
-//ETX
+  //ETX
 
 protected:
   vtkKWLabel();
@@ -107,6 +104,7 @@ private:
   int LineType;
   int Width;
   int AdjustWrapLengthToWidth;
+
   vtkKWLabel(const vtkKWLabel&); // Not implemented
   void operator=(const vtkKWLabel&); // Not implemented
 };

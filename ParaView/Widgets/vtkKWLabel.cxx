@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.21");
+vtkCxxRevisionMacro(vtkKWLabel, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -69,22 +69,47 @@ vtkKWLabel::~vtkKWLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::SetLabel(const char* l)
+void vtkKWLabel::SetLabel(const char* _arg)
 {
-  if(!l)
+  if (!_arg)
     {
-    l = "";
+    _arg = "";
     }
-  
-  delete [] this->Label;
-  this->Label = strcpy(new char[strlen(l)+1], l);
-  if(this->Application)
+
+  if (this->Label == NULL && _arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->Label && _arg && (!strcmp(this->Label, _arg))) 
     {
-    // if this has been created then change the text
-    this->Script("%s configure -text {%s}", this->GetWidgetName(), 
+    return;
+    }
+
+  if (this->Label) 
+    { 
+    delete [] this->Label; 
+    }
+
+  if (_arg)
+    {
+    this->Label = new char[strlen(_arg)+1];
+    strcpy(this->Label, _arg);
+    }
+  else
+    {
+    this->Label = NULL;
+    }
+
+  this->Modified();
+
+  if (this->IsCreated() && this->Label)
+    {
+    this->Script("%s configure -text {%s}", 
+                 this->GetWidgetName(), 
                  this->Label);
     }
-}
+} 
 
 //----------------------------------------------------------------------------
 void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
@@ -126,7 +151,7 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWLabel::SetLineType( int type )
 {
-  if ( this->Application )
+  if (this->IsCreated())
     {
     if ( this->LineType != type )
       {
