@@ -39,588 +39,586 @@ $kw(vtkTemp937) SetState 1
 $kw(vtkTemp897) AcceptCallback
 
 # Pan
-$kw(vtkTemp4) SetInteractorEventPosition 255 303
-$kw(vtkTemp4) CameraStyle3DOnMiddleButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 256 303
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 256 302
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 256 301
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 255 300
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 255 298
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 253 297
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 253 296
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 252 295
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 251 293
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 249 290
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 249 289
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 248 287
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 247 286
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 244 285
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 244 282
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 242 280
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 240 278
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 239 274
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 238 273
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 236 272
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 235 268
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 233 266
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 231 263
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 230 261
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 227 259
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 226 256
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 225 252
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 223 251
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 221 249
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 220 247
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 218 243
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 217 242
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 215 239
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 214 237
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 212 235
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 211 233
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 210 231
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 208 230
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 208 229
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 207 229
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 207 228
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 207 228
-$kw(vtkTemp4) CameraStyle3DOnMiddleButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 255 303 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 256 303 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 256 302 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 256 301 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 255 300 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 255 298 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 253 297 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 253 296 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 252 295 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 251 293 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 249 290 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 249 289 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 248 287 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 247 286 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 244 285 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 244 282 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 242 280 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 240 278 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 239 274 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 238 273 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 236 272 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 235 268 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 233 266 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 231 263 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 230 261 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 227 259 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 226 256 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 225 252 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 223 251 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 221 249 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 220 247 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 218 243 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 217 242 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 215 239 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 214 237 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 212 235 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 211 233 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 210 231 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 208 230 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 208 229 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 207 229 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 207 228 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 207 228 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonReleaseEvent"
 
 # Roll
-$kw(vtkTemp4) SetInteractorEventPosition 370 85
-$kw(vtkTemp4) SetInteractorShiftKey 1
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 370 86
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 370 87
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 370 89
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 370 90
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 90
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 91
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 92
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 94
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 97
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 99
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 374 101
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 374 104
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 374 106
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 374 109
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 375 110
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 375 113
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 117
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 122
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 124
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 129
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 134
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 141
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 144
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 149
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 156
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 163
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 165
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 170
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 177
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 180
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 186
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 193
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 196
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 198
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 376 206
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 211
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 215
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 217
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 221
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 224
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 227
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 229
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 235
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 237
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 241
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 246
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 249
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 250
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 252
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 253
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 258
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 259
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 262
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 263
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 377 263
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonUp
-$kw(vtkTemp4) SetInteractorShiftKey 0
+$kw(vtkTemp4) SetInteractorEventInformation 370 85 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 370 86 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 370 87 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 370 89 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 370 90 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 90 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 91 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 92 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 94 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 97 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 99 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 374 101 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 374 104 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 374 106 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 374 109 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 375 110 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 375 113 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 117 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 122 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 124 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 129 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 134 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 141 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 144 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 149 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 156 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 163 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 165 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 170 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 177 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 180 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 186 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 193 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 196 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 198 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 376 206 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 211 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 215 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 217 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 221 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 224 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 227 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 229 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 235 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 237 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 241 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 246 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 249 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 250 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 252 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 253 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 258 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 259 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 262 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 263 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 377 263 0 1 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # Choose center of rotation
 $kw(vtkTemp4) ChangeInteractorStyle 4
-$kw(vtkTemp4) SetInteractorEventPosition 234 273
-$kw(vtkTemp4) CenterOfRotationStyleOnLeftButtonDown
-$kw(vtkTemp4) CenterOfRotationStyleOnLeftButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 234 273 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 $kw(vtkTemp4) ChangeInteractorStyle 1
 
 # Rotate
-$kw(vtkTemp4) SetInteractorEventPosition 197 228
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 197 230
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 231
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 232
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 233
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 234
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 235
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 236
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 238
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 239
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 240
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 241
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 242
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 243
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 244
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 245
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 249
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 252
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 256
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 258
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 264
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 269
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 274
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 278
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 282
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 285
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 286
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 289
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 198 291
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 293
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 197 295
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 196 297
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 196 298
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 195 300
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 195 304
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 193 307
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 193 308
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 191 312
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 191 313
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 190 314
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 190 314
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 197 228 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 230 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 231 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 232 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 233 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 234 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 235 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 236 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 238 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 239 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 240 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 241 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 242 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 243 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 244 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 245 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 249 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 252 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 256 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 258 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 264 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 269 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 274 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 278 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 282 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 285 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 286 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 289 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 198 291 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 293 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 197 295 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 196 297 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 196 298 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 195 300 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 195 304 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 193 307 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 193 308 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 191 312 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 191 313 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 190 314 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 190 314 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # Zoom
-$kw(vtkTemp4) SetInteractorEventPosition 371 109
-$kw(vtkTemp4) CameraStyle3DOnRightButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 371 110
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 111
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 112
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 113
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 114
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 115
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 117
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 118
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 120
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 121
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 123
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 126
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 128
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 129
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 130
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 133
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 135
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 138
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 371 140
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 145
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 372 152
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 157
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 164
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 168
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 173
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 180
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 185
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 195
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 200
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 206
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 213
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 220
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 224
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 231
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 238
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 243
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 248
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 251
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 254
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 259
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 264
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 265
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 269
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 272
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 275
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 276
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 373 277
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 375 278
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 375 278
-$kw(vtkTemp4) CameraStyle3DOnRightButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 371 109 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "RightButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 110 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 111 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 112 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 113 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 114 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 115 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 117 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 118 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 120 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 121 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 123 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 126 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 128 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 129 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 130 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 133 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 135 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 138 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 371 140 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 145 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 372 152 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 157 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 164 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 168 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 173 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 180 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 185 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 195 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 200 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 206 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 213 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 220 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 224 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 231 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 238 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 243 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 248 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 251 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 254 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 259 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 264 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 265 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 269 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 272 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 275 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 276 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 373 277 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 375 278 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 375 278 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "RightButtonReleaseEvent"
 
 # Move
 [$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
-$kw(vtkTemp4) SetInteractorEventPosition 196 240
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 196 241
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 196 243
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 189 254
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 180 266
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 166 282
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 155 297
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 145 317
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 134 343
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 129 357
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 126 368
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 119 395
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 118 397
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 118 397
-$kw(vtkTemp4) CameraStyle3DOnLeftButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 196 240 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 196 241 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 196 243 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 189 254 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 180 266 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 166 282 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 155 297 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 145 317 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 134 343 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 129 357 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 126 368 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 119 395 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 118 397 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 118 397 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # parallel projection (pan and zoom work differently with parallel and
 # perspective projections)
 $kw(vtkTemp18) ParallelProjectionOn
 
 # pan
-$kw(vtkTemp4) SetInteractorEventPosition 134 346
-$kw(vtkTemp4) CameraStyle3DOnMiddleButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 135 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 136 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 137 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 142 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 145 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 154 345
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 164 342
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 176 339
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 185 337
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 200 334
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 217 330
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 238 324
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 249 322
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 269 319
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 286 315
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 298 312
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 307 311
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 310 309
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 312 309
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 312 309
-$kw(vtkTemp4) CameraStyle3DOnMiddleButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 134 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 135 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 136 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 137 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 142 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 145 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 154 345 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 164 342 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 176 339 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 185 337 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 200 334 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 217 330 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 238 324 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 249 322 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 269 319 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 286 315 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 298 312 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 307 311 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 310 309 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 312 309 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 312 309 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonReleaseEvent"
 
 # zoom
-$kw(vtkTemp4) SetInteractorEventPosition 103 373
-$kw(vtkTemp4) CameraStyle3DOnRightButtonDown
-$kw(vtkTemp4) SetInteractorEventPosition 103 372
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 371
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 370
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 367
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 366
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 365
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 364
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 363
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 362
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 360
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 359
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 358
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 356
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 355
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 354
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 351
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 350
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 349
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 348
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 347
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 346
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 345
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 343
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 342
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 340
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 338
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 334
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 333
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 328
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 325
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 321
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 320
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 317
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 315
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 312
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 311
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 309
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 307
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 304
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 301
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 300
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 296
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 294
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 292
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 289
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 288
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 287
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 284
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 283
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 281
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 280
-$kw(vtkTemp4) CameraStyle3DOnMouseMove
-$kw(vtkTemp4) SetInteractorEventPosition 103 280
-$kw(vtkTemp4) CameraStyle3DOnRightButtonUp
+$kw(vtkTemp4) SetInteractorEventInformation 103 373 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "RightButtonPressEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 372 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 371 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 370 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 367 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 366 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 365 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 364 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 363 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 362 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 360 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 359 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 358 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 356 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 355 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 354 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 351 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 350 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 349 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 348 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 347 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 346 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 345 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 343 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 342 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 340 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 338 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 334 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 333 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 328 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 325 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 321 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 320 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 317 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 315 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 312 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 311 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 309 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 307 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 304 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 301 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 300 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 296 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 294 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 292 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 289 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 288 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 287 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 284 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 283 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 281 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 280 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
+$kw(vtkTemp4) SetInteractorEventInformation 103 280 0 0 0 0 0
+$kw(vtkTemp4) InvokeInteractorEvent "RightButtonReleaseEvent"
 
 # Fix the size of the image.
 set MainView [[$Application GetMainWindow] GetMainView]
