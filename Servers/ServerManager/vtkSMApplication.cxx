@@ -28,15 +28,8 @@
 #include "vtkToolkits.h"
 #include "vtkSMGeneratedModules.h"
 
-#include "vtkSMDomain.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyIterator.h"
-
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.9");
+vtkCxxRevisionMacro(vtkSMApplication, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -97,40 +90,6 @@ void vtkSMApplication::Initialize()
   delete[] init_string;
 
   parser->Delete();
-
-  proxyM->InstantiateGroupPrototypes("filters");
-  proxyM->InstantiateGroupPrototypes("readers");
-  proxyM->InstantiateGroupPrototypes("sources");
-  proxyM->InstantiateGroupPrototypes("utilities");
-  proxyM->InstantiateGroupPrototypes("rendering");
-
-  cout << "Check for properties without domains" << endl;
-  vtkSMProxyIterator* pi = vtkSMProxyIterator::New();
-  vtkSMPropertyIterator* pri = vtkSMPropertyIterator::New();
-  vtkSMDomainIterator* di = vtkSMDomainIterator::New();
-  for ( pi->Begin(); !pi->IsAtEnd(); pi->Next() )
-    {
-    vtkSMProxy* proxy = pi->GetProxy();
-    pri->SetProxy(proxy);
-    for ( pri->Begin(); !pri->IsAtEnd(); pri->Next() )
-      {
-      vtkSMProperty* prop = pri->GetProperty();
-      di->SetProperty(prop);
-      int count = 0;
-      for ( di->Begin(); !di->IsAtEnd(); di->Next() )
-        {
-        count ++;
-        }
-      if ( !count )
-        {
-        cout << "* Property: " << proxy->GetXMLName() << "->" << prop->GetXMLName() << " has no domain" << endl;
-        }
-      }
-    }
-  pi->Delete();
-  pri->Delete();
-  di->Delete();
-  cout << "Done checking for properties without domains" << endl;
 
 // //  const char* directory = args->GetValue("--configuration-path");
 //   const char* directory =  "/home/berk/etc/servermanager";

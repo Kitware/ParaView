@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.17");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.18");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -348,7 +348,6 @@ void vtkSMProxyManager::SaveState(const char* filename)
   this->SaveState(0, &os, indent);
 }
 
-//---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
 {
 
