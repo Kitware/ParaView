@@ -107,7 +107,7 @@ public:
   vtkGetMacro(SquirtCompressionLevel, int);
   vtkSetClampMacro(SquirtCompressionLevel, int, 0, 5);
 
-  virtual void SetImageReductionFactorForUpdateRate(float DesiredUpdateRate);
+  virtual void SetImageReductionFactorForUpdateRate(double DesiredUpdateRate);
 
 protected:
   vtkDesktopDeliveryClient();
