@@ -169,9 +169,9 @@ vtkPVData::vtkPVData()
 
   this->ResetCameraButton = vtkKWPushButton::New();
   
-  this->PreviousAmbient = 0;
-  this->PreviousSpecular = 0;
-  this->PreviousDiffuse = 1;
+  this->PreviousAmbient = 0.2;
+  this->PreviousSpecular = 0.1;
+  this->PreviousDiffuse = 0.8;
   this->PreviousWasSolid = 1;
 
   this->PVColorMap = NULL;
@@ -510,6 +510,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Property%d", this->InstanceCount);
   this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
   this->SetPropertyTclName(tclName);
+  pvApp->BroadcastScript("%s SetAmbient 0.2", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetDiffuse 0.8", this->PropertyTclName);
+
   
   pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
 			 this->PropertyTclName);
@@ -1473,6 +1476,10 @@ void vtkPVData::ColorByPropertyInternal()
   color = this->ColorButton->GetColor();
   pvApp->BroadcastScript("%s SetColor %f %f %f", 
 			 this->PropertyTclName, color[0], color[1], color[2]);
+  // Add a bit of specular when just coloring by property.
+  pvApp->BroadcastScript("%s SetSpecular 0.1", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetSpecularPower 100.0", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", this->PropertyTclName);
   
   this->SetPVColorMap(NULL);
 
@@ -1515,6 +1522,9 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
     vtkErrorMacro("Could not get the color map.");
     return;
     }
+
+  // Turn off the specualr so it does not interfere with data.
+  pvApp->BroadcastScript("%s SetSpecular 0.0", this->PropertyTclName);
 
   pvApp->BroadcastScript("%s SetLookupTable %s", this->MapperTclName,
                          this->PVColorMap->GetLookupTableTclName());
@@ -1559,7 +1569,7 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
 
   // I would like to make this an argument, but not right now.
   int numComps;
-  vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
+  vtkDataArray *a = this->VTKData->GetCellData()->GetArray(name);
   if (a == NULL)
     {
     //vtkErrorMacro("Could not find array.");
@@ -1575,6 +1585,11 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
     return;
     }
 
+  // Turn off the specualr so it does not interfere with data.
+  pvApp->BroadcastScript("%s SetSpecular 0.0", this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetLookupTable %s", this->MapperTclName,
+                         this->PVColorMap->GetLookupTableTclName());
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->MapperTclName);
@@ -1582,6 +1597,8 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
                          this->MapperTclName, name);
   this->PVColorMap->SetVectorComponent(comp, numComps);
 
+  pvApp->BroadcastScript("%s SetLookupTable %s", this->LODMapperTclName,
+                         this->PVColorMap->GetLookupTableTclName());
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->LODMapperTclName);
