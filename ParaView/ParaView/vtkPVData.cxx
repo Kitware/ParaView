@@ -421,7 +421,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 							  tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
-  
+
+
+  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   if (this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
@@ -483,6 +485,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
 
+  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
   this->Script("%s SetLookupTable [%s GetLookupTable]",
                this->GetScalarBarTclName(), this->MapperTclName);
   pvApp->BroadcastScript("%s SetLookupTable [%s GetLookupTable]", 
