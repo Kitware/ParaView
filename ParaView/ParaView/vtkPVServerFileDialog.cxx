@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.10");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.11");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -897,6 +897,11 @@ void vtkPVServerFileDialog::Update()
 {
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
+  const char* perms = "r";
+  if(this->SaveDialog)
+    {
+    perms = "w";
+    }
   
   // Make sure we have a directory.
   if(!this->LastPath)
@@ -909,7 +914,7 @@ void vtkPVServerFileDialog::Update()
 
   // Read the list of subdirectories and files.
   if(!(this->GetPVApplication()->GetProcessModule()
-       ->GetDirectoryListing(this->LastPath, dirs, files)))
+       ->GetDirectoryListing(this->LastPath, dirs, files, perms)))
     {
     // Directory did not exist, use current directory instead.
     vtkErrorMacro("Cannot open directory: " << this->LastPath);
@@ -920,7 +925,7 @@ void vtkPVServerFileDialog::Update()
     
     // We will now succeed.
     this->GetPVApplication()->GetProcessModule()
-      ->GetDirectoryListing(this->LastPath, dirs, files);
+      ->GetDirectoryListing(this->LastPath, dirs, files, perms);
     }
   
   this->Script("%s delete all", this->FileList->GetWidgetName());
