@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.15");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -210,7 +210,7 @@ void vtkPVExtractPartsWidget::SetSelectState(int idx, int val)
   if (!this->AcceptCalled)
     {
     float *scalars = this->Property->GetScalars();
-    scalars[idx] = val;
+    scalars[2*idx+1] = val;
     }
 }
 
@@ -225,11 +225,11 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
     return;
     }
 
-  num = this->PartSelectionList->GetNumberOfItems();
+  num = this->Property->GetNumberOfScalars() / 2;
   for (idx = 0; idx < num; ++idx)
     {
     *file << "$kw(" << this->GetTclName() << ") SetSelectState "
-          << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
+          << idx << " " << this->Property->GetScalars()[2*idx+1] << endl;
     }
 }
 
