@@ -55,14 +55,17 @@ public:
   // Default is yes only for piece 0 writer.
   virtual void SetWriteSummaryFile(int flag);
   vtkGetMacro(WriteSummaryFile, int);
-  vtkBooleanMacro(WriteSummaryFile, int);
+  vtkBooleanMacro(WriteSummaryFile, int);  
+  
+  // Description:
+  // Invoke the writer.  Returns 1 for success, 0 for failure.
+  int Write();
 protected:
   vtkXMLPDataWriter();
   ~vtkXMLPDataWriter();
   
   virtual vtkXMLWriter* CreatePieceWriter(int index)=0;
   
-  int Write();
   void WriteFileAttributes();
   virtual void WritePrimaryElementAttributes();
   int WriteData();
