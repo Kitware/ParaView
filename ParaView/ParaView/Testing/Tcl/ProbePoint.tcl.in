@@ -15,7 +15,7 @@ set pv(vtkTemp187) [$pv(vtkTemp179) GetPVWidget {Input}]
 $pv(vtkTemp187) SetCurrentValue $pv(vtkTemp138)
 set pv(vtkTemp188) [$pv(vtkTemp179) GetPVWidget {Glyph}]
 $pv(vtkTemp188) SetCurrentValue $pv(vtkTemp97)
-set pv(vtkTemp200) [$pv(vtkTemp179) GetPVWidget {Scale Factor:}]
+set pv(vtkTemp200) [$pv(vtkTemp179) GetPVWidget {Scale Factor}]
 $pv(vtkTemp200) SetValue .5
 $pv(vtkTemp179) AcceptCallback
 
