@@ -63,14 +63,8 @@ public:
   virtual vtkDataSet* GetOutput(int index);
   
   // Description:
-  // Update the list of attributes and their values from the file
-  // without creating outputs.  This can be used to inspect the list
-  // of attributes and set restrictions before reading any real data.
-  void UpdateAttributes();
-  
-  // Description:
   // Get the number of distinct attribute values present in the file.
-  // Valid after UpdateAttributes or UpdateInformation.
+  // Valid after UpdateInformation.
   int GetNumberOfAttributes();
   
   // Description:
@@ -123,11 +117,13 @@ protected:
   // output from which the request came.
   virtual void MarkGeneratedOutputs(vtkDataObject* output);
 
-  virtual void ExecuteAttributes();
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual void SetupEmptyOutput();
-  virtual void SetupOutputInformation();
-  void SetupOutput(const char* filePath, int index);
+  virtual int FillOutputPortInformation(int, vtkInformation* info);
+  virtual int RequestDataObject(vtkInformation *request,
+                                vtkInformationVector **inputVector,
+                                vtkInformationVector *outputVector);
+  void SetupOutput(const char* filePath, int index, vtkInformation *outInfo);
   void ReadXMLData();
   
   // Callback registered with the InternalProgressObserver.

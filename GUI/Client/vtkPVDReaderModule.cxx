@@ -23,22 +23,17 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
 {
-  this->HaveTime = 0;
-  this->TimeScale = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::~vtkPVDReaderModule()
 {
-  if(this->TimeScale)
-    {
-    this->TimeScale->Delete();
-    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -50,8 +45,9 @@ void vtkPVDReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 int vtkPVDReaderModule::Finalize(const char* fname)
 {
-  // If we have time, we need to behave as an advanced reader module.
-  if(this->HaveTime)
+  vtkPVScale *scale = vtkPVScale::SafeDownCast( this->GetPVWidget("TimeStep") );
+// If we have more than 1 timestep, we need to behave as an advanced reader module.
+  if(scale && scale->GetRangeMax() > 0)
     {
     return this->Superclass::Finalize(fname);
     }
@@ -61,67 +57,12 @@ int vtkPVDReaderModule::Finalize(const char* fname)
     }
 }
 
-//----------------------------------------------------------------------------
-int vtkPVDReaderModule::ReadFileInformation(const char* fname)
-{
-  // Make sure the reader's file name is set.
-  this->SetReaderFileName(fname);
-
-  // Check whether the input file has a "timestep" attribute.
-  vtkClientServerStream stream;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  stream
-    << vtkClientServerStream::Invoke
-    // Since this is a reader, there is only one VTK source. Therefore,
-    // we use index 0.
-    << this->GetVTKSourceID(0) << "UpdateAttributes"
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
-  stream
-    << vtkClientServerStream::Invoke
-    << this->GetVTKSourceID(0) << "GetAttributeIndex" << "timestep"
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
-  int index = -1;
-  this->HaveTime = 
-    (pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &index) && index >= 0) ? 1 : 0;
-
-  // If we have time, we need to behave as an advanced reader module.
-  if(this->HaveTime)
-    {
-    this->TimeScale = vtkPVScale::New();
-    this->TimeScale->SetLabel("Timestep");
-    this->TimeScale->SetPVSource(this);
-    this->TimeScale->RoundOn();
-    this->TimeScale->SetParent(this->ParameterFrame->GetFrame());
-    this->TimeScale->SetModifiedCommand(this->GetTclName(), 
-                                        "SetAcceptButtonColorToModified");
-    this->TimeScale->SetSMPropertyName("TimestepAsIndex");
-    this->TimeScale->SetDisplayEntryAndLabelOnTop(0);
-    this->TimeScale->SetDisplayValueFlag(0);
-    this->TimeScale->Create(this->GetPVApplication());
-    this->TimeScale->DisplayEntry();
-    this->AddPVWidget(this->TimeScale);
-    this->Script("pack %s -side top -fill x -expand 1", 
-                 this->TimeScale->GetWidgetName());
-
-    // Have time.  Behave as a vtkPVAdvancedReaderModule.
-    return this->Superclass::ReadFileInformation(fname);
-    }
-  else
-    {
-    // No time, skip over vtkPVAdvancedReaderModule behavior.
-    return this->vtkPVReaderModule::ReadFileInformation(fname);
-    }
-}
-
-//----------------------------------------------------------------------------
 int vtkPVDReaderModule::GetNumberOfTimeSteps()
 {
-  if(this->HaveTime)
+  vtkPVScale *scale = vtkPVScale::SafeDownCast( this->GetPVWidget("TimeStep") );
+  if(scale && scale->GetRangeMax() > 0)
     {
-    return static_cast<int>(this->TimeScale->GetRangeMax() -
-                            this->TimeScale->GetRangeMin())+1;
+    return static_cast<int>(scale->GetRangeMax() - scale->GetRangeMin()) + 1;
     }
   else
     {
@@ -132,9 +73,10 @@ int vtkPVDReaderModule::GetNumberOfTimeSteps()
 //----------------------------------------------------------------------------
 void vtkPVDReaderModule::SetRequestedTimeStep(int step)
 {
-  if(this->HaveTime)
+  vtkPVScale *scale = vtkPVScale::SafeDownCast( this->GetPVWidget("TimeStep") );
+  if(scale && scale->GetRangeMax() > 0)
     {
-    this->TimeScale->SetValue(step + this->TimeScale->GetRangeMin());
+    scale->SetValue(step + scale->GetRangeMin());
     this->AcceptCallback();
     this->GetPVApplication()->GetMainView()->EventuallyRender();
     this->Script("update");

@@ -14,6 +14,10 @@
           extensions=".pvd"
           file_description="ParaView Data Files">
     <Source class="vtkPVDReader"/>
+    
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           help="Set the current timestep."/>	
   </Module>
   <Module name="XMLPolyDataReader"
           root_name="XMLPolyDataReader"

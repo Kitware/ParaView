@@ -16,14 +16,15 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.2");
+vtkCxxRevisionMacro(vtkPVDReader, "1.3");
 vtkStandardNewMacro(vtkPVDReader);
+
 
 //----------------------------------------------------------------------------
 vtkPVDReader::vtkPVDReader()
 {
-  this->TimestepIndexRange[0] = 0;
-  this->TimestepIndexRange[1] = -1;
+  this->TimeStepRange[0] = 0;
+  this->TimeStepRange[1] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -35,28 +36,37 @@ vtkPVDReader::~vtkPVDReader()
 void vtkPVDReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "TimestepIndexRange: "
-     << this->TimestepIndexRange[0] << " "
-     << this->TimestepIndexRange[1] << "\n";
+  os << indent << "TimeStepRange: "
+     << this->TimeStepRange[0] << " "
+     << this->TimeStepRange[1] << "\n";
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDReader::SetTimestepAsIndex(int index)
+void vtkPVDReader::SetTimeStep(int index)
 {
   this->SetRestrictionAsIndex("timestep", index);
 }
 
 //----------------------------------------------------------------------------
-int vtkPVDReader::GetTimestepAsIndex()
+int vtkPVDReader::GetTimeStep()
 {
   return this->GetRestrictionAsIndex("timestep");
 }
 
-//----------------------------------------------------------------------------
-void vtkPVDReader::ExecuteAttributes()
+
+void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
 {
-  this->Superclass::ExecuteAttributes();
+  this->Superclass::SetupOutputInformation(outInfo);
+
   int index = this->GetAttributeIndex("timestep");
-  this->TimestepIndexRange[0] = 0;
-  this->TimestepIndexRange[1] = this->GetNumberOfAttributeValues(index)-1;
+  this->TimeStepRange[0] = 0;
+  this->TimeStepRange[1] = this->GetNumberOfAttributeValues(index)-1;
+  if (this->TimeStepRange[1] == -1)
+    {
+    this->TimeStepRange[1] = 0;
+    }
 }
+
+
+
+

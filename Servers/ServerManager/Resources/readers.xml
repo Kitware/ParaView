@@ -22,19 +22,19 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
      <IntVectorProperty 
-        name="TimestepIndexRangeInfo"
-        command="GetTimestepIndexRange"
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
         information_only="1">
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
      <IntVectorProperty 
-        name="TimestepAsIndex"
-        command="SetTimestepAsIndex"
+        name="TimeStep"
+        command="SetTimeStep"
         number_of_elements="1"
         default_values="0">
        <IntRangeDomain name="range">
           <RequiredProperties>
-             <Property name="TimestepIndexRangeInfo" function="Range"/>
+             <Property name="TimeStepRangeInfo" function="Range"/>
           </RequiredProperties>
        </IntRangeDomain>
      </IntVectorProperty>

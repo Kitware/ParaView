@@ -31,7 +31,6 @@ public:
   
   // Description:
   virtual int Finalize(const char* fname);
-  virtual int ReadFileInformation(const char* fname);
   
   // Description:
   // Get the number of time steps that can be provided by this reader.
@@ -49,12 +48,6 @@ public:
 protected:
   vtkPVDReaderModule();
   ~vtkPVDReaderModule();
-  
-  // Whether the input file has time.
-  int HaveTime;
-  
-  // Time selection slider.
-  vtkPVScale* TimeScale;
   
 private:
   vtkPVDReaderModule(const vtkPVDReaderModule&); // Not implemented

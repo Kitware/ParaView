@@ -34,22 +34,23 @@ public:
   // should be referenced by its index.  Only data sets matching this
   // value will be read.  An out-of-range index will remove the
   // restriction.
-  void SetTimestepAsIndex(int index);
-  int GetTimestepAsIndex();
+  void SetTimeStep(int index);
+  int GetTimeStep();
 
   // Description:
   // Get the range of index values valid for the TimestepAsIndex
   // setting.
-  vtkGetVector2Macro(TimestepIndexRange, int);
+  vtkGetVector2Macro(TimeStepRange, int);
+
 protected:
   vtkPVDReader();
   ~vtkPVDReader();
 
-  // Set TimestepIndexRange during ExecuteAttributes.
-  virtual void ExecuteAttributes();
+  // Set TimeStepRange
+  virtual void SetupOutputInformation(vtkInformation *outInfo);
 
   // Save the range of valid timestep index values.
-  int TimestepIndexRange[2];
+  int TimeStepRange[2];
 
 private:
   vtkPVDReader(const vtkPVDReader&);  // Not implemented.

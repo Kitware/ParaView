@@ -55,7 +55,7 @@ $kw(vtkTemp5) ReadFileInformation $kw(vtkTemp1186) "testAnimationSaveLoad.pvd"
 $kw(vtkTemp5) FinalizeRead $kw(vtkTemp1186) "testAnimationSaveLoad.pvd"
 set kw(vtkTemp1191) [$kw(vtkTemp1186) GetPVWidget {Filename}]
 $kw(vtkTemp1191) SetValue "testAnimationSaveLoad.pvd"
-set kw(vtkTemp1196) [$kw(vtkTemp1186) GetPVWidget {Timestep}]
+set kw(vtkTemp1196) [$kw(vtkTemp1186) GetPVWidget {TimeStep}]
 $kw(vtkTemp1196) SetValue 0
 $kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
 $kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
