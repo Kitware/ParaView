@@ -27,7 +27,7 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.23");
+vtkCxxRevisionMacro(vtkString, "1.24");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ char* vtkString::CropString(char* str, size_t max_len)
 }
 
 //----------------------------------------------------------------------------
-int vtkString::ConvertDateMacroString(char *str, struct tm *tmt)
+int vtkStringConvertDateMacroString(char *str, struct tm *tmt)
 {
   if (!str || !tmt)
     {
@@ -510,7 +510,7 @@ int vtkString::ConvertDateMacroString(char *str, struct tm *tmt)
 int vtkString::ConvertDateMacroString(char *str, time_t *tmt)
 {
   struct tm tmt2;
-  if (!vtkString::ConvertDateMacroString(str, &tmt2))
+  if (!vtkStringConvertDateMacroString(str, &tmt2))
     {
     return 0;
     }
@@ -519,7 +519,7 @@ int vtkString::ConvertDateMacroString(char *str, time_t *tmt)
 }
 
 //----------------------------------------------------------------------------
-int vtkString::ConvertTimeStampMacroString(char *str, struct tm *tmt)
+int vtkStringConvertTimeStampMacroString(char *str, struct tm *tmt)
 {
   if (!str || !tmt)
     {
@@ -574,7 +574,7 @@ int vtkString::ConvertTimeStampMacroString(char *str, struct tm *tmt)
 int vtkString::ConvertTimeStampMacroString(char *str, time_t *tmt)
 {
   struct tm tmt2;
-  if (!vtkString::ConvertTimeStampMacroString(str, &tmt2))
+  if (!vtkStringConvertTimeStampMacroString(str, &tmt2))
     {
     return 0;
     }
