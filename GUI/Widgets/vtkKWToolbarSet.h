@@ -49,6 +49,10 @@ public:
   // Return 1 on success, 0 otherwise.
   int AddToolbar(vtkKWToolbar *toolbar);
   int HasToolbar(vtkKWToolbar *toolbar);
+  
+  // Description:
+  // Return a toolbar at a particular index.
+  vtkKWToolbar* GetToolbar(int index);
   vtkIdType GetNumberOfToolbars();
 
   // Description:
@@ -64,6 +68,12 @@ public:
   void HideToolbar(vtkKWToolbar *toolbar);
   void ShowToolbar(vtkKWToolbar *toolbar);
   void SetToolbarVisibility(vtkKWToolbar *toolbar, int flag);
+
+  // Description:
+  // Indicates if the given toolbar is visible in 
+  // the toolset.
+  int IsToolbarVisible(vtkKWToolbar *toolbar);
+  
   vtkIdType GetNumberOfVisibleToolbars();
 
   // Description:

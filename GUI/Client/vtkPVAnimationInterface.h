@@ -112,6 +112,16 @@ public:
   // Callback that sets the current time to the end of the time range.
   void GoToEnd();
 
+  // Description:
+  // Callback that sets the current time to the next step.
+  // If at the end of the range then, this has no effect.
+  void GoToNext();
+
+  // Description:
+  // Callback that sets the current time to the previous step.
+  // If at the start of the range then, this has no effect.
+  void GoToPrevious();
+
   // ------------------------------------------------
 
   // Description:
@@ -206,6 +216,13 @@ public:
   // Description:
   // Add an empty source item
   vtkPVAnimationInterfaceEntry* AddEmptySourceItem();
+  
+  // Description:
+  // Returns the first available Empty source item (i.e. an Item
+  // that is not valid since it does not have the PVSource or 
+  // the Method set). It will add an empty source item, if
+  // necessary.
+  vtkPVAnimationInterfaceEntry* GetEmptySourceItem();
   void UpdateEntries();
   void DeleteSourceItem(int item);
   void UpdateSourceMenu(int idx);

@@ -33,6 +33,7 @@ class vtkKWProgressGauge;
 class vtkKWSplitFrame;
 class vtkKWTclInteractor;
 class vtkKWToolbarSet;
+class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
 class vtkKWView;
 class vtkKWViewCollection;
@@ -199,6 +200,25 @@ public:
   // The toolbar container.
   vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
 
+  // Description:
+  // Add a toolbar to the window. Do not directly add the toolbar to
+  // the vtkKWToolbarSet instance if
+  // it must be made availble in the View | Toolbars menu to
+  // toggle visibility. Also, 
+  // use HideToolbar / ShowToolbar / SetToolbarVisibility methods
+  // alone to change the visibility of the toolbar.
+  void AddToolbar(vtkKWToolbar* toolbar, const char* name);
+
+  // Description:
+  // Change the visibility of a toolbar.
+  void HideToolbar(vtkKWToolbar* toolbar, const char* name);
+  void ShowToolbar(vtkKWToolbar* toolbar, const char* name);
+  void SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag);
+
+  // Description:;
+  // Callback to toggle toolbar visibility
+  void ToggleToolbarVisibility(int id, const char* name);
+  
   // Description:
   // The status frame.
   vtkGetObjectMacro(StatusFrame, vtkKWFrame);
@@ -394,6 +414,7 @@ protected:
   vtkKWMenu *MenuWindow;
   vtkKWMenu *MenuHelp;
   vtkKWMenu *PageMenu;
+  vtkKWMenu *ToolbarsMenu;
 
   vtkKWFrame *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;

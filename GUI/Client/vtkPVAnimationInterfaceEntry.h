@@ -66,6 +66,13 @@ public:
   vtkSetStringMacro(CurrentMethod);
   vtkGetStringMacro(CurrentMethod);
 
+  // Description:
+  // Set the current method using the index in the Methods menu.
+  // It invokes the command of the menu item at the given idx,
+  // this simulating the effect that the user choose the given index
+  // method from the methods menu.
+  void SetCurrentMethodIndex(int idx);
+  
   void SetCurrentSMProperty(vtkSMProperty *prop);
   vtkGetObjectMacro(CurrentSMProperty, vtkSMProperty);
   

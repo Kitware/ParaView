@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.173");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.174");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1140,6 +1140,27 @@ void vtkPVAnimationInterface::GoToEnd()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::GoToNext()
+{
+  int cur = static_cast<int>(this->TimeScale->GetValue()) + 1;
+  
+  if (cur < this->GetNumberOfFrames())
+    {
+    this->SetCurrentTime(cur);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::GoToPrevious()
+{
+  int cur = static_cast<int>(this->TimeScale->GetValue()) - 1;
+  if (cur >=0 )
+    {
+    this->SetCurrentTime(cur);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateSourceMenu(int idx)
 {
   char methodAndArgString[1024];
@@ -1897,6 +1918,22 @@ void vtkPVAnimationInterface::SetCacheGeometry(int flag)
 vtkPVApplication* vtkPVAnimationInterface::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->GetApplication());
+}
+
+//-----------------------------------------------------------------------------
+vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetEmptySourceItem()
+{
+  vtkCollectionIterator* it = this->AnimationEntriesIterator;
+  for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+    {
+    vtkPVAnimationInterfaceEntry* entry
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+    if ( !entry->IsActionValid() )
+      {
+      return entry;
+      }
+    }
+  return this->AddEmptySourceItem();
 }
 
 //-----------------------------------------------------------------------------

@@ -111,7 +111,6 @@ class vtkLinkedList;
 #define VTK_PV_ANIMATION_MENU_INDEX    3
 #define VTK_PV_ANIMATION_MENU_LABEL    " Animation"
 
-
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
 public:
@@ -188,7 +187,16 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
-  
+ 
+  // Description:
+  // Animation Toolbar callbacks
+  void PlayCallback();
+  void StopCallback();
+  void GoToBeginningCallback();
+  void GoToEndCallback();
+  void GoToPreviousCallback();
+  void GoToNextCallback();
+
   // Description:
   // Access from script for regression test.
   void SaveBatchScript(const char *filename);
@@ -588,6 +596,15 @@ protected:
   vtkKWToolbar* Toolbar;
   // This controls button visibility.
   vtkKWMenuButton* ToolbarMenuButton;
+ 
+  // Animation Toolbar
+  vtkKWToolbar* AnimationToolbar;
+  vtkKWPushButton *PlayButton;
+  vtkKWPushButton *StopButton;
+  vtkKWPushButton *GotoBeginingButton;
+  vtkKWPushButton *GotoEndButton;
+  vtkKWPushButton *GotoPreviousButton;
+  vtkKWPushButton *GotoNextButton;
   
   // widgets for setting center of rotation for rotate camera interactor style
   vtkKWToolbar *PickCenterToolbar;
@@ -625,6 +642,7 @@ protected:
   void InitializeMenus(vtkKWApplication* app);
   void InitializeToolbars(vtkKWApplication* app);
   void InitializeInteractorInterfaces(vtkKWApplication* app);
+  void InitializeAnimationInterfaces(vtkKWApplication* app);
 
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;

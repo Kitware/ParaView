@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.6");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.7");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -335,6 +335,13 @@ void vtkKWToolbarSet::SetToolbarVisibility(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWToolbarSet::IsToolbarVisible(vtkKWToolbar* toolbar)
+{
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+  return (toolbar_slot && toolbar_slot->Visibility)? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 vtkIdType vtkKWToolbarSet::GetNumberOfVisibleToolbars()
 {
   vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
@@ -407,6 +414,32 @@ void vtkKWToolbarSet::SetShowBottomSeparator(int arg)
   this->Modified();
 
   this->PackBottomSeparator();
+}
+
+//----------------------------------------------------------------------------
+vtkKWToolbar* vtkKWToolbarSet::GetToolbar(int index)
+{
+  if (index < 0 || index >= this->GetNumberOfToolbars())
+    {
+    vtkErrorMacro("Invalid index");
+    return NULL;
+    }
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
+  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
+    this->Toolbars->NewIterator();
+  int i = 0;
+  while (!it->IsDoneWithTraversal() && i != index)
+    {
+    it->GoToNextItem();
+    i++;
+    }
+  vtkKWToolbar* toolbar = NULL;
+  if (!it->IsDoneWithTraversal() && it->GetData(toolbar_slot) == VTK_OK)
+    {
+    toolbar = toolbar_slot->Toolbar;
+    }
+  it->Delete();
+  return toolbar;
 }
 
 //----------------------------------------------------------------------------

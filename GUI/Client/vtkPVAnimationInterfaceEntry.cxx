@@ -78,7 +78,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.53");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -557,6 +557,19 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
     {
     app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetCurrentMethodIndex(int idx)
+{
+  vtkKWMenu* menu = this->GetMethodMenuButton()->GetMenu();
+  int numItems = menu->GetNumberOfItems();
+  if (idx < 0 || idx >= numItems)
+    {
+    vtkErrorMacro("Current method index beyond menu items");
+    return;
+    }
+  menu->Invoke(idx);
 }
 
 //-----------------------------------------------------------------------------

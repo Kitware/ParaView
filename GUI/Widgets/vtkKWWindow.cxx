@@ -45,7 +45,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.202");
+vtkCxxRevisionMacro(vtkKWWindow, "1.203");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -148,6 +148,7 @@ vtkKWWindow::vtkKWWindow()
   this->MenuWindow            = NULL;
 
   this->Toolbars              = vtkKWToolbarSet::New();
+  this->ToolbarsMenu          = NULL; 
   this->MenuBarSeparatorFrame = vtkKWFrame::New();
   this->MiddleFrame           = vtkKWSplitFrame::New();
   this->ViewFrame             = vtkKWFrame::New();
@@ -268,7 +269,11 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->MenuWindow->Delete();
     }
-
+  if (this->ToolbarsMenu)
+    {
+    this->ToolbarsMenu->Delete();
+    this->ToolbarsMenu = NULL;
+    }
   this->SetStatusImageName(0);
   this->SetWindowClass(0);
   this->SetTitle(0);
@@ -817,6 +822,66 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
   return this->MenuView;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name)
+{
+  if (!this->Toolbars->AddToolbar(toolbar))
+    {
+    return;
+    }
+  if (!this->ToolbarsMenu)
+    {
+    this->ToolbarsMenu = vtkKWMenu::New();
+    this->ToolbarsMenu->SetParent(this->GetMenuView());
+    this->ToolbarsMenu->SetTearOff(0);
+    this->ToolbarsMenu->Create(this->GetApplication(), "");
+    this->GetMenuView()->InsertCascade(1, " Toolbars", this->ToolbarsMenu, 1,
+      "Customize Toolbars");
+    }
+  int id = this->ToolbarsMenu->GetNumberOfItems(); 
+  char *rbv = this->ToolbarsMenu->CreateCheckButtonVariable(this, name);
+
+  ostrstream command;
+  command << "ToggleToolbarVisibility " << id << " " << name << ends;
+  this->ToolbarsMenu->AddCheckButton(
+    name, rbv, this, command.str(), "Show/Hide this toolbar");
+  this->ToolbarsMenu->CheckCheckButton(this, name, 1);
+  command.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::HideToolbar(vtkKWToolbar* toolbar, const char* name)
+{
+  this->SetToolbarVisibility(toolbar, name, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowToolbar(vtkKWToolbar* toolbar, const char* name)
+{
+  this->SetToolbarVisibility(toolbar, name, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag)
+{
+  this->Toolbars->SetToolbarVisibility(toolbar, flag);
+  if (this->ToolbarsMenu)
+    {
+    this->ToolbarsMenu->CheckCheckButton(this, name, flag);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ToggleToolbarVisibility(int id, const char* name)
+{
+  vtkKWToolbar* toolbar = this->Toolbars->GetToolbar(id);
+  if (!toolbar)
+    {
+    return;
+    }
+  int new_visibility = (this->Toolbars->IsToolbarVisible(toolbar))? 0 : 1;
+  this->SetToolbarVisibility(toolbar, name, new_visibility);
+}
 //----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindow::GetMenuWindow()
 {
