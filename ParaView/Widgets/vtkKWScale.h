@@ -51,6 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWEntry;
 
+#define VTK_
+
 class VTK_EXPORT vtkKWScale : public vtkKWWidget
 {
 public:
@@ -77,6 +79,11 @@ public:
   // Display a label and or a text entry box. These are options. 
   void DisplayEntry();  
   void DisplayLabel(const char *l);  
+  virtual void SetDisplayEntryAndLabelOnTop(int flag);
+  vtkGetMacro(DisplayEntryAndLabelOnTop, int);
+  vtkBooleanMacro(DisplayEntryAndLabelOnTop, int);  
+  vtkGetObjectMacro(Label, vtkKWWidget);
+  vtkGetObjectMacro(Entry, vtkKWEntry);
 
   // Description:
   // Method that gets invoked when the sliders value has changed.
@@ -110,15 +117,20 @@ protected:
   vtkKWScale();
   ~vtkKWScale();
 
+  int         DisplayEntryAndLabelOnTop;
+
   char        *Command;
   char        *StartCommand;
   char        *EndCommand;
   float       Value;
   float       Resolution;
-  vtkKWEntry  *Entry;
   vtkKWWidget *ScaleWidget;
-  vtkKWWidget *ScaleLabel;
+  vtkKWEntry  *Entry;
+  vtkKWWidget *Label;
   float Range[2];
+
+  void PackWidget();
+
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented
   void operator=(const vtkKWScale&); // Not implemented

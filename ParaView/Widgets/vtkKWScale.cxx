@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.27");
+vtkCxxRevisionMacro(vtkKWScale, "1.28");
 
 
 
@@ -64,11 +64,12 @@ vtkKWScale::vtkKWScale()
   this->Value = 0;
   this->Resolution = 1;
   this->Entry = NULL;
-  this->ScaleLabel = NULL;
+  this->Label = NULL;
   this->ScaleWidget = vtkKWWidget::New();
   this->ScaleWidget->SetParent(this);
   this->Range[0] = 0;
   this->Range[1] = 1;  
+  this->DisplayEntryAndLabelOnTop = 1;
 }
 
 vtkKWScale::~vtkKWScale()
@@ -89,9 +90,9 @@ vtkKWScale::~vtkKWScale()
     {
     this->Entry->Delete();
     }
-  if (this->ScaleLabel)
+  if (this->Label)
     {
-    this->ScaleLabel->Delete();
+    this->Label->Delete();
     }
   this->ScaleWidget->Delete();
 }
@@ -141,13 +142,13 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
                this->ScaleWidget->GetWidgetName(),
                this->Range[0], this->Range[1]);
   this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
-  this->Script("pack %s -side bottom -fill x -expand yes -pady 0 -padx 0",
-               this->ScaleWidget->GetWidgetName());
 
   this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
                this->ScaleWidget->GetWidgetName(), this->GetTclName());
   this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
                this->ScaleWidget->GetWidgetName(), this->GetTclName());
+
+  this->PackWidget();
 }
 
 void vtkKWScale::SetRange(float min, float max)
@@ -179,26 +180,73 @@ void vtkKWScale::DisplayEntry()
   this->Entry->Create(this->Application,"-width 10");
   this->Script("bind %s <Return> {%s EntryValueChanged}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side right -padx 2", this->Entry->GetWidgetName());
   this->Entry->SetValue(this->GetValue(), 2);
+  this->PackWidget();
 }
 
 void vtkKWScale::DisplayLabel(const char *name)
 {
-  if (this->ScaleLabel)
+  if (this->Label)
     {
     this->Script("%s configure -text {%s}",
-                 this->ScaleLabel->GetWidgetName(), name );
+                 this->Label->GetWidgetName(), name );
     return;
     }
 
-  this->ScaleLabel = vtkKWWidget::New();
-  this->ScaleLabel->SetParent(this);
+  this->Label = vtkKWWidget::New();
+  this->Label->SetParent(this);
   char temp[1024];
   sprintf(temp,"-text {%s}",name);
-  this->ScaleLabel->Create(this->Application,"label",temp);
-  this->Script("pack %s -side left",
-               this->ScaleLabel->GetWidgetName());
+  this->Label->Create(this->Application,"label",temp);
+  this->PackWidget();
+}
+
+void vtkKWScale::PackWidget()
+{
+  this->Script("pack %s -side %s -fill x -expand yes -pady 0 -padx 0",
+               this->ScaleWidget->GetWidgetName(),
+               (this->DisplayEntryAndLabelOnTop ? "bottom" : "left"));
+
+  if (this->Entry)
+    {
+    if (this->DisplayEntryAndLabelOnTop)
+      {
+      this->Script("pack %s -side right -padx 2", 
+                   this->Entry->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack %s -side right -padx 2 -after %s", 
+                   this->Entry->GetWidgetName(), 
+                   this->ScaleWidget->GetWidgetName());
+      }
+    }
+
+  if (this->Label)
+    {
+    if (this->DisplayEntryAndLabelOnTop)
+      {
+      this->Script("pack %s -side left", this->Label->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack %s -side left -padx 2 -before %s", 
+                   this->Label->GetWidgetName(), 
+                   this->ScaleWidget->GetWidgetName());
+      }
+    }
+}
+
+void vtkKWScale::SetDisplayEntryAndLabelOnTop(int arg)
+{
+  if (this->DisplayEntryAndLabelOnTop == arg)
+    {
+    return;
+    }
+
+  this->DisplayEntryAndLabelOnTop = arg;
+  this->Modified();
+  this->PackWidget();
 }
 
 void vtkKWScale::EntryValueChanged()
@@ -307,9 +355,9 @@ void vtkKWScale::SetBalloonHelpString( const char *string )
     {
     this->Entry->SetBalloonHelpString( string );
     }
-  if ( this->ScaleLabel )
+  if ( this->Label )
     {
-    this->ScaleLabel->SetBalloonHelpString( string );
+    this->Label->SetBalloonHelpString( string );
     }
   
 }
@@ -321,9 +369,9 @@ void vtkKWScale::SetBalloonHelpJustification( int j )
     {
     this->Entry->SetBalloonHelpJustification( j );
     }
-  if ( this->ScaleLabel )
+  if ( this->Label )
     {
-    this->ScaleLabel->SetBalloonHelpJustification( j );
+    this->Label->SetBalloonHelpJustification( j );
     }
   
 }
@@ -333,4 +381,6 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Resolution: " << this->GetResolution() << endl;
+  os << indent << "Label: " << this->Label << endl;
+  os << indent << "Entry: " << this->Entry << endl;
 }
