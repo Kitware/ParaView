@@ -157,6 +157,12 @@ public:
   // This removes a PVSource from the collection called "listname".
   // No trace entry is added during this call.
   void RemovePVSource(const char* listname, vtkPVSource *pvs);
+
+  // Description:
+  // This calls delete on all the pv sources.
+  void DeleteAllSourcesCallback();
+  void DeleteAllSources();
+  void DeleteSourceAndOutputs(vtkPVSource*);
   
   // Description: 
   // The current data is the data object that will be used as
@@ -410,17 +416,27 @@ public:
 
   // Description:
   // Propagates the center to the manipulators.
+  void SetCenterOfRotation(float f[3]) 
+    { this->SetCenterOfRotation(f[0], f[1], f[2]); }
   void SetCenterOfRotation(float x, float y, float z);
 
   // Description:
   // This method is for testing only.
   void SaveSessionFile(const char* path);
   void LoadSessionFile(const char* path);
-  void SerializeSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Get the source from a name. This is used for serialization.
+  vtkPVSource* GetSourceFromName(const char*);
+  void AddToNamesToSources(const char* name, vtkPVSource* source);
 
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
+
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
+  virtual void SerializeToken(istream& is, const char token[1024]);
 
   // Main render window
   vtkPVRenderView *MainView;
@@ -573,6 +589,11 @@ private:
   static const char* StandardManipulators;
   static const char* StandardWriters;
 
+//BTX
+  void SerializeSource(ostream& os, vtkIndent indent, vtkPVSource*,
+                       vtkArrayMap<void*,int>*);
+  vtkArrayMap<const char*, vtkPVSource*> *NamesToSources;
+//ETX
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented

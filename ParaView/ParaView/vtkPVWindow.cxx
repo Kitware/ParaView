@@ -113,6 +113,7 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
 
   this->CommandFunction = vtkPVWindowCommand;
@@ -268,6 +269,12 @@ vtkPVWindow::vtkPVWindow()
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  if ( this->NamesToSources )
+    {
+    this->NamesToSources->Delete();
+    this->NamesToSources = 0;
+    }
+
   this->PrepareForDelete();
 
   this->FlyButton->Delete();
@@ -625,6 +632,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Log stuff (not traced)
   this->AdvancedMenu->InsertCommand(5, "Show Error Log", this, "ShowErrorLog", 
                                     2, "Show log of all errors and warnings");
+  
+  this->AdvancedMenu->InsertCommand(5, "Delete All Sources", this, 
+                                    "DeleteAllSourcesCallback", 
+                                    1, "Delete all sources currently created in ParaView");
               
 
   this->AdvancedMenu->InsertCommand(7, "Open Package", this, "OpenPackage", 2,
@@ -1075,14 +1086,22 @@ void vtkPVWindow::CenterEntryCallback()
   float y = this->CenterYEntry->GetValueAsFloat();
   float z = this->CenterZEntry->GetValueAsFloat();
   this->SetCenterOfRotation(x, y, z);
-  this->MainView->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
+  float *pos = this->CenterActor->GetPosition();
+  if ( pos[0] == x && pos[1] == y && pos[2] == z )
+    {
+    return;
+    }
+  this->CenterXEntry->SetValue(x, 4);
+  this->CenterYEntry->SetValue(y, 4);
+  this->CenterZEntry->SetValue(z, 4);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   this->CenterActor->SetPosition(x, y, z);
+  this->MainView->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -3177,23 +3196,39 @@ void vtkPVWindow::SaveSessionFile(const char* path)
 //----------------------------------------------------------------------------
 void vtkPVWindow::LoadSessionFile(const char* path)
 {
+  if ( this->NamesToSources )
+    {
+    this->NamesToSources->Delete();
+    this->NamesToSources = 0;
+    }
   istream *fptr;
   fptr = new ifstream(path, ios::in);
   this->Serialize(*fptr);
   delete fptr;
+  if ( this->NamesToSources )
+    {
+    this->NamesToSources->Delete();
+    this->NamesToSources = 0;
+    }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVWindow ";
+  this->ExtractRevision(os,"$Revision: 1.330 $");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
 {
-  cout << "SerializeSelf" << endl;
   this->Superclass::SerializeSelf(os, indent);
 
-  os << indent << "CenterOfRotation { "
+  os << indent << "CenterOfRotation "
      << this->CenterActor->GetPosition()[0] << " "
      << this->CenterActor->GetPosition()[1] << " " 
-     << this->CenterActor->GetPosition()[2] << " }" 
-     << endl;    
+     << this->CenterActor->GetPosition()[2] << endl;    
 
   os << indent << "RenderView ";
   this->MainView->Serialize(os, indent);
@@ -3204,6 +3239,7 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
     = this->SourceLists->NewIterator();
   scit->InitTraversal();
   vtkIndent nindent = indent.GetNextIndent();
+  vtkIndent nnindent = indent.GetNextIndent();
   while ( !scit->IsDoneWithTraversal() )
     {
     vtkPVSourceCollection* col = 0;
@@ -3211,22 +3247,146 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
     if ( scit->GetKey(name) == VTK_OK && name &&
          scit->GetData(col) == VTK_OK )
       {
-      os << indent << "SourceList_" << name << " {" << endl;
-      vtkCollectionIterator* it = col->NewIterator();
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
+      if ( vtkString::Equals(name, "Sources") )
         {
-        vtkPVSource *source = static_cast<vtkPVSource*>(it->GetObject());
-        os << nindent << source->GetName() << " ";
-        source->Serialize(os, indent);
-        it->GoToNextItem();
+        os << indent << "SourceList " << name << endl;
+        os << nindent << "{" << endl;
+        vtkArrayMap<void*, int> *writtenMap = vtkArrayMap<void*,int>::New();
+        vtkCollectionIterator* it = col->NewIterator();
+        it->InitTraversal();
+        while ( !it->IsDoneWithTraversal() )
+          {
+          vtkPVSource *source = static_cast<vtkPVSource*>(it->GetObject());
+          this->SerializeSource(os, nindent, source, writtenMap);
+          it->GoToNextItem();
+          }
+        it->Delete();
+        writtenMap->Delete();
+        os << nindent << "}" << endl;
         }
-      it->Delete();
-      os << indent << "}" << endl;
       }
     scit->GoToNextItem();
     }
   scit->Delete();
+}
+
+//------------------------------------------------------------------------------
+void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent, 
+                                  vtkPVSource* source,
+                                  vtkArrayMap<void*,int>* writtenMap)
+{
+  int written = 0;
+  writtenMap->GetItem(static_cast<void*>(source), written);
+  if ( !written )
+    {
+    if ( source->GetNumberOfPVInputs() > 0 )
+      {
+      int cc;
+      for ( cc = 0; cc < source->GetNumberOfPVInputs(); cc ++ )
+        {
+        vtkPVData* data = source->GetNthPVInput(cc);
+        if ( data && data->GetPVSource() )
+          {
+          this->SerializeSource(os, indent, data->GetPVSource(), writtenMap);
+          }
+        }
+      }
+    os << indent << "Module " << source->GetName() << " " 
+       << source->GetModuleName() << " ";
+    source->Serialize(os, indent.GetNextIndent());
+    writtenMap->SetItem(static_cast<void*>(source), 1);
+    }
+  else
+    {
+    //cout << "\tAlready written" << endl;
+    }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
+{
+  int cc;
+  if ( vtkString::Equals(token, "CenterOfRotation") )
+    {
+    float cor[3];
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetCenterOfRotation(cor);
+    }
+  else if ( vtkString::Equals(token, "RenderView") )
+    {
+    this->MainView->Serialize(is);
+    }
+  else if ( vtkString::Equals(token, "AnimationInterface") )
+    {
+    this->AnimationInterface->Serialize(is);
+    }
+  else if ( vtkString::Equals(token, "SourceList") )
+    {
+    char sourcelistname[1024] = "\0";
+    is >> sourcelistname;
+    if ( !sourcelistname[0] )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      return;
+      }
+    cout << "Reading source list: " << sourcelistname << endl;
+    int done =0;
+    char ntoken[1024];
+    while ( !done )
+      {
+      ntoken[0] = 0;
+      is >> ntoken;
+      if ( !ntoken[0] )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      if ( vtkString::Equals(ntoken, "Module") )
+        {
+        char sourcename[1024];
+        sourcename[0] = 0;
+        is >> sourcename;
+        if ( !sourcename[0] )
+          {
+          vtkErrorMacro("Problem Parsing session file");
+          return;
+          }
+        char modulename[1024];
+        modulename[0] = 0;
+        is >> modulename;
+        if ( !modulename[0] )
+          {
+          vtkErrorMacro("Problem Parsing session file");
+          return;
+          }
+        vtkPVSource *source = this->CreatePVSource(
+          modulename, sourcelistname);
+        source->Serialize(is);  
+        //source->AcceptCallback();
+        source->Accept(0, 0);
+        source->SetTraceReferenceObject(this);
+        this->AddToNamesToSources(sourcename, source);
+        }
+      if ( vtkString::Equals(ntoken, "}") )
+        {
+        done = 1;
+        }
+      }
+    }
+  else
+    {
+    cout << "Unknown Token for " << this->GetClassName() << ": " 
+         << token << endl;
+    this->Superclass::SerializeToken(is,token);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3309,6 +3469,76 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
   if ( res )
     {
     this->MainView->UpdateCameraManipulators();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AddToNamesToSources(const char* name, vtkPVSource* source)
+{
+  if ( !this->NamesToSources )
+    {
+    this->NamesToSources = vtkArrayMap<const char*, vtkPVSource*>::New();
+    }
+  this->NamesToSources->SetItem(name, source);
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetSourceFromName(const char* name)
+{
+  if ( !this->NamesToSources )
+    {
+    return 0;
+    }
+  vtkPVSource* source = 0;
+  this->NamesToSources->GetItem(name, source);
+  return source;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
+{
+  if ( !source )
+    {
+    return;
+    }
+  int cc;
+  while ( source->GetNumberOfPVConsumers() > 0 )
+    {
+    vtkPVData* output = source->GetNthPVOutput(0);
+    if ( output && output->GetPVSource() )
+      {
+      this->DeleteSourceAndOutputs(output->GetPVSource());
+      }
+    }
+  source->DeleteCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DeleteAllSourcesCallback()
+{
+  if ( vtkKWMessageDialog::PopupYesNo(
+         this->Application, this, "Delete All The Sources", 
+         "Are you sure you want to delete all the sources?", 
+         vtkKWMessageDialog::QuestionIcon))
+    {
+    this->DeleteAllSources();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DeleteAllSources()
+{
+  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
+  pvApp->AddTraceEntry("# User selected delete all sources");
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  while ( col->GetNumberOfItems() > 0 )
+    {
+    vtkPVSource* source = col->GetLastPVSource();
+    if ( !source )
+      {
+      break;
+      }
+    this->DeleteSourceAndOutputs(source);
     }
 }
 
