@@ -171,6 +171,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
@@ -226,10 +230,6 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
-
-  // Description:
-  // The widget saves it state/command in the vtk tcl script.
-  void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:
   vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented

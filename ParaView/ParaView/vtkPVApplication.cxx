@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.261");
+vtkCxxRevisionMacro(vtkPVApplication, "1.262");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -532,6 +532,7 @@ vtkPVApplication::~vtkPVApplication()
 void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 {
   this->ProcessModule = pm;
+  vtkPVProcessModule::SetProcessModule(pm);
 }
   
 //----------------------------------------------------------------------------
@@ -1253,19 +1254,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
 
-  if (this->RunBatchScript)
-    {
-    vtkPVProcessModule* pm = this->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetApplicationID()
-                    << "LoadScript"
-                    << this->GetBatchScriptName()
-                    << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
-    this->Exit();
-    return;
-    }
-
   // set the font size to be small
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
@@ -1386,6 +1374,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 //        rgDialog->Delete();
 //        }
 //      }
+
+  if (this->RunBatchScript)
+    {
+    this->LoadScript(this->GetBatchScriptName());
+    this->Exit();
+    return;
+    }
 
   // Create the rendering module here.
   char* rmClassName;
