@@ -721,14 +721,14 @@ void vtkPVArrayMenu::UpdateComponentMenu()
 }
 
 vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVArrayMenu::SafeDownCast(clone);
 }
 
 vtkPVWidget* vtkPVArrayMenu::ClonePrototypeInternal(vtkPVSource* pvSource,
-				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if a clone of this widget has already been created
@@ -762,7 +762,7 @@ vtkPVWidget* vtkPVArrayMenu::ClonePrototypeInternal(vtkPVSource* pvSource,
 }
 
 void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVArrayMenu* pvam = vtkPVArrayMenu::SafeDownCast(clone);
@@ -770,6 +770,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     {
     pvam->SetNumberOfComponents(this->NumberOfComponents);
     pvam->SetInputName(this->InputName);
+    pvam->SetFieldSelection(this->FieldSelection);
     pvam->SetAttributeType(this->AttributeType);
     pvam->SetLabel(this->Label->GetLabel());
     pvam->SetObjectTclName(pvSource->GetVTKSourceTclName());
@@ -840,6 +841,25 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   else
     {
     this->SetInputName("Input");
+    }
+  
+  // Search for field selection with matching name.
+  const char* field_selection = element->GetAttribute("field_selection");
+  if(field_selection)
+    {
+    if(strcmp("PointData", field_selection) == 0)
+      {
+      this->SetFieldSelection(vtkDataSet::POINT_DATA_FIELD);
+      }
+    else if(strcmp("CellData", field_selection) == 0)
+      {
+      this->SetFieldSelection(vtkDataSet::CELL_DATA_FIELD);
+      }
+    else
+      {
+      vtkErrorMacro("Unknown field selection.");
+      this->SetFieldSelection(vtkDataSet::POINT_DATA_FIELD);
+      }
     }
   
   // Search for attribute type with matching name.
