@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.3");
 
 
 
@@ -66,7 +66,7 @@ vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.2");
 vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
 {
   this->LocalRender = 1;
-  this->CollectThreshold = 4.0;
+  this->CompositeThreshold = 20.0;
 
   this->Composite                = 0;
   this->CompositeTclName    = 0;
@@ -142,7 +142,7 @@ void vtkPVCompositeRenderModule::StillRender()
   // If using a RenderingGroup (i.e. vtkAllToNPolyData), do not do
   // local rendering
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+      (float)(totalMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -241,7 +241,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // MakeCollection Decision.
   localRender = 0;
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+      (float)(tmpMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -386,9 +386,9 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
 
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModule::SetCollectThreshold(float threshold)
+void vtkPVCompositeRenderModule::SetCompositeThreshold(float threshold)
 {
-  this->CollectThreshold = threshold;
+  this->CompositeThreshold = threshold;
 
   // This will cause collection to be re evaluated.
   this->SetTotalVisibleMemorySizeValid(0);
@@ -461,7 +461,7 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
   this->SetTotalVisibleMemorySizeValid(1);
 
   if (this->TotalVisibleGeometryMemorySize > 
-      this->GetCollectThreshold()*1000)
+      this->GetCompositeThreshold()*1000)
     {
     decision = 0;
     }
@@ -501,7 +501,7 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
   this->ComputeTotalVisibleMemorySize();
   this->SetTotalVisibleMemorySizeValid(1);
   if (this->TotalVisibleLODMemorySize > 
-      this->GetCollectThreshold()*1000)
+      this->GetCompositeThreshold()*1000)
     {
     decision = 0;
     }
@@ -563,7 +563,7 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
+  os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
 
   if (this->CompositeTclName)
     {

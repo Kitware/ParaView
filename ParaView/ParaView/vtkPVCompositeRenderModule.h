@@ -63,8 +63,8 @@ public:
   // Description:
   // This methods can be used from a script.  
   // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
+  void SetCompositeThreshold(float);
+  vtkGetMacro(CompositeThreshold, float);
 
   // Description:
   // Renders using Still/FullRes or interactive/LODs
@@ -127,7 +127,7 @@ protected:
   int CollectionDecision;
   int LODCollectionDecision;
 
-  float CollectThreshold;
+  float CompositeThreshold;
 
   vtkPVTreeComposite *Composite;
   char *CompositeTclName;

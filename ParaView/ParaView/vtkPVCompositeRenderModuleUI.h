@@ -97,12 +97,17 @@ public:
 
   // Description:
   // Threshold for collecting data to a single process (MBytes).
-  void CollectCheckCallback();
-  void CollectThresholdScaleCallback();
-  void SetCollectThreshold(float val);
-  vtkGetMacro(CollectThreshold, float);
+  void CompositeCheckCallback();
+  void CompositeThresholdScaleCallback();
+  void SetCompositeThreshold(float val);
+  vtkGetMacro(CompositeThreshold, float);
   // I should really put this in the composite module.
-  void SetCollectThresholdInternal(float threshold);
+  void SetCompositeThresholdInternal(float threshold);
+
+  // Description:
+  // This is a hack to disable a feature that is 
+  // not working yet for tiled displays.
+  void SetCompositeOptionEnabled(int val);
 
 protected:
   vtkPVCompositeRenderModuleUI();
@@ -116,11 +121,11 @@ protected:
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
 
-  vtkKWLabel*       CollectLabel;
-  vtkKWCheckButton* CollectCheck;
-  vtkKWScale*       CollectThresholdScale;
-  vtkKWLabel*       CollectThresholdLabel;
-  float             CollectThreshold;
+  vtkKWLabel*       CompositeLabel;
+  vtkKWCheckButton* CompositeCheck;
+  vtkKWScale*       CompositeThresholdScale;
+  vtkKWLabel*       CompositeThresholdLabel;
+  float             CompositeThreshold;
 
   vtkKWLabel*       ReductionLabel;
   vtkKWCheckButton* ReductionCheck;
@@ -138,9 +143,13 @@ protected:
   int CompositeWithRGBAFlag;
   int CompositeCompressionFlag;
 
+  int CompositeOptionEnabled;
+
   vtkPVCompositeRenderModuleUI(const vtkPVCompositeRenderModuleUI&); // Not implemented
   void operator=(const vtkPVCompositeRenderModuleUI&); // Not implemented
 };
 
 
 #endif
+
+

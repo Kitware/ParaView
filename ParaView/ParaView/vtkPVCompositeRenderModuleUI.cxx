@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.3");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.4");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -75,11 +75,11 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
   this->CompositeCompressionCheck = vtkKWCheckButton::New();
 
-  this->CollectLabel = vtkKWLabel::New();
-  this->CollectCheck = vtkKWCheckButton::New();
-  this->CollectThresholdScale = vtkKWScale::New();
-  this->CollectThresholdLabel = vtkKWLabel::New();
-  this->CollectThreshold = 20.0;
+  this->CompositeLabel = vtkKWLabel::New();
+  this->CompositeCheck = vtkKWCheckButton::New();
+  this->CompositeThresholdScale = vtkKWScale::New();
+  this->CompositeThresholdLabel = vtkKWLabel::New();
+  this->CompositeThreshold = 20.0;
 
   this->SquirtLabel = vtkKWLabel::New();
   this->SquirtCheck = vtkKWCheckButton::New();
@@ -97,6 +97,8 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   this->CompositeWithFloatFlag = 0;
   this->CompositeWithRGBAFlag = 0;
   this->CompositeCompressionFlag = 1;
+
+  this->CompositeOptionEnabled = 1;
 }
 
 
@@ -116,8 +118,8 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
     pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionFlag);
 
-    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
-                             this->CollectThreshold);
+    pvapp->SetRegisteryValue(2, "RunTime", "CompositeThreshold", "%f",
+                             this->CompositeThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "ReductionFactor", "%d",
                              this->ReductionFactor);
     pvapp->SetRegisteryValue(2, "RunTime", "SquirtLevel", "%d",
@@ -136,14 +138,14 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
   this->CompositeCompressionCheck->Delete();
   this->CompositeCompressionCheck = NULL;
 
-  this->CollectLabel->Delete();
-  this->CollectLabel = NULL;
-  this->CollectCheck->Delete();
-  this->CollectCheck = NULL;
-  this->CollectThresholdScale->Delete();
-  this->CollectThresholdScale = NULL;
-  this->CollectThresholdLabel->Delete();
-  this->CollectThresholdLabel = NULL;
+  this->CompositeLabel->Delete();
+  this->CompositeLabel = NULL;
+  this->CompositeCheck->Delete();
+  this->CompositeCheck = NULL;
+  this->CompositeThresholdScale->Delete();
+  this->CompositeThresholdScale = NULL;
+  this->CompositeThresholdLabel->Delete();
+  this->CompositeThresholdLabel = NULL;
 
   this->ReductionLabel->Delete();
   this->ReductionLabel = NULL;
@@ -215,55 +217,62 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
       !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
-    this->CollectLabel->SetParent(this->LODScalesFrame);
-    this->CollectLabel->Create(this->Application, "-anchor w");
-    this->CollectLabel->SetLabel("Collection threshold:");
+    this->CompositeLabel->SetParent(this->LODScalesFrame);
+    this->CompositeLabel->Create(this->Application, "-anchor w");
+    this->CompositeLabel->SetLabel("Composite:");
 
-    this->CollectCheck->SetParent(this->LODScalesFrame);
-    this->CollectCheck->Create(this->Application, "");
-    this->CollectCheck->SetState(1);
-    this->CollectCheck->SetCommand(this, "CollectCheckCallback");
+    this->CompositeCheck->SetParent(this->LODScalesFrame);
+    this->CompositeCheck->Create(this->Application, "");
+    this->CompositeCheck->SetState(1);
+    this->CompositeCheck->SetCommand(this, "CompositeCheckCallback");
 
-    this->CollectThresholdScale->SetParent(this->LODScalesFrame);
-    this->CollectThresholdScale->Create(this->Application,
+    this->CompositeThresholdScale->SetParent(this->LODScalesFrame);
+    this->CompositeThresholdScale->Create(this->Application,
                                         "-orient horizontal");
-    this->CollectThresholdScale->SetRange(0.1, 100.0);
-    this->CollectThresholdScale->SetResolution(0.1);
-    this->CollectThresholdScale->SetValue(this->CollectThreshold);
-    this->CollectThresholdScale->SetCommand(this, 
-                                            "CollectThresholdScaleCallback");
-    this->CollectThresholdScale->SetBalloonHelpString(
-      "This slider determines when models are collected to process 0 for "
+    this->CompositeThresholdScale->SetRange(0.0, 100.0);
+    this->CompositeThresholdScale->SetResolution(0.1);
+    this->CompositeThresholdScale->SetValue(this->CompositeThreshold);
+    this->CompositeThresholdScale->SetCommand(this, 
+                                            "CompositeThresholdScaleCallback");
+    this->CompositeThresholdScale->SetBalloonHelpString(
+      "This slider determines when distributed rendering is used."
+      "When compositing is off geometry is collected to process 0 for "
       "local rendering. Threshold critera is based on size of model in mega "
       "bytes.  "
-      "Left: Always leave models distributed. Right: Move even large models "
+      "Left: Always use compositing. Right: Move even large models "
       "to process 0.");    
 
-    this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
-    this->CollectThresholdLabel->Create(this->Application, "-anchor w");
+    this->CompositeThresholdLabel->SetParent(this->LODScalesFrame);
+    this->CompositeThresholdLabel->Create(this->Application, "-anchor w");
     if (pvapp &&
-        pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
+        pvapp->GetRegisteryValue(2, "RunTime", "CompositeThreshold", 0))
       {
-      this->CollectThreshold = 
-        pvapp->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold");
+      this->CompositeThreshold = 
+        pvapp->GetFloatRegisteryValue(2, "RunTime", "CompositeThreshold");
       }
 
     // Force the set.
-    float tmp = this->CollectThreshold;
-    this->CollectThreshold = -1.0;
-    this->SetCollectThreshold(tmp);
+    float tmp = this->CompositeThreshold;
+    this->CompositeThreshold = -1.0;
+    this->SetCompositeThreshold(tmp);
+
+    // hACK
+    if ( ! this->CompositeOptionEnabled)
+      {
+      this->CompositeCheck->EnabledOff();
+      }
 
     pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
-                  this->CollectThresholdLabel->GetWidgetName(), row++);
+                  this->CompositeThresholdLabel->GetWidgetName(), row++);
     pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
-                  this->CollectLabel->GetWidgetName(), row);
+                  this->CompositeLabel->GetWidgetName(), row);
     pvapp->Script("grid %s -row %d -column 1 -sticky nes", 
-                  this->CollectCheck->GetWidgetName(), row);
+                  this->CompositeCheck->GetWidgetName(), row);
     pvapp->Script("grid %s -row %d -column 2 -sticky news", 
-                  this->CollectThresholdScale->GetWidgetName(), row++);
+                  this->CompositeThresholdScale->GetWidgetName(), row++);
 
     pvapp->Script("grid columnconfigure %s 2 -weight 1",
-                  this->CollectThresholdScale->GetParent()->GetWidgetName());
+                  this->CompositeThresholdScale->GetParent()->GetWidgetName());
 
 
     // Determines which reduction/subsampling factor to use.
@@ -449,81 +458,79 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CollectThresholdScaleCallback()
+void vtkPVCompositeRenderModuleUI::CompositeThresholdScaleCallback()
 {
-  float threshold = this->CollectThresholdScale->GetValue();
+  float threshold = this->CompositeThresholdScale->GetValue();
 
-  if (threshold == 0.0)
-    {
-    threshold = 0.1;
-    }
-  this->SetCollectThreshold(threshold);
+  this->SetCompositeThreshold(threshold);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CollectCheckCallback()
+void vtkPVCompositeRenderModuleUI::CompositeCheckCallback()
 {
-  int val = this->CollectCheck->GetState();
+  int val = this->CompositeCheck->GetState();
 
   if (val == 0)
     {
-    this->SetCollectThreshold(0.0);
+    this->SetCompositeThreshold(VTK_LARGE_FLOAT);
     }
   else
     {
-    float threshold = this->CollectThresholdScale->GetValue();
-    if (threshold == 0.0)
-      {
-      threshold = 1.0;
-      }
-    this->SetCollectThreshold(threshold);
+    float threshold = this->CompositeThresholdScale->GetValue();
+    this->SetCompositeThreshold(threshold);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::SetCollectThreshold(float threshold)
+void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
 {
-  if (this->CollectThreshold == threshold)
+  if (this->CompositeThreshold == threshold)
     {
     return;
     }
 
-  if (threshold == 0.0)
+  // Hack to get rid of a feature (tiled display compositing).
+  if ( ! this->CompositeOptionEnabled)
     {
-    this->CollectCheck->SetState(0);
-    this->CollectThresholdScale->EnabledOff();
-    this->CollectThresholdScale->SetWidth(2);    
-    this->CollectThresholdLabel->EnabledOff();
-    this->CollectThresholdLabel->SetLabel("0 MBytes");
+    threshold = VTK_LARGE_FLOAT;
+    }
+
+  if (threshold == VTK_LARGE_FLOAT)
+    {
+    this->CompositeCheck->SetState(0);
+    this->CompositeThresholdScale->EnabledOff();
+    this->CompositeThresholdScale->SetWidth(2);    
+    this->CompositeThresholdLabel->EnabledOff();
+    this->CompositeThresholdLabel->SetLabel("Compositing Disabled");
     }
   else
     {
     char str[256];
-    this->CollectCheck->SetState(1);
-    this->CollectThresholdScale->EnabledOn();
-    this->CollectThresholdScale->SetWidth(15);    
-    this->CollectThresholdLabel->EnabledOn();
-    this->CollectThresholdScale->SetValue(threshold);
-    sprintf(str, "%.1f MBytes", threshold);
-    this->CollectThresholdLabel->SetLabel(str);
+    this->CompositeCheck->SetState(1);
+    this->CompositeThresholdScale->EnabledOn();
+    this->CompositeThresholdScale->SetWidth(15);    
+    this->CompositeThresholdLabel->EnabledOn();
+    this->CompositeThresholdScale->SetValue(threshold);
+    sprintf(str, "Composite above %.1f MBytes", threshold);
+    this->CompositeThresholdLabel->SetLabel(str);
     }
 
-  this->CollectThreshold = threshold;
+  this->CompositeThreshold = threshold;
 
 
-  this->SetCollectThresholdInternal(threshold);
+  this->SetCompositeThresholdInternal(threshold);
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
-  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
+  this->AddTraceEntry("$kw(%s) SetCompositeThreshold %f",
                       this->GetTclName(), threshold);
 }
 
 //----------------------------------------------------------------------------
 // Eliminate this method ...........!!!!!!!!!!!!!!
-void vtkPVCompositeRenderModuleUI::SetCollectThresholdInternal(float threshold)
+void vtkPVCompositeRenderModuleUI::SetCompositeThresholdInternal(float threshold)
 {
   // This will cause collection to be re evaluated.
   this->CompositeRenderModule->SetTotalVisibleMemorySizeValid(0);
-  this->CompositeRenderModule->SetCollectThreshold(threshold);
+  this->CompositeRenderModule->SetCompositeThreshold(threshold);
 }
 
 
@@ -789,13 +796,20 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
+{
+  this->CompositeOptionEnabled = val;
+  this->CompositeCheck->SetEnabled(val);
+  this->CompositeCheckCallback();
+}
 
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
+  os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
   os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
   os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 

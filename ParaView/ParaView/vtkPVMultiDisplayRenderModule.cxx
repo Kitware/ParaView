@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.2");
 
 
 
@@ -149,7 +149,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
   localRender = 0;
-  if ((float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+  if ((float)(totalMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -258,7 +258,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 
   // MakeCollection Decision.
   localRender = 0;
-  if ((float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+  if ((float)(tmpMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
