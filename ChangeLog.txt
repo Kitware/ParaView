@@ -1,3 +1,15 @@
+Changes in 1.8.4
+
+- Changed the codec for AVI writing again. Thsi time to video1 which 
+  everyone should have.
+- Some fixes to the EnSight readers
+- BUG: (bug #1508) In the CopySelections method of vtkDataArraySelection,
+  check whether the array names and settings of the input
+  vtkDataArraySelection match this one before actually copying.  Without this
+  change, the EnSight reader was being modified when nothing had actually
+  changed, and so it was re-executing unnecessarily.
+
+
 Changes in 1.8.3
 
 - Added support for writing AVI animations on Windows platforms
