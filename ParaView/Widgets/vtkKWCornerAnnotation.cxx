@@ -56,10 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty2D.h"
 #include "vtkString.h"
 #include "vtkTextProperty.h"
+#include "vtkXMLCornerAnnotationWriter.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.61");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.62");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -967,7 +968,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.61 $");
+  this->ExtractRevision(os,"$Revision: 1.62 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1028,55 +1029,24 @@ void vtkKWCornerAnnotation::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::SendChangedEvent()
 {
-  vtkKWCornerAnnotation::EventStruct event;
-  this->FillEvent(&event);
-  this->InvokeEvent(this->AnnotationChangedEvent, &event);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::FillEvent(vtkKWCornerAnnotation::EventStruct *event)
-{
-  if (!event ||
-      !this->IsCreated() ||
-      !this->CornerProp ||
-      !this->TextPropertyWidget)
+  if (!this->CornerProp)
     {
     return;
     }
 
-  int i;
-  for (i = 0; i < 4; i++)
-    {
-    event->CornerTexts[i] = this->GetCornerText(i);
-    }
+  ostrstream event;
 
-  event->MaximumLineHeightScale = this->CornerProp->GetMaximumLineHeight();
+  vtkXMLCornerAnnotationWriter *xmlw = vtkXMLCornerAnnotationWriter::New();
+  xmlw->SetObject(this->CornerProp);
+  xmlw->WriteFactoredOn();
+  xmlw->WriteIndentedOff();
+  xmlw->Write(event);
+  xmlw->Delete();
 
-  this->TextPropertyWidget->FillEvent(&event->TextProperty);
+  event << ends;
 
-  event->Visibility = this->GetVisibility();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::UpdateCornerAnnotationAccordingToEvent(
-  vtkCornerAnnotation *ca,
-  vtkKWCornerAnnotation::EventStruct *event)
-{
-  if (!ca || !event)
-    {
-    return;
-    }
-
-  int i;
-  for (i = 0; i < 4; i++)
-    {
-    ca->SetText(i, event->CornerTexts[i]);
-    }
-
-  ca->SetMaximumLineHeight(event->MaximumLineHeightScale);
-
-  vtkKWTextProperty::UpdateTextPropertyAccordingToEvent(
-    ca->GetTextProperty(), &event->TextProperty);
+  this->InvokeEvent(this->AnnotationChangedEvent, event.str());
+  event.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

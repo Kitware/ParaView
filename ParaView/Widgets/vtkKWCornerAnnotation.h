@@ -44,8 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
-#include "vtkKWTextProperty.h" // Sorry, I need vtkKWTextProperty::EventStruct
-
 class vtkCornerAnnotation;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
@@ -58,6 +56,7 @@ class vtkKWLabeledText;
 class vtkKWPopupButton;
 class vtkKWRenderWidget;
 class vtkKWScale;
+class vtkKWTextProperty;
 class vtkKWView;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWWidget
@@ -191,22 +190,6 @@ public:
   // Description:
   // In vtkKWView mode, displays and updates the property ui display
   virtual void ShowProperties();
-
-  // Description:
-  // Event structure, and update the UI according to this event
-  //BTX
-  class EventStruct
-  {
-  public:
-    int Visibility;
-    char* CornerTexts[4];
-    float MaximumLineHeightScale;
-    vtkKWTextProperty::EventStruct TextProperty;
-  };
-  virtual void FillEvent(EventStruct *event);
-  static void UpdateCornerAnnotationAccordingToEvent(
-    vtkCornerAnnotation *ca, EventStruct *event);
-  //ETX
 
 protected:
   vtkKWCornerAnnotation();

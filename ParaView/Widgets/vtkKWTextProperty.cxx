@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.20");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.21");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1130,46 +1130,6 @@ void vtkKWTextProperty::UpdateEnableState()
     {
     this->OpacityScale->SetEnabled(this->Enabled);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTextProperty::FillEvent(vtkKWTextProperty::EventStruct *event)
-{
-  if (!event || !this->IsCreated() || !this->GetTextProperty())
-    {
-    return;
-    }
-
-  vtkTextProperty *tprop = this->GetTextProperty();
-
-  float *color = this->GetColor();
-  event->Color[0] = color[0];
-  event->Color[1] = color[1];
-  event->Color[2] = color[2];
-
-  event->FontFamily = tprop->GetFontFamily();
-  event->Bold = tprop->GetBold();
-  event->Italic = tprop->GetItalic();
-  event->Shadow = tprop->GetShadow();
-  event->Opacity = tprop->GetOpacity();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateTextPropertyAccordingToEvent(
-  vtkTextProperty *tprop,
-  vtkKWTextProperty::EventStruct *event)
-{
-  if (!tprop || !event)
-    {
-    return;
-    }
-
-  tprop->SetColor(event->Color);
-  tprop->SetFontFamily(event->FontFamily);
-  tprop->SetBold(event->Bold);
-  tprop->SetItalic(event->Italic);
-  tprop->SetShadow(event->Shadow);
-  tprop->SetOpacity(event->Opacity);
 }
 
 //----------------------------------------------------------------------------
