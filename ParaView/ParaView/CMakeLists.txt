@@ -29,6 +29,7 @@ SET( ParaView_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVClientServerModule.cxx
   vtkPVClipDataSet.cxx
+  vtkPVCollectionWriter.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx

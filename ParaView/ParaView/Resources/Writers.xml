@@ -67,5 +67,10 @@
          parallel="1"
          extension=".pvti"
          file_description="PVTK ImageData Files"/>
+ <Writer input="vtkDataSet"
+         class="vtkPVCollectionWriter"
+         writer="vtkXMLPVCollectionWriter"
+         extension=".vtc"
+         file_description="ParaView Data Files"/>
 </ModuleInterfaces>
 
