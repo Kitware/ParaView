@@ -77,11 +77,13 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
   this->Manipulators = vtkPVInteractorStyleControl::ManipulatorMap::New();
   this->ManipulatorCollection = 0;
   this->DefaultManipulator = 0;
+  this->Type = 0;
 }
 
 //------------------------------------------------------------------------------
 vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
 {
+  this->StoreRegistery();
   int cc;
   if ( this->LabeledFrame )
     {
@@ -98,6 +100,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->Manipulators->Delete();
   this->SetManipulatorCollection(0);
   this->SetDefaultManipulator(0);
+  this->SetType(0);
 }
 
 //------------------------------------------------------------------------------
@@ -112,6 +115,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
 {
   if ( this->Application )
     {
+    this->ReadRegistery();
     vtkPVInteractorStyleControl::ManipulatorMapIterator* it 
       = this->Manipulators->NewIterator();
     int cc;
@@ -158,6 +162,10 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
     return;
     }
   vtkPVCameraManipulator *manipulator = this->GetManipulator(name);
+  if ( !manipulator )
+    {
+    return;
+    }
   vtkPVCameraManipulator *clone = manipulator->NewInstance();
 
   int mouse = pos % 3;
@@ -346,6 +354,52 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   //frame->Delete();
   this->Script("pack %s -expand true -fill both", this->LabeledFrame->GetWidgetName());
   this->UpdateMenus();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::ReadRegistery()
+{
+  if ( !this->Application || !this->Type )
+    {
+    vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
+    }
+  int cc;
+  char manipulator[100];
+  char buffer[100];
+  for ( cc = 0; cc < 9; cc ++ )
+    {
+    int mouse = cc % 3;
+    int key = static_cast<int>(cc / 3);
+    buffer[0] = 0;
+    sprintf(manipulator, "ManipulatorT%sM%dK%d", this->Type, mouse, key);
+    if ( this->Application->GetRegisteryValue(2, "RunTime", manipulator,
+                                              buffer) &&
+         *buffer > 0 &&
+         this->GetManipulator(buffer) )
+      {
+      this->SetCurrentManipulator(mouse, key, buffer);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::StoreRegistery()
+{
+  if ( !this->Application || !this->Type )
+    {
+    vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
+    }
+  int cc;
+  char manipulator[100];
+  for ( cc = 0; cc < 9; cc ++ )
+    {
+    int mouse = cc % 3;
+    int key = static_cast<int>(cc / 3);
+    
+    sprintf(manipulator, "ManipulatorT%sM%dK%d", this->Type, mouse, key);
+    this->Application->SetRegisteryValue(2, "RunTime", manipulator,
+                                         this->Menus[cc]->GetValue());
+    }
 }
 
 //----------------------------------------------------------------------------

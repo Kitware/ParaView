@@ -116,6 +116,16 @@ public:
   vtkSetStringMacro(DefaultManipulator);
   vtkGetStringMacro(DefaultManipulator);
 
+  // Description:
+  // Read and store information to the registery.
+  void ReadRegistery();
+  void StoreRegistery();
+
+  // Description:
+  // Type or name of manipulator is used for storing in the registery.
+  vtkSetStringMacro(Type);
+  vtkGetStringMacro(Type);
+
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
@@ -125,6 +135,7 @@ protected:
   vtkKWOptionMenu *Menus[9];
   vtkCollection *ManipulatorCollection;
   char* DefaultManipulator;
+  char* Type;
 
 //BTX
   typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;
