@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.230");
+vtkCxxRevisionMacro(vtkPVSource, "1.231");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -251,6 +251,12 @@ void vtkPVSource::SetPVInput(vtkPVData *pvd)
 
   pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
                          pvd->GetVTKDataTclName());
+
+
+  // Try to set the actor translate
+  //float *pt;
+  //pvd->GetActorTranslate(pt);
+  //this->GetPVOutput()->SetActorTranslate(pt);
 }
 
 //----------------------------------------------------------------------------
@@ -1616,7 +1622,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   pvd->SetVTKData(vtkdata, otherTclName);
 
   // Connect the source and data.
-  pvs->SetPVOutput(pvd);
+  pvs->SetPVOutput(pvd);  
   
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
@@ -1853,7 +1859,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.230 $");
+  this->ExtractRevision(os,"$Revision: 1.231 $");
 }
 
 //----------------------------------------------------------------------------
