@@ -75,6 +75,8 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_CLIENTSERVER_RMI_TAG          938531
 #define VTK_PV_CLIENTSERVER_ROOT_RMI_TAG     938532
 
+#define VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG    397529
+
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
 #define VTK_PV_ROOT_RESULT_TAG               838488
 #define VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG 838490
@@ -112,7 +114,8 @@ void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg,
   vtkMultiProcessController* controler = self->GetController();
   for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
     {
-    controler->TriggerRMI(i, remoteArg, remoteArgLength, VTK_PV_CLIENTSERVER_RMI_TAG);
+    controler->TriggerRMI(
+      i, remoteArg, remoteArgLength, VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     }
   vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
 }
@@ -128,8 +131,20 @@ void vtkPVClientServerRootRMI(void *localArg, void *remoteArg,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
+                                          int remoteArgLength,
+                                          int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule* self =
+    reinterpret_cast<vtkPVClientServerModule*>(localArg);
+  self->GetInterpreter()
+    ->ProcessStream(reinterpret_cast<unsigned char*>(remoteArg),
+                    remoteArgLength);
+}
+
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.52");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.53");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -275,6 +290,10 @@ void vtkPVClientServerModule::Initialize()
   else
     { // Sattelite processes of server.
     this->Controller->CreateOutputWindow();
+
+    this->Controller->AddRMI(vtkPVSendStreamToClientServerNodeRMI, this,
+                             VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
     // Now we are exiting.
