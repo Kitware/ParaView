@@ -1,5 +1,5 @@
 PROJECT(ServerManager)
-      
+
 SET( ServerManagerCommon_SRCS
   vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
