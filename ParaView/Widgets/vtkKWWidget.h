@@ -167,6 +167,10 @@ public:
   void GetBackgroundColor(int *r, int *g, int *b);
   
   // Description:
+  // Query if widget has Tk configuration option
+  int HasConfigurationOption(const char* option);
+  
+  // Description:
   // Adjusts the placement of the baloon help
   vtkSetMacro(BalloonHelpJustification,int);
   vtkGetMacro(BalloonHelpJustification,int);  
