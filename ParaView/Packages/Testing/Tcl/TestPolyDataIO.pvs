@@ -10,9 +10,11 @@ if {[info exists argc]} {
     }
 } 
 
-# Open the AltIO package.
+# Disable popup message dialogs.
 set kw(vtkTemp1) [Application GetMainWindow]
-set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp1) SetUseMessageDialog 0
+
+# Open the AltIO package.
 $kw(vtkTemp1) OpenPackage "$DataDir/Data/vtkAltIOPackage.xml"
 
 # Create a non-trivial vtkPolyData.
@@ -24,17 +26,26 @@ $kw(vtkTemp268) SetValue 36
 $kw(vtkTemp243) AcceptCallback
 update
 
-# Write the vtkPolyData.
+# Give it some scalar data.
 set kw(vtkTemp295) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 $kw(vtkTemp295) AcceptCallback
-$kw(vtkTemp1) WriteVTKFile "sPolyData.xvtk"
+
+# Choose the file name/type based on whether we are in parallel mode.
+set kw(vtkTemp1000) [Application GetController]
+set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+
+set fileName "sPolyData.vtp"
+if {$nprocs > 1} { set fileName "sPolyData.pvtp" }
+
+# Write the vtkPolyData.
+$kw(vtkTemp1) WriteVTKFile $fileName
 
 # Delete the old pipeline.
 $kw(vtkTemp295) DeleteCallback
 $kw(vtkTemp243) DeleteCallback
 
 # Read the vtkPolyData from the temporary file.
-$kw(vtkTemp1) Open "sPolyData.xvtk"
+$kw(vtkTemp1) Open $fileName
 set kw(vtkTemp337) [vtkTemp1 GetCurrentPVSource]
 update
 
@@ -51,4 +62,4 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 # Delete the temporary file.
-catch { file delete -force "sPolyData.xvtk" }
+catch { file delete -force $fileName }
