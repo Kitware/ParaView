@@ -1,12 +1,3 @@
 [submodule "ParaViewData"]
 	path = ParaView/Data
 	url = git://paraview.org/ParaViewData.git
-[submodule "TclTk-8-3-2"]
-	path = TclTk8.3.2Win
-	url = git://paraview.org/ParaViewTclTk.git
-[submodule "VTK"]
-	path = VTK
-	url = git://vtk.org/VTK.git
-[submodule "Xdmf1"]
-	path = Xdmf
-	url = git://paraview.org/Xdmf.git
