@@ -45,30 +45,29 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.3");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
-  this->ProgressRequests = 0;
-  this->GUIHelper = 0;
-  this->MPIMToNSocketConnectionID.ID = 0;
-  this->ProgressEnabled = 0;
-  this->LogThreshold = 0.01;
-  this->ClientMode = 0;
-  this->ServerMode = 0;
-  this->RenderServerMode = 0;
-  this->HostName = NULL;
-  this->RenderServerHostName = NULL;
-  this->SetRenderServerHostName("localhost");
-  this->SetHostName("localhost");
-  this->Port = 11111;
-  this->RenderServerPort = 22221;
+  this->MachinesFileName = 0;
   this->RenderNodePort = 0;
   this->ReverseConnection = 0;
+  this->ProgressEnabled = 0;
+  this->HostName = 0;
   this->Username = 0;
-  this->MachinesFileName =0;
+  this->RenderServerHostName = 0;
+  this->RenderServerPort = 22221;
+  this->Port = 11111;
+  this->ServerMode = 0;
+  this->RenderServerMode = 0;
+  this->ClientMode = 0;
+  this->AlwaysSSH = 0;
+  this->LogThreshold = 0;
   this->DemoPath = 0;
+  this->GUIHelper = 0;
+  this->SetRenderServerHostName("localhost");
+  this->SetHostName("localhost");
 }
 
 //----------------------------------------------------------------------------
