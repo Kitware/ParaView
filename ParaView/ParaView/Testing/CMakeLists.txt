@@ -9,5 +9,6 @@ IF(PYTHON_EXECUTABLE)
            ${VTK_SOURCE_DIR}/Common/Testing/HeaderTesting.py
 	   "${PARAVIEW_SOURCE_DIR}/ParaView"
            vtkPVDefaultModules.h
+           ParaViewRC.h
            )
 ENDIF(PYTHON_EXECUTABLE)

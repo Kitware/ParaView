@@ -15,6 +15,7 @@ IF(PYTHON_EXECUTABLE)
            bitmaps.h
            icons.h
            kwinit.h
+           kwappicon.h
            vtkKWEvent.h
            vtkKWWidgets.h
            vtkbwidgets.h
