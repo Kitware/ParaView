@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.13");
+vtkCxxRevisionMacro(vtkPVPick, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ void vtkPVPickPrint(ostream& os, vtkDataArray* da,
                     vtkIdType index, vtkIdType j)
 {
   // Print the component using its real type.
-  void* d = da->GetVoidPointer(index);
+  void* d = da->GetVoidPointer(index*da->GetNumberOfComponents());
   switch(da->GetDataType())
     {
     case VTK_ID_TYPE:
