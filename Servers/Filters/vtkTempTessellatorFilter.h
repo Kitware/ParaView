@@ -17,7 +17,7 @@
 #ifndef __vtkTempTessellatorFilter_h
 #define __vtkTempTessellatorFilter_h
 
-// .NAME TempTessellatorFilter - approximate nonlinear FEM elements with simplices
+// .NAME vtkTempTessellatorFilter - approximate nonlinear FEM elements with simplices
 // .SECTION Description
 // This class approximates nonlinear FEM elements with linear simplices.
 //
@@ -25,8 +25,7 @@
 // after ParaView 1.4.0.
 //
 // This filter rifles through all the cells in an
-// input vtkDataSet. It tesselates each cell and
-// uses the vtkStreamingTessellator
+// input vtkDataSet. It tesselates each cell and uses the vtkStreamingTessellator
 // and vtkDataSetSubdivisionAlgorithm classes to generate simplices that approximate the
 // nonlinear mesh using some approximation metric (encoded in the particular
 // vtkDataSetSubdivisionAlgorithm::EvaluateEdge implementation). The simplices are placed into
@@ -51,7 +50,7 @@
 // .SECTION See Also
 // vtkDataSetToUnstructuredGridFilter vtkDataSet vtkStreamingTessellator vtkDataSetSubdivisionAlgorithm
 
-#include <vtkDataSetToUnstructuredGridFilter.h>
+#include "vtkDataSetToUnstructuredGridFilter.h"
 
 class vtkDataArray;
 class vtkDataSet;
