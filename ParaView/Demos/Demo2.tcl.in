@@ -82,7 +82,7 @@ proc POPInit {} {
 
 
     # Load the model of the continents.
-    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading continents."
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading continents.\n Continents were created by extracting the models surface at depth 0 and cliping with salinity value of 0.\nThe resulting model was decimated."
     set pvCont [$pvWindow Open "$DataDir/contDeciFull.vtk"]
     # set the color of the continent model.
     set pvContOutput [$pvCont GetNthPVOutput 0]
@@ -92,7 +92,7 @@ proc POPInit {} {
 
 
     # Load the model of the ocean floor.
-    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading ocean floor."
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading ocean floor.\nThe ocean floor was created by taking an salinity iso surface at value 0."
     set pvFloor [$pvWindow Open "$DataDir/oceanFloorSmall.vtk"]
     # set the color of the ocean floor model.
     set pvFloorOutput [$pvFloor GetNthPVOutput 0]
@@ -102,12 +102,12 @@ proc POPInit {} {
 
 
     # load the pop volume
-    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading POP data."
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading POP data.\nThis POP data is a reduced resolution grid with dimensions 360x240x40"
     set pvPOP [$pvWindow Open "$DataDir/small.pop"]
     $pvPOP AcceptCallback
 
 
-    .control.main.info configure -text "Extract grid."
+    .control.main.info configure -text "We are creating an extract grid to show\nthe ocean at a constant depth."
     set sInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
     set pvExtractGrid [$sInt CreateCallback]
     [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 0 0
@@ -126,7 +126,7 @@ proc POPInit {} {
     # Create an iso surface of Salinity and color it by temerature.
     $pvWindow SetCurrentPVSource $pvPOP
 
-    .control.main.info configure -text "Create contour."
+    .control.main.info configure -text "We are creating a contour of salinity.\nThe iso surface will be mapped to show temperature as color."
     set pvContour [$pvWindow ContourCallback]
     [$pvContour GetVTKSource] SetValue 0 0.035
     [$pvContour GetVTKSource] ComputeScalarsOff
@@ -201,7 +201,7 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
 
     # Loop over all of the depth values.
     for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
-	.control.main.info configure -text "Salt depth $i."
+	.control.main.info configure -text "We are animating through depth levels\nshowing salinity mapped to color.\nCurrent depth is $i."
 	[$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
 	$pvExtractGrid UpdateParameterWidgets
 	$pvExtractGrid AcceptCallback
@@ -237,7 +237,7 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
 
     # Loop over all of the depth values.
     for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
-	.control.main.info configure -text "Temperature depth $i."
+	.control.main.info configure -text "We are animating through depth levels\nshowing temperature mapped to color.\nCurrent depth is $i."
 	[$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
 	$pvExtractGrid UpdateParameterWidgets
 	$pvExtractGrid AcceptCallback
@@ -270,7 +270,7 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
     $cam SetFocalPoint 0 0 0
 
     for {set i 0} {$i < 360} { set i [expr $i + $RotationStep]} {
-	.control.main.info configure -text "Rotate $i."
+	.control.main.info configure -text "We are rotating a model that shows the ocean\nsurface with temperature mapped to color.\n"
 	$cam Azimuth $RotationStep
 	RenWin1 Render
 	update
@@ -294,7 +294,7 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
     update
 
     for {set i 0.035} {$i <= 0.039} { set i [expr $i + $IsoStep]} {
-	.control.main.info configure -text "Contour value $i."
+	.control.main.info configure -text "This is an animation of a salinity iso surface.\nThe color of the surface shows temperature.\nThe current salinity iso-surface value is $i"
 	[$pvContour GetVTKSource] SetValue 0 $i
 	$pvContour UpdateParameterWidgets
 	$pvContour AcceptCallback
@@ -348,7 +348,7 @@ proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
     set pvView [$pvWindow GetMainView]
     $pvWindow SetCurrentPVSource $pvClip
     
-    .control.main.info configure -text "Animating"
+    .control.main.info configure -text "Particle dataset."
 
     # Show whole data set.
     [$pvClip GetVTKSource] SetOffset -546.0
@@ -382,7 +382,7 @@ proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
 	$pvView EventuallyRender
 	update
 
-	.control.main.info configure -text "rotate $i"
+	.control.main.info configure -text "This animation is rotating a lower resolution\nmodel of the particle data set.\nThe data set is subsampled with a ratio of 20 to 1 to get better performance.\nPoint size is set to 2 to fill in gaps between particles.\n Color of the points displays density\nRotation: $i."
 	if pvDemoShouldStop {
 	    $pvView EventuallyRender
 	    return
@@ -413,7 +413,7 @@ proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
 	    return
 	}
 
-	.control.main.info configure -text "clip $offset"
+        .control.main.info configure -text "This animation uses a clip filter to remove layers\nof a particle data set.\nThe points are colored by density.\nDensity is measured by the number of nieghbors within a sphere around the particle.\nClip: %offset"
     }
 
     $pvClipOutput SetCubeAxesVisibility 0
