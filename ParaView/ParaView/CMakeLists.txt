@@ -12,12 +12,6 @@ SET( ParaViewShared_SRCS
 )
 
 SET( ParaViewServer_SRCS
-  vtkCTHData.cxx
-  vtkCTHDataToPolyDataFilter.cxx
-  vtkCTHExtractAMRPart.cxx
-  vtkCTHFractal.cxx
-  vtkCTHOutlineFilter.cxx
-  vtkCTHSource.cxx
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
@@ -32,6 +26,18 @@ SET( ParaViewServer_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   )
+
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+SET( ParaViewServer_SRCS
+  ${ParaViewServer_SRCS}
+  vtkCTHData.cxx
+  vtkCTHDataToPolyDataFilter.cxx
+  vtkCTHExtractAMRPart.cxx
+  vtkCTHFractal.cxx
+  vtkCTHOutlineFilter.cxx
+  vtkCTHSource.cxx
+  )
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 SET( ParaViewServerNonWrapped_SRCS
   )

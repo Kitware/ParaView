@@ -22,7 +22,8 @@
   <LabeledToggle variable="Filled" trace_name="Filled" default_value="0"
                  help="Specify whether the glyph is filled (a polygon) or not (a closed polygon defined by line segments). This only applies to 2D closed glyphs"/>
 </Module>
-                                                                                
+
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 <Module name="CTHFractal" menu_name="CTHFractal" root_name="CTHFractal"
         module_type="Source" 
         long_help="Test source for CTH AMR" 
@@ -43,6 +44,7 @@
                  default_value="0"
                  help="Set whether to generate overlapping ghost levels." />
 </Module>
+#endif
 
 <Module name="VectorText" menu_name="3D Text" root_name="VectorText"
         module_type="Source" 

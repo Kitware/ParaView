@@ -138,6 +138,7 @@
               use_label="0" show_resolution="0" 
               help="Set the minimum and maximum point for elevation"/>
 </Module>
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 <Module name="CTHPartAMR" menu_name="Extract CTH Parts" root_name="CTHPartAMR" module_type="Filter" long_help="Create a surface from a CTH volume fraction." short_help="Extract a part from a CTH dataset.">
   <Filter class="vtkCTHExtractAMRPart">
     <Input name="Input" class="vtkCTHData">
@@ -155,6 +156,7 @@
     </Item>
   </SelectWidget>
 </Module>
+#endif
 <Module name="CTHPart" menu_name="Extract CTH Parts" root_name="CTHPart" module_type="Filter" long_help="Create a surface from a CTH volume fraction." short_help="Extract a part from a CTH dataset.">
   <Filter class="vtkExtractCTHPart">
     <Input name="Input" class="vtkRectilinearGrid">
@@ -347,6 +349,7 @@
   <LabeledToggle label="Non-manifold" trace_name="NonManifoldTraversal" variable="NonManifoldTraversal" help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops." default_value="1"/>
   <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do not want to process ghost levels and do not mind seams." default_value="1"/>
 </Module>
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 <Module name="CTHOutlineFilter" menu_name="Outline (CTH AMR)" root_name="CTHOutline" module_type="Filter">
   <Filter class="vtkCTHOutlineFilter">
     <Input name="Input" class="vtkCTHData"/>
@@ -359,6 +362,7 @@
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
+#endif
 <Module name="OutlineFilter" menu_name="Outline" root_name="Outline" module_type="Filter" replace_input="0" long_help="This filter generates a bounding box representation of the input." short_help="Generates a bounding box.">
   <Filter class="vtkPOutlineFilter">
     <Input name="Input" class="vtkDataSet"/>

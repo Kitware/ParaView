@@ -2,12 +2,10 @@ PROJECT(Filters)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
-  vtkBoxClipDataSet.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkExtractCells.cxx
   vtkGroup.cxx
-  vtkKdTree.cxx
   vtkMergeArrays.cxx
   vtkMergeCells.cxx
   vtkMultiOut2.cxx
@@ -34,13 +32,15 @@ SET(Filters_SRCS
   vtkPlanesIntersection.cxx
   vtkPointsProjectedHull.cxx
   vtkStructuredCacheFilter.cxx
-  vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
   )
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
+    vtkTiledDisplaySchedule.cxx
+    vtkBoxClipDataSet.cxx
+    vtkKdTree.cxx
     vtkAllToNRedistributePolyData.cxx
     #vtkBalancedRedistributePolyData.cxx
     vtkDistributedDataFilter.cxx
