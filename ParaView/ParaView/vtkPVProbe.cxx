@@ -237,11 +237,11 @@ void vtkPVProbe::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->ScalarArrayMenu->SetPVSource(this);
+  this->ScalarArrayMenu->SetDataSetCommand(this->GetVTKSourceTclName(), "GetSource");
   this->ScalarArrayMenu->SetNumberOfComponents(1);
   this->ScalarArrayMenu->ShowComponentMenuOn();
   this->ScalarArrayMenu->SetInputName("Input");
-  this->ScalarArrayMenu->SetAttributeName("Scalars");
+  this->ScalarArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
   this->ScalarArrayMenu->SetObjectTclName(this->GetTclName());
   this->ScalarArrayMenu->SetParent(this->ParameterFrame->GetFrame());
   this->ScalarArrayMenu->SetLabel("Scalars");

@@ -1257,17 +1257,17 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label, 
-                                          const char *attributeName,
+                                          int attributeType,
                                           int numComponenets,
                                           const char *help)
 {
   vtkPVArrayMenu *arrayMenu;
 
   arrayMenu = vtkPVArrayMenu::New();
-  arrayMenu->SetPVSource(this);
+  arrayMenu->SetDataSetCommand(this->GetVTKSourceTclName(), "GetInput");
   arrayMenu->SetNumberOfComponents(numComponenets);
   arrayMenu->SetInputName("Input");
-  arrayMenu->SetAttributeName(attributeName);
+  arrayMenu->SetAttributeType(attributeType);
   arrayMenu->SetObjectTclName(this->GetVTKSourceTclName());
 
   arrayMenu->SetParent(this->ParameterFrame->GetFrame());

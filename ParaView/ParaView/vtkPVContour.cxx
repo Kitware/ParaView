@@ -99,7 +99,7 @@ void vtkPVContour::CreateProperties()
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources());
   
-  this->AddArrayMenu("Scalars", "Scalars", 1,
+  this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
                      "Choose which scalar array you want to contour.");
 
   this->ScalarRangeLabel->SetParent(this->GetParameterFrame()->GetFrame());

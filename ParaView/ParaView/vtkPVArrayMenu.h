@@ -68,22 +68,11 @@ public:
   // Create the widget.
   void Create(vtkKWApplication *app);
 
-
   // Description:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
   const char* GetLabel() {return this->Label->GetLabel();}
-
-
-  // Description:
-  // This only thing this reference is used for is getting the input data
-  // which is used to add items to the menu.  It is not reference counted 
-  // because the PVSource owns this widget.  I have been trying to get
-  // rid of this reference to make the widget more general, but
-  // it is the only (best) way I can track the changes of the input.
-  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() {return this->PVSource;}
 
   // Description:
   // Only arrays with this number of components are added to the menu.
@@ -113,9 +102,9 @@ public:
   // This is one value that lets this widget interact with its associated 
   // object.  This specifies the type of the attribute (i.e Scalars, Vectors ...).
   // It defaults to NULL.
-  vtkSetStringMacro(AttributeName);
-  vtkGetStringMacro(AttributeName);
-  
+  vtkSetMacro(AttributeType, int);
+  vtkGetMacro(AttributeType, int);  
+
   // Description:
   // This is the filter/object that will be modified by the widgtet when the 
   // selected array gets changed in the menu.  It should have methods like:
@@ -124,7 +113,20 @@ public:
   vtkSetStringMacro(ObjectTclName);
   vtkGetStringMacro(ObjectTclName);
 
+  // -----
 
+  // Description:
+  // We need a method to get the vtkDataSet. obj->Method() must return a data set.  
+  // This is necessary because the input to the filter/mapper might change.
+  void SetDataSetCommand(const char* objTclName, const char* method);
+
+  // Description:
+  // This is used internally (by DataSetCommand).  If you set a data set yourself,
+  // it will just be overwritten.
+  vtkSetObjectMacro(DataSet, vtkDataSet);
+  vtkGetObjectMacro(DataSet, vtkDataSet);
+
+  // -----
 
   // Description:
   // Gets called when the accept button is pressed.
@@ -174,13 +176,12 @@ protected:
   int ArrayNumberOfComponents;
   int SelectedComponent;
 
-  vtkPVSource *PVSource;
   int NumberOfComponents;
   int ShowComponentMenu;
 
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
-  char*       AttributeName;
+  int         AttributeType;
   char*       ObjectTclName;
 
   // Subwidgets.
@@ -191,6 +192,13 @@ protected:
   // Resets the values based on the array.
   void UpdateComponentMenu();
 
+
+  // For getting the data set.
+  char* DataSetCommandObjectTclName;
+  vtkSetStringMacro(DataSetCommandObjectTclName);
+  char* DataSetCommandMethod;
+  vtkSetStringMacro(DataSetCommandMethod);
+  vtkDataSet *DataSet;
 };
 
 #endif

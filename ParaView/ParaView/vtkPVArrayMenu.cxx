@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkPVArrayMenu.h"
-#include "vtkPVData.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
@@ -64,17 +63,20 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ArrayNumberOfComponents = 1;
   this->SelectedComponent = 0;
 
-  this->PVSource = NULL;
   this->NumberOfComponents = 1;
   this->ShowComponentMenu = 0;
 
   this->InputName = NULL;
-  this->AttributeName = NULL;
+  this->AttributeType = 0;
   this->ObjectTclName = NULL;
 
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = vtkKWOptionMenu::New();
   this->ComponentMenu = vtkKWOptionMenu::New();
+
+  this->DataSetCommandObjectTclName = NULL;
+  this->DataSetCommandMethod = NULL;
+  this->DataSet = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -82,10 +84,7 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 {
   this->SetArrayName(NULL);
 
-  this->SetPVSource(NULL);
-
   this->SetInputName(NULL);
-  this->SetAttributeName(NULL);
   this->SetObjectTclName(NULL);
 
   this->Label->Delete();
@@ -94,6 +93,19 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->ArrayMenu = NULL;
   this->ComponentMenu->Delete();
   this->ComponentMenu = NULL;
+
+  this->SetDataSetCommandObjectTclName(NULL);
+  this->SetDataSetCommandMethod(NULL);
+  this->SetDataSet(NULL);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetDataSetCommand(const char* objTclName, 
+                                       const char* method)
+{
+  this->SetDataSetCommandObjectTclName(objTclName);
+  this->SetDataSetCommandMethod(method);
 }
 
 
@@ -231,14 +243,21 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
 void vtkPVArrayMenu::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  const char* attributeName;
+
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  if (attributeName == NULL)
+    {
+    vtkErrorMacro("Could not find attribute name.");
+    return;
+    }
 
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
-  if (this->InputName == NULL || this->AttributeName == NULL 
-          || this->ObjectTclName == NULL)
+  if (this->InputName == NULL || this->ObjectTclName == NULL)
     {
     vtkErrorMacro("Access names have not all been set.");
     return;
@@ -249,7 +268,7 @@ void vtkPVArrayMenu::Accept()
     pvApp->BroadcastScript("%s Select%s%s %s", 
                            this->ObjectTclName,
                            this->InputName,
-                           this->AttributeName,
+                           attributeName,
                            this->ArrayName);
     pvApp->AddTraceEntry("$pv(%s) SetValue %s", 
                          this->GetTclName(), 
@@ -260,7 +279,7 @@ void vtkPVArrayMenu::Accept()
     pvApp->BroadcastScript("%s Select%s%s {}", 
                            this->ObjectTclName,
                            this->InputName,
-                           this->AttributeName);
+                           attributeName);
     pvApp->AddTraceEntry("$pv(%s) SetValue {}", this->GetTclName());
     }
 
@@ -269,7 +288,7 @@ void vtkPVArrayMenu::Accept()
     pvApp->BroadcastScript("%s Select%s%sComponent %d", 
                            this->ObjectTclName,
                            this->InputName,
-                           this->AttributeName,
+                           attributeName,
                            this->SelectedComponent);
     pvApp->AddTraceEntry("$pv(%s) SetSelectedComponent %s", 
                          this->GetTclName(), 
@@ -285,15 +304,20 @@ void vtkPVArrayMenu::Accept()
 void vtkPVArrayMenu::Reset()
 {
   int i, num;
-  vtkPVData *pvd;
-  vtkDataSet *data;
   char methodAndArgs[1024];
   vtkDataArray *array;
   int arrayFound = 0;
   const char *first = NULL;
+  const char* attributeName;
 
-  if (this->InputName == NULL || this->AttributeName == NULL 
-          || this->ObjectTclName == NULL)
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  if (attributeName == NULL)
+    {
+    vtkErrorMacro("Could not find attribute name.");
+    return;
+    }
+
+  if (this->InputName == NULL || this->ObjectTclName == NULL)
     {
     vtkErrorMacro("Access names have not all been set.");
     return;
@@ -304,7 +328,7 @@ void vtkPVArrayMenu::Reset()
                this->GetTclName(), 
                this->ObjectTclName,
                this->InputName,
-               this->AttributeName);
+               attributeName);
 
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
@@ -313,32 +337,28 @@ void vtkPVArrayMenu::Reset()
                  this->GetTclName(), 
                  this->ObjectTclName,
                  this->InputName,
-                 this->AttributeName);
+                 attributeName);
     }
 
   // Regenerate the menu, and look for the specified array.
   this->ArrayMenu->ClearEntries();
-  if (this->PVSource == NULL)
+  if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
     {
-    vtkErrorMacro("PVSource has not been set.");
+    vtkErrorMacro("DataSetCommand has not been set.")
     return;
     }
-  pvd = this->PVSource->GetPVInput();
-  if (pvd == NULL)
+  this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
+               this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+  if (this->DataSet == NULL)
     {
-    vtkErrorMacro("Could not get the input of my source.");
+    vtkErrorMacro("Could not find vtk data set.");
     return;
     }
-  data = pvd->GetVTKData();
-  if (data == NULL)
-    { // Lets be anal.
-    vtkErrorMacro("Could not find vtk data.");
-    return;
-    }
-  num = data->GetPointData()->GetNumberOfArrays();
+
+  num = this->DataSet->GetPointData()->GetNumberOfArrays();
   for (i = 0; i < num; ++i)
     {
-    array = data->GetPointData()->GetArray(i);
+    array = this->DataSet->GetPointData()->GetArray(i);
     // It the array does not have a name, then we can do nothing with it.
     if (array->GetName())
       {
@@ -367,19 +387,16 @@ void vtkPVArrayMenu::Reset()
   if (arrayFound == 0)
     { // If the current value is not in the menu, then look for another to use.
     // First look for a default attribute.
-    // What a pain !!!  Is using the PVSource is a good idea?
-    this->SetArrayName(NULL);
-    this->Script("catch {%s SetArrayName [[[%s GetPointData] Get%s] GetName]}",
-                 this->GetTclName(), pvd->GetVTKDataTclName(), this->AttributeName);
-    if (this->ArrayName == NULL || this->ArrayName[0] == '\0')
+    array = this->DataSet->GetPointData()->GetAttribute(this->AttributeType); 
+    if (array == NULL)
       { // lets just use the first in the menu.
       if (first)
         {
-        this->SetArrayName(first);
+        array = this->DataSet->GetPointData()->GetArray(first); 
         }
       else
         {
-        vtkWarningMacro("Could not find " << this->AttributeName);
+        vtkWarningMacro("Could not find " << attributeName);
         // Here we may want to keep the previous value.
         this->SetArrayName(NULL);
         }
@@ -387,6 +404,10 @@ void vtkPVArrayMenu::Reset()
 
       // In this case, the widget does not match the object.
       this->ModifiedFlag = 1;
+    }
+  if (array)
+    {
+    this->SetArrayName(array->GetName());
     }
 
   // Now set the menu's value.
@@ -397,12 +418,13 @@ void vtkPVArrayMenu::Reset()
 
 
 
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::UpdateComponentMenu()
 {
   int i;
-  vtkPVData *pvd;
-  vtkDataSet *data;
   char methodAndArgs[1024];
   char label[124];
   vtkDataArray *array;
@@ -419,25 +441,27 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->ArrayNumberOfComponents = 1;
   this->SelectedComponent = 0;
 
+  // Make sure the data set is the latest.
+  if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
+    {
+    vtkErrorMacro("DataSetCommand has not been set.")
+    return;
+    }
+  this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
+               this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+  if (this->DataSet == NULL)
+    {
+    vtkErrorMacro("Could not find vtk data set.");
+    return;
+    }
+
   // Find out how many components the selected array has.
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource has not been set.");
-    return;
-    }
-  pvd = this->PVSource->GetPVInput();
-  if (pvd == NULL)
-    {
-    vtkErrorMacro("Could not get the input of my source.");
-    return;
-    }
-  data = pvd->GetVTKData();
-  if (data == NULL)
+  if (this->DataSet == NULL)
     { // Lets be anal.
     vtkErrorMacro("Could not find vtk data.");
     return;
     }
-  array = data->GetPointData()->GetArray(this->ArrayName);
+  array = this->DataSet->GetPointData()->GetArray(this->ArrayName);
   if (array == NULL)
     {
     vtkErrorMacro("Could not find array.");

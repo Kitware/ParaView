@@ -182,12 +182,12 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   if (this->DefaultScalars)
     {
-    pvs->AddArrayMenu("Scalars", "Scalars", 1,
+    pvs->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
                       "Select the input scalars to process.");
     }
   if (this->DefaultVectors)
     {
-    pvs->AddArrayMenu("Vectors", "Vectors", 3,
+    pvs->AddArrayMenu("Vectors", vtkDataSetAttributes::VECTORS, 3,
                       "Select the input vectors to process.");
     }
 

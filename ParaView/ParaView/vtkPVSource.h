@@ -171,7 +171,7 @@ public:
 
   // Description:
   // Create a menu to select the active scalars of the input..
-  vtkPVArrayMenu *AddArrayMenu(const char* label, const char* attributeName, 
+  vtkPVArrayMenu *AddArrayMenu(const char* label, int attributeType, 
                                int numComponents, const char* help);
 
   // Description:
