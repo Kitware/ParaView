@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -191,18 +191,37 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     vtkPVWidgetProperty *pvwp;
     pvwp = vtkPVWidgetProperty::SafeDownCast(
       this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+    // TODO Fix this hack.
     vtkPVObjectWidget* ow = 
       vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetProxy ";
-    if (ow)
+    if (strcmp(this->GetCurrentVTKValue(), "Output") == 0)
       {
-      vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
-      *file << "$pvTemp" << id.ID;
+      *file << "  $pvTemp" << this->PVSource->GetVTKSourceID(0) 
+            <<  " SetInput 1 " ;
+      if (ow)
+        {
+        vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
+        *file << "$pvTemp" << id.ID;
+        }
+      else
+        {
+        *file << "{}" ;
+        }
+      *file << " Set" << this->VariableName;
       }
     else
       {
-      *file << "{}" ;
+      *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+            <<  " GetProperty " << this->VariableName << "] SetProxy ";
+      if (ow)
+        {
+        vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
+        *file << "$pvTemp" << id.ID;
+        }
+      else
+        {
+        *file << "{}" ;
+        }
       }
     }
   else
