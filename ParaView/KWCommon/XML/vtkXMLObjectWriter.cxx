@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -130,6 +130,15 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent indent)
   elem->Delete();
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectWriter::Write(const char *filename)
+{
+  ofstream os(filename, ios::out);
+  vtkIndent indent;
+
+  return this->Write(os, indent);
 }
 
 //----------------------------------------------------------------------------

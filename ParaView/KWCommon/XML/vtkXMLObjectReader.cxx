@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataParser.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -110,6 +110,14 @@ int vtkXMLObjectReader::ParseString(const char *str)
   int res = this->ParseStream(strstr);
   strstr.rdbuf()->freeze(0);
   return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectReader::ParseFile(const char *filename)
+{
+  ifstream is(filename);
+
+  return this->ParseStream(is);
 }
 
 //----------------------------------------------------------------------------

@@ -80,6 +80,11 @@ public:
   virtual int ParseString(const char*);
 
   // Description:
+  // Parse an XML file.
+  // Return 1 on success, 0 on error.
+  virtual int ParseFile(const char*);
+
+  // Description:
   // Return the name of the root element of the XML tree this reader
   // is supposed to read and process.
   virtual char* GetRootElementName() = 0;

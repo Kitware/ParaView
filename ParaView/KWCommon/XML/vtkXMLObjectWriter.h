@@ -72,6 +72,7 @@ public:
   // Write an XML serialized representation of the object
   // Return 1 on success, 0 otherwise.
   virtual int Write(ostream &os, vtkIndent indent);
+  virtual int Write(const char *filename);
 
   // Description:
   // Return the name of the root element of the XML tree this writer
