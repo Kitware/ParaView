@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.266");
+vtkCxxRevisionMacro(vtkPVSource, "1.267");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1173,6 +1173,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Note has to be done here because tcl update causes render which
   // causes the filter to execute.
   pvd->UpdateProperties();
+
+  window->UpdateFilterMenu();
 }
 
 //----------------------------------------------------------------------------
@@ -2503,7 +2505,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.266 $");
+  this->ExtractRevision(os,"$Revision: 1.267 $");
 }
 
 //----------------------------------------------------------------------------
