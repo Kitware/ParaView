@@ -336,11 +336,21 @@ void vtkPVClipPlane::AcceptCallback()
                  this->CenterXEntry->GetValueAsFloat(), 
                  this->CenterYEntry->GetValueAsFloat(), 
                  this->CenterZEntry->GetValueAsFloat());
+    pvApp->AddTraceEntry("%s SetOrigin %f %f %f", this->VTKSourceTclName,
+                 this->CenterXEntry->GetValueAsFloat(), 
+                 this->CenterYEntry->GetValueAsFloat(), 
+                 this->CenterZEntry->GetValueAsFloat());
     pvApp->BroadcastScript("%s SetNormal %f %f %f", this->VTKSourceTclName,
                  this->NormalXEntry->GetValueAsFloat(), 
                  this->NormalYEntry->GetValueAsFloat(), 
                  this->NormalZEntry->GetValueAsFloat());
+    pvApp->AddTraceEntry("%s SetNormal %f %f %f", this->VTKSourceTclName,
+                 this->NormalXEntry->GetValueAsFloat(), 
+                 this->NormalYEntry->GetValueAsFloat(), 
+                 this->NormalZEntry->GetValueAsFloat());
     pvApp->BroadcastScript("%s SetOffset %f", this->VTKSourceTclName,
+                 this->OffsetEntry->GetValueAsFloat());
+    pvApp->AddTraceEntry("%s SetOffset %f", this->VTKSourceTclName,
                  this->OffsetEntry->GetValueAsFloat());
     }
   this->vtkPVSource::AcceptCallback();

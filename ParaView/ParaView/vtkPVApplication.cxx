@@ -179,7 +179,6 @@ vtkPVApplication::~vtkPVApplication()
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteScript(int id, char *format, ...)
 {
@@ -594,6 +593,8 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartLog(char *filename)
 {
+  this->Application->AddTraceEntry("%s StartLog", this->GetTclName());
+
   if (this->Log)
     {
     this->StopLog();
@@ -607,6 +608,8 @@ void vtkPVApplication::StartLog(char *filename)
 //----------------------------------------------------------------------------
 void vtkPVApplication::StopLog()
 {
+  this->Application->AddTraceEntry("%s StopLog", this->GetTclName());
+
   if (this->Log)
     {
     ((vtkTimerLog*)this->Log)->DumpLog(this->LogFileName);
