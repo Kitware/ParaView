@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWin32RegistryUtilities.h
+  Module:    vtkKWUNIXRegistryHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,23 +11,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegistryUtilities - A Win32 implementation of the registry
+// .NAME vtkKWRegistryHelper - A registry class
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
-// when the program executes again. It is designed specifically for 
-// Win32 platform.
+// when the program executes again. It is implemented as a file in
+// the user's home directory.
 
-#ifndef __vtkKWWin32RegistryUtilities_h
-#define __vtkKWWin32RegistryUtilities_h
+#ifndef __vtkKWUNIXRegistryHelper_h
+#define __vtkKWUNIXRegistryHelper_h
 
-#include "vtkKWRegistryUtilities.h"
-#include "vtkWindows.h" // needed for HKEY
+#include "vtkKWRegistryHelper.h"
 
-class VTK_EXPORT vtkKWWin32RegistryUtilities : public vtkKWRegistryUtilities
+class vtkKWUNIXRegistryHelperInternals;
+
+class VTK_EXPORT vtkKWUNIXRegistryHelper : public vtkKWRegistryHelper
 {
 public:
-  static vtkKWWin32RegistryUtilities* New();
-  vtkTypeRevisionMacro(vtkKWWin32RegistryUtilities, vtkKWRegistryUtilities);
+  static vtkKWUNIXRegistryHelper* New();
+  vtkTypeRevisionMacro(vtkKWUNIXRegistryHelper, vtkKWRegistryHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,20 +49,27 @@ public:
 
   // Description:
   // Open the registry at toplevel/subkey.
-  virtual int OpenInternal(const char *toplevel, const char *subkey, int readonly);
+  virtual int OpenInternal(const char *toplevel, const char *subkey, 
+                           int readonly);
   
   // Description:
   // Close the registry.
   virtual int CloseInternal();
 
 protected:
-  vtkKWWin32RegistryUtilities();
-  virtual ~vtkKWWin32RegistryUtilities();
+  vtkKWUNIXRegistryHelper();
+  virtual ~vtkKWUNIXRegistryHelper();
+  vtkSetStringMacro(SubKey);
+
+  char *CreateKey(const char *key);
 
 private:
-  HKEY HKey;
-  vtkKWWin32RegistryUtilities(const vtkKWWin32RegistryUtilities&); // Not implemented
-  void operator=(const vtkKWWin32RegistryUtilities&); // Not implemented
+  char *SubKey;
+
+  vtkKWUNIXRegistryHelperInternals* Internals;
+
+  vtkKWUNIXRegistryHelper(const vtkKWUNIXRegistryHelper&); // Not implemented
+  void operator=(const vtkKWUNIXRegistryHelper&); // Not implemented
 };
 
 #endif

@@ -28,7 +28,7 @@
 class vtkKWLabel;
 class vtkKWMessageDialog;
 class vtkKWMessageDialog;
-class vtkKWRegistryUtilities;
+class vtkKWRegistryHelper;
 class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindow;
@@ -206,8 +206,8 @@ public:
   // Description:
   // Return the Registry object. It is created on first use
   // and deleted on exiting the application.
-  vtkKWRegistryUtilities *GetRegistry( const char* toplevel);
-  vtkKWRegistryUtilities *GetRegistry( );
+  vtkKWRegistryHelper *GetRegistryHelper( const char* toplevel);
+  vtkKWRegistryHelper *GetRegistryHelper( );
   //ETX
 
   // Description:
@@ -390,7 +390,7 @@ protected:
   int LimitedEditionMode;
   char *LimitedEditionModeName;
 
-  vtkKWRegistryUtilities *Registry;
+  vtkKWRegistryHelper *RegistryHelper;
   int RegistryLevel;
   int BalloonHelpDelay;
 

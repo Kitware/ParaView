@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWRegistryUtilities.h"
+#include "vtkKWRegistryHelper.h"
 
 #define IFT(x,res) if ( !x )                    \
   {                                             \
@@ -35,7 +35,7 @@ int main(int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   int res = 0;
   
-  vtkKWRegistryUtilities *reg = vtkKWRegistryUtilities::New();
+  vtkKWRegistryHelper *reg = vtkKWRegistryHelper::New();
   reg->SetTopLevel("TestRegistry");
   
   IFT(reg->SetValue("TestSubkey",  "TestKey1", "Test Value 1"), res);

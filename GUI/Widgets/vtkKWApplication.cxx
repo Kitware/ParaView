@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
-#include "vtkKWRegistryUtilities.h"
+#include "vtkKWRegistryHelper.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.190");
+vtkCxxRevisionMacro(vtkKWApplication, "1.191");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -100,7 +100,7 @@ vtkKWApplication::vtkKWApplication()
 
   this->ExitStatus = 0;
 
-  this->Registry = 0;
+  this->RegistryHelper = 0;
   this->RegistryLevel = 10;
 
   this->UseMessageDialogs = 1;  
@@ -231,9 +231,9 @@ vtkKWApplication::~vtkKWApplication()
 
   this->SetDisplayHelpStartingPage(NULL);
 
-  if (this->Registry )
+  if (this->RegistryHelper )
     {
-    this->Registry->Delete();
+    this->RegistryHelper->Delete();
     }
 }
 
@@ -266,8 +266,8 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     {
     char setup_key[REG_KEY_NAME_SIZE_MAX];
     sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
-    vtkKWRegistryUtilities *reg 
-      = this->GetRegistry(this->GetApplicationName());
+    vtkKWRegistryHelper *reg 
+      = this->GetRegistryHelper(this->GetApplicationName());
     char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
@@ -1166,21 +1166,21 @@ void vtkKWApplication::AddAboutCopyrights(ostream &os)
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegistryUtilities *vtkKWApplication::GetRegistry( const char*toplevel )
+vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper( const char*toplevel )
 {
-  this->GetRegistry();
-  this->Registry->SetTopLevel( toplevel );
-  return this->Registry;
+  vtkKWRegistryHelper *reg_helper = this->GetRegistryHelper();
+  reg_helper->SetTopLevel(toplevel);
+  return reg_helper;
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegistryUtilities *vtkKWApplication::GetRegistry()
+vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper()
 {
-  if ( !this->Registry )
+  if ( !this->RegistryHelper )
     {
-    this->Registry = vtkKWRegistryUtilities::New();
+    this->RegistryHelper = vtkKWRegistryHelper::New();
     }
-  return this->Registry;
+  return this->RegistryHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -1243,8 +1243,8 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
   vsprintf(value, format, var_args);
   va_end(var_args);
   
-  vtkKWRegistryUtilities *reg 
-    = this->GetRegistry(this->GetApplicationName());
+  vtkKWRegistryHelper *reg 
+    = this->GetRegistryHelper(this->GetApplicationName());
   res = reg->SetValue(buffer, key, value);
   return res;
 }
@@ -1266,8 +1266,8 @@ int vtkKWApplication::GetRegistryValue(int level, const char* subkey,
           this->GetApplicationVersionName(),
           subkey);
 
-  vtkKWRegistryUtilities *reg 
-    = this->GetRegistry(this->GetApplicationName());
+  vtkKWRegistryHelper *reg 
+    = this->GetRegistryHelper(this->GetApplicationName());
   res = reg->ReadValue(buffer, key, buff);
   if ( *buff && value )
     {
@@ -1292,8 +1292,8 @@ int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey,
           this->GetApplicationVersionName(),
           subkey);
   
-  vtkKWRegistryUtilities *reg 
-    = this->GetRegistry(this->GetApplicationName());
+  vtkKWRegistryHelper *reg 
+    = this->GetRegistryHelper(this->GetApplicationName());
   res = reg->DeleteValue(buffer, key);
   return res;
 }

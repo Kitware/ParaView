@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWin32RegistryUtilities.cxx
+  Module:    vtkKWWin32RegistryHelper.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWWin32RegistryUtilities.h"
+#include "vtkKWWin32RegistryHelper.h"
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegistryUtilities, "1.1");
-vtkStandardNewMacro( vtkKWWin32RegistryUtilities );
+vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.1");
+vtkStandardNewMacro( vtkKWWin32RegistryHelper );
 
 #define BUFFER_SIZE 8192
 
-vtkKWWin32RegistryUtilities::vtkKWWin32RegistryUtilities()
+vtkKWWin32RegistryHelper::vtkKWWin32RegistryHelper()
 {
   this->HKey = 0;  
 }
 
-vtkKWWin32RegistryUtilities::~vtkKWWin32RegistryUtilities()
+vtkKWWin32RegistryHelper::~vtkKWWin32RegistryHelper()
 {
 }
 
-int vtkKWWin32RegistryUtilities::OpenInternal(const char *toplevel,
+int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
                                                const char *subkey, 
                                                int readonly)
 {
@@ -42,7 +42,7 @@ int vtkKWWin32RegistryUtilities::OpenInternal(const char *toplevel,
   ostrstream str;
   DWORD dwDummy;
   str << "Software\\Kitware\\" << toplevel << "\\" << subkey << ends;
-  if ( readonly == vtkKWRegistryUtilities::READONLY )
+  if ( readonly == vtkKWRegistryHelper::READONLY )
     {
     res = ( RegOpenKeyEx(scope, str.str(), 
                          0, KEY_READ, &this->HKey) == ERROR_SUCCESS );
@@ -57,14 +57,14 @@ int vtkKWWin32RegistryUtilities::OpenInternal(const char *toplevel,
   return res;
 }
 
-int vtkKWWin32RegistryUtilities::CloseInternal()
+int vtkKWWin32RegistryHelper::CloseInternal()
 {
   int res;
   res = ( RegCloseKey(this->HKey) == ERROR_SUCCESS );    
   return res;
 }
 
-int vtkKWWin32RegistryUtilities::ReadValueInternal(const char *key,
+int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key,
                                                     char *value)
 {
   int res = 1;
@@ -76,21 +76,21 @@ int vtkKWWin32RegistryUtilities::ReadValueInternal(const char *key,
   return res;
 }
 
-int vtkKWWin32RegistryUtilities::DeleteKeyInternal(const char *key)
+int vtkKWWin32RegistryHelper::DeleteKeyInternal(const char *key)
 {
   int res = 1;
   res = ( RegDeleteKey( this->HKey, key ) == ERROR_SUCCESS );
   return res;
 }
 
-int vtkKWWin32RegistryUtilities::DeleteValueInternal(const char *key)
+int vtkKWWin32RegistryHelper::DeleteValueInternal(const char *key)
 {
   int res = 1;
   res = ( RegDeleteValue( this->HKey, key ) == ERROR_SUCCESS );
   return res;
 }
 
-int vtkKWWin32RegistryUtilities::SetValueInternal(const char *key, 
+int vtkKWWin32RegistryHelper::SetValueInternal(const char *key, 
                                                    const char *value)
 {
   int res = 1;
@@ -102,7 +102,7 @@ int vtkKWWin32RegistryUtilities::SetValueInternal(const char *key,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWin32RegistryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWWin32RegistryHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWRegistryUtilities.h
+  Module:    vtkKWRegistryHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegistryUtilities - A registry class
+// .NAME vtkKWRegistryHelper - A registry class
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. On Win32 platform it is 
 // implemented using the registry and on unix as a file in
 // the user's home directory.
 
-#ifndef __vtkKWRegistryUtilities_h
-#define __vtkKWRegistryUtilities_h
+#ifndef __vtkKWRegistryHelper_h
+#define __vtkKWRegistryHelper_h
 
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkKWRegistryUtilities : public vtkObject
+class VTK_EXPORT vtkKWRegistryHelper : public vtkObject
 {
 public:
   // Description:
   // Standard New and type methods
-  static vtkKWRegistryUtilities* New();
-  vtkTypeRevisionMacro(vtkKWRegistryUtilities, vtkObject);
+  static vtkKWRegistryHelper* New();
+  vtkTypeRevisionMacro(vtkKWRegistryHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -88,8 +88,8 @@ public:
 //ETX
 
   protected:
-  vtkKWRegistryUtilities();
-  virtual ~vtkKWRegistryUtilities();
+  vtkKWRegistryHelper();
+  virtual ~vtkKWRegistryHelper();
 
   // Description:
   // Should the registry be locked?
@@ -140,8 +140,8 @@ private:
   int Locked;
   int GlobalScope;
 
-  vtkKWRegistryUtilities(const vtkKWRegistryUtilities&); // Not implemented
-  void operator=(const vtkKWRegistryUtilities&); // Not implemented
+  vtkKWRegistryHelper(const vtkKWRegistryHelper&); // Not implemented
+  void operator=(const vtkKWRegistryHelper&); // Not implemented
 };
 
 #endif

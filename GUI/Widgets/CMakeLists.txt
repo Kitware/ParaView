@@ -68,7 +68,7 @@ SET( KWWidgets_SRCS
   vtkKWPushButtonWithMenu.cxx 
   vtkKWRadioButton.cxx 
   vtkKWRange.cxx 
-  vtkKWRegistryUtilities.cxx
+  vtkKWRegistryHelper.cxx
   vtkKWRenderWidget.cxx 
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWSaveImageDialog.cxx 
@@ -157,7 +157,7 @@ ENDFOREACH (WidgetType)
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
-    vtkKWWin32RegistryUtilities.cxx
+    vtkKWWin32RegistryHelper.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
@@ -165,7 +165,7 @@ IF (WIN32)
     )
 ELSE (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    vtkKWUNIXRegistryUtilities.cxx
+    vtkKWUNIXRegistryHelper.cxx
     )
 ENDIF (WIN32)
 
