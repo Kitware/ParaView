@@ -181,7 +181,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.7");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.8");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -947,6 +947,8 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
         if ( entry->GetPVSource() )
           {
           entry->GetPVSource()->AcceptCallback();
+          vtkKWMenu *menu = entry->GetPVSource()->GetPVWindow()->GetMenuView();
+          menu->CheckRadioButton(menu, "Radio", VTK_PV_ANIMATION_MENU_INDEX);
           }
         }
       }
@@ -954,6 +956,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
     this->AddTraceEntry("$kw(%s) SetCurrentTime %d", 
                         this->GetTclName(), this->GetCurrentTime());
 
+    
     // Allow the application GUI to be refreshed (ex: in a trace file)
 
     this->Script("update");
@@ -1457,7 +1460,6 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   
   if(numPartitions > 1)
     {
-    vtkPVSource* source;
     sources->InitTraversal();
     for(vtkstd::vector<vtkClientServerID>::iterator i = arrays.begin();
         i != arrays.end(); ++i)
