@@ -15,6 +15,7 @@
 #include "vtkXMLCollectionReader.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkInstantiator.h"
@@ -27,7 +28,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.9");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.10");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -470,6 +471,24 @@ void vtkXMLCollectionReader::ReadXMLData()
     
     // Share the new data with our output.
     this->Outputs[this->CurrentOutput]->ShallowCopy(out);
+
+    // If a "name" attribute exists, store the name of the output in
+    // its field data.
+    vtkXMLDataElement* ds =
+      this->Internal->RestrictedDataSets[this->CurrentOutput];
+    const char* name = ds? ds->GetAttribute("name") : 0;
+    if(name)
+      {
+      vtkCharArray* nmArray = vtkCharArray::New();
+      nmArray->SetName("Name");
+      size_t len = strlen(name);
+      nmArray->SetNumberOfTuples(static_cast<vtkIdType>(len)+1);
+      char* copy = nmArray->GetPointer(0);
+      memcpy(copy, name, len);
+      copy[len] = '\0';
+      this->Outputs[this->CurrentOutput]->GetFieldData()->AddArray(nmArray);
+      nmArray->Delete();
+      }
     }
 }
 
