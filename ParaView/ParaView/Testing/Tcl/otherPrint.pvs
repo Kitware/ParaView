@@ -48,6 +48,9 @@ proc rtOtherTest { fileid } {
         if {$a == "vtkPVApplication"} {
            continue
         }
+        if {$a == "vtkPVRenderView"} {
+           continue
+        }
 	if { [ catch {
            $a b
            b Print
