@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.4");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.5");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -72,8 +72,6 @@ vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
-  
-  this->AcceptCalled = 0;
   
   this->Property = NULL;
 }
@@ -195,8 +193,6 @@ void vtkPVExtractPartsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 
   num = this->PartSelectionList->GetNumberOfItems();
 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->ModifiedFlag)
     {
     this->Inactivate();
@@ -229,7 +225,6 @@ void vtkPVExtractPartsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
   delete [] numScalars;
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 
@@ -345,6 +340,12 @@ void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 void vtkPVExtractPartsWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVExtractPartsWidget::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

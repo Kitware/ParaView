@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.12");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.13");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -339,7 +339,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       part = pvs->GetPart(partIdx);
-      { // Only one source takes all parts as input.
+      // Only one source takes all parts as input.
       sourceID = this->GetVTKSourceID(0);
       if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         { // Sanity check.
@@ -1980,123 +1980,82 @@ void vtkPVSource::SaveState(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-// Duplicates functionality in Input menu.
-// This method sets inputs for standard input.
-// Others (source) are set by InputMenuWidget.
 void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 {
-#if 0
-  int num, idx;
-  int numSources, numOutputs;
-  int sourceCount, outputCount;
-  vtkPVSource *pvs;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  int numInputs = this->GetNumberOfPVInputs();
 
-  if (this->GetNumberOfPVInputs() == 0)
+  for (int inpIdx=0; inpIdx<numInputs; inpIdx++)
     {
-    return;
-    }
+    // Just PVInput 0 for now.
+    vtkPVSource* pvs = this->GetNthPVInput(inpIdx);
 
-  num = this->GetNumberOfVTKSources();
-
-  // Special case for filters that take multiple inputs like append.
-  if (this->GetVTKMultipleInputsFlag())
-    {
-    if (num != 1)
-      {
-      vtkErrorMacro("Expecting only a single source.");
-      return;
-      }
-    // Loop through all of the PVSources.
-    for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
-      {
-      pvs = this->GetNthPVInput(idx);
-      if (pvs == NULL)
-        {
-        vtkErrorMacro("Empty Input.");
-        return;
-        }
-      // Loop through all of the vtk sources (group).
-      numSources = pvs->GetNumberOfVTKSources();
-      for (sourceCount = 0; sourceCount < numSources; ++sourceCount)
-        {
-        // Loop through all of the outputs of this vtk source (multiple outputs).
-        vtkClientServerStream& stream = pm->GetStream();
-        stream.Reset();
-        stream << vtkClientServerStream::Invoke << pvs->GetVTKSourceID(sourceCount) <<
-          "GetNumberOfOutputs" << vtkClientServerStream::End;
-        pm->SendStreamToServer();
-        if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
-          {
-          vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
-          }
-        // should we have a GatherInformation for client server??
-//         pm->GatherInformation(this->NumberOfOutputsInformation,
-//                               (char*)(pvs->GetVTKSourceTclName(sourceCount)));
-//         numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
-        for (outputCount = 0; outputCount < numOutputs; ++outputCount)
-          {
-          *file << "\t";
-          // This is a bit of a hack to get the input name.
-          *file << this->GetVTKSourceTclName(0) << " AddInput [" 
-                << pvs->GetVTKSourceTclName(sourceCount) 
-                << " GetOutput " << outputCount << "]\n";
-          }
-        }
-      }
-    return;
-    }
-
-
-  // Just PVInput 0 for now.
-  pvs = this->GetNthPVInput(0);
-  // Maybe this output traversal should be a part of PVSource.
-  numSources = pvs->GetNumberOfVTKSources();
-  sourceCount = -1;
-  numOutputs = 0;
-  outputCount = 0;
-  if (pvs == NULL)
-    {
-    return;
-    }
-  // Loop through our sources.
-  for (idx = 0; idx < num; ++idx)
-    {
-    // Pick off the input outputs one by one.
-    while (outputCount >= numOutputs)
-      {
-      ++sourceCount;
-      if (sourceCount >= numSources)
-        { // sanity check.
-        vtkErrorMacro("Ran out of sources.");
-        return;
-        }
-      outputCount = 0;
-      pm->GatherInformation(this->NumberOfOutputsInformation,
-                            (char*)(pvs->GetVTKSourceTclName(sourceCount)));
-      numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
-      }
-
-    vtkPVInputProperty* ip = this->GetInputProperty(idx);
+    // Set the VTK reference to the new input.
     const char* inputName;
+    vtkPVInputProperty* ip=0;
+    if (this->VTKMultipleInputsFlag)
+      {
+      ip = this->GetInputProperty(0);
+      }
+    else
+      {
+      ip = this->GetInputProperty(inpIdx);
+      }
+
     if (ip)
       {
       inputName = ip->GetName();
       }
     else
       {
+      vtkErrorMacro("No input property defined, setting to default.");
       inputName = "Input";
       }
 
-    *file << "\t";
-    *file << this->GetVTKSourceTclName(idx) << " Set"
-          << inputName << " [" 
-          << pvs->GetVTKSourceTclName(sourceCount) 
-          << " GetOutput " << outputCount << "]\n";
-    
-    ++outputCount;
+    int numParts = pvs->GetNumberOfParts();
+
+    if (this->VTKMultipleInputsFlag)
+      { 
+      const char* sourceTclName = this->GetVTKSourceTclName(0);
+      if (sourceTclName == NULL)
+        { // Sanity check.
+        vtkErrorMacro("Missing tcl name.");
+        return;
+        }
+      
+      // Only one filter takes all parts as input.
+      for (int partIdx = 0; partIdx < numParts; ++partIdx)
+        {
+        vtkPVPart* part = pvs->GetPart(partIdx);
+        
+        *file << "\t";
+        *file << sourceTclName << " Add" << inputName  << " [" 
+              << pvs->GetVTKSourceTclName(part->GetVTKSourceIndex()) 
+              << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
+        }      
+      }
+    else
+      {
+      // Multiple filters process all parts
+      int numSources = this->GetNumberOfVTKSources();
+      for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+        {
+        const char* sourceTclName = this->GetVTKSourceTclName(sourceIdx);
+        // This is to handle the case when there are multiple
+        // inputs and the first one has multiple parts. For
+        // example, in the Glyph filter, when the input has multiple
+        // parts, the glyph source has to be applied to each.
+        // In that case, sourceTclName == glyph input, 
+        // inputName == glyph source.
+        int partIdx = sourceIdx % numParts;
+        vtkPVPart* part = pvs->GetPart(partIdx);
+        *file << "\t";
+        *file << sourceTclName << " Set" << inputName << " [" 
+              << pvs->GetVTKSourceTclName(part->GetVTKSourceIndex()) 
+              << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
+
+        }
+      }
     }
-#endif
 }
 
 
@@ -2475,6 +2434,8 @@ int vtkPVSource::InitializeData()
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
       part->SetVTKDataID(dataID);
+      part->SetVTKSourceIndex(sourceIdx);
+      part->SetVTKOutputIndex(idx);
       this->AddPart(part);
 
       // Create the extent translator (sources with no inputs only).

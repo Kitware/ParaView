@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.8");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.9");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1584,6 +1584,7 @@ void vtkPVData::SetRepresentation(const char* repr)
 void vtkPVData::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -1602,7 +1603,7 @@ void vtkPVData::DrawWireframe()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
       if (this->PreviousWasSolid)
         {
@@ -1611,21 +1612,40 @@ void vtkPVData::DrawWireframe()
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToWireframe",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToWireframe" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
-        part->GetPartDisplay()->InvalidateGeometry();
-        }
+       pm->GetStream() 
+         << vtkClientServerStream::Invoke << part->GetGeometryID()
+         << "GetUseOutline" << vtkClientServerStream::End;
+       pm->SendStreamToClient();
+       int useOutline;
+       pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+       if (useOutline)
+         {
+         pm->GetStream() 
+           << vtkClientServerStream::Invoke << part->GetGeometryID()
+           << "SetUseOutline" << 0 << vtkClientServerStream::End;
+         pm->SendStreamToClientAndServer();
+         part->GetPartDisplay()->InvalidateGeometry();
+         }
       }
     }
 
@@ -1639,6 +1659,7 @@ void vtkPVData::DrawWireframe()
 void vtkPVData::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
 
@@ -1661,19 +1682,39 @@ void vtkPVData::DrawPoints()
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToPoints",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToPoints" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << "GetUseOutline" << vtkClientServerStream::End;
+      pm->SendStreamToClient();
+      int useOutline;
+      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      if (useOutline)
+        { 
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetUseOutline" << 0 << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
         }
       }
@@ -1689,6 +1730,8 @@ void vtkPVData::DrawPoints()
 void vtkPVData::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int num, idx;
   
@@ -1706,23 +1749,40 @@ void vtkPVData::DrawSurface()
       {
       if (!this->PreviousWasSolid)
         {
-        pvApp->BroadcastScript("%s SetAmbient %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousAmbient);
-        pvApp->BroadcastScript("%s SetDiffuse %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousDiffuse);
-        pvApp->BroadcastScript("%s SetSpecular %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousSpecular);
-        pvApp->BroadcastScript("%s SetRepresentationToSurface",
-                               part->GetPartDisplay()->GetPropertyTclName());
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetAmbient" << this->PreviousAmbient << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetDiffuse" << this->PreviousDiffuse << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetSpecular" << this->PreviousSpecular << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetRepresentationToSurface" << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         }
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << "GetUseOutline" << vtkClientServerStream::End;
+      pm->SendStreamToClient();
+      int useOutline;
+      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      if (useOutline)
+        { 
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetUseOutline" << 0 << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
         }
       }
@@ -1739,6 +1799,8 @@ void vtkPVData::DrawSurface()
 void vtkPVData::DrawOutline()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int num, idx;
   
@@ -1760,19 +1822,31 @@ void vtkPVData::DrawOutline()
         this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
-      this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToSurface",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      this->PreviousWasSolid = 0; 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToSurface" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
-      {
-      pvApp->BroadcastScript("%s SetUseOutline 1", part->GetGeometryTclName());
+    if (part->GetGeometryID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke <<  part->GetGeometryID()
+        << "SetUseOutline" << 1 << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       part->GetPartDisplay()->InvalidateGeometry();
       }
     }
@@ -1805,6 +1879,8 @@ void vtkPVData::SetInterpolation(const char* repr)
 void vtkPVData::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int idx, num;
   
@@ -1816,10 +1892,13 @@ void vtkPVData::SetInterpolationToFlat()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetInterpolationToFlat",
-                             part->GetPartDisplay()->GetPropertyTclName());
+    if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetInterpolationToFlat" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     if ( this->GetPVRenderView() )
       {
@@ -1833,6 +1912,7 @@ void vtkPVData::SetInterpolationToFlat()
 void vtkPVData::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int num, idx;
   
@@ -1844,10 +1924,13 @@ void vtkPVData::SetInterpolationToGouraud()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetInterpolationToGouraud",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetInterpolationToGouraud" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
   
@@ -2183,6 +2266,7 @@ void vtkPVData::SetPointSize(int size)
 void vtkPVData::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -2190,11 +2274,14 @@ void vtkPVData::ChangePointSize()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetPointSize %f",
-                             part->GetPartDisplay()->GetPropertyTclName(),
-                             this->PointSizeThumbWheel->GetValue());
+     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetPointSize" << this->PointSizeThumbWheel->GetValue()
+        << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
  
@@ -2232,6 +2319,7 @@ void vtkPVData::SetLineWidth(int width)
 void vtkPVData::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -2239,11 +2327,14 @@ void vtkPVData::ChangeLineWidth()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetLineWidth %f",
-                             part->GetPartDisplay()->GetPropertyTclName(),
-                             this->LineWidthThumbWheel->GetValue());
+      if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetLineWidth" << this->LineWidthThumbWheel->GetValue()
+        << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
 
@@ -2327,10 +2418,19 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         outputCount = 0;
         }
 
- //      *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
-//             << part->GetGeometryTclName() << " SetInput [" 
-//             << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
-//             << " GetOutput " << outputCount << "]\n";
+      *file << "vtkPVGeometryFilter pvTemp" << part->GetGeometryID() << "\n\t"
+            << "pvTemp" << part->GetGeometryID() << " SetInput [pvTemp" 
+            << this->GetPVSource()->GetVTKSourceID(sourceCount) 
+            << " GetOutput " << outputCount << "]\n";
+      *file << "\t";
+      if ( vtkString::Equals(this->RepresentationMenu->GetValue(), "Outline") )
+        {
+        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 1" << endl;
+        }
+      else
+        {
+        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 0" << endl;
+        }
       // Move to next output
       ++outputCount;
 
@@ -2359,33 +2459,33 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
               << this->PVColorMap->GetLookupTableTclName() << endl;
         }
   
-      *file << "vtkActor " << part->GetPartDisplay()->GetPropTclName() << "\n\t"
-            << part->GetPartDisplay()->GetPropTclName() << " SetMapper " 
-            << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
-            << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetRepresentationTo"
+      *file << "vtkActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n\t"
+            << "pvTemp" << part->GetPartDisplay()->GetPropID() << " SetMapper " 
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
+            << "[ pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetRepresentationTo"
             << part->GetPartDisplay()->GetProperty()->GetRepresentationAsString() << "\n\t"
-            << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetInterpolationTo"
+            << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetInterpolationTo"
             << part->GetPartDisplay()->GetProperty()->GetInterpolationAsString() << "\n";
 
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetAmbient "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetAmbient "
             << part->GetPartDisplay()->GetProperty()->GetAmbient() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetDiffuse "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetDiffuse "
             << part->GetPartDisplay()->GetProperty()->GetDiffuse() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecular "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecular "
             << part->GetPartDisplay()->GetProperty()->GetSpecular() << "\n";
       *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecularPower "
             << part->GetPartDisplay()->GetProperty()->GetSpecularPower() << "\n";
       float *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecularColor "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularColor "
             << color[0] << " " << color[1] << " " << color[2] << "\n";
       if (part->GetPartDisplay()->GetProperty()->GetLineWidth() > 1)
         {
-        *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetLineWidth "
+        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetLineWidth "
             << part->GetPartDisplay()->GetProperty()->GetLineWidth() << "\n";
         }
       if (part->GetPartDisplay()->GetProperty()->GetPointSize() > 1)
         {
-        *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetPointSize "
+        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetPointSize "
             << part->GetPartDisplay()->GetProperty()->GetPointSize() << "\n";
         }
 
@@ -2393,12 +2493,12 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         {
         float propColor[3];
         part->GetPartDisplay()->GetProperty()->GetColor(propColor);
-        *file << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetColor "
+        *file << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetColor "
               << propColor[0] << " " << propColor[1] << " " << propColor[2]
               << "\n";
         }
 
-      *file << "pvTemp" << renID.ID << " AddActor " << part->GetPartDisplay()->GetPropTclName() << "\n";
+      *file << "pvTemp" << renID.ID << " AddActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n";
       }  
     }
 
@@ -2582,6 +2682,8 @@ void vtkPVData::SetOpacity(float val)
 //----------------------------------------------------------------------------
 void vtkPVData::OpacityChangedCallback()
 {
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+
   vtkPVPart *part;
   int idx, num;
 
@@ -2589,9 +2691,16 @@ void vtkPVData::OpacityChangedCallback()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
-                                              part->GetPartDisplay()->GetPropTclName(), 
-                                              this->OpacityScale->GetValue());
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetPropID()
+      << "GetProperty"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << vtkClientServerStream::LastResult 
+      << "SetOpacity" << this->OpacityScale->GetValue()
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   if ( this->GetPVRenderView() )
@@ -2638,11 +2747,16 @@ void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
   this->TranslateThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetPropID()
+      << "SetPosition" << x << y << z
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2722,11 +2836,16 @@ void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
   this->ScaleThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx); 
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetScale" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2807,11 +2926,16 @@ void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
   this->OrientationScale[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx);  
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetOrientation" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2891,11 +3015,16 @@ void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
   this->OriginThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx);  
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetOrigin" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.6");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.7");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -97,6 +97,9 @@ vtkPVPart::vtkPVPart()
   this->InstanceCount = instanceCount;
   
   this->ClassNameInformation = vtkPVClassNameInformation::New();
+
+  this->VTKSourceIndex = -1;
+  this->VTKOutputIndex = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -326,6 +329,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   char *className = this->ClassNameInformation->GetVTKClassName();
   if (!strcmp(className, "vtkPolyData"))
     {
+    // Don't add anything if we are only using one processes.
+    // Image can still benifit from its cache so this check
+    // is specific for unstructured data.
+    if (pm->GetNumberOfPartitions() == 1)
+      {
+      return;
+      }  
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
     if (atoi(pm->GetRootResult()) != 1)
@@ -350,6 +360,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     }
   else if (!strcmp(className, "vtkUnstructuredGrid"))
     {
+    // Don't add anything if we are only using one processes.
+    // Image can still benifit from its cache so this check
+    // is specific for unstructured data.
+    if (pm->GetNumberOfPartitions() == 1)
+      {
+      return;
+      }      
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
     if (atoi(pm->GetRootResult()) != 1)
@@ -441,10 +458,6 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
 //  os << indent << "GeometryID: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
 //  os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "ClassNameInformation: " << this->ClassNameInformation << endl;
+  os << indent << "VTKSourceIndex: " << this->VTKSourceIndex << endl;
+  os << indent << "VTKOutputIndex: " << this->VTKOutputIndex << endl;
 }
-
-
-  
-
-
-

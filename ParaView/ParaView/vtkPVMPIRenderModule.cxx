@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.3");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.4");
 
 
 
@@ -175,6 +175,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
     {
     vtkClientServerID tmp;

@@ -244,7 +244,14 @@ public:
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
 
+  // Description:
+  // Set/get the property to use with this widget.  Overridden in subclasses.
   virtual void SetProperty(vtkPVWidgetProperty *) {}
+  virtual vtkPVWidgetProperty* GetProperty() { return NULL; }
+  
+  // Description:
+  // Create the right property for use with this widget.  Overridden in
+  // subclasses.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
   vtkSetMacro(UseWidgetRange, int);
@@ -276,6 +283,7 @@ protected:
 
   vtkPVSource* PVSource;
 
+  int AcceptCalled;
 
   int UseWidgetRange;
   float WidgetRange[2];

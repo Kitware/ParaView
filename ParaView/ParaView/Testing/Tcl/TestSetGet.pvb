@@ -16,6 +16,10 @@ set exceptions {
   vtkIceTRenderManager-GetBufferWriteTime
   vtkIceTRenderManager-GetCompositeTime
   vtkVRMLSource-GetOutput
+  vtkPointsProjectedHull-GetSizeCcwHullX
+  vtkPointsProjectedHull-GetSizeCcwHullY
+  vtkPointsProjectedHull-GetSizeCcwHullZ
+  vtkKWUserInterfaceNotebookManager-GetNotebook
 }
 
 proc TestOne {cname} {

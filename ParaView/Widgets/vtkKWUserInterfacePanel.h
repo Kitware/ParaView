@@ -35,17 +35,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkKWUserInterfacePanel - a user interface panel.
 // .SECTION Description
-// This class is used to abstract the way an interface "panel" can be subdivided
-// into "pages" (i.e. "sections"). It allows specific GUI parts of an application
-// to be encapsulated inside independent panels. Panels are then associated to 
-// a user interface manager (see vtkKWUserInterfaceManager) which is responsible 
-// for grouping them inside a widget and handling user interaction so that
-// panels and their pages can be selected in more or less fancy ways. 
-// If the user interface manager uses a notebook under the hood, then this class
-// is likely to receive a notebook's page when it will request for a page from
-// the manager. If the manager chooses for a flat GUI, then this class is likely
-// to receive a simple frame that will be stacked by the manager on top of
-// other pages.
+// This class is used to abstract the way an interface "panel" can be 
+// subdivided into "pages" (i.e. "sections"). It allows specific GUI parts of
+// an application to be encapsulated inside independent panels. Panels are 
+// then associated to a user interface manager (see vtkKWUserInterfaceManager)
+// which is responsible for grouping them inside a widget and handling user 
+// interaction so that panels and their pages can be selected in more or less
+// fancy ways. If the user interface manager uses a notebook under the hood, 
+// then this class is likely to receive a notebook's page when it will request
+// for a page from the manager. If the manager chooses for a flat GUI, then 
+// this class is likely to receive a simple frame that will be stacked by the
+// manager on top of other pages.
 // This class is not a widget, it can not be mapped, the manager is the
 // place where a concrete widget is set and used as the root of all panels (see
 // vtkKWUserInterfaceNotebookManager for example). What you need to do
@@ -78,9 +78,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the user interface manager. This automatically adds/registers the panel
-  // to the manager. If you want to remove this panel from the manager, set
-  // the manager to NULL (it is done automatically by the destructor).
+  // Set the user interface manager. This automatically adds/registers the 
+  // panel to the manager. If you want to remove this panel from the manager,
+  // set the manager to NULL (it is done automatically by the destructor).
   virtual void SetUserInterfaceManager(vtkKWUserInterfaceManager*);
   vtkGetObjectMacro(UserInterfaceManager, vtkKWUserInterfaceManager);
 
@@ -141,11 +141,13 @@ public:
   // Note that if the panel has not been created at this point, the manager 
   // will call the panel's Create() method automatically, allowing the 
   // creation of the panel to be delayed until it is really needed.
-  // Raise() behaves like Show(), but it will also instruct the manager to bring
-  // up the first page of the panel to the front.
+  // Raise() behaves like Show(), but it will also instruct the manager to 
+  // bring up the first page of the panel to the front.
+  // IsVisible() will check if the pages of this panel are visible/shown.
   // Return 1 on success, 0 on error.
   virtual int Show();
   virtual int Raise();
+  virtual int IsVisible();
 
   // Description:
   // Refresh the interface.

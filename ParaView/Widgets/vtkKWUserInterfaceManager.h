@@ -160,12 +160,14 @@ public:
   // for this panel are shown/hidden.
   // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
+  // IsPanelVisible() checks if the pages of the panel are visible/shown.
   // Note that you should use the panel's own API to show/raise a panel: this
   // will automatically call this method with the proper panel parameter
   // (see vtkKWUserInterfacePanel::Show/Raise()).
   // Return 1 on success, 0 on error.
   virtual int ShowPanel(vtkKWUserInterfacePanel *panel) = 0;
   virtual int HidePanel(vtkKWUserInterfacePanel *panel) = 0;
+  virtual int IsPanelVisible(vtkKWUserInterfacePanel *panel) = 0;
   virtual int RaisePanel(vtkKWUserInterfacePanel *panel) 
     { return this->ShowPanel(panel); };
 

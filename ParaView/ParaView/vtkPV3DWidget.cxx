@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.4");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.5");
 
 //===========================================================================
 //***************************************************************************
@@ -238,9 +238,10 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
 }
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::AcceptInternal(vtkClientServerID)
+void vtkPV3DWidget::AcceptInternal(vtkClientServerID id)
 {
   this->PlaceWidget();
+  this->Superclass::AcceptInternal(id);
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;
 }
@@ -248,6 +249,7 @@ void vtkPV3DWidget::AcceptInternal(vtkClientServerID)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ResetInternal()
 {
+  this->Superclass::ResetInternal();
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;
 }
@@ -392,7 +394,7 @@ void vtkPV3DWidget::Render()
 {
   if ( this->Placed )
     {
-    this->Script("pvRenderWindowInteractor Render");
+    this->GetPVApplication()->GetMainWindow()->GetInteractor()->Render();
     }
 }
 

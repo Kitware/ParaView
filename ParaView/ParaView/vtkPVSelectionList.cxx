@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.34.4.4");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.34.4.5");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -74,7 +74,6 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->OptionWidth = 0;
   
   this->DefaultValue = 0;
-  this->AcceptCalled = 0;
   
   this->Property = NULL;
 }
@@ -221,8 +220,6 @@ void vtkPVSelectionList::AcceptInternal(vtkClientServerID sourceId)
   this->Property->SetVTKSourceID(sourceId);
   
   this->Property->AcceptInternal();
-  
-  this->AcceptCalled = 1;
 }
 
 
@@ -302,6 +299,7 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   
 //  this->Menu->SetButtonText(name);
   this->ModifiedCallback();
+  this->Update();
 }
 
 vtkPVSelectionList* vtkPVSelectionList::ClonePrototype(vtkPVSource* pvSource,
@@ -409,6 +407,12 @@ void vtkPVSelectionList::SetProperty(vtkPVWidgetProperty *prop)
     this->Property->SetIndex(this->DefaultValue);
     delete [] cmd;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVSelectionList::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

@@ -56,8 +56,7 @@ class vtkKWListBox;
 class vtkKWPushButton;
 class vtkKWRange;
 class vtkKWScale;
-
-class vtkContourValues;
+class vtkPVContourWidgetProperty;
 
 class VTK_EXPORT vtkPVValueList : public vtkPVWidget
 {
@@ -78,14 +77,8 @@ public:
   
   // Description:
   // Access to this widget from a script.
-  void AddValueInternal(float val);
   void AddValue(float val);
   void RemoveAllValues();
-
-  // Description:
-  // This virtual method returns the range in which new values
-  // can be added. This method should be overwritten by sub-classes.
-  virtual int GetValueRange(float range[2]) {(void)range;return 0;}
 
   // Description:
   // Button callbacks.
@@ -107,26 +100,26 @@ public:
   // Description:
   // Gets called when the accept button is pressed. The sub-classes
   // should first call this and then do their own thing.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
   // Description:
-  // Update UI from ContourValues object. This is an internal
+  // Update UI from Property object. This is an internal
   // method to be only used by the tracing interface. Use at
   // your own risk.
   void Update();
-
+  
 protected:
   vtkPVValueList();
   ~vtkPVValueList();
 
   static const int MAX_NUMBER_ENTRIES;
 
-  vtkContourValues* ContourValues;
-
+  vtkPVContourWidgetProperty *Property;
+  
   vtkKWLabeledFrame* ContourValuesFrame;
   vtkKWFrame* ContourValuesFrame2;
   vtkKWListBox* ContourValuesList;
@@ -150,6 +143,8 @@ protected:
   vtkKWPushButton* GenerateButton;
 
   vtkKWRange* GenerateRangeWidget;
+
+  virtual int ComputeWidgetRange() {return 0;}
   
   vtkPVValueList(const vtkPVValueList&); // Not implemented
   void operator=(const vtkPVValueList&); // Not implemented

@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.5");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.6");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -548,8 +548,6 @@ void vtkPVCalculatorWidget::UpdateFunction(const char* newSymbol)
 
 void vtkPVCalculatorWidget::ClearFunction()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   this->FunctionLabel->SetLabel("");
 
   this->ClearAllVariables();
@@ -565,8 +563,7 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   char menuCommand[256];
   char menuEntry[256];
   char* name;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-    
+
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionLabel->SetLabel("");
@@ -620,8 +617,6 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
                                               const char* arrayName,
                                               int component)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   this->UpdateFunction(variableName);
 
   char** arrayNames = new char *[this->NumberOfScalarVariables];
@@ -690,8 +685,6 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
 void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
   this->UpdateFunction(variableName);
 
   char** arrayNames = new char *[this->NumberOfVectorVariables];
@@ -780,8 +773,6 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // Format a command to move value from widget to vtkObjects (on all
   // processes).  The VTK objects do not yet have to have the same Tcl
   // name!
@@ -1017,6 +1008,12 @@ void vtkPVCalculatorWidget::ClearAllVariables()
 void vtkPVCalculatorWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVCalculatorWidget::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

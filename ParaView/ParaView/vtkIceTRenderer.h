@@ -19,11 +19,7 @@
 #ifndef __vtkIceTRenderer_h
 #define __vtkIceTRenderer_h
 
-//#include "vtksnlParallelWin32Header.h"
-
-#include <vtkOpenGLRenderer.h>
-
-#include <GL/ice-t.h>
+#include "vtkOpenGLRenderer.h"
 
 class VTK_EXPORT vtkIceTRenderer : public vtkOpenGLRenderer
 {
@@ -64,6 +60,9 @@ protected:
 
   int ComposeNextFrame;
   int InIceTRender;
+
+  vtkIceTRenderer(const vtkIceTRenderer&); // Not implemented
+  void operator=(const vtkIceTRenderer&); // Not implemented
 };
 
 #endif //__vtkIceTRenderer_h

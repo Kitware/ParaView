@@ -95,7 +95,13 @@ public:
   // This method resets the widget values from the VTK filter.
   virtual void ResetInternal();
 
+  // Description:
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
@@ -112,8 +118,6 @@ protected:
 
   // Called to inactivate widget (after accept is called).
   void Inactivate();
-
-  int AcceptCalled;
 
   vtkPVScalarListWidgetProperty *Property;
   

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.5");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.6");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -286,12 +286,17 @@ void vtkPVScale::ResetInternal()
     {
     this->SetValue(this->Property->GetScalar(0));
     }
-  if ( this->ObjectTclName && this->RangeSourceVariable )
+  if ( this->ObjectID.ID != 0 && this->RangeSourceVariable )
     {
-    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
-                  this->ObjectTclName, this->RangeSourceVariable);
-    this->Script("eval %s SetRange %s", this->Scale->GetTclName(),
-                  this->GetPVApplication()->GetProcessModule()->GetRootResult());                  
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    ostrstream str;
+    str << "Get" << this->RangeSourceVariable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
+                    << str.str() << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    float range = 0.0;
+    pm->GetLastServerResult().GetArgument(0,0, &range);
+    this->Script("eval %s SetRange %f", this->Scale->GetTclName(), range);
     }
 
   this->ModifiedFlag = 0;
@@ -432,6 +437,12 @@ int vtkPVScale::RoundValue(float val)
 void vtkPVScale::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVScale::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.6");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.7");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -490,7 +490,7 @@ void vtkPVLineWidget::ResetInternal()
                   this->LastAcceptedPoint1[2]);
   this->SetPoint2(this->LastAcceptedPoint2[0], this->LastAcceptedPoint2[1],
                   this->LastAcceptedPoint2[2]);
-  this->SetResolution(this->LastAcceptedResolution);
+  this->SetResolution(static_cast<int>(this->LastAcceptedResolution));
 
   this->Superclass::ResetInternal();
 }

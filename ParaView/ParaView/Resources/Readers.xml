@@ -119,7 +119,7 @@
           root_name="Ensight" 
           module_type="Reader"
           extensions=".case" file_description="EnSight Files">
-    <Source class="vtkGenericEnSightReader"/>
+    <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectionList label="Byte order" trace_name="ByteOrder"
                    variable="ByteOrder"
                    help="Select the byte order of the binary file"
@@ -128,7 +128,7 @@
       <Item name="little endian" value="1"/>
     </SelectionList>
     
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet" set_command="SetTimeValue"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
@@ -239,18 +239,15 @@
                  help="Set the number of ghost levels to read."
                  default_value="1"/>
   </Module>
-<!--
   <Module name="ensightMS" class="vtkPVEnSightReaderModule"
           root_name="EnsightMS" 
           module_type="Reader"
           extensions=".sos" file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet" set_command="SetTimeValue"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
--->
-
 <Module name="ImageReader" menu_name="Raw File Reader" root_name="ImageRead" 
         module_type="Reader" class="vtkPVRawReaderModule"
         extensions=".raw" file_description="Raw (binary) Files"
@@ -317,7 +314,7 @@
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
   <VectorEntry label="Stride" trace_name="stride" variable="Stride" type="int"
-               length="3"
+               length="3" default_value="1 1 1"
                help="Set the number of steps to skip between each point (structured data only)."/>
   <XDMFParameters trace_name="xdmf_parameters" label="Parameters" />
               

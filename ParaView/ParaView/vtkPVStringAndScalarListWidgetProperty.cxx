@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.3");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -69,24 +69,26 @@ vtkPVStringAndScalarListWidgetProperty::~vtkPVStringAndScalarListWidgetProperty(
 void vtkPVStringAndScalarListWidgetProperty::AcceptInternal()
 {
   int i, j, scalarCount = 0, stringCount = 0;
-  vtkPVProcessModule* pm = this->Widget->GetPVApplication()->GetProcessModule();
+  vtkClientServerStream& stream = 
+    this->Widget->GetPVApplication()->GetProcessModule()->GetStream();
+  
   for (i = 0; i < this->NumberOfCommands; i++)
     {
-    pm->GetStream() 
-      << vtkClientServerStream::Invoke << this->VTKSourceID << this->VTKCommands[i];
+    stream << vtkClientServerStream::Invoke
+           << this->VTKSourceID << " " << this->VTKCommands[i];
     for (j = 0; j < this->NumberOfStringsPerCommand[i]; j++)
       {
-      pm->GetStream() << this->Strings->GetString(stringCount);
+      stream << this->Strings->GetString(stringCount);
       stringCount++;
       }
     for (j = 0; j < this->NumberOfScalarsPerCommand[i]; j++)
       {
-      pm->GetStream() << this->Scalars[scalarCount];
+      stream << this->Scalars[scalarCount];
       scalarCount++;
       }
-    pm->GetStream() << vtkClientServerStream::End;
+    stream << vtkClientServerStream::End;
     }
-  pm->SendStreamToServer();
+  this->Widget->GetPVApplication()->GetProcessModule()->SendStreamToServer();
 }
 
 void vtkPVStringAndScalarListWidgetProperty::SetVTKCommands(
@@ -127,6 +129,11 @@ void vtkPVStringAndScalarListWidgetProperty::SetStrings(int num,
 void vtkPVStringAndScalarListWidgetProperty::AddString(char *string)
 {
   this->Strings->AddString(string);
+}
+
+void vtkPVStringAndScalarListWidgetProperty::SetString(int idx, char *string)
+{
+  this->Strings->SetString(idx, string);
 }
 
 const char* vtkPVStringAndScalarListWidgetProperty::GetString(int idx)

@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19.2.4");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -184,6 +184,19 @@ const void vtkPVAnimationInterfaceEntry::CreateLabel(int idx)
   }
   */
   this->SetLabel(label.c_str());
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterfaceEntry::IsActionValid(int has_source)
+{
+  if ( has_source )
+    {
+    if ( this->PVSource )
+      {
+      return 1;
+      }
+    }
+  return ( strcmp(this->GetMethodMenuButton()->GetButtonText(), "None") != 0 );
 }
 
 //-----------------------------------------------------------------------------

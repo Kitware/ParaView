@@ -101,7 +101,13 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
@@ -121,7 +127,6 @@ protected:
   char* DefaultValue;
   vtkSetStringMacro(DefaultValue);
   vtkGetStringMacro(DefaultValue);
-  int AcceptCalled;
 
   vtkPVStringWidgetProperty *Property;
   

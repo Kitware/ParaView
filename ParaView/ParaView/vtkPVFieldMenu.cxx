@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.4");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.5");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -448,6 +448,11 @@ void vtkPVFieldMenu::SetProperty(vtkPVWidgetProperty *prop)
     {
     this->Property->SetVTKCommand("SetAttributeMode");
     }
+}
+
+vtkPVWidgetProperty* vtkPVFieldMenu::GetProperty()
+{
+  return this->Property;
 }
 
 vtkPVWidgetProperty* vtkPVFieldMenu::CreateAppropriateProperty()

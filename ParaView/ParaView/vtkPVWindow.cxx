@@ -144,7 +144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.12");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.13");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1483,8 +1483,6 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if ( action == 0 )
     {
     if (button == 1)
@@ -1819,6 +1817,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
   error << "Could not find an appropriate reader for file "
         << openFileName << ". Would you like to manually select "
         << "the reader for this file?" << ends;
+  error.rdbuf()->freeze(0);     
   if (this->UseMessageDialog)
     {
     if ( vtkKWMessageDialog::PopupOkCancel(this->Application, this,
@@ -1851,6 +1850,8 @@ int vtkPVWindow::Open(char *openFileName, int store)
         str << "OpenCustom \"" << reader->GetModuleName() << "\"" <<ends;
         this->AddRecentFile(openFileName, this, str.str());
         str.rdbuf()->freeze(0);
+        dialog->Delete();
+        return VTK_OK;
         }
       // Cleanup
       dialog->Delete();
@@ -1860,7 +1861,6 @@ int vtkPVWindow::Open(char *openFileName, int store)
     {
     vtkErrorMacro(<<error.str());
     }
-  error.rdbuf()->freeze(0);     
 
   return VTK_ERROR;
 }
@@ -2398,7 +2398,8 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   // We may want different questions if there is no animation.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && script[0] && this->AnimationInterface->GetScriptAvailable())
+  if (script && script[0] && this->AnimationInterface->GetScriptAvailable() && 
+    this->AnimationInterface->IsAnimationValid())
     {
     animationFlag = 1;
     }

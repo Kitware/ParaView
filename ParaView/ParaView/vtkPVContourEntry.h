@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVValueList.h"
 
 class vtkPVArrayMenu;
-class vtkPVContourWidgetProperty;
+class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
 {
@@ -66,17 +66,12 @@ public:
 
   // Description:
   // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
 
-  // Description:
-  // This virtual method returns the scalar range of the selected
-  // array for the input.
-  virtual int GetValueRange(float range[2]);
-  
   // Description:
   // ArrayMenu is used to obtain the scalar range (it contains an array
   // information object)
@@ -84,12 +79,18 @@ public:
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
   // Description:
-  // Set the property to use with this widget.
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
   
   // Description:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
+  // Description:
+  // Get the VTK commands.
+  vtkSetStringMacro(SetNumberCommand);
+  vtkSetStringMacro(SetContourCommand);
   
 protected:
   vtkPVContourEntry();
@@ -99,7 +100,11 @@ protected:
   
   int AcceptCalled;
   void UpdateProperty();
-  vtkPVContourWidgetProperty *Property;
+
+  char *SetNumberCommand;
+  char *SetContourCommand;
+  
+  virtual int ComputeWidgetRange();
   
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented

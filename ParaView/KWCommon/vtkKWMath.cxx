@@ -35,10 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWMath.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.4.4.1");
+vtkCxxRevisionMacro(vtkKWMath, "1.4.4.2");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
@@ -115,6 +117,21 @@ int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, double range[2])
     return 0;
     }
 
+  // for performance on simple types use the fast cached versions
+  // LONG and INT are not in this list due to precision issues
+  // that float cannot represent
+  if (array->GetDataType() == VTK_UNSIGNED_CHAR ||
+      array->GetDataType() == VTK_CHAR ||
+      array->GetDataType() == VTK_UNSIGNED_SHORT ||
+      array->GetDataType() == VTK_SHORT ||
+      array->GetDataType() == VTK_FLOAT)
+    {
+    float tmpf[2];
+    array->GetRange(tmpf, comp);
+    range[0] = tmpf[0];
+    range[1] = tmpf[1];
+    } 
+  
   switch (array->GetDataType())
     {
     vtkTemplateMacro4(vtkKWMathGetScalarRange,
@@ -223,5 +240,108 @@ int vtkKWMath::GetScalarTypeFittingRange(
     }
 
   return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMath::FixTransferFunctionPointsOutOfRange(
+  vtkPiecewiseFunction *func, float range[2])
+{
+  if (!func || !range)
+    {
+    return 0;
+    }
+
+  float *function_range = func->GetRange();
+  
+  // Make sure we have points at each end of the range
+
+  if (function_range[0] < range[0])
+    {
+    func->AddPoint(range[0], func->GetValue(range[0]));
+    }
+  else
+    {
+    func->AddPoint(range[0], func->GetValue(function_range[0]));
+    }
+
+  if (function_range[1] > range[1])
+    {
+    func->AddPoint(range[1], func->GetValue(range[1]));
+    }
+  else
+    {
+    func->AddPoint(range[1], func->GetValue(function_range[1]));
+    }
+
+  // Remove all points out-of-range
+
+  int func_size = func->GetSize();
+  float *func_ptr = func->GetDataPointer();
+  
+  int i;
+  for (i = func_size - 1; i >= 0; i--)
+    {
+    float x = func_ptr[i * 2];
+    if (x < range[0] || x > range[1])
+      {
+      func->RemovePoint(x);
+      }
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMath::FixTransferFunctionPointsOutOfRange(
+  vtkColorTransferFunction *func, float range[2])
+{
+  if (!func || !range)
+    {
+    return 0;
+    }
+
+  float *function_range = func->GetRange();
+  
+  // Make sure we have points at each end of the range
+
+  float rgb[3];
+  if (function_range[0] < range[0])
+    {
+    func->GetColor(range[0], rgb);
+    func->AddRGBPoint(range[0], rgb[0], rgb[1], rgb[2]);
+    }
+  else
+    {
+    func->GetColor(function_range[0], rgb);
+    func->AddRGBPoint(range[0], rgb[0], rgb[1], rgb[2]);
+    }
+
+  if (function_range[1] > range[1])
+    {
+    func->GetColor(range[1], rgb);
+    func->AddRGBPoint(range[1], rgb[0], rgb[1], rgb[2]);
+    }
+  else
+    {
+    func->GetColor(function_range[1], rgb);
+    func->AddRGBPoint(range[1], rgb[0], rgb[1], rgb[2]);
+    }
+
+  // Remove all points out-of-range
+
+  int func_size = func->GetSize();
+  float *func_ptr = func->GetDataPointer();
+  
+  int i;
+  for (i = func_size - 1; i >= 0; i--)
+    {
+    float x = func_ptr[i * 4];
+    if (x < range[0] || x > range[1])
+      {
+      func->RemovePoint(x);
+      }
+    }
+
+  return 1;
 }
 

@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.6");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.7");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -372,7 +372,6 @@ vtkPVApplication::vtkPVApplication()
   // GUI style & consistency
 
   vtkKWLabeledFrame::AllowShowHideOn();
-  vtkKWLabeledFrame::SetLabelCaseToLowercaseFirst();
   vtkKWLabeledFrame::BoldLabelOn();
   
   // The following is necessary to make sure that the tcl object

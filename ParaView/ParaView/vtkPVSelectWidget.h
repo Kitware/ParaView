@@ -168,7 +168,12 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Set the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
@@ -194,7 +199,6 @@ protected:
   int UseWidgetCommand;
 
   vtkPVStringWidgetProperty *Property;
-  int AcceptCalled;
   
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

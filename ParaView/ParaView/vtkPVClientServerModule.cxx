@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.7");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.8");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -977,9 +977,18 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
   // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript(
-    "[$Application GetProcessModule] GatherInformationInternal %s %s",
-    info->GetClassName(), objectTclName);
+  if (!info->GetRootOnly())
+    {
+    this->ServerScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName);
+    }
+  else
+    {
+    this->RootScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName);
+    }
   this->GatherInformationInternal(NULL, NULL);
   this->TemporaryInformation = NULL;
 }
@@ -1025,7 +1034,7 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
   tempInfo1->CopyFromObject(object);
 
   // Nodes other than 0 just send their information.
-  if (myId != 0)
+  if (myId != 0 && !tempInfo1->GetRootOnly())
     {
     tempInfo1->CopyToStream(&css);
     size_t length;
@@ -1039,27 +1048,32 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
     return;
     }
 
-  // Node 0.  Create another temporary information object in which to
-  // receive information from other nodes.
-  o = vtkInstantiator::CreateInstance(infoClassName);
-  vtkPVInformation* tempInfo2 = vtkPVInformation::SafeDownCast(o);
-  o = 0;
-
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int idx;
-  for (idx = 1; idx < numProcs; ++idx)
+ // Node 0.
+  tempInfo1->CopyFromObject(object);
+  if (!tempInfo1->GetRootOnly())
     {
-    int length;
-    this->Controller->Receive(&length, 1, idx, 498798);
-    unsigned char* data = new unsigned char[length];
-    this->Controller->Receive(data, length, idx, 498799);
-    css.SetData(data, length);
-    tempInfo2->CopyFromStream(&css);
-    tempInfo1->AddInformation(tempInfo2);
-    delete [] data;
+    // Create another temporary information object in which to
+    // receive information from other nodes.
+    o = vtkInstantiator::CreateInstance(infoClassName);
+    vtkPVInformation* tempInfo2 = vtkPVInformation::SafeDownCast(o);
+    o = NULL;
+    
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int idx;
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      int length;
+      this->Controller->Receive(&length, 1, idx, 498798);
+      unsigned char* data = new unsigned char[length];
+      this->Controller->Receive(data, length, idx, 498799);
+      css.SetData(data, length);
+      tempInfo2->CopyFromStream(&css);
+      tempInfo1->AddInformation(tempInfo2);
+      delete [] data;
+      }
+    tempInfo2->Delete();
     }
-  tempInfo2->Delete();
-  tempInfo2 = 0;
+
 
   // Send final information to client over socket connection.
   size_t length;

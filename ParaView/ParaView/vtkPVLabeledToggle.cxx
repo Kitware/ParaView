@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.4");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.5");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -60,7 +60,6 @@ vtkPVLabeledToggle::vtkPVLabeledToggle()
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
-  this->AcceptCalled = 0;
   this->DefaultValue = 0;
   this->Property = NULL;
 }
@@ -195,8 +194,6 @@ void vtkPVLabeledToggle::AcceptInternal(vtkClientServerID sourceID)
   this->Property->SetIndex(this->GetState());
   this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
-  
-  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -307,6 +304,12 @@ void vtkPVLabeledToggle::SetProperty(vtkPVWidgetProperty *prop)
     this->Property->SetIndex(this->DefaultValue);
     delete [] cmd;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVLabeledToggle::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

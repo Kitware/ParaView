@@ -122,7 +122,9 @@ public:
   vtkProperty *GetProperty() { return this->Property;}
   vtkProp *GetProp() { return this->Prop;}
   vtkGetMacro(PropID, vtkClientServerID);
-//  vtkClientServerID GetPropID() { return this->PropID;}
+  vtkGetMacro(PropertyID, vtkClientServerID);
+  vtkGetMacro(MapperID, vtkClientServerID);
+
 
   // Description:
   // Not referenced counted.  I might get rid of this reference later.

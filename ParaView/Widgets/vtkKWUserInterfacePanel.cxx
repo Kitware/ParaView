@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.7");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.7.4.1");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -213,6 +213,19 @@ int vtkKWUserInterfacePanel::Show()
     }
 
   return this->UserInterfaceManager->ShowPanel(this);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfacePanel::IsVisible()
+{
+  if (this->UserInterfaceManager == NULL)
+    {
+    vtkErrorMacro("The UserInterfaceManager manager needs to be set before "
+                  "pages can be checked for visibility.");
+    return 0;
+    }
+
+  return this->UserInterfaceManager->IsPanelVisible(this);
 }
 
 //----------------------------------------------------------------------------

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.4.2.1");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.4.2.2");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -78,6 +78,7 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
   this->ScalarBarWidget         = NULL;
   this->VolumeProperty          = NULL;
   this->NumberOfComponents      = VTK_MAX_VRCOMP;
+  this->ShowLabelFormat         = 1;
 
   // GUI
 
@@ -272,6 +273,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->TitleEntry->SetParent(this->TitleFrame);
   this->TitleEntry->Create(app, 0);
   this->TitleEntry->SetLabel("Title:");
+  this->TitleEntry->GetEntry()->SetWidth(20);
   this->TitleEntry->GetEntry()->BindCommand(this, "ScalarBarTitleCallback");
 
   this->TitleEntry->SetBalloonHelpString(
@@ -341,15 +343,12 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->LabelFormatEntry->SetParent(this->LabelFrame);
   this->LabelFormatEntry->Create(app, 0);
   this->LabelFormatEntry->SetLabel("Label format:");
+  this->LabelFormatEntry->GetEntry()->SetWidth(20);
   this->LabelFormatEntry->GetEntry()->BindCommand(
     this, "ScalarBarLabelFormatCallback");
 
   this->LabelFormatEntry->SetBalloonHelpString(
     "Set the scalar bar label format.");
-
-  this->Script("pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
-               this->LabelFormatEntry->GetWidgetName(),
-               (!this->PopupMode ? "left" : "top"));
 
   // --------------------------------------------------------------
   // Scalar Bar label text property : popup button if needed
@@ -367,9 +366,6 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     this->Script("%s configure -bd 2 -relief groove", 
                  this->LabelTextPropertyPopupButton->GetPopupButton()
                  ->GetPopupFrame()->GetWidgetName());
-
-    this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
-                 this->LabelTextPropertyPopupButton->GetWidgetName());
 
     this->LabelTextPropertyWidget->SetParent(
       this->LabelTextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
@@ -390,10 +386,6 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     "Label text properties:");
   this->LabelTextPropertyWidget->SetChangedCommand(
     this, "LabelTextPropertyCallback");
-
-  this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
-               this->LabelTextPropertyWidget->GetWidgetName(),
-               this->LabelTextPropertyWidget->GetLongFormat() ? 0 : 2);
 
   // --------------------------------------------------------------
   // Maximum number of colors
@@ -425,9 +417,6 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->MaximumNumberOfColorsThumbWheel->SetEntryCommand(
     this, "MaximumNumberOfColorsEndCallback");
 
-  this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill x", 
-               this->MaximumNumberOfColorsThumbWheel->GetWidgetName());
-  
   // --------------------------------------------------------------
   // Number of labels
 
@@ -451,15 +440,74 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->NumberOfLabelsScale->SetEntryCommand(
     this, "NumberOfLabelsEndCallback");
 
-  this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill x", 
-               this->NumberOfLabelsScale->GetWidgetName());
-  
   foo->Delete();
 
   // --------------------------------------------------------------
   // Update the GUI according to the Ivar value (i.e. the corner prop, etc.)
+  
+  this->PackLabelFrameChildren();
 
   this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScalarBarAnnotation::PackLabelFrameChildren()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->LabelFrame->UnpackChildren();
+  
+  if (this->LabelFormatEntry->IsCreated() && this->ShowLabelFormat)
+    {
+    this->Script(
+      "pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
+      this->LabelFormatEntry->GetWidgetName(),
+      (!this->PopupMode ? "left" : "top"));
+    }
+
+  if (this->PopupTextProperty && 
+      !this->PopupMode && 
+      this->LabelTextPropertyPopupButton->IsCreated())
+    {
+    this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
+                 this->LabelTextPropertyPopupButton->GetWidgetName());
+    }
+
+  if (this->LabelTextPropertyWidget->IsCreated())
+    {
+    this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
+                 this->LabelTextPropertyWidget->GetWidgetName(),
+                 this->LabelTextPropertyWidget->GetLongFormat() ? 0 : 2);
+    }
+
+  if (this->MaximumNumberOfColorsThumbWheel->IsCreated())
+    {
+    this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill x", 
+                 this->MaximumNumberOfColorsThumbWheel->GetWidgetName());
+    }
+
+  if (this->NumberOfLabelsScale->IsCreated())
+    {
+    this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill x", 
+                 this->NumberOfLabelsScale->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScalarBarAnnotation::SetShowLabelFormat(int arg)
+{
+  if (this->ShowLabelFormat == arg)
+    {
+    return;
+    }
+
+  this->ShowLabelFormat = arg;
+  this->Modified();
+
+  this->PackLabelFrameChildren();
 }
 
 //----------------------------------------------------------------------------
@@ -891,4 +939,5 @@ void vtkKWScalarBarAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "ShowLabelFormat: " << this->ShowLabelFormat << endl;
 }

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.3.2.1");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.3.2.2");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -195,6 +195,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
   this->TextEntry->SetParent(this->TextFrame);
   this->TextEntry->Create(app, 0);
   this->TextEntry->SetLabel("Header:");
+  this->TextEntry->GetEntry()->SetWidth(20);
   this->TextEntry->GetEntry()->BindCommand(this, "HeaderTextCallback");
 
   this->TextEntry->SetBalloonHelpString(

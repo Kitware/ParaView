@@ -40,6 +40,7 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourWidgetProperty.cxx
+  vtkPVCutEntry.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
@@ -58,6 +59,7 @@ SET( ParaView_SRCS
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
+  vtkPVFileEntryProperty.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx
@@ -98,6 +100,7 @@ SET( ParaView_SRCS
   vtkPVNavigationWindow.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVObjectWidget.cxx
+  vtkPVOrientScaleWidget.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
   vtkPVPLOT3DReaderModule.cxx
@@ -145,6 +148,7 @@ SET( ParaView_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx 
+  vtkPVValueList.cxx
   vtkPVVectorEntry.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx

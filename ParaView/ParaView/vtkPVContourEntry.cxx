@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContourEntry.h"
 
 #include "vtkContourValues.h"
+#include "vtkKWListBox.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
@@ -54,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.8");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.9");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -70,22 +71,22 @@ vtkPVContourEntry::vtkPVContourEntry()
 
   this->SuppressReset = 1;
   
-  this->AcceptCalled = 0;
-  this->Property = NULL;
-  
   this->ArrayMenu = NULL;
+  
+  this->SetNumberCommand = NULL;
+  this->SetContourCommand = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
-  this->SetPVSource(NULL);
-  this->SetProperty(NULL);
   this->SetArrayMenu(NULL);
+  this->SetSetNumberCommand(NULL);
+  this->SetSetContourCommand(NULL);
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVContourEntry::GetValueRange(float range[2])
+int vtkPVContourEntry::ComputeWidgetRange()
 {
   if (!this->ArrayMenu)
     {
@@ -99,24 +100,25 @@ int vtkPVContourEntry::GetValueRange(float range[2])
     return 0;
     }
 
-  ai->GetComponentRange(0, range);
+  ai->GetComponentRange(0, this->WidgetRange);
+  this->UseWidgetRange = 1;
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   int i;
   int numContours;
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     return;
     }
 
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->Superclass::AcceptInternal(sourceID);
 
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = this->ContourValuesList->GetNumberOfItems();
 
   char **cmds = new char*[numContours+1];
   int *numScalars = new int[numContours+1];
@@ -124,17 +126,17 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
   this->UpdateProperty();
   
   cmds[0] = new char[20];
-  sprintf(cmds[0], "SetNumberOfContours");
+  sprintf(cmds[0], this->SetNumberCommand);
   numScalars[0] = 1;
   
   for (i = 0; i < numContours; i++)
     {
     cmds[i+1] = new char[9];
-    sprintf(cmds[i+1], "SetValue");
+    sprintf(cmds[i+1], this->SetContourCommand);
     numScalars[i+1] = 2;
     }
   
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetVTKCommands(numContours+1, cmds, numScalars);
   this->Property->AcceptInternal();
   
@@ -144,8 +146,6 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
     }
   delete [] cmds;
   delete [] numScalars;
-  
-  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,11 +156,11 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
   float value;
   int numContours;
 
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
 
   for (i = 0; i < numContours; i++)
     {
-    value = this->ContourValues->GetValue(i);
+    value = this->Property->GetScalar(2*(i+1));
     *file << "\t";
     *file << sourceTclName << " SetValue " 
           << i << " " << value << endl;
@@ -186,12 +186,11 @@ void vtkPVContourEntry::ResetInternal()
   
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
-  this->ContourValues->SetNumberOfContours(0);
+  this->ContourValuesList->DeleteAll();
   for (i = 0; i < numContours; i++)
     {
-    this->AddValueInternal(scalars[2*(i+1)]);
+    this->AddValue(scalars[2*(i+1)]);
     }
-  this->Update();
 
   // Since the widget now matches the fitler, it is no longer modified.
   this->ModifiedFlag = 0;
@@ -234,6 +233,8 @@ void vtkPVContourEntry::CopyProperties(
       pvce->SetArrayMenu(am);
       am->Delete();
       }
+    pvce->SetSetNumberCommand(this->SetNumberCommand);
+    pvce->SetSetContourCommand(this->SetContourCommand);
     }
   else 
     {
@@ -269,6 +270,9 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetArrayMenu(amw);
     amw->Delete();  
     }
+
+  this->SetSetNumberCommand(element->GetAttribute("set_number_command"));
+  this->SetSetContourCommand(element->GetAttribute("set_contour_command"));
   
   return 1;
 }
@@ -276,7 +280,7 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::UpdateProperty()
 {
-  int numContours = this->ContourValues->GetNumberOfContours();
+  int numContours = this->ContourValuesList->GetNumberOfItems();
   float *scalars = new float[2*numContours+1];
   scalars[0] = numContours;
   int i;
@@ -284,7 +288,7 @@ void vtkPVContourEntry::UpdateProperty()
   for (i = 0; i < numContours; i++)
     {
     scalars[2*i+1] = i;
-    scalars[2*(i+1)] = this->ContourValues->GetValue(i);
+    scalars[2*(i+1)] = atof(this->ContourValuesList->GetItem(i));
     }
   this->Property->SetScalars(2*numContours+1, scalars);
   delete [] scalars;
@@ -294,6 +298,12 @@ void vtkPVContourEntry::UpdateProperty()
 void vtkPVContourEntry::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVContourWidgetProperty::SafeDownCast(prop);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVContourEntry::GetProperty()
+{
+  return this->Property;
 }
 
 //-----------------------------------------------------------------------------
@@ -307,4 +317,8 @@ void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
+  os << indent << "SetContourCommand: "
+     << (this->SetContourCommand ? this->SetContourCommand : "(none)") << endl;
+  os << indent << "SetNumberCommand: "
+     << (this->SetNumberCommand ? this->SetNumberCommand : "(none)") << endl;
 }

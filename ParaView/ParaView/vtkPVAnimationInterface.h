@@ -184,6 +184,10 @@ public:
   void SetCacheGeometry(int flag);
 
   // Description:
+  // This method returns 1 when there is at least one valid action.
+  int IsAnimationValid();
+
+  // Description:
   // Add an empty source item
   vtkPVAnimationInterfaceEntry* AddEmptySourceItem();
   void UpdateEntries();

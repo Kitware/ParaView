@@ -59,11 +59,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // This virtual method returns the scalar range of the selected
-  // array for the input.
-  virtual int GetValueRange(float range[2]);
-
-  // Description:
   // This input menu supplies the data set.
   virtual void SetInputMenu(vtkPVInputMenu*);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
@@ -72,6 +67,8 @@ protected:
   vtkPVCutEntry();
   ~vtkPVCutEntry();
   
+  virtual int ComputeWidgetRange();
+
   vtkPVCutEntry(const vtkPVCutEntry&); // Not implemented
   void operator=(const vtkPVCutEntry&); // Not implemented
 

@@ -53,9 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVFileEntryProperty.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
-#include "vtkPVStringWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.6");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.7");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -73,7 +73,6 @@ vtkPVFileEntry::vtkPVFileEntry()
   //this->Entry->PullDownOn();
   this->BrowseButton = vtkKWPushButton::New();
   this->Extension = NULL;
-  this->SuppressReset = 1;
   this->InSetValue = 0;
 
   this->TimestepFrame = vtkKWFrame::New();
@@ -244,7 +243,8 @@ void vtkPVFileEntry::EntryChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
-  if ( ts < this->Range[0] || ts > this->Range[1] )
+  if ( ts < this->Range[0] || ts > this->Range[1] ||
+       (this->Range[0] == 0 && this->Range[1] == 0))
     {
     return;
     }
@@ -579,14 +579,13 @@ void vtkPVFileEntry::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   const char* fname = this->Entry->GetValue();
   char *cmd = new char[strlen(this->VariableName)+4];
   sprintf(cmd, "Set%s", this->VariableName);
   
   this->Property->SetString(fname);
   this->Property->SetVTKSourceID(sourceID);
+  this->Property->SetTimeStep(this->TimeStep);
   this->Property->SetVTKCommand(cmd);
   
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
@@ -599,6 +598,13 @@ void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
       }
     }
 
+  if (this->Range[1] - this->Range[1] > 0)
+    {
+    this->WidgetRange[0] = this->Range[0];
+    this->WidgetRange[1] = this->Range[1];
+    this->UseWidgetRange = 1;
+    }
+  
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
@@ -608,9 +614,8 @@ void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::ResetInternal()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->SetValue(this->Property->GetString());
+  this->SetTimeStep(this->Property->GetTimeStep());
 
   this->ModifiedFlag = 0;
 }
@@ -716,37 +721,24 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[5000];
-
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
       this->GetTclName(), ai->GetTclName());
     }
 
-  sprintf(script, "%s SetFileName [ lindex $%s_files [expr round($pvTime)-%d] ]",
-    this->GetPVSource()->GetVTKSourceTclName(),
-    this->GetPVSource()->GetVTKSourceTclName(),
-    this->Range[0]);
-  ai->SetLabelAndScript(this->GetTraceName(), script);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(this->Range[0]);
-
-  //int ts = static_cast<int>(this->Timestep->GetValue());
-  //ai->SetCurrentTime(ts);
   ai->SetTimeEnd(this->Range[1]);
   ai->SetTypeToInt();
-  //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
-  sprintf(script, "AnimationMenuCallback $kw(%s)", 
-    ai->GetTclName());
-  ai->SetSaveStateScript(script);
-  ai->SetSaveStateObject(this);
   ai->Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::SetProperty(vtkPVWidgetProperty *prop)
 {
-  this->Property = vtkPVStringWidgetProperty::SafeDownCast(prop);
+  this->Property = vtkPVFileEntryProperty::SafeDownCast(prop);
   if (this->Property)
     {
     char *cmd = new char[strlen(this->VariableName)+4];
@@ -756,9 +748,15 @@ void vtkPVFileEntry::SetProperty(vtkPVWidgetProperty *prop)
 }
 
 //----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVFileEntry::GetProperty()
+{
+  return this->Property;
+}
+
+//----------------------------------------------------------------------------
 vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
 {
-  return vtkPVStringWidgetProperty::New();
+  return vtkPVFileEntryProperty::New();
 }
 
 //----------------------------------------------------------------------------

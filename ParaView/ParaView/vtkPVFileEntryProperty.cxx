@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.2.2.1");
 
 vtkPVFileEntryProperty::vtkPVFileEntryProperty()
 {

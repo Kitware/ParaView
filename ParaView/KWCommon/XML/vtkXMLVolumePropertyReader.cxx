@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyReader.h"
 
 #include "vtkColorTransferFunction.h"
+#include "vtkImageData.h"
+#include "vtkKWMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
@@ -45,12 +47,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.7");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.7.2.1");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
 {
   return "VolumeProperty";
+}
+
+//----------------------------------------------------------------------------
+vtkXMLVolumePropertyReader::vtkXMLVolumePropertyReader()
+{
+  this->ImageData = NULL;
+  this->CheckScalarOpacityUnitDistance = 0;
+  this->KeepTransferFunctionPointsRange = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkXMLVolumePropertyReader::~vtkXMLVolumePropertyReader()
+{
+  this->SetImageData(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLVolumePropertyReader::SetImageData(vtkImageData *data)
+{
+  if (this->ImageData == data)
+    {
+    return;
+    }
+
+  this->ImageData = data;
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -81,6 +110,13 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
   if (elem->GetScalarAttribute("IndependentComponents", ival))
     {
     obj->SetIndependentComponents(ival);
+    }
+
+  float avg_spacing = 0.0;
+  if (this->ImageData)
+    {
+    float *spacing = this->ImageData->GetSpacing();
+    avg_spacing = (spacing[0] + spacing[1] + spacing[2]) / 3.0;
     }
 
   // Iterate over all components
@@ -145,7 +181,12 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
 
     if (comp_elem->GetScalarAttribute("ScalarOpacityUnitDistance", fval))
       {
-      obj->SetScalarOpacityUnitDistance(c_idx, fval);
+      if (!(this->CheckScalarOpacityUnitDistance &&
+            this->ImageData &&
+            (fval < (avg_spacing / 10.0) || fval > (avg_spacing * 10.0))))
+        {
+        obj->SetScalarOpacityUnitDistance(c_idx, fval);
+        }
       }
 
     // Gray or Color Transfer Function
@@ -158,10 +199,18 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *gtf = obj->GetGrayTransferFunction(c_idx);
       if (gtf)
         {
+        float function_range[2];
+        function_range[0] = gtf->GetRange()[0];
+        function_range[1] = gtf->GetRange()[1];
+        
         xmlpfr->SetObject(gtf);
         xmlpfr->ParseInNestedElement(
           comp_elem,
           vtkXMLVolumePropertyWriter::GetGrayTransferFunctionElementName());
+        if (this->KeepTransferFunctionPointsRange)
+          {
+          vtkKWMath::FixTransferFunctionPointsOutOfRange(gtf, function_range);
+          }
         gtf_was_set = 1;
         }
       }
@@ -174,10 +223,17 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkColorTransferFunction *rgbtf = obj->GetRGBTransferFunction(c_idx);
       if (rgbtf)
         {
+        float function_range[2];
+        rgbtf->GetRange(function_range);
+
         xmlctfr->SetObject(rgbtf);
         xmlctfr->ParseInNestedElement(
           comp_elem,
           vtkXMLVolumePropertyWriter::GetRGBTransferFunctionElementName());
+        if (this->KeepTransferFunctionPointsRange)
+          {
+          vtkKWMath::FixTransferFunctionPointsOutOfRange(rgbtf, function_range);
+          }
         rgbtf_was_set = 1;
         }
       }
@@ -207,10 +263,18 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *sotf = obj->GetScalarOpacity(c_idx);
       if (sotf)
         {
+        float function_range[2];
+        function_range[0] = sotf->GetRange()[0];
+        function_range[1] = sotf->GetRange()[1];
+
         xmlpfr->SetObject(sotf);
         xmlpfr->ParseInNestedElement(
           comp_elem,
           vtkXMLVolumePropertyWriter::GetScalarOpacityElementName());
+        if (this->KeepTransferFunctionPointsRange)
+          {
+          vtkKWMath::FixTransferFunctionPointsOutOfRange(sotf, function_range);
+          }
         sotf_was_set = 1;
         }
       }
@@ -229,10 +293,18 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *gotf = obj->GetStoredGradientOpacity(c_idx);
       if (gotf)
         {
+        float function_range[2];
+        function_range[0] = gotf->GetRange()[0];
+        function_range[1] = gotf->GetRange()[1];
+
         xmlpfr->SetObject(gotf);
         xmlpfr->ParseInNestedElement(
           comp_elem,
           vtkXMLVolumePropertyWriter::GetGradientOpacityElementName());
+        if (this->KeepTransferFunctionPointsRange)
+          {
+          vtkKWMath::FixTransferFunctionPointsOutOfRange(gotf, function_range);
+          }
         gotf_was_set = 1;
         }
       }
@@ -247,5 +319,3 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
   
   return 1;
 }
-
-

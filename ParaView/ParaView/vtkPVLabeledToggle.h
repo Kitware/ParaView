@@ -90,7 +90,13 @@ public:
                                      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
+  // Description:
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
 protected:
@@ -124,7 +130,6 @@ protected:
   
   int DefaultValue;
   vtkSetMacro(DefaultValue, int);
-  int AcceptCalled;
 
   vtkPVIndexWidgetProperty *Property;
   

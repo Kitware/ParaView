@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.5");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.6");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -91,8 +91,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
 
-  this->AcceptCalled = 0;
-  
   this->Property = NULL;
 }
 
@@ -242,7 +240,7 @@ void vtkPVArrayMenu::ArrayMenuEntryCallback(const char* name)
   this->SetArrayName(name);
   this->UpdateComponentMenu();
   this->ModifiedCallback();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -255,7 +253,7 @@ void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
 
   this->SelectedComponent = comp;
   this->ModifiedCallback();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -345,7 +343,6 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::AcceptInternal(vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
@@ -395,7 +392,6 @@ void vtkPVArrayMenu::AcceptInternal(vtkClientServerID sourceID)
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -448,10 +444,13 @@ void vtkPVArrayMenu::ResetInternal()
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
     {
-    this->SetSelectedComponent(this->Property->GetScalar(0));
+    this->SetSelectedComponent(static_cast<int>(this->Property->GetScalar(0)));
     }
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
   this->Update();
 }
 
@@ -495,7 +494,7 @@ void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
 void vtkPVArrayMenu::Update()
 {
   this->UpdateArrayMenu();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -855,6 +854,12 @@ const char* vtkPVArrayMenu::GetLabel()
 void vtkPVArrayMenu::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVArrayMenu::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

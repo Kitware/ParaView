@@ -105,6 +105,7 @@ public:
   void DisplayLabel(const char *l);  
   vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(Entry, vtkKWEntry);
+  vtkGetObjectMacro(Scale, vtkKWWidget);
   vtkSetStringMacro(ShortLabel);
   vtkGetStringMacro(ShortLabel);
   
@@ -203,6 +204,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Internal
+  vtkSetMacro(DisableScaleValueCallback, int);
+  vtkBooleanMacro(DisableScaleValueCallback, int);
 
 protected:
   vtkKWScale();

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.3");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.4");
 
 
 //----------------------------------------------------------------------------
@@ -193,10 +193,6 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
          << "SetProperty" << this->PropertyID  << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->PropID 
          << "SetMapper" << this->MapperID  << vtkClientServerStream::End;
-  // send to the client and server
-  ostrstream str;
-  stream.Print(str);
-  vtkErrorMacro(<<str.str());
   pm->SendStreamToClientAndServer();
   // now we can get pointers to the client vtk objects, this
   // must be after the streams are sent

@@ -590,7 +590,7 @@
         <SphereWidget trace_name="Sphere" use_label="0" help="Adjusts the parameters of the sphere to cut with."/>
       </Item>
     </SelectWidget>
-    <CutEntry label="Cut Offset Values" trace_name="Cut Values" initial_value="0" input_menu="im1" help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."/>
+    <CutEntry label="Cut Offset Values" trace_name="Cut Values" initial_value="0" input_menu="im1" help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value." set_number_command="SetNumberOfContours" set_contour_command="SetValue"/>
 </Module>
 <Module name="Clip" root_name="Clip" module_type="Filter" button_image="PVClipButton" button_help="Clip with an implicit plane, sphere or with scalars.Clipping does not reduce the dimensionality of the data set." long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid." short_help="Clip with an implicit plane, sphere or with scalars.">
   <Filter class="vtkPVClipDataSet">
@@ -655,7 +655,7 @@
 // Do not change the tracename of the array menu, it is used by vtkPVContour
   <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" label="Scalars" trace_name="Scalars" input_menu="im" number_of_components="1" help="Choose which scalar array you want to contour."/>
   <ScalarRangeLabel id="srl" trace_name="ScalarRangeLabel" array_menu="am"/>
-  <ContourEntry label="Contour Values" trace_name="Contour Values" help="List of current contour values." scalar_range="srl" array_menu="am"/>
+  <ContourEntry label="Contour Values" trace_name="Contour Values" help="List of current contour values." array_menu="am" set_number_command="SetNumberOfContours" set_contour_command="SetValue"/>
   <LabeledToggle label="Compute Normals" variable="ComputeNormals" help="Select whether to compute normals" default_value="1"/>
   <LabeledToggle label="Compute Gradients" variable="ComputeGradients" help="Select whether to compute gradients" default_value="0"/>
   <LabeledToggle label="Compute Scalars" variable="ComputeScalars" help="Select whether to compute scalars" default_value="0"/>
@@ -667,29 +667,7 @@
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <InputMenu id="im2" label="Glyph" help="Select the glyph source." input_name="Source" source_list="GlyphSources"/>
-  <SelectWidget variable="Orient">
-    <Item label="Vector" value="1">
-      <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors used to orient to glyphs."/>
-    </Item>
-    <Item label="Off" value="0">
-      <DummyWidget/>
-    </Item>
-  </SelectWidget>
-  <SelectWidget label="Scale Mode" variable="ScaleMode" trace_name="Scale Mode">
-    <Item label="Scalar" value="0">
-      <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Choose the scalar array used to scale the glyphs."/>
-    </Item>
-    <Item label="Vector Magnitude"  value="1">
-      <DummyWidget/>
-    </Item>
-    <Item label="Vector Components"  value="2">
-      <DummyWidget/>
-    </Item>
-    <Item label="Data Scaling Off"  value="3">
-      <DummyWidget/>
-    </Item>
-  </SelectWidget>
-  <ScaleFactorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" input_menu="im"/>
+  <OrientScaleWidget trace_name="OrientScale" input_menu="im" scalars_command="SelectInputScalars" vectors_command="SelectInputVectors" orient_command="SetOrient" scale_mode_command="SetScaleMode" scale_factor_command="SetScaleFactor" default_orient_mode="1" default_scale_mode ="1"/>
   <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" variable="MaximumNumberOfPoints" type="int" help="Set the maximum number of points to glyph" default_value="5000"/>
   <LabeledToggle label="Mask Points" trace_name="MaskPoints" variable="UseMaskPoints" help="Create no more than specified maximum number of glyphs" default_value="1"/>
   <LabeledToggle label="Random Masking" trace_name="RandomMask" variable="RandomMode" help="Choose points at random to mask" default_value="0"/>

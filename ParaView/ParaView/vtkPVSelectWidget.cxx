@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.6");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.7");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,7 +77,6 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->UseWidgetCommand = 0;
 
   this->Property = NULL;
-  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,8 +201,6 @@ int vtkPVSelectWidget::GetModifiedFlag()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
     {
@@ -219,7 +216,6 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
     pvwp->GetWidget()->AcceptInternal(sourceId);
     }
 
-  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;
 }
 

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.5");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.6");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -132,15 +132,9 @@ void vtkPVPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     float val[3];
     widget->GetCenter(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->CenterEntry[cc]->SetValue(val[cc]);
-      }
-    widget->GetNormal(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->NormalEntry[cc]->SetValue(val[cc]);
-      }
+    this->SetCenterInternal(val[0], val[1], val[2]);
+    widget->GetNormal(val);
+    this->SetNormalInternal(val[0], val[1], val[2]);
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }

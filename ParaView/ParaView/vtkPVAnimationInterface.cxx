@@ -180,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.4");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.5");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1437,6 +1437,22 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
 
 
 //-----------------------------------------------------------------------------
+int vtkPVAnimationInterface::IsAnimationValid()
+{
+  vtkCollectionIterator* it = this->AnimationEntriesIterator;
+  for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+    {
+    vtkPVAnimationInterfaceEntry* entry
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+    if ( entry->IsActionValid() )
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* imageFileName,
                                                 const char* geometryFileName)
@@ -1874,9 +1890,12 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
   for ( cc = 0; cc < this->AnimationEntries->GetNumberOfItems(); cc ++ )
     {
     vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(cc);
-    *file << "set kw(" << entry->GetTclName() << ") [$kw(" << this->GetTclName() 
-          << ") AddEmptySourceItem]" << endl;
-    entry->SaveState(file);
+    if ( entry->IsActionValid(1) )
+      {
+      *file << "set kw(" << entry->GetTclName() << ") [$kw(" << this->GetTclName() 
+        << ") AddEmptySourceItem]" << endl;
+      entry->SaveState(file);
+      }
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetNumberOfFrames " << numberFrames << endl;

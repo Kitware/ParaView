@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkTclUtil.h"
@@ -58,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.2");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.3");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -67,7 +68,6 @@ int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 {
-  
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->LabeledFrame->SetParent(this);
   
@@ -86,6 +86,10 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
   
   this->TimeSets = vtkDataArrayCollection::New();
   this->TimeSetsTclName = 0;
+  
+  this->Property = 0;
+  
+  this->SetCommand = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,6 +102,7 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->SetFrameLabel(0);
   this->TimeSets->Delete();
   this->SetTimeSetsTclName(0);
+  this->SetSetCommand(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -246,10 +251,8 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Accept()
+void vtkPVSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->ModifiedFlag)
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
@@ -258,12 +261,10 @@ void vtkPVSelectTimeSet::Accept()
                         this->Application->GetMainInterp()->result);
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  char buf[1024];
-  sprintf(buf, "%12.5e", this->GetTimeValue());
-  pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID 
-                  << "SetTimeValue" <<  buf 
-                  << vtkClientServerStream::End;
+  this->Property->SetVTKSourceID(sourceID);
+  this->Property->SetScalars(1, &this->TimeValue);
+  this->Property->AcceptInternal();
+
   this->ModifiedFlag = 0;
 }
 
@@ -282,7 +283,7 @@ void vtkPVSelectTimeSet::Trace(ofstream *file)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Reset()
+void vtkPVSelectTimeSet::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -308,9 +309,7 @@ void vtkPVSelectTimeSet::Reset()
   char timeValueText[32];
   char indices[32];
 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("%s GetTimeValue", this->PVSource->GetVTKSourceTclName());
-  float actualTimeValue = atof(pm->GetRootResult());
+  float actualTimeValue = this->Property->GetScalar(0);
   int matchFound = 0;
 
   this->ModifiedFlag = 0;
@@ -381,8 +380,6 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 // Maybe the animation should call PVwidget methods and not vtk object methods.
 void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[500];
-
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
@@ -391,13 +388,8 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
-  sprintf(script, "%s SetTimeValue $pvTime", 
-          this->PVSource->GetVTKSourceTclName());
-  ai->SetLabelAndScript(this->GetTraceName(), script);
-  sprintf(script, "AnimationMenuCallback $kw(%s)", 
-    ai->GetTclName());
-  ai->SetSaveStateScript(script);
-  ai->SetSaveStateObject(this);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetCurrentProperty(this->Property);
   ai->Update();
 }
 
@@ -421,6 +413,7 @@ void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone,
   if (pvts)
     {
     pvts->SetLabel(this->FrameLabel);
+    pvts->SetSetCommand(this->SetCommand);
     }
   else 
     {
@@ -441,6 +434,8 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetLabel(label);
     }
+  
+  this->SetSetCommand(element->GetAttribute("set_command"));
   
   return 1;
 }
@@ -525,9 +520,34 @@ void vtkPVSelectTimeSet::SetupTimeSetsTclName()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    int numScalars = 1;
+    this->Property->SetVTKCommands(1, &this->SetCommand, &numScalars);
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVSelectTimeSet::GetProperty()
+{
+  return this->Property;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVSelectTimeSet::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeValue: " << this->TimeValue << endl;
   os << indent << "LabeledFrame: " << this->LabeledFrame << endl;
+  os << indent << "SetCommand: "
+     << (this->SetCommand ? this->SetCommand : "(none)") << endl;
 }

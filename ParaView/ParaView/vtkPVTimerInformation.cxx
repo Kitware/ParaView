@@ -46,11 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkByteSwap.h"
 #include "vtkTimerLog.h"
 #include "vtkPVApplication.h"
-
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.2.4.1");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.2.4.2");
 
 
 
@@ -234,52 +234,48 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
     }
 }
 
-//----------------------------------------------------------------------------
-int vtkPVTimerInformation::GetMessageLength()
-{
-  int length = 2* static_cast<int>(sizeof(int));
+void vtkPVTimerInformation::CopyToStream(vtkClientServerStream* css) const
+{ 
+  css->Reset();
+  *css << vtkClientServerStream::Reply
+       << this->NumberOfLogs;
   int idx;
-
   for (idx = 0; idx < this->NumberOfLogs; ++idx)
     {
-    if (this->Logs[idx])
-      {
-      length += static_cast<int>(strlen(this->Logs[idx])) + 1;
-      }
-    else
-      {
-      length += 1;
-      }
+    *css << (const char*)this->Logs[idx];
     }
-  return length;
+  *css << vtkClientServerStream::End;
 }
+
 
 //----------------------------------------------------------------------------
-void vtkPVTimerInformation::WriteMessage(unsigned char* msg)
-{
-  int idx, length;
-  int endianMarker = 1;
-
-  memcpy(msg, (unsigned char*)&endianMarker, sizeof(int));
-  msg += sizeof(int);
-  memcpy(msg, (unsigned char*)&this->NumberOfLogs, sizeof(int));
-  msg += sizeof(int);
-
+void
+vtkPVTimerInformation::CopyFromStream(const vtkClientServerStream* css)
+{ 
+  int idx;
   for (idx = 0; idx < this->NumberOfLogs; ++idx)
     {
-    if (this->Logs[idx])
+    delete []this->Logs[idx];
+    }
+    
+  if(!css->GetArgument(0, 0, &this->NumberOfLogs))
+    {
+    vtkErrorMacro("Error NumberOfLogs from message.");
+    return;
+    }
+  this->Reallocate(this->NumberOfLogs);
+  for (idx = 0; idx < this->NumberOfLogs; ++idx)
+    {
+    char* log;
+    if(!css->GetArgument(0, idx+1, &log))
       {
-      length = static_cast<int>(strlen(this->Logs[idx])) + 1;
-      memcpy(msg, this->Logs[idx], length);
-      msg += length;
+      vtkErrorMacro("Error parsing LOD geometry memory size from message.");
+      return;
       }
-    else
-      {
-      msg[0] = '\0';
-      msg += 1;
-      }
+    this->Logs[idx] = strcpy(new char[strlen(log)+1], log);
     }
 }
+
 
 //----------------------------------------------------------------------------
 int vtkPVTimerInformation::GetNumberOfLogs()

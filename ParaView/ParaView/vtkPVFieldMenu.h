@@ -116,7 +116,13 @@ public:
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
 
+  // Description:
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:

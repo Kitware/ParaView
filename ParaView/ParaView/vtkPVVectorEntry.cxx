@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.7");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.8");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -81,7 +81,6 @@ vtkPVVectorEntry::vtkPVVectorEntry()
     this->EntryValues[cc] = 0;
     this->DefaultValues[cc] = 0;
     }
-  this->AcceptCalled = 0;
   
   this->Property = NULL;
 }
@@ -309,7 +308,6 @@ void vtkPVVectorEntry::AcceptInternal(vtkClientServerID sourceID)
   this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
-  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;  
 }
 
@@ -784,6 +782,12 @@ void vtkPVVectorEntry::SetProperty(vtkPVWidgetProperty *prop)
     sprintf(cmd, "Set%s", this->VariableName);
     this->Property->SetVTKCommands(1, &cmd, &this->VectorLength);
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVVectorEntry::GetProperty()
+{
+  return this->Property;
 }
 
 //-----------------------------------------------------------------------------

@@ -162,7 +162,7 @@ FIND_FILE(VTK_WRAP_HINTS hints
 #
 FOREACH(CLASS ${ClientServer_WRAP_CLASSES})
   SET(ClientServer_CLASS_FOUND 0)
-  FOREACH(DIR ${VTK_INCLUDE_DIRS} ${PARAVIEW_SOURCE_DIR}/ParaView ${PARAVIEW_SOURCE_DIR}/Widgets)
+  FOREACH(DIR ${VTK_INCLUDE_DIRS} ${PARAVIEW_SOURCE_DIR}/ParaView ${PARAVIEW_SOURCE_DIR}/Widgets ${PARAVIEW_SOURCE_DIR}/Filters)
     IF (NOT ClientServer_CLASS_FOUND)
       IF (EXISTS ${DIR}/${CLASS}.h)
         SET(ClientServer_RESOLVED_CLASSES ${ClientServer_RESOLVED_CLASSES} ${DIR}/${CLASS}.h)
@@ -175,4 +175,4 @@ ENDFOREACH(CLASS)
 VTK_WRAP_ClientServer(vtkParaViewCSWrapped vtkClientServerWrappedList ${ClientServer_RESOLVED_CLASSES})
 
 ADD_LIBRARY(vtkParaViewCSWrapped ${vtkClientServerWrappedList})
-TARGET_LINK_LIBRARIES (vtkParaViewCSWrapped vtkClientServer vtkKWParaViewTCL vtkHybrid vtkParallel)
+TARGET_LINK_LIBRARIES (vtkParaViewCSWrapped vtkClientServer vtkKWParaViewTCL vtkHybrid vtkParallel )

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.6");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.7");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -668,15 +668,9 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     {
     float val[3];
     widget->GetOrigin(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->CenterEntry[cc]->SetValue(val[cc]);
-      }
-    widget->GetNormal(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->NormalEntry[cc]->SetValue(val[cc]);
-      }
+    this->SetCenterInternal(val[0], val[1], val[2]);
+    widget->GetNormal(val);
+    this->SetNormalInternal(val[0], val[1], val[2]);
     if (!widget->GetDrawPlane())
       { 
       vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
