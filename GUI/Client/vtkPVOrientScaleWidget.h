@@ -62,6 +62,7 @@ public:
   // Description:
   // Callbacks
   void ScaleModeMenuCallback();
+  void OrientModeMenuCallback();
   void ScalarsMenuEntryCallback();
   void VectorsMenuEntryCallback();
   
@@ -150,6 +151,15 @@ protected:
 
   int DefaultOrientMode;
   int DefaultScaleMode;
+
+  char *CurrentScalars;
+  char *CurrentVectors;
+  char *CurrentOrientMode;
+  char *CurrentScaleMode;
+  vtkSetStringMacro(CurrentScalars);
+  vtkSetStringMacro(CurrentVectors);
+  vtkSetStringMacro(CurrentOrientMode);
+  vtkSetStringMacro(CurrentScaleMode);
   
 //BTX
   virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *pvSource,
