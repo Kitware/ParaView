@@ -51,9 +51,10 @@
 
 #include "vtkRMScalarBarWidget.h"
 #include "vtkKWEvent.h"
+#include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.98");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.99");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -994,7 +995,7 @@ void vtkPVColorMap::StartColorButtonCallback(double r, double g, double b)
   rgb[0] = r;
   rgb[1] = g;
   rgb[2] = b;
-  this->RGBToHSV(rgb, hsv);
+  vtkMath::RGBToHSV(rgb, hsv);
 
   this->SetStartHSV(hsv[0], hsv[1], hsv[2]);
 }
@@ -1016,7 +1017,7 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
 
   // Change color button (should have no callback effect...)
   hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
-  this->HSVToRGB(hsv, rgb);
+  vtkMath::HSVToRGB(hsv, rgb);
   this->StartColorButton->SetColor(rgb);
 
   this->AddTraceEntry("$kw(%s) SetStartHSV %g %g %g", 
@@ -1035,7 +1036,7 @@ void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
   rgb[0] = r;
   rgb[1] = g;
   rgb[2] = b;
-  this->RGBToHSV(rgb, hsv);
+  vtkMath::RGBToHSV(rgb, hsv);
 
   this->SetEndHSV(hsv[0], hsv[1], hsv[2]);
 }
@@ -1057,7 +1058,7 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
 
   // Change color button (should have no callback effect...)
   hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
-  this->HSVToRGB(hsv, rgb);
+  vtkMath::HSVToRGB(hsv, rgb);
   this->EndColorButton->SetColor(rgb);
 
   this->AddTraceEntry("$kw(%s) SetEndHSV %g %g %g", 
@@ -1406,172 +1407,6 @@ void vtkPVColorMap::ColorRangeEntryCallback()
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::RGBToHSV(double rgb[3], double hsv[3])
-{
-  double hue = 0;
-  double sat = 0;
-  double val = 0;
-  double lx, ly, lz;
-
-  if (rgb[0] <= 0.0 && rgb[1] <= 0.0 && rgb[2] <= 0.0)
-    {
-    hsv[0] = 0.0;
-    hsv[1] = 0.0;
-    hsv[2] = 0.0;
-    return;
-    }
-
-  if (rgb[0] == rgb[1] && rgb[1] == rgb[2])
-    {
-    hsv[2] = rgb[0];
-    hsv[1] = 0.0;
-    hsv[0] = 0.0;
-    return;
-    }
-
-  if (rgb[0] >= rgb[1] && rgb[1] >= rgb[2])
-    { // case 0
-    val = rgb[0];
-    lz = rgb[1];
-    lx = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (0.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
-    }
-  else if (rgb[1] >= rgb[0] && rgb[0] >= rgb[2])
-    { // case 1
-    ly = rgb[0];
-    val = rgb[1];
-    lx = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (1.0 + ((1.0 - (ly/val))/sat))/6.0;
-    }
-  else if (rgb[1] >= rgb[2] && rgb[2] >= rgb[0])
-    { // case 2
-    lx = rgb[0];
-    val = rgb[1];
-    lz = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (2.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
-    }
-  else if (rgb[2] >= rgb[1] && rgb[1] >= rgb[0])
-    { // case 3
-    lx = rgb[0];
-    ly = rgb[1];
-    val = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (3.0 + ((1.0 - (ly/val))/sat))/6.0;
-    }
-  else if (rgb[2] >= rgb[0] && rgb[0] >= rgb[1])
-    { // case 4
-    lz = rgb[0];
-    lx = rgb[1];
-    val = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (4.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
-    }
-  else if (rgb[0] >= rgb[2] && rgb[2] >= rgb[1])
-    { // case 5
-    val = rgb[0];
-    lx = rgb[1];
-    ly = rgb[2];
-    sat = 1.0 - (lx/val);
-    hue = (5.0 + ((1.0 - (ly/val))/sat))/6.0;
-    }
-  hsv[0] = hue;
-  hsv[1] = sat;
-  hsv[2] = val;
-}
-
-//----------------------------------------------------------------------------
-// Only used to get the color of the button when HSV is set from script.
-// It might be easier to save the RGB values.
-void vtkPVColorMap::HSVToRGB(double hsv[3], double rgb[3])
-{
-  double hue = hsv[0];
-  double sat = hsv[1];
-  double val = hsv[2];
-  double lx, ly, lz;
-
-  // Wrap hue into expected range.
-  while (hue >= 1.0)
-    {
-    hue = hue-1.0;
-    }
-  while (hue < 0.0)
-    {
-    hue = hue+1.0;
-    }
-
-  // Gray.
-  if (sat == 0.0)
-    {
-    rgb[0] = rgb[1] = rgb[2] = val;
-    return;
-    }
-
-  // Red (green)
-  if (hue < (1.0/6.0))
-    {
-    rgb[0] = val;
-    lx = (1.0-sat)*val;
-    lz = val*(1.0 - ((1.0 - (6.0*hue))*sat));
-    rgb[1] = lz;
-    rgb[2] = lx;
-    return;
-    }
-  // Green (red)
-  if (hue < 2.0/6.0)
-    {
-    rgb[1] = val;
-    lx = (1.0-sat)*val;
-    ly = val*(1.0 - (((6.0*hue) - 1.0)*sat));
-    rgb[0] = ly;
-    rgb[2] = lx;
-    return;
-    }
-  // Green (blue)
-  if (hue< (3.0/6.0))
-    { // case 2
-    rgb[1] = val;
-    lx = (1.0-sat)*val;
-    lz = val*(1.0 - ((1.0 - ((6.0*hue) - 2.0))*sat));
-    rgb[0] = lx;
-    rgb[2] = lz;
-    return;
-    }
-  // Blue (green)
-  if (hue < (4.0/6.0))
-    {
-    rgb[2] = val;
-    lx = (1.0 - sat)*val;
-    ly = val*(1.0 - (((6.0*hue)-3.0)*sat));
-    rgb[0] = lx;
-    rgb[1] = ly;
-    return;
-    }
-  // Blue (red)
-  if (hue < 5.0/6.0)
-    { // case 4
-    rgb[2] = val;
-    lx = (1.0-sat)*val;
-    lz = val* (1.0 - ((1.0 - ((6.0*hue)-4.0))*sat));
-    rgb[0] = lz;
-    rgb[1] = lx;
-    return;
-    }
-  // Red (blue).
-  if (hue < 1.0)
-    {
-    rgb[0] = val;
-    lx = (1.0-sat)*val;    
-    ly = val*(1.0 - (((6.0*hue)-5.0)*sat));
-    rgb[1] = lx;
-    rgb[2] = ly;
-    return;
     }
 }
 
