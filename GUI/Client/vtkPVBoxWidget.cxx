@@ -40,9 +40,11 @@
 #include "vtkTransform.h"
 #include "vtkCommand.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPlanes.h"
+#include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.24");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -56,6 +58,7 @@ vtkPVBoxWidget::vtkPVBoxWidget()
   this->BoxTransformID.ID = 0;
 
   this->BoxTransform = 0;
+  this->Box = 0;
 
   this->ControlFrame = vtkKWFrame::New();
   this->TranslateLabel = vtkKWLabel::New();
@@ -108,7 +111,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
   if (pm && this->BoxTransformID.ID )
     {
     pm->DeleteStreamObject(this->BoxTransformID);
-    this->BoxTransformID.ID = 0;
+    this->BoxTransformID.ID = 0; 
     }
   if (pm && this->BoxMatrixID.ID)
     {
@@ -117,7 +120,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     }
   if(pm)
     {
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStreamToRenderServerClientAndServer();
     }
 }
 
@@ -158,32 +161,43 @@ void vtkPVBoxWidget::ActualPlaceWidget()
   this->Superclass::ActualPlaceWidget();
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
     this->Application);
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
+  // now make sure the widget is placed on the server
+  // since this is the only 3d widget on the server....
+  double bds[6];
+  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
+  pvApp->GetProcessModule()->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "PlaceWidget" 
+                  << bds[0] << bds[1] << bds[2] << bds[3] 
+                  << bds[4] << bds[5] << vtkClientServerStream::End;
+  pvApp->GetProcessModule()->SendStreamToServer();
+  
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "GetPlanes" << this->BoxID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
-  this->PlaceWidget();
+  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(this->Application);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
+  this->PlaceWidget(); 
   if ( ! this->ModifiedFlag)
     {
     return;
     }
   if ( this->BoxID.ID )
     {
-    vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->Application);
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->Widget3DID << "GetPlanes" << this->BoxID 
                     << vtkClientServerStream::End;
     this->SetStoredPosition(this->PositionGUI);
     this->SetStoredRotation(this->RotationGUI);
     this->SetStoredScale(this->ScaleGUI);
+    pm->SendStreamToRenderServerClientAndServer(); 
     }
   this->Superclass::AcceptInternal(sourceID);
   this->Initialized = 1;
@@ -306,6 +320,8 @@ void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BoxID: " << this->BoxID.ID
      << endl;
+  os << indent << "Box: " 
+    << this->Box << endl;
   os << indent << "BoxTransform: " 
     << this->BoxTransform << endl;
   os << indent << "BoxTransformID" << this->BoxTransformID << endl;
@@ -370,11 +386,13 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
                   << 0 << 1 << 0 << 1 << 0 << 1
                   << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
   this->BoxID = pm->NewStreamObject("vtkPlanes");
-  this->BoxTransformID = pm->NewStreamObject("vtkTransform");
   this->BoxMatrixID = pm->NewStreamObject("vtkMatrix4x4");
+  this->BoxTransformID = pm->NewStreamObject("vtkTransform");
+  pm->SendStreamToRenderServerClientAndServer();
   
-  pm->SendStreamToClientAndRenderServer();
+  this->Box = vtkPlanes::SafeDownCast(pm->GetObjectFromID(this->BoxID));
   this->BoxTransform = vtkTransform::SafeDownCast(pm->GetObjectFromID(this->BoxTransformID));
   this->SetFrameLabel("Box Widget");
 
@@ -725,10 +743,11 @@ void vtkPVBoxWidget::UpdateBox(int update)
                   << vtkClientServerStream::InsertArray(&mat->Element[0][0], 16)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->BoxTransformID
-                  << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetTransform" << this->BoxTransformID << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStreamToRenderServerClientAndServer();
   this->SetValueChanged();
 }
 

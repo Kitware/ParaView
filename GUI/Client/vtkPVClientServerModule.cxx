@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.72");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -265,7 +265,9 @@ void vtkPVClientServerModule::Initialize()
       { 
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
+//      this->Interpreter->SetLogFile("./client.log");
       }
+
     // attempt to initialize render server connection to data server
     this->InitializeRenderServer();
       
@@ -293,7 +295,16 @@ void vtkPVClientServerModule::Initialize()
     }
   else if (myId == 0)
     { // process 0 of Server
-    // send the number of server processes as a handshake.
+    // send the number of server processes as a handshake. 
+    if(this->RenderServerMode)
+      {
+//      this->Interpreter->SetLogFile("./renderserver.log");
+      }
+    else
+      {
+//      this->Interpreter->SetLogFile("./dataserver.log");
+      }
+    
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
         //

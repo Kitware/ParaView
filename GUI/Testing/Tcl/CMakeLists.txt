@@ -102,6 +102,15 @@ FOREACH (tfile ${PROJECT_TESTS})
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
+  # repeat the test with the client server driver in render server mode
+  ADD_TEST("${tfile}RenderServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
+    --test-render-server
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+    -D ${PVClientTestData}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
 IF(VTK_PRINT_SELF_CHECK_TCL)
