@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.6");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -125,6 +125,16 @@ void vtkKWLabeledWidget::SetLabelWidth(int width)
     {
     this->Label->SetWidth(width);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabeledWidget::GetLabelWidth()
+{
+  if (this->Label)
+    {
+    return this->Label->GetWidth();
+    }
+  return 0;
 }
 
 // ----------------------------------------------------------------------------

@@ -74,8 +74,9 @@ public:
   void SetLabel(const char *);
   
   // Description:
-  // Convenience method to set the label width.
+  // Convenience method to set/get the label width.
   void SetLabelWidth(int width);
+  int GetLabelWidth();
   
   // Description:
   // Show/Hide the label.
