@@ -158,8 +158,11 @@ void vtkKWChangeColorButton::ChangeColor()
 		    this->GetWidgetName(), result );
       }
     this->Script( "update idletasks");
-    this->Script("eval %s %f %f %f", this->Command, 
-		 (float)r/255.0, (float)g/255.0, (float)b/255.0);
+    if ( this->Command )
+      {
+      this->Script("eval %s %f %f %f", this->Command, 
+		   (float)r/255.0, (float)g/255.0, (float)b/255.0);
+      }
     this->Color[0] = (float)r/255.0;
     this->Color[1] = (float)g/255.0;
     this->Color[2] = (float)b/255.0;
