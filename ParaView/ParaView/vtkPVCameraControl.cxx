@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.1");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -111,8 +111,6 @@ void vtkPVCameraControl::Elevation(double angle)
   
   float *center = this->InteractorStyle->GetCenter();
   cam->OrthogonalizeViewUp();
-  double *fp = cam->GetFocalPoint();
-  double *pos = cam->GetPosition();
   double *vup = cam->GetViewUp();
   double v2[3];
   
@@ -149,8 +147,6 @@ void vtkPVCameraControl::Azimuth(double angle)
   
   float *center = this->InteractorStyle->GetCenter();
   cam->OrthogonalizeViewUp();
-  double *fp = cam->GetFocalPoint();
-  double *pos = cam->GetPosition();
   double *vup = cam->GetViewUp();
   
   vtkTransform *xform = vtkTransform::New();
