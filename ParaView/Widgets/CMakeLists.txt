@@ -35,6 +35,7 @@ vtkKWLabeledPopupButton.cxx
 vtkKWLabeledPushButton.cxx
 vtkKWLabeledPushButtonSet.cxx 
 vtkKWLabeledRadioButtonSet.cxx 
+vtkKWLabeledScaleSet.cxx 
 vtkKWLabeledText.cxx 
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
@@ -58,6 +59,7 @@ vtkKWRange.cxx
 vtkKWRenderWidget.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScale.cxx 
+vtkKWScaleSet.cxx 
 vtkKWSegmentedProgressGauge.cxx
 vtkKWSelectionFrame.cxx
 vtkKWSimpleEntryDialog.cxx

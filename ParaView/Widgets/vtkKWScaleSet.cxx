@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWScaleSet);
-vtkCxxRevisionMacro(vtkKWScaleSet, "1.1");
+vtkCxxRevisionMacro(vtkKWScaleSet, "1.2");
 
 int vtkvtkKWScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -259,8 +259,7 @@ void vtkKWScaleSet::Pack()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
-         << "]}" << endl;
+  this->UnpackChildren();
 
   vtkKWScaleSet::ScaleSlot *scale_slot = NULL;
   vtkKWScaleSet::ScalesContainerIterator *it = 

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledScaleSet);
-vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.2");
 
 int vtkKWLabeledScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -120,7 +120,7 @@ void vtkKWLabeledScaleSet::Pack()
              << " -side left -anchor nw -fill y" << endl;
       }
     tk_cmd << "pack " << this->ScaleSet->GetWidgetName() 
-           << " -side left -anchor nw -fill y" << endl;
+           << " -side left -anchor nw -expand y -fill both" << endl;
     }
   else
     {
@@ -130,7 +130,7 @@ void vtkKWLabeledScaleSet::Pack()
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->ScaleSet->GetWidgetName() 
-           << " -side top -anchor nw -padx 10" << endl;
+           << " -side top -anchor nw -padx 10 -expand y -fill x" << endl;
     }
   
   tk_cmd << ends;
