@@ -925,7 +925,7 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 0">
+        default_values="0 -1">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
       <Property
@@ -1356,7 +1356,7 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 0">
+        default_values="0 -1">
       </IntVectorProperty>
       <IntVectorProperty
         name="Visibility"
@@ -1412,7 +1412,7 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 0">
+        default_values="0 -1">
       </IntVectorProperty>
       <IntVectorProperty
         name="Visibility"
@@ -1454,7 +1454,7 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 0">
+        default_values="0 -1">
       </IntVectorProperty>
       <IntVectorProperty
         name="Representation"
