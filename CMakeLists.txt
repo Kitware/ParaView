@@ -1,7 +1,5 @@
 PROJECT(VIEWS) 
 
-BUILD_SHARED_LIBRARIES()
-
 SUBDIRS(Widgets ParaView)
 
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
