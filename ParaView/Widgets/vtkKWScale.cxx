@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.7");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.8");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -538,7 +538,7 @@ void vtkKWScale::UpdateEntryResolution()
     // representation of the floating point number this->Resolution.
     // sprintf would be of no help here.
     const char *res = this->Script("expr %f", fabs(this->Resolution));
-    char *pos = strchr(res, '.');
+    const char *pos = strchr(res, '.');
     if (pos)
       {
       this->EntryResolution = strlen(res) - (pos - res) - 1;

@@ -20,7 +20,7 @@
 #include "vtkBase64Utility.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkBase64InputStream, "1.4");
+vtkCxxRevisionMacro(vtkBase64InputStream, "1.4.2.1");
 vtkStandardNewMacro(vtkBase64InputStream);
 
 //----------------------------------------------------------------------------
@@ -144,9 +144,9 @@ unsigned long vtkBase64InputStream::Read(unsigned char* data,
 }
 
 //----------------------------------------------------------------------------
-inline int vtkBase64InputStream::DecodeTriplet(unsigned char& c0,
-                                               unsigned char& c1,
-                                               unsigned char& c2)
+int vtkBase64InputStream::DecodeTriplet(unsigned char& c0,
+                                        unsigned char& c1,
+                                        unsigned char& c2)
 {
   // Read the 4 bytes encoding this triplet from the stream.
 

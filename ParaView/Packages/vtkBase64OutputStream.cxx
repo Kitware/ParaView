@@ -20,7 +20,7 @@
 #include "vtkBase64Utility.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkBase64OutputStream, "1.4");
+vtkCxxRevisionMacro(vtkBase64OutputStream, "1.4.2.1");
 vtkStandardNewMacro(vtkBase64OutputStream);
 
 //----------------------------------------------------------------------------
@@ -106,9 +106,9 @@ int vtkBase64OutputStream::Write(const unsigned char* data,
 }
 
 //----------------------------------------------------------------------------
-inline int vtkBase64OutputStream::EncodeTriplet(unsigned char c0,
-                                                unsigned char c1,
-                                                unsigned char c2)
+int vtkBase64OutputStream::EncodeTriplet(unsigned char c0,
+                                         unsigned char c1,
+                                         unsigned char c2)
 {
   // Encodes 3 bytes into 4 bytes and writes them to the output stream.
   unsigned char out[4];
@@ -118,8 +118,8 @@ inline int vtkBase64OutputStream::EncodeTriplet(unsigned char c0,
 }
   
 //----------------------------------------------------------------------------
-inline int vtkBase64OutputStream:: EncodeEnding(unsigned char c0,
-                                                unsigned char c1)
+int vtkBase64OutputStream:: EncodeEnding(unsigned char c0,
+                                         unsigned char c1)
 {
   // Encodes a 2-byte ending into 3 bytes and 1 pad byte and writes.
   unsigned char out[4];
@@ -129,7 +129,7 @@ inline int vtkBase64OutputStream:: EncodeEnding(unsigned char c0,
 }
 
 //----------------------------------------------------------------------------
-inline int vtkBase64OutputStream::EncodeEnding(unsigned char c0)
+int vtkBase64OutputStream::EncodeEnding(unsigned char c0)
 {
   // Encodes a 1-byte ending into 2 bytes and 2 pad bytes and writes.
   unsigned char out[4];
