@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 #include "vtkKWRegisteryUtilities.h"
 #include "vtkKWSplashScreen.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindow.h"
 #include "vtkKWWindowCollection.h"
@@ -85,7 +86,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.144");
+vtkCxxRevisionMacro(vtkKWApplication, "1.145");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1085,7 +1086,8 @@ void vtkKWApplication::ConfigureAbout()
       {
       this->CreateSplashScreen();
       }
-    if (this->SplashScreen->GetImageName())
+    const char *img_name = this->SplashScreen->GetImageName();
+    if (img_name)
       {
       if (!this->AboutDialogImage)
         {
@@ -1098,22 +1100,52 @@ void vtkKWApplication::ConfigureAbout()
         }
 
       this->Script("%s config -image {%s}",
-                   this->AboutDialogImage->GetWidgetName(), 
-                   this->SplashScreen->GetImageName());
+                   this->AboutDialogImage->GetWidgetName(), img_name);
       this->Script("pack %s -side top", 
                    this->AboutDialogImage->GetWidgetName());
+      int width = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
+      if (width > this->AboutDialog->GetTextWidth())
+        {
+        this->AboutDialog->SetTextWidth(width);
+        }
       }
     }
 
+  ostrstream title;
+  title << "About " << this->GetApplicationPrettyName() << ends;
+  this->AboutDialog->SetTitle(title.str());
+  title.rdbuf()->freeze(0);
+
   ostrstream str;
-  str << this->GetApplicationPrettyName()
-      << "\n  Application : " << this->GetApplicationName() 
-      << "\n  Version : " << this->GetApplicationVersionName() 
-      << "\n  Release : " << this->GetApplicationReleaseName() << ends;
-
+  this->AddAboutText(str);
+  str << endl;
+  this->AddAboutCopyrights(str);
+  str << ends;
   this->AboutDialog->SetText(str.str());
-
   str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddAboutText(ostream &os)
+{
+  os << this->GetApplicationPrettyName() 
+     << " (" 
+     << this->GetApplicationVersionName() 
+     << " " 
+     << this->GetApplicationReleaseName()
+     << ")" 
+     << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddAboutCopyrights(ostream &os)
+{
+  os << "Tcl/Tk" << endl
+     << "  - Copyright (c) 1989-1994 The Regents of the University of "
+     << "California." << endl
+     << "  - Copyright (c) 1994 The Australian National University." << endl
+     << "  - Copyright (c) 1994-1998 Sun Microsystems, Inc." << endl
+     << "  - Copyright (c) 1998-2000 Ajuba Solutions." << endl;
 }
 
 //----------------------------------------------------------------------------

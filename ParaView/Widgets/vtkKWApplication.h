@@ -413,6 +413,8 @@ protected:
   // About dialog
 
   virtual void ConfigureAbout();
+  virtual void AddAboutText(ostream &);
+  virtual void AddAboutCopyrights(ostream &);
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
 
