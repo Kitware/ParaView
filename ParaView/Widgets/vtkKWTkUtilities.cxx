@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkBase64Utility.h"
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
-#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 
 // This has to be here because on HP varargs are included in 
@@ -59,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.5");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.6");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -251,7 +250,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       }
     }
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height, TK_PHOTO_COMPOSITE_SET);
 #else
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
@@ -284,40 +283,51 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   const char *blend_with_name,
                                   const char *color_option)
 {
-  if (!image )
+  vtkImageData *input = image;
+
+  if (!input)
     {
     vtkGenericWarningMacro(<< "No image data specified");
     return 0;
     }
-  image->Update();
+  input->Update();
 
-  int *ext = image->GetWholeExtent();
+#define FLIP 1
+#if FLIP
+  vtkImageFlip *flip = vtkImageFlip::New();
+  flip->SetInput(input);
+  flip->SetFilteredAxis(1);
+  flip->Update();
+  input = flip->GetOutput();
+#endif
+
+  int *ext = input->GetWholeExtent();
   if ((ext[5] - ext[4]) > 0)
     {
-    vtkGenericWarningMacro(<< "Can only handle 2D image data");
+    vtkGenericWarningMacro(<< "Can only handle 2D input data");
+#if FLIP
+    flip->Delete();
+#endif
     return 0;
     }
 
-  vtkImageFlip *flip = vtkImageFlip::New();
-  flip->SetInput(image);
-  flip->SetFilteredAxis(1);
-  flip->Update();
-
   int width = ext[1] - ext[0] + 1;
   int height = ext[3] - ext[2] + 1;
-  int pixel_size = image->GetNumberOfScalarComponents();
+  int pixel_size = input->GetNumberOfScalarComponents();
 
   int res = vtkKWTkUtilities::UpdatePhoto(
     interp,
     photo_name,
-    static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
+    static_cast<unsigned char*>(input->GetScalarPointer()),
     width, height,
     pixel_size,
     width * height * pixel_size,
     blend_with_name,
     color_option);
 
+#if FLIP
   flip->Delete();
+#endif
   return res;
 }
 
