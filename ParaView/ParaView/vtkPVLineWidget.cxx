@@ -54,18 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 
-//----------------------------------------------------------------------------
-vtkPVLineWidget* vtkPVLineWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVLineWidget");
-  if (ret)
-    {
-    return (vtkPVLineWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVLineWidget;
-}
+vtkStandardNewMacro(vtkPVLineWidget);
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -84,11 +73,6 @@ vtkPVLineWidget::vtkPVLineWidget()
 //----------------------------------------------------------------------------
 vtkPVLineWidget::~vtkPVLineWidget()
 {
-  if (this->Widget3D->GetEnabled())
-    {
-    this->Widget3D->EnabledOff();
-    }
-  this->Widget3D->Delete();
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
   for (int i=0; i<3; i++)
@@ -224,6 +208,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long, void*)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
+  this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
   this->Labels[0]->SetLabel("Point 0");

@@ -61,7 +61,7 @@ class VTK_EXPORT vtkPVLineWidget : public vtkPV3DWidget
 {
 public:
   static vtkPVLineWidget* New();
-  vtkTypeMacro(vtkPVLineWidget, vtkPVWidget);
+  vtkTypeMacro(vtkPVLineWidget, vtkPV3DWidget);
 
   // Description:
   // Called when accept button is pushed.  
