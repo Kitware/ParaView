@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.289");
+vtkCxxRevisionMacro(vtkPVData, "1.290");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2922,6 +2922,11 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     *file << "  [$pvTemp" << partD->GetGeometryID() 
           << " GetProperty ColorMode] SetElements1 "  
           << part->GetPartDisplay()->GetMapper()->GetColorMode()
+          << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty InterpolateColorsBeforeMapping] SetElements1 "  
+          << part->GetPartDisplay()->GetMapper()->GetInterpolateScalarsBeforeMapping()
           << endl;
     
     *file << "  [$pvTemp" << partD->GetGeometryID() 

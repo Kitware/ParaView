@@ -66,6 +66,14 @@
              default_values="0">
           </IntVectorProperty>
 
+          <IntVectorProperty
+             name="InterpolateColorsBeforeMapping"
+             command="SetInterpolateScalarsBeforeMapping"
+             number_of_elements="1"
+             default_values="0">
+             <BooleanDomain name="bool"/>
+          </IntVectorProperty>
+
          <StringVectorProperty 
              name="ColorArray" 
              command="SelectColorArray" 
