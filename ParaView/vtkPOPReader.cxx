@@ -163,8 +163,6 @@ void vtkPOPReader::ExecuteInformation()
 {
   int xDim, yDim, zDim;
   
-  cerr << "&&&&&&&&&&&&&&&&&&&&&& POP ExecuteInformation\n";
-  
   this->ReadInformationFile();  
   
   xDim = this->Dimensions[0]+1;
@@ -183,8 +181,6 @@ void vtkPOPReader::Execute()
   int ext[6];
   int i;
   vtkFieldData *fd;
-
-  cerr << "&&&&&&&&&&&&&&&&&&&&&& POP Execute\n";
 
   output = this->GetOutput();
   fd = vtkFieldData::New();
