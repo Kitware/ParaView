@@ -164,6 +164,14 @@ public:
   // Set custom script
   void SetCustomScript(const char* script);
 
+  // Description:
+  // Prepare to be played or whatever.
+  void Prepare();
+
+  // Description:
+  // Callback when key is pressed in the script editor.
+  void MarkScriptEditorDirty();
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -205,6 +213,8 @@ protected:
   int UpdatingEntries;
 
   int Dirty;
+
+  int ScriptEditorDirty;
 
   int CustomScript;
 
