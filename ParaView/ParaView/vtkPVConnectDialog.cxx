@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.5");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
@@ -140,14 +140,15 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
     {
     const char* server = servers;
     size_t cc;
-    for ( cc = 0; cc < strlen(servers); cc ++ )
+    size_t len = strlen(servers);
+    for ( cc = 0; cc < len; cc ++ )
       {
       if ( servers[cc] == ',' )
         {
         servers[cc] = 0;
         cout << "Found server: [" << server << "]" << endl;
-        server = servers + cc + 1;
         this->Hostname->GetEntry()->AddValue(server);
+        server = servers + cc + 1;
         }
       }
     if ( strlen(server) )
@@ -156,6 +157,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
       this->Hostname->GetEntry()->AddValue(server);
       }
     }
+  this->Grab = 0;
 }
 
 //----------------------------------------------------------------------------

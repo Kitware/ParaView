@@ -208,7 +208,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.34");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.35");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -353,6 +353,11 @@ void vtkPVClientServerModule::Initialize()
 #else
           sleep(1);
 #endif
+          if ( this->RemoteExecution->GetResult() != vtkKWRemoteExecute::RUNNING )
+            {
+            cc = max_try;
+            break;
+            }
           if (comm->ConnectTo(this->Hostname, this->Port)) 
             {
             break;
