@@ -1,7 +1,6 @@
 PROJECT(Widgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SOURCE_FILES( KWWidgets_SRCS
-kwinit.c
 vtkCornerAnnotation.cxx
 vtkKWActorComposite.cxx 
 vtkKWApplication.cxx 
@@ -54,12 +53,22 @@ vtkKWComposite
 vtkKWView 
 )
 
-
 WRAP_EXCLUDE_FILES(
-  kwinit 
   vtktcl 
   vtkKWEvent
 )
+
+OPTION(USE_INSTALLED_TCLTK_PACKAGES "Use the intalled Tcl/Tk packages instead of kwinit." OFF)
+MARK_AS_ADVANCED(USE_INSTALLED_TCLTK_PACKAGES)
+
+IF (NOT USE_INSTALLED_TCLTK_PACKAGES)
+  SOURCE_FILES( KWWidgets_SRCS
+    kwinit.c
+  )
+  WRAP_EXCLUDE_FILES(
+    kwinit 
+  )
+ENDIF (NOT USE_INSTALLED_TCLTK_PACKAGES)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)

@@ -7,3 +7,5 @@
 #endif
 
 #cmakedefine USE_NOTEBOOK_ICONS
+
+#cmakedefine USE_INSTALLED_TCLTK_PACKAGES

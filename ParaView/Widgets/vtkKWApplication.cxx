@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
 #include "vtkKWRegisteryUtilities.h"
+#include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindow.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
@@ -54,7 +55,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTclUtil.h"
 
 #include <stdarg.h>
+
+#ifdef USE_INSTALLED_TCLTK_PACKAGES
+static Tcl_Interp *Et_Interp = 0;
+#else
 #include "kwinit.h"
+#endif
+
 #ifdef _WIN32
 #include <htmlhelp.h>
 #endif
@@ -449,12 +456,14 @@ void vtkKWApplication::Exit()
   return;
 }
     
+#ifndef USE_INSTALLED_TCLTK_PACKAGES
 /* The following constants define internal paths (not on disk)   */
 /* for Tcl/Tk to use when looking for initialization scripts     */
 /* which are in this file. They do not represent any hardwired   */
 /* paths                                                         */
 #define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.2"
 #define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
+#endif
 
 Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
 {
@@ -462,8 +471,10 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   char *args;
   char buf[100];
 
+#ifndef USE_INSTALLED_TCLTK_PACKAGES
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
   putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+#endif
   
   Tcl_FindExecutable(argv[0]);
   interp = Tcl_CreateInterp();
@@ -475,11 +486,22 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
+#ifdef USE_INSTALLED_TCLTK_PACKAGES
+  Et_Interp = interp;
+
+  if (Tcl_Init(interp) == TCL_ERROR ||
+      Tk_Init(interp) == TCL_ERROR)
+    {
+    // ??
+    }
+  
+  Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
+#else
   Et_DoInit(interp);
+#endif
   
   // initialize VTK
   Vtktcl_Init(interp);
-
 
   // initialize Widgets
   if (vtkKWApplication::WidgetVisibility)
