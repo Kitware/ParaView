@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.2.1");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.2.2");
 
 
 
@@ -68,6 +68,8 @@ vtkPVIceTDisplayRenderModule::vtkPVIceTDisplayRenderModule()
   this->Composite = 0;
 
   this->DisplayManagerTclName = 0;
+
+  this->ReductionFactor = 2;
 }
 
 //----------------------------------------------------------------------------
@@ -149,8 +151,8 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
     this->RendererTclName);
 
-  cout << "Ren1: " << this->RendererTclName << " " << this->Renderer->GetClassName() << endl;
-  cout << "RenWin1: " << this->RenderWindowTclName << " " << this->RenderWindow->GetClassName() << endl;
+  //cout << "Ren1: " << this->RendererTclName << " " << this->Renderer->GetClassName() << endl;
+  //cout << "RenWin1: " << this->RenderWindowTclName << " " << this->RenderWindow->GetClassName() << endl;
 
 
   this->Composite = NULL;
@@ -190,12 +192,18 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->Script("%s UseCompositingOn", this->CompositeTclName);
   pm->RootScript("%s UseCompositingOn", this->CompositeTclName);
 
-  //pm->ServerScript("%s FullScreenOn");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModule::StillRender()
 {
+  // No reduction for still render.
+  if (this->PVApplication && this->DisplayManagerTclName)
+    {
+    this->PVApplication->BroadcastScript("%s SetImageReductionFactor 1",
+                                         this->DisplayManagerTclName);
+    }
+
   this->Superclass::StillRender();
   /*
   this->UpdateAllPVData();
@@ -219,6 +227,13 @@ void vtkPVIceTDisplayRenderModule::StillRender()
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModule::InteractiveRender()
 {
+  if (this->PVApplication && this->DisplayManagerTclName)
+    {
+    this->PVApplication->BroadcastScript("%s SetImageReductionFactor %d",
+                                         this->DisplayManagerTclName,
+                                         this->ReductionFactor);
+    }
+
   this->Superclass::InteractiveRender();
     /*
   this->UpdateAllPVData();
@@ -236,5 +251,7 @@ void vtkPVIceTDisplayRenderModule::InteractiveRender()
 void vtkPVIceTDisplayRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
 }
 

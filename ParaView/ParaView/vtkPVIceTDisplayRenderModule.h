@@ -62,6 +62,11 @@ public:
   // Set the application right after construction.
   virtual void SetPVApplication(vtkPVApplication *pvApp);
 
+  // Description:
+  // Set this flag to indicate whether to calculate the reduction factor for
+  // use in tree composite (or client server).
+  vtkSetMacro(ReductionFactor, int);
+  vtkGetMacro(ReductionFactor, int);
 
   void StillRender();
   void InteractiveRender();
@@ -76,7 +81,8 @@ protected:
 
   vtkSetStringMacro(DisplayManagerTclName);
   char *DisplayManagerTclName;
-  
+
+  int ReductionFactor;  
 
   vtkPVIceTDisplayRenderModule(const vtkPVIceTDisplayRenderModule&); // Not implemented
   void operator=(const vtkPVIceTDisplayRenderModule&); // Not implemented
