@@ -23,13 +23,14 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.38");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -39,8 +40,6 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->EntryLabel = 0;
-
-  this->InitSourceVariable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -51,7 +50,6 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
   this->SetEntryLabel(0);
-  this->SetInitSourceVariable(0);;
 }
 
 //----------------------------------------------------------------------------
@@ -217,31 +215,30 @@ void vtkPVStringEntry::ResetInternal()
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
-  if ( this->ObjectID.ID && this->InitSourceVariable && !this->AcceptCalled)
+  if (svp)
     {
-    vtkstd::string method = "Get";
-    method += this->InitSourceVariable;
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ObjectID << method.c_str()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    const char* value;
-    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &value))
+    if (!this->AcceptCalled)
       {
-      this->SetValue(value);
+      vtkSMStringListDomain* dom = vtkSMStringListDomain::SafeDownCast(
+        svp->GetDomain("default_value"));
+      if (dom && dom->GetNumberOfStrings() > 0)
+        {
+        if (dom->GetNumberOfStrings() > 0)
+          {
+          this->SetValue(dom->GetString(0));
+          }
+        }
+      else
+        {
+        this->SetValue(svp->GetElement(0));
+        }
       }
     else
       {
-      vtkErrorMacro("Error getting \"" << this->InitSourceVariable
-                    << "\" value from server.");
+      this->SetValue(svp->GetElement(0));
       }
     }
-  else if (svp)
-    {
-    this->SetValue(svp->GetElement(0));
-    }
-  
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -266,7 +263,6 @@ void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone,
   if (pvse)
     {
     pvse->SetLabel(this->EntryLabel);
-    pvse->SetInitSourceVariable(this->InitSourceVariable);
     }
   else 
     {
@@ -291,12 +287,6 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetLabel(this->VariableName);
     }
 
-  const char* init_source = element->GetAttribute("init_source");
-  if ( init_source )
-    {
-    this->SetInitSourceVariable(init_source);
-    }
-  
   return 1;
 }
 

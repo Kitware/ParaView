@@ -102,10 +102,6 @@ protected:
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
 
-  vtkSetStringMacro(InitSourceVariable);
-  vtkGetStringMacro(InitSourceVariable);
-  char* InitSourceVariable;
-
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

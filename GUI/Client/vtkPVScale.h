@@ -162,10 +162,6 @@ protected:
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
 
-  vtkSetStringMacro(RangeSourceVariable);
-  vtkGetStringMacro(RangeSourceVariable);
-  char* RangeSourceVariable;
-  
   int TraceSliderMovement;
   
 //BTX

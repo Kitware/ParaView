@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.47");
+vtkCxxRevisionMacro(vtkPVScale, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -44,7 +44,6 @@ vtkPVScale::vtkPVScale()
   this->EntryLabel = 0;
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
-  this->RangeSourceVariable = 0;
   this->EntryFlag = 0;
   this->Round = 0;
   this->EntryAndLabelOnTopFlag = 1;
@@ -60,7 +59,6 @@ vtkPVScale::~vtkPVScale()
   this->Scale = NULL;
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
-  this->SetRangeSourceVariable(0);
 }
 
 //----------------------------------------------------------------------------
@@ -354,30 +352,37 @@ void vtkPVScale::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVScale::ResetInternal()
 {
+  vtkSMProperty* prop = this->GetSMProperty();
+
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  
-  if ( this->ObjectID.ID != 0 && this->RangeSourceVariable )
+
+  if (prop)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    ostrstream str;
-    str << "Get" << this->RangeSourceVariable << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
-                    << str.str() << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    if (ivp)
+    vtkSMDoubleRangeDomain* drd = vtkSMDoubleRangeDomain::SafeDownCast(
+      prop->GetDomain("range"));
+    vtkSMIntRangeDomain* ird = vtkSMIntRangeDomain::SafeDownCast(
+      prop->GetDomain("range"));
+    int minExists = 0, maxExists = 0;
+    if (ird)
       {
-      int range[2] = { 0, 0 };
-      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
-      this->Scale->SetRange(range[0], range[1]);
+      int min = ird->GetMinimum(0, minExists);
+      int max = ird->GetMaximum(0, maxExists);
+      if (minExists && maxExists)
+        {
+        this->Scale->SetRange(min, max);
+        }
       }
-    else if (dvp)
+    else if (drd)
       {
-      double range[2] = { 0, 0 };
-      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
-      this->Scale->SetRange(range[0], range[1]);
+      double min = drd->GetMinimum(0, minExists);
+      double max = drd->GetMaximum(0, maxExists);
+      if (minExists && maxExists)
+        {
+        this->Scale->SetRange(min, max);
+        }
       }
     }
 
@@ -412,12 +417,11 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVScale* pvs = vtkPVScale::SafeDownCast(clone);
   if (pvs)
     {
-    float min, max;
-    this->Scale->GetRange(min, max);
-    pvs->SetRange(min, max);
+    //float min, max;
+    //this->Scale->GetRange(min, max);
+    //pvs->SetRange(min, max);
     pvs->SetResolution(this->Scale->GetResolution());
     pvs->SetLabel(this->EntryLabel);
-    pvs->SetRangeSourceVariable(this->RangeSourceVariable);
     pvs->SetEntryFlag(this->EntryFlag);
     pvs->SetRound(this->Round);
     pvs->SetEntryAndLabelOnTopFlag(this->EntryAndLabelOnTopFlag);
@@ -462,20 +466,6 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     resolution = 1;
     }
   this->SetResolution(resolution);
-
-  float range[2];
-  if(!element->GetVectorAttribute("range",2,range))
-    {
-    range[0] = 0;
-    range[1] = 100;
-    }
-  this->SetRange(range[0], range[1]);
-
-  const char* range_source = element->GetAttribute("range_source");
-  if(range_source)
-    {
-    this->SetRangeSourceVariable(range_source);
-    }
 
   const char* display_entry = element->GetAttribute("display_entry");
   if (display_entry)
