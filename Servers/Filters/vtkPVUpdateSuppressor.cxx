@@ -21,7 +21,7 @@
 #include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.18");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.19");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
@@ -101,8 +101,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdateGhostLevel(0);
   input->Update();
 
-  unsigned long t2;
-#ifdef VTK_USE_EXECUTIVES
+  unsigned long t2 = 0;
   vtkDemandDrivenPipeline *ddp = 0;
   if (input->GetSource())
     {
@@ -115,9 +114,6 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     ddp->UpdateInformation();
     t2 = ddp->GetPipelineMTime();
     }
-#else
-  t2 = input->GetPipelineMTime();
-#endif
   if (t2 > this->UpdateTime || output->GetDataReleased())
     {
     output->ShallowCopy(input);
