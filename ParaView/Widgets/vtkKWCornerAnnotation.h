@@ -105,6 +105,7 @@ public:
   void SetTextColor(float *rgb)
     { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
   float *GetTextColor();
+  void OnTextColorChangeCallback();
 
   // Description:
   // Set/Get the maximum line height.
@@ -119,13 +120,14 @@ public:
   
   // Description:
   // GUI components access
-  vtkGetObjectMacro(TextProperty, vtkKWTextProperty);
+  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
+  void OnTextChangeCallback();
 
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
 
-  vtkKWTextProperty *TextProperty;
+  vtkKWTextProperty *TextPropertyWidget;
 
   vtkKWCheckButton       *CornerVisibilityButton;
 
