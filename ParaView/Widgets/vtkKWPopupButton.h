@@ -84,6 +84,9 @@ protected:
 
   char* PopupTitle;
 
+  virtual void Bind();
+  virtual void UnBind();
+
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
   virtual void UpdateEnableState();

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.7");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.8");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -104,13 +104,6 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
 
   ostrstream tk_cmd;
 
-  // Bind the button so that it popups the toplevel
-
-  tk_cmd << "bind " << this->GetWidgetName() 
-         << " <ButtonPress> {" 
-         << this->GetTclName() << " DisplayPopupCallback}"
-         << endl;
-
   // Create the toplevel
 
   this->PopupTopLevel->Create(app, "toplevel", "-bd 2 -relief flat");
@@ -140,10 +133,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   this->PopupCloseButton->SetLabel("Close");
 
   tk_cmd << "pack " << this->PopupCloseButton->GetWidgetName() 
-         << " -side top -expand y -fill x -pady 2" << endl
-         << "bind " << this->PopupCloseButton->GetWidgetName() 
-         << " <ButtonPress> {" 
-         << this->GetTclName() << " WithdrawPopupCallback}" << endl;
+         << " -side top -expand y -fill x -pady 2" << endl;
 
   // Pack, bind
 
@@ -157,9 +147,49 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
                  this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
     }
 
+  this->Bind();
+
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPopupButton::Bind()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Bind the button so that it popups the toplevel
+
+  this->Script("bind %s <ButtonPress> {%s DisplayPopupCallback}",
+               this->GetWidgetName(), this->GetTclName());
+
+  if (this->PopupCloseButton && this->PopupCloseButton->IsCreated())
+    {
+    this->Script("bind %s <ButtonPress> {%s WithdrawPopupCallback}",
+                 this->PopupCloseButton->GetWidgetName(), this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPopupButton::UnBind()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("bind %s <ButtonPress> {}", 
+               this->GetWidgetName());
+
+  if (this->PopupCloseButton)
+    {
+    this->Script("bind %s <ButtonPress> {}", 
+                 this->PopupCloseButton->GetWidgetName());
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -283,6 +313,20 @@ void vtkKWPopupButton::UpdateEnableState()
   if (this->PopupCloseButton)
     {
     this->PopupCloseButton->SetEnabled(this->Enabled);
+    }
+
+  // Now given the state, bind or unbind
+
+  if (this->IsCreated())
+    {
+    if (this->Enabled)
+      {
+      this->Bind();
+      }
+    else
+      {
+      this->UnBind();
+      }
     }
 }
 
