@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.310");
+vtkCxxRevisionMacro(vtkPVApplication, "1.311");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1597,67 +1597,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
-  os << indent << "UseRenderingGroup: " << (this->Options->GetUseRenderingGroup()?"on":"off")
-     << endl; 
-  os << indent << "UseOffscreenRendering: " << (this->Options->GetUseOffscreenRendering()?"on":"off")
-     << endl; 
   os << indent << "StartGUI: " << this->StartGUI << endl;
-  if (this->Options->GetUseTiledDisplay())
-    { 
-    os << indent << "UseTiledDisplay: On\n";
-    os << indent << "TileDimensions: " << this->Options->GetTileDimensions()[0]
-       << ", " << this->Options->GetTileDimensions()[1] << endl;
-    }
 
-  os << indent << "UseStereoRendering: " << this->Options->GetUseStereoRendering() << endl;
-
-  if (this->Options->GetClientMode())
-    {
-    os << indent << "Running as a client\n";
-    os << indent << "Port: " << this->Options->GetPort() << endl;
-    os << indent << "RenderNodePort: " << this->Options->GetRenderNodePort() << endl;
-    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-    os << indent << "Host: " << (this->Options->GetHostName()?this->Options->GetHostName():"(none)") << endl;
-    os << indent << "Render Host: " << (this->Options->GetRenderServerHostName()?this->Options->GetRenderServerHostName():"(none)") << endl;
-    os << indent << "Username: " 
-       << (this->Options->GetUsername()?this->Options->GetUsername():"(none)") << endl;
-    os << indent << "AlwaysSSH: " << this->Options->GetAlwaysSSH() << endl;
-    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-    }
-  if (this->Options->GetServerMode())
-    {
-    os << indent << "Running as a server\n";
-    os << indent << "Port: " << this->Options->GetPort() << endl;
-    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-    }
-  if (this->Options->GetRenderServerMode())
-    {
-    if(this->Options->GetClientMode())
-      {
-      os << indent << "Running as a client connectd to a render server\n";
-      }
-    else
-      {
-      os << indent << "Running as a render server\n";
-      os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-      os << indent << "Port: " << this->Options->GetPort() << endl;
-      os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-      }
-    
-    }
-  if (this->Options->GetUseSoftwareRendering())
-    {
-    os << indent << "UseSoftwareRendering: Enabled\n";
-    }
-  if (this->Options->GetUseSatelliteSoftwareRendering())
-    {
-    os << indent << "UseSatelliteSoftware: Enabled\n";
-    }
-  if (this->Options->GetStartEmpty())
-    {
-    os << indent << "ParaView was started with no default modules.\n";
-    }
   os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
      << endl;
   os << indent << "TraceFileName: " 
@@ -1670,27 +1611,28 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourcesBrowserAlwaysShowName: " 
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 
-  os << indent << "CrashOnErrors: " << (this->Options->GetCrashOnErrors()?"on":"off") << endl;
-  os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-  os << indent << "MachinesFileName: " 
-    << (this->Options->GetMachinesFileName()?this->Options->GetMachinesFileName():"(null)") << endl;
-  os << indent << "CaveConfigurationFileName: " 
-    << (this->Options->GetCaveConfigurationFileName()?this->Options->GetCaveConfigurationFileName():"(null)") << endl;
-  os << indent << "DisableComposite: " << this->Options->GetDisableComposite() << endl;
-
   os << indent << "SMApplication: ";
   if (this->SMApplication)
     {
-    os << endl;
-    this->SMApplication->PrintSelf(os, indent.GetNextIndent());
+    this->SMApplication->PrintSelf(os << endl, indent.GetNextIndent());
     }
   else
     {
     os << "(none)" << endl;
     }
-  os << "OldRenderModuleName: " << (this->Options->GetRenderModuleName()?this->Options->GetRenderModuleName():"(none)") << endl;
+
+  os << indent << "Options: ";
+  if (this->Options)
+    {
+    this->Options->PrintSelf(os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::DisplayTCLError(const char* message)
 {
   vtkErrorMacro("TclTk error: "<<message);

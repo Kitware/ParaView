@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVOptions );
-vtkCxxRevisionMacro(vtkPVOptions, "1.1");
+vtkCxxRevisionMacro(vtkPVOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -187,7 +187,7 @@ void vtkPVOptions::Initialize()
   this->Internals->CMD.AddBooleanArgument("--crash-on-errors", &this->CrashOnErrors, 
     "For debugging purposes. This will make ParaView abort on errors.");
   this->Internals->CMD.AddBooleanArgument("--disable-composite", &this->DisableComposite, 
-    "Use this option when redering resources are not available on the server.");
+    "Use this option when rendering resources are not available on the server.");
   this->Internals->CMD.AddBooleanArgument("-dc", &this->DisableComposite, 
     "--disable-composite");
 
@@ -321,38 +321,109 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ServerMode: " << this->ServerMode << endl;
-  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
-  os << indent << "ConnectID: " << this->ConnectID << endl;
-  os << indent << "UseOffscreenRendering: " << this->UseOffscreenRendering << endl;
   os << indent << "PlayDemoFlag: " << this->PlayDemoFlag << endl;
   os << indent << "DisableRegistry: " << this->DisableRegistry << endl;
-  os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
-  os << indent << "ClientMode: " << this->ClientMode << endl;
-  os << indent << "ClientRenderServer: " << this->ClientRenderServer << endl;
-  os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
-  os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-  os << indent << "Port: " << this->Port << endl;
-  os << indent << "RenderModuleName: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
-  os << indent << "CaveConfigurationFileName: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
   os << indent << "BatchScriptName: " << (this->BatchScriptName?this->BatchScriptName:"(none)") << endl;
-  os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
-  os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;
-  os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
-  os << indent << "MachinesFileName: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
-
-  os << indent << "TileDimensions: " << this->TileDimensions[0] << " " << this->TileDimensions[1] << endl;
-  os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
-  os << indent << "UseSatelliteSoftwareRendering: " << this->UseSatelliteSoftwareRendering << endl;
-  os << indent << "UseRenderingGroup: " << this->UseRenderingGroup << endl;
-  os << indent << "UseSoftwareRendering: " << this->UseSoftwareRendering << endl;
-  os << indent << "UseTiledDisplay: " << this->UseTiledDisplay << endl;
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
-  os << indent << "DisableComposite: " << this->DisableComposite << endl;
-  os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
   os << indent << "UnknownArgument: " << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
   os << indent << "GroupFileName: " << (this->GroupFileName?this->UnknownArgument:"(none)") << endl;
   os << indent << "ErrorMessage: " << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
+
+  // Separate runtime informations so that it can be displayed in the about dialog
+  this->AboutPrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOptions::AboutPrintSelf(ostream& os, vtkIndent indent)
+{
+  if (this->ClientMode)
+    {
+    os << indent << "Running as a client\n";
+    }
+
+  if (this->ServerMode)
+    {
+    os << indent << "Running as a server\n";
+    }
+
+  if (this->ClientRenderServer)
+    {
+    os << indent << "Running as a client connected to a render server\n";
+    }
+
+  if (this->RenderServerMode)
+    {
+    os << indent << "Running as a render server\n";
+    }
+
+  if (this->ConnectDataToRender)
+    {
+    os << indent << "Running as a client to a data and render server\n";
+    }
+
+  if (this->ConnectDataToRender)
+    {
+    os << indent << "Running as a client to a data and render server\n";
+    }
+
+  if (this->ClientMode || this->ServerMode || this->RenderServerMode 
+   || this->RenderServerMode || this->ConnectDataToRender || this->ConnectDataToRender)
+    {
+    os << indent << "ConnectID is: " << this->ConnectID << endl;
+    os << indent << "Port: " << this->Port << endl;
+    os << indent << "Render Node Port: " << this->RenderNodePort << endl;
+    os << indent << "Render Server Port: " << this->RenderServerPort << endl;
+    os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;
+    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
+    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    os << indent << "Username: " 
+       << (this->Username?this->Username:"(none)") << endl;
+    if(this->AlwaysSSH)
+      {
+      os << indent << "Always using SSH";
+      }
+    }
+
+  if (this->UseSoftwareRendering)
+    {
+    os << indent << "Using Software Rendering\n";
+    }
+  if (this->UseSatelliteSoftwareRendering)
+    {
+    os << indent << "Using SatelliteSoftwareRendering\n";
+    }
+  if(this->UseStereoRendering)
+    {
+    os << indent << "Using Stereo Rendering\n";
+    }
+  if(this->UseOffscreenRendering)
+    {
+    os << indent << "Using Offscreen Rendering\n"; 
+    }
+  if (this->UseTiledDisplay)
+    { 
+    os << indent << "Using Tiled Display" << endl;
+    os << indent << "With Tile Dimensions: " << this->TileDimensions[0]
+       << ", " << this->TileDimensions[1] << endl;
+    }
+  if(this->UseRenderingGroup)
+    {
+    os << indent << "Using RenderingGroup: Enabled\n";
+    }
+  if( this->RenderModuleName )
+    {
+    os << indent << "Render Module: " << this->RenderModuleName << endl;
+    }
+  if(this->MachinesFileName)
+    {
+    os << indent << "Network configuration: " << this->MachinesFileName << endl;
+    }
+  if(this->CaveConfigurationFileName)
+    {
+    os << indent << "Specify cave configuration: " << this->CaveConfigurationFileName << endl;
+    }
+  os << indent << "Composite is: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
+
 }

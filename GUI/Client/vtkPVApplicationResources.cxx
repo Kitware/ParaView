@@ -21,6 +21,7 @@
 #include "vtkKWTkUtilities.h"
 
 #include "vtkPNGReader.h"
+#include "vtkPVOptions.h"
 
 #include <sys/stat.h>
 
@@ -281,6 +282,10 @@ void vtkPVApplication::AddAboutText(ostream &os)
      << "http://www.kitware.com" << endl
      << "This is version " << this->MajorVersion << "." << this->MinorVersion
      << ", release " << this->GetApplicationReleaseName() << endl;
+
+  vtkIndent indent;
+  os << endl << "Runtime information:" << endl;
+  this->Options->AboutPrintSelf( os, indent.GetNextIndent() );
 }
 
 //----------------------------------------------------------------------------
