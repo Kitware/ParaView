@@ -109,6 +109,7 @@ public:
   // These methods transmit the state change to all of the satellite
   // processes.
   void SetVisibility(int v);
+  int GetVisibility();
 
   // Description:
   // Although not all sources will need or use this input, I want to 
