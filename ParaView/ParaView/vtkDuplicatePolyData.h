@@ -43,6 +43,8 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  void InitializeSchedule(int numProcs);
+
 protected:
   vtkDuplicatePolyData();
   ~vtkDuplicatePolyData();
@@ -54,9 +56,14 @@ protected:
 
   vtkMultiProcessController *Controller;
 
+  int NumberOfProcesses;
+  int ScheduleLength;
+  int **Schedule;
+
 private:
   vtkDuplicatePolyData(const vtkDuplicatePolyData&); // Not implemented
   void operator=(const vtkDuplicatePolyData&); // Not implemented
 };
 
 #endif
+

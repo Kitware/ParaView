@@ -22,7 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.2.2.1");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.2.2.2");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -33,12 +33,133 @@ vtkDuplicatePolyData::vtkDuplicatePolyData()
   // Controller keeps a reference to this object as well.
   this->Controller = NULL;
   this->SetController(vtkMultiProcessController::GetGlobalController());  
+
+  this->Schedule = NULL;
+  this->ScheduleLength = 0;
+  this->NumberOfProcesses = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkDuplicatePolyData::~vtkDuplicatePolyData()
 {
   this->SetController(0);
+  // Free the schedule memory.
+  this->InitializeSchedule(0);
+}
+
+
+#define vtkDPDPow2(j) (1 << (j))
+static inline int vtkDPDLog2(int j, int& exact)
+{
+  int counter=0;
+  exact = 1;
+  while(j)
+    {
+    if ( ( j & 1 ) && (j >> 1) )
+      {
+      exact = 0;
+      }
+    j = j >> 1;
+    counter++;
+    }
+  return counter-1;
+}
+
+//----------------------------------------------------------------------------
+void vtkDuplicatePolyData::InitializeSchedule(int numProcs)
+{
+  int i, j, k, exact;
+  int *procFlags = NULL;
+
+  if (this->NumberOfProcesses == numProcs)
+    {
+    return;
+    }
+
+  // Free old schedule.
+  for (i = 0; i < this->NumberOfProcesses; ++i)
+    {
+    delete [] this->Schedule[i];
+    this->Schedule[i] = NULL;
+    }
+  if (this->Schedule)
+    {
+    delete [] this->Schedule;
+    this->Schedule = NULL;
+    }
+
+  this->NumberOfProcesses = numProcs;
+  if (numProcs == 0)
+    {
+    return;
+    }
+
+  i = vtkDPDLog2(numProcs, exact);
+  if (!exact)
+    {
+    ++i;
+    }
+  this->ScheduleLength = vtkDPDPow2(i) - 1;
+  this->Schedule = new int*[numProcs];
+  for (i = 0; i < numProcs; ++i)
+    {
+    this->Schedule[i] = new int[this->ScheduleLength];
+    for (j = 0; j < this->ScheduleLength; ++j)
+      {
+      this->Schedule[i][j] = -1;
+      }
+    }
+
+  // Temporary array to record which processes have been used.
+  procFlags = new int[numProcs];
+
+  for (j = 0; j < this->ScheduleLength; ++j)
+    {
+    for (i = 0; i < numProcs; ++i)
+      {
+      if (this->Schedule[i][j] == -1)
+        {
+        // Try to find a available process that we have not paired with yet.
+        for (k = 0; k < numProcs; ++k)
+          {
+          procFlags[k] = 0;
+          }
+        // Eliminate this process as a candidate.
+        procFlags[i] = 1;
+        // Eliminate procs already communicating durring this cycle.
+        for (k = 0; k < numProcs; ++k)
+          {
+          if (this->Schedule[k][j] != -1)
+            {
+            procFlags[this->Schedule[k][j]] = 1;
+            }
+          }
+        // Eliminate proces we have already paired with.
+        for (k = 0; k < j; ++k)
+          {
+          if (this->Schedule[i][k] != -1)
+            {
+            procFlags[this->Schedule[i][k]] = 1;
+            }
+          }
+        // Look for the first appropriate process.
+        for (k = 0; k < numProcs; ++k)
+          {
+          if (procFlags[k] == 0)
+            {
+            // Set the pair in the schedule for communication.
+            this->Schedule[i][j] = k;
+            this->Schedule[k][j] = i;
+            // Break the loop.
+            k = numProcs;
+            }
+          }
+        }
+      }
+    }
+
+  delete [] procFlags;
+  procFlags = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -75,7 +196,7 @@ void vtkDuplicatePolyData::Execute()
 {
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
-  int numProcs, myId;
+  int numProcs, myId, partner;
   int idx;
 
   if (input == NULL)
@@ -94,54 +215,58 @@ void vtkDuplicatePolyData::Execute()
   
   myId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
+  this->InitializeSchedule(numProcs);
 
   // Collect.
   vtkPolyData *pd = NULL;;
 
-  if (myId == 0)
-    {
-    vtkAppendPolyData *append = vtkAppendPolyData::New();
-    pd = vtkPolyData::New();
-    pd->CopyStructure(input);
-    pd->GetPointData()->PassData(input->GetPointData());
-    pd->GetCellData()->PassData(input->GetCellData());
-    append->AddInput(pd);
-    pd->Delete();
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      pd = vtkPolyData::New();
-      this->Controller->Receive(pd, idx, 131767);
-      append->AddInput(pd);
-      pd->Delete();
-      pd = NULL;
-      }
-    append->Update();
-    input = append->GetOutput();
+  vtkAppendPolyData *append = vtkAppendPolyData::New();
+  // First append the input from this process.
+  pd = vtkPolyData::New();
+  pd->CopyStructure(input);
+  pd->GetPointData()->PassData(input->GetPointData());
+  pd->GetCellData()->PassData(input->GetCellData());
+  append->AddInput(pd);
+  pd->Delete();
 
-    // Send to all processes.
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      this->Controller->Send(input, idx, 131768);
-      }
-
-    // Copy to output.
-    output->CopyStructure(input);
-    output->GetPointData()->PassData(input->GetPointData());
-    output->GetCellData()->PassData(input->GetCellData());
-    append->Delete();
-    append = NULL;
-    }
-  else
+  for (idx = 0; idx < this->ScheduleLength; ++idx)
     {
-    this->Controller->Send(input, 0, 131767);
-    vtkPolyData *pd = vtkPolyData::New();
-    this->Controller->Receive(pd, 0, 131768);
-    output->CopyStructure(pd);
-    output->GetPointData()->PassData(pd->GetPointData());
-    output->GetCellData()->PassData(pd->GetCellData());
-    pd->Delete();
-    pd = NULL;
+    partner = this->Schedule[myId][idx];
+    if (partner >= 0)
+      {
+      // Matching the order may not be necessary and may slow things down,
+      // but it is a reasonable precaution.
+      if (partner > myId)
+        {
+        this->Controller->Send(input, partner, 131767);
+
+        pd = vtkPolyData::New();
+        this->Controller->Receive(pd, partner, 131767);
+        append->AddInput(pd);
+        pd->Delete();
+        pd = NULL;
+        }
+      else
+        {
+        pd = vtkPolyData::New();
+        this->Controller->Receive(pd, partner, 131767);
+        append->AddInput(pd);
+        pd->Delete();
+        pd = NULL;
+
+        this->Controller->Send(input, partner, 131767);
+        }
+      }
     }
+  append->Update();
+  input = append->GetOutput();
+
+  // Copy to output.
+  output->CopyStructure(input);
+  output->GetPointData()->PassData(input->GetPointData());
+  output->GetCellData()->PassData(input->GetCellData());
+  append->Delete();
+  append = NULL;
 }
 
 
@@ -149,7 +274,35 @@ void vtkDuplicatePolyData::Execute()
 void vtkDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  int i, j;
   
   os << indent << "Controller: (" << this->Controller << ")\n";
+
+  os << indent << "Schedule:\n";
+  for (i = 0; i < this->NumberOfProcesses; ++i)
+    {
+    os << indent.GetNextIndent() << i << ": ";
+    if (this->Schedule[i][0] >= 0)
+      {
+      os << this->Schedule[i][0];
+      }
+    else
+      {
+      os << "X";
+      }
+    for (j = 1; j < this->ScheduleLength; ++j)
+      {
+      os << ", ";
+      if (this->Schedule[i][j] >= 0)
+        {
+        os << this->Schedule[i][j];
+        }
+      else
+        {
+        os << "X";
+        }
+      }
+    os << endl;
+    }
 }
 
