@@ -962,12 +962,13 @@ void vtkPVWindow::PlayDemo()
 
   if (!found)
     {
-    vtkKWMessageDialog::PopupMessage(this->Application, this,
-				     vtkKWMessageDialog::Warning,
-				     "Warning", 
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this,
+      "Warning", 
       "Could not find Demo1.pvs in the installation or\n"
       "build directory. Please make sure that ParaView\n"
-      "is installed properly.");
+      "is installed properly.",
+      vtkKWMessageDialog::WarningIcon);
     }
 }
 
@@ -1004,8 +1005,8 @@ void vtkPVWindow::OpenCallback()
 			  + strlen(openFileName) + 2];
     sprintf(error,"Permission denied for opening %s", openFileName);
     vtkKWMessageDialog::PopupMessage(this->Application, this,
-				     vtkKWMessageDialog::Error,
-				     "Error",  error);
+				     "Error",  error,
+				     vtkKWMessageDialog::ErrorIcon);
     delete [] error;
     return;
     }
@@ -1239,12 +1240,11 @@ int vtkPVWindow::OpenRecentFile( char* path)
   else
     {
     vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this, vtkKWMessageDialog::Error,
-      "Open Error", 
+      this->GetApplication(), this, "Open Error", 
       "There was a problem opening file. Please verify that the "
-      "file exists and that it is on the locaion you specified. ");
-				     
-
+      "file exists and that it is on the locaion you specified. ", 
+      vtkKWMessageDialog::ErrorIcon);				     
+    
     return 0;
     }
 }
@@ -1463,9 +1463,10 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   const char *script = this->AnimationInterface->GetScript();
   if (script && strlen(script) > 0)
     {
-    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
-			       vtkKWMessageDialog::Question, "Animation", 
-			       "Do you want your script to generate an animation?"))
+    if (vtkKWMessageDialog::PopupYesNo(
+	  this->Application, this, "Animation", 
+	  "Do you want your script to generate an animation?", 
+	  vtkKWMessageDialog::QuestionIcon))
       {
       animationFlag = 1;
       }
@@ -1473,9 +1474,10 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   
   if (animationFlag == 0)
     {
-    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
-			       vtkKWMessageDialog::Question, "Image", 
-			       "Do you want your script to save an image?"))
+    if (vtkKWMessageDialog::PopupYesNo(
+	  this->Application, this, "Image", 
+	  "Do you want your script to save an image?", 
+	  vtkKWMessageDialog::QuestionIcon))
       {
       imageFlag = 1;
       }
@@ -1496,9 +1498,10 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     *file << "WinToImage SetInput RenWin1\n";
     *file << "vtkJPEGWriter Writer\n\t";
     *file << "Writer SetInput [WinToImage GetOutput]\n\n";
-    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
-			       vtkKWMessageDialog::Question, "Offscreen", 
-			       "Do you want offscreen rendering?"))
+    if (vtkKWMessageDialog::PopupYesNo(
+	  this->Application, this, "Offscreen", 
+	  "Do you want offscreen rendering?", 
+	  vtkKWMessageDialog::QuestionIcon))
       {
       *file << "RenWin1 SetOffScreenRendering 1\n\n";
       }    

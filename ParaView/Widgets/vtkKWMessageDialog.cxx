@@ -39,13 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWWindow.h"
-#include "vtkKWLabel.h"
-#include "vtkKWImageLabel.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWIcon.h"
+#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
@@ -63,6 +65,8 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->CommandFunction = vtkKWMessageDialogCommand;
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->MessageDialogFrame);
+  this->CheckButton = vtkKWCheckButton::New();
+  this->CheckButton->SetParent(this->MessageDialogFrame);
   this->ButtonFrame = vtkKWWidget::New();
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
   this->OKFrame = vtkKWWidget::New();
@@ -77,13 +81,14 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Icon = vtkKWImageLabel::New();
   this->Icon->SetParent(this);
   this->IconImage = 0;
-  this->Default = NoneDefault;
   this->DialogName = 0;
+  this->Options    = 0;
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
 {
   this->Label->Delete();
+  this->CheckButton->Delete();
   this->ButtonFrame->Delete();
   this->OKFrame->Delete();
   this->CancelFrame->Delete();
@@ -107,6 +112,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
   this->Label->Create(app,"");
+  this->CheckButton->Create(app, "");
   this->ButtonFrame->Create(app,"frame","");
   
   switch (this->Style)
@@ -120,7 +126,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
       this->Script("pack %s -side left -padx 4 -expand yes",
                    this->OKFrame->GetWidgetName());
       break;
-    case vtkKWMessageDialog::YesNo :
+    case vtkKWMessageDialog::YesNo: 
       this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->OKButton->Create(app,"button","-text Yes -width 16");
       this->OKButton->SetCommand(this, "OK");
@@ -134,7 +140,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                    this->OKFrame->GetWidgetName(),
                    this->CancelFrame->GetWidgetName());
       break;
-    case vtkKWMessageDialog::OkCancel :
+    case vtkKWMessageDialog::OkCancel:
       this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->OKButton->Create(app,"button","-text OK -width 16");
       this->OKButton->SetCommand(this, "OK");
@@ -166,7 +172,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
       "<FocusIn>", this->CancelFrame->GetWidgetName(), 
       "configure -relief groove");
     this->CancelButton->SetBind(
-      "<FocusOut>", this->CancelFrame->GetWidgetName(), \
+      "<FocusOut>", this->CancelFrame->GetWidgetName(),
       "configure -relief flat");
     {
     this->CancelButton->SetBind(this, "<Return>", "Cancel");
@@ -175,8 +181,15 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   
   this->Script("pack %s -side bottom -fill x -pady 4",
                this->ButtonFrame->GetWidgetName());
+  if ( this->GetDialogName() )
+    {
+    this->CheckButton->SetText("Do not show this dialog any more.");
+    this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
+		 this->CheckButton->GetWidgetName());
+    }
   this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
                this->Label->GetWidgetName());
+
   this->Script("pack %s -side right -fill both -expand true -pady 4",
 	       this->MessageDialogFrame->GetWidgetName());
   this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
@@ -210,15 +223,15 @@ int vtkKWMessageDialog::Invoke()
       }
     }
   
-  if ( this->Default == vtkKWMessageDialog::YesDefault )
+  if ( this->Options & vtkKWMessageDialog::YesDefault )
     {
     this->OKButton->Focus();
     }
-  else if( this->Default == vtkKWMessageDialog::NoDefault )
+  else if( this->Options & vtkKWMessageDialog::NoDefault )
     {
     this->CancelButton->Focus();
     } 
-  if ( this->GetDefault() != vtkKWMessageDialog::NoneDefault )
+  else
     {
     this->SetBind("<Right>", "focus [ tk_focusNext %W ]");
     this->SetBind("<Left>", "focus [ tk_focusPrev %W ]");
@@ -239,45 +252,64 @@ int vtkKWMessageDialog::Invoke()
   this->Script("update idletasks");
 
   int res = vtkKWDialog::Invoke();
+  cout << "Dialog: " << this->DialogName << " rem: " 
+       << this->GetRememberMessage() << " res: " << res << endl;
   if ( this->DialogName && this->GetRememberMessage() )
     {
     int ires = res;
-    if ( !ires )
+    if ( this->Options & vtkKWMessageDialog::RememberYes )
       {
+      cout << "Remember yes" << endl;
+      ires = 1;
+      }
+    else if ( this->Options & vtkKWMessageDialog::RememberNo )
+      {
+      cout << "RememberNo" << endl;
       ires = -1;
       }
+    else
+      {
+      cout << "Remember both" << endl;
+      if ( !ires )
+	{
+	ires = -1;
+	}
+      }
+    //cout << "Ires: " << ires << endl;
     this->Application->SetMessageDialogResponse(this->DialogName, ires);
     }
   return res;
 }
 
-void vtkKWMessageDialog::SetIcon( int ico )
+void vtkKWMessageDialog::SetIcon()
 {
-  if ( ico && !this->IconImage )
+  if ( this->Options && !this->IconImage )
     {
     this->IconImage = vtkKWIcon::New();
     }
-  switch ( ico )
+  if ( this->Options & vtkKWMessageDialog::ErrorIcon )
     {
-    case vtkKWMessageDialog::Error:
-      this->IconImage->SetImageData(vtkKWIcon::ICON_ERROR);
-      this->Icon->SetImageData(this->IconImage);
-      break;
-    case vtkKWMessageDialog::Question:
-      this->IconImage->SetImageData(vtkKWIcon::ICON_QUESTION);
-      this->Icon->SetImageData(this->IconImage);
-      break;
-    case vtkKWMessageDialog::Warning:
-      this->IconImage->SetImageData(vtkKWIcon::ICON_WARNING);
-      this->Icon->SetImageData(this->IconImage);
-      break;
-    default:
-      this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
-		   this->Icon->GetWidgetName());
-      this->Script("pack forget %s", this->Icon->GetWidgetName());
-      return;
+    this->IconImage->SetImageData(vtkKWIcon::ICON_ERROR);
+    this->Icon->SetImageData(this->IconImage);
+    }
+  else if ( this->Options & vtkKWMessageDialog::QuestionIcon )
+    {
+    this->IconImage->SetImageData(vtkKWIcon::ICON_QUESTION);
+    this->Icon->SetImageData(this->IconImage);
+    }
+  else if ( this->Options & vtkKWMessageDialog::WarningIcon )
+    {
+    this->IconImage->SetImageData(vtkKWIcon::ICON_WARNING);
+    this->Icon->SetImageData(this->IconImage);
+    }
+  else
+    {
+    this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
+		 this->Icon->GetWidgetName());
+    this->Script("pack forget %s", this->Icon->GetWidgetName());
+    return;
     }  
-
+  
   this->Script("%s configure -anchor n "
 	       "-pady 10 -padx 4 -borderwidth 4",
 	       this->Icon->GetWidgetName());
@@ -286,51 +318,64 @@ void vtkKWMessageDialog::SetIcon( int ico )
 }
 
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
-				      unsigned int icon, const char* title, 
-				      const char*message)
+				      const char* title, 
+				      const char*message, int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetMasterWindow(win);
+  dlg2->SetOptions(
+    options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );
-  dlg2->SetIcon( icon );
+  dlg2->SetIcon();
   dlg2->BeepOn();
-  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
   dlg2->Invoke();
   dlg2->Delete();
 }
 
 int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
-				   unsigned int icon, const char* title, 
-				   const char*message)
+				   const char* name, 
+				   const char* title, const char* message,
+				   int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToYesNo();
   dlg2->SetMasterWindow(win);
+  dlg2->SetOptions(
+    options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
+  dlg2->SetDialogName(name);
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );
-  dlg2->SetIcon( icon );
+  dlg2->SetIcon();
   dlg2->BeepOn();
-  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
   int ret = dlg2->Invoke();
   dlg2->Delete();
   return ret;
 }
+
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
+				   const char* title, 
+				   const char*message, int options)
+{
+  return vtkKWMessageDialog::PopupYesNo(app, win, 0, title, message, 
+					options);
+}
+
 int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
-				      unsigned int icon, const char* title, 
-				      const char*message)
+				      const char* title, 
+				      const char*message, int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToOkCancel();
+  dlg2->SetOptions(
+    options | vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dlg2->SetMasterWindow(win);
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );
-  dlg2->SetIcon( icon );
-  dlg2->BeepOn();
-  dlg2->SetDefault(vtkKWMessageDialog::YesDefault);
+  dlg2->SetIcon();
   int ret = dlg2->Invoke();
   dlg2->Delete();
   return ret;
@@ -338,5 +383,7 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
 
 int vtkKWMessageDialog::GetRememberMessage()
 {
-  return 0;
+  int res = this->CheckButton->GetState();
+  cout << "Remember message: " << res << endl;
+  return res;
 }

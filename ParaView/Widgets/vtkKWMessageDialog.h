@@ -48,9 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWDialog.h"
 class vtkKWApplication;
+class vtkKWCheckButton;
+class vtkKWIcon;
 class vtkKWImageLabel;
 class vtkKWLabel;
-class vtkKWIcon;
 
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
@@ -62,17 +63,15 @@ public:
   enum {Message = 0,
         YesNo,
         OkCancel};
-  
-  enum {NoIcon = 0,
-	Error,
-	Warning,
-	Question,
-	Info};
 
-  enum {NoneDefault = 0,
-	YesDefault = 1,
-	NoDefault = 2};
-	
+  enum {RememberYes  = 0x00002,
+	RememberNo   = 0x00004,
+        ErrorIcon    = 0x00008,
+	WarningIcon  = 0x00010,
+	QuestionIcon = 0x00020,
+	YesDefault   = 0x00040,
+	NoDefault    = 0x00080,
+	Beep         = 0x00100};
   //ETX
   
   // Description:
@@ -84,19 +83,10 @@ public:
   void SetText(const char *);
 
   // Description:
-  // Set the icon in the message dialog
-  void SetIcon(int);
-
-  // Description:
   // Invoke the dialog and display it in a modal manner. 
   // This method returns a zero if the dilaog was killed or 
   // canceled, nonzero otherwise.
   virtual int Invoke();
-
-  // Description:
-  // Set the default button
-  vtkSetClampMacro(Default, int, 0, 2);
-  vtkGetMacro(Default, int );
 
   // Description:
   // Set the style of the message box
@@ -112,16 +102,29 @@ public:
   vtkGetStringMacro(DialogName);
 
   // Description:
+  // Set different options for the dialog.
+  vtkSetMacro(Options, int);
+  vtkGetMacro(Options, int);
+
+  // Description:
   // Utility methods to create various dialog windows.
+  // icon is a enumerated icon type described in vtkKWIcon.
+  // title is a title string of the dialog. name is the dialog name
+  // used for the registery. message is the text message displayed
+  // in the dialog.
   static void PopupMessage(vtkKWApplication *app, vtkKWWindow *masterWin,
-			   unsigned int icon, const char* title, 
-			   const char*message);
+			   const char* title, 
+			   const char* message, int options = 0);
+  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin,
+			const char* title, 
+			const char* message, int options = 0);
   static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin, 
-			unsigned int icon, const char* title, 
-			const char*message);
+			const char* name, 
+			const char* title, const char* message, 
+			int options = 0);
   static int PopupOkCancel(vtkKWApplication *app, vtkKWWindow *masterWin,
-			   unsigned int icon, const char* title, 
-			   const char*message);
+			   const char* title, 
+			   const char* message, int options = 0);
 
 protected:
   vtkKWMessageDialog();
@@ -129,6 +132,7 @@ protected:
 
   int             Style;
   int             Default;
+  int             Options;
   char            *DialogName;
 
   vtkKWWidget     *MessageDialogFrame;
@@ -140,8 +144,16 @@ protected:
   vtkKWIcon       *IconImage;
   vtkKWWidget     *OKFrame;
   vtkKWWidget     *CancelFrame;
+  vtkKWCheckButton *CheckButton;
 
+  // Description:
+  // Get the value of the check box for remembering the answer from
+  // the user.
   int GetRememberMessage();
+  
+  // Description:
+  // Set the icon on the message dialog.
+  void SetIcon();
 
 private:
   vtkKWMessageDialog(const vtkKWMessageDialog&); // Not implemented
