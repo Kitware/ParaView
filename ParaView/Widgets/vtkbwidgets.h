@@ -84,7 +84,7 @@ permission to use and distribute the software in accordance with the
 terms specified in this license. 
 */
 
-const char* bwidgets =
+const char* bwidgets1 =
 "# ----------------------------------------------------------------------------\n"
 "#  widget.tcl\n"
 "#  This file is part of Unifix BWidget Toolkit\n"
@@ -1785,7 +1785,9 @@ const char* bwidgets =
 "    return [Widget::cget $path.$node $option]\n"
 "}\n"
 "\n"
-"\n"
+"\n";
+
+const char* bwidgets2 =
 "# ------------------------------------------------------------------------------\n"
 "#  Command Tree::bindText\n"
 "# ------------------------------------------------------------------------------\n"

@@ -136,8 +136,17 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  char* script = new char[strlen(bwidgets)+1];
-  strcpy(script, bwidgets);
+  char* script = new char[strlen(bwidgets1)+1];
+  strcpy(script, bwidgets1);
+  if (Tcl_GlobalEval(interp, script) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
+    << interp->result);
+    }
+  delete[] script;
+
+  script = new char[strlen(bwidgets2)+1];
+  strcpy(script, bwidgets2);
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
