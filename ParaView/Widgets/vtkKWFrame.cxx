@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.8");
+vtkCxxRevisionMacro(vtkKWFrame, "1.9");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -109,7 +109,7 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
     {
     // create the top level
     wname = this->GetWidgetName();
-    this->Script("frame %s -borderwidth 2 -relief flat", wname);
+    this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
     this->Frame = this;
     }
