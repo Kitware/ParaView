@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.2");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -118,73 +118,86 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
     }
 
 #if defined(_WIN32)
-  // Search for all files in the given directory.
-  vtkstd::string pattern = prefix;
-  pattern += "*";
-  WIN32_FIND_DATA data;
-  HANDLE handle = FindFirstFile(pattern.c_str(), &data);
-  if(handle == INVALID_HANDLE_VALUE)
-    { 
-    LPVOID lpMsgBuf;
-    FormatMessage( 
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      NULL,
-      GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-      (LPTSTR) &lpMsgBuf,
-      0,
-      NULL 
-      );
-    // Could add check of GetLastError here.
-    vtkErrorMacro("Error calling FindFirstFile : " << (char*)lpMsgBuf << "\nDirectory: " << pattern.c_str());
-    LocalFree( lpMsgBuf );
-    return;
-    }
-  int done = 0;
-  while(!done)
+  if(strcmp(dirname, "<GET_DRIVE_LETTERS>") == 0)
     {
-    // Look at this file.
-    if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    // Special case to get top level drive letters.
+    char strings[1024];
+    DWORD n = GetLogicalDriveStrings(1024, strings);
+    char* start = strings;
+    char* end = start;
+    for(;end != strings+n; ++end)
       {
-      if(strcmp(data.cFileName, "..") != 0 && strcmp(data.cFileName, ".") != 0)
+      if(*end == '\\')
         {
-        directories.insert(data.cFileName);
+        *end = '/';
+        }
+      if(!*end)
+        {
+        directories.insert(start);
+        start = end+1;
         }
       }
-    else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
-            (!((data.dwFileAttributes & FILE_ATTRIBUTE_READONLY) && save) &&
-             !(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
-             !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
-             !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
+    }
+  else
+    {
+    // Search for all files in the given directory.
+    vtkstd::string pattern = prefix;
+    pattern += "*";
+    WIN32_FIND_DATA data;
+    HANDLE handle = FindFirstFile(pattern.c_str(), &data);
+    if(handle == INVALID_HANDLE_VALUE)
       {
-      files.insert(data.cFileName);
+      LPVOID lpMsgBuf;
+      FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+        GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf, 0, NULL);
+      vtkErrorMacro("Error calling FindFirstFile : "
+                    << (char*)lpMsgBuf << "\nDirectory: " << dirname);
+      LocalFree(lpMsgBuf);
+      return;
+      }
+    int done = 0;
+    while(!done)
+      {
+      // Look at this file.
+      if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+        if(strcmp(data.cFileName, "..") != 0 &&
+           strcmp(data.cFileName, ".") != 0)
+          {
+          directories.insert(data.cFileName);
+          }
+        }
+      else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
+              (!((data.dwFileAttributes & FILE_ATTRIBUTE_READONLY) && save) &&
+               !(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
+               !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
+               !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
+        {
+        files.insert(data.cFileName);
+        }
+
+      // Find the next file.
+      done = (FindNextFile(handle, &data) == 0)?1:0;
       }
 
-    // Find the next file.
-    done = (FindNextFile(handle, &data) == 0)?1:0;
-    }
+    if(GetLastError() != ERROR_NO_MORE_FILES)
+      {
+      LPVOID lpMsgBuf;
+      FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+        GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf, 0, NULL);
+      vtkErrorMacro("Error calling FindNextFile : "
+                    << (char*)lpMsgBuf << "\nDirectory: " << dirname);
+      LocalFree(lpMsgBuf);
+      }
 
-  if(GetLastError() != ERROR_NO_MORE_FILES)
-    { 
-    LPVOID lpMsgBuf;
-    
-    FormatMessage( 
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      NULL,
-      GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-      (LPTSTR) &lpMsgBuf,
-      0,
-      NULL 
-      );
-    vtkErrorMacro("Error calling FindNextFile : " << (char*)lpMsgBuf << "\nDirectory: " << dirname);
-    LocalFree( lpMsgBuf );
-    }
-
-  if(!FindClose(handle))
-    {
-    // Could add check of GetLastError here.
-    vtkErrorMacro("Error calling FindClose.");
+    if(!FindClose(handle))
+      {
+      vtkErrorMacro("Error calling FindClose.");
+      }
     }
 #else
   // Open the directory and make sure it exists.
