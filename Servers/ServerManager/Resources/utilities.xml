@@ -194,7 +194,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="3d_widgets">
-    <LineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget">
+    <LineWidgetProxy name="LineWidgetProxy" class="vtkPickLineWidget">
       <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"

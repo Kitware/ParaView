@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkSMLineWidgetProxy.h"
 
-#include "vtkLineWidget.h"
+#include "vtkPickLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
@@ -22,7 +22,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
@@ -32,7 +32,7 @@ vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
   this->Point1[1] = this->Point1[2] = 0;
   this->Point2[0] = 0.5;
   this->Point2[1] = this->Point2[2] = 0;
-  this->SetVTKClassName("vtkLineWidget");
+  this->SetVTKClassName("vtkPickLineWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
-  vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
+  vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(wdg);
   if (!widget)
     {
     return;
