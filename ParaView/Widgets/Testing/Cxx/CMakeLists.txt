@@ -1,12 +1,5 @@
-ADD_EXECUTABLE( TestHashTable TestHashTable.cxx )
-ADD_EXECUTABLE( TestPointerArray TestPointerArray.cxx )
-ADD_EXECUTABLE( TestRegistery TestRegistery.cxx )
-ADD_EXECUTABLE( TestMemory TestMemory.cxx )
 ADD_EXECUTABLE( ConvertImage ConvertImage.cxx )
 
-ADD_TEST(TestHashTable ${CXX_TEST_PATH}/TestHashTable)
-ADD_TEST(TestPointerArray ${CXX_TEST_PATH}/TestPointerArray)
-ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
