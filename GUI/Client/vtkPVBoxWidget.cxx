@@ -42,7 +42,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.22");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -416,8 +416,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
                                                  "TranslateEndCallback");
     this->TranslateThumbWheel[cc]->SetEntryCommand(this,
                                                    "TranslateEndCallback");
-    //this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
-    //  "<KeyRelease>", "TranslateKeyPressCallback");
+    this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
+      "<KeyRelease>", "TranslateKeyPressCallback");
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
@@ -435,8 +435,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
     this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
     this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleEndCallback");
-    //this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
-    //  "<KeyRelease>", "ScaleKeyPressCallback");
+    this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
+      "<KeyRelease>", "ScaleKeyPressCallback");
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
 
@@ -455,8 +455,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
                                               "OrientationEndCallback");
     this->OrientationScale[cc]->SetEntryCommand(this, 
                                                 "OrientationEndCallback");
-    //this->OrientationScale[cc]->GetEntry()->SetBind(this,
-    //  "<KeyRelease>", "OrientationKeyPressCallback");
+    this->OrientationScale[cc]->GetEntry()->SetBind(this,
+      "<KeyRelease>", "OrientationKeyPressCallback");
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
