@@ -163,6 +163,7 @@ protected:
   void CompleteInputArrays(vtkPolyData* input);
   void ReceiveInputArrays(vtkDataSetAttributes* attr, int recFrom);
   void SendInputArrays(vtkDataSetAttributes* attr, int sendTo);
+  int DoubleCheckArrays(vtkPolyData* input);
 
   vtkMultiProcessController *Controller;
   //vtkPointLocator *Locator;

@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.3");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -752,6 +752,8 @@ void vtkPVClientServerModule::Exit()
     // if you start client server mode with mpi the server
     // never gets the break rmi unless this sleep is here.
     Sleep(1000);
+#else
+    sleep(1);
 #endif
     }
   if(this->RenderServerSocket)
@@ -762,6 +764,8 @@ void vtkPVClientServerModule::Exit()
     // if you start client server mode with mpi the server
     // never gets the break rmi unless this sleep is here.
     Sleep(1000);
+#else
+    sleep(1);
 #endif
     }
   // Break RMI for MPI controller is in Init method.
