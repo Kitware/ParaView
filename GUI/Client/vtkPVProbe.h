@@ -28,6 +28,7 @@ class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkXYPlotWidget;
 class vtkPVPlotDisplay;
+class vtkXYPlotWidgetObserver;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -57,6 +58,13 @@ public:
   // Get the XY Plot widget.
   vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
   
+  // Description:
+  // This method is called when event is triggered on the XYPlotWidget.
+//BTX
+  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
+                            void* calldata);
+//ETX
+
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
@@ -79,6 +87,7 @@ protected:
   int Dimensionality; // point = 0, line = 1
   
   vtkXYPlotWidget* XYPlotWidget;
+  vtkXYPlotWidgetObserver* XYPlotObserver;
 
   int GetDimensionality();
 
