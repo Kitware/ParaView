@@ -30,6 +30,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
   vtkM2NCollect.cxx
+  vtkPVServerXDMFParameters.cxx
   )
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
@@ -52,11 +53,8 @@ SET( ParaViewExtraWrapper_SRCS
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWObject.h
   )
 
-IF(XDMF_FOUND)
   SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
-    vtkPVServerXDMFParameters.cxx
     )
-ENDIF(XDMF_FOUND)
 
 SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesActor.cxx
@@ -201,6 +199,7 @@ INCLUDE_DIRECTORIES(
   ${VTKCLIENTSERVER_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
   ${KWSYS_INCLUDE_DIR}
+  ${XDMF_INCLUDE_DIRS}
   )
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
@@ -402,7 +401,7 @@ IF(PARAVIEW_BUILD_DEVELOPMENT)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVFilters)
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmf)
+TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmfCS)
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVDevelopment)

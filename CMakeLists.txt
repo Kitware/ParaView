@@ -131,6 +131,11 @@ SET(XDMF_REGENERATE_YACCLEX OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_REGENERATE_WRAPPERS OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
+SET(XDMF_KITS_DIR "${ParaView_BINARY_DIR}/Utilities/Xdmf/vtk/Utilities")
+SET(XDMF_INCLUDE_DIRS
+  "${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk"
+  "${ParaView_BINARY_DIR}/Utilities/Xdmf/vtk")
+SET(PARAVIEW_LINK_XDMF ON)
 SUBDIRS(Utilities/Xdmf)
 
 #########################################################################
