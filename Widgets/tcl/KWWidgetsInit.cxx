@@ -41,6 +41,9 @@ ClientData vtkKWLabelNewCommand();
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWLabeledFrameNewCommand();
+int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWListBoxNewCommand();
 int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWMenuNewCommand();
@@ -98,6 +101,9 @@ ClientData vtkKWWindowNewCommand();
 int vtkKWWindowCollectionCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWWindowCollectionNewCommand();
+int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWXtEmbeddedWidgetNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -154,6 +160,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWLabelCommand);
   vtkTclCreateNew(interp,"vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
                   vtkKWLabeledFrameCommand);
+  vtkTclCreateNew(interp,"vtkKWListBox", vtkKWListBoxNewCommand,
+                  vtkKWListBoxCommand);
   vtkTclCreateNew(interp,"vtkKWMenu", vtkKWMenuNewCommand,
                   vtkKWMenuCommand);
   vtkTclCreateNew(interp,"vtkKWMessageDialog", vtkKWMessageDialogNewCommand,
@@ -192,5 +200,7 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWWindowCommand);
   vtkTclCreateNew(interp,"vtkKWWindowCollection", vtkKWWindowCollectionNewCommand,
                   vtkKWWindowCollectionCommand);
+  vtkTclCreateNew(interp,"vtkKWXtEmbeddedWidget", vtkKWXtEmbeddedWidgetNewCommand,
+                  vtkKWXtEmbeddedWidgetCommand);
   return TCL_OK;
 }

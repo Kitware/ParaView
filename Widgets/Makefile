@@ -29,6 +29,7 @@ vtkKWExtent \
 vtkKWGenericComposite \
 vtkKWLabel \
 vtkKWLabeledFrame \
+vtkKWListBox \
 vtkKWMenu \
 vtkKWMessageDialog \
 vtkKWNotebook \
@@ -47,7 +48,8 @@ vtkKWWidgetCollection \
 vtkKWViewCollection \
 vtkKWVolumeComposite \
 vtkKWWindow \
-vtkKWWindowCollection
+vtkKWWindowCollection \
+vtkKWXtEmbeddedWidget 
 
 #------------------------------------------------------------------------------
 # Autoconfig defines that can be overridden in user.make

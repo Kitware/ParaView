@@ -27,8 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 // .NAME vtkKWListBox
 // .SECTION Description
-// A widget that looks like a button but when pressed provides a list
-// of options that the user can select.
+// A widget that can have a list of items with a scroll bar.
 
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h
