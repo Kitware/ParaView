@@ -324,6 +324,12 @@ public:
   // Check if the application needs to abort.
   virtual int CheckForOtherAbort() { return 0; }
   
+  // Description:
+  // Static method that processes the event. First argument is  
+  // the calling object, second is event id, third is a pointer to
+  // the windows and last is the arguments of the event.
+  static void ProcessEvent(vtkObject *, unsigned long, void *, void *);
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -347,6 +353,10 @@ protected:
   // Description:
   // Display the exit dialog.
   int ExitDialog();
+
+  // Description:
+  // Process events
+  virtual void InternalProcessEvent(vtkObject *, unsigned long, float *, void *);
 
   virtual void CreateStatusImage();
 
