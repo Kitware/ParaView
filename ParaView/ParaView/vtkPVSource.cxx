@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.6");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.7");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -317,12 +317,13 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     {
     inputName = "Input";
     }
+
   numParts = pvs->GetNumberOfParts();
-  for (partIdx = 0; partIdx < numParts; ++partIdx)
-    {
-    part = pvs->GetPart(partIdx);
-    if (this->VTKMultipleInputsFlag)
-      { // Only one source takes all parts as input.
+  if (this->VTKMultipleInputsFlag)
+    { // Only one source takes all parts as input.
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      part = pvs->GetPart(partIdx);
       sourceTclName = this->GetVTKSourceTclName(0);
       
       if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
@@ -335,9 +336,21 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
                          part->GetVTKDataTclName());
         }      
       }
-    else
-      { // One source for each part.
-      sourceTclName = this->GetVTKSourceTclName(partIdx);
+    }
+  else
+    { // One source for each part.
+    int numSources = this->GetNumberOfVTKSources();
+    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+      {
+      sourceTclName = this->GetVTKSourceTclName(sourceIdx);
+      // This is to handle the case when there are multiple
+      // inputs and the first one has multiple parts. For
+      // example, in the Glyph filter, when the input has multiple
+      // parts, the glyph source has to be applied to each.
+      // In that case, sourceTclName == glyph input, 
+      // inputName == glyph source.
+      partIdx = sourceIdx % numParts;
+      part = pvs->GetPart(partIdx);
       if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
         {
         vtkErrorMacro("Source data mismatch.");
