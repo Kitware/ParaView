@@ -27,7 +27,7 @@
 #include "vtkCell.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.12");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.13");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the
@@ -340,14 +340,18 @@ int vtkPlanesIntersection::PolygonIntersectsBBox(double bounds[6], vtkPoints *pt
 
     // find 3 points that are not co-linear and compute a normal
 
-    double nvec[3];
+    double nvec[3], p0[3], p1[3], pp[3];
 
     int npts = pts->GetNumberOfPoints();
 
+    pts->GetPoint(0, p0);
+    pts->GetPoint(1, p1);
+
     for (int p = 2; p < npts; p++)
       {
-      vtkPlanesIntersection::ComputeNormal(pts->GetPoint(0), pts->GetPoint(1),
-                                           pts->GetPoint(p), nvec);
+      pts->GetPoint(p, pp);
+
+      vtkPlanesIntersection::ComputeNormal(p0, p1, pp, nvec);
 
       if (vtkPlanesIntersection::GoodNormal(nvec))
         {
@@ -414,7 +418,7 @@ int vtkPlanesIntersection::PolygonIntersectsBBox(double bounds[6], vtkPoints *pt
 //  
 
 vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorld(vtkRenderer *ren,
-                                                                    double x0, double x1, double y0, double y1)
+                      double x0, double x1, double y0, double y1)
 {
   vtkPlanesIntersection *planes;
     
@@ -663,16 +667,26 @@ vtkPlanesIntersection *vtkPlanesIntersection::Convert3DCell(vtkCell *cell)
     vtkCell *face = cell->GetFace(i);
     
     vtkPoints *facePts = face->GetPoints();
+    int npts = facePts->GetNumberOfPoints();
+
+    double p0[3], p1[3], pp[3], n[3];
     
-    double *p1 = facePts->GetPoint(0);
-    double *p2 = facePts->GetPoint(1);
-    double *p3 = facePts->GetPoint(2);
+    facePts->GetPoint(0, p0);
+    facePts->GetPoint(1, p1);
+
+    for (int p = 2; p < npts; p++)
+      {
+      facePts->GetPoint(p, pp);
+
+      vtkPlanesIntersection::ComputeNormal(pp, p1, p0, n);
+
+      if (vtkPlanesIntersection::GoodNormal(n))
+        {
+        break;
+        }
+      }
     
-    double n[3];
-    
-    vtkPlanesIntersection::ComputeNormal(p3, p2, p1, n);
-    
-    origins->SetPoint(i, p2);
+    origins->SetPoint(i, pp);
     normals->SetTuple(i, n);
     
     inside[0] += p1[0];
