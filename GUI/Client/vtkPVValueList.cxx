@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.16");
+vtkCxxRevisionMacro(vtkPVValueList, "1.17");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -499,7 +499,7 @@ void vtkPVValueList::DeleteValueCallback()
 //-----------------------------------------------------------------------------
 void vtkPVValueList::GenerateValuesCallback()
 {
-  float range[2];
+  double range[2];
   this->GenerateRangeWidget->GetRange(range);
 
   if (range[0] == 0 && range[1] == 0) // happens if the entries are empty

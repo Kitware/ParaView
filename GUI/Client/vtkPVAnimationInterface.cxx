@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.131");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.132");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -819,7 +819,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
   this->NumberOfFramesEntry->GetEntry()->SetValue(t);
-  float range[2];
+  double range[2];
   this->TimeRange->SetWholeRange(0, t);
   this->TimeRange->GetRange(range);
   this->TimeRange->SetRange(range[0], t);
@@ -2053,7 +2053,7 @@ void vtkPVAnimationInterface::ScriptEditorCallback()
 //-----------------------------------------------------------------------------
 int vtkPVAnimationInterface::GetGlobalStart()
 {
-  float range[2];
+  double range[2];
   this->TimeRange->GetRange(range);
   return static_cast<int>(range[0]);
 }
@@ -2061,7 +2061,7 @@ int vtkPVAnimationInterface::GetGlobalStart()
 //-----------------------------------------------------------------------------
 int vtkPVAnimationInterface::GetGlobalEnd()
 {
-  float range[2];
+  double range[2];
   this->TimeRange->GetRange(range);
   return static_cast<int>(range[1]);
 }

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.7");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.8");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -540,7 +540,7 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
   
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
-    float range[2];
+    double range[2];
     this->ScalarOpacityRampRange->GetRange(range);
     
     double startValue = this->ScalarOpacityStartValueScale->GetValue();
@@ -600,7 +600,7 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
   
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
-    float range[2];
+    double range[2];
     this->ColorRampRange->GetRange(range);
     
     double *startColor = this->ColorStartValueButton->GetColor();
