@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.22");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.23");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -1171,6 +1171,34 @@ int vtkKWTkUtilities::GetSlaves(
   delete [] buffer;
 
   return nb_slaves;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
+                                          const char *window, 
+                                          int x, int y)
+{
+  if (!interp || !window)
+    {
+    return 0;
+    }
+
+  ostrstream geometry;
+  geometry << "concat [winfo width " << window << "] [winfo height "
+           << window << "] [winfo rootx " << window << "] [winfo rooty "
+           << window << "]" << ends;
+  int res = Tcl_GlobalEval(interp, geometry.str());
+  geometry.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query window geometry! " << window);
+    return 0;
+    }
+  
+  int ww, wh, wx, wy;
+  sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy);
+
+  return (x >= wx && x < (wx + ww) && y >= wy && y < (wy + wh)) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------

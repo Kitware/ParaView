@@ -79,6 +79,13 @@ public:
   static void GetBackgroundColor(Tcl_Interp *interp,
                                  const char *window, 
                                  int *r, int *g, int *b);
+
+  // Description:
+  // Check if a pair of screen coordinates are within the area defined by
+  // a window.
+  static int ContainsCoordinates(Tcl_Interp *interp,
+                                 const char *window, 
+                                 int x, int y);
   
   // Description:
   // Update a photo given a pixel structure. 
