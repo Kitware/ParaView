@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.232");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.233");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1979,8 +1979,11 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     return;
     }
   this->EventuallyRenderFlag = 0;
-  this->RenderWindow->SetDesiredUpdateRate(
-    this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
+  if (this->GetPVWindow()->GetInteractor())
+    {
+    this->RenderWindow->SetDesiredUpdateRate(
+      this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
+    }
 
   // I do not know if these are necessary here.
   abort = this->ShouldIAbort();
@@ -2652,7 +2655,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.232 $");
+  this->ExtractRevision(os,"$Revision: 1.233 $");
 }
 
 //------------------------------------------------------------------------------
