@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.195");
+vtkCxxRevisionMacro(vtkKWWindow, "1.196");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1672,12 +1672,15 @@ void vtkKWWindow::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   // Update the toolbars
+
   this->PropagateEnableState(this->Toolbars);
 
   // Update the notebook
+
   this->PropagateEnableState(this->Notebook);
 
   // Update the Tcl interactor
+
   this->PropagateEnableState(this->TclInteractor);
 
   this->PropagateEnableState(this->SelectedView);
@@ -1739,6 +1742,22 @@ void vtkKWWindow::UpdateMenuState()
             index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
           }
         }
+      }
+    }
+
+  // Update the About entry, since the pretty name also depends on the
+  // limited edition mode
+
+  if (this->MenuHelp)
+    {
+    int pos = this->MenuHelp->GetIndexOfCommand(this, "DisplayAbout");
+    if (pos >= 0)
+      {
+      ostrstream label;
+      label << "-label {About " 
+            << this->GetApplication()->GetApplicationPrettyName() << "}"<<ends;
+      this->MenuHelp->ConfigureItem(pos, label.str());
+      label.rdbuf()->freeze(0);
       }
     }
 }
