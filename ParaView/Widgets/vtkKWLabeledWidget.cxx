@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.10");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -81,7 +81,7 @@ void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
 
   // Create the container frame
 
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
                this->GetWidgetName(), args ? args : "");
 
   // Create the label. If the parent has been set before (i.e. by the subclass)

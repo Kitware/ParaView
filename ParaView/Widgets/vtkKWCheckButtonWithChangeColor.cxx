@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.3");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.4");
 
 int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
                                            int argc, char *argv[]);
@@ -89,7 +89,7 @@ void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app, const char *
 
   // Create the container frame
 
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
                this->GetWidgetName(), args ? args : "");
   
   // Create the checkbutton. 
