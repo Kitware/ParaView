@@ -41,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.34");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -474,7 +474,7 @@ void vtkPVInteractorStyleControl::SetLabel(const char* label)
   if ( this->LabeledFrame && this->Application )
     {
     ostrstream str;
-    str << "Camera Control for: " << label << ends;
+    str << "Camera Control for " << label << ends;
     this->LabeledFrame->SetLabel(str.str());
     str.rdbuf()->freeze(0);
     }
