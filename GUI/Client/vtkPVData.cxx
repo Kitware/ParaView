@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.259");
+vtkCxxRevisionMacro(vtkPVData, "1.260");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -3358,7 +3358,14 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->ColorMenuLabel);
   this->PropagateEnableState(this->ColorMenu);
-  this->PropagateEnableState(this->ColorButton);
+  if ( this->PVColorMap )
+    {
+    this->ColorButton->SetEnabled(0);
+    }
+  else
+    {
+    this->PropagateEnableState(this->ColorButton);
+    }
   this->PropagateEnableState(this->EditColorMapButton);
   this->PropagateEnableState(this->RepresentationMenuLabel);
   this->PropagateEnableState(this->RepresentationMenu);
