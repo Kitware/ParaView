@@ -23,59 +23,6 @@
 
 #define FALSE 0
 #define TRUE  1
-#define MEG (1024*1024)
-static long open_mem=0;
-
-/* Memory handler */
-void *myMalloc(long size) {
-
-  static long total_mem=0;
-  void *mem_ptr;
-
-  /* Quick sanity check */
-  if (size<=0) return NULL;
-
-  /* Actually allocate memory */
-  mem_ptr = malloc(size+sizeof(long));
-
-  /* Make sure malloc worked */
-  if (mem_ptr == NULL) 
-    {
-    fprintf(stderr,"Could not allocate %ld bytes of mem\n", (long)size);
-    exit(1);
-    }
-  else
-    {
-    /* Store size of malloc  */
-    *((long*)mem_ptr) = size;
-
-    /* Accumulate total */
-    total_mem += size;
-    open_mem += size;
-    printf("Total MB alloc'd mem: %f (Open=%f)\n",
-            (float)total_mem/MEG,(float)open_mem/MEG);
-    }
-  return (long*)mem_ptr+1;
-}
-
-void myFree(void *mem_ptr) {
-
-  static long freed_mem=0;
-
-  /* Read the amount of memory this will 'free' */
-  long size = *((long*)mem_ptr-1);
-
-  /* Accumulate total */
-  freed_mem += size;
-  open_mem -= size;
-  printf("Total Mbytes of freed mem: %f (Open=%f)\n",
-            (float)freed_mem/MEG,(float)open_mem/MEG);
-
-  /* Actually free memory */
-  free(((long*)mem_ptr)-1);
-}
-/*#define free myFree */
-/*#define malloc myMalloc */
 
 
 /*-------------------------------------------------------------------------*/
@@ -760,7 +707,10 @@ int read_file_header(SpyFile* spy)
       {
       fread_int(spy, &stm_ptmp->MField_int[i],1,spy->in_file);
       }
-    else stm_ptmp->MField_int[i] = (i+1)*100;
+    else 
+      {
+      stm_ptmp->MField_int[i] = (i+1)*100;
+      }
     }
 
   /* Read in the file offset */
