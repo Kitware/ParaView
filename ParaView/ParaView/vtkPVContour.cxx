@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkContourFilter.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -100,6 +101,13 @@ vtkPVContour::~vtkPVContour()
 //----------------------------------------------------------------------------
 vtkPVContour* vtkPVContour::New()
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVContour");
+  if(ret)
+    {
+    return (vtkPVContour*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkPVContour();
 }
 
