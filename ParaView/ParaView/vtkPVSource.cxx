@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.10");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.11");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1125,25 +1125,25 @@ void vtkPVSource::DeleteCallback()
     it->Delete();
     }
 
-  current = prev;
+  current = window->GetCurrentPVSource();
+  if ( this == current )
+    {
+    current = prev;
   
-  if (prev == NULL)
-    {
-    // Unpack the properties.  This is required if prev is NULL.
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-                 this->ParametersParent->GetWidgetName());
-
-    // Show the 3D View settings
-    vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-    vtkPVWindow *window = pvApp->GetMainWindow();
-    this->Script("%s invoke \"%s\"", 
-                 window->GetMenuView()->GetWidgetName(),
-                 VTK_PV_VIEW_MENU_LABEL);
-    }
-  else
-    {
-    //prev->GetPVOutput(0)->VisibilityOn();
-    //prev->ShowProperties();
+    if (prev == NULL)
+      {
+      // Unpack the properties.  This is required if prev is NULL.
+      this->Script("catch {eval pack forget [pack slaves %s]}",
+                   this->ParametersParent->GetWidgetName());
+      
+      // Show the 3D View settings
+      vtkPVApplication *pvApp = 
+        vtkPVApplication::SafeDownCast(this->Application);
+      vtkPVWindow *window = pvApp->GetMainWindow();
+      this->Script("%s invoke \"%s\"", 
+                   window->GetMenuView()->GetWidgetName(),
+                   VTK_PV_VIEW_MENU_LABEL);
+      }
     }
         
   // Remove all of the actors mappers. from the renderer.
@@ -2087,7 +2087,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.10 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.11 $");
 }
 
 //----------------------------------------------------------------------------
