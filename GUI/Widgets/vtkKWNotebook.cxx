@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.69");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.70");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -2491,7 +2491,10 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
 
   // Empty the most recent pages buffer
 
-  this->Internals->MostRecentPages.clear();
+  if (this->Internals)
+    {
+    this->Internals->MostRecentPages.clear();
+    }
 
   // If we are enabling this feature, put the current tabs in the most
   // recent pages

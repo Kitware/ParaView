@@ -115,6 +115,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Get the drag and drop framework.
+  // Override the superclass to allow the frame to be dragged using
+  // the label.
+  virtual vtkKWDragAndDropTargets* GetDragAndDropTargets();
+
 protected:
 
   vtkKWFrameLabeled();

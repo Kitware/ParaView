@@ -16,8 +16,9 @@
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
-#include "vtkKWLabel.h"
+#include "vtkKWDragAndDropTargets.h"
 #include "vtkKWFrameLabeled.h"
+#include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
@@ -29,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.32");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.33");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -599,7 +600,7 @@ int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
       {
       if (anchor)
         {
-        *anchor = frame->GetDragAndDropAnchor();
+        *anchor = frame->GetDragAndDropTargets()->GetAnchor();
         }
       return 1;
       }
@@ -679,20 +680,19 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
       {
       if (this->EnableDragAndDrop)
         {
-        if (!widget->HasDragAndDropTarget(this->Notebook))
+        if (!widget->GetDragAndDropTargets()->HasTarget(this->Notebook))
           {
-          widget->EnableDragAndDropOn();
-          widget->SetDragAndDropAnchor(anchor);
-          widget->AddDragAndDropTarget(this->Notebook);
-          widget->SetDragAndDropEndCommand(
+          widget->GetDragAndDropTargets()->EnableOn();
+          widget->GetDragAndDropTargets()->SetAnchor(anchor);
+          widget->GetDragAndDropTargets()->SetTargetEndCommand(
             this->Notebook, this, "DragAndDropEndCallback");
           }
         }
       else
         {
-        if (widget->HasDragAndDropTarget(this->Notebook))
+        if (widget->GetDragAndDropTargets()->HasTarget(this->Notebook))
           {
-          widget->RemoveDragAndDropTarget(this->Notebook);
+          widget->GetDragAndDropTargets()->RemoveTarget(this->Notebook);
           }
         }
       }

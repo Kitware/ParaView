@@ -14,6 +14,7 @@
 #include "vtkKWFrameLabeled.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWDragAndDropTargets.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
@@ -25,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.2");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.3");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -47,8 +48,6 @@ vtkKWFrameLabeled::vtkKWFrameLabeled()
   this->Displayed     = 1;
   this->ShowHideFrame = 0;
   this->ShowIconInLimitedEditionMode = 0;
-
-  this->DragAndDropAnchor = this->GetLabel();
 }
 
 //----------------------------------------------------------------------------
@@ -365,6 +364,18 @@ void vtkKWFrameLabeled::UpdateEnableState()
   this->PropagateEnableState(this->Border2);
   this->PropagateEnableState(this->Groove);
   this->PropagateEnableState(this->Icon);
+}
+
+//----------------------------------------------------------------------------
+vtkKWDragAndDropTargets* vtkKWFrameLabeled::GetDragAndDropTargets()
+{
+  int exist = this->HasDragAndDropTargets();
+  vtkKWDragAndDropTargets *targets = this->Superclass::GetDragAndDropTargets();
+  if (!exist)
+    {
+    targets->SetAnchor(this->GetLabel());
+    }
+  return targets;
 }
 
 //----------------------------------------------------------------------------
