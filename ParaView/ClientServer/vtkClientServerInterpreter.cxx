@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.6");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.7");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -283,7 +283,7 @@ vtkClientServerInterpreter
       {
       // Object was not created.
       ostrstream error;
-      error << "Cannot create object of type \"" << cname << "\".";
+      error << "Cannot create object of type \"" << cname << "\"." << ends;
       *this->LastResultMessage
         << vtkClientServerStream::Error << error.str()
         << vtkClientServerStream::End;
@@ -341,7 +341,8 @@ vtkClientServerInterpreter
       // Command function was not found for the class.
       ostrstream error;
       const char* cname = obj? obj->GetClassName():"(vtk object is NULL)";
-      error << "Wrapper function not found for class \"" << cname << "\".";
+      error << "Wrapper function not found for class \"" << cname << "\"."
+            << ends;
       *this->LastResultMessage
         << vtkClientServerStream::Error << error.str()
         << vtkClientServerStream::End;
