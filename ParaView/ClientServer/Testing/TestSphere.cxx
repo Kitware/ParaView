@@ -41,6 +41,7 @@ int main()
   css << invoke << mapper << "SetInput" << result << end;
   css << invoke << ren1 << "AddActor" << actor << end;
   css << invoke << ren1 << "Render" << end;
+  css << invoke << iren << "Initialize" << end;
   css << invoke << iren << "Start" << end;
 
   interp->ProcessStream(css);
