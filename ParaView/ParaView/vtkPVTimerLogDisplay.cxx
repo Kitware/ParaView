@@ -41,7 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVTimerLogDisplay.h"
 
-#include "vtkKWApplication.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVTimerInformation.h"
+#include "vtkPVApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
@@ -55,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.2.1");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -90,6 +92,8 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->MasterWindow = 0;
   this->Threshold = 0.01;
   this->Writable = 0;
+
+  this->TimerInformation = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -128,6 +132,12 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
   
   this->SetTitle(NULL);
   this->SetMasterWindow(0);
+
+  if (this->TimerInformation)
+    {
+    this->TimerInformation->Delete();
+    this->TimerInformation = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -305,11 +315,10 @@ void vtkPVTimerLogDisplay::Display()
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::SetThreshold(float val)
 {
-  if (val == this->Threshold)
-    {
-    return;
-    }
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
   this->Modified();
+  pvApp->BroadcastScript("$Application SetLogThreshold %f", val);
   this->Threshold = val;
   this->Update();
 }
@@ -322,7 +331,10 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
     return;
     }
   this->Modified();
-  vtkTimerLog::SetMaxEntries(length);
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("$Application SetLogBufferLength %d", length);
+
   this->Update();
 }
 
@@ -337,7 +349,8 @@ int vtkPVTimerLogDisplay::GetBufferLength()
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Clear()
 {
-  vtkTimerLog::ResetLog();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("$Application ResetLog");
   this->Update();
 }
 
@@ -345,13 +358,15 @@ void vtkPVTimerLogDisplay::Clear()
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::EnableCheckCallback()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if (this->EnableCheck->GetState())
     {
-    vtkTimerLog::LoggingOn();
+    pvApp->BroadcastScript("$Application SetEnableLog 1");
     }
   else
     {
-    vtkTimerLog::LoggingOff();
+    pvApp->BroadcastScript("$Application SetEnableLog 0");
     }
 }
 
@@ -386,7 +401,11 @@ void vtkPVTimerLogDisplay::Save(const char *fileName)
     delete fptr;
     return;
     }
-  vtkTimerLog::DumpLogWithIndents(fptr, this->Threshold);
+
+  // Read back the log from the list.
+  this->Update();
+  *fptr << this->DisplayText->GetValue() << endl;
+
   fptr->close();
   delete fptr;
 }
@@ -430,62 +449,98 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Update()
 {
-  ostrstream *fptr;
-  int length;
-  char *str;
-   
+  vtkPVApplication *pvApp;
+
+  pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("Could not get pv application.");
+    return;
+    }
+
+  if (this->TimerInformation)
+    {
+    // I have no method to clear the information yet.
+    this->TimerInformation->Delete();
+    this->TimerInformation = NULL;
+    }
+  this->TimerInformation = vtkPVTimerInformation::New();
+  pvApp->GetProcessModule()->GatherInformation(this->TimerInformation, 
+                                               "$Application");
+  // Special case for client-server.
+  // add the client process as a log.
+  if (pvApp->GetClientMode())
+    {
+    vtkPVTimerInformation* tmp = vtkPVTimerInformation::New();
+    tmp->CopyFromObject(pvApp);
+    tmp->AddInformation(this->TimerInformation);
+    this->TimerInformation->Delete();
+    this->TimerInformation = tmp;
+    }
+
+  this->DisplayLog();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::DisplayLog()
+{
+  int numLogs;
+  int id;
+ 
+  numLogs = this->TimerInformation->GetNumberOfLogs();
+
   this->EnableWrite();
   this->DisplayText->SetValue("");
-
-  length = vtkTimerLog::GetNumberOfEvents() * 40;
-  if (length > 0)
+  for (id = 0; id < numLogs; ++id)
     {
-    str = new char [length];
-    fptr = new ostrstream(str, length);
+    char* str = this->TimerInformation->GetLog(id);
 
-    if (fptr->fail())
+    if (numLogs > 1)
       {
-      vtkErrorMacro(<< "Unable to string stream");
+      char tmp[128];
+      sprintf(tmp, "Log %d:", id);
+      this->Append("");
+      this->Append(tmp);
       }
-    else
+
+    if (str == NULL)
       {
-      //*fptr << "Hello world !!!\n ()";
-      vtkTimerLog::DumpLogWithIndents(fptr, this->Threshold);
+      vtkWarningMacro("Null Log. " << id << " of " << numLogs);
+      return;
+      }
 
-      length = fptr->pcount();
-      str[length] = '\0';
+    char *start, *end;
+    int count, length;
+    length = vtkString::Length(str);
+    char* strCopy = new char[length+1];
+    memcpy(strCopy, str, length+1);
 
-      delete fptr;
-      
-      //this->DisplayText->SetValue(str);
-      // Put the strings in one by one to avoid a Tk bug.
-      // Strings seemed to be put in recursively, so we run out of stack.
-      char *start, *end;
-      int count;
-      length = vtkString::Length(str);
-      count = 0;
-      start = end = str;
-      while (count < length)
+    //this->DisplayText->SetValue(strCopy);
+    // Put the strings in one by one to avoid a Tk bug.
+    // Strings seemed to be put in recursively, so we run out of stack.
+    count = 0;
+    start = end = strCopy;
+    while (count < length)
+      {
+      // Find the next line break.
+      while (*end != '\n' && count < length)
         {
-        // Find the next line break.
-        while (*end != '\n' && count < length)
-          {
-          ++end;
-          ++count;
-          }
-        // Set it to an end of string.
-        *end = '\0';
-        // Add the string.
-        this->Append(start);
-        // Initialize the search for the next string.
-        start = end+1;
-        end = start;
+        ++end;
         ++count;
         }
-
-      delete [] str;
+      // Set it to an end of string.
+      *end = '\0';
+      // Add the string.
+      this->Append(start);
+      // Initialize the search for the next string.
+      start = end+1;
+      end = start;
+      ++count;
       }
-    }  
+    delete [] strCopy;
+    strCopy = NULL;
+    }
+  //this->DisableWrite();
 }
 
 
@@ -496,6 +551,20 @@ void vtkPVTimerLogDisplay::Dismiss()
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
+
+//----------------------------------------------------------------------------
+vtkPVTimerInformation* vtkPVTimerLogDisplay::GetTimerInformation()
+{
+  return this->TimerInformation;
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVTimerLogDisplay::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->Application);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -503,4 +572,7 @@ void vtkPVTimerLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
   os << indent << "Threshold: " << this->Threshold << endl;
+  vtkIndent i2 = indent.GetNextIndent();
+  os << indent << "TimerInformation: \n";
+  this->TimerInformation->PrintSelf(os, i2);
 }
