@@ -29,7 +29,6 @@
 class vtkCTHData;
 class vtkPlane;
 class vtkAppendPolyData;
-class vtkSynchronizedTemplates3D;
 class vtkContourFilter;
 class vtkDataSetSurfaceFilter;
 class vtkCutter;
@@ -100,14 +99,6 @@ protected:
   // Polydata is not instantiated.  It just holds the output
   // from the internal pipeline.
   vtkPolyData* PolyData;
-  // KitwareContourFilter took too long because of garbage collection
-  // when input of internal filter was deleted.
-  // Synchronized template super class is poly data source.
-#ifdef VTK_USE_PATENTED  
-  vtkSynchronizedTemplates3D* Contour;
-#else
-  vtkContourFilter* Contour;
-#endif
 
 private:
   void InternalImageDataCopy(vtkCTHAMRContour *src);
