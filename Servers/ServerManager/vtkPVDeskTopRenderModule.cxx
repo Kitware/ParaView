@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.7");
 
 
 
@@ -199,14 +199,22 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOff"
                   << vtkClientServerStream::End;
+  pvm->SendStream(  vtkProcessModule::CLIENT
+                  | vtkProcessModule::RENDER_SERVER_ROOT);
+
   if ( this->ProcessModule->GetOptions()->GetUseOffscreenRendering() )
     {
     stream
+      << vtkClientServerStream::Invoke << this->DisplayManagerID
+      << "InitializeOffScreen" << vtkClientServerStream::End;
+    pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+
+    stream
       << vtkClientServerStream::Invoke << this->CompositeID
       << "InitializeOffScreen" << vtkClientServerStream::End;
+    pvm->SendStream(  vtkProcessModule::CLIENT
+                    | vtkProcessModule::RENDER_SERVER_ROOT);
     }
-  pvm->SendStream(  vtkProcessModule::CLIENT
-                  | vtkProcessModule::RENDER_SERVER_ROOT);
 
   this->InitializeObservers();
 }
