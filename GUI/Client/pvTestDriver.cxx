@@ -43,7 +43,7 @@ pvTestDriver::pvTestDriver()
 
 int pvTestDriver::WaitForAndPrintData(const char* pname, 
                                       kwsysProcess* process,
-                                      double timeout, int* foundWaiting,
+                                      double timeout,
                                       vtkstd::string* output)
 {
   if(!process)
@@ -63,21 +63,19 @@ int pvTestDriver::WaitForAndPrintData(const char* pname,
       {
       *output += str;
       }
-    if(foundWaiting && processPipe == kwsysProcess_Pipe_STDOUT)
-      {
-      if(str.find("Waiting") != str.npos)
-        {
-        *foundWaiting = 1;
-        }
-      }
-    cerr << "\n-------------- " << pname
-         << " output chunk begin --------------\n";
-    cerr.write(data, length);
-    cerr << "\n-------------- " << pname
-         << " output chunk end   --------------\n\n";
-    cerr.flush();
+    this->PrintData(pname, data, length);
     }
   return processPipe;
+}
+
+void pvTestDriver::PrintData(const char* pname, const char* data, int length)
+{
+  cerr << "\n-------------- " << pname
+       << " output chunk begin --------------\n";
+  cerr.write(data, length);
+  cerr << "\n-------------- " << pname
+       << " output chunk end   --------------\n\n";
+  cerr.flush();
 }
 
 void pvTestDriver::SeparateArguments(const char* str, 
@@ -239,10 +237,40 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name)
   cerr << "pvTestDirver: starting process " << name << "\n";
   kwsysProcess_SetTimeout(server, this->TimeOut);
   kwsysProcess_Execute(server);
-  int foundWaiting = 0;
-  while(!foundWaiting)
+  const char* waiting = "Waiting";
+  const char* waiting_cur = waiting;
+  const char* waiting_end = waiting_cur + strlen(waiting);
+  while(waiting_cur != waiting_end)
     {
-    if(!WaitForAndPrintData("server", server, 30.0, &foundWaiting))
+    // Search for the "Waiting" string in the server output.
+    double timeout = 30.0;
+    char* data;
+    int length;
+    int pipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
+    if(pipe == kwsysProcess_Pipe_STDOUT)
+      {
+      // Search for the "Waiting" string starting from where the
+      // previous search left off.  It is possible that the string
+      // will be received in pieces.
+      const char* data_end = data+length;
+      for(const char* data_cur = data;
+          data_cur != data_end && waiting_cur != waiting_end; ++data_cur)
+        {
+        if(*waiting_cur != *data_cur)
+          {
+          waiting_cur = waiting;
+          }
+        if(*waiting_cur == *data_cur)
+          {
+          ++waiting_cur;
+          }
+        }
+      }
+    if(pipe == kwsysProcess_Pipe_STDOUT || pipe == kwsysProcess_Pipe_STDERR)
+      {
+      this->PrintData(name, data, length);
+      }
+    else
       {
       cerr << "pvTestDirver: " << name << " never started.\n";
       kwsysProcess_Kill(server);
@@ -404,19 +432,19 @@ int pvTestDriver::Main(int argc, char* argv[])
   int mpiError = 0;
   while(clientPipe || serverPipe || renderServerPipe)
     {
-    clientPipe = WaitForAndPrintData("client", client, 0.1, 0, &output);
+    clientPipe = WaitForAndPrintData("client", client, 0.1, &output);
     if(!mpiError && this->OutputStringHasError("client", output))
       {
       mpiError = 1;
       }
     output = "";
-    serverPipe = WaitForAndPrintData("server", server, 0.1, 0, &output);
+    serverPipe = WaitForAndPrintData("server", server, 0.1, &output);
     if(!mpiError && this->OutputStringHasError("server", output))
       {
       mpiError = 1;
       }
     output = "";
-    renderServerPipe = WaitForAndPrintData("renderServer", renderServer, 0.1, 0, &output);
+    renderServerPipe = WaitForAndPrintData("renderServer", renderServer, 0.1, &output);
     if(!mpiError && this->OutputStringHasError("renderServer", output))
       {
       mpiError = 1;
