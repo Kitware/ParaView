@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.11");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.12");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -636,6 +636,42 @@ const char* vtkSMPropertyAdaptor::GetSelectionMaximum(unsigned int idx)
 //---------------------------------------------------------------------------
 void vtkSMPropertyAdaptor::InitializePropertyFromInformation()
 {
+  if (this->DoubleVectorProperty)
+    {
+    vtkSMDoubleVectorProperty* ip = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->DoubleVectorProperty->GetInformationProperty());
+    if (ip)
+      {
+      unsigned int numElems = ip->GetNumberOfElements();
+      this->DoubleVectorProperty->SetNumberOfElements(numElems);
+      this->DoubleVectorProperty->SetElements(ip->GetElements());
+      }
+    }
+  if (this->IdTypeVectorProperty)
+    {
+    vtkSMIdTypeVectorProperty* ip = vtkSMIdTypeVectorProperty::SafeDownCast(
+      this->IdTypeVectorProperty->GetInformationProperty());
+    if (ip)
+      {
+      unsigned int numElems = ip->GetNumberOfElements();
+      this->IdTypeVectorProperty->SetNumberOfElements(numElems);
+      for (unsigned int i=0; i<numElems; i++)
+        {
+        this->IdTypeVectorProperty->SetElement(i, ip->GetElement(i));
+        }
+      }
+    }
+  if (this->IntVectorProperty)
+    {
+    vtkSMIntVectorProperty* ip = vtkSMIntVectorProperty::SafeDownCast(
+      this->IntVectorProperty->GetInformationProperty());
+    if (ip)
+      {
+      unsigned int numElems = ip->GetNumberOfElements();
+      this->IntVectorProperty->SetNumberOfElements(numElems);
+      this->IntVectorProperty->SetElements(ip->GetElements());
+      }
+    }
   if (this->StringVectorProperty)
     {
     vtkSMStringVectorProperty* ip = vtkSMStringVectorProperty::SafeDownCast(
