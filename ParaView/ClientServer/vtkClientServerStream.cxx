@@ -446,7 +446,6 @@ void vtkClientServerStreamGetArgumentCase(SourceType*,
   SourceType value;
   memcpy(&value, src, sizeof(value));
   *dest = static_cast<T>(value);
-  memcpy(dest, src, sizeof(*dest));
 }
 
 #define VTK_CSS_GET_ARGUMENT_CASE(TypeId, SourceType) \
