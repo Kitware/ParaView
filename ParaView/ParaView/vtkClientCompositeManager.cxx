@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.27");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.27.2.1");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -584,7 +584,6 @@ void vtkClientCompositeManager::EndRender()
   
   vtkRenderer *ren = vtkRenderer::New();
   ren->SetRenderWindow(this->RenderWindow);
-  ren->SetLayer(1);
   renderers->ReplaceItem(0, ren);
   
   vtkImageActor *imageActor = vtkImageActor::New();

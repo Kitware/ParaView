@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.25.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.25.2.2");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -76,6 +76,7 @@ vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 {
+  this->Parent = 0;
   this->Observer = vtkPVAnimationInterfaceEntryObserver::New();
   this->Observer->AnimationEntry = this;
   this->DeleteEventTag = 0;
@@ -375,6 +376,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->DummyFrame->GetWidgetName());
     this->GetMethodMenuButton()->SetButtonText("None");
+    this->CustomScript = 1;
     }
 }
 
@@ -704,6 +706,10 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
   this->CustomScript = 1;
   this->Dirty = 1;
   this->SetScript(script);
+  if ( !this->Parent )
+    {
+    return;
+    }
   this->AddTraceEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
     script);
   this->GetMethodMenuButton()->SetButtonText("Script");
@@ -888,5 +894,7 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
     << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
   
   os << indent << "CurrentProperty: " << this->CurrentProperty << endl;
+
+  os << indent << "CustomScript: " << this->CustomScript << endl;
 }
 

@@ -286,7 +286,7 @@
           menu_name="D3" root_name="D3"
           module_type="Filter"
           multiprocess_support="multiple_processes"
-          long_help="Repartition a data set."
+          long_help="Repartition a data set into load-balanced spatially convex regions."
           short_help="Repartition a data set.">
     <Filter class="vtkDistributedDataFilter">
       <Input name="Input"
@@ -295,15 +295,20 @@
     <InputMenu trace_name="Input" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <LabeledToggle label="Clip cells"
-                   trace_name="ClipCells"
-                   variable="ClipCells"
-                   help="Turn this on if you want cells clipped to spatial boundary regions."
+    <LabeledToggle label="Assign cells uniquely" 
+                   trace_name="AssignBoundaryCellsToOneRegion" 
+                   variable="AssignBoundaryCellsToOneRegion" 
+                   help="Each cell is assigned to one process only (isosurfacing)" 
+                   default_value="1"/>
+    <LabeledToggle label="or Duplicate cells" 
+                   trace_name="AssignBoundaryCellsToAllIntersectingRegions" 
+                   variable="AssignBoundaryCellsToAllIntersectingRegions" 
+                   help="Cells on processor boundaries will be duplicated" 
                    default_value="0"/>
-    <LabeledToggle label="Include all intersecting cells"
-                   trace_name="IncludeAllIntersectingCells"
-                   variable="IncludeAllIntersectingCells"
-                   help="Turn this on if you want all cells that intersect spatial boundaries."
+    <LabeledToggle label="or Divide cells" 
+                   trace_name="DivideBoundaryCells" 
+                   variable="DivideBoundaryCells" 
+                   help="Cells on processor boundaries will be split (volume rendering)" 
                    default_value="0"/>
     <StringEntry variable="GlobalIdArrayName"
                  trace_name="GlobalIdArrayName"
@@ -1725,6 +1730,7 @@
       <Input name="Source"
              class="vtkDataSet">
     <GroupRequirement quantity="Single"/>
+        <ArrayRequirement attribute="Point"/>
       </Input>
     </Filter>
     <SelectWidget type="object"

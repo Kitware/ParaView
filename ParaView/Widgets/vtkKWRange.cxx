@@ -25,7 +25,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.28");
+vtkCxxRevisionMacro(vtkKWRange, "1.28.2.1");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -694,30 +694,52 @@ void vtkKWRange::ConstrainRangeToResolution(float range[2], int adjust)
     {
     double value = (double)range[i];
     double new_value = res * vtkKWMath::Round(value / res);
+    // This adjustment is made to make sure that the new values
+    // fall in the range. For example, if range is [1,62],
+    // the line above assigns [0,63] to the new_values. The
+    // code below adjusts this range to be [3,60]
     if (adjust)
       {
       if (new_value != value)
         {
         if (i - inv)
           {
-          while (new_value > value + epsilon)
+          // If inv is false (0), this executes for range[1].
+          // If the new_value is greater than range[1], adjust
+          // it to the smaller multiple of res.
+          if (new_value > value + epsilon)
             {
-            new_value -= res;
+            int times = static_cast<int>(
+              (new_value - (value + epsilon))/res);
+            new_value = new_value - (times + 1)*res;
             }
-          while (new_value <= (value - res) + epsilon)
+
+          // This should newer be true. Just in case.
+          if (new_value <= (value - res) + epsilon)
             {
-            new_value += res;
+            int times = static_cast<int>(
+              ((value - epsilon) - new_value)/res);
+            new_value = new_value + (times + 1)*res;
             }
           }
         else
           {
-          while (new_value < value - epsilon)
+          // If inv is false (0), this executes for range[0].
+          // If the new_value is smaller than range[0], adjust
+          // it to the larger multiple of res.
+          if (new_value < value - epsilon)
             {
-            new_value += res;
+            int times = static_cast<int>(
+              ((value - epsilon) - new_value)/res);
+            new_value = new_value + (times + 1)*res;
             }
-          while (new_value >= (value + res) - epsilon)
+
+          // This should newer be true. Just in case.
+          if (new_value >= (value + res) - epsilon)
             {
-            new_value -= res;
+            int times = static_cast<int>(
+              (new_value - (value + epsilon))/res);
+            new_value = new_value - (times + 1)*res;
             }
           }
         }

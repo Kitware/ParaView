@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.10");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.10.2.1");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -49,7 +49,7 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   this->CompositeCheck = vtkKWCheckButton::New();
   this->CompositeThresholdScale = vtkKWScale::New();
   this->CompositeThresholdLabel = vtkKWLabel::New();
-  this->CompositeThreshold = 20.0;
+  this->CompositeThreshold = 10.0;
 
   this->SquirtLabel = vtkKWLabel::New();
   this->SquirtCheck = vtkKWCheckButton::New();

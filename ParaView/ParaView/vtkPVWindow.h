@@ -478,6 +478,10 @@ public:
   vtkGetObjectMacro(TranslateCameraButton, vtkKWRadioButton);
   vtkGetObjectMacro(RotateCameraButton, vtkKWRadioButton);
   
+  // Description:
+  // Update the toolbar aspect once the toolbar settings have been changed
+  virtual void UpdateToolbarAspect();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

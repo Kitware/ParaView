@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102.2.3");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -947,6 +947,15 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       {
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      if ( entry->GetCustomScript() )
+        {
+        if ( entry->GetScript() )
+          {
+          this->Script(entry->GetScript());
+          }
+        }
+      else
+        {
       vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
       if (prop)
         {
@@ -957,6 +966,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       if ( entry->GetPVSource() )
         {
         entry->GetPVSource()->UpdateVTKSourceParameters();
+          }
         }
       }
       
@@ -1190,7 +1200,6 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SaveDialogOn();
   saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Images");
-  saveDialog->SetDefaultExtension(".jpg");
   saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
 
   if ( saveDialog->Invoke() &&
@@ -1329,7 +1338,6 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
   saveDialog->SaveDialogOn();
   saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Geometry");
-  saveDialog->SetDefaultExtension(".pvd");
   saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
   if(saveDialog->Invoke() && (strlen(saveDialog->GetFileName()) > 0))
     {

@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.511.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.511.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1188,9 +1188,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     pvs->SetTraceReferenceCommand(s.str());
     s.rdbuf()->freeze(0);
     }
-
-    // We need an initial current source, why not use sphere ? 
-    this->SetCurrentPVSource(pvs);
     }
   else
     {
@@ -2148,7 +2145,7 @@ void vtkPVWindow::WriteData()
   vtkPVApplication *pvApp = this->GetPVApplication();
   int parallel = (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1);
   int numParts = this->GetCurrentPVSource()->GetNumberOfParts();
-  const char* defaultExtension = 0;
+  int writerFound = 0;
   
   ostrstream typesStr;
   
@@ -2165,9 +2162,9 @@ void vtkPVWindow::WriteData()
       const char* ext = wm->GetExtension();
 
       typesStr << " {{" << desc << "} {" << ext << "}}";
-      if(!defaultExtension)
+      if(!writerFound)
         {
-        defaultExtension = ext;
+        writerFound = 1;
         }
       }
     it->GoToNextItem();
@@ -2177,7 +2174,7 @@ void vtkPVWindow::WriteData()
   data->Delete();
   
   // Make sure we have at least one writer.
-  if(!defaultExtension)
+  if(!writerFound)
     {
     ostrstream msg;
     msg << "No writers support";
@@ -2212,11 +2209,9 @@ void vtkPVWindow::WriteData()
   saveDialog->SaveDialogOn();
   saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
-  saveDialog->SetDefaultExtension(defaultExtension);
   saveDialog->SetFileTypes(types);
   saveDialog->Create(this->Application, 0);
-  // Ask the user for the filename.  Default the extension to the
-  // first writer supported.
+  // Ask the user for the filename.
 
   delete [] types;
 
@@ -3304,17 +3299,6 @@ void vtkPVWindow::EnableSelectMenu()
     numSources = 0;
     }
 
-  int numGlyphs;
-  sources = this->GetSourceList("GlyphSources");
-  if (sources)
-    {
-    numGlyphs =  sources->GetNumberOfItems();
-    }
-  else
-    {
-    numGlyphs = 0;
-    }
-  
   if (numSources == 0)
     {
     this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
@@ -4280,6 +4264,14 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
   rwi->SetInteractiveRenderEnabled(s);
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVWindow::UpdateToolbarAspect()
+{
+  this->Superclass::UpdateToolbarAspect();
+  
+  this->DisableToolbarButtons();
+  this->EnableToolbarButtons();
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)

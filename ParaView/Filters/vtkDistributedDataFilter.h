@@ -163,6 +163,39 @@ public:
   vtkSetMacro(ClipCells, int);
 
   // Description:
+  //  Another way to set ClipCells and IncludeAllIntersectingCells.
+  //  AssignBoundaryCellsToOneRegion turns off both ClipCells and
+  //  IncludeAllIntersectingCells.  Each cell will be included in
+  //  exactly one process' output unstructured grid.  
+
+  void AssignBoundaryCellsToOneRegionOn();
+  void AssignBoundaryCellsToOneRegionOff();
+  void SetAssignBoundaryCellsToOneRegion(int val);
+
+  // Description:
+  //  Another way to set ClipCells and IncludeAllIntersectingCells.
+  //  AssignBoundaryCellsToAllIntersectingRegions turns off ClipCells 
+  //  turns on IncludeAllIntersectingCells.  A cell will be included
+  //  in the output unstructured grid built for every region that it
+  //  intersects.  If a cell intersects two process' spatial regions,
+  //  both processes will have that cell in their output grid.
+
+  void AssignBoundaryCellsToAllIntersectingRegionsOn();
+  void AssignBoundaryCellsToAllIntersectingRegionsOff();
+  void SetAssignBoundaryCellsToAllIntersectingRegions(int val);
+
+  // Description:
+  //  Another way to set ClipCells and IncludeAllIntersectingCells.
+  //  DivideBoundaryCells turns on both ClipCells and
+  //  IncludeAllIntersectingCells.  A cell that straddles a processor
+  //  boundary will be split along the boundary, with each process
+  //  getting the portion of the cell that lies in it's spatial region.
+
+  void DivideBoundaryCellsOn();
+  void DivideBoundaryCellsOff();
+  void SetDivideBoundaryCells(int val);
+
+  // Description:
   //   Build a vtkUnstructuredGrid for a spatial region from the 
   //   data distributed across processes.  Execute() must be called
   //   by all processes, or it will hang.
@@ -296,6 +329,9 @@ private:
   int RetainKdtree;
   int IncludeAllIntersectingCells;
   int ClipCells;
+  int AssignBoundaryCellsToOneRegion;
+  int AssignBoundaryCellsToAllIntersectingRegions;
+  int DivideBoundaryCells;
 
   int Timing;
 

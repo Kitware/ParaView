@@ -62,7 +62,7 @@
         long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
         short_help="Create a 3D arrow">
   <Source class="vtkPVArrowSource"/>
-<!-- Scales are used here because vtkSphereSource sets these ranges for these parameters. -->
+<!-- Scales are used here because vtkArrowSource sets these ranges for these parameters. -->
   <Scale label="Tip resolution" trace_name="TipResolution"
                variable="TipResolution"
                help="Set the number of faces on the tip."
@@ -292,7 +292,7 @@
                help="Set the radius of the sphere" />
   <Scale label="Theta Resolution" trace_name="Theta Resolution" 
                variable="ThetaResolution"
-               default_value="8" resolution="1" data_range="3 1024" 
+               default_value="8" resolution="1" range="3 1024" 
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)" />
   <Scale label="Start Theta" trace_name="Start Theta" 

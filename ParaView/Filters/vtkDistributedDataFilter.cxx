@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13.2.1");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -364,6 +364,57 @@ void vtkDistributedDataFilter::SetController(vtkMultiProcessController *c)
   c->Register(this);
   this->NumProcesses = c->GetNumberOfProcesses();
   this->MyId    = c->GetLocalProcessId();
+}
+void vtkDistributedDataFilter::AssignBoundaryCellsToOneRegionOn()
+{
+  this->SetAssignBoundaryCellsToOneRegion(1);
+}
+void vtkDistributedDataFilter::AssignBoundaryCellsToOneRegionOff()
+{
+  this->SetAssignBoundaryCellsToOneRegion(0);
+}
+void vtkDistributedDataFilter::SetAssignBoundaryCellsToOneRegion(int val)
+{
+  if (val)
+    {
+    this->IncludeAllIntersectingCells = 0;
+    this->ClipCells = 0;
+    }
+}
+void 
+vtkDistributedDataFilter::AssignBoundaryCellsToAllIntersectingRegionsOn()
+{
+  this->SetAssignBoundaryCellsToAllIntersectingRegions(1);
+}
+void 
+vtkDistributedDataFilter::AssignBoundaryCellsToAllIntersectingRegionsOff()
+{
+  this->SetAssignBoundaryCellsToAllIntersectingRegions(0);
+}
+void 
+vtkDistributedDataFilter::SetAssignBoundaryCellsToAllIntersectingRegions(int val)
+{
+  if (val)
+    {
+    this->IncludeAllIntersectingCells = 1;
+    this->ClipCells = 0;
+    }
+}
+void vtkDistributedDataFilter::DivideBoundaryCellsOn()
+{
+  this->SetDivideBoundaryCells(1);
+}
+void vtkDistributedDataFilter::DivideBoundaryCellsOff()
+{
+  this->SetDivideBoundaryCells(0);
+}
+void vtkDistributedDataFilter::SetDivideBoundaryCells(int val)
+{
+  if (val)
+    {
+    this->IncludeAllIntersectingCells = 1;
+    this->ClipCells = 1;
+    }
 }
 //-------------------------------------------------------------------------
 // Execute

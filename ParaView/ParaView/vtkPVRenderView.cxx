@@ -95,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.1");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.2");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -219,6 +219,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
   
   this->Renderer2D = vtkRenderer::New();
+  // Keep the zbuffer for picking.
+  this->Renderer2D->EraseOff();
 }
 
 //----------------------------------------------------------------------------
@@ -285,12 +287,6 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  vtkPVApplication *pvApp = 0;
-  if ( this->Application )
-    {
-    pvApp = this->GetPVApplication();
-    }
-
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
@@ -455,12 +451,12 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
   this->RenderWindow->AddRenderer(this->Renderer2D);
+  this->RenderWindow->SetNumberOfLayers(3);
+  this->Renderer2D->SetLayer(2);
   
   // the 2d renderer must be kept in sync with the main renderer
   this->Renderer->AddObserver(
     vtkCommand::StartEvent, this->Observer);  
-  this->RenderWindow->SetNumberOfLayers(2);
-  this->Renderer->SetLayer(1);
 
   this->RenderWindow->AddObserver(
     vtkCommand::CursorChangedEvent, this->Observer);
@@ -1634,7 +1630,6 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVApplication *pvApp;
   int partIdx, numParts;
 
   this->AddTraceEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
@@ -1651,7 +1646,6 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
     this->SetUseTriangleStrips(1);
     }
 
-  pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
   if (pvWin == NULL)
     {

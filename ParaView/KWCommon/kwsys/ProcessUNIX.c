@@ -1044,6 +1044,7 @@ static int kwsysProcessInitialize(kwsysProcess* cp)
   memset(cp->CommandExitCodes, 0, sizeof(int)*cp->NumberOfCommands);
 
   /* Allocate memory to save the real working directory.  */
+  if ( cp->WorkingDirectory )
   {
 #if defined(MAXPATHLEN)
   cp->RealWorkingDirectoryLength = MAXPATHLEN;

@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.3");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -850,77 +850,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->UseStereoRendering = 1;
     }
 
-#ifdef VTK_USE_MPI
-// Temporarily removing this (for the release - it has bugs)
-//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
-//                                            index) == VTK_OK ||
-//         vtkPVApplication::CheckForArgument(argc, argv, "-p",
-//                                            index) == VTK_OK )
-//      {
-//      this->UseRenderingGroup = 1;
-//      }
-
-//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
-//                                            index) == VTK_OK ||
-//         vtkPVApplication::CheckForArgument(argc, argv, "-gf",
-//                                            index) == VTK_OK )
-//      {
-//      const char* newarg=0;
-//      int len = (int)(strlen(argv[index]));
-//      for (int i=0; i<len; i++)
-//        {
-//        if (argv[index][i] == '=')
-//          {
-//          newarg = &(argv[index][i+1]);
-//          }
-//        }
-//      this->SetGroupFileName(newarg);
-//      }
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-td",
-                                          index) == VTK_OK )
-    {
-    this->UseTiledDisplay = 1;
-
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
-                                          index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->TileDimensions[0] = atoi(newarg);
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
-                                          index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->TileDimensions[1] = atoi(newarg);
-      }
-    }
-#endif
-
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--client",
                                           index) == VTK_OK ||
@@ -1007,6 +936,84 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       this->AlwaysSSH = 1;
       }
     }
+
+#ifdef VTK_USE_MPI
+// Temporarily removing this (for the release - it has bugs)
+//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
+//                                            index) == VTK_OK ||
+//         vtkPVApplication::CheckForArgument(argc, argv, "-p",
+//                                            index) == VTK_OK )
+//      {
+//      this->UseRenderingGroup = 1;
+//      }
+
+//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
+//                                            index) == VTK_OK ||
+//         vtkPVApplication::CheckForArgument(argc, argv, "-gf",
+//                                            index) == VTK_OK )
+//      {
+//      const char* newarg=0;
+//      int len = (int)(strlen(argv[index]));
+//      for (int i=0; i<len; i++)
+//        {
+//        if (argv[index][i] == '=')
+//          {
+//          newarg = &(argv[index][i+1]);
+//          }
+//        }
+//      this->SetGroupFileName(newarg);
+//      }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-td",
+                                          index) == VTK_OK )
+    {
+    if (!this->ClientMode)
+      {
+      vtkErrorMacro("Tiled display is supported only in client/server mode. Please re-run with --client option. Disabling tiled display");
+      }
+    else
+      {
+      this->UseTiledDisplay = 1;
+      
+      if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
+                                              index) == VTK_OK ||
+           vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
+                                              index) == VTK_OK )
+        {
+        // Strip string to equals sign.
+        const char* newarg=0;
+        int len = (int)(strlen(argv[index]));
+        for (i=0; i<len; i++)
+          {
+          if (argv[index][i] == '=')
+            {
+            newarg = &(argv[index][i+1]);
+            }
+          }
+        this->TileDimensions[0] = atoi(newarg);
+        }
+      if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
+                                              index) == VTK_OK ||
+           vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
+                                              index) == VTK_OK )
+        {
+        // Strip string to equals sign.
+        const char* newarg=0;
+        int len = (int)(strlen(argv[index]));
+        for (i=0; i<len; i++)
+          {
+          if (argv[index][i] == '=')
+            {
+            newarg = &(argv[index][i+1]);
+            }
+          }
+        this->TileDimensions[1] = atoi(newarg);
+        }
+      }
+    }
+#endif
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
        == VTK_OK || 

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.10.2.1");
 
 
 
@@ -119,6 +119,12 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->CompositeID << "InitializeRMIs"
+    << vtkClientServerStream::End;
+  pm->GetStream() 
+    << vtkClientServerStream::Invoke
+    <<  this->CompositeID 
+    << "SetRenderWindow"
+    << this->RenderWindowID
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 }

@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.35.2.1");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -180,25 +180,36 @@ int vtkPVSelectWidget::GetModifiedFlag()
 void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 {
   // Command to update the UI.
-  if (this->GetCurrentVTKValue())
+  this->Property->SetStringType(this->ElementType);
+
+  const char* value = this->GetCurrentVTKValue();
+  if (!value)
     {
-    this->Property->SetStringType(this->ElementType);
+    return;
+    }
+
     if(this->ElementType == OBJECT)
       { 
       vtkPVWidgetProperty *pvwp;
-      pvwp = vtkPVWidgetProperty::SafeDownCast(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-      vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
-        ->GetObjectByName(this->GetCurrentVTKValue());
+    pvwp = vtkPVWidgetProperty::SafeDownCast(
+      this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+    vtkPVObjectWidget* ow = 
+      vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+    if (ow)
+      {
+      vtkClientServerID id = 
+        ow->GetObjectByName(this->GetCurrentVTKValue());
       this->Property->SetObjectID(id);
-      this->Property->SetString(this->GetCurrentVTKValue());
       }
     else
       {
-      this->Property->SetString(this->GetCurrentVTKValue());
+      vtkClientServerID id = { 0 };
+      this->Property->SetObjectID(id);
       }
+      }
+  this->Property->SetString(value);
     this->Property->SetVTKSourceID(sourceId);
     this->Property->AcceptInternal();
-    }
 
   if (this->CurrentIndex >= 0)
     {
@@ -301,7 +312,7 @@ const char* vtkPVSelectWidget::GetVTKValue(int index)
     }
   
   const char* res = this->Values->GetString(index);
-  if (res && res[0] != '\0')
+  if (res)
     {
     return res;
     }
@@ -467,9 +478,17 @@ void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file,
     { 
     vtkPVWidgetProperty *pvwp;
     pvwp = vtkPVWidgetProperty::SafeDownCast(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-    vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
-      ->GetObjectByName(this->GetCurrentVTKValue());
+    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget());
+    if (ow)
+      {
+      vtkClientServerID id
+        = ow->GetObjectByName(this->GetCurrentVTKValue());
     elem << "pvTemp" << id << ends;
+      }
+    else
+      {
+      elem << "{}" << ends;
+      }
     }
   else
     {

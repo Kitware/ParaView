@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.52");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.52.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -100,14 +100,11 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
   vtkObject *o;
   vtkPVSource *source;
   int currentFound = 0;
-  vtkPVInputProperty *inProp;
   
   if (sources == NULL)
     {
     return;
     }
-
-  inProp = this->GetInputProperty();
 
   this->ClearEntries();
   sources->InitTraversal();

@@ -1,4 +1,5 @@
 SET( ParaViewShared_SRCS
+  vtkDesktopDeliveryClient.cxx
   vtkPVApplication.cxx
   vtkPVClientServerModule.cxx
   vtkPVExtentTranslator.cxx
@@ -212,8 +213,6 @@ IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     #vtkIceTComposite.cxx
-    vtkDesktopDeliveryClient.cxx
-    vtkDesktopDeliveryServer.cxx
     vtkIceTFactory.cxx
     vtkPVDeskTopRenderModule.cxx
     vtkPVDeskTopRenderModuleUI.cxx
@@ -224,6 +223,7 @@ IF (PARAVIEW_USE_ICE_T)
     )
   SET( ParaViewServer_SRCS
     ${ParaViewServer_SRCS}
+    vtkDesktopDeliveryServer.cxx
     vtkIceTRenderManager.cxx
     vtkIceTClientCompositeManager.cxx
     vtkIceTRenderer.cxx
