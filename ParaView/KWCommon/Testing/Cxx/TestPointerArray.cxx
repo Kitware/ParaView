@@ -1,7 +1,7 @@
 #include "vtkVector.txx"
 #include "vtkLinkedList.txx"
 
-int CheckName(const char *name, char **names)
+int CheckName(const char *name, const char **names)
 {
   int cc;
   if ( !name )
@@ -58,7 +58,7 @@ int TestList(DType*)
 
   for ( cc=0; cc < 13; cc++ )
     {
-    char* name = 0;
+    const char* name = 0;
     if ( cc < 10 )
       {
       if ( strings->GetItem(cc, name) != VTK_OK )
@@ -121,7 +121,7 @@ int TestList(DType*)
 
   for ( cc=0; cc < 11; cc++ )
     {
-    char *name = 0;
+    const char *name = 0;
     if ( cc < 7 )
       {
       if ( strings->GetItem(cc, name) != VTK_OK )
@@ -171,7 +171,7 @@ int TestList(DType*)
 
   for ( cc=0; cc < strings->GetNumberOfItems(); cc++ )
     {
-    char *name = 0;
+    const char *name = 0;
     if ( strings->GetItem(cc, name) != VTK_OK )
       {
       C_ERROR(strings) << "Problem accessing item: " << cc << endl;
@@ -195,7 +195,7 @@ int TestList(DType*)
   //cout << "Try iterator" << endl;
   while ( it->IsDoneWithTraversal() != VTK_OK )
     {
-    char* str = 0;
+    const char* str = 0;
     vtkIdType idx = 0;
     if ( it->GetData(str) != VTK_OK )
       {
@@ -270,12 +270,12 @@ int main()
   int res = 0;
 
   //cout << "Vector: " << endl;
-  vtkVector<char *> *vv = vtkVector<char *>::New();
+  vtkVector<const char *> *vv = vtkVector<const char *>::New();
   res += TestList(vv);
   vv->Delete();
 
   //cout << "Linked List: " << endl;
-  vtkLinkedList<char *> *vl = vtkLinkedList<char *>::New();
+  vtkLinkedList<const char *> *vl = vtkLinkedList<const char *>::New();
   res += TestList(vl);
   vl->Delete();
 
