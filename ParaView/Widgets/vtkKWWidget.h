@@ -69,6 +69,10 @@ public:
   int IsCreated() { return (this->Application != 0); }
 
   // Description:
+  // Set tk configuration options of the widget
+  void Configure(const char* opts);
+
+  // Description:
   // Query if widget is "alive" (i.e. is created and not deleted as far as
   // Tk is concered, i.e. 'winfo exists')
   int IsAlive();

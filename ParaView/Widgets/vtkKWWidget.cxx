@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.86");
+vtkCxxRevisionMacro(vtkKWWidget, "1.87");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.86 $");
+  this->ExtractRevision(os,"$Revision: 1.87 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1531,6 +1531,17 @@ int vtkKWWidget::IsGrabbed()
 
   const char *res = this->Script("grab status %s", this->GetWidgetName());
   return (!strcmp(res, "none") ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::Configure(const char* opts)
+{
+  if ( !this->IsCreated() || !opts )
+    {
+    return;
+    }
+  this->Script("%s configure %s",
+    this->GetWidgetName(), opts);
 }
 
 //----------------------------------------------------------------------------
