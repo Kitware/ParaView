@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.174");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.175");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1927,7 +1927,7 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetEmptySourceItem()
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkPVAnimationInterfaceEntry* entry
-      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
     if ( !entry->IsActionValid() )
       {
       return entry;
