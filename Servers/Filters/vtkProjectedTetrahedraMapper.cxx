@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.7");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.8");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -520,12 +520,15 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
 
   unsigned char *colors = this->Colors->GetPointer(0);
   vtkIdType *cells = input->GetCells()->GetPointer();
+  vtkIdType totalnumcells = input->GetNumberOfCells();
+  vtkIdType numcellsrendered = 0;
 
   // Let's do it!
   for (vtkIdTypeArray *sorted_cell_ids = this->VisibilitySort->GetNextCells();
        sorted_cell_ids != NULL;
        sorted_cell_ids = this->VisibilitySort->GetNextCells())
     {
+    this->UpdateProgress((double)numcellsrendered/totalnumcells);
     if (renderer->GetRenderWindow()->CheckAbortStatus())
       {
       break;
@@ -779,6 +782,7 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
         glDrawElements(GL_TRIANGLE_FAN, 5, GL_UNSIGNED_BYTE, gl_indices);
         }
       }
+    numcellsrendered += num_cell_ids;
     }
 
   // Restore OpenGL state.
@@ -798,6 +802,8 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
 
   glDepthMask(GL_TRUE);
   glEnable(GL_LIGHTING);
+
+  this->UpdateProgress(1.0);
 }
 
 //-----------------------------------------------------------------------------
