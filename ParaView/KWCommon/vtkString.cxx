@@ -25,7 +25,7 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.21");
+vtkCxxRevisionMacro(vtkString, "1.22");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -439,6 +439,7 @@ char* vtkString::CropString(char* str, size_t max_len)
     {
     dst[cc] = src[cc];
     }
+  dst[cc] = 0;
 
   // Add the ellipsis
 
