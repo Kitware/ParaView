@@ -66,8 +66,9 @@ Section "Dummy Section" SecDummy
 
   SetOutPath "$INSTDIR\bin"
   File "${PV_BIN}\bin\paraview.exe"
-  File "${PV_BIN}\bin\tcl84.dll"
-  File "${PV_BIN}\bin\tk84.dll"
+  File "${PV_BIN}\bin\pvbatch.exe"
+  File "${PV_BIN}\bin\pvserver.exe"
+  File "${PV_BIN}\bin\*.dll"
   File "C:\martink\msvcr71.dll"
   File "C:\martink\msvcp71.dll"
   
