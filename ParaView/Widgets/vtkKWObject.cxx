@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
+#include "vtkString.h"
 #include "vtkTclUtil.h"
 
 #include <stdarg.h>
@@ -115,7 +116,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.19 $");
+  this->ExtractRevision(os,"$Revision: 1.20 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -186,9 +187,8 @@ const char *vtkKWObject::GetTclName()
 
   vtkTclGetObjectFromPointer(this->GetApplication()->GetMainInterp(), 
                              (void *)this, this->CommandFunction);
-  this->TclName = 
-    new char [strlen(this->GetApplication()->GetMainInterp()->result)+1];
-  strcpy(this->TclName,this->GetApplication()->GetMainInterp()->result);
+  this->TclName = vtkString::Duplicate(
+    this->GetApplication()->GetMainInterp()->result);
   return this->TclName;
 }
 
