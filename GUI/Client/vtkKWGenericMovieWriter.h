@@ -68,7 +68,6 @@ protected:
 
   char *FileName;
   int Error;
-  long Time;
 
 private:
   vtkKWGenericMovieWriter(const vtkKWGenericMovieWriter&); // Not implemented

@@ -23,7 +23,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkKWGenericMovieWriter, "1.1");
+vtkCxxRevisionMacro(vtkKWGenericMovieWriter, "1.2");
 
 //---------------------------------------------------------------------------
 vtkKWGenericMovieWriter::vtkKWGenericMovieWriter()
@@ -36,7 +36,6 @@ vtkKWGenericMovieWriter::vtkKWGenericMovieWriter()
 vtkKWGenericMovieWriter::~vtkKWGenericMovieWriter()
 {
   this->SetFileName(0);
-  this->SetInput(0);
 }
 
 //----------------------------------------------------------------------------
