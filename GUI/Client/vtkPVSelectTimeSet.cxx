@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.42");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.43");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -254,6 +254,13 @@ void vtkPVSelectTimeSet::Accept()
   if (dvp)
     {
     dvp->SetElement(0, this->TimeValue);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
   this->ModifiedFlag = 0;

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.20");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -170,6 +170,10 @@ void vtkPVExtractPartsWidget::Accept()
     this->GetSMProperty());
   if (!ivp)
     {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     return;
     }
   

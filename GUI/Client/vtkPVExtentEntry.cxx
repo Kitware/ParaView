@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.41");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -279,6 +279,14 @@ void vtkPVExtentEntry::Accept()
       ivp->SetElement(2*i+1, static_cast<int>(this->MinMax[i]->GetMaxValue()));
       }
     }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
+
   
   this->ModifiedFlag = 0;
   

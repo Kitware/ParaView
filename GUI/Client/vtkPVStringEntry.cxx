@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -169,6 +169,13 @@ void vtkPVStringEntry::Accept()
   if (svp)
     {
     svp->SetElement(0, this->GetValue());
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
   
   this->ModifiedFlag = 0;

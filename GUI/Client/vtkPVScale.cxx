@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.45");
+vtkCxxRevisionMacro(vtkPVScale, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -284,6 +284,14 @@ void vtkPVScale::Accept()
     this->GetSMProperty());
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
+
+  if (!dvp && !ivp)
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
 
   if (this->EntryFlag)
     {

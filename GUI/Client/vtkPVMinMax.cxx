@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.34");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -257,14 +257,18 @@ void vtkPVMinMax::Accept()
     this->GetSMProperty());
   if (prop)
     {
-    int checkDomains = vtkSMProperty::GetCheckDomains();
-    vtkSMProperty::SetCheckDomains(0);
     prop->SetNumberOfElements(2);
     prop->SetElement(0, this->GetMinValue());
     prop->SetElement(1, this->GetMaxValue());
-    vtkSMProperty::SetCheckDomains(checkDomains);
     }
-  
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
+
   this->ModifiedFlag = 0;
 
   // I put this after the accept internal, because

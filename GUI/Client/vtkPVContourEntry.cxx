@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.49");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -97,6 +97,13 @@ void vtkPVContourEntry::Accept()
       {
       prop->SetElement(i, this->ContourValues->GetValue(i));
       }
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
   this->ModifiedFlag = 0;

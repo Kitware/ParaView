@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.30");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -173,7 +173,14 @@ void vtkPVLabeledToggle::Accept()
     {
     ivp->SetElement(0, this->GetState());
     }
-  
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
+
   this->ModifiedFlag = 0;
 
   // I put this after the accept internal, because
