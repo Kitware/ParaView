@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.344");
+vtkCxxRevisionMacro(vtkPVSource, "1.345");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -542,10 +542,7 @@ void vtkPVSource::Update()
   this->Parts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
-    if (part->GetPartDisplay())
-      {
-      part->GetPartDisplay()->Update();
-      }
+    part->Update();
     }
 }
 
@@ -611,7 +608,10 @@ void vtkPVSource::SetVisibilityInternal(int v)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPart(idx);
-    part->GetPartDisplay()->SetVisibility(v);
+    if (part)
+      {
+      part->SetVisibility(v);
+      }
     }
 }
 
@@ -1436,7 +1436,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     for (idx = 0; idx < numParts; ++idx)
       {
       part = this->GetPart(idx);
-      part->GetPartDisplay()->InvalidateGeometry();
+      part->MarkForUpdate();
       }
     }
 
