@@ -77,6 +77,7 @@
 #include "vtkPVOptions.h"
 #include "vtkStdString.h"
 
+
 #define VTK_PV_OUTLINE_LABEL "Outline"
 #define VTK_PV_SURFACE_LABEL "Surface"
 #define VTK_PV_WIREFRAME_LABEL "Wireframe of Surface"
@@ -85,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.1");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.2");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1438,10 +1439,12 @@ void vtkPVDisplayGUI::VolumeRenderByArray(const char* name, int field)
 {
   this->AddTraceEntry("$kw(%s) VolumeRenderByArray %s %d",
     this->GetTclName(), name, field);
+  this->VolumeScalarSelectionWidget->SetValue(name , field);
   this->PVSource->VolumeRenderByArray(name, field);
+
   this->PVSource->ColorByArray(name, field); // So the LOD Mapper remains 
-  //synchronized with the Volume mapper.
-  this->VolumeScalarSelectionWidget->SetValue(name, field);
+        //synchronized with the Volume mapper.
+        //Note that this call also invalidates the "name" pointer.
   if (this->GetPVRenderView())
     {
     this->GetPVRenderView()->EventuallyRender();
