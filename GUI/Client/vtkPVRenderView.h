@@ -143,8 +143,6 @@ public:
   void ShowNavigationWindowCallback(int registery);
   void ShowSelectionWindowCallback(int registery);
   
-  void AddBindings();
-  
   // Description:
   // Export the renderer and render window to a file.
   void SaveInBatchScript(ofstream *file);
@@ -318,7 +316,7 @@ public:
   //BTX
   vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   //ETX
-  
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();

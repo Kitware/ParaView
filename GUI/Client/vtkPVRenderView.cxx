@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.347");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.348");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1518,13 +1518,6 @@ void vtkPVRenderView::SetCameraParallelScale(float scale)
   this->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddBindings()
-{
-  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
-               this->VTKWidget->GetWidgetName(), this->GetTclName());
-}
-    
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVRenderView::GetPVApplication()
 {
