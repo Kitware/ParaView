@@ -145,6 +145,7 @@ static const char *vtkKWEventStrings[] = {
   "VolumeScaleBarColorChangedEvent",
   "VolumeScaleBarVisibilityChangedEvent",
   "VolumeStandardCameraViewEvent",
+  "WindowInterfaceChangedEvent",
   "WindowLayoutChangedEvent",
   "WindowLevelChangedEvent",
   "WindowLevelChangedImageCompositeEvent",

@@ -154,6 +154,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeScaleBarColorChangedEvent,
     VolumeScaleBarVisibilityChangedEvent,
     VolumeStandardCameraViewEvent,
+    WindowInterfaceChangedEvent,
     WindowLayoutChangedEvent,
     WindowLevelChangedEvent,
     WindowLevelChangedImageCompositeEvent,
