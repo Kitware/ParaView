@@ -17,17 +17,17 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkDataSet.h"
+#include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.15");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.16");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
+vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
-  // What was this for?
-  //this->vtkSource::SetNthOutput(1,vtkDataSet::New());
-  //this->Outputs[1]->Delete();
+  this->Input = 0;
 
   this->UpdatePiece = 0;
   this->UpdateNumberOfPieces = 1;
@@ -39,37 +39,32 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
+  this->SetInput(0);
   this->RemoveAllCaches();
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkPVUpdateSuppressor::GetMTime()
+vtkPolyData* vtkPVUpdateSuppressor::GetPolyDataOutput()
 {
-  unsigned long mTime=this->vtkDataSetToDataSetFilter::GetMTime();
-
-  return mTime;
+  vtkDataSet* o = this->GetOutput();
+  return vtkPolyData::SafeDownCast(o);
 }
 
-
-// All these recursive pipeline methods now do nothing.
-// I could use the UpdateExtent from the output, but
-// The user may not have called update before force update.
-
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::UpdateData(vtkDataObject *)
+vtkDataSet* vtkPVUpdateSuppressor::GetOutput()
 {
-}
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::UpdateInformation()
-{
-}
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::PropagateUpdateExtent(vtkDataObject *)
-{
-}
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::TriggerAsynchronousUpdate()
-{
+  if (this->NumberOfOutputs < 1 || this->Outputs[0] == 0)
+    {
+    vtkDataSet* input = this->GetInput();
+    if (input == 0)
+      {
+      return 0;
+      }
+    vtkDataSet* output = input->NewInstance();
+    this->SetOutput(output);
+    output->Delete();
+    }
+  return static_cast<vtkDataSet*>(this->Outputs[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -190,6 +185,7 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
 void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Input: (" << this->Input << ")\n";
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
 }

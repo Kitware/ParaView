@@ -19,17 +19,33 @@
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetSource.h"
 
-class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetToDataSetFilter
+class vtkPolyData;
+
+class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetSource
 {
 public:
-  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetSource);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Cast output to a polydata.  Return NULL if this is not possible.
+  vtkPolyData* GetPolyDataOutput();
+
+  // Description:
+  // Check input type and make the output the same type.
+  virtual vtkDataSet* GetOutput();
 
   // Description:
   // Construct with user-specified implicit function.
   static vtkPVUpdateSuppressor *New();
+
+  // Description:
+  // The pipeline knows nothing about this input.  The pipeline thinks
+  // that this is a source.
+  void SetInput(vtkDataSet* input);
+  vtkDataSet* GetInput(){return this->Input;}
 
   // Description:
   // Methods for saving, clearing and updating flip books.
@@ -39,19 +55,8 @@ public:
   void CacheUpdate(int idx, int total);
 
   // Description:
-  // Return the mtime also considering the locator and clip function.
-  unsigned long GetMTime();
-
-  // Description:
   // Force update on the input.
   void ForceUpdate();
-
-  // Description:
-  // Overwrite UpdateData so that it will not propagate update.
-  void UpdateData(vtkDataObject *);
-  void UpdateInformation();
-  void PropagateUpdateExtent(vtkDataObject *);
-  void TriggerAsynchronousUpdate();
 
   // Description:
   // Set number of pieces and piece on the data.
@@ -68,6 +73,8 @@ protected:
   ~vtkPVUpdateSuppressor();
 
   void Execute();
+
+  vtkDataSet* Input;
 
   int UpdatePiece;
   int UpdateNumberOfPieces;
