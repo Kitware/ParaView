@@ -130,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.614");
+vtkCxxRevisionMacro(vtkPVWindow, "1.615");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4767,7 +4767,7 @@ void vtkPVWindow::SetProgress(const char* text, int val)
     this->LastProgress = lastprog;
     return;
     }
-  if ( lastprog - this->LastProgress < .5 )
+  if ( lastprog - this->LastProgress < 1 )
     {
     return;
     }
