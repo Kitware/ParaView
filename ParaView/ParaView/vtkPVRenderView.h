@@ -390,7 +390,9 @@ protected:
   vtkKWPushButton   *ZMaxViewButton; 
   vtkKWPushButton   *ZMinViewButton; 
 
+  vtkKWLabeledFrame *LODFrame;
   vtkKWLabeledFrame *RenderParametersFrame;
+  vtkKWLabeledFrame *ParallelRenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ParallelProjectionCheck;
   vtkKWCheckButton *ImmediateModeCheck;
