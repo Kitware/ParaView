@@ -1222,6 +1222,7 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
   
   if (this->CurrentPVData)
     {
+    this->EnableFilterButtons();
     this->CurrentPVData->UnRegister(this);
     this->CurrentPVData = NULL;
     // Remove all of the entries from the filter menu.
@@ -1229,6 +1230,10 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
       {
       this->FilterMenu->DeleteAllMenuItems();
       }
+    }
+  else
+    {
+    this->DisableFilterButtons();
     }
   if (pvd)
     {
@@ -1349,15 +1354,15 @@ void vtkPVWindow::DisableFilterButtons()
 void vtkPVWindow::EnableFilterButtons()
 {
   this->Script("%s configure -state normal",
-               window->GetCalculatorButton()->GetWidgetName());
+               this->CalculatorButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               window->GetThresholdButton()->GetWidgetName());
+               this->ThresholdButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               window->GetContourButton()->GetWidgetName());
+               this->ContourButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               window->GetGlyphButton()->GetWidgetName());
+               this->GlyphButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               window->GetProbeButton()->GetWidgetName());
+               this->ProbeButton->GetWidgetName());
 
 }
 
