@@ -303,6 +303,10 @@
        variable="NumberOfScalarComponents" type="int" 
        help="How many componenets does each pixel have. (i.e. RGB would be 3.)"
        default_value="1"/>
+  <StringEntry label="Array name" trace_name="ArrayName"
+               variable="ScalarArrayName"
+               help="Name to assign to array read"
+               default_value="ImageFile"/>
 </Module>
 
 #ifdef PARAVIEW_LINK_XDMF
