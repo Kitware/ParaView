@@ -176,7 +176,8 @@ vtkKWWidget *vtkPVRenderView::GetSourceParent()
     }
   
   this->SourceParent = vtkKWWidget::New();
-  this->SourceParent->SetParent(this->ParentWindow->GetPropertiesParent());
+//  this->SourceParent->SetParent(this->ParentWindow->GetPropertiesParent());
+  this->SourceParent->SetParent(this->GetPropertiesParent());
   this->SourceParent->Create(this->Application, "frame", "");
   
   return this->SourceParent;
@@ -202,7 +203,8 @@ vtkKWWidget *vtkPVRenderView::GetActorParent()
     }
   
   this->ActorParent = vtkKWWidget::New();
-  this->ActorParent->SetParent(this->ParentWindow->GetPropertiesParent());
+//  this->ActorParent->SetParent(this->ParentWindow->GetPropertiesParent());
+  this->ActorParent->SetParent(this->GetPropertiesParent());
   this->ActorParent->Create(this->Application, "frame", "");
   return this->ActorParent;
 }
@@ -373,7 +375,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
 	       this->GetTclName());
   
-  this->NavigationFrame->SetParent(this->ParentWindow->GetPropertiesParent());
+//  this->NavigationFrame->SetParent(this->ParentWindow->GetPropertiesParent());
+  this->NavigationFrame->SetParent(this->GetPropertiesParent());
   this->NavigationFrame->Create(this->Application);
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());

@@ -165,8 +165,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   char *rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(1, "Source List", 
-                                            rbv, this, "ShowWindowProperties");
   this->GetMenuProperties()->AddRadioButton(2, "Source",
                                             rbv, this,
                                             "ShowCurrentSourceProperties");
