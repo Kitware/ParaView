@@ -811,7 +811,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GlyphSources->AddItem(pvs);
   pvs->Delete();
   pvd->Delete();
-  
+
+
+  this->DisableFilterButtons();
 }
 
 //----------------------------------------------------------------------------
@@ -1346,6 +1348,17 @@ void vtkPVWindow::DisableFilterButtons()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableFilterButtons()
 {
+  this->Script("%s configure -state normal",
+               window->GetCalculatorButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetThresholdButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetContourButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetGlyphButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
+               window->GetProbeButton()->GetWidgetName());
+
 }
 
 //----------------------------------------------------------------------------

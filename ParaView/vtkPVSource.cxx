@@ -1137,16 +1137,7 @@ void vtkPVSource::DeleteCallback()
     this->Script("%s entryconfigure %d -state normal",
                  window->GetMenu()->GetWidgetName(), i);
     }
-  this->Script("%s configure -state normal",
-               window->GetCalculatorButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetThresholdButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetContourButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetGlyphButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetProbeButton()->GetWidgetName());
+  window->EnableFilterButtons();
 
   // This should delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
