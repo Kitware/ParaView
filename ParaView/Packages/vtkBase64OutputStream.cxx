@@ -17,13 +17,11 @@
 =========================================================================*/
 #include "vtkBase64OutputStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkBase64Utility.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkBase64OutputStream, "1.3");
+vtkCxxRevisionMacro(vtkBase64OutputStream, "1.4");
 vtkStandardNewMacro(vtkBase64OutputStream);
-
-//----------------------------------------------------------------------------
-static unsigned char vtkBase64OutputStreamEncode(unsigned char c);
 
 //----------------------------------------------------------------------------
 vtkBase64OutputStream::vtkBase64OutputStream()
@@ -114,10 +112,8 @@ inline int vtkBase64OutputStream::EncodeTriplet(unsigned char c0,
 {
   // Encodes 3 bytes into 4 bytes and writes them to the output stream.
   unsigned char out[4];
-  out[0] = vtkBase64OutputStreamEncode((c0 >> 2) & 0x3F);
-  out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30)|((c1 >> 4) & 0x0F));
-  out[2] = vtkBase64OutputStreamEncode(((c1 << 2) & 0x3C)|((c2 >> 6) & 0x03));
-  out[3] = vtkBase64OutputStreamEncode(c2 & 0x3F);
+  vtkBase64Utility::EncodeTriplet(c0, c1, c2,
+                                  &out[0], &out[1], &out[2], &out[3]);
   return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
 }
   
@@ -127,10 +123,8 @@ inline int vtkBase64OutputStream:: EncodeEnding(unsigned char c0,
 {
   // Encodes a 2-byte ending into 3 bytes and 1 pad byte and writes.
   unsigned char out[4];
-  out[0] = vtkBase64OutputStreamEncode((c0 >> 2) & 0x3F);
-  out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30)|((c1 >> 4) & 0x0F));
-  out[2] = vtkBase64OutputStreamEncode(((c1 << 2) & 0x3C));
-  out[3] = '=';
+  vtkBase64Utility::EncodePair(c0, c1,
+                               &out[0], &out[1], &out[2], &out[3]);
   return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
 }
 
@@ -139,21 +133,7 @@ inline int vtkBase64OutputStream::EncodeEnding(unsigned char c0)
 {
   // Encodes a 1-byte ending into 2 bytes and 2 pad bytes and writes.
   unsigned char out[4];
-  out[0] = vtkBase64OutputStreamEncode((c0 >> 2) & 0x3F);
-  out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30));
-  out[2] = '=';
-  out[3] = '=';
+  vtkBase64Utility::EncodeSingle(c0,
+                                 &out[0], &out[1], &out[2], &out[3]);
   return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
-}
-
-//----------------------------------------------------------------------------
-static const unsigned char vtkBase64OutputStreamEncodeTable[65] =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  "abcdefghijklmnopqrstuvwxyz"
-  "0123456789+/";
-
-//----------------------------------------------------------------------------
-unsigned char vtkBase64OutputStreamEncode(unsigned char c)
-{ 
-  return vtkBase64OutputStreamEncodeTable[c]; 
 }
