@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.38");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -237,6 +237,10 @@ void vtkPVFileEntry::EntryChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
+  if ( ts < this->Range[0] || ts > this->Range[1] )
+    {
+    return;
+    }
   this->TimeStep = ts;
   if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
     {
