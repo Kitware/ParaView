@@ -168,17 +168,17 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
 
   input->GetWholeExtent(this->Extent);
 
-  cerr << "WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
-       << this->Extent[2] << ", " << this->Extent[3] << ", "
-       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  vtkDebugMacro("WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
+		<< this->Extent[2] << ", " << this->Extent[3] << ", "
+		<< this->Extent[4] << ", " << this->Extent[5]);
   
   if (this->Assignment)
     {
     aExt = this->Assignment->GetExtent();
     
-    cerr << this->Assignment << " AssignExtent: " << aExt[0] << ", " << aExt[1] << ", "
-	 << aExt[2] << ", " << aExt[3] << ", "
-	 << aExt[4] << ", " << aExt[5] << endl;    
+    vtkDebugMacro(<< this->Assignment << " AssignExtent: " << aExt[0] << ", " 
+    << aExt[1] << ", " << aExt[2] << ", " << aExt[3] << ", " << aExt[4] << ", " 
+    << aExt[5]);
     
     if (aExt[0] > this->Extent[0])
       {
@@ -217,9 +217,9 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
     this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;    
     }
   
-  cerr << "Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
-       << this->Extent[2] << ", " << this->Extent[3] << ", "
-       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  vtkDebugMacro("Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
+		<< this->Extent[2] << ", " << this->Extent[3] << ", "
+		<< this->Extent[4] << ", " << this->Extent[5]);
   
   input->SetUpdateExtent(this->Extent);
 }
@@ -247,7 +247,7 @@ void vtkPVImageTextureFilter::Execute()
   this->Clip->Update();
   
   outputTexture->ShallowCopy(this->Clip->GetOutput());
-  cerr << *outputTexture << endl;
+  vtkDebugMacro(<< *outputTexture);
   vtkStructuredPointsWriter *w;
   w = vtkStructuredPointsWriter::New();
   w->SetInput(this->IntermediateImage);
@@ -282,7 +282,7 @@ void vtkPVImageTextureFilter::Execute()
   y = origin[1] + (float)(this->Extent[2]) * spacing[1];
   z = origin[2] + (float)(this->Extent[4]) * spacing[2];
 
-  cerr << "Origin: " << x << ", " << y << ", " << z << endl;
+  vtkDebugMacro("Origin: " << x << ", " << y << ", " << z);
   this->PlaneSource->SetOrigin(x, y, z);
 
   if (this->PlaneAxis == 0)
@@ -313,7 +313,7 @@ void vtkPVImageTextureFilter::Execute()
     y = origin[1] + (float)(this->Extent[2]) * spacing[1];
     z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     
-  cerr << "P1: " << x << ", " << y << ", " << z << endl;
+  vtkDebugMacro("P1: " << x << ", " << y << ", " << z);
     
     this->PlaneSource->SetPoint1(x, y, z);
     x = origin[0] + (float)(this->Extent[0]) * spacing[0];
@@ -321,7 +321,7 @@ void vtkPVImageTextureFilter::Execute()
     z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     this->PlaneSource->SetPoint2(x, y, z);
 
-  cerr << "P2: " << x << ", " << y << ", " << z << endl;
+  vtkDebugMacro("P2: " << x << ", " << y << ", " << z);
     
     }
   

@@ -297,47 +297,15 @@ int vtkPVScalarBar::GetVisibility()
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetOrientationToHorizontal()
 {
-  //  float tmp;
-  //  float *pos;
-  
-  //  if (this->ScalarBar->GetOrientation() == VTK_ORIENT_VERTICAL)
-  //    {
-  //    pos = this->ScalarBar->GetPosition();
-  //    this->ScalarBar->GetPositionCoordinate()->
-  //      SetCoordinateSystemToNormalizedViewport();
-  //    this->ScalarBar->GetPositionCoordinate()->
-  //      SetValue((1.0 - pos[0])/2.0, pos[1]);
-  //    tmp = this->ScalarBar->GetHeight();
-  //    this->ScalarBar->SetHeight(this->ScalarBar->GetWidth());
-  //    this->HeightScale->SetValue(this->ScalarBar->GetHeight());
-  //    this->ScalarBar->SetWidth(tmp);
-  //    this->WidthScale->SetValue(this->ScalarBar->GetWidth());
-    this->ScalarBar->SetOrientationToHorizontal();
-    this->GetView()->Render();
-    //    }
+  this->ScalarBar->SetOrientationToHorizontal();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetOrientationToVertical()
 {
-  //  float tmp;
-  //  float *pos;
-  
-  //  if (this->ScalarBar->GetOrientation() == VTK_ORIENT_HORIZONTAL)
-  //    {
-  //    pos = this->ScalarBar->GetPosition();
-  //    this->ScalarBar->GetPositionCoordinate()->
-  //      SetCoordinateSystemToNormalizedViewport();
-  //    this->ScalarBar->GetPositionCoordinate()->
-  //      SetValue(1.0 - 2*pos[0], pos[1]);
-  //    tmp = this->ScalarBar->GetHeight();
-  //    this->ScalarBar->SetHeight(this->ScalarBar->GetWidth());
-  //    this->HeightScale->SetValue(this->ScalarBar->GetHeight());
-  //    this->ScalarBar->SetWidth(tmp);
-  //    this->WidthScale->SetValue(this->ScalarBar->GetWidth());
-    this->ScalarBar->SetOrientationToVertical();
-    this->GetView()->Render();
-    //    }
+  this->ScalarBar->SetOrientationToVertical();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -371,7 +339,30 @@ void vtkPVScalarBar::SetPVData(vtkPVData *data)
     data->Register(this);
     // Manage double pointer.
     data->SetScalarBar(this);
-    this->ScalarBar->SetLookupTable(data->GetActorComposite()->
-                                    GetMapper()->GetLookupTable());
+    this->UpdateLookupTable();
+    }
+}
+
+//-----------------------------------------------------------------------------------
+void vtkPVScalarBar::UpdateLookupTable()
+{
+  vtkLookupTable *lt;
+  
+  if (this->PVData)
+    {
+    if (this->PVData->GetActorComposite()->GetActor()->GetTexture())
+      {
+      lt = vtkLookupTable::New();
+      lt->SetTableRange(0, 100);
+      lt->Build();
+      this->ScalarBar->SetLookupTable(lt);
+      this->PVData->GetActorComposite()->GetActor()->GetTexture()->SetLookupTable(lt);
+      lt->Delete();
+      }
+    else
+      {
+      this->ScalarBar->SetLookupTable(this->PVData->GetActorComposite()->
+				      GetMapper()->GetLookupTable());
+      }
     }
 }

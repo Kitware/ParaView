@@ -105,6 +105,8 @@ public:
   void SetScalarBarWidth();
   void SetScalarBarXPosition();
   void SetScalarBarYPosition();
+
+  void UpdateLookupTable();
   
 protected:
   vtkPVScalarBar();

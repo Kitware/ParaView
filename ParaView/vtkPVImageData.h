@@ -91,10 +91,7 @@ protected:
 //  ~vtkPVImageData();
 //  vtkPVImageData(const vtkPVImageData&) {};
   void operator=(const vtkPVImageData&) {};
-    
-  vtkPVImageTextureFilter *TextureFilter;
-  vtkTexture *Texture;
-  };
+};
 
 #endif
 

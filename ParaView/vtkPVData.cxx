@@ -653,6 +653,7 @@ vtkPVActorComposite* vtkPVData::GetActorComposite()
   return this->ActorComposite;
 }
 
+//----------------------------------------------------------------------------
 vtkPVScalarBar *vtkPVData::GetScalarBar()
 {
   return this->ScalarBar;

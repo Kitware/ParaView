@@ -38,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkGeometryFilter.h"
 #include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
+#include "vtkPVScalarBar.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -540,6 +541,9 @@ void vtkPVActorComposite::SetMode(int mode)
       this->GetActor()->SetTexture(texture);
       texture->Delete();
       texture = NULL;
+      
+      this->GetPVData()->GetScalarBar()->UpdateLookupTable();
+      
       return;
       }
     }

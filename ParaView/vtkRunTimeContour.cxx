@@ -112,11 +112,13 @@ vtkImageData *vtkRunTimeContour::GetXSliceOutput()
   
   return (vtkImageData *)(this->Outputs[1]);
 }
+
 //----------------------------------------------------------------------------
 void vtkRunTimeContour::SetXSliceOutput(vtkImageData *output)
 {
   this->vtkSource::SetNthOutput(1, output);
 }
+
 //----------------------------------------------------------------------------
 vtkImageData *vtkRunTimeContour::GetYSliceOutput()
 {
@@ -127,11 +129,13 @@ vtkImageData *vtkRunTimeContour::GetYSliceOutput()
   
   return (vtkImageData *)(this->Outputs[2]);
 }
+
 //----------------------------------------------------------------------------
 void vtkRunTimeContour::SetYSliceOutput(vtkImageData *output)
 {
   this->vtkSource::SetNthOutput(2, output);
 }
+
 //----------------------------------------------------------------------------
 vtkImageData *vtkRunTimeContour::GetZSliceOutput()
 {
@@ -142,12 +146,12 @@ vtkImageData *vtkRunTimeContour::GetZSliceOutput()
   
   return (vtkImageData *)(this->Outputs[3]);
 }
+
 //----------------------------------------------------------------------------
 void vtkRunTimeContour::SetZSliceOutput(vtkImageData *output)
 {
   this->vtkSource::SetNthOutput(3, output);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkRunTimeContour::Execute()
