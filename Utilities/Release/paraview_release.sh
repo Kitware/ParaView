@@ -411,7 +411,11 @@ source_zipfile()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.zip &&
-        zip -r Tarballs/${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION}
+        rm -rf Tarballs/${PROJECT}-${VERSION} &&
+        tar c --exclude CVS ${PROJECT}-${VERSION} | (cd Tarballs; tar x) &&
+        cd Tarballs &&
+        zip -r ${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION} &&
+        rm -rf ${PROJECT}-${VERSION}
     ) >Logs/source_zipfile.log 2>&1 || error_log Logs/source_zipfile.log
 }
 
