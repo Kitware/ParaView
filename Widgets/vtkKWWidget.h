@@ -78,7 +78,7 @@ public:
   // Description:
   // Add/Remove/Get a child to this Widget
   void AddChild(vtkKWWidget *w) {this->Children->AddItem(w);};
-  void RemoveChild(vtkKWWidget *w) {this->Children->RemoveItem(w);};
+  void RemoveChild(vtkKWWidget *w);
   vtkKWWidgetCollection *GetChildren() {return this->Children;};
   
   // Description::

@@ -70,6 +70,9 @@ vtkKWWidget::vtkKWWidget()
   this->Parent                   = NULL;
   this->CommandFunction          = vtkKWWidgetCommand;
   this->Children                 = vtkKWWidgetCollection::New();
+  // Make tracking memory leaks easier.
+  this->Children->Register(this);
+  this->Children->Delete();
   this->DeletingChildren         = 0;
   this->BalloonHelpString        = NULL;  
   this->BalloonHelpJustification = 0;
@@ -82,7 +85,7 @@ vtkKWWidget::~vtkKWWidget()
     {
     this->SetBalloonHelpString(NULL);
     }
-  this->Children->Delete();
+  this->Children->UnRegister(this);
   
   if (this->Application)
     {
@@ -189,8 +192,24 @@ int  vtkKWWidget::GetNetReferenceCount()
     2*this->Children->GetNumberOfItems();
 }
 
+// Removing items in the middle of a traversal is a bad thing.
+// UnRegister will handle removing all of the children.
+void vtkKWWidget::RemoveChild(vtkKWWidget *w) 
+{
+  if ( ! this->DeletingChildren)
+    {
+    this->Children->RemoveItem(w);
+    }
+}
+
+
 void vtkKWWidget::UnRegister(vtkObject *o)
 {
+  if (((int)this) == 0x03bda490)
+    {
+    this->BreakOnError();
+    }
+
   if (!this->DeletingChildren)
     {
     // delete the children if we are about to be deleted
@@ -201,9 +220,10 @@ void vtkKWWidget::UnRegister(vtkObject *o)
       this->DeletingChildren = 1;
       this->Children->InitTraversal();
       while ((child = this->Children->GetNextKWWidget()))
-          {
-          child->SetParent(NULL);
-          }
+        {
+        child->SetParent(NULL);
+        }
+      this->Children->RemoveAllItems();
       this->DeletingChildren = 0;
       }
     }
@@ -266,7 +286,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.15 $");
+  this->ExtractRevision(os,"$Revision: 1.16 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
