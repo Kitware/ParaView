@@ -1066,6 +1066,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
       {
       ((vtkPVGlyph3D*)comp)->UpdateSourceMenu();
       }
+    this->ShowCurrentSourceProperties();
     }
 }
 
