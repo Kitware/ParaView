@@ -40,7 +40,7 @@ class VTK_EXPORT vtkPVPartDisplay : public vtkPVDisplay
 {
 public:
   static vtkPVPartDisplay* New();
-  vtkTypeRevisionMacro(vtkPVPartDisplay, vtkObject);
+  vtkTypeRevisionMacro(vtkPVPartDisplay, vtkPVDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
