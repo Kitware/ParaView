@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.10");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.11");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -315,6 +315,11 @@ int vtkIceTRenderer::UpdateGeometry()
 
   delete[] visible;
   return this->NumberOfPropsRendered;
+}
+
+void vtkIceTRenderer::StereoMidpoint()
+{
+  this->ComposeNextFrame = 1;
 }
 
 void vtkIceTRenderer::PrintSelf(ostream &os, vtkIndent indent)

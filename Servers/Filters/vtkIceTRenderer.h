@@ -54,6 +54,10 @@ public:
   // compositing is on.
   virtual void Clear();
 
+  // Description:
+  // Reset ComposeNextFrame between rendering each eye for stereo viewing
+  void StereoMidpoint();
+
 protected:
   vtkIceTRenderer();
   virtual ~vtkIceTRenderer();
