@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.10");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.11");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -58,7 +58,8 @@ vtkKWLabeledLabel::vtkKWLabeledLabel()
   this->CommandFunction = vtkKWLabeledLabelCommand;
 
   this->PackHorizontally = 1;
-  this->ExpandLabel2 = 0;
+  this->ExpandLabel2     = 0;
+  this->LabelAnchor      = vtkKWWidget::ANCHOR_NW;
 
   this->Label2 = vtkKWLabel::New();
 }
@@ -118,12 +119,16 @@ void vtkKWLabeledLabel::Pack()
 
   ostrstream tk_cmd;
 
+  tk_cmd << this->Label2->GetWidgetName() << " config -anchor " 
+         << this->GetAnchorAsString(this->LabelAnchor) << endl;
+
   if (this->PackHorizontally)
     {
     if (this->ShowLabel)
       {
       tk_cmd << "pack " << this->Label->GetWidgetName() 
-             << " -side left -anchor nw" << endl;
+             << " -side left -anchor " 
+             << this->GetAnchorAsString(this->LabelAnchor) << endl;
       }
     tk_cmd << "pack " << this->Label2->GetWidgetName() 
            << " -side left -anchor nw -fill both -expand " 
@@ -134,7 +139,8 @@ void vtkKWLabeledLabel::Pack()
     if (this->ShowLabel)
       {
       tk_cmd << "pack " << this->Label->GetWidgetName() 
-             << " -side top -anchor nw" << endl;
+             << " -side top -anchor " 
+             << this->GetAnchorAsString(this->LabelAnchor) << endl;
       }
     tk_cmd << "pack " << this->Label2->GetWidgetName() 
            << " -side top -anchor nw -padx 10 -fill both -expand "
@@ -167,6 +173,19 @@ void vtkKWLabeledLabel::SetExpandLabel2(int _arg)
     return;
     }
   this->ExpandLabel2 = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetLabelAnchor(int _arg)
+{
+  if (this->LabelAnchor == _arg)
+    {
+    return;
+    }
+  this->LabelAnchor = _arg;
   this->Modified();
 
   this->Pack();
@@ -226,4 +245,7 @@ void vtkKWLabeledLabel::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ExpandLabel2: " 
      << (this->ExpandLabel2 ? "On" : "Off") << endl;
+
+  os << indent << "LabelAnchor: " 
+     << this->GetAnchorAsString(this->LabelAnchor) << endl;
 }

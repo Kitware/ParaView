@@ -89,12 +89,19 @@ public:
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification(int j);
 
+  // Description:
+  // Set the anchoring for the first label
+  virtual void SetLabelAnchor(int);
+  vtkBooleanMacro(LabelAnchor, int);
+  vtkGetMacro(LabelAnchor, int);
+
 protected:
   vtkKWLabeledLabel();
   ~vtkKWLabeledLabel();
 
   int PackHorizontally;
   int ExpandLabel2;
+  int LabelAnchor;
 
   vtkKWLabel *Label2;
 
