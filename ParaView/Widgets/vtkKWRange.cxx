@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.19");
+vtkCxxRevisionMacro(vtkKWRange, "1.20");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -704,7 +704,7 @@ void vtkKWRange::UpdateEntriesResolution()
       // sprintf would be of no help here.
 
       const char *res = this->Script("expr %f", fabs(this->Resolution));
-      char *pos = strchr(res, '.');
+      const char *pos = strchr(res, '.');
       if (pos)
         {
         this->EntriesResolution = (int)(strlen(res)) - (pos - res) - 1;
