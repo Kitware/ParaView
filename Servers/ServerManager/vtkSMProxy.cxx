@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMProxy, "1.22");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -99,6 +99,8 @@ vtkSMProxy::vtkSMProxy()
   vtkClientServerID nullID = { 0 };
   this->SelfID = nullID;
 
+  this->XMLElement = 0;
+  this->DoNotModifyProperty = 0;
 
   // Assign a unique clientserver id to this object.
   // Note that this ups the reference count to 2.
@@ -123,8 +125,6 @@ vtkSMProxy::vtkSMProxy()
     pm->GetInterpreter()->ClearLastResult();
     }
 
-  this->XMLElement = 0;
-  this->DoNotModifyProperty = 0;
 }
 
 //---------------------------------------------------------------------------
