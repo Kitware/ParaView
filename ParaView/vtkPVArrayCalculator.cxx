@@ -209,6 +209,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
   this->AttributeModeLabel->Create(pvApp, "");
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
+  this->AttributeModeLabel->SetBalloonHelpString("Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp, "");
   this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
@@ -216,6 +217,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
                                                "ChangeAttributeMode cell");
   this->AttributeModeMenu->SetCurrentEntry("Point Data");
+  this->AttributeModeMenu->SetBalloonHelpString("Select whether to operate on point or cell data");
   this->Script("pack %s %s -side left",
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
@@ -229,6 +231,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ArrayNameEntry->Create(pvApp);
   this->ArrayNameEntry->SetValue("resultArray");
   this->ArrayNameEntry->SetLabel("Result Array Name:");
+  this->ArrayNameEntry->SetBalloonHelpString("Set the name of the array to hold the results of this computation");
   this->Script("pack %s -side left",
                this->ArrayNameEntry->GetWidgetName());
   
@@ -445,9 +448,11 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ScalarsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->ScalarsMenu->Create(pvApp, "");
   this->ScalarsMenu->SetButtonText("scalars");
+  this->ScalarsMenu->SetBalloonHelpString("Select a scalar array to operate on");
   this->VectorsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->VectorsMenu->Create(pvApp, "");
   this->VectorsMenu->SetButtonText("vectors");
+  this->VectorsMenu->SetBalloonHelpString("Select a vector array to operate on");
   this->ChangeAttributeMode("point");
   this->Script("grid %s -row 5 -column 3 -columnspan 4 -sticky news",
                this->ScalarsMenu->GetWidgetName());

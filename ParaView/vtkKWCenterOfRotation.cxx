@@ -176,28 +176,36 @@ void vtkKWCenterOfRotation::Create(vtkKWApplication *app, char *args)
   
   this->OpenButton->Create(app,"button","-text {>} -bd 1");
   this->OpenButton->SetCommand(this, "OpenCallback");
+  this->OpenButton->SetBalloonHelpString("Expand the center of rotation user interface");
   this->Script( "pack %s -side left -expand 0 -fill none -padx 2 -pady 2",
                 this->OpenButton->GetWidgetName());
   
   // Point entry
   this->XLabel->Create(app,"label","-text {X}");
+  this->XLabel->SetBalloonHelpString("Set the X-coordinate for the center of rotation");
   this->XEntry->Create(app,"-width 7");
+  this->XEntry->SetBalloonHelpString("Set the X-coordinate for the center of rotation");
   this->Script( "bind %s <KeyPress-Return> {%s EntryCallback}",
                 this->XEntry->GetWidgetName(), this->GetTclName());
   
   this->YLabel->Create(app,"label","-text {Y}");
+  this->YLabel->SetBalloonHelpString("Set the Y-coordinate for the center of rotation");
   this->YEntry->Create(app,"-width 7");
+  this->YEntry->SetBalloonHelpString("Set the Y-coordinate for the center of rotation");
   this->Script( "bind %s <KeyPress-Return> {%s EntryCallback}",
                 this->YEntry->GetWidgetName(), this->GetTclName());
   
   this->ZLabel->Create(app,"label","-text {Z}");
+  this->ZLabel->SetBalloonHelpString("Set the Z-coordinate for the center of rotation");
   this->ZEntry->Create(app,"-width 7");
+  this->ZEntry->SetBalloonHelpString("Set the Z-coordinate for the center of rotation");
   this->Script( "bind %s <KeyPress-Return> {%s EntryCallback}",
                 this->ZEntry->GetWidgetName(), this->GetTclName());
   
   this->CloseButton->Create(app,"button","-text {<} -bd 1");
   this->CloseButton->SetCommand(this, "CloseCallback");
-     
+  this->CloseButton->SetBalloonHelpString("Collapse the center of rotation user interface");
+  
   this->Update();
 }
 

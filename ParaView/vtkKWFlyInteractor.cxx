@@ -87,12 +87,14 @@ void vtkKWFlyInteractor::Create(vtkKWApplication *app, char *args)
   this->Toolbar->Create(app);
 
   this->Label->Create(app,"label","-text {Fly Speed} -bd 2");
+  this->Label->SetBalloonHelpString("Change the flying speed");
   this->Script( "pack %s -side left -expand 0 -fill none",
                 this->Label->GetWidgetName());
   
   this->SpeedSlider->Create(app,"-resolution 0.1 -orient horizontal -bd 2");
   this->SpeedSlider->SetRange(0, 5);
   this->SpeedSlider->SetValue(2.0);    
+  this->SpeedSlider->SetBalloonHelpString("Change the flying speed");
   this->Script( "pack %s -side left -expand 0 -fill none",
                 this->SpeedSlider->GetWidgetName());
 

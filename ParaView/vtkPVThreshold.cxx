@@ -92,6 +92,7 @@ void vtkPVThreshold::CreateProperties()
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
   this->AttributeModeLabel->Create(pvApp, "");
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
+  this->AttributeModeLabel->SetBalloonHelpString("Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp, "");
   this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
@@ -99,6 +100,7 @@ void vtkPVThreshold::CreateProperties()
   this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
                                                "ChangeAttributeMode cell");
   this->AttributeModeMenu->SetCurrentEntry("Point Data");
+  this->AttributeModeMenu->SetBalloonHelpString("Select whether to operate on point or cell data");
   this->Script("pack %s %s -side left",
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
@@ -120,7 +122,8 @@ void vtkPVThreshold::CreateProperties()
   this->UpperValueScale->SetRange(range[0], range[1]);
   this->UpperValueScale->SetValue(range[1]);
   this->UpperValueScale->SetCommand(this, "UpperValueCallback");
-
+  this->UpperValueScale->SetBalloonHelpString("Choose the upper value of the threshold");
+  
   // Command to update the UI.
   this->CancelCommands->AddString("%s SetValue [%s %s]",
                                   this->UpperValueScale->GetTclName(),
@@ -134,7 +137,8 @@ void vtkPVThreshold::CreateProperties()
   this->LowerValueScale->SetRange(range[0], range[1]);
   this->LowerValueScale->SetValue(range[0]);
   this->LowerValueScale->SetCommand(this, "LowerValueCallback");
-
+  this->LowerValueScale->SetBalloonHelpString("Choose the lower value of the threshold");
+  
   // Command to update the UI.
   this->CancelCommands->AddString("%s SetValue [%s %s]",
                                   this->LowerValueScale->GetTclName(),

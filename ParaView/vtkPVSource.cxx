@@ -357,18 +357,21 @@ void vtkPVSource::CreateProperties()
   this->AcceptButton->SetParent(frame);
   this->AcceptButton->Create(this->Application, "-text Accept");
   this->AcceptButton->SetCommand(this, "AcceptCallback");
+  this->AcceptButton->SetBalloonHelpString("Cause the current values in the user interface to take effect");
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->AcceptButton->GetWidgetName());
 
   this->CancelButton->SetParent(frame);
   this->CancelButton->Create(this->Application, "-text Cancel");
   this->CancelButton->SetCommand(this, "CancelCallback");
+  this->CancelButton->SetBalloonHelpString("Revert to the previous values in the user interface.  If no values have been set, remove the filter from the pipeline.");
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->CancelButton->GetWidgetName());
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
   this->DeleteButton->SetCommand(this, "DeleteCallback");
+  this->DeleteButton->SetBalloonHelpString("Remove this filter from the pipeline.  This can only be done if the filter is at the end of the pipeline.");
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
 
@@ -382,9 +385,11 @@ void vtkPVSource::CreateProperties()
     this->InputMenuLabel->SetParent(this->InputMenuFrame);
     this->InputMenuLabel->Create(this->Application, "");
     this->InputMenuLabel->SetLabel("Input: ");
+    this->InputMenuLabel->SetBalloonHelpString("Choose which data set to use as input to this filter");
     
     this->InputMenu->SetParent(this->InputMenuFrame);
     this->InputMenu->Create(this->Application, "");
+    this->InputMenu->SetBalloonHelpString("Choose which data set to use as input to this filter");
     this->Script("pack %s %s -side left -fill x",
                  this->InputMenuLabel->GetWidgetName(),
                  this->InputMenu->GetWidgetName());
@@ -397,13 +402,15 @@ void vtkPVSource::CreateProperties()
 
   this->ScalarOperationLabel->SetParent(this->ScalarOperationFrame);
   this->ScalarOperationLabel->Create(this->Application, "");
-  this->ScalarOperationLabel->SetLabel("Point Scalars");
+  this->ScalarOperationLabel->SetLabel("Point Scalars:");
+  this->ScalarOperationLabel->SetBalloonHelpString("Select which array to use as point scalars for this filter");
   
   this->ScalarOperationMenu->SetParent(this->ScalarOperationFrame);
   this->ScalarOperationMenu->Create(this->Application, "");
   this->ScalarOperationMenu->AddEntryWithCommand("Default Point Scalars",
                                                  this, "ChangeScalars");
   this->ScalarOperationMenu->SetValue("Default Point Scalars");
+  this->ScalarOperationMenu->SetBalloonHelpString("Select which array to use as point scalars for this filter");
   
   // Isolate events to this window untill accept or cancel is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());

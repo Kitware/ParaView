@@ -123,10 +123,12 @@ void vtkPVGlyph3D::CreateProperties()
   this->GlyphSourceLabel->SetParent(this->GlyphSourceFrame);
   this->GlyphSourceLabel->Create(pvApp, "");
   this->GlyphSourceLabel->SetLabel("Glyph Source:");
+  this->GlyphSourceLabel->SetBalloonHelpString("Select the data set to use as a glyph");
   
   this->GlyphSourceMenu->SetParent(this->GlyphSourceFrame);
   this->GlyphSourceMenu->Create(pvApp, "");
   this->GlyphSourceMenu->SetInputType("vtkPolyData");
+  this->GlyphSourceMenu->SetBalloonHelpString("Select the data set to use as a glyph");
   this->UpdateSourceMenu();
   if (this->GlyphSourceTclName)
     {
@@ -150,6 +152,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleModeLabel->SetParent(this->ScaleModeFrame);
   this->ScaleModeLabel->Create(pvApp, "");
   this->ScaleModeLabel->SetLabel("Scale Mode:");
+  this->ScaleModeLabel->SetBalloonHelpString("Select whether/how to scale the glyphs");
   
   this->ScaleModeMenu->SetParent(this->ScaleModeFrame);
   this->ScaleModeMenu->Create(pvApp, "");
@@ -158,6 +161,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleModeMenu->AddEntry("Vector Components");
   this->ScaleModeMenu->AddEntry("Data Scaling Off");
   this->ScaleModeMenu->SetValue("Scalar");
+  this->ScaleModeMenu->SetBalloonHelpString("Select whether/how to scale the glyphs");  
   this->SetGlyphScaleMode("Scalar");
   
   this->AcceptCommands->AddString("%s ChangeScaleMode",
@@ -178,6 +182,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->VectorModeLabel->SetParent(this->VectorModeFrame);
   this->VectorModeLabel->Create(pvApp, "");
   this->VectorModeLabel->SetLabel("Vector Mode:");
+  this->VectorModeLabel->SetBalloonHelpString("Select what to use as vectors for scaling/rotation");
   
   this->VectorModeMenu->SetParent(this->VectorModeFrame);
   this->VectorModeMenu->Create(pvApp, "");
@@ -185,6 +190,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->VectorModeMenu->AddEntry("Vector");
   this->VectorModeMenu->AddEntry("Vector Rotation Off");
   this->VectorModeMenu->SetValue("Vector");
+  this->VectorModeMenu->SetBalloonHelpString("Select what to use as vectors for scaling/rotation");
   this->SetGlyphVectorMode("Vector");
   
   this->AcceptCommands->AddString("%s ChangeVectorMode",
@@ -200,6 +206,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->OrientCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->OrientCheck->Create(pvApp, "-text Orient");
   this->OrientCheck->SetState(1);
+  this->OrientCheck->SetBalloonHelpString("Select whether to orient the glyphs");
   
   this->CancelCommands->AddString("%s SetState [%s GetOrient]",
                                   this->OrientCheck->GetTclName(),
@@ -212,6 +219,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleCheck->Create(pvApp, "-text Scale");
   this->ScaleCheck->SetState(1);
+  this->ScaleCheck->SetBalloonHelpString("Select whether to scale the glyphs");
   
   this->CancelCommands->AddString("%s SetState [%s GetScaling]",
                                   this->ScaleCheck->GetTclName(),
@@ -225,6 +233,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleEntry->Create(pvApp);
   this->ScaleEntry->SetLabel("Scale Factor:");
   this->ScaleEntry->SetValue("1.0");
+  this->ScaleEntry->SetBalloonHelpString("Select the amount to scale the glyphs by");
   
   this->CancelCommands->AddString("%s SetValue [%s GetScaleFactor]",
                                   this->ScaleEntry->GetTclName(),
