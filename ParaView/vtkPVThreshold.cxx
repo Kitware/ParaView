@@ -150,8 +150,6 @@ void vtkPVThreshold::CreateProperties()
                                   this->LowerValueScale->GetTclName(),
                                   this->UpperValueScale->GetTclName());
 
-  vtkErrorMacro("range: " << range[0] << " to " << range[1]);
-  
   this->AllScalarsCheck->SetParent(this->GetParameterFrame());
   this->AllScalarsCheck->Create(pvApp, "-text AllScalars");
   this->AllScalarsCheck->SetState(1);
@@ -180,8 +178,6 @@ void vtkPVThreshold::CreateProperties()
 void vtkPVThreshold::UpperValueCallback()
 {
   float lowerValue = this->LowerValueScale->GetValue();
-  vtkErrorMacro("UpperValue: " << this->UpperValueScale->GetValue()
-                << ", LowerValue: " << lowerValue);
   if (this->UpperValueScale->GetValue() < lowerValue)
     {
     this->UpperValueScale->SetValue(lowerValue);
