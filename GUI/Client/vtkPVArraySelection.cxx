@@ -35,13 +35,14 @@
 
 #include <vtkstd/string>
 #include <vtkstd/set>
+#include <vtkstd/vector>
 
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.56");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.57");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -361,23 +362,34 @@ void vtkPVArraySelection::Accept()
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::SetReaderSelectionsFromProperty()
 {
-  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
-
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  int elemCount = 0;
 
   if (svp)
     {
+    vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+    int elemCount = 0;
     for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {
       vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
-      svp->SetElement(elemCount++, check->GetText());
-      ostrstream str;
-      str << check->GetState() << ends;
-      svp->SetElement(elemCount++, str.str());
-      str.rdbuf()->freeze(0);
+      const char* aname = check->GetText();
+      int state = check->GetState();
+      // Only send changes to the server. If the state of the
+      // widget is the same as the state of the selection, we
+      // know that on the server side, the value does not have
+      // to change.
+      if ( (state && !this->Selection->ArrayIsEnabled(aname)) ||
+           (!state && this->Selection->ArrayIsEnabled(aname)) )
+        {
+        ostrstream str;
+        str << state << ends;
+        svp->SetElement(elemCount, aname);
+        svp->SetElement(elemCount+1, str.str());
+        elemCount += 2;
+        delete[] str.str();
+        }
       }
+    svp->SetNumberOfElements(elemCount);
     it->Delete();
     }
 }
