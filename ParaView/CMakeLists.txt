@@ -132,6 +132,7 @@ IF (PARAVIEW_CAN_BUILD)
 
 # Add the testing directories
  IF(BUILD_TESTING)
+   ENABLE_TESTING()
    SUBDIRS(ParaView/Testing)
    SUBDIR_DEPENDS(ParaView/Testing ParaView)
  ENDIF(BUILD_TESTING)
