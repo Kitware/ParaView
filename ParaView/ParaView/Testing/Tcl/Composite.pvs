@@ -11,7 +11,7 @@ if {[info exists argc]} {
     
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp20) [$kw(vtkTemp1) GetMainView]
-$kw(vtkTemp1) Open "/home/andy/vtk/VTKData/Data/ironProt.vtk"
+$kw(vtkTemp1) Open "$DataDir/Data/ironProt.vtk"
 set kw(vtkTemp276) [vtkTemp1 GetCurrentPVSource]
 set kw(vtkTemp287) [$kw(vtkTemp276) GetPVWidget {File Name}]
 $kw(vtkTemp287) SetValue /home/andy/vtk/VTKData/Data/ironProt.vtk
