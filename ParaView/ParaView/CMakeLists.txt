@@ -31,6 +31,7 @@ SET( ParaView_SRCS
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositeUtilities.cxx
+  vtkPVConnectDialog.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 

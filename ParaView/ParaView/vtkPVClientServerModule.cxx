@@ -74,12 +74,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
 
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkKWRemoteExecute.h"
-#include "vtkPVWindow.h"
-
+#include "vtkPVConnectDialog.h"
 #ifndef _WIN32
 #include <unistd.h>
 #endif
@@ -107,113 +103,7 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 
 #define VTK_PV_SEND_DATA_OBJECT_TAG          838489
 #define VTK_PV_DATA_OBJECT_TAG               923857
-
-//----------------------------------------------------------------------------
-//============================================================================
-class vtkPVClientServerModuleConnectDialog : public vtkKWMessageDialog
-{
-public:
-  vtkTypeRevisionMacro(vtkPVClientServerModuleConnectDialog, vtkKWMessageDialog);
-  static vtkPVClientServerModuleConnectDialog* New();
-
-  void Create(vtkPVApplication* app, const char* opts)
-    {
-    char buffer[1024];
-    sprintf(buffer, "Cannot connect to the server %s:%d. Make sure the server is running.",
-        this->HostnameString, this->PortInt);
-    this->SetOptions(
-      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault |
-      vtkKWMessageDialog::WarningIcon );
-    this->SetStyleToOkCancel();
-    this->Superclass::Create(app, 0);
-    this->SetMasterWindow(app->GetMainWindow());
-    this->SetText(buffer);
-    this->SetTitle("ParaView Connection Warning");
-    this->Label->SetParent(this->BottomFrame);
-    this->Label->Create(app, "-text {Hostname}");
-    this->Hostname->SetParent(this->BottomFrame);
-    this->Hostname->Create(app, 0);
-    this->Port->SetParent(this->BottomFrame);
-    this->Port->Create(app, 0);
-    this->Script("pack %s -side left -expand 0", 
-        this->Label->GetWidgetName());
-    this->Script("pack %s -side left -expand 1 -fill x", 
-        this->Hostname->GetWidgetName());
-    this->Script("pack %s -side left -expand 0", 
-        this->Port->GetWidgetName());
-    this->SetHostname(this->HostnameString);
-    this->SetPort(this->PortInt);
-    }
-
-  void OK()
-    {
-    this->SetHostnameString(this->Hostname->GetValue());
-    this->PortInt = this->Port->GetValueAsInt();
-    this->Superclass::OK();
-    }
-
-  void SetHostname(const char* hn)
-    {
-    if ( this->Hostname->IsCreated() )
-      {
-      this->Hostname->SetValue(hn);
-      }
-    this->SetHostnameString(hn);
-    }
-  const char* GetHostName()
-    {
-    return this->HostnameString;
-    }
-  void SetPort(int pt)
-    {
-    if ( this->Port->IsCreated() )
-      {
-      char buffer[100];
-      sprintf(buffer, "%d", pt);
-      this->Port->SetValue(buffer);
-      }
-    this->PortInt = pt;
-    }
-  int GetPort()
-    {
-    return this->PortInt;
-    }
-
-protected:
-  vtkPVClientServerModuleConnectDialog() 
-    {
-    this->Hostname = vtkKWEntry::New();
-    this->Port = vtkKWEntry::New();
-    this->Label = vtkKWLabel::New();
-
-    this->HostnameString = 0;
-    this->PortInt = 0;
-    }
-
-  ~vtkPVClientServerModuleConnectDialog() 
-    {
-    this->Hostname->Delete();
-    this->Port->Delete();
-    this->Label->Delete();
-    }
-
-  vtkKWEntry* Hostname;
-  vtkKWEntry* Port;
-  vtkKWLabel* Label;
-
-  vtkSetStringMacro(HostnameString);
-  char* HostnameString;
-  int PortInt;
-
-private:
-  vtkPVClientServerModuleConnectDialog(const vtkPVClientServerModuleConnectDialog&);
-  void operator=(const vtkPVClientServerModuleConnectDialog&);
-};
-vtkStandardNewMacro(vtkPVClientServerModuleConnectDialog);
-vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.28");
-//============================================================================
-//----------------------------------------------------------------------------
-
+    
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
 void vtkPVRootScript(void *localArg, void *remoteArg, 
@@ -315,7 +205,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.28");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.29");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -421,7 +311,7 @@ void vtkPVClientServerModule::Initialize()
       if ( start )
         {
         char* args[4];
-        args[0] = vtkString::Duplicate("/home/andy/vtk/ParaView-gcc/bin/ParaView");
+        args[0] = vtkString::Duplicate("ParaView");
         args[1] = vtkString::Duplicate("--server");
         args[2] = vtkString::Duplicate("--port=XXXXXX");
         args[3] = 0;
@@ -441,8 +331,8 @@ void vtkPVClientServerModule::Initialize()
           }
         continue;
         }
-      vtkPVClientServerModuleConnectDialog* dialog = 
-        vtkPVClientServerModuleConnectDialog::New();
+      vtkPVConnectDialog* dialog = 
+        vtkPVConnectDialog::New();
       dialog->SetHostname(this->Hostname);
       dialog->SetPort(this->Port);
       dialog->Create(this->GetPVApplication(), 0);
