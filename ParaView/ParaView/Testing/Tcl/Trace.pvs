@@ -70,11 +70,39 @@ set pv(vtkTemp298) [$pv(vtkTemp286) GetPVWidget {Result Array Name:}]
 $pv(vtkTemp298) SetValue {sum}
 $pv(vtkTemp286) AcceptCallback
 
+# Test the Plane widget tracing.
+
+set kw(vtkTemp285) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set kw(vtkTemp295) [$kw(vtkTemp285) GetPVWidget {Center}]
+set kw(vtkTemp300) [$kw(vtkTemp285) GetPVWidget {Radius}]
+$kw(vtkTemp300) SetValue 5
+$kw(vtkTemp295) SetValue 0 15 0
+$kw(vtkTemp285) AcceptCallback
+
+$pv(vtkTemp1) ResetCameraCallback
+
+set kw(vtkTemp327) [$pv(vtkTemp1) ClipPlaneCallback]
+set kw(vtkTemp334) [$kw(vtkTemp327) GetPVWidget {Plane}]
+set kw(vtkTemp335) [$kw(vtkTemp334) GetCenterEntry]
+$kw(vtkTemp335) SetValue 0 16 0
+set kw(vtkTemp336) [$kw(vtkTemp334) GetNormalEntry]
+$kw(vtkTemp336) SetValue 0.57546 0.76627 -0.28578
+set kw(vtkTemp337) [$kw(vtkTemp327) GetPVWidget {Offset}]
+$kw(vtkTemp337) SetValue 1
+$kw(vtkTemp327) AcceptCallback
+
+
+
 # OK, turn off the trace so that the file we source is not open.
 
 Application StopRecordingScript
 
 # Delete all the sources
+
+$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp327)
+$kw(vtkTemp327) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp285)
+$kw(vtkTemp285) DeleteCallback
 
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp286)
 $pv(vtkTemp286) DeleteCallback
