@@ -42,6 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVTreeComposite.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -168,6 +169,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
   pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;

@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPropPicker.h"
 #include "vtkCamera.h"
 #include "vtkActor.h"
-
+#include "vtkPVTreeComposite.h"
 
 
 int vtkKWCenterOfRotationCommand(ClientData cd, Tcl_Interp *interp,

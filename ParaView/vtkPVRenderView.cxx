@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkToolkits.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPVTreeComposite.h"
 
 #include "vtkPVRenderView.h"
 #include "vtkKWInteractor.h"
@@ -110,10 +111,11 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
-  this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
+  // Tree compositer handles aborts now.
+  //this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
   
   // Create the compositer.
-  this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkTreeComposite", "TreeComp1");
+  this->Composite = (vtkPVTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
 
@@ -207,7 +209,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 {
   char *local;
   const char *wname;
-
+  
   local = new char [strlen(args)+100];
 
   if (this->Application)
@@ -270,6 +272,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationCanvas->SetParent(this->NavigationFrame->GetFrame());
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
+
+  // Application yhas to be set before we can get a tcl name.
+  this->GetPVApplication()->BroadcastScript("%s SetRenderView %s", 
+					    this->CompositeTclName,
+					    this->GetTclName());
   
   this->EventuallyRender();
   delete [] local;
@@ -628,14 +635,14 @@ void vtkPVRenderView::RemoveComposite(vtkKWComposite *c)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StartRender()
 {
-  float renderTime = this->Renderer->GetAllocatedRenderTime();
+  float renderTime = 1.0 / this->RenderWindow->GetDesiredUpdateRate();
   int *windowSize = this->RenderWindow->GetSize();
   int area, reductionFactor;
   float timePerPixel;
   float getBuffersTime, setBuffersTime, transmitTime;
   float newReductionFactor;
   
-  renderTime *= 0.5;
+  renderTime *= 0.7;
   area = windowSize[0] * windowSize[1];
   reductionFactor = this->GetComposite()->GetReductionFactor();
   getBuffersTime = this->GetComposite()->GetGetBuffersTime();
@@ -647,8 +654,13 @@ void vtkPVRenderView::StartRender()
 
   newReductionFactor = sqrt(area * timePerPixel / renderTime);
   
-  // effectively turning this off for now
-  newReductionFactor = 1;
+  //cerr << "---------------------------------------------------------\n";
+  //cerr << "New ReductionFactor: " << newReductionFactor << ", oldFact: " 
+  //     << reductionFactor << endl;
+  //cerr << "Alloc.Comp.Time: " << renderTime << ", area: " << area 
+  //     << ", pixelTime: " << timePerPixel << endl;
+  //cerr << "GetBufTime: " << getBuffersTime << ", SetBufTime: " << setBuffersTime
+  //     << ", transTime: " << transmitTime << endl;
   
   this->GetComposite()->SetReductionFactor(newReductionFactor);
 }
@@ -694,8 +706,8 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   this->RenderWindow->SetDesiredUpdateRate(0.000001);
   //this->SetRenderModeToStill();
   this->ResetCameraClippingRange();
+  this->StartRender();
   this->RenderWindow->Render();
-  //this->Render();
 }
 
 //----------------------------------------------------------------------------

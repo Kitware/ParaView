@@ -42,13 +42,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVRenderView_h
 
 #include "vtkKWView.h"
-#include "vtkTreeComposite.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 
 class vtkPVApplication;
 class vtkKWInteractor;
+class vtkPVTreeComposite;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -118,7 +118,7 @@ public:
 
   // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
-  vtkGetObjectMacro(Composite, vtkTreeComposite);
+  vtkPVTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:
   // Update the navigation window for a particular source
@@ -158,7 +158,7 @@ protected:
 
   int Interactive;
 
-  vtkTreeComposite *Composite;
+  vtkPVTreeComposite *Composite;
   char *CompositeTclName;
   vtkSetStringMacro(CompositeTclName);
 

@@ -110,6 +110,9 @@ ClientData vtkPVSourceListNewCommand();
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVThresholdNewCommand();
+int vtkPVTreeCompositeCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVTreeCompositeNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -227,6 +230,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceListCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVThreshold", vtkPVThresholdNewCommand,
                   vtkPVThresholdCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVTreeComposite", vtkPVTreeCompositeNewCommand,
+                  vtkPVTreeCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVWorldPointPicker", vtkPVWorldPointPickerNewCommand,

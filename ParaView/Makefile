@@ -52,6 +52,7 @@ vtkPVSourceCollection \
 vtkPVSourceInterface \
 vtkPVSourceList \
 vtkPVThreshold \
+vtkPVTreeComposite \
 vtkPVWindow \
 vtkPVWorldPointPicker \
 vtkSimpleFieldDataToAttributeDataFilter \
@@ -81,12 +82,11 @@ KIT_LIBS =
 KIT_OBJ = ${SRC_OBJ} 
 KIT_TCL_OBJ = ${TCL_OBJ}
 KIT_NEWS = ${TCL_NEWS}
-KIT_FLAGS = -I../Widgets -I../../Widgets
+KIT_FLAGS = -I../Widgets -I../../Widgets ${CONTROLLER_API_FLAGS}
 KIT_EXTRA_DEPENDS = ../Widgets
 
 VTK_LIB_FILE  = vtk${ME}${VTK_LIB_EXT}
 TCL_LIB_FILE  = vtk${ME}Tcl${VTK_LIB_EXT}
-
 
 #------------------------------------------------------------------------------
 # Include the generic stuff here
