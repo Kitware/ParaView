@@ -136,6 +136,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
   if (wl)
     {
     window = wl->GetWindow();
+    window *= this->LevelScale;
     level = wl->GetLevel();    
     level = level * this->LevelScale + this->LevelShift;
     }
