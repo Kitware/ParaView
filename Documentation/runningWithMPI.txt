@@ -1,0 +1,61 @@
+
+* Running ParaView With MPI
+
+** Introduction
+
+If compiled with MPI support, ParaView can be launched like any other MPI
+application. The method for starting an MPI application is system and
+implementation dependent. Contact your system administrator for information
+on how this can be done. 
+
+Once started, the user interface with appear on the display attached to the
+root process (process with id 0).  On the displays attached to the other
+processes (satellite processes), independent render windows will
+appear. These do not have associated user interfaces and can not be
+manipulated by the user. Note that all processes must have access to a
+display. This does not require the presence of a monitor. As long as
+ParaView can open windows from all processes and read their contents, it
+will function properly. If multiple processes share the same display, it is
+very likely that windows opened by these processes will overlap. If this
+happens, the contents of those windows can not be read by ParaView and the
+image on the main window (the one with the user interface) will be
+corrupt. The same can happen if there are other windows which hide part or
+all of a satellite process' window.
+
+In the next release, ParaView will support off-screen windows to solve
+some of these problems.
+
+** Unix/Linux Related Issues
+
+The environment(s) in which ALL processes run must define the DISPLAY
+variable.  Furthermore, they must have the right access to these displays.
+With some MPI implementations, it is possible to pass environmental
+variables to MPI processes. However, unless the DISPLAY variable is :0
+or localhost:0, all windows will appear on the same display and ParaView
+will not function properly. 
+
+Some MPI implementation use ssh which sets up X tunneling to allow the
+remote programs to create windows on the display of the system which starts
+the program. Unless this behavior is changed, all windows will show up
+on one display and most probably overlap. 
+
+Our solution to these problems is 
+1. to create a default login on all nodes which sets the necessary 
+   variables (for example by creating/modifying .Xauthority -better
+   solution- or using xhost +localhost -less secure solution-),
+2. on each process, set a DISPLAY variable which depends on where the 
+   process is running and if necessary, set-up authorization in a
+   a start-up file which belongs to the user which starts the MPI job
+   (for example .bashrc, .cshrc or  equivalent, note that .login and 
+   .profile are not always executed when the shell is not interactive)
+
+In the next release, ParaView will support Mesa off-screen rendering.
+
+** Windows Related Issues
+
+In some MPI implementations, the remote tasks started by the MPI system are
+not allowed to interact with the desktop. Unless this is changed, ParaView
+can not function. The solution to this problem is implementation dependent
+and usually involves changing the setting of the service responsible of
+starting processes and sometimes recompiling the service (obviously not an
+option if no source code is available).
