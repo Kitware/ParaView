@@ -67,6 +67,11 @@ public:
   vtkGetObjectMacro(ClipPlane, vtkPlane);
 
   // Description:
+  // Use a different algorithm that ignores ghost levels.
+  vtkSetMacro(IgnoreGhostLevels, int);
+  vtkGetMacro(IgnoreGhostLevels, int);
+
+  // Description:
   // Look at clip plane to compute MTime.
   unsigned long GetMTime();    
 
@@ -88,6 +93,8 @@ protected:
   float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
                            double* pCell, float* pPoint, vtkCTHData* output);
   //void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
+
+  int IgnoreGhostLevels;
 
   vtkPlane* ClipPlane;
   vtkStringList *VolumeArrayNames;
