@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.4");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -56,6 +56,7 @@ vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
   this->InputMenu = NULL;
   this->Input = NULL;
+  this->ScaleFactor = 0.1;
 }
 
 vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
@@ -99,10 +100,10 @@ void vtkPVScaleFactorEntry::UpdateScaleFactor()
   float maxBnds = bnds[1] - bnds[0];
   maxBnds = (bnds[3] - bnds[2] > maxBnds) ? (bnds[3] - bnds[2]) : maxBnds;
   maxBnds = (bnds[5] - bnds[4] > maxBnds) ? (bnds[5] - bnds[4]) : maxBnds;
-  maxBnds *= 0.1;
+  maxBnds *= this->ScaleFactor;
   
   char value[1000];
-  sprintf(value, "%f", maxBnds);
+  sprintf(value, "%g", maxBnds);
   this->SetValue(value);
 }
 
@@ -112,6 +113,13 @@ int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
   if (!this->Superclass::ReadXMLAttributes(element, parser))
     {
     return 0;
+    }
+
+  // Setup the scaling.
+  if(!element->GetScalarAttribute("scale_factor",
+                                  &this->ScaleFactor))
+    {
+    this->ScaleFactor = 0.1;
     }
   
   const char* input_menu = element->GetAttribute("input_menu");
@@ -144,6 +152,7 @@ void vtkPVScaleFactorEntry::CopyProperties(
   vtkPVScaleFactorEntry *pvsfe = vtkPVScaleFactorEntry::SafeDownCast(clone);
   if (pvsfe)
     {
+    pvsfe->ScaleFactor = this->ScaleFactor;
     if (this->InputMenu)
       {
       vtkPVInputMenu *im = this->InputMenu->ClonePrototype(source, map);

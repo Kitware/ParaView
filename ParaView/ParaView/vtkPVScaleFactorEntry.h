@@ -87,7 +87,9 @@ protected:
   vtkPVInputMenu *InputMenu;
   vtkPVSource *Input;
   void SetInput(vtkPVSource *input);
-  
+
+  float ScaleFactor;
+
 private:
   vtkPVScaleFactorEntry(const vtkPVScaleFactorEntry&); // Not implemented
   void operator=(const vtkPVScaleFactorEntry&); // Not implemented
