@@ -158,7 +158,7 @@ int vtkMPEG2WriterInternal::RemoveImage(const char* fname)
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPEG2WriterHelper);
-vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.1");
+vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkMPEG2WriterHelper::vtkMPEG2WriterHelper()
@@ -383,14 +383,20 @@ void vtkMPEG2WriterInternal::Init()
 
   /* clip table */
   if (!(this->Structure->clp = (unsigned char *)malloc(1024)))
+    {
     MPEG2_error("malloc failed\n");
+    }
   this->Structure->clp+= 384;
+
   for (i=-384; i<640; i++)
+    {
     this->Structure->clp[i] = (i<0) ? 0 : ((i>255) ? 255 : i);
+    }
 
   for (i=0; i<3; i++)
     {
-    size = (i==0) ? this->Structure->width*this->Structure->height : this->Structure->chrom_width*this->Structure->chrom_height;
+    size = (i==0) ? this->Structure->width*this->Structure->height : 
+      this->Structure->chrom_width*this->Structure->chrom_height;
 
     if (!(this->Structure->newrefframe[i] = (unsigned char *)malloc(size)))
       MPEG2_error("malloc failed\n");
@@ -429,11 +435,9 @@ void vtkMPEG2WriterInternal::Init()
     }
 }
 
-void MPEG2_error( char *text )
+void MPEG2_error( const char *text )
 {
-  fprintf(stderr,text);
-  putc('\n',stderr);
-  exit(1);
+  vtkGenericWarningMacro(<< text);
 }
 
 void vtkMPEG2WriterInternal::ReadParmFile( )

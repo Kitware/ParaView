@@ -64,7 +64,7 @@ void MPEG2_motion_estimation _ANSI_ARGS_((unsigned char *oldorg, unsigned char *
   struct mbinfo *mbi, int secondfield, int ipflag));
 
 /* mpeg2enc.c */
-void MPEG2_error _ANSI_ARGS_((char *text));
+void MPEG2_error _ANSI_ARGS_((const char *text));
 
 /* predict.c */
 void MPEG2_predict _ANSI_ARGS_((unsigned char *reff[], unsigned char *refb[],
