@@ -118,10 +118,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_PV_VTK_FILTERS_MENU_LABEL "Filter"
 #define VTK_PV_VTK_SOURCES_MENU_LABEL "Source"
+#define VTK_PV_OPEN_DATA_MENU_LABEL "Open Data"
+#define VTK_PV_SAVE_DATA_MENU_LABEL "Save Data"
+#define VTK_PV_SELECT_SOURCE_MENU_LABEL "Select"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.10");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.11");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -658,30 +661,35 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // support multiple windows (exit is enough)
   this->MenuFile->DeleteMenuItem("Close");
   // Open a data file. Can support multiple file formats (see Open()).
-  this->MenuFile->InsertCommand(0, "Open Data File", this, "OpenCallback",0);
+  this->MenuFile->InsertCommand(0, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
   // Save current data in VTK format.
-  this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData",0);
+  this->MenuFile->InsertCommand(1, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
   // Add advanced file options
   int clidx = this->GetFileMenuIndex();
-  this->MenuFile->InsertCommand(clidx++, "Load ParaView Script", this, 
-                                "LoadScript", 0,
-                                "Load ParaView Script (.pvs)");
-  this->MenuFile->InsertCommand(clidx++,
-                                "Save ParaView Script", this, 
-                                "SaveTrace", 17,
-                                "Saves a script/trace of every action "
-                                "since start up.");
   this->MenuFile->InsertCommand(clidx++, "Export VTK Script", this,
                                 "ExportVTKScript", 7,
                                 "Write a script which can be "
                                 "parsed by the vtk executable");
 
+  this->MenuFile->InsertSeparator(clidx++);
+
+  this->MenuFile->InsertCommand(clidx++, "Load Session", this, 
+                                "LoadScript", 0,
+                                "Restore a trace of actions.");
+  this->MenuFile->InsertCommand(clidx++,
+                                "Save Session", this, 
+                                "SaveTrace", 3,
+                                "Save a trace of every action "
+                                "since start up.");
+
+  /*
   // Open XML package
   this->MenuFile->InsertCommand(clidx++, "Open Package", this, 
                                 "OpenPackage", 8,
                                 "Open a ParaView package and load the "
                                 "contents");
+  */
 
   // Select menu: ParaView specific menus.
 
@@ -689,7 +697,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // (i.e. glyphs) data objects/sources)
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
-  this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
+  this->Menu->InsertCascade(2, VTK_PV_SELECT_SOURCE_MENU_LABEL, this->SelectMenu, 0);
   
   // Create the menu for selecting the glyphs.  
   this->GlyphMenu->SetParent(this->SelectMenu);
@@ -1071,7 +1079,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
-  this->MenuFile->SetState("Open Data File", vtkKWMenu::Disabled);
+  this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
 
   if (this->InitializeDefaultInterfaces)
     {
@@ -2140,7 +2148,7 @@ void vtkPVWindow::WriteData()
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
-  saveDialog->SetTitle("Save Data");
+  saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetDefaultExt(defaultExtension);
   saveDialog->SetFileTypes(types);
   // Ask the user for the filename.  Default the extension to the
@@ -2927,13 +2935,13 @@ void vtkPVWindow::EnableSelectMenu()
   
   if (numSources == 0)
     {
-    this->Menu->SetState("Select", vtkKWMenu::Disabled);
+    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
     this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
                                   vtkKWMenu::Disabled);
     }
   else
     {
-    this->Menu->SetState("Select", vtkKWMenu::Normal);
+    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Normal);
     this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
                                   vtkKWMenu::Normal);
     }
@@ -3633,7 +3641,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     {
     this->ReaderList->AppendItem(prototype);
     }
-  this->MenuFile->SetState("Open Data File", vtkKWMenu::Normal);
+  this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
 }
 
 //----------------------------------------------------------------------------
@@ -3748,7 +3756,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.10 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.11 $");
 }
 
 //----------------------------------------------------------------------------
