@@ -9,7 +9,7 @@ ADD_TEST(TestPointerArray ${CXX_TEST_PATH}/TestPointerArray)
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
 
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
+LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
 
 # add in opengl
 IF (WIN32)

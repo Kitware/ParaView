@@ -81,7 +81,7 @@ ENDIF (WIN32)
 
 ADD_EXECUTABLE(ParaView WIN32 ParaView) 
 
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
+LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
 
 IF (VTK_MANGLE_MESA)
   IF (MESA_INCLUDE_PATH)
