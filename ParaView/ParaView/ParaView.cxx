@@ -68,6 +68,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkParallelInstantiator.h"
 #endif
 
+#include "vtkPVFiltersInstantiator.h"
 #include "vtkParaViewInstantiator.h"
 
 static void ParaViewEnableMSVCDebugHook();
