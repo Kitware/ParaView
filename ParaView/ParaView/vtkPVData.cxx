@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.243");
+vtkCxxRevisionMacro(vtkPVData, "1.244");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1374,6 +1374,7 @@ void vtkPVData::SetColorRange(double min, double max)
   if (this->PVColorMap == NULL)
     {
     vtkErrorMacro("Color map is missing.");
+    return;
     }
 
   this->PVColorMap->SetScalarRange(min, max);
@@ -1386,6 +1387,7 @@ void vtkPVData::SetColorRangeInternal(double min, double max)
   if (this->PVColorMap == NULL)
     {
     vtkErrorMacro("Color map is missing.");
+    return;
     }
 
   this->PVColorMap->SetScalarRangeInternal(min, max);
