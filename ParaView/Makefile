@@ -54,6 +54,7 @@ vtkPVPolyDataNormals \
 vtkPVPolyDataSource \
 vtkPVPolyDataToPolyDataFilter \
 vtkPVRenderView \
+vtkPVSelectionList \
 vtkPVShrinkPolyData \
 vtkPVSource \
 vtkPVSourceList \

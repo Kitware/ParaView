@@ -119,6 +119,9 @@ ClientData vtkPVPolyDataToPolyDataFilterNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
+int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSelectionListNewCommand();
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVShrinkPolyDataNewCommand();
@@ -245,6 +248,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVPolyDataToPolyDataFilterCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
+  vtkTclCreateNew(interp,"vtkPVSelectionList", vtkPVSelectionListNewCommand,
+                  vtkPVSelectionListCommand);
   vtkTclCreateNew(interp,"vtkPVShrinkPolyData", vtkPVShrinkPolyDataNewCommand,
                   vtkPVShrinkPolyDataCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,

@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
+#include "vtkPVSelectionList.h"
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -63,6 +64,7 @@ vtkPVSource::vtkPVSource()
   this->NumberOfAcceptCommands = 0;
   this->AcceptCommandArrayLength = 0;
   this->AcceptCommands = NULL;
+  this->LastSelectionList = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -98,6 +100,12 @@ vtkPVSource::~vtkPVSource()
   this->AcceptButton->Delete();
   this->AcceptButton = NULL;  
   
+  if (this->LastSelectionList)
+    {
+    this->LastSelectionList->UnRegister(this);
+    this->LastSelectionList = NULL;
+    }
+
   this->DeleteAcceptCommands();
 }
 
@@ -434,7 +442,7 @@ void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
                entry->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
                           this->GetTclName(), setCmd, entry->GetTclName()); 
 
@@ -476,7 +484,7 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
                check->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s [%s GetState]",
                           this->GetTclName(), setCmd, check->GetTclName()); 
 
@@ -557,7 +565,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
                maxEntry->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, minEntry->GetTclName(),
                           maxEntry->GetTclName());
@@ -658,7 +666,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
                zEntry->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName());
@@ -781,7 +789,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
                wEntry->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
@@ -947,7 +955,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
                zEntry->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
 			 this->GetTclName(), setCmd, uEntry->GetTclName(), 
 			 vEntry->GetTclName(), wEntry->GetTclName(),
@@ -999,7 +1007,7 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
                slider->GetTclName(), this->GetTclName(), getCmd); 
 
   // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
+  // The VTK objects do not yet have to have the same Tcl name!
   this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
 			 this->GetTclName(), setCmd, slider->GetTclName());
 
@@ -1007,6 +1015,49 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   labelWidget->Delete();
   slider->Delete();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd)
+{
+  vtkPVSelectionList *sl = vtkPVSelectionList::New();
+  
+  sl->SetLabel(label);
+  this->Widgets->AddItem(sl);
+  sl->SetParent(this->ParameterFrame->GetFrame());
+  sl->Create(this->Application);  
+  this->Script("pack %s -side left", sl->GetWidgetName());
+    
+  this->Script("%s SetValue [[%s GetVTKSource] %s]",
+	       sl->GetTclName(), this->GetTclName(), getCmd);
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects do not yet have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
+			 this->GetTclName(), setCmd, sl->GetTclName());
+  
+  // Save this selection list so the user can add items to it.
+  if (this->LastSelectionList)
+    {
+    this->LastSelectionList->UnRegister(this);
+    }
+  sl->Register(this);
+  this->LastSelectionList = sl;
+
+  sl->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkPVSource::AddModeListItem(char *name, int value)
+{
+  if (this->LastSelectionList == NULL)
+    {
+    vtkErrorMacro("No selection list exists yet.");
+    return;
+    }
+  this->LastSelectionList->AddItem(name, value);
+}
+
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()

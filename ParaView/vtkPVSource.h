@@ -35,13 +35,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVSource_h
 #define __vtkPVSource_h
 
+#include "vtkKWComposite.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkPVData.h"
 #include "vtkSource.h"
-#include "vtkKWComposite.h"
-class vtkPVWindow;
 
+class vtkPVSelectionList;
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -138,6 +139,11 @@ public:
 		float min, float max, float resolution);
 
   // Description:
+  // Creates a list for delecting a mode.
+  void AddModeList(char *label, char *setCmd, char *getCmd);
+  void AddModeListItem(char *name, int value);
+  
+  // Description:
   // Set the vtk source that will be a part of the pipeline.
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
@@ -167,7 +173,9 @@ protected:
   vtkKWWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
-  
+
+  vtkPVSelectionList *LastSelectionList;
+
 //BTX
   // List of strings
   int NumberOfAcceptCommands;
@@ -180,5 +188,9 @@ protected:
 };
 
 #endif
+
+
+
+
 
 
