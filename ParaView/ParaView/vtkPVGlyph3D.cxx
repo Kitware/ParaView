@@ -70,7 +70,7 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->VectorModeMenu = vtkKWOptionMenu::New();
   this->OrientCheck = vtkPVLabeledToggle::New();
   this->ScaleCheck = vtkPVLabeledToggle::New();
-  this->ScaleEntry = vtkKWLabeledEntry::New();
+  this->ScaleEntry = vtkPVScalarEntry::New();
 
   // Glyph adds too its input, so sould not replace it.
   this->ReplaceInput = 0;
@@ -253,21 +253,12 @@ void vtkPVGlyph3D::CreateProperties()
   this->Widgets->AddItem(this->ScaleCheck);
   
   this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleEntry->Create(pvApp);
-  this->ScaleEntry->SetLabel("Scale Factor:");
-  this->ScaleEntry->SetValue("1.0");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->ScaleEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->ScaleEntry->SetBalloonHelpString("Select the amount to scale the glyphs by");
-  
-  this->ResetCommands->AddString("%s SetValue [%s GetScaleFactor]",
-                                 this->ScaleEntry->GetTclName(),
-                                 this->GetVTKSourceTclName()); 
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaleFactor [%s GetValueAsFloat]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  this->ScaleEntry->GetTclName());
+  this->ScaleEntry->SetPVSource(this);
+  this->ScaleEntry->Create(pvApp, "Scale Factor:", "SetScaleFactor",
+                           "GetScaleFactor", "Select the amount to scale the glyphs by",
+                           this->GetVTKSourceTclName());
+  this->Widgets->AddItem(this->ScaleEntry);
+  this->ScaleEntry->GetEntry()->SetValue("1.0");
 
   this->Script("pack %s %s %s",
                this->OrientCheck->GetWidgetName(),
@@ -527,7 +518,7 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
   *file << this->VTKSourceTclName << " SetScaling "
         << this->ScaleCheck->GetCheckButton()->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaleFactor "
-        << this->ScaleEntry->GetValueAsFloat() << "\n\n";
+        << this->ScaleEntry->GetEntry()->GetValueAsFloat() << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

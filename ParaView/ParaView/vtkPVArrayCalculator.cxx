@@ -58,8 +58,7 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();
-  this->ArrayNameFrame = vtkKWWidget::New();
-  this->ArrayNameEntry = vtkKWLabeledEntry::New();
+  this->ArrayNameEntry = vtkPVStringEntry::New();
   
   this->CalculatorFrame = vtkKWLabeledFrame::New();
   this->FunctionLabel = vtkKWLabel::New();
@@ -114,8 +113,6 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
   this->AttributeModeMenu = NULL;
   this->AttributeModeFrame->Delete();
   this->AttributeModeFrame = NULL;
-  this->ArrayNameFrame->Delete();
-  this->ArrayNameFrame = NULL;
   this->ArrayNameEntry->Delete();
   this->ArrayNameEntry = NULL;
   
@@ -238,35 +235,17 @@ void vtkPVArrayCalculator::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  this->ArrayNameFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ArrayNameFrame->Create(pvApp, "frame", "");
+  this->ArrayNameEntry->SetParent(this->ParameterFrame->GetFrame());
+  this->ArrayNameEntry->SetPVSource(this);
+  this->Widgets->AddItem(this->ArrayNameEntry);
+  this->ArrayNameEntry->Create(pvApp, "Result Array Name:",
+                               "SetResultArrayName", "GetResultArrayName",
+                               "Set the name of the array to hold the results of this computation",
+                               this->GetVTKSourceTclName());
+  this->ArrayNameEntry->GetEntry()->SetValue("resultArray");
   this->Script("pack %s -side top -fill x",
-               this->ArrayNameFrame->GetWidgetName());
-  
-  this->ArrayNameEntry->SetParent(this->ArrayNameFrame);
-  this->ArrayNameEntry->Create(pvApp);
-  this->ArrayNameEntry->SetValue("resultArray");
-  this->ArrayNameEntry->SetLabel("Result Array Name:");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->ArrayNameEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->ArrayNameEntry->SetBalloonHelpString("Set the name of the array to hold the results of this computation");
-  this->Script("pack %s -side left",
                this->ArrayNameEntry->GetWidgetName());
   
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->ArrayNameEntry->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetResultArrayName");
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetResultArrayName",
-                                  this->ArrayNameEntry->GetTclName());
-
   this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->CalculatorFrame->Create(pvApp);
   this->CalculatorFrame->SetLabel("Calculator");

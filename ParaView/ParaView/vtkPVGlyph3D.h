@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVLabeledToggle.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkPVScalarEntry.h"
 #include "vtkGlyph3D.h"
 
 class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
@@ -120,7 +120,7 @@ protected:
   vtkKWOptionMenu *VectorModeMenu;
   vtkPVLabeledToggle *OrientCheck;
   vtkPVLabeledToggle *ScaleCheck;
-  vtkKWLabeledEntry *ScaleEntry;
+  vtkPVScalarEntry *ScaleEntry;
 };
 
 #endif

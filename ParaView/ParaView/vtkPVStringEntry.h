@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVThreshold.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVStringEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,59 +39,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVThreshold - A class to handle the UI for vtkThreshold
+// .NAME vtkPVStringEntry -
 // .SECTION Description
 
+#ifndef __vtkPVStringEntry_h
+#define __vtkPVStringEntry_h
 
-#ifndef __vtkPVThreshold_h
-#define __vtkPVThreshold_h
+#include "vtkPVWidget.h"
+#include "vtkKWApplication.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 
-#include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWScale.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkThreshold.h"
-
-class VTK_EXPORT vtkPVThreshold : public vtkPVSource
+class VTK_EXPORT vtkPVStringEntry : public vtkPVWidget
 {
 public:
-  static vtkPVThreshold* New();
-  vtkTypeMacro(vtkPVThreshold, vtkPVSource);
-    
-  // Description:
-  // Set up the UI for this source
-  void CreateProperties();
+  static vtkPVStringEntry* New();
+  vtkTypeMacro(vtkPVStringEntry, vtkPVWidget);
 
-  // Description:
-  // Tcl callback for the attribute mode option menu
-  void ChangeAttributeMode(const char* newMode);
-
-  // Description:
-  // Tcl callbacks for the upper value and lower value scales
-  void UpperValueCallback();
-  void LowerValueCallback();
-
-  // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
-
-  virtual void UpdateScalars();
+  void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
+              char *getCmd, char *help, const char *tclName);
+  
+  vtkGetObjectMacro(Label, vtkKWLabel);
+  vtkGetObjectMacro(Entry, vtkKWEntry);
   
 protected:
-  vtkPVThreshold();
-  ~vtkPVThreshold();
-  vtkPVThreshold(const vtkPVThreshold&) {};
-  void operator=(const vtkPVThreshold&) {};
-
-  vtkKWWidget* AttributeModeFrame;
-  vtkKWLabel* AttributeModeLabel;
-  vtkKWOptionMenu* AttributeModeMenu;
-  vtkKWScale* UpperValueScale;
-  vtkKWScale* LowerValueScale;
-  vtkPVLabeledToggle* AllScalarsCheck;
+  vtkPVStringEntry();
+  ~vtkPVStringEntry();
+  vtkPVStringEntry(const vtkPVStringEntry&) {};
+  void operator=(const vtkPVStringEntry&) {};
+  
+  vtkKWLabel *Label;
+  vtkKWEntry *Entry;
 };
 
 #endif

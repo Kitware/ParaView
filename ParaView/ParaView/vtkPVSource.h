@@ -61,6 +61,8 @@ class vtkPVWindow;
 class vtkStringList;
 class vtkPVLabeledToggle;
 class vtkPVFileEntry;
+class vtkPVStringEntry;
+class vtkPVScalarEntry;
 class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
@@ -190,14 +192,14 @@ public:
   // Formats the command with brackets so that sopaces are preserved.  
   // Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkKWEntry *AddStringEntry(char *label, char *setCmd, char *getCmd,
-                             char* help, vtkKWObject *o = NULL);
+  vtkPVStringEntry *AddStringEntry(char *label, char *setCmd, char *getCmd,
+                                   char* help, vtkKWObject *o = NULL);
  
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
-                              char* help, vtkKWObject *o = NULL);
+  vtkPVScalarEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+                                    char* help, vtkKWObject *o = NULL);
   
   // Description:
   // Create an entry for items with multiple elements.

@@ -61,7 +61,7 @@ vtkPVThreshold::vtkPVThreshold()
   this->AttributeModeMenu = vtkKWOptionMenu::New();
   this->UpperValueScale = vtkKWScale::New();
   this->LowerValueScale = vtkKWScale::New();
-  this->AllScalarsCheck = vtkKWCheckButton::New();
+  this->AllScalarsCheck = vtkPVLabeledToggle::New();
 }
 
 //----------------------------------------------------------------------------
@@ -166,24 +166,12 @@ void vtkPVThreshold::CreateProperties()
                                   this->UpperValueScale->GetTclName());
 
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->AllScalarsCheck->Create(pvApp, "-text AllScalars");
-  this->AllScalarsCheck->SetState(1);
-  this->AllScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
-  
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 this->AllScalarsCheck->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetAllScalars");
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetAllScalars",
-                                  this->AllScalarsCheck->GetTclName());
+  this->AllScalarsCheck->SetPVSource(this);
+  this->AllScalarsCheck->Create(pvApp, "AllScalars", "SetAllScalars",
+                                "GetAllScalars", "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.",
+                                this->GetVTKSourceTclName());
+  this->Widgets->AddItem(this->AllScalarsCheck);
+  this->AllScalarsCheck->GetCheckButton()->SetState(1);
 
   this->Script("pack %s %s %s",
                this->UpperValueScale->GetWidgetName(),
@@ -399,7 +387,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
         << this->LowerValueScale->GetValue() << " "
         << this->UpperValueScale->GetValue() << "\n\t"
         << this->VTKSourceTclName << " SetAllScalars "
-        << this->AllScalarsCheck->GetState() << "\n\n";
+        << this->AllScalarsCheck->GetCheckButton()->GetState() << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

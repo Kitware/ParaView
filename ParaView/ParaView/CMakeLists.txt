@@ -29,10 +29,12 @@ vtkPVLODActor
 vtkPVMethodInterface 
 vtkPVProbe
 vtkPVRenderView 
+vtkPVScalarEntry
 vtkPVSelectionList 
 vtkPVSource 
 vtkPVSourceInterface 
 vtkPVSourceInterfaceParser
+vtkPVStringEntry
 vtkPVThreshold 
 vtkPVTreeComposite 
 vtkPVWidget

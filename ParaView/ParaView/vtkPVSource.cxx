@@ -65,6 +65,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArraySelection.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVStringEntry.h"
+#include "vtkPVScalarEntry.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -1569,7 +1571,8 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
 
   // Although it has been deleted, it did not destruct.
   return toggle;
-}  
+}
+
 //----------------------------------------------------------------------------
 vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
                                           char *getCmd, char *ext, char *help,
@@ -1584,7 +1587,6 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
   entry = vtkPVFileEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
@@ -1595,18 +1597,15 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
-  // We need to change this into a PVWidget.
   return entry;
 }
 
 //----------------------------------------------------------------------------
-vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
-                                        char *getCmd, char *help,
-                                        vtkKWObject *o)
+vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
+                                              char *getCmd, char *help,
+                                              vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *entry;
+  vtkPVStringEntry *entry;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1615,66 +1614,25 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
-    {  
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  
-  entry = vtkKWEntry::New();
+  entry = vtkPVStringEntry::New();
   this->Widgets->AddItem(entry);
-  entry->SetParent(frame);
-  entry->Create(this->Application, "");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               entry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    entry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 entry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue]]",
-             this->GetTclName(), tclName, setCmd, entry->GetTclName());
-
-  frame->Delete();
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
-  // We need to change this into a PVWidget.
   return entry;
 }
 
 //----------------------------------------------------------------------------
-vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
-                                         char *getCmd, char* help,
-                                         vtkKWObject *o)
+vtkPVScalarEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
+                                               char *getCmd, char* help,
+                                               vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *entry;
+  vtkPVScalarEntry *entry;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1683,55 +1641,16 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
-    {  
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  
-  entry = vtkKWEntry::New();
+  entry = vtkPVScalarEntry::New();
   this->Widgets->AddItem(entry);
-  entry->SetParent(frame);
-  entry->Create(this->Application, "");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               entry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    entry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 entry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-             this->GetTclName(), tclName, setCmd, entry->GetTclName());
-
-  frame->Delete();
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
-  // We need to change this into a PVWidget.
   return entry;
 }
 
@@ -2130,7 +2049,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
 }
 
 //----------------------------------------------------------------------------
-// It might make sence here to store the labels in an array 
+// It might make sense here to store the labels in an array 
 // so that a loop can be used to create the widgets.
 void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
                                   char *l4, char *l5, char *l6,

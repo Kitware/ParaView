@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVSource.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkPVStringEntry.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLabeledEntry.h"
@@ -99,8 +99,7 @@ protected:
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;
   
-  vtkKWWidget* ArrayNameFrame;
-  vtkKWLabeledEntry* ArrayNameEntry;
+  vtkPVStringEntry* ArrayNameEntry;
   
   vtkKWLabeledFrame* CalculatorFrame;
   vtkKWLabel* FunctionLabel;
