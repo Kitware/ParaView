@@ -35,14 +35,14 @@
 #include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkSmartPointer.h"
+#include "vtkStdString.h"
 
-#include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtkstd/map>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.30");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -80,10 +80,10 @@ class vtkPVInteractorStyleControlInternal
 {
 public:
 //BTX
-  typedef vtkstd::vector<vtkstd::string> ArrayString;
-  typedef vtkstd::map<vtkstd::string,vtkSmartPointer<vtkPVCameraManipulator> > ManipulatorMap;
-  typedef vtkstd::map<vtkstd::string,vtkSmartPointer<vtkPVWidget> > WidgetsMap;
-  typedef vtkstd::map<vtkstd::string,ArrayString> MapStringToArrayString;
+  typedef vtkstd::vector<vtkStdString> ArrayString;
+  typedef vtkstd::map<vtkStdString,vtkSmartPointer<vtkPVCameraManipulator> > ManipulatorMap;
+  typedef vtkstd::map<vtkStdString,vtkSmartPointer<vtkPVWidget> > WidgetsMap;
+  typedef vtkstd::map<vtkStdString,ArrayString> MapStringToArrayString;
 
   ManipulatorMap          Manipulators;
   WidgetsMap              Widgets;
