@@ -70,7 +70,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkShortArray.h"
-#include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
@@ -107,11 +106,13 @@
 #include <vtkstd/string>
 #include <sys/stat.h>
 
+#include <kwsys/SystemTools.hxx>
+
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.339");
+vtkCxxRevisionMacro(vtkPVApplication, "1.340");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -167,13 +168,17 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
                                    unsigned long vtkNotUsed(event), 
                                    void *clientdata, void *calldata)
 {
+  if (!clientdata || !calldata)
+    {
+    return;
+    }
   vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );
   const char* message = static_cast<char*>( calldata );
   cerr << "# Error or warning: " << message << endl;
   self->AddTraceEntry("# Error or warning:");
-  int cc;
+  size_t cc;
   ostrstream str;
-  for ( cc= 0; cc < vtkString::Length(message); cc ++ )
+  for ( cc= 0; cc < strlen(message); cc ++ )
     {
     str << message[cc];
     if ( message[cc] == '\n' )
@@ -242,8 +247,8 @@ public:
       if ( message )
         {
         message += 3;
-        char *rmessage = vtkString::Duplicate(message);
-        int last = vtkString::Length(rmessage)-1;
+        char *rmessage = kwsys::SystemTools::DuplicateString(message);
+        int last = strlen(rmessage) - 1;
         while ( last > 0 && 
                 (rmessage[last] == ' ' || rmessage[last] == '\n' || 
                  rmessage[last] == '\r' || rmessage[last] == '\t') )
@@ -376,7 +381,8 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
   Vtkpvservermanagertcl_Init(interp); 
   Vtkpvservercommontcl_Init(interp); 
 
-  char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
+  char* script = 
+    kwsys::SystemTools::DuplicateString(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     if (err)
@@ -429,7 +435,7 @@ vtkPVApplication::vtkPVApplication()
   // since it is first created in vtkKWApplication's constructor
   // (in vtkKWApplication's constructor GetClassName() returns
   // the wrong value because the virtual table is not setup yet)
-  char* tclname = vtkString::Duplicate(this->GetTclName());
+  char* tclname = kwsys::SystemTools::DuplicateString(this->GetTclName());
   vtkTclUpdateCommand(this->MainInterp, tclname, this);
   delete[] tclname;
 
@@ -779,7 +785,8 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   exportDialog->SetDefaultExtension(".pvs");
   exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0 )
+       exportDialog->GetFileName() && 
+       strlen(exportDialog->GetFileName()) > 0 )
     {
     if (rename(fname, exportDialog->GetFileName()) != 0)
       {

@@ -90,7 +90,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
-#include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkToolkits.h"
@@ -119,6 +118,8 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
+#include <kwsys/SystemTools.hxx>
+
 #ifndef VTK_USE_ANSI_STDLIB
 # define PV_NOCREATE | ios::nocreate
 #else
@@ -142,7 +143,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.669");
+vtkCxxRevisionMacro(vtkPVWindow, "1.670");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1169,7 +1170,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Make sure the widget is name appropriately: paraview instead of a number.
   // On X11, the window name is the same as the widget name.
 
-  this->WidgetName = vtkString::Duplicate(".paraview");
+  this->WidgetName = kwsys::SystemTools::DuplicateString(".paraview");
 
   // Allow the user to interactively resize the properties parent.
   // Set the left panel size (Frame1) for this app. Do it now before
@@ -2099,12 +2100,13 @@ void vtkPVWindow::OpenCallback()
   this->SetEnabled(0);
   if ( loadDialog->Invoke() )
     {
-    openFileName = vtkString::Duplicate(loadDialog->GetFileName());
+    openFileName = 
+      kwsys::SystemTools::DuplicateString(loadDialog->GetFileName());
     }
   this->SetEnabled(enabled);
   
   // Store last path
-  if ( openFileName && vtkString::Length(openFileName) > 0 )
+  if ( openFileName && strlen(openFileName) > 0 )
     {
     if  (this->Open(openFileName, 1) == VTK_OK)
       {
@@ -2151,7 +2153,8 @@ int vtkPVWindow::Open(char *openFileNameUnSafe, int store)
   // Clean filename 
   // (Ex: {} are added when a filename with a space is dropped on ParaView
 
-  char *openFileName = vtkString::RemoveChars(openFileNameUnSafe, "{}");
+  char *openFileName = 
+    kwsys::SystemTools::RemoveChars(openFileNameUnSafe, "{}");
 
   if (!this->CheckIfFileIsReadable(openFileName))
     {
@@ -2257,8 +2260,8 @@ int vtkPVWindow::Open(char *openFileNameUnSafe, int store)
 vtkPVReaderModule* vtkPVWindow::InitializeReadCustom(const char* proto,
                                                      const char* fileName)
 {
-  if ( !proto || vtkString::Length(proto) == 0 || 
-       !fileName || vtkString::Length(fileName) == 0 )
+  if ( !proto || strlen(proto) == 0 || 
+       !fileName || strlen(fileName) == 0 )
     {
     return 0;
     }
@@ -2269,7 +2272,8 @@ vtkPVReaderModule* vtkPVWindow::InitializeReadCustom(const char* proto,
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
-    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetModuleName(), proto))
+    if (retVal == VTK_OK && 
+        rm && rm->GetModuleName() && !strcmp(rm->GetModuleName(), proto))
       {
       it->Delete();
       return this->InitializeRead(rm, fileName);
@@ -2343,8 +2347,8 @@ int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
 //-----------------------------------------------------------------------------
 int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
 {
-  if ( !reader || vtkString::Length(reader) == 0 || 
-       !filename || vtkString::Length(filename) == 0 )
+  if ( !reader || strlen(reader) == 0 || 
+       !filename || strlen(filename) == 0 )
     {
     return VTK_ERROR;
     }
@@ -2354,8 +2358,8 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
-    if (retVal == VTK_OK && rm && 
-        vtkString::Equals(rm->GetModuleName(), reader) &&
+    if (retVal == VTK_OK && 
+        rm && rm->GetModuleName() && !strcmp(rm->GetModuleName(), reader) &&
         this->OpenWithReader(filename, rm) == VTK_OK )
       {
       it->Delete();
@@ -2551,8 +2555,8 @@ void vtkPVWindow::WriteData()
 
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
-  if ( saveDialog->Invoke() &&
-       vtkString::Length(saveDialog->GetFileName())>0 )
+  if ( saveDialog->Invoke() && saveDialog->GetFileName() &&
+       strlen(saveDialog->GetFileName()) > 0)
     {
     const char* filename = saveDialog->GetFileName();
     
@@ -2640,7 +2644,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
     if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel,
                                                        numParts))
       {
-      if(vtkString::EndsWith(fileName, wm->GetExtension()))
+      if(kwsys::SystemTools::StringEndsWith(fileName, wm->GetExtension()))
         {
         writer = wm;
         break;
@@ -2667,7 +2671,8 @@ void vtkPVWindow::SaveSMState()
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0)
+       exportDialog->GetFileName() &&
+       strlen(exportDialog->GetFileName())>0)
     {
     this->SaveSMState(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveSMStatePath");
@@ -2697,7 +2702,8 @@ void vtkPVWindow::SaveBatchScript()
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0)
+       exportDialog->GetFileName() &&
+       strlen(exportDialog->GetFileName())>0)
     {
     this->SaveBatchScript(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveBatchLastPath");
@@ -2714,7 +2720,7 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
     return 0;
     }
 
-  int pos = vtkString::Length(fname)-1;
+  int pos = strlen(fname)-1;
   while (pos > 0)
     {
     if ( fname[pos] == '.' )
@@ -2804,7 +2810,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   const char* extension = 0;
   const char* writerName = 0;
-  if (imageFileName && vtkString::Length(imageFileName) > 0)
+  if (imageFileName && strlen(imageFileName) > 0)
     {
     extension = this->ExtractFileExtension(imageFileName);
     if ( !extension)
@@ -3152,7 +3158,8 @@ void vtkPVWindow::SaveState()
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0)
+       exportDialog->GetFileName() &&
+       strlen(exportDialog->GetFileName())>0)
     {
     this->SaveState(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveStateLastPath");
@@ -4085,7 +4092,8 @@ void vtkPVWindow::SaveTrace()
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0 &&
+       exportDialog->GetFileName() &&
+       strlen(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
     {
     this->SaveLastPath(exportDialog, "SaveTracePath");
@@ -4100,7 +4108,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
   vtkPVApplication* pvApp = this->GetPVApplication();
   ofstream *trace = pvApp->GetTraceFile();
 
-  if (vtkString::Length(filename) <= 0)
+  if (!filename || strlen(filename) <= 0)
     {
     return 0;
     }
@@ -4287,10 +4295,10 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
   this->ReadSourceInterfacesFromFile(openFileName);
 
   // Store last path
-  if ( openFileName && vtkString::Length(openFileName) > 0 )
+  if ( openFileName && strlen(openFileName) > 0 )
     {
-    char *pth = vtkString::Duplicate(openFileName);
-    int pos = vtkString::Length(openFileName);
+    char *pth = kwsys::SystemTools::DuplicateString(openFileName);
+    int pos = strlen(openFileName);
     // Strip off the file name
     while (pos && pth[pos] != '/' && pth[pos] != '\\')
       {
@@ -4406,13 +4414,13 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
   for(int i=0; i < dir->GetNumberOfFiles(); ++i)
     {
     const char* file = dir->GetFile(i);
-    int extPos = vtkString::Length(file)-4;
+    int extPos = (file ? strlen(file) : 0) - 4;
     
     // Look for the ".xml" extension.
-    if((extPos > 0) && vtkString::Equals(file+extPos, ".xml"))
+    if((extPos > 0) && !strcmp(file+extPos, ".xml"))
       {
       char* fullPath 
-        = new char[vtkString::Length(file)+vtkString::Length(directory)+2];
+        = new char[strlen(file)+strlen(directory)+2];
       strcpy(fullPath, directory);
       strcat(fullPath, "/");
       strcat(fullPath, file);
@@ -4483,9 +4491,9 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   // First add to the extension string.
   if (this->FileExtensions)
     {
-    length = vtkString::Length(this->FileExtensions);
+    length = strlen(this->FileExtensions);
     }
-  length += vtkString::Length(ext) + 5;
+  length += strlen(ext) + 5;
   newStr = new char [length];
 #ifdef _WIN32
   if (this->FileExtensions == NULL)
@@ -4517,9 +4525,9 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   length = 0;
   if (this->FileDescriptions)
     {
-    length = vtkString::Length(this->FileDescriptions);
+    length = strlen(this->FileDescriptions);
     }
-  length += vtkString::Length(description) + vtkString::Length(ext) + 10;
+  length += strlen(description) + strlen(ext) + 10;
   newStr = new char [length];
   if (this->FileDescriptions == NULL)
     {  
@@ -4572,7 +4580,7 @@ void vtkPVWindow::WarningMessage(const char* message)
 {
   this->Script("bell");
   this->CreateErrorLogDisplay();
-  char *wmessage = vtkString::Duplicate(message);
+  char *wmessage = kwsys::SystemTools::DuplicateString(message);
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
@@ -4585,7 +4593,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   cout << "ErrorMessage" << endl;
   this->Script("bell");
   this->CreateErrorLogDisplay();
-  char *wmessage = vtkString::Duplicate(message);
+  char *wmessage = kwsys::SystemTools::DuplicateString(message);
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
@@ -4693,7 +4701,7 @@ void vtkPVWindow::AddManipulator(const char* rotypes, const char* name,
     return;
     }
 
-  char *types = vtkString::Duplicate(rotypes);
+  char *types = kwsys::SystemTools::DuplicateString(rotypes);
   char t[100];
   int res = 1;
 
@@ -4701,11 +4709,11 @@ void vtkPVWindow::AddManipulator(const char* rotypes, const char* name,
   str.width(100);
   while(str >> t)
     {
-    if ( vtkString::Equals(t, "2D") )
+    if ( !strcmp(t, "2D") )
       {
       this->MainView->GetManipulatorControl2D()->AddManipulator(name, pcm);
       }
-    else if (vtkString::Equals(t, "3D") )
+    else if (!strcmp(t, "3D") )
       {
       this->MainView->GetManipulatorControl3D()->AddManipulator(name, pcm);
       }
@@ -4734,7 +4742,7 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
     return;
     }
 
-  char *types = vtkString::Duplicate(rotypes);
+  char *types = kwsys::SystemTools::DuplicateString(rotypes);
   char t[100];
   int res = 1;
 
@@ -4742,12 +4750,12 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
   str.width(100);
   while(str >> t)
     {
-    if ( vtkString::Equals(t, "2D") )
+    if ( !strcmp(t, "2D") )
       {
       this->MainView->GetManipulatorControl2D()->AddArgument(variable, 
                                                              name, widget);
       }
-    else if (vtkString::Equals(t, "3D") )
+    else if (!strcmp(t, "3D") )
       {
       this->MainView->GetManipulatorControl3D()->AddArgument(variable, 
                                                              name, widget);

@@ -35,7 +35,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkString.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWScale.h"
 #include "vtkKWLabeledRadioButtonSet.h"
@@ -44,6 +43,8 @@
 #include "vtkSMDomain.h"
 
 #include <vtkstd/string>
+
+#include <kwsys/SystemTools.hxx>
 
 #define vtkABS(x) (((x)>0)?(x):-(x))
 
@@ -78,7 +79,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.55");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -163,9 +164,9 @@ void vtkPVAnimationInterfaceEntry::CreateLabel(int idx)
   sprintf(index, "Action %d", idx);
   vtkstd::string label;
   label = index;
-  if ( this->SourceMenuButton->GetButtonText() && 
-    strlen(this->SourceMenuButton->GetButtonText()) > 0 &&
-    !vtkString::Equals(this->SourceMenuButton->GetButtonText(), "None") )
+  if (this->SourceMenuButton->GetButtonText() && 
+      strlen(this->SourceMenuButton->GetButtonText()) > 0 &&
+      strcmp(this->SourceMenuButton->GetButtonText(), "None"))
     {
     label += " (";
     label += this->SourceMenuButton->GetButtonText();
@@ -545,7 +546,7 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->UpdateMethodMenu();
-  if ( vtkString::Length(this->Script) == 0 )
+  if (!this->Script || strlen(this->Script) == 0)
     {
     this->SetLabelAndScript("Script", 0, 0);
     }
@@ -1144,14 +1145,14 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
     {
     new_script += script;
     }
-  if ( !vtkString::Equals(this->CurrentMethod, label) )
+  if (!this->CurrentMethod || (label && strcmp(this->CurrentMethod, label)))
     {
     this->SetCurrentMethod(label);
     //cout << __LINE__ << " Dirty" << endl;
     this->Dirty = 1;
     }
   this->GetMethodMenuButton()->SetButtonText(label);
-  if ( !vtkString::Equals(this->Script, new_script.c_str()) )
+  if (!this->Script || strcmp(this->Script, new_script.c_str()))
     {
     this->SetScript(new_script.c_str());
     //cout << __LINE__ << " Dirty" << endl;
@@ -1225,7 +1226,7 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
 void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
 {
   //cout << "SetScript: " << scr << endl;
-  if ( vtkString::Equals(scr, this->Script) )
+  if (scr && this->Script && !strcmp(scr, this->Script))
     {
     return;
     }
@@ -1234,7 +1235,7 @@ void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
     delete [] this->Script;
     this->Script = 0;
     }
-  this->Script = vtkString::Duplicate(scr);
+  this->Script = kwsys::SystemTools::DuplicateString(scr);
 
   if ( !this->ScriptEditor->IsCreated() && this->ScriptEditor->IsAlive() )
     {

@@ -29,13 +29,13 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkString.h"
 #include "vtkStringList.h"
 
+#include <kwsys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.69");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.70");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -184,32 +184,35 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 {
   int found = 0;
   int cc;
-  if ( vtkString::Equals(key, "Tab") ||
-    vtkString::Equals(key, "ISO_Left_Tab") ||
-    vtkString::Equals(key, "Return") ||
-    vtkString::Equals(key, "") )
+  if (key && (!strcmp(key, "Tab") ||
+              !strcmp(key, "ISO_Left_Tab") ||
+              !strcmp(key, "Return") ||
+              !strcmp(key, "")))
     {
     for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
       {
       const char* val = this->EntryValues[cc];
-      if ( !vtkString::Equals(val, this->GetEntry(cc)->GetValue()) )
+      if (!val || (this->GetEntry(cc)->GetValue() && 
+                   strcmp(val, this->GetEntry(cc)->GetValue())))
         {
         if ( this->EntryValues[cc] )
           {
           delete[] this->EntryValues[cc];
           }
-        this->EntryValues[cc] = vtkString::Duplicate(this->GetEntry(cc)->GetValue());
+        this->EntryValues[cc] = kwsys::SystemTools::DuplicateString(
+          this->GetEntry(cc)->GetValue());
         this->AcceptedCallback();
         this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
         }
       }
     }
-  else if ( vtkString::Equals(key, "Escape") )
+  else if (key && !strcmp(key, "Escape") )
     {
     for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
       {
       const char* val = this->EntryValues[cc];
-      if ( !vtkString::Equals(val, this->GetEntry(cc)->GetValue()) )
+      if (!val || (this->GetEntry(cc)->GetValue() && 
+                   strcmp(val, this->GetEntry(cc)->GetValue())))
         {
         this->GetEntry(cc)->SetValue(val);
         }
@@ -373,7 +376,7 @@ void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
     {
     delete [] this->EntryValues[index];
     }
-  this->EntryValues[index] = vtkString::Duplicate(value);
+  this->EntryValues[index] = kwsys::SystemTools::DuplicateString(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -408,7 +411,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
       {
       delete [] this->EntryValues[idx];
       }
-    this->EntryValues[idx] = vtkString::Duplicate(values[idx]);
+    this->EntryValues[idx] = kwsys::SystemTools::DuplicateString(values[idx]);
     sscanf(values[idx], "%f", &scalars[idx]);
     }
   
@@ -437,7 +440,8 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       {
       delete [] this->EntryValues[idx];
       }
-    this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
+    this->EntryValues[idx] = 
+      kwsys::SystemTools::DuplicateString(entry->GetValue());
     scalars[idx] = entry->GetValueAsFloat();
     }
   

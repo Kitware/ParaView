@@ -24,7 +24,6 @@
 #include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkKWScale.h"
 #include "vtkClientServerStream.h"
@@ -32,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.22");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.23");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -477,7 +476,7 @@ void vtkPVTimerLogDisplay::DisplayLog()
 
     char *start, *end;
     int count, length;
-    length = vtkString::Length(str);
+    length = strlen(str);
     char* strCopy = new char[length+1];
     memcpy(strCopy, str, length+1);
 

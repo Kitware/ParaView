@@ -29,16 +29,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
-#include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
 #include "vtkClientServerStream.h"
+
+#include <kwsys/SystemTools.hxx>
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.36");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.37");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -978,8 +979,8 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                x + image_icon_max_width / 2, y);
   if (this->GetApplication()->GetMainInterp()->result)
     {
-    tmp = 
-      vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
+    tmp = kwsys::SystemTools::DuplicateString(
+      this->GetApplication()->GetMainInterp()->result);
     if (directory)
       {
       this->Script("%s bind %s <ButtonPress-1> {%s SelectDirectory {%s} %s}",

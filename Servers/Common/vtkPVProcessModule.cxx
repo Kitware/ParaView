@@ -28,7 +28,6 @@
 #include "vtkPolyData.h"
 #include "vtkShortArray.h"
 #include "vtkSource.h"
-#include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
@@ -54,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.28");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -487,7 +486,7 @@ void vtkPVProcessModule::SetProcessEnvironmentVariable(int processId,
                                                        const char* var)
 {
   (void)processId;
-  char* envstr = vtkString::Duplicate(var);
+  char* envstr = kwsys::SystemTools::DuplicateString(var);
   putenv(envstr);
 }
 

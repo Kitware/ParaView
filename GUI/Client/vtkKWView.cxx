@@ -47,7 +47,6 @@
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
-#include "vtkString.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
 #include "vtkTextMapper.h"
@@ -88,7 +87,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.2");
+vtkCxxRevisionMacro(vtkKWView, "1.3");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -766,7 +765,7 @@ void vtkKWView::SaveAsImage()
   path = dlg->GetFileName();
 
   // make sure we have a file name
-  if (path && vtkString::Length(path) > 1)
+  if (path && strlen(path) > 1)
     {
     this->SaveAsImage(path);
     }

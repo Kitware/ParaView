@@ -26,7 +26,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
-#include "vtkString.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationCueTree.h"
 #include "vtkSMPropertyIterator.h"
@@ -56,10 +55,12 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
+#include <kwsys/SystemTools.hxx>
+
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.21");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.22");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -646,12 +647,12 @@ void vtkPVAnimationManager::InitializeObservers(vtkPVAnimationCue* cue)
 //-----------------------------------------------------------------------------
 char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
 {
-  if (proxyname==NULL || vtkString::Length(proxyname) == 0)
+  if (proxyname==NULL || strlen(proxyname) == 0)
     {
     vtkErrorMacro("Invalid proxy name");
     return NULL;
     }
-  char* listname = new char[vtkString::Length(proxyname)+1];
+  char* listname = new char[strlen(proxyname)+1];
   listname[0] = 0;
   sscanf(proxyname,"%[^.].",listname);
   return listname;
@@ -660,13 +661,13 @@ char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
 //-----------------------------------------------------------------------------
 char* vtkPVAnimationManager::GetSourceName(const char* proxyname)
 {
-  if (proxyname==NULL || vtkString::Length(proxyname) == 0)
+  if (proxyname==NULL || strlen(proxyname) == 0)
     {
     vtkErrorMacro("Invalid proxy name");
     return NULL;
     }
-  char* listname = new char[vtkString::Length(proxyname)+1];
-  char* sourcename =  new char[vtkString::Length(proxyname)+1];
+  char* listname = new char[strlen(proxyname)+1];
+  char* sourcename =  new char[strlen(proxyname)+1];
   listname[0] = 0;
   sourcename[0] = 0;
   sscanf(proxyname,"%[^.].%[^.]",listname,sourcename);
@@ -679,7 +680,7 @@ char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
 {
   char* listname = this->GetSourceListName(proxyname);
   char* sourcename  = this->GetSourceName(proxyname);
-  char* key = vtkString::Append(listname,".",sourcename);
+  char* key = kwsys::SystemTools::AppendStrings(listname, ".", sourcename);
   delete [] listname;
   delete [] sourcename;
   return key;
@@ -688,21 +689,21 @@ char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
 //-----------------------------------------------------------------------------
 char* vtkPVAnimationManager::GetSubSourceName(const char* proxyname)
 {
-  if (proxyname==NULL || vtkString::Length(proxyname) == 0)
+  if (proxyname==NULL || strlen(proxyname) == 0)
     {
     vtkErrorMacro("Invalid proxy name");
     return NULL;
     }
-  char* listname = new char[vtkString::Length(proxyname)+1];
-  char* sourcename =  new char[vtkString::Length(proxyname)+1];
-  char* subsourcename =  new char[vtkString::Length(proxyname)+1];
+  char* listname = new char[strlen(proxyname)+1];
+  char* sourcename =  new char[strlen(proxyname)+1];
+  char* subsourcename =  new char[strlen(proxyname)+1];
   listname[0] = 0;
   sourcename[0] = 0;
   subsourcename[0] = 0;
   sscanf(proxyname,"%[^.].%[^.].%s",listname,sourcename,subsourcename);
   delete [] listname;
   delete [] sourcename;
-  if (vtkString::Length(subsourcename) > 0)
+  if (strlen(subsourcename) > 0)
     {
     return subsourcename;
     }

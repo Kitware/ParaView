@@ -59,7 +59,6 @@
 #include "vtkSMPartDisplay.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkString.h"
 #include "vtkTIFFWriter.h"
 #include "vtkWindowToImageFilter.h"
 
@@ -72,6 +71,8 @@
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <vtkstd/map>
+
+#include <kwsys/SystemTools.hxx>
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -178,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.177");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.178");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -2043,7 +2044,8 @@ void vtkPVAnimationInterface::ShowEntryInFrame(
 void vtkPVAnimationInterface::UpdateEntries()
 {
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
-  char* command = vtkString::Duplicate("ShowEntryInFrameCallback XXXXXXXXXXXXXXXXX");
+  char* command = kwsys::SystemTools::DuplicateString(
+    "ShowEntryInFrameCallback XXXXXXXXXXXXXXXXX");
   int idx = 0;
   this->AnimationEntriesMenu->GetMenu()->DeleteAllMenuItems();
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )

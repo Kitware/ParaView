@@ -25,10 +25,11 @@
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
-#include "vtkString.h"
+
+#include <kwsys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.38");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -370,8 +371,8 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
                in + image_icon_max_width / 2, y);
   if (this->GetApplication()->GetMainInterp()->result)
     {
-    tmp = 
-      vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
+    tmp = kwsys::SystemTools::DuplicateString(
+      this->GetApplication()->GetMainInterp()->result);
     this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d %s 1}",
                  this->Canvas->GetWidgetName(), tmp,
                  this->GetTclName(), compIdx, tmp);
@@ -421,7 +422,8 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
     this->Script("%s create rectangle %d %d %d %d -fill yellow -outline {}",
                  this->Canvas->GetWidgetName(), 
                  bbox[0], bbox[1], bbox[2], bbox[3]);
-    tmp = vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
+    tmp = kwsys::SystemTools::DuplicateString(
+      this->GetApplication()->GetMainInterp()->result);
     this->Script( "%s lower %s",this->Canvas->GetWidgetName(), tmp);
     delete [] tmp;
     tmp = NULL;

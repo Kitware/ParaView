@@ -21,12 +21,11 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkTclUtil.h"
-#include "vtkString.h"
 #include "vtkWindows.h"
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.6");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.7");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -213,7 +212,8 @@ int vtkPVProcessModuleBatchHelper::RunGUIStart(int argc, char **argv, int numSer
   proxm->InstantiateGroupPrototypes("filters");
 
   vtkPVBatchOptions* boptions = vtkPVBatchOptions::SafeDownCast(this->ProcessModule->GetOptions());
-  char* file = vtkString::Duplicate(boptions->GetBatchScriptName());
+  char* file = 
+    kwsys::SystemTools::DuplicateString(boptions->GetBatchScriptName());
   int res = 0; 
   // make exit do nothing in batch scripts
   if(Tcl_GlobalEval(interp, "proc exit {} {}") != TCL_OK)

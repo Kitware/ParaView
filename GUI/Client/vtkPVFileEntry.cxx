@@ -29,7 +29,6 @@
 #include "vtkPVReaderModule.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkKWListSelectOrder.h"
 #include "vtkCommand.h"
@@ -73,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.101");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.102");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -509,8 +508,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         {
         this->FileListSelect->AddSourceElement(files->GetString(cc));
         }
-      if ( vtkString::StartsWith(files->GetString(cc), file.c_str() ) &&
-        vtkString::EndsWith(files->GetString(cc), ext.c_str()) )
+      if ( kwsys::SystemTools::StringStartsWith(
+             files->GetString(cc), file.c_str() ) &&
+           kwsys::SystemTools::StringEndsWith(
+             files->GetString(cc), ext.c_str()) )
         {
         cnt ++;
         }

@@ -30,7 +30,6 @@
 #include "vtkPVScale.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
-#include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkSmartPointer.h"
 #include "vtkStdString.h"
@@ -38,9 +37,11 @@
 #include <vtkstd/vector>
 #include <vtkstd/map>
 
+#include <kwsys/SystemTools.hxx>
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.40");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -312,7 +313,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     {
     ostrstream str;
     str << "[ " << scale->GetTclName() << " GetValue ]" << ends;
-    value = vtkString::Duplicate(str.str());
+    value = kwsys::SystemTools::DuplicateString(str.str());
     str.rdbuf()->freeze(0);
     }
   else if ( vectorEntry )
@@ -327,7 +328,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
       str << f[cc] << " ";
       }
     str << "}" <<ends;
-    value = vtkString::Duplicate(str.str());
+    value = kwsys::SystemTools::DuplicateString(str.str());
     str.rdbuf()->freeze(0);
     }
   else
@@ -365,10 +366,10 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
   if ( found )
     {
     // This is a hack. 
-    if ( vtkString::Length(value) > 0 && !vectorEntry ) 
+    if ( value && strlen(value) > 0 && !vectorEntry ) 
       {
       const char* val = this->GetApplication()->EvaluateString("%s", value);
-      char *rname = vtkString::Append("Manipulator", name);      
+      char *rname = kwsys::SystemTools::AppendStrings("Manipulator", name);
       this->GetApplication()->SetRegisteryValue(2, "RunTime", rname, val);
       delete[] rname;
       }
@@ -427,8 +428,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
          access->GetControl() == control )
       {
       // If this is the same one, then just assign it.
-      if ( vtkString::Equals(access->GetClassName(), 
-                             manipulator->GetClassName()) )
+      if ( !strcmp(access->GetClassName(), manipulator->GetClassName()))
         {
         clone = access;
         }

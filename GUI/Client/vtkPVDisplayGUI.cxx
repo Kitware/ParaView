@@ -63,7 +63,6 @@
 #include "vtkProperty2D.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
-#include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
@@ -86,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.23");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.24");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1815,23 +1814,27 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetRepresentation(const char* repr)
 {
-  if ( vtkString::Equals(repr, VTK_PV_WIREFRAME_LABEL) )
+  if (!repr)
+    {
+    return;
+    }
+  if (!strcmp(repr, VTK_PV_WIREFRAME_LABEL) )
     {
     this->DrawWireframe();
     }
-  else if ( vtkString::Equals(repr, VTK_PV_SURFACE_LABEL) )
+  else if (!strcmp(repr, VTK_PV_SURFACE_LABEL) )
     {
     this->DrawSurface();
     }
-  else if ( vtkString::Equals(repr, VTK_PV_POINTS_LABEL) )
+  else if (!strcmp(repr, VTK_PV_POINTS_LABEL) )
     {
     this->DrawPoints();
     }
-  else if ( vtkString::Equals(repr, VTK_PV_OUTLINE_LABEL) )
+  else if (!strcmp(repr, VTK_PV_OUTLINE_LABEL) )
     {
     this->DrawOutline();
     }
-  else if ( vtkString::Equals(repr, VTK_PV_VOLUME_LABEL) )
+  else if (!strcmp(repr, VTK_PV_VOLUME_LABEL) )
     {
     this->DrawVolume();
     }
@@ -2046,11 +2049,15 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolation(const char* repr)
 {
-  if ( vtkString::Equals(repr, "Flat") )
+  if (!repr)
+    {
+    return;
+    }
+  if (!strcmp(repr, "Flat") )
     {
     this->SetInterpolationToFlat();
     }
-  else if ( vtkString::Equals(repr, "Gouraud") )
+  else if (!strcmp(repr, "Gouraud") )
     {
     this->SetInterpolationToGouraud();
     }
