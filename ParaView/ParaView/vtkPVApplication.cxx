@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.236");
+vtkCxxRevisionMacro(vtkPVApplication, "1.237");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -452,66 +452,6 @@ vtkPVRenderView *vtkPVApplication::GetMainView()
 {
   return this->GetMainWindow()->GetMainView();
 }
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::BroadcastScript(char *format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-  
-  this->BroadcastSimpleScript(buffer);
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::RemoteScript(int id, char *format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);  
-  
-  this->RemoteSimpleScript(id, buffer);
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::AcceptLicense()
@@ -1669,40 +1609,6 @@ int vtkPVApplication::GetGlobalLODFlag()
 // Make instances of sources.
 //============================================================================
 
-//----------------------------------------------------------------------------
-vtkObject *vtkPVApplication::MakeTclObject(const char *className,
-                                           const char *tclName)
-{
-  this->BroadcastScript("%s %s", className, tclName);
-  return this->TclToVTKObject(tclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::MakeServerTclObject(const char *className,
-                                           const char *tclName)
-{
-  this->GetProcessModule()->ServerScript("%s %s", className, tclName);
-}
-
-
-//----------------------------------------------------------------------------
-vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
-{
-  vtkObject *o;
-  int error;
-
-  o = (vtkObject *)(vtkTclGetPointerFromObject(
-                      tclName, "vtkObject", this->GetMainInterp(), error));
-  
-  if (o == NULL)
-    {
-    vtkErrorMacro("Could not get pointer from object \""
-                  << tclName << "\"");
-    }
-  
-  return o;
-}
-
 void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
@@ -1996,30 +1902,6 @@ const char* const vtkPVApplication::ExitProc =
 
 //============================================================================
 // Stuff that is a part of render-process module.
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
-{
-  if (this->ProcessModule)
-    {
-    this->ProcessModule->RemoteSimpleScript(remoteId, str);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::BroadcastSimpleScript(const char *str)
-{
-  if (this->ProcessModule)
-    {
-    this->ProcessModule->BroadcastSimpleScript(str);
-    }
-  else
-    {
-    this->SimpleScript(str);
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 char* vtkPVApplication::GetDemoPath()

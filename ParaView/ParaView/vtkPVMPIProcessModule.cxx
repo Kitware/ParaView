@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.19");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.20");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -85,18 +85,6 @@ int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
-
-
-//----------------------------------------------------------------------------
-void vtkPVSlaveScript(void *localArg, void *remoteArg,
-                      int vtkNotUsed(remoteArgLength),
-                      int vtkNotUsed(remoteProcessId))
-{
-  vtkPVApplication *self = (vtkPVApplication *)(localArg);
-
-  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
-  self->SimpleScript((char*)remoteArg);
-}
 
 
 //----------------------------------------------------------------------------
@@ -191,9 +179,6 @@ void vtkPVMPIProcessModule::Initialize()
     }
   else
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    this->Controller->AddRMI(vtkPVSlaveScript, (void *)(pvApp),
-                             VTK_PV_SLAVE_SCRIPT_RMI_TAG);
     this->Controller->AddRMI(vtkPVSendStreamToServerNodeRMI, this,
                              VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     this->Controller->ProcessRMIs();
@@ -256,64 +241,6 @@ int vtkPVMPIProcessModule::GetPartitionId()
     return this->Controller->GetLocalProcessId();
     }
   return 0;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
-{
-  int id, num;
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Missing application object.");
-    return;
-    }
-
-  num = this->GetNumberOfPartitions();
-
-  int len = vtkString::Length(str);
-  if (!str || (len < 1))
-    {
-    return;
-    }
-
-  for (id = 1; id < num; ++id)
-    {
-    this->RemoteSimpleScript(id, str);
-    }
-
-  // Do reverse order, because 0 will block.
-  this->Application->SimpleScript(str);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::RemoteSimpleScript(int remoteId, const char *str)
-{
-  int length;
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Missing application object.");
-    return;
-    }
-
-  // send string to evaluate.
-  length = vtkString::Length(str) + 1;
-  if (length <= 1)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() == remoteId)
-    {
-    this->Application->SimpleScript(str);
-    return;
-    }
-
-  this->Controller->TriggerRMI(remoteId, const_cast<char*>(str),
-                               VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------

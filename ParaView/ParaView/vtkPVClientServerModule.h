@@ -89,18 +89,6 @@ public:
   virtual void Exit();
 
   // Description:
-  // The primary method for building pipelines on remote proceses
-  // is to use tcl.
-  virtual void RemoteSimpleScript(int remoteId, const char *str);
-  virtual void BroadcastSimpleScript(const char *str);
-  void BroadcastScriptRMI(const char *str);
-  void RelayScriptRMI(const char *str);
-    
-  // Description:
-  // Execute on all server procs (but not client).
-  virtual void ServerSimpleScript(const char *str);
-
-  // Description:
   // Get the Partition piece. -1 means no partition assigned to this process.
   virtual int GetPartitionId();
 
@@ -127,12 +115,6 @@ public:
                                          vtkObject* object);
 
   // Description:
-  // This executes a script on process 0 of the server.
-  // Used mainly for client server operation.
-  virtual void  RootSimpleScript(const char *str);
-  virtual const char* GetRootResult();
-  
-  // Description:
   // Get a directory listing for the given directory.  This
   // implementation will always give a listing on the server side.
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
@@ -142,12 +124,6 @@ public:
   // Get a file selection dialog instance.
   virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
   
-  // Description:
-  // Get a reference to a vtkDataObject from the server-side root node
-  // given the Tcl name of the object.
-  virtual int ReceiveRootPolyData(const char* tclName,
-                                  vtkPolyData* output);
-
 //BTX
   enum 
     {

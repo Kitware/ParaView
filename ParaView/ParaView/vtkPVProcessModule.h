@@ -86,29 +86,6 @@ public:
   // as a generic vtkKWApplication.
   vtkPVApplication *GetPVApplication();
 
-//BTX
-  // Description:
-  // Script which is executed in the remot processes.
-  // If a result string is passed in, the results are place in it. 
-  void RemoteScript(int remoteId, const char *EventString, ...);
-
-  // Description:
-  // Can only be called by process 0.  It executes a script on every
-  // process.
-  void BroadcastScript(const char *EventString, ...);
-
-  // Description:
-  // Can only be called by process 0.  
-  // It executes a script on every server process.
-  // This is needed because we only connect pipeline on server (not client).
-  void ServerScript(const char *EventString, ...);
-
-
-//ETX
-  virtual void RemoteSimpleScript(int remoteId, const char *str);
-  virtual void BroadcastSimpleScript(const char *str);
-  virtual void ServerSimpleScript(const char *str);
-  
   // Description:
   // The controller is needed for filter that communicate internally.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
@@ -132,16 +109,6 @@ public:
   virtual int GetNumberOfPartitions();
   
   // Description:
-  // This executes a script on process 0 of the server.
-  // Used mainly for client server operation.
-//BTX
-  void  RootScript(const char *EventString, ...);
-//ETX
-  virtual void  RootSimpleScript(const char *str);
-  vtkSetStringMacro(RootResult);
-  virtual const char* GetRootResult();
-  
-  // Description:
   // Set the application instance for this class.
   virtual void SetApplication (vtkKWApplication* arg);
   
@@ -150,12 +117,6 @@ public:
   // success, and 0 for failure (when the directory does not exist).
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
                                   vtkStringList* files, int save);
-  
-  // Description:
-  // Get a reference to a vtkDataObject from the server-side root node
-  // given the Tcl name of the object.
-  virtual int ReceiveRootPolyData(const char* tclName,
-                                  vtkPolyData* output);
   
   // Description:
   // Get a file selection dialog instance.
@@ -264,8 +225,6 @@ protected:
 
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
-
-  char *RootResult;
 
   vtkClientServerInterpreter* Interpreter;
   vtkClientServerStream* ClientServerStream;

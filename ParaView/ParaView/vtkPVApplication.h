@@ -62,13 +62,6 @@ class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
 
-
-#define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
-#define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
-#define VTK_PV_SLAVE_SCRIPT_COMMAND_TAG 1120
-#define VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG 1130
-#define VTK_PV_SLAVE_SCRIPT_RESULT_TAG 1140
-
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
 public:
@@ -104,21 +97,6 @@ public:
   virtual void Start(char* arg)
     { this->vtkKWApplication::Start(arg); }
 
-  
-//BTX
-  // Description:
-  // Script which is executed in the remot processes.
-  // If a result string is passed in, the results are place in it. 
-  void RemoteScript(int remoteId, char *EventString, ...);
-
-  // Description:
-  // Can only be called by process 0.  It executes a script on every other
-  // process.
-  void BroadcastScript(char *EventString, ...);
-//ETX
-  void RemoteSimpleScript(int remoteId, const char *str);
-  void BroadcastSimpleScript(const char *str);
-  
   // Description:
   // We need to keep the controller in a prominent spot because there is no
   // more "RegisterAndGetGlobalController" method.
@@ -164,26 +142,6 @@ public:
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 //ETX
 
-  // Description:
-  // This constructs a vtk object (type specified by class name) and
-  // uses the tclName for the tcl instance command.  The user must
-  // cast to the correct type, and is responsible for deleting the
-  // object.
-  vtkObject *MakeTclObject(const char *className,
-                           const char *tclName);
-
-  // Description:
-  // This constructs a vtk object (type specified by class name) on the
-  // server processes and uses the tclName for the tcl instance command.
-  // The user must cast to the correct type, and is responsible for deleting
-  // the object.
-  void MakeServerTclObject(const char *className, const char *tclName);
-
-  // Description:
-  // This method returns pointer to the object specified as a tcl
-  // name.
-  vtkObject *TclToVTKObject(const char *tclName);
-    
   // Description:
   // A start at recording macros in ParaView.  Create a custom trace file
   // that can be loaded back into paraview.  Window variables get

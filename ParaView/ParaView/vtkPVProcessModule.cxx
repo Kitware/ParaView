@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.27");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.28");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -99,7 +99,6 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->UniqueID.ID = 3;
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
-  this->RootResult = NULL;
   this->ClientServerStream = 0;
   this->Interpreter = 0;
   this->InterpreterObserver = 0;
@@ -118,7 +117,6 @@ vtkPVProcessModule::~vtkPVProcessModule()
     this->Controller->Delete();
     this->Controller = NULL;
     }
-  this->SetRootResult(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -164,144 +162,6 @@ int vtkPVProcessModule::GetPartitionId()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::BroadcastScript(const char* format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Missing application object.");
-    return;
-    }
-
-  va_list ap;
-  va_start(ap, format);
-  int length = this->Application->EstimateFormatLength(format, ap);
-  va_end(ap);
-
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-
-  this->BroadcastSimpleScript(buffer);
-
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::ServerScript(const char* format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Missing application object.");
-    return;
-    }
-
-  va_list ap;
-  va_start(ap, format);
-  int length = this->Application->EstimateFormatLength(format, ap);
-  va_end(ap);
-
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-
-  this->ServerSimpleScript(buffer);
-
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::BroadcastSimpleScript(const char *str)
-{
-  this->Application->SimpleScript(str);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::ServerSimpleScript(const char *str)
-{
-  // Do this so that only the client server process module
-  // needs to implement this method.
-  this->BroadcastSimpleScript(str);
-  this->SetRootResult(this->Application->GetMainInterp()->result);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Missing application object.");
-    return;
-    }
-
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-
-  this->RemoteSimpleScript(id, buffer);
-
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::RemoteSimpleScript(int remoteId, const char *str)
-{
-  // send string to evaluate.
-  if (vtkString::Length(str) <= 0)
-    {
-    return;
-    }
-
-  if (remoteId == 0)
-    {
-    this->Application->SimpleScript(str);
-    }
-  }
-
-
-//----------------------------------------------------------------------------
 int vtkPVProcessModule::GetNumberOfPartitions()
 {
   return 1;
@@ -341,52 +201,6 @@ void vtkPVProcessModule::GatherInformationInternal(const char*,
 
   this->TemporaryInformation->CopyFromObject(object);
  }
-
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::RootScript(const char* format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-
-  this->RootSimpleScript(buffer);
-
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::RootSimpleScript(const char *script)
-{
-  // Default implementation just executes locally.
-  this->Script(script);
-  this->SetRootResult(this->Application->GetMainInterp()->result);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVProcessModule::GetRootResult()
-{
-  return this->RootResult;
-}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SetApplication(vtkKWApplication* arg)
@@ -463,33 +277,6 @@ vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 {
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
   return dialog;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
-                                            vtkPolyData* out)
-{
-  // Make sure we have a named Tcl VTK object.
-  if(!tclName || !tclName[0])
-    {
-    return 0;
-    }
-
-  // We are the server.  Just return the object from the local
-  // interpreter.
-  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);
-  vtkObject* obj = this->GetPVApplication()->TclToVTKObject(name.c_str());
-  vtkPolyData* dobj = vtkPolyData::SafeDownCast(obj);
-  if(dobj)
-    {
-    out->DeepCopy(dobj);
-    }
-  else
-    {
-    return 0;
-    }
-  return 1;
-
 }
 
 //----------------------------------------------------------------------------
@@ -600,10 +387,6 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "ReportInterpreterErrors: "
      << this->ReportInterpreterErrors << endl;
-  if (this->RootResult)
-    {
-    os << indent << "RootResult: " << this->RootResult << endl;
-    }
 }
 
 //----------------------------------------------------------------------------

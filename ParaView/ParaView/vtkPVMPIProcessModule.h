@@ -61,12 +61,6 @@ class vtkMultiProcessController;
 class vtkMapper;
 class vtkDataSet;
 
-#define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
-#define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
-#define VTK_PV_SLAVE_SCRIPT_COMMAND_TAG 1120
-#define VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG 1130
-#define VTK_PV_SLAVE_SCRIPT_RESULT_TAG 1140
-
 class VTK_EXPORT vtkPVMPIProcessModule : public vtkPVProcessModule
 {
 public:
@@ -106,12 +100,6 @@ public:
   // Send current ClientServerStream data to the server root and the client.
   // Also reset the vtkClientServerStream object.
   virtual void SendStreamToClientAndServerRoot();
-
-  // Description:
-  // The primary method for building pipelines on remote proceses
-  // is to use tcl.
-  virtual void RemoteSimpleScript(int remoteId, const char *str);
-  virtual void BroadcastSimpleScript(const char *str);
 
   // Description:
   // A method for getting generic information from the server.
