@@ -42,10 +42,10 @@ public:
 
   // Description:
   // Delegated to contour
-  void SetValue(int i, float value);
-  float GetValue(int i);
-  float *GetValues();
-  void GetValues(float *contourValues);
+  void SetValue(int i, double value);
+  double GetValue(int i);
+  double *GetValues();
+  void GetValues(double *contourValues);
   void SetNumberOfContours(int number);
   int GetNumberOfContours();
   const char* GetInputScalarsSelection();

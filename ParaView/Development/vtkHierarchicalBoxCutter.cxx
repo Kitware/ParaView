@@ -27,7 +27,7 @@
 #include "vtkCutter.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxCutter, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxCutter, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxCutter);
 
 //----------------------------------------------------------------------------
@@ -79,19 +79,19 @@ void vtkHierarchicalBoxCutter::ExecuteData(vtkDataObject* dooutput)
 
 //----------------------------------------------------------------------------
 // These are forwarded to the actual cutter
-void vtkHierarchicalBoxCutter::SetValue(int i, float value)
+void vtkHierarchicalBoxCutter::SetValue(int i, double value)
 {
   this->Cutter->SetValue(i, value);
 }
-float vtkHierarchicalBoxCutter::GetValue(int i)
+double vtkHierarchicalBoxCutter::GetValue(int i)
 {
   return this->Cutter->GetValue(i);
 }
-float* vtkHierarchicalBoxCutter::GetValues()
+double* vtkHierarchicalBoxCutter::GetValues()
 {
   return this->Cutter->GetValues();
 }
-void vtkHierarchicalBoxCutter::GetValues(float* contourValues)
+void vtkHierarchicalBoxCutter::GetValues(double* contourValues)
 {
   this->Cutter->GetValues(contourValues);
 }
@@ -103,12 +103,12 @@ int vtkHierarchicalBoxCutter::GetNumberOfContours()
 {
   return this->Cutter->GetNumberOfContours();
 }
-void vtkHierarchicalBoxCutter::GenerateValues(int numContours, float range[2])
+void vtkHierarchicalBoxCutter::GenerateValues(int numContours, double range[2])
 {
   this->Cutter->GenerateValues(numContours, range);
 }
 void vtkHierarchicalBoxCutter::GenerateValues(
-  int numContours, float rangeStart, float rangeEnd)
+  int numContours, double rangeStart, double rangeEnd)
 {
   this->Cutter->GenerateValues(numContours, rangeStart, rangeEnd);
 }

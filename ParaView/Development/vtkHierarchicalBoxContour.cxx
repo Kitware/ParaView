@@ -29,7 +29,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxContour, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxContour, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxContour);
 
 //----------------------------------------------------------------------------
@@ -81,19 +81,19 @@ void vtkHierarchicalBoxContour::ExecuteData(vtkDataObject* dooutput)
 
 //----------------------------------------------------------------------------
 // Delegate to contour
-void vtkHierarchicalBoxContour::SetValue(int i, float value)
+void vtkHierarchicalBoxContour::SetValue(int i, double value)
 {
   this->Contour->SetValue(i, value);
 }
-float vtkHierarchicalBoxContour::GetValue(int i)
+double vtkHierarchicalBoxContour::GetValue(int i)
 {
   return this->Contour->GetValue(i);
 }
-float* vtkHierarchicalBoxContour::GetValues()
+double* vtkHierarchicalBoxContour::GetValues()
 {
   return this->Contour->GetValues();
 }
-void vtkHierarchicalBoxContour::GetValues(float *contourValues)
+void vtkHierarchicalBoxContour::GetValues(double *contourValues)
 {
   this->Contour->GetValues(contourValues);
 }

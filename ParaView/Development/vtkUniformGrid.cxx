@@ -32,7 +32,7 @@
 #include "vtkVertex.h"
 #include "vtkVoxel.h"
 
-vtkCxxRevisionMacro(vtkUniformGrid, "1.3");
+vtkCxxRevisionMacro(vtkUniformGrid, "1.4");
 vtkStandardNewMacro(vtkUniformGrid);
 
 vtkCxxSetObjectMacro(vtkUniformGrid,
@@ -130,9 +130,9 @@ vtkCell *vtkUniformGrid::GetCell(vtkIdType cellId)
   int iMin, iMax, jMin, jMax, kMin, kMax;
   int *dims = this->GetDimensions();
   int d01 = dims[0]*dims[1];
-  float x[3];
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double x[3];
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
 
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
   
@@ -243,9 +243,9 @@ void vtkUniformGrid::GetCell(vtkIdType cellId, vtkGenericCell *cell)
   int iMin, iMax, jMin, jMax, kMin, kMax;
   int *dims = this->GetDimensions();
   int d01 = dims[0]*dims[1];
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
-  float x[3];
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
+  double x[3];
 
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
   
@@ -351,12 +351,12 @@ void vtkUniformGrid::GetCell(vtkIdType cellId, vtkGenericCell *cell)
 //----------------------------------------------------------------------------
 // Fast implementation of GetCellBounds().  Bounds are calculated without
 // constructing a cell.
-void vtkUniformGrid::GetCellBounds(vtkIdType cellId, float bounds[6])
+void vtkUniformGrid::GetCellBounds(vtkIdType cellId, double bounds[6])
 {
   int loc[3], iMin, iMax, jMin, jMax, kMin, kMax;
-  float x[3];
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double x[3];
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
   int *dims = this->GetDimensions();
 
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
@@ -424,8 +424,8 @@ void vtkUniformGrid::GetCellBounds(vtkIdType cellId, float bounds[6])
     }
 
 
-  bounds[0] = bounds[2] = bounds[4] =  VTK_LARGE_FLOAT;
-  bounds[1] = bounds[3] = bounds[5] = -VTK_LARGE_FLOAT;
+  bounds[0] = bounds[2] = bounds[4] =  VTK_DOUBLE_MAX;
+  bounds[1] = bounds[3] = bounds[5] = -VTK_DOUBLE_MAX;
   
   // Extract point coordinates
   for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
@@ -449,12 +449,12 @@ void vtkUniformGrid::GetCellBounds(vtkIdType cellId, float bounds[6])
 }
 
 //----------------------------------------------------------------------------
-float *vtkUniformGrid::GetPoint(vtkIdType ptId)
+double *vtkUniformGrid::GetPoint(vtkIdType ptId)
 {
-  static float x[3];
+  static double x[3];
   int i, loc[3];
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
   int *dims = this->GetDimensions();
 
   x[0] = x[1] = x[2] = 0.0;
@@ -522,12 +522,12 @@ float *vtkUniformGrid::GetPoint(vtkIdType ptId)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkUniformGrid::FindPoint(float x[3])
+vtkIdType vtkUniformGrid::FindPoint(double x[3])
 {
   int i, loc[3];
-  float d;
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double d;
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
   int *dims = this->GetDimensions();
 
   //
@@ -552,22 +552,22 @@ vtkIdType vtkUniformGrid::FindPoint(float x[3])
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkUniformGrid::FindCell(float x[3], vtkCell *vtkNotUsed(cell), 
+vtkIdType vtkUniformGrid::FindCell(double x[3], vtkCell *vtkNotUsed(cell), 
                                  vtkGenericCell *vtkNotUsed(gencell),
                                  vtkIdType vtkNotUsed(cellId), 
-                                  float vtkNotUsed(tol2), 
-                                  int& subId, float pcoords[3], 
-                                  float *weights)
+                                  double vtkNotUsed(tol2), 
+                                  int& subId, double pcoords[3], 
+                                  double *weights)
 {
   return
     this->FindCell( x, (vtkCell *)NULL, 0, 0.0, subId, pcoords, weights );
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkUniformGrid::FindCell(float x[3], vtkCell *vtkNotUsed(cell), 
+vtkIdType vtkUniformGrid::FindCell(double x[3], vtkCell *vtkNotUsed(cell), 
                                  vtkIdType vtkNotUsed(cellId),
-                                 float vtkNotUsed(tol2), 
-                                 int& subId, float pcoords[3], float *weights)
+                                 double vtkNotUsed(tol2), 
+                                 int& subId, double pcoords[3], double *weights)
 {
   int loc[3];
   int *dims = this->GetDimensions();
@@ -597,23 +597,23 @@ vtkIdType vtkUniformGrid::FindCell(float x[3], vtkCell *vtkNotUsed(cell),
 }
 
 //----------------------------------------------------------------------------
-vtkCell *vtkUniformGrid::FindAndGetCell(float x[3],
+vtkCell *vtkUniformGrid::FindAndGetCell(double x[3],
                                       vtkCell *vtkNotUsed(cell),
                                       vtkIdType vtkNotUsed(cellId),
-                                      float vtkNotUsed(tol2), int& subId, 
-                                      float pcoords[3], float *weights)
+                                      double vtkNotUsed(tol2), int& subId, 
+                                      double pcoords[3], double *weights)
 {
   int i, j, k, loc[3];
   vtkIdType npts, idx;
   int *dims = this->GetDimensions();
   vtkIdType d01 = dims[0]*dims[1];
-  float xOut[3];
+  double xOut[3];
   int iMax = 0;
   int jMax = 0;
   int kMax = 0;;
   vtkCell *cell = NULL;
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
 
   if ( this->ComputeStructuredCoordinates(x, loc, pcoords) == 0 )
     {
@@ -764,15 +764,15 @@ int vtkUniformGrid::GetCellType(vtkIdType cellId)
 //----------------------------------------------------------------------------
 void vtkUniformGrid::ComputeBounds()
 {
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
   
   if ( this->Extent[0] > this->Extent[1] || 
        this->Extent[2] > this->Extent[3] ||
        this->Extent[4] > this->Extent[5] )
     {
-    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] =  VTK_LARGE_FLOAT;
-    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] =  VTK_DOUBLE_MAX;
+    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
     return;
     }
   this->Bounds[0] = origin[0] + (this->Extent[0] * spacing[0]);
@@ -805,13 +805,13 @@ void vtkUniformGrid::SetDimensions(int dim[3])
 // The voxel is specified by the array ijk[3], and the parametric coordinates
 // in the cell are specified with pcoords[3]. The function returns a 0 if the
 // point x is outside of the volume, and a 1 if inside the volume.
-int vtkUniformGrid::ComputeStructuredCoordinates(float x[3], int ijk[3], 
-                                               float pcoords[3])
+int vtkUniformGrid::ComputeStructuredCoordinates(double x[3], int ijk[3], 
+                                               double pcoords[3])
 {
   int i;
-  float d, floatLoc;
-  float *origin = this->GetOrigin();
-  float *spacing = this->GetSpacing();
+  double d, doubleLoc;
+  double *origin = this->GetOrigin();
+  double *spacing = this->GetSpacing();
   int *dims = this->GetDimensions();
   
   //
@@ -820,12 +820,12 @@ int vtkUniformGrid::ComputeStructuredCoordinates(float x[3], int ijk[3],
   for (i=0; i<3; i++) 
     {
     d = x[i] - origin[i];
-    floatLoc = d / spacing[i];
+    doubleLoc = d / spacing[i];
     // Floor for negtive indexes.
-    ijk[i] = (int) (floor(floatLoc));
+    ijk[i] = (int) (floor(doubleLoc));
     if ( ijk[i] >= this->Extent[i*2] && ijk[i] < this->Extent[i*2 + 1] )
       {
-      pcoords[i] = floatLoc - (float)ijk[i];
+      pcoords[i] = doubleLoc - (double)ijk[i];
       }
 
     else if ( ijk[i] < this->Extent[i*2] || ijk[i] > this->Extent[i*2+1] ) 
@@ -1011,8 +1011,8 @@ void vtkUniformGrid::InternalUniformGridCopy(vtkImageData *src)
 {
   int idx;
 
-  float origin[3];
-  float spacing[3];
+  double origin[3];
+  double spacing[3];
   src->GetOrigin(origin);
   src->GetSpacing(spacing);
   this->SetExtent(src->GetExtent());

@@ -45,22 +45,22 @@ public:
   // Description:
   // Set a particular contour value at contour number i. The index i ranges 
   // between 0<=i<NumberOfContours.
-  void SetValue(int i, float value); 
+  void SetValue(int i, double value); 
   
   // Description:
   // Get the ith contour value.
-  float GetValue(int i); 
+  double GetValue(int i); 
 
   // Description:
   // Get a pointer to an array of contour values. There will be
   // GetNumberOfContours() values in the list.
-  float *GetValues(); 
+  double *GetValues(); 
 
   // Description:
   // Fill a supplied list with contour values. There will be
   // GetNumberOfContours() values in the list. Make sure you allocate
   // enough memory to hold the list.
-  void GetValues(float *contourValues);
+  void GetValues(double *contourValues);
   
   // Description:
   // Set the number of contours to place into the list. You only really
@@ -75,12 +75,12 @@ public:
   // Description:
   // Generate numContours equally spaced contour values between specified
   // range. Contour values will include min/max range values.
-  void GenerateValues(int numContours, float range[2]); 
+  void GenerateValues(int numContours, double range[2]); 
 
   // Description:
   // Generate numContours equally spaced contour values between specified
   // range. Contour values will include min/max range values.
-  void GenerateValues(int numContours, float rangeStart, float rangeEnd); 
+  void GenerateValues(int numContours, double rangeStart, double rangeEnd); 
 
   // Description
   // Specify the implicit function to perform the cutting.
