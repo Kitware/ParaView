@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.13");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -2329,6 +2329,10 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
 {
   this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "HideParameterRange: "
+     << (this->HideParameterRange ? "On" : "Off") << endl;
+  os << indent << "HideValueRange: "
+     << (this->HideValueRange ? "On" : "Off") << endl;
   os << indent << "CanvasHeight: "<< this->CanvasHeight << endl;
   os << indent << "CanvasWidth: "<< this->CanvasWidth << endl;
   os << indent << "PointRadius: "<< this->PointRadius << endl;
