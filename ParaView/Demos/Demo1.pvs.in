@@ -10,9 +10,7 @@ set DataDirLocal 1
 if ![file exists $DataDir/combxyz.bin] {
     if ![file exists combxyz.bin] {
 	vtkKWMessageDialog _adialog
-	_adialog Create Application ""
-	_adialog SetText "Could not find the data file combxyz.bin.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
-	_adialog Invoke
+	_adialog PopupMessage Application [Application GetMainWindow] 1 Error "Could not find the data file combxyz.bin. This usually means that ParaView was not installed properly or that this script was loaded using 'Load Script' from the file menu."
 	_adialog Delete
 	set FoundFiles 0
     }
@@ -24,9 +22,7 @@ if ![file exists $DataDir/combxyz.bin] {
 if ![file exists $DataDir/combq.bin] {
     if ![file exists combq.bin] {
 	vtkKWMessageDialog _adialog
-	_adialog Create Application ""
-	_adialog SetText "Could not find the data file combq.bin\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
-	_adialog Invoke
+	_adialog PopupMessage Application [Application GetMainWindow] 1 Error "Could not find the data file combq.bin. This usually means that ParaView was not installed properly or that this script was loaded using 'Load Script' from the file menu."
 	_adialog Delete
 	set FoundFiles 0
     } 
@@ -38,8 +34,7 @@ if ![file exists $DataDir/blow.vtk] {
     if ![file exists blow.vtk] {
 	vtkKWMessageDialog _adialog
 	_adialog Create Application ""
-	_adialog SetText "Could not find the data file blow.vtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
-	_adialog Invoke
+	_adialog PopupMessage Application [Application GetMainWindow] 1 Error "Could not find the data file blow.vtk. This usually means that ParaView was not installed properly or that this script was loaded using 'Load Script' from the file menu."
 	_adialog Delete
 	set FoundFiles 0
     }
