@@ -527,7 +527,7 @@ install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/paraview" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
@@ -541,7 +541,7 @@ strip()
 {
     [ -z "${DONE_strip}" ] || return 0 ; DONE_strip="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Stripping executables ..." &&
     (
         strip Install${PREFIX}/bin/*
@@ -553,7 +553,7 @@ manifest()
 {
     [ -z "${DONE_manifest}" ] || return 0 ; DONE_manifest="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Writing MANIFEST ..." &&
     (
         mkdir -p Install${PREFIX}${DOC_DIR} &&
