@@ -31,9 +31,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkDoubleArray.h"
 
-//#include "vtkRef.h"
-
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.19");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.20");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -43,12 +41,22 @@ vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
   this->SquirtCompressionLevel = 5;
   this->SquirtBuffer = vtkUnsignedCharArray::New();
   this->UseCompositing = 0;
-  this->UseTileDisplay = 0;
+  this->RemoteDisplay = 0;
 }
 
 vtkDesktopDeliveryClient::~vtkDesktopDeliveryClient()
 {
   this->SquirtBuffer->Delete();
+}
+
+void vtkDesktopDeliveryClient::SetUseCompositing(int v)
+{
+  this->Superclass::SetUseCompositing(v);
+
+  if (this->RemoteDisplay)
+    {
+    this->SetParallelRendering(v);
+    }
 }
 
 void
@@ -308,5 +316,4 @@ void vtkDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
      << this->RemoteImageProcessingTime << endl;
   os << indent << "TransferTime: " << this->TransferTime << endl;
   os << indent << "SquirtCompressionLevel: " << this->SquirtCompressionLevel << endl;
-  os << indent << "UseTileDisplay: " << this->UseTileDisplay << endl;
 }

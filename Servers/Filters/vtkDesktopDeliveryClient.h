@@ -42,9 +42,14 @@ public:
 
   static vtkDesktopDeliveryClient *New();
 
-  // For ParaView
-  void SetUseCompositing(int v) {this->UseCompositing = v; if (!this->UseTileDisplay) {this->SetParallelRendering(v);}}
-  void SetRenderManager(vtkParallelRenderManager*) {};
+  // Description:
+  // Generally, when you turn compositing off, you expect the image in the
+  // local render window to remain unchanged.  If you are doing remote
+  // display, then there is no point in rendering anything on the server
+  // side.  Thus, if RemoteDisplay is on and UseCompositing is turned off,
+  // then ParallelRendering is also turned off altogether.  Likewise,
+  // ParallelRendering is turned back on when UseCompositing is turned on.
+  virtual void SetUseCompositing(int v);
 
   // Description:
   // Set/Get the controller that is attached to a vtkDesktopDeliveryServer.
@@ -109,10 +114,6 @@ public:
 
   virtual void SetImageReductionFactorForUpdateRate(double DesiredUpdateRate);
 
-  vtkSetMacro(UseTileDisplay, int);
-  vtkGetMacro(UseTileDisplay, int);
-  vtkBooleanMacro(UseTileDisplay, int);
-
 protected:
   vtkDesktopDeliveryClient();
   virtual ~vtkDesktopDeliveryClient();
@@ -139,7 +140,6 @@ protected:
   void SquirtDecompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
 
   int UseCompositing;
-  int UseTileDisplay;
   
 private:
   vtkDesktopDeliveryClient(const vtkDesktopDeliveryClient &); //Not implemented
