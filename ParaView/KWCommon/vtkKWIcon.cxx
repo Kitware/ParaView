@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.10");
+vtkCxxRevisionMacro(vtkKWIcon, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -348,6 +348,14 @@ void vtkKWIcon::SetImageData(int image)
         image_helpbubble_buffer_length);
       break;      
 
+    case vtkKWIcon::ICON_INFO_MINI:
+      this->SetImageData(
+        image_info_mini, 
+        image_info_mini_width, image_info_mini_height,
+        image_info_mini_pixel_size, 
+        image_info_mini_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_LAYOUT:
       this->SetImageData(
         image_layout, 
@@ -426,6 +434,14 @@ void vtkKWIcon::SetImageData(int image)
         image_warning_width, image_warning_height,
         image_warning_pixel_size, 
         image_warning_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_WARNING_MINI:
+      this->SetImageData(
+        image_warning_mini, 
+        image_warning_mini_width, image_warning_mini_height,
+        image_warning_mini_pixel_size, 
+        image_warning_mini_buffer_length);
       break;
     }
   this->Internal = image;
