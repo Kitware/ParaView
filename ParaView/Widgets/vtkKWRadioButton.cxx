@@ -67,6 +67,6 @@ void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("radiobutton %s -value 1 -variable %sValue %s",
-               wname,wname,args);
+               wname,wname,(args?args:""));
 }
 

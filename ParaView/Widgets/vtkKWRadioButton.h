@@ -63,10 +63,11 @@ public:
   // Description:
   // Set/Get the state of the Radio button 0 = off 1 = on
   vtkBooleanMacro(State,int);
-  
+
 protected:
   vtkKWRadioButton() {};
   ~vtkKWRadioButton() {};
+
 private:
   vtkKWRadioButton(const vtkKWRadioButton&); // Not implemented
   void operator=(const vtkKWRadioButton&); // Not implemented
