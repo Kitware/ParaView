@@ -253,6 +253,9 @@ public:
   // Description:
   // The the port for the client/render server socket connection.
   vtkGetMacro(RenderServerPort,int);
+  // Description:
+  // The the port for the client/render server socket connection.
+  vtkGetMacro(RenderNodePort,int);
 
   // Description:
   // The default behavior is for the server to wait and for the client 
@@ -437,6 +440,7 @@ protected:
   vtkSetStringMacro(Username);
   int Port;
   int RenderServerPort;
+  int RenderNodePort;
   int AlwaysSSH;
   int ReverseConnection;
   int UseSoftwareRendering;

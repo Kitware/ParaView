@@ -63,6 +63,10 @@ public:
   // Fill the port information values into the port information object.
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
   vtkSetStringMacro(MachinesFileName);
+  
+  // Description:
+  // Set port to use, if the value is 0, then the system will pick the port.
+  vtkSetMacro(PortNumber,int);
 protected:
   void LoadMachinesFile();
   virtual void SetController(vtkMultiProcessController*);

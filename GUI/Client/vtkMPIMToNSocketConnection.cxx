@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.6");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.7");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -46,7 +46,7 @@ vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
   this->MachinesFileName = 0;
   this->Socket = 0;
   this->HostName = 0;
-  this->PortNumber = -1;
+  this->PortNumber = 0;
   this->Internals = new vtkMPIMToNSocketConnectionInternals;
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());  
@@ -87,7 +87,6 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkMPIMToNSocketConnection::LoadMachinesFile()
 {
-  unsigned int myId = this->Controller->GetLocalProcessId();
   if(!this->MachinesFileName)
     {
     return;
@@ -128,7 +127,8 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
   unsigned int myId = this->Controller->GetLocalProcessId();
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port
-  int sock = this->SocketCommunicator->OpenSocket(0);
+  cerr << "open with port " << this->PortNumber << "\n";
+  int sock = this->SocketCommunicator->OpenSocket(this->PortNumber);
   // find out the random port picked
   int port = this->SocketCommunicator->GetPort(sock);
   if(this->Internals->MachineNames.size())

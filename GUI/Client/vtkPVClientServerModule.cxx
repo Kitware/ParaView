@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.70");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -633,6 +633,13 @@ void vtkPVClientServerModule::InitializeRenderServer()
   
   // now tell the render server to find out what ports it is going
   // to use
+  this->GetStream()  
+    << vtkClientServerStream::Invoke
+    << this->GetApplicationID() << "GetRenderNodePort" << vtkClientServerStream::End;
+  this->GetStream()
+    << vtkClientServerStream::Invoke << id << "SetPortNumber"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
   this->GetStream()  
     << vtkClientServerStream::Invoke
     << this->GetApplicationID() << "GetMachinesFileName" << vtkClientServerStream::End;

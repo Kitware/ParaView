@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.266");
+vtkCxxRevisionMacro(vtkPVApplication, "1.267");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -463,6 +463,7 @@ vtkPVApplication::vtkPVApplication()
   this->SetHostName("localhost");
   this->Port = 11111;
   this->RenderServerPort = 22221;
+  this->RenderNodePort = 0;
   this->ReverseConnection = 0;
   this->Username = 0;
   this->UseSoftwareRendering = 0;
@@ -614,6 +615,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "",
   "--render-port", "",
   "Specify the port client and render server will use (--port=22222).  Client and render servers ports must match.", 
+  "--render-node-port", "",
+  "Specify the port to be used by each render node (--render-node-port=22222).  Client and render servers ports must match.", 
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
   "--reverse-connection", "-rc",
@@ -1081,6 +1084,22 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       this->SetMachinesFileName(newarg);
       }
     
+  
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-node-port",
+                                            index) == VTK_OK)
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->RenderNodePort = atoi(newarg);
+      }
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-port",
                                             index) == VTK_OK)
       {
@@ -2026,6 +2045,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running as a client\n";
     os << indent << "Port: " << this->Port << endl;
+    os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
     os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
     os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
     os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
