@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.58");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.59");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -667,13 +667,13 @@ void vtkKWRenderWidget::RemoveAllProps()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
 {
-  if (r < 0 || g < 0 || b < 0)
+  float *color = this->GetBackgroundColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
     {
     return;
     }
-  
-  float *ff = this->GetBackgroundColor();
-  if (ff[0] == r && ff[1] == g && ff[2] == b)
+
+  if (r < 0 || g < 0 || b < 0)
     {
     return;
     }
@@ -699,12 +699,6 @@ void vtkKWRenderWidget::Close()
     {
     this->GetCornerAnnotation()->ClearAllTexts();
     }
-
-  // Why should I hide those ?
-  /*
-  this->SetCornerAnnotationVisibility(0);
-  this->SetHeaderAnnotationVisibility(0);
-  */
 }
 
 //----------------------------------------------------------------------------
@@ -725,8 +719,7 @@ int vtkKWRenderWidget::GetCornerAnnotationVisibility()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 {
-  if (!this->CornerAnnotation ||
-      this->GetCornerAnnotationVisibility() == v)
+  if (this->GetCornerAnnotationVisibility() == v)
     {
     return;
     }
@@ -754,12 +747,17 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationColor(float r, float g, float b)
 {
+  float *color = this->GetCornerAnnotationColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
   if (this->CornerAnnotation && this->CornerAnnotation->GetTextProperty())
     {
-    float *rgb = this->CornerAnnotation->GetTextProperty()->GetColor();
-    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+    this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
+    if (this->GetCornerAnnotationVisibility())
       {
-      this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
       this->Render();
       }
     }
@@ -792,8 +790,7 @@ int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 {
-  if (!this->HeaderAnnotation || 
-      this->GetHeaderAnnotationVisibility() == v)
+  if (this->GetHeaderAnnotationVisibility() == v)
     {
     return;
     }
@@ -821,12 +818,17 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 {
+  float *color = this->GetHeaderAnnotationColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
   if (this->HeaderAnnotation && this->HeaderAnnotation->GetTextProperty())
     {
-    float *rgb = this->HeaderAnnotation->GetTextProperty()->GetColor();
-    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+    this->HeaderAnnotation->GetTextProperty()->SetColor(r, g, b);
+    if (this->GetHeaderAnnotationVisibility())
       {
-      this->HeaderAnnotation->GetTextProperty()->SetColor(r, g, b);
       this->Render();
       }
     }
