@@ -53,19 +53,23 @@ int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
   this->CommandFunction = vtkKWMessageDialogCommand;
-  this->Message = vtkKWWidget::New();
-  this->Message->SetParent(this);
+  this->Label = vtkKWWidget::New();
+  this->Label->SetParent(this);
   this->ButtonFrame = vtkKWWidget::New();
   this->ButtonFrame->SetParent(this);
   this->OKButton = vtkKWWidget::New();
   this->OKButton->SetParent(this->ButtonFrame);
+  this->CancelButton = vtkKWWidget::New();
+  this->CancelButton->SetParent(this->ButtonFrame);
+  this->Style = vtkKWMessageDialog::Message;
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
 {
-  this->Message->Delete();
+  this->Label->Delete();
   this->ButtonFrame->Delete();
   this->OKButton->Delete();
+  this->CancelButton->Delete();
 }
 
 
@@ -74,20 +78,45 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->vtkKWDialog::Create(app,args);
   
-  this->Message->Create(app,"label","");
+  this->Label->Create(app,"label","");
   this->ButtonFrame->Create(app,"frame","");
-  this->OKButton->Create(app,"button","-text OK -width 16");
-  this->OKButton->SetCommand(this, "OK");
-  this->Script("pack %s -side left -padx 4 -expand yes",
-               this->OKButton->GetWidgetName());
+  
+  switch (this->Style)
+    {
+    case vtkKWMessageDialog::Message :
+      this->OKButton->Create(app,"button","-text OK -width 16");
+      this->OKButton->SetCommand(this, "OK");
+      this->Script("pack %s -side left -padx 4 -expand yes",
+                   this->OKButton->GetWidgetName());
+      break;
+    case vtkKWMessageDialog::YesNo :
+      this->OKButton->Create(app,"button","-text Yes -width 16");
+      this->OKButton->SetCommand(this, "OK");
+      this->CancelButton->Create(app,"button","-text No -width 16");
+      this->CancelButton->SetCommand(this, "Cancel");
+      this->Script("pack %s %s -side left -padx 4 -expand yes",
+                   this->OKButton->GetWidgetName(),
+                   this->CancelButton->GetWidgetName());
+      break;
+    case vtkKWMessageDialog::OkCancel :
+      this->OKButton->Create(app,"button","-text OK -width 16");
+      this->OKButton->SetCommand(this, "OK");
+      this->CancelButton->Create(app,"button","-text Cancel -width 16");
+      this->CancelButton->SetCommand(this, "Cancel");
+      this->Script("pack %s %s -side left -padx 4 -expand yes",
+                   this->OKButton->GetWidgetName(),
+                   this->CancelButton->GetWidgetName());
+      break;
+    }
+  
   this->Script("pack %s -side bottom -fill x -pady 4",
                this->ButtonFrame->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 4",
-               this->Message->GetWidgetName());
+               this->Label->GetWidgetName());
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->Script("%s configure -text {%s}",
-               this->Message->GetWidgetName(),txt);
+               this->Label->GetWidgetName(),txt);
 }

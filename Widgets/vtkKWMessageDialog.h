@@ -41,6 +41,12 @@ public:
   static vtkKWMessageDialog* New();
   vtkTypeMacro(vtkKWMessageDialog,vtkKWDialog);
 
+  //BTX
+  enum {Message = 0,
+        YesNo,
+        OkCancel};
+  //ETX
+  
   // Description:
   // Create a Tk widget
   void Create(vtkKWApplication *app, const char *args);
@@ -48,6 +54,14 @@ public:
   // Description:
   // Set the text of the message
   void SetText(const char *);
+
+  // Description:
+  // Set the style of the message box
+  vtkSetMacro(Style,int);
+  vtkGetMacro(Style,int);
+  void SetStyleToMessage() {this->SetStyle(vtkKWMessageDialog::Message);};
+  void SetStyleToYesNo() {this->SetStyle(vtkKWMessageDialog::YesNo);};
+  void SetStyleToOkCancel() {this->SetStyle(vtkKWMessageDialog::OkCancel);};
   
 protected:
   vtkKWMessageDialog();
@@ -55,9 +69,12 @@ protected:
   vtkKWMessageDialog(const vtkKWMessageDialog&) {};
   void operator=(const vtkKWMessageDialog&) {};
 
-  vtkKWWidget *Message;
+  int Style;
+  
+  vtkKWWidget *Label;
   vtkKWWidget *ButtonFrame;
   vtkKWWidget *OKButton;
+  vtkKWWidget *CancelButton;  
 };
 
 
