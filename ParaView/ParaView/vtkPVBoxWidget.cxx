@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.11");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -320,7 +320,7 @@ void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 vtkPVBoxWidget* vtkPVBoxWidget::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVBoxWidget::SafeDownCast(clone);
@@ -352,7 +352,7 @@ void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
       strcpy(this->BalloonHelpString, str);
       }
     }
-  
+
   if ( this->Application && !this->BalloonHelpInitialized )
     {
     this->BalloonHelpInitialized = 1;
@@ -366,7 +366,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   char tclName[256];
 
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Box");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
@@ -818,7 +818,7 @@ void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 
 //----------------------------------------------------------------------------
 int vtkPVBoxWidget::ReadXMLAttributes(vtkPVXMLElement* element,
-                                        vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
   return 1;
