@@ -361,6 +361,12 @@ protected:
   vtkKWWindow();
   ~vtkKWWindow();
 
+  // Description:
+  // Add the toolbar to the menu alone.
+  void AddToolbarToMenu(vtkKWToolbar* toolbar, const char* name, 
+    vtkKWWidget* target, const char* command);
+
+  void SetToolbarVisibilityInternal(vtkKWToolbar* toolbar,const char* name, int flag);
   // Recent files
 
   //BTX

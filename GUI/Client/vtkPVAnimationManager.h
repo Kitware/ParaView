@@ -73,6 +73,8 @@ class vtkPVAnimationCue;
 class vtkPVSource;
 class vtkPVKeyFrame;
 class vtkSMStringVectorProperty;
+class vtkKWToolbar;
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVAnimationManager : public vtkKWWidget
 {
@@ -264,6 +266,10 @@ protected:
   void InitializeObservers(vtkPVAnimationCue* cue);
 
   vtkPVAnimationCueTree* GetAnimationCueTreeForSource(vtkPVSource* pvSource);
+
+  vtkKWToolbar* KeyFramesToolbar;
+  vtkKWPushButton* InitStateButton;
+  vtkKWPushButton* AddKeyFramesButton;
 private:
   vtkPVAnimationManager(const vtkPVAnimationManager&); // Not implemented.
   void operator=(const vtkPVAnimationManager&); // Not implemented.

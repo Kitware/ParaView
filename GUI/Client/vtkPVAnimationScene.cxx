@@ -16,8 +16,6 @@
 #include "vtkPVAnimationScene.h"
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
-//#include "vtkCollection.h"
-//#include "vtkCollectionIterator.h"
 #include "vtkAnimationScene.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWFrame.h"
@@ -56,6 +54,8 @@
 #include "vtkPVSource.h"
 #include "vtkSMPartDisplay.h"
 #include "vtkErrorCode.h"
+#include "vtkPVVCRControl.h"
+
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
 #endif
@@ -67,7 +67,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.4");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -106,15 +106,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->AnimationSceneProxy = NULL;
   this->AnimationSceneProxyName = NULL;
 
-  this->ControlButtonFrame = vtkKWFrame::New();
-  this->PlayButton = vtkKWPushButton::New();
-  this->StopButton = vtkKWPushButton::New();
-  this->GoToBeginningButton = vtkKWPushButton::New();
-  this->GoToEndButton = vtkKWPushButton::New();
-  this->GoToPreviousButton = vtkKWPushButton::New();
-  this->GoToNextButton = vtkKWPushButton::New();
-  this->LoopCheckButton = vtkKWCheckButton::New();
-
+  this->VCRControl = vtkPVVCRControl::New();
   this->TimeLabel = vtkKWLabel::New();
   this->TimeScale = vtkKWScale::New();
   this->FrameRateLabel = vtkKWLabel::New();
@@ -123,9 +115,6 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->DurationThumbWheel = vtkKWThumbWheel::New();
   this->PlayModeMenuButton = vtkKWMenuButton::New();
   this->PlayModeLabel = vtkKWLabel::New();
-
-//  this->AnimationCues = vtkCollection::New();
-//  this->AnimationCuesIterator = this->AnimationCues->NewIterator();
 
   this->RenderView = NULL;
   this->AnimationManager = NULL;
@@ -158,14 +147,7 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
     }
   this->SetWindow(NULL);
   this->Observer->Delete();
-  this->ControlButtonFrame->Delete();
-  this->PlayButton->Delete();
-  this->StopButton->Delete();
-  this->GoToBeginningButton->Delete();
-  this->GoToEndButton->Delete();
-  this->GoToPreviousButton->Delete();
-  this->GoToNextButton->Delete();
-  this->LoopCheckButton->Delete();
+  this->VCRControl->Delete();
 
   this->TimeLabel->Delete();
   this->TimeScale->Delete();
@@ -175,8 +157,6 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
   this->DurationThumbWheel->Delete();
   this->PlayModeMenuButton->Delete();
   this->PlayModeLabel->Delete();
-//  this->AnimationCues->Delete();
-//  this->AnimationCuesIterator->Delete();
   this->SetRenderView(NULL);
   this->SetAnimationManager(NULL);
   if (this->ImageWriter)
@@ -256,80 +236,22 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
 
   this->CreateProxy();
 
-  vtkKWIcon* icon = vtkKWIcon::New();
+  //vtkKWIcon* icon = vtkKWIcon::New();
   
   this->Script("grid propagate %s 1",
     this->GetWidgetName());
-  
-  // Animation Control.
-  this->ControlButtonFrame->SetParent(this);
-  this->ControlButtonFrame->Create(app, 0);
+ 
+  this->VCRControl->SetParent(this);
+  this->VCRControl->Create(app);
+  this->VCRControl->SetPlayCommand(this, "Play");
+  this->VCRControl->SetStopCommand(this, "Stop");
+  this->VCRControl->SetGoToBeginningCommand(this, "GoToBeginning");
+  this->VCRControl->SetGoToEndCommand(this,"GoToEnd");
+  this->VCRControl->SetGoToPreviousCommand(this, "GoToPrevious");
+  this->VCRControl->SetGoToNextCommand(this,"GoToNext");
   this->Script("grid %s -columnspan 2 -sticky {}",
-    this->ControlButtonFrame->GetWidgetName());
-
-  // Animation Control: Play button to start the animation.
-  this->PlayButton->SetParent(this->ControlButtonFrame);
-  this->PlayButton->Create(app, "");
-  this->PlayButton->SetCommand(this, "Play");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_PLAY);
-  this->PlayButton->SetImageOption(icon);
+    this->VCRControl->GetWidgetName());
   
-  // Animation Control: Stop button to stop the animation.
-  this->StopButton->SetParent(this->ControlButtonFrame);
-  this->StopButton->Create(app, "");
-  this->StopButton->SetCommand(this, "Stop");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_STOP);
-  this->StopButton->SetImageOption(icon);
-  
-  // Animation Control: "go to beginning" button.
-  this->GoToBeginningButton->SetParent(this->ControlButtonFrame);
-  this->GoToBeginningButton->Create(app, "");
-  this->GoToBeginningButton->SetCommand(this, "GoToBeginning");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_BEGINNING);
-  this->GoToBeginningButton->SetImageOption(icon);
-
-  // Animation Control: "go to end" button.
-  this->GoToEndButton->SetParent(this->ControlButtonFrame);
-  this->GoToEndButton->Create(app, "");
-  this->GoToEndButton->SetCommand(this, "GoToEnd");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_END);
-  this->GoToEndButton->SetImageOption(icon);
-
-  // Animation Control: "go to previous frame" button.
-  this->GoToPreviousButton->SetParent(this->ControlButtonFrame);
-  this->GoToPreviousButton->Create(app, 0);
-  this->GoToPreviousButton->SetCommand(this, "GoToPrevious");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_REWIND_TO_KEY);
-  this->GoToPreviousButton->SetImageOption(icon);
-
-  // Animation Control: "go to next frame" button.
-  this->GoToNextButton->SetParent(this->ControlButtonFrame);
-  this->GoToNextButton->Create(app, 0);
-  this->GoToNextButton->SetCommand(this, "GoToNext");
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_FAST_FORWARD_TO_KEY);
-  this->GoToNextButton->SetImageOption(icon);
-  
-  //  Animation Control: loop button to loop the animation.
-  this->LoopCheckButton->SetParent(this->ControlButtonFrame);
-  this->LoopCheckButton->Create(app, "");
-  this->LoopCheckButton->SetCommand(this, "LoopCheckButtonCallback");
-  this->LoopCheckButton->SetState(0);
-  this->LoopCheckButton->SetIndicator(0);
-  icon->SetImage(vtkKWIcon::ICON_TRANSPORT_LOOP);
-  this->LoopCheckButton->SetImageOption(icon);
-
-  //  Animation Control: pack the transport buttons
-  this->Script("pack %s %s %s %s %s %s %s -side left -fill both -padx 1", 
-               this->GoToBeginningButton->GetWidgetName(), 
-               this->GoToPreviousButton->GetWidgetName(),
-               this->PlayButton->GetWidgetName(), 
-               this->StopButton->GetWidgetName(),
-               this->GoToNextButton->GetWidgetName(),
-               this->GoToEndButton->GetWidgetName(), 
-               this->LoopCheckButton->GetWidgetName());
-
-  icon->Delete();
-
   // Animation Control: Time scale
   this->TimeLabel->SetParent(this);
   this->TimeLabel->Create(app, 0);
@@ -388,6 +310,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->FrameRateThumbWheel->ExpandEntryOn();
   this->FrameRateThumbWheel->SetEntryCommand(this, "FrameRateChangedCallback");
   this->FrameRateThumbWheel->SetEndCommand(this, "FrameRateChangedCallback");
+  this->FrameRateThumbWheel->GetEntry()->BindCommand(this,
+    "FrameRateChangedCallback");
   this->Script("grid %s %s -sticky ew",
     this->FrameRateLabel->GetWidgetName(),
     this->FrameRateThumbWheel->GetWidgetName());
@@ -738,9 +662,12 @@ double vtkPVAnimationScene::GetDuration()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetDuration(double duration)
 {
+  double ntime = this->GetNormalizedCurrentTime();
+  
   this->AnimationSceneProxy->SetEndTime(duration);
   this->DurationThumbWheel->SetValue(duration);
   this->TimeScale->SetRange(0, duration);
+  this->TimeScale->SetValue(duration*ntime);
   this->InvalidateAllGeometries();
   this->AddTraceEntry("$kw(%s) SetDuration %f", this->GetTclName(), duration);
 }
@@ -752,13 +679,18 @@ void vtkPVAnimationScene::Play()
   if (this->Window)
     {
     this->Window->UpdateEnableState();
-    }  
+    }
+  this->VCRControl->SetInPlay(1);
+  this->VCRControl->UpdateEnableState();
+  
   this->AnimationSceneProxy->Play();
   this->InPlay = 0;
   if (this->Window)
     {
     this->Window->UpdateEnableState();
     }
+  this->VCRControl->SetInPlay(0);
+  this->VCRControl->UpdateEnableState();
   this->AddTraceEntry("$kw(%s) Play", this->GetTclName());
 }
 
@@ -850,7 +782,7 @@ int vtkPVAnimationScene::GetPlayMode()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::LoopCheckButtonCallback()
 {
-  this->SetLoop(this->LoopCheckButton->GetState());
+  this->SetLoop(this->VCRControl->GetLoopButtonState());
 }
 
 //-----------------------------------------------------------------------------
@@ -891,7 +823,7 @@ void vtkPVAnimationScene::SetLoop(int loop)
     {
     return;
     }
-  this->LoopCheckButton->SetState(loop);
+  this->VCRControl->SetLoopButtonState(loop);
   this->AnimationSceneProxy->SetLoop(loop);
   this->AddTraceEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
 }
@@ -916,6 +848,12 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
 }
 
 //-----------------------------------------------------------------------------
+double vtkPVAnimationScene::GetCurrentTime()
+{
+  return this->TimeScale->GetValue();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetNormalizedCurrentTime(double ntime)
 {
   if (!this->IsCreated())
@@ -927,6 +865,12 @@ void vtkPVAnimationScene::SetNormalizedCurrentTime(double ntime)
 }
 
 //-----------------------------------------------------------------------------
+double vtkPVAnimationScene::GetNormalizedCurrentTime()
+{
+  return (this->GetCurrentTime() / this->GetDuration());
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::TimeScaleCallback()
 {
   this->SetCurrentTime(this->TimeScale->GetValue());
@@ -935,25 +879,14 @@ void vtkPVAnimationScene::TimeScaleCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::AddAnimationCue(vtkPVAnimationCue *pvCue)
 {
-//if (this->AnimationCues->IsItemPresent(pvCue))
-//  {
-//  vtkErrorMacro("Cue already added to the scene");
-//  return;
-//  }
+
   this->AnimationSceneProxy->AddCue(pvCue->GetCueProxy());
-  //this->AnimationCues->AddItem(pvCue);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::RemoveAnimationCue(vtkPVAnimationCue* pvCue)
 {
-//if (!this->AnimationCues->IsItemPresent(pvCue))
-//  {
-//  vtkErrorMacro("Cue not present in the scene to remove");
-//  return;
-//  }
   this->AnimationSceneProxy->RemoveCue(pvCue->GetCueProxy());
-  //this->AnimationCues->RemoveItem(pvCue);
 }
 
 //-----------------------------------------------------------------------------
@@ -975,20 +908,16 @@ void vtkPVAnimationScene::UpdateEnableState()
     return;
     }
   int enabled = this->Enabled;
-
   // These widgets are always off except when playing.
   this->Enabled = this->IsInPlay();
-  this->PropagateEnableState(this->StopButton);
+  
 
   // These widgets are on when playing or when gui is enabled.
   this->Enabled = this->IsInPlay() || enabled;
-  this->PropagateEnableState(this->LoopCheckButton);
+  this->PropagateEnableState(this->VCRControl);
  
   // These widgets are disabled when playing.
   this->Enabled = enabled && !this->IsInPlay();
-  this->PropagateEnableState(this->PlayButton);
-  this->PropagateEnableState(this->GoToPreviousButton);
-  this->PropagateEnableState(this->GoToNextButton);
   this->PropagateEnableState(this->FrameRateLabel);
   this->PropagateEnableState(this->FrameRateThumbWheel);
   this->PropagateEnableState(this->DurationLabel);
@@ -997,9 +926,6 @@ void vtkPVAnimationScene::UpdateEnableState()
   this->PropagateEnableState(this->PlayModeMenuButton);
   this->PropagateEnableState(this->TimeLabel);
   this->PropagateEnableState(this->TimeScale);
-  this->PropagateEnableState(this->GoToBeginningButton);
-  this->PropagateEnableState(this->GoToEndButton);
-
   this->Enabled = enabled;
 }
 

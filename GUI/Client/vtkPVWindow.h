@@ -92,6 +92,7 @@ class vtkSMAxesProxy;
 class vtkKWSplitFrame;
 
 class vtkPVAnimationManager;
+class vtkKWToolbarSet;
 
 //BTX
 template <class key, class data> 
@@ -181,6 +182,7 @@ public:
 
   // Description:
   // Access to the toolbars.
+  vtkGetObjectMacro(AnimationToolbar, vtkKWToolbar);
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
@@ -556,6 +558,13 @@ public:
   void SetToolbarVisibility(const char* identifier, int state);
 
   // Description:
+  // Adds a toolbar to the under the View window.
+  void AddLowerToolbar(vtkKWToolbar* toolbar, const char* name, int visibility=1);
+  void SetLowerToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag);
+  void ToggleLowerToolbarVisibility(int id, const char* name);
+    
+
+  // Description:
   // This changes the visibility of the Horizontal pane.
   // Animation key frames are shown in the Horizontal pane.
   int GetHorizontalPaneVisibility();
@@ -568,6 +577,9 @@ public:
   // Override Unregister since widgets have loops.
   virtual void UnRegister(vtkObjectBase *o);
 
+  // Description:
+  // Access to the vtkKWToolbarSet for the Lower toolbars.
+  vtkGetObjectMacro(LowerToolbars, vtkKWToolbarSet);
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -685,8 +697,8 @@ protected:
   void AddFileWriter(vtkPVWriter* writer);  
   
   // Helper for WriteVTKFile() and WritePVTKFile().
-  vtkPVWriter* FindPVWriter(const char* fileName, int parallel, int numParts);
-  
+  vtkPVWriter* FindPVWriter(const char* fileName, int parallel, int numParts); 
+
 //BTX
   vtkArrayMap<const char*, vtkPVSource*>* Prototypes;
   vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
@@ -744,6 +756,7 @@ protected:
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
   vtkKWSplitFrame *LowerFrame;
+  vtkKWToolbarSet* LowerToolbars;
   
   vtkClientServerID ServerFileListingID;
 

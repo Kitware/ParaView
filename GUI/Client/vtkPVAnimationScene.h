@@ -19,8 +19,6 @@
 #define __vtkPVAnimationScene_h
 
 #include "vtkKWWidget.h"
-//class vtkCollection;
-//class vtkCollectionIterator;
 class vtkPVAnimationSceneObserver;
 class vtkKWFrame;
 class vtkKWPushButton;
@@ -38,7 +36,7 @@ class vtkImageWriter;
 class vtkKWGenericMovieWriter;
 class vtkWindowToImageFilter;
 class vtkSMXMLPVAnimationWriterProxy;
-
+class vtkPVVCRControl;
 
 class VTK_EXPORT vtkPVAnimationScene : public vtkKWWidget
 {
@@ -97,12 +95,14 @@ public:
   // Note that this time is not normalized time. It extends from
   // [0, Duration].
   void SetCurrentTime( double time);
+  double GetCurrentTime();
 
   // Description:
   // Sets the current time for the animation state. 
   // This is normalized time [0,1], normalized to the duration 
   // of the scene.
   void SetNormalizedCurrentTime(double ntime);
+  double GetNormalizedCurrentTime();
 
   // Description:
   // Add/Remove animation cues from the scene. PVAnimationCues are not
@@ -145,14 +145,7 @@ protected:
   vtkPVAnimationManager* AnimationManager;
 
   // Animation Control.
-  vtkKWFrame* ControlButtonFrame;
-  vtkKWPushButton *PlayButton;
-  vtkKWPushButton *StopButton;
-  vtkKWPushButton *GoToBeginningButton;
-  vtkKWPushButton *GoToEndButton;
-  vtkKWPushButton *GoToPreviousButton;
-  vtkKWPushButton *GoToNextButton;
-  vtkKWCheckButton *LoopCheckButton;
+  vtkPVVCRControl* VCRControl;
 
   vtkKWLabel* TimeLabel;
   vtkKWScale* TimeScale;
@@ -198,8 +191,6 @@ protected:
 
   
   unsigned long ErrorEventTag;
-//  vtkCollection* AnimationCues;
-//  vtkCollectionIterator* AnimationCuesIterator;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.

@@ -51,13 +51,17 @@
 #include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkCollectionIterator.h"
+#include "vtkKWToolbar.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWToolbarSet.h"
+
 #include <vtkstd/map>
 #include <vtkstd/string>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.6");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.7");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -122,7 +126,11 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->Internals = new vtkPVAnimationManagerInternals;
   this->Observer = vtkPVAnimationManagerObserver::New();
   this->Observer->SetTarget(this);
-  this->RecordAll = 0;
+  this->RecordAll = 1;
+
+  this->KeyFramesToolbar = vtkKWToolbar::New();
+  this->InitStateButton = vtkKWPushButton::New();
+  this->AddKeyFramesButton = vtkKWPushButton::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -136,11 +144,16 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
   this->ProxyIterator->Delete();
   delete this->Internals;
   this->Observer->Delete();
+
+  this->KeyFramesToolbar->Delete();
+  this->InitStateButton->Delete();
+  this->AddKeyFramesButton->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
 {
+
   if (this->IsCreated())
     {
     vtkErrorMacro("Widget already created.");
@@ -153,17 +166,18 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
     }
   this->Superclass::Create(app, NULL, NULL);
 
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+  vtkPVWindow* pvWin = pvApp->GetMainWindow();
+
   this->HAnimationInterface->SetParent(this->HorizantalParent);
   this->HAnimationInterface->Create(app, "-relief flat");
 
   this->VAnimationInterface->SetParent(this->VerticalParent);
   this->VAnimationInterface->SetAnimationManager(this);
   this->VAnimationInterface->Create(app, "-relief flat");
-  
+
   this->AnimationScene->SetParent(
     this->VAnimationInterface->GetScenePropertiesFrame());
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
   this->AnimationScene->SetAnimationManager(this);
   this->AnimationScene->SetWindow(pvWin);
   this->AnimationScene->SetRenderView(pvWin->GetMainView());
@@ -171,6 +185,25 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
 
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->AnimationScene->GetWidgetName());
+
+  pvWin->AddLowerToolbar(this->KeyFramesToolbar, "Recorder", 0);
+  this->KeyFramesToolbar->SetParent(pvWin->GetLowerToolbars()->GetToolbarsFrame());
+  this->KeyFramesToolbar->Create(app);
+ 
+  this->InitStateButton->SetParent(this->KeyFramesToolbar->GetFrame());
+  this->InitStateButton->Create(app, "-image PVInitState");
+  this->InitStateButton->SetCommand(this, "InitializeAnimatedPropertyStatus");
+  this->InitStateButton->SetBalloonHelpString(
+    "Set a reference point for all animatable properties, so that any changes can noted.");
+  this->KeyFramesToolbar->AddWidget(this->InitStateButton);
+
+  this->AddKeyFramesButton->SetParent(this->KeyFramesToolbar->GetFrame());
+  this->AddKeyFramesButton->Create(app, "-image PVKeyFrameChanges");
+  this->AddKeyFramesButton->SetCommand(this, "KeyFramePropertyChanges");
+  this->AddKeyFramesButton->SetBalloonHelpString(
+    "Record all the changes in animatable properties, and add them as key frames.");
+  this->KeyFramesToolbar->AddWidget(this->AddKeyFramesButton);
+  
 }
 
 //-----------------------------------------------------------------------------

@@ -77,6 +77,9 @@
 #include "Resources/vtkPVStep.h"
 #include "Resources/vtkPVExponential.h"
 #include "Resources/vtkPVSinusoid.h"
+#include "Resources/vtkPVKeyFrameChanges.h"
+#include "Resources/vtkPVInitState.h"
+
 
 // Splash screen
 
@@ -420,7 +423,20 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVSinusoid_height,
     image_PVSinusoid_pixel_size,
     image_PVSinusoid_buffer_length);
+  
+  this->CreatePhoto("PVKeyFrameChanges",
+    image_PVKeyFrameChanges,
+    image_PVKeyFrameChanges_width,
+    image_PVKeyFrameChanges_height,
+    image_PVKeyFrameChanges_pixel_size,
+    image_PVKeyFrameChanges_buffer_length);
 
+  this->CreatePhoto("PVInitState",
+    image_PVInitState,
+    image_PVInitState_width,
+    image_PVInitState_height,
+    image_PVInitState_pixel_size,
+    image_PVInitState_buffer_length);
 }
 
 //----------------------------------------------------------------------------

@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.206");
+vtkCxxRevisionMacro(vtkKWWindow, "1.207");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -768,6 +768,27 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name,
     {
     return;
     }
+  int id = this->Toolbars->GetNumberOfToolbars() - 1; 
+  ostrstream command;
+  command << "ToggleToolbarVisibility " << id << " " << name << ends;
+  this->AddToolbarToMenu(toolbar, name, this, command.str());
+  command.rdbuf()->freeze(0);
+
+  // Restore state from registry.
+  ostrstream reg_key;
+  reg_key << name << "_ToolbarVisibility" << ends;
+  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
+    {
+    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
+    }
+  this->SetToolbarVisibility(toolbar, name, visibility);
+  reg_key.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::AddToolbarToMenu(vtkKWToolbar* toolbar, const char* name,
+  vtkKWWidget* target, const char* command)
+{
   if (!this->ToolbarsMenu)
     {
     this->ToolbarsMenu = vtkKWMenu::New();
@@ -777,27 +798,14 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name,
     this->GetMenuWindow()->InsertCascade(2, " Toolbars", this->ToolbarsMenu, 1,
       "Customize Toolbars");
     }
-  int id = this->ToolbarsMenu->GetNumberOfItems(); 
   char *rbv = this->ToolbarsMenu->CreateCheckButtonVariable(this, name);
 
-  ostrstream command;
-  command << "ToggleToolbarVisibility " << id << " " << name << ends;
   this->ToolbarsMenu->AddCheckButton(
-    name, rbv, this, command.str(), "Show/Hide this toolbar");
+    name, rbv, target, command, "Show/Hide this toolbar");
 
   delete [] rbv;
   
-  this->ToolbarsMenu->CheckCheckButton(this, name, 1);
-  command.rdbuf()->freeze(0);
-
-  ostrstream reg_key;
-  reg_key << name << "_ToolbarVisibility" << ends;
-  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
-    {
-    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
-    }
-  this->SetToolbarVisibility(toolbar, name, visibility);
-  reg_key.rdbuf()->freeze(0);
+  this->ToolbarsMenu->CheckCheckButton(this, name, 1); 
 }
 
 //----------------------------------------------------------------------------
@@ -816,6 +824,13 @@ void vtkKWWindow::ShowToolbar(vtkKWToolbar* toolbar, const char* name)
 void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag)
 {
   this->Toolbars->SetToolbarVisibility(toolbar, flag);
+  this->SetToolbarVisibilityInternal(toolbar, name, flag); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* toolbar,
+  const char* name, int flag)
+{
   if (this->ToolbarsMenu)
     {
     this->ToolbarsMenu->CheckCheckButton(this, name, flag);
@@ -824,7 +839,8 @@ void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, 
   reg_key << name << "_ToolbarVisibility" << ends;
   this->GetApplication()->SetRegisteryValue(2, "RunTime", reg_key.str(),
     "%d", flag);
-  reg_key.rdbuf()->freeze(0);
+  reg_key.rdbuf()->freeze(0); 
+  this->UpdateToolbarAspect();
 }
 
 //----------------------------------------------------------------------------

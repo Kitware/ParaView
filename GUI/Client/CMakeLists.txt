@@ -176,6 +176,7 @@ SET( ParaViewClient_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVValueList.cxx
+  vtkPVVCRControl.cxx
   vtkPVVectorEntry.cxx
   vtkPVVolumeAppearanceEditor.cxx
   vtkPVVolumePropertyWidget.cxx

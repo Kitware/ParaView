@@ -105,6 +105,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkKWToolbarSet.h"
 
 #include "vtkPVAnimationManager.h"
 #ifdef _WIN32
@@ -219,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.649");
+vtkCxxRevisionMacro(vtkPVWindow, "1.650");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -323,6 +324,8 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationInterface->SetTraceReferenceCommand("GetAnimationInterface");
   this->AnimationInterface->SetApplication(this->GetApplication());
 
+  this->LowerToolbars = vtkKWToolbarSet::New();
+  
   this->LowerFrame = vtkKWSplitFrame::New();
   this->LowerFrame->SetFrame1Size(480);
 
@@ -531,6 +534,7 @@ vtkPVWindow::~vtkPVWindow()
     this->PVLookmarkManager = NULL;
     }
   #endif
+
 }
 
 
@@ -850,6 +854,11 @@ void vtkPVWindow::PrepareForDelete()
       this->PreferencesMenu->Delete();
       this->PreferencesMenu=NULL;
     }
+  if (this->LowerToolbars)
+    {
+    this->LowerToolbars->Delete();
+    this->LowerToolbars = NULL;
+    }
 }
 
 
@@ -1077,7 +1086,7 @@ void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
 {
   if (!strcmp(identifier, "animation"))
     {
-    this->Superclass::SetToolbarVisibility(this->AnimationToolbar, 
+    this->SetLowerToolbarVisibility(this->AnimationToolbar, 
       VTK_PV_TOOLBARS_ANIMATION_LABEL, state);
     }
   else if (!strcmp(identifier, "tools"))
@@ -1099,17 +1108,16 @@ void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
-
   this->AddToolbar(this->InteractorToolbar, VTK_PV_TOOLBARS_INTERACTION_LABEL);
   this->AddToolbar(this->Toolbar, VTK_PV_TOOLBARS_TOOLS_LABEL);
-  this->AddToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
+  this->AddLowerToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
   this->AddToolbar(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL);
 //  this->HideToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
 
   this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
 
-  this->AnimationToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->AnimationToolbar->SetParent(this->LowerToolbars->GetToolbarsFrame());
   this->AnimationToolbar->Create(app);
 
   this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
@@ -1394,6 +1402,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Add Show lower pane to menu.
   this->GetMenuWindow()->AddCommand(VTK_PV_SHOW_HORZPANE_LABEL, this,
     "ToggleHorizontalPaneVisibilityCallback", 0);
+
+  this->LowerToolbars->SetParent(this->ViewFrame);
+  this->LowerToolbars->Create(app,0);
+  this->LowerToolbars->ShowBottomSeparatorOff();
 
   this->LowerFrame->SetFrame1MinimumSize(1);
   this->LowerFrame->SetFrame2MinimumSize(1);
@@ -5056,6 +5068,21 @@ void vtkPVWindow::UpdateToolbarAspect()
   
   this->DisableToolbarButtons();
   this->EnableToolbarButtons();
+
+  if (this->LowerToolbars->IsCreated())
+    {
+    if (this->LowerToolbars->GetNumberOfVisibleToolbars())
+      {
+      this->Script(
+        "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
+        this->LowerToolbars->GetWidgetName());
+      this->LowerToolbars->PackToolbars();
+      }
+    else
+      {
+      this->LowerToolbars->Unpack();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -5391,6 +5418,51 @@ void vtkPVWindow::RestoreWindowGeometry()
       this->LowerFrame->SetFrame1Size(reg_size);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::AddLowerToolbar(vtkKWToolbar* toolbar, const char* name, 
+  int visibility/*=1*/)
+{
+  if (!this->LowerToolbars->AddToolbar(toolbar))
+    {
+    return;
+    }
+  int id = this->LowerToolbars->GetNumberOfToolbars() - 1; 
+  ostrstream command;
+  command << "ToggleLowerToolbarVisibility " << id << " " << name << ends;
+  this->AddToolbarToMenu(toolbar, name, this, command.str());
+  command.rdbuf()->freeze(0);
+
+  // Restore state from registry.
+  ostrstream reg_key;
+  reg_key << name << "_ToolbarVisibility" << ends;
+  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
+    {
+    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
+    }
+  this->SetLowerToolbarVisibility(toolbar, name, visibility);
+  reg_key.rdbuf()->freeze(0);
+}
+  
+//-----------------------------------------------------------------------------
+void vtkPVWindow::ToggleLowerToolbarVisibility(int id, const char* name)
+{
+  vtkKWToolbar* toolbar = this->LowerToolbars->GetToolbar(id);
+  if (!toolbar)
+    {
+    return;
+    }
+  int new_visibility = this->LowerToolbars->IsToolbarVisible(toolbar)? 0 : 1;
+  this->SetLowerToolbarVisibility(toolbar, name, new_visibility);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SetLowerToolbarVisibility(vtkKWToolbar* toolbar,
+  const char* name, int flag)
+{
+  this->LowerToolbars->SetToolbarVisibility(toolbar, flag);
+  this->SetToolbarVisibilityInternal(toolbar, name, flag);
 }
 
 //-----------------------------------------------------------------------------
