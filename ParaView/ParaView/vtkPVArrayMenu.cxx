@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.30");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
@@ -129,12 +129,12 @@ void vtkPVArrayMenu::SetFieldSelection(int field)
     return;
     }
   this->FieldSelection = field;
-  this->ModifiedCallback();
 
   if (this->Application == NULL)
     {
     return;
     }
+  this->ModifiedCallback();
 
   switch (field)
     {
