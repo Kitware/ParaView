@@ -216,10 +216,16 @@ IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewServer_SRCS
     ${ParaViewServer_SRCS}
     vtkDesktopDeliveryServer.cxx
-    vtkIceTRenderManager.cxx
     vtkIceTClientCompositeManager.cxx
     vtkIceTRenderer.cxx
     )
+  IF(VTK_USE_MPI)
+    SET( ParaViewServer_SRCS
+      ${ParaViewServer_SRCS}
+      vtkIceTRenderManager.cxx
+      )
+  ENDIF(VTK_USE_MPI)
+
   SET( ParaViewShared_SRCS
     ${ParaViewShared_SRCS}
     vtkDesktopDeliveryClient.cxx
