@@ -57,6 +57,7 @@ class vtkMultiProcessController;
 class vtkPVApplication;
 class vtkPVDataInformation;
 class vtkPVPart;
+class vtkPVPartDisplay;
 class vtkSource;
 class vtkStringList;
 
@@ -130,7 +131,7 @@ public:
   
   // Description:
   // This initializes the data object to request the correct partiaion.
-  virtual void InitializePVPartPartition(vtkPVPart* part);
+  virtual void InitializePartition(vtkPVPartDisplay* partDisplay);
 
   // Description:
   // This executes a script on process 0 of the server.

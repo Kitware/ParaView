@@ -37,11 +37,12 @@
 
 #ifdef VTK_USE_PATENTED
 #include "vtkKitwareContourFilter.h"
+#include "vtkKitwareCutter.h"
 #endif
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.6");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.7");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
@@ -253,7 +254,7 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   //vtkContourFilter *contour = vtkContourFilter::New();
   vtkContourFilter *contour = vtkKitwareContourFilter::New();
   // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  //contour->ComputeNormalsOn();
+  contour->ComputeNormalsOff();
 #else
   vtkContourFilter *contour = vtkContourFilter::New();
 #endif
@@ -302,7 +303,11 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
     clip1->SetClipFunction(this->ClipPlane);
     append2->AddInput(clip1->GetOutput());
     // We need to create a capping surface.
+#ifdef VTK_USE_PATENTED
+    vtkCutter *cut = vtkKitwareCutter::New();
+#else
     vtkCutter *cut = vtkCutter::New();
+#endif
     cut->SetInput(data);
     cut->SetCutFunction(this->ClipPlane);
     cut->SetValue(0, 0.0);
@@ -328,9 +333,9 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
 
   data->Delete();
   contour->Delete();
-  //surface->Delete();
-  //clip0->Delete();
-  //append1->Delete();
+  surface->Delete();
+  clip0->Delete();
+  append1->Delete();
   if (append2)
     {
     append2->Delete();

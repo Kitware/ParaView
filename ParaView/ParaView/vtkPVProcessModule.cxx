@@ -55,6 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVWindow.h"
 #include "vtkShortArray.h"
 #include "vtkSource.h"
@@ -81,7 +83,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.17");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.18");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -368,7 +370,7 @@ void vtkPVProcessModule::GatherDataInformation(vtkSource *deci)
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::InitializePVPartPartition(vtkPVPart *part)
+void vtkPVProcessModule::InitializePartition(vtkPVPartDisplay *pDisp)
 {
   int numProcs = 1;
 
@@ -377,19 +379,19 @@ void vtkPVProcessModule::InitializePVPartPartition(vtkPVPart *part)
     numProcs = 2;
     }
   this->Script("%s SetNumberOfPieces %d",
-               part->GetMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", part->GetMapperTclName(), 0);
+               pDisp->GetMapperTclName(), numProcs);
+  this->Script("%s SetPiece %d", pDisp->GetMapperTclName(), 0);
   this->Script("%s SetUpdateNumberOfPieces %d",
-               part->GetUpdateSuppressorTclName(), numProcs);
+               pDisp->GetUpdateSuppressorTclName(), numProcs);
   this->Script("%s SetUpdatePiece %d", 
-               part->GetUpdateSuppressorTclName(), 0);
+               pDisp->GetUpdateSuppressorTclName(), 0);
   this->Script("%s SetNumberOfPieces %d",
-               part->GetLODMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", part->GetLODMapperTclName(), 0);
+               pDisp->GetLODMapperTclName(), numProcs);
+  this->Script("%s SetPiece %d", pDisp->GetLODMapperTclName(), 0);
   this->Script("%s SetUpdateNumberOfPieces %d",
-               part->GetLODUpdateSuppressorTclName(), numProcs);
+               pDisp->GetLODUpdateSuppressorTclName(), numProcs);
   this->Script("%s SetUpdatePiece %d", 
-               part->GetLODUpdateSuppressorTclName(), 0);
+               pDisp->GetLODUpdateSuppressorTclName(), 0);
 }
 
 

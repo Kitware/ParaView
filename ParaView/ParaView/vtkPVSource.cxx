@@ -64,6 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
@@ -79,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.294");
+vtkCxxRevisionMacro(vtkPVSource, "1.295");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -505,7 +506,7 @@ void vtkPVSource::ForceUpdate(vtkPVApplication* pvApp)
   this->PVParts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
     {
-    part->ForceUpdate(pvApp);
+    part->GetPartDisplay()->ForceUpdate(pvApp);
     }
 }
 
@@ -517,7 +518,7 @@ void vtkPVSource::Update()
   this->PVParts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
     {
-    part->Update();
+    part->GetPartDisplay()->Update();
     }
 }
 
@@ -537,7 +538,7 @@ void vtkPVSource::SetVisibilityInternal(int v)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVPart(idx);
-    part->SetVisibility(v);
+    part->GetPartDisplay()->SetVisibility(v);
     }
 }
 
@@ -1324,7 +1325,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       part = this->GetPVPart(idx);
       // This has a side effect of gathering and displaying information.
       // Should this be part->Update() !!!!!!!!!!!!!!??????
-      this->GetPVPart()->Update();
+      this->GetPVPart()->GetPartDisplay()->Update();
       }
     pvd->UpdateProperties();
     }
@@ -1361,7 +1362,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     for (idx = 0; idx < numParts; ++idx)
       {
       part = this->GetPVPart(idx);
-      part->RemoveAllCaches();
+      part->GetPartDisplay()->RemoveAllCaches();
       }
     }
   else
@@ -2374,11 +2375,12 @@ int vtkPVSource::InitializeData()
       part->SetPVApplication(pvApp);
       this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
                    dataName);
-      pm->InitializePVPartPartition(part);
+      // !!! This is also done in vtkPVPartDisplay.  Probably not needed here !!!!
+      pm->InitializePartition(part->GetPartDisplay());
       this->AddPVPart(part);
       // This initialization should be done by a render module.
-      part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
-      part->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
+      part->GetPartDisplay()->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
+      part->GetPartDisplay()->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
 
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
@@ -2433,7 +2435,7 @@ void vtkPVSource::SetLODResolution(int dim)
     {
     part = this->GetPVPart(idx);
     pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                           part->GetLODDeciTclName(), this->LODResolution,
+                           part->GetPartDisplay()->GetLODDeciTclName(), this->LODResolution,
                            this->LODResolution, this->LODResolution); 
     }
 }
@@ -2629,7 +2631,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.294 $");
+  this->ExtractRevision(os,"$Revision: 1.295 $");
 }
 
 //----------------------------------------------------------------------------

@@ -85,6 +85,7 @@ SET( ParaView_SRCS
   vtkPVNavigationWindow.cxx
   vtkPVObjectWidget.cxx
   vtkPVPart.cxx
+  vtkPVPartDisplay.cxx
   vtkPVPLOT3DReaderModule.cxx
   vtkPVPivotManipulator.cxx
   vtkPVPlaneWidget.cxx

@@ -56,6 +56,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRenderWindow.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -134,7 +135,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.43");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1542,7 +1543,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
             }
           this->GetPVApplication()->GetProcessModule()->ServerScript(
                   "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
-                  part->GetMapperTclName(), fileName,
+                  part->GetPartDisplay()->GetMapperTclName(), fileName,
                   this->GetPVApplication()->GetProcessModule()->GetPartitionId());
           }
         }

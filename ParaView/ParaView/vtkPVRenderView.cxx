@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVProcessModule.h"
@@ -109,7 +110,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.245");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.246");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1757,10 +1758,10 @@ void vtkPVRenderView::AddPVSource(vtkPVSource *pvs)
   for (idx = 0; idx < num; ++idx)
     {
     part = pvs->GetPVPart(idx);
-    if (part && part->GetPropTclName() != NULL)
+    if (part && part->GetPartDisplay()->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-                             part->GetPropTclName());
+                             part->GetPartDisplay()->GetPropTclName());
       }
     }
 }
@@ -1781,10 +1782,10 @@ void vtkPVRenderView::RemovePVSource(vtkPVSource *pvs)
   for (idx = 0; idx < num; ++idx)
     {
     part = pvs->GetPVPart(idx);
-    if (part->GetPropTclName() != NULL)
+    if (part->GetPartDisplay()->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-                             part->GetPropTclName());
+                             part->GetPartDisplay()->GetPropTclName());
       }
     }
 }
@@ -2161,10 +2162,10 @@ void vtkPVRenderView::ImmediateModeCallback()
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetMapperTclName(),
+                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetLODMapperTclName(),
+                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       }
     }
@@ -2676,7 +2677,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.245 $");
+  this->ExtractRevision(os,"$Revision: 1.246 $");
 }
 
 //------------------------------------------------------------------------------

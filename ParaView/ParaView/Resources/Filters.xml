@@ -755,9 +755,15 @@ help="Set the name of the array to hold the results of this computation"/>
           button_help="Cut with an implicit plane or sphere. Cutting typically reduces the dimensionality of the data."
           long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces." 
           short_help="Cut datasets with planes or spheres.">
+#ifdef VTK_USE_PATENTED
+    <Filter class="vtkKitwareCutter">
+      <Input name="Input" class="vtkDataSet" /> 
+    </Filter>
+#else
     <Filter class="vtkCutter">
       <Input name="Input" class="vtkDataSet" /> 
     </Filter>
+#endif
     <InputMenu id="im1" label="Input" help="Set the input to this filter."
                input_name="Input"/>
     <BoundsDisplay show_hide_frame="1" label="Input Bounds"

@@ -106,7 +106,7 @@ public:
 
   // Description:
   // This initializes the data object to request the correct partiaion.
-  virtual void InitializePVPartPartition(vtkPVPart *part);
+  virtual void InitializePartition(vtkPVPartDisplay *partDisplay);
 
 protected:
   vtkPVMPIProcessModule();

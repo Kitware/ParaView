@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkDataSet;
 class vtkPVApplication;
 class vtkPVDataInformation;
+class vtkPVPartDisplay;
 class vtkPolyDataMapper;
 class vtkProp;
 class vtkProperty;
@@ -68,22 +69,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Enables or disables the collection filter.
-  void SetCollectionDecision(int val);
-  vtkGetMacro(CollectionDecision, int);
-  void SetLODCollectionDecision(int val);
-  vtkGetMacro(LODCollectionDecision, int);
-
-  // Description:
-  // Turns visibilioty on or off.
-  // When visibility is off, geometry data is released.
-  void SetVisibility(int v);
-
-  // Description:
   // This also creates the parallel vtk objects for the composite.
   // (actor, mapper, ...)
   void SetPVApplication(vtkPVApplication *pvApp);
-  
   void SetApplication(vtkKWApplication *)
     {
     vtkErrorMacro("vtkPVPart::SetApplication should not be used. Use SetPVApplcation instead.");
@@ -103,11 +91,6 @@ public:
   vtkGetStringMacro(VTKDataTclName);  
 
   // Description:
-  // This method updates the piece that has been assigned to this process.
-  // It also gathers the data information.
-  void Update();
-
-  // Description:
   // This method is called on creation.  If the data object is unstructured and 
   // has a maximum number of pieces, then a extract piece filter is inserted
   // before the data object.  This will give parallel pipelines at the
@@ -115,43 +98,14 @@ public:
   void InsertExtractPiecesIfNecessary();
   
   //===================
-  
-  // Description:
-  // This method should be called immediately after the object is constructed.
-  // It create VTK objects which have to exeist on all processes.
-  void CreateParallelTclObjects(vtkPVApplication *pvApp);
-        
+          
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-
-  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
-
-  // Description:
-  // Tcl name of the actor across all processes.
-  vtkGetStringMacro(PropTclName);  
         
   // Description:
   // Get the tcl name of the vtkPVGeometryFilter.
   vtkGetStringMacro(GeometryTclName);
-  
-
-  void ForceUpdate(vtkPVApplication* pvApp);
-  
-
-  //=============================================================== 
-  // Description:
-  // These access methods are neede for process module abstraction.
-  vtkGetStringMacro(UpdateSuppressorTclName);
-  vtkGetStringMacro(LODUpdateSuppressorTclName);
-  vtkGetStringMacro(MapperTclName);
-  vtkGetStringMacro(LODMapperTclName);
-  vtkGetStringMacro(LODDeciTclName);
-  vtkGetStringMacro(PropertyTclName);
-  vtkGetStringMacro(CollectTclName);
-  vtkGetStringMacro(LODCollectTclName);
-  vtkProperty *GetProperty() { return this->Property;}
-  vtkProp *GetProp() { return this->Prop;}
   
   // Description:
   // Moving away from direct access to VTK data objects.
@@ -169,17 +123,16 @@ public:
   vtkGetStringMacro(Name);
 
   // Description:
-  // For flip books.
-  void RemoveAllCaches();
-  void CacheUpdate(int idx, int total);
+  // Temporary access to the display object.
+  // Render modules may eleimnate the need for this access.
+  vtkPVPartDisplay* GetPartDisplay() { return this->PartDisplay;}
 
 protected:
   vtkPVPart();
   ~vtkPVPart();
-  
-  int CollectionDecision;
-  int LODCollectionDecision;
 
+  vtkPVPartDisplay* PartDisplay;
+  
   // A part needs a name to show in the extract part filter.
   // We are also going to allow expresion matching.
   char *Name;
@@ -187,48 +140,20 @@ protected:
   vtkPVDataInformation *DataInformation;
   
   char *VTKDataTclName;
-
-  // Problems with vtkLODActor led me to use these.
-  vtkProperty *Property;
-  vtkProp *Prop;
-        
-  char *PropTclName;
-  vtkSetStringMacro(PropTclName);
-  
-  char *PropertyTclName;
-  vtkSetStringMacro(PropertyTclName);
-  
-  char *MapperTclName;
-  vtkSetStringMacro(MapperTclName);
-
-  char *LODMapperTclName;
-  vtkSetStringMacro(LODMapperTclName);
-  
-  char *LODDeciTclName;
-  vtkSetStringMacro(LODDeciTclName);
     
   char *GeometryTclName;
   vtkSetStringMacro(GeometryTclName);
 
-  char *UpdateSuppressorTclName;
-  vtkSetStringMacro(UpdateSuppressorTclName);
-  
-  char *LODUpdateSuppressorTclName;
-  vtkSetStringMacro(LODUpdateSuppressorTclName);
-  
-  char *CollectTclName;
-  vtkSetStringMacro(CollectTclName);
-
-  char *LODCollectTclName;
-  vtkSetStringMacro(LODCollectTclName);
-  
   // Here to create unique names.
   int InstanceCount;
 
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
+  void CreateParallelTclObjects(vtkPVApplication *pvApp);
+
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
-
-  vtkPolyDataMapper *Mapper;
 
   vtkPVPart(const vtkPVPart&); // Not implemented
   void operator=(const vtkPVPart&); // Not implemented

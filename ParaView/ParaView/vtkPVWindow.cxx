@@ -78,6 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
@@ -129,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.435");
+vtkCxxRevisionMacro(vtkPVWindow, "1.436");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -451,7 +452,7 @@ int vtkPVWindow::MakeCollectionDecision()
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvp = pvs->GetPVPart(partIdx);
-      pvp->SetCollectionDecision(this->CollectionDecision);
+      pvp->GetPartDisplay()->SetCollectionDecision(this->CollectionDecision);
       }
     }
 
@@ -498,7 +499,7 @@ int vtkPVWindow::MakeLODCollectionDecision()
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvp = pvs->GetPVPart(partIdx);
-      pvp->SetLODCollectionDecision(this->LODCollectionDecision);
+      pvp->GetPartDisplay()->SetLODCollectionDecision(this->LODCollectionDecision);
       }
     }
 
@@ -4180,7 +4181,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.435 $");
+  this->ExtractRevision(os,"$Revision: 1.436 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4573,7 +4574,7 @@ void vtkPVWindow::CacheUpdate(int idx, int total)
       for (partIdx = 0; partIdx < numParts; ++partIdx)
         {
         pvp = pvs->GetPVPart(partIdx);
-        pvp->CacheUpdate(idx, total);
+        pvp->GetPartDisplay()->CacheUpdate(idx, total);
         }
       }
     }

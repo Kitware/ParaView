@@ -90,6 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -208,7 +209,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.35");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -936,20 +937,17 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
 
 }    
 
-
-
-
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::InitializePVPartPartition(vtkPVPart *part)
+void vtkPVClientServerModule::InitializePartition(vtkPVPartDisplay *pDisp)
 {
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        part->GetMapperTclName());
+                        pDisp->GetMapperTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        part->GetLODMapperTclName());
+                        pDisp->GetLODMapperTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        part->GetUpdateSuppressorTclName());
+                        pDisp->GetUpdateSuppressorTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        part->GetLODUpdateSuppressorTclName());
+                        pDisp->GetLODUpdateSuppressorTclName());
 }
 
 //----------------------------------------------------------------------------

@@ -65,6 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVDataInformation.h"
 
 
@@ -87,7 +88,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.11");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.12");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -400,7 +401,7 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
 
 
 //----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
+void vtkPVMPIProcessModule::InitializePartition(vtkPVPartDisplay *partDisplay)
 {
   int numProcs, id;
   vtkPVApplication* pvApp = this->GetPVApplication();
@@ -414,34 +415,36 @@ void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
   int debugNum = numProcs;
   if (pvApp->GetUseTiledDisplay())
     {
-    this->Script("%s SetPiece 0", part->GetMapperTclName());
-    this->Script("%s SetUpdatePiece 0", part->GetUpdateSuppressorTclName());
-    this->Script("%s SetPiece 0", part->GetLODMapperTclName());
-    this->Script("%s SetUpdatePiece 0", part->GetLODUpdateSuppressorTclName());
+    this->Script("%s SetPiece 0", partDisplay->GetMapperTclName());
+    this->Script("%s SetUpdatePiece 0", partDisplay->GetUpdateSuppressorTclName());
+    this->Script("%s SetPiece 0", partDisplay->GetLODMapperTclName());
+    this->Script("%s SetUpdatePiece 0", partDisplay->GetLODUpdateSuppressorTclName());
     this->Script("%s SetNumberOfPieces %d",
-                 part->GetMapperTclName(), 0);
+                 partDisplay->GetMapperTclName(), 0);
     this->Script("%s SetUpdateNumberOfPieces %d",
-                 part->GetUpdateSuppressorTclName(), 0);
+                 partDisplay->GetUpdateSuppressorTclName(), 0);
     this->Script("%s SetNumberOfPieces %d", 
-                 part->GetLODMapperTclName(), 0);
+                 partDisplay->GetLODMapperTclName(), 0);
     this->Script("%s SetUpdateNumberOfPieces %d",
-                 part->GetLODUpdateSuppressorTclName(), 0);
+                 partDisplay->GetLODUpdateSuppressorTclName(), 0);
     for (id = 1; id < numProcs; ++id)
       {
       this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         part->GetMapperTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetPiece %d", part->GetMapperTclName(), id-1);
+                         partDisplay->GetMapperTclName(), debugNum-1);
+      this->RemoteScript(id, "%s SetPiece %d", 
+                         partDisplay->GetMapperTclName(), id-1);
       this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         part->GetUpdateSuppressorTclName(), debugNum-1);
+                         partDisplay->GetUpdateSuppressorTclName(), debugNum-1);
       this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         part->GetUpdateSuppressorTclName(), id-1);
+                         partDisplay->GetUpdateSuppressorTclName(), id-1);
       this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         part->GetLODMapperTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetPiece %d", part->GetLODMapperTclName(), id-1);
+                         partDisplay->GetLODMapperTclName(), debugNum-1);
+      this->RemoteScript(id, "%s SetPiece %d", 
+                         partDisplay->GetLODMapperTclName(), id-1);
       this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         part->GetLODUpdateSuppressorTclName(), debugNum-1);
+                         partDisplay->GetLODUpdateSuppressorTclName(), debugNum-1);
       this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         part->GetLODUpdateSuppressorTclName(), id-1);
+                         partDisplay->GetLODUpdateSuppressorTclName(), id-1);
       }
     }
   else 
@@ -453,19 +456,20 @@ void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
     for (id = 0; id < numProcs; ++id)
       {
       this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         part->GetMapperTclName(), debugNum);
-      this->RemoteScript(id, "%s SetPiece %d", part->GetMapperTclName(), id);
+                         partDisplay->GetMapperTclName(), debugNum);
+      this->RemoteScript(id, "%s SetPiece %d", partDisplay->GetMapperTclName(), id);
       this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         part->GetUpdateSuppressorTclName(), debugNum);
+                         partDisplay->GetUpdateSuppressorTclName(), debugNum);
       this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         part->GetUpdateSuppressorTclName(), id);
+                         partDisplay->GetUpdateSuppressorTclName(), id);
       this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         part->GetLODMapperTclName(), debugNum);
-      this->RemoteScript(id, "%s SetPiece %d", part->GetLODMapperTclName(), id);
+                         partDisplay->GetLODMapperTclName(), debugNum);
+      this->RemoteScript(id, "%s SetPiece %d", 
+                         partDisplay->GetLODMapperTclName(), id);
       this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         part->GetLODUpdateSuppressorTclName(), debugNum);
+                         partDisplay->GetLODUpdateSuppressorTclName(), debugNum);
       this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         part->GetLODUpdateSuppressorTclName(), id);
+                         partDisplay->GetLODUpdateSuppressorTclName(), id);
       }
     }
 }
