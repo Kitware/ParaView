@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309");
+vtkCxxRevisionMacro(vtkPVSource, "1.310");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1417,7 +1417,7 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
 
-  window->GetAnimationInterface()->Stop();
+  window->GetAnimationInterface()->DeleteSource(this);
 
   if (this->GetPVOutput())
     {  
