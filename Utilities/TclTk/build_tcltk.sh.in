@@ -12,6 +12,9 @@ if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4@TCLTK_DEBUG_EXT@.a -a \
   build_tk=false;
 fi
 
+unset MAKEFLAGS
+unset MAKELEVEL
+
 if [ "x$build_tcl" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
   "@CMAKE_MAKE_PROGRAM@" || exit 1
