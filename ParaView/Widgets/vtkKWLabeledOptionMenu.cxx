@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledOptionMenu);
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.4");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -126,20 +126,14 @@ void vtkKWLabeledOptionMenu::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledOptionMenu::SetEnabled(int e)
+void vtkKWLabeledOptionMenu::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  if (this->OptionMenu)
     {
-    this->OptionMenu->SetEnabled(e);
+    this->OptionMenu->SetEnabled(this->Enabled);
     }
-
-  // Then call superclass, which will call SetEnabled on the label and 
-  // update the internal Enabled ivar (although it is not of much use here)
-
-  this->Superclass::SetEnabled(e);
 }
 
 // ---------------------------------------------------------------------------
