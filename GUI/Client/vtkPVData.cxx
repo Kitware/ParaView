@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.278");
+vtkCxxRevisionMacro(vtkPVData, "1.279");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2813,7 +2813,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << " SetInput 0"
           << endl;
 
-    *file << "  $Ren1 AddDisplay $pvTemp" << partD->GetGeometryID() << endl;
+    *file << "  $Ren1 AddDisplayer $pvTemp" << partD->GetGeometryID() << endl;
     
     if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
                            VTK_PV_OUTLINE_LABEL) )
