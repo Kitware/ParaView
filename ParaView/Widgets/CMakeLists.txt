@@ -50,6 +50,11 @@ vtkKWComposite
 vtkKWView 
 )
 
+IF (WIN32)
+  SOURCE_FILES( KWWidgets_SRCS vtkKWRegisteryUtilities )
+  WRAP_EXCLUDE_FILES(vtkKWRegisteryUtilities)
+ENDIF (WIN32)
+  
 WRAP_EXCLUDE_FILES(kwinit vtktcl)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
