@@ -20,7 +20,7 @@
 #include "vtkXMLDataReader.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.3");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -149,8 +149,6 @@ void vtkXMLPDataReader::ReadXMLInformation()
 int vtkXMLPDataReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
 {
   if(!this->Superclass::ReadPrimaryElement(ePrimary)) { return 0; }
-  vtkDataSet* output = this->GetOutputAsDataSet();
-  
   // Read information about the data.
   if(!ePrimary->GetScalarAttribute("GhostLevel", this->GhostLevel))
     {

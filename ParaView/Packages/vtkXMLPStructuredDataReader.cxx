@@ -21,7 +21,7 @@
 #include "vtkDataSet.h"
 #include "vtkTableExtentTranslator.h"
 
-vtkCxxRevisionMacro(vtkXMLPStructuredDataReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLPStructuredDataReader, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLPStructuredDataReader::vtkXMLPStructuredDataReader()
@@ -180,8 +180,6 @@ int vtkXMLPStructuredDataReader::ReadPieceData()
   vtkDataSet* input = this->GetPieceInputAsDataSet(this->Piece);
   input->SetUpdateExtent(this->SubExtent);
   input->Update();
-  
-  vtkDataSet* output = this->GetOutputAsDataSet();
   
   // Get the actual portion of the piece that was read.
   this->GetPieceInputExtent(this->Piece, this->SubPieceExtent);

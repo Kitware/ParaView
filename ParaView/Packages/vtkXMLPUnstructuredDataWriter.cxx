@@ -19,7 +19,7 @@
 #include "vtkXMLUnstructuredDataWriter.h"
 #include "vtkPointSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPUnstructuredDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPUnstructuredDataWriter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLPUnstructuredDataWriter::vtkXMLPUnstructuredDataWriter()
@@ -51,8 +51,6 @@ vtkPointSet* vtkXMLPUnstructuredDataWriter::GetInputAsPointSet()
 //----------------------------------------------------------------------------
 vtkXMLWriter* vtkXMLPUnstructuredDataWriter::CreatePieceWriter()
 {
-  vtkDataSet* input = this->GetInputAsDataSet();
-  
   vtkXMLUnstructuredDataWriter* pWriter = this->CreateUnstructuredPieceWriter();
   pWriter->SetNumberOfPieces(this->NumberOfPieces);
   pWriter->SetWritePiece(this->Piece);

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkXMLPolyDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPolyDataWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPolyDataWriter);
 
 //----------------------------------------------------------------------------
@@ -137,8 +137,6 @@ void vtkXMLPolyDataWriter::WriteAppendedPieceAttributes(int index)
 //----------------------------------------------------------------------------
 void vtkXMLPolyDataWriter::WriteAppendedPiece(int index, vtkIndent indent)
 {
-  vtkPolyData* input = this->GetInput();
-  
   this->Superclass::WriteAppendedPiece(index, indent);
   
   this->VertsPositions[index] =

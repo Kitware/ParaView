@@ -21,7 +21,7 @@
 #include "vtkXMLImageDataReader.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkXMLPImageDataReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLPImageDataReader, "1.2");
 vtkStandardNewMacro(vtkXMLPImageDataReader);
 
 //----------------------------------------------------------------------------
@@ -92,7 +92,6 @@ void vtkXMLPImageDataReader::GetPieceInputExtent(int index, int* extent)
 int vtkXMLPImageDataReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
 {
   if(!this->Superclass::ReadPrimaryElement(ePrimary)) { return 0; }
-  vtkImageData* output = this->GetOutput();
   
   // Get the image's origin.
   if(ePrimary->GetVectorAttribute("Origin", 3, this->Origin) != 3)
