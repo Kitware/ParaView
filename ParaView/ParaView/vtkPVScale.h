@@ -128,11 +128,17 @@ public:
   // This is used as a script callback in AnimationMenuCallback.
   void SetObjectVariableToPVTime(int time);
   
+  vtkSetMacro(EntryFlag, int);
+  vtkSetMacro(EntryAndLabelOnTopFlag, int);
+  
 protected:
   vtkPVScale();
   ~vtkPVScale();
   
   int RoundValue(float val);
+
+  int EntryFlag;
+  int EntryAndLabelOnTopFlag;
   
   vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;

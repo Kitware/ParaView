@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.27");
+vtkCxxRevisionMacro(vtkPVScale, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -44,6 +44,8 @@ vtkPVScale::vtkPVScale()
   this->Property = 0;
   this->DefaultValue = 0.0;
   this->AcceptedValueInitialized = 0;
+  this->EntryFlag = 0;
+  this->EntryAndLabelOnTopFlag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -126,12 +128,14 @@ float vtkPVScale::GetRangeMax()
 void vtkPVScale::DisplayEntry()
 {
   this->Scale->DisplayEntry();
+  this->EntryFlag = 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScale::SetDisplayEntryAndLabelOnTop(int value)
 {
   this->Scale->SetDisplayEntryAndLabelOnTop(value);
+  this->EntryAndLabelOnTopFlag = value;
 }
 
 //----------------------------------------------------------------------------
@@ -175,6 +179,12 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   this->Scale->Create(this->Application, "-showvalue 1");
   this->Scale->SetCommand(this, "CheckModifiedCallback");
 
+  if (this->EntryFlag)
+    {
+    this->DisplayEntry();
+    }
+  this->SetDisplayEntryAndLabelOnTop(this->EntryAndLabelOnTopFlag);
+  
   this->SetBalloonHelpString(this->BalloonHelpString);
   this->Script("pack %s -side left -fill x -expand t", 
                this->Scale->GetWidgetName());
@@ -295,6 +305,8 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvs->SetResolution(this->Scale->GetResolution());
     pvs->SetLabel(this->EntryLabel);
     pvs->SetRangeSourceVariable(this->RangeSourceVariable);
+    pvs->SetEntryFlag(this->EntryFlag);
+    pvs->SetEntryAndLabelOnTopFlag(this->EntryAndLabelOnTopFlag);
     }
   else 
     {
@@ -371,8 +383,19 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetRangeSourceVariable(range_source);
     }
 
-  return 1;
+  const char* display_entry = element->GetAttribute("display_entry");
+  if (display_entry)
+    {
+    this->EntryFlag = atoi(display_entry);
+    }
   
+  const char* display_top = element->GetAttribute("entry_and_label_on_top");
+  if (display_top)
+    {
+    this->EntryAndLabelOnTopFlag = atoi(display_top);
+    }
+  
+  return 1;  
 }
 
 //----------------------------------------------------------------------------
@@ -380,6 +403,9 @@ void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Round: " << this->Round << endl;
+  os << indent << "EntryFlag: " << this->EntryFlag << endl;
+  os << indent << "EntryAndLabelOnTopFlag: " << this->EntryAndLabelOnTopFlag
+     << endl;
 }
 
 //----------------------------------------------------------------------------
