@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.40");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.41");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -233,7 +233,7 @@ void vtkPVSelectTimeSet::SaveInBatchScript(ofstream *file)
     }
   
   *file << "  [$pvTemp" << sourceID <<  " GetProperty "
-        << this->SMPropertyName << "] SetElement " << this->TimeValue << endl;
+        << this->SMPropertyName << "] SetElements1 " << this->TimeValue << endl;
 }
 
 //-----------------------------------------------------------------------------
