@@ -670,7 +670,7 @@ help="Set the name of the array to hold the results of this computation"/>
       <Input name="Input" class="vtkPolyData" /> 
     </Filter>
   </Module>
-<Module name="DataSetTriangleFilter" menu_name="Tetrehedralize" root_name="Tetra" module_type="Filter" 
+<Module name="DataSetTriangleFilter" menu_name="Tetrahedralize" root_name="Tetra" module_type="Filter" 
         long_help="This filter converts 3-d cells to tetrahedrons and polygons to triangles.  The output is always of type unstructured grid." 
         short_help="Convert to tetrahedrons and triangles.">
   <Filter class="vtkDataSetTriangleFilter">
