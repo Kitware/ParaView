@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVSelectionList.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
-vtkCxxRevisionMacro(vtkPVGlyph3D, "1.74");
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.75");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -94,7 +95,7 @@ void vtkPVGlyph3D::SetGlyphSource(vtkPVData *source)
     {
     source->Register(this);
     pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
-                          source->GetVTKDataTclName());
+                          source->GetPVPart()->GetVTKDataTclName());
     }
   else
     {

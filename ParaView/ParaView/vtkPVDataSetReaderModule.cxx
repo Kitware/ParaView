@@ -43,9 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPDataSetReader.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVDataSetFileEntry.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
@@ -55,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.13");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -172,7 +174,13 @@ int vtkPVDataSetReaderModule::Initialize(const char* fname,
       pvd->Delete();
       return VTK_ERROR;
     }
-  pvd->SetVTKData(d, outputTclName);
+
+  vtkPVPart *part = vtkPVPart::New();
+  part->SetPVApplication(pvApp);
+  part->SetVTKData(d, outputTclName);
+  pvApp->GetProcessModule()->InitializePVPartPartition(part);
+  pvd->SetPVPart(part);
+  part->Delete();
 
   // Connect the source and data.
   pvs->SetPVOutput(pvd);
@@ -180,16 +188,16 @@ int vtkPVDataSetReaderModule::Initialize(const char* fname,
   // outputs, how do we know the method?
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-                         pvd->GetVTKDataTclName());   
+                         pvd->GetPVPart()->GetVTKDataTclName());   
 
   int len;
   if ( this->PrototypeInstanceCount == 0 )
     {
-    len = strlen(tclName)+ 11 + 2 + 10;
+    len = static_cast<int>(static_cast<int>(strlen(tclName)))+ 11 + 2 + 10;
     }
   else
     {
-    len = strlen(tclName) + 11 + 
+    len = static_cast<int>(strlen(tclName)) + 11 + 
       static_cast<int>(
         log10(static_cast<double>(this->PrototypeInstanceCount))) + 
       2 + 10;
@@ -202,7 +210,7 @@ int vtkPVDataSetReaderModule::Initialize(const char* fname,
   pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
                          extentTclName, pvs->GetVTKSourceTclName());
   pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                         pvd->GetVTKDataTclName(), extentTclName);
+                         pvd->GetPVPart()->GetVTKDataTclName(), extentTclName);
   // Hold onto name so it can be deleted.
   pvs->SetExtentTranslatorTclName(extentTclName);
 

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.32");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.33");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -875,11 +875,11 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
     int len;
     if ( i == 0 )
       {
-      len = strlen(tclName)+ strlen("Output") + 3;
+      len = static_cast<int>(strlen(tclName)+ strlen("Output")) + 3;
       }
     else
       {
-      len = strlen(tclName)+ strlen("Output") + 
+      len = static_cast<int>(strlen(tclName)+ strlen("Output")) + 
         static_cast<int>(log10(static_cast<double>(i))) + 3;
       }
     char* outputTclName = new char[len];
@@ -924,7 +924,7 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
       connection->SetParametersParent(
         window->GetMainView()->GetSourceParent());
       connection->SetApplication(pvApp);
-      int len = strlen(tclName)+ 2 + 
+      int len = static_cast<int>(strlen(tclName))+ 2 + 
         static_cast<int>(log10(static_cast<double>(i+1))) + 3;
       connectionTclName = new char[len];
       sprintf(connectionTclName, "%s_%d", tclName, i+1);
@@ -938,11 +938,11 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
       
       if ( i == 0 )
         {
-        len = strlen(connectionTclName)+ strlen("Output") + 3;
+        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 3;
         }
       else
         {
-        len = strlen(connectionTclName)+ strlen("Output") + 
+        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 
           static_cast<int>(log10(static_cast<double>(i))) + 3;
         }
       outputTclName = new char[len];

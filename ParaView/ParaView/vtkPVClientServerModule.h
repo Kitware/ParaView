@@ -55,8 +55,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVClientServerModule_h
 
 #include "vtkPVProcessModule.h"
-class vtkPVData;
+class vtkPVPart;
 class vtkPVApplication;
+class vtkPVDataInformation;
 class vtkMultiProcessController;
 class vtkSocketController;
 class vtkMapper;
@@ -95,12 +96,8 @@ public:
   void RelayScriptRMI(const char *str);
     
   // Description:
-  // Temporary fix because empty VTK objects do not have arrays.
-  // This will create arrays if they exist on other processes.
-  virtual void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
-  void SendCompleteArrays(vtkMapper *mapper);
-  virtual void CompleteArrays(vtkDataSet *data, char *dataTclName);
-  void SendCompleteArrays(vtkDataSet *data);
+  // This method should eventually replace "CompleteArrays" ...
+  virtual void GatherDataInformation(vtkDataSet *data);
 
   // Description:
   // Get the Partition piece. -1 means no partition assigned to this process.
@@ -110,41 +107,10 @@ public:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
   
-  // Description:
-  // Get the bounds of the distributed data.
-  virtual void GetPVDataBounds(vtkPVData *pvd, float bounds[6]);
-
-  // Description:
-  // Get the total number of points across all processes.
-  virtual int GetPVDataNumberOfPoints(vtkPVData *pvd);
-
-  // Description:
-  // Get the total number of cells across all processes.
-  virtual int GetPVDataNumberOfCells(vtkPVData *pvd);
-
-  // Description:
-  // Get the range across all processes of a component of an array.
-  // If the component is -1, then the magnitude range is returned.
-  virtual void GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                                    const char *arrayName, int component, 
-                                    float *range);
-
-
-  // Description:
-  // When ParaView needs to query data on other procs, it needs a way to
-  // get the information back (only VTK object on satellite procs).
-  // These methods send the requested data to proc 0 with a tag of 1966.
-  // Note:  Process 0 returns without sending.
-  // These should probably be consolidated into one GetDataInfo method.
-  void SendDataBounds(vtkDataSet *data);
-  void SendDataNumberOfCells(vtkDataSet *data);
-  void SendDataNumberOfPoints(vtkDataSet *data);
-  void SendDataArrayRange(vtkDataSet *data, int pointDataFlag,
-                          char *arrayName, int component);
 
   // Description:
   // This initializes the data object to request the correct partiaion.
-  virtual void InitializePVDataPartition(vtkPVData *pvd);
+  virtual void InitializePVPartPartition(vtkPVPart *part);
   void InitializePartition(char *tclName, int updateFlag);
 
   // Description:

@@ -45,12 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.3");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.4");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -99,7 +100,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
   vtkPVData* data = window->GetCurrentPVData();
   if (data )
     {
-    float bounds[6];
+    double bounds[6];
     float center[3];
     float dpoint1[3];
     float startpoint[4];
@@ -107,7 +108,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     int cc;
 
     // Get bounds
-    data->GetBounds(bounds);
+    data->GetDataInformation()->GetBounds(bounds);
 
     // Calculate center of bounds.
     for ( cc = 0; cc < 3; cc ++ )

@@ -89,6 +89,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkPolyData.h"
+#include "vtkPVHelpPaths.h"
+#include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVRenderGroupDialog.h"
+#include "vtkPVProcessModule.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -105,7 +110,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.169");
+vtkCxxRevisionMacro(vtkPVApplication, "1.170");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1665,90 +1670,4 @@ void vtkPVApplication::BroadcastSimpleScript(const char *str)
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::GetPVDataBounds(vtkPVData *pvd, float bounds[6])
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return;
-    }
-
-  this->ProcessModule->GetPVDataBounds(pvd, bounds);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVApplication::GetPVDataNumberOfCells(vtkPVData *pvd)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return 0;
-    }
-
-  return this->ProcessModule->GetPVDataNumberOfCells(pvd);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVApplication::GetPVDataNumberOfPoints(vtkPVData *pvd)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return 0;
-    }
-
-  return this->ProcessModule->GetPVDataNumberOfPoints(pvd);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                            const char *arrayName, int component, float *range)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return;
-    }
-
-  this->ProcessModule->GetPVDataArrayComponentRange(pvd, pointDataFlag, 
-                                                arrayName, component, range);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::InitializePVDataPartition(vtkPVData *pvd)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return;
-    }
-
-  this->ProcessModule->InitializePVDataPartition(pvd);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return;
-    }
-
-  this->ProcessModule->CompleteArrays(mapper, mapperTclName);
-}
-//----------------------------------------------------------------------------
-void vtkPVApplication::CompleteArrays(vtkDataSet *data, char *dataTclName)
-{
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("Missing process module.");
-    return;
-    }
-
-  this->ProcessModule->CompleteArrays(data, dataTclName);
-}
 

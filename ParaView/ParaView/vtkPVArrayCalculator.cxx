@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.50");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.51");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -533,13 +534,13 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
-    fd = this->GetPVInput()->GetVTKData()->GetPointData();
+    fd = this->GetPVInput()->GetPVPart()->GetVTKData()->GetPointData();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
-    fd = this->GetPVInput()->GetVTKData()->GetCellData();
+    fd = this->GetPVInput()->GetPVPart()->GetVTKData()->GetCellData();
     }
   
   if (fd)

@@ -17,6 +17,7 @@ vtkPVApplication.cxx
 vtkPVApplicationResources.cxx 
 vtkPVApplicationSettingsInterface.cxx
 vtkPVArrayCalculator.cxx 
+vtkPVArrayInformation.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
@@ -30,6 +31,8 @@ vtkPVContainerWidget.cxx
 vtkPVContour.cxx 
 vtkPVContourEntry.cxx 
 vtkPVData.cxx 
+vtkPVDataInformation.cxx
+vtkPVDataSetAttributesInformation.cxx
 vtkPVDataSetFileEntry.cxx
 vtkPVDataSetReaderModule.cxx
 vtkPVDummyWidget.cxx
@@ -62,6 +65,7 @@ vtkPVMinMax.cxx
 vtkPVMPIProcessModule.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
+vtkPVPart.cxx
 vtkPVPassThrough.cxx
 vtkPVPLOT3DReaderModule.cxx
 vtkPVPivotManipulator.cxx

@@ -58,7 +58,6 @@ class vtkPVSource;
 class vtkPVWindow;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
-class vtkPVData;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -170,13 +169,6 @@ public:
   // macro/script is loaded.
   void StartRecordingScript(char *filename);
   void StopRecordingScript();
-
-  // Description:
-  // Temporary fix because empty VTK objects do not have arrays.
-  // This will create arrays if they exist on other processes.
-  // Get rid of the mapper version of this call !!!!!!!!!!!
-  void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
-  void CompleteArrays(vtkDataSet *data, char *dataTclName);
 
   // Description:
   // Since ParaView has only one window, we might as well provide access to it.
@@ -300,32 +292,6 @@ public:
   // Description:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
-
-  //=============================================================================
-  // Methods that belong in a renderer-process module.
-
-  // Description:
-  // Get the bounds of the distributed data.
-  void GetPVDataBounds(vtkPVData *pvd, float bounds[6]);
-
-  // Description:
-  // Get the total number of points across all processes.
-  int GetPVDataNumberOfPoints(vtkPVData *pvd);
-
-  // Description:
-  // Get the total number of cells across all processes.
-  int GetPVDataNumberOfCells(vtkPVData *pvd);
-
-  // Description:
-  // Get the range across all processes of a component of an array.
-  // If the component is -1, then the magnitude range is returned.
-  void GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                                    const char *arrayName, int component, 
-                                    float *range);
-
-  // Description:
-  // This initializes the data object to request the correct partiaion.
-  void InitializePVDataPartition(vtkPVData *pvd);
 
 protected:
   vtkPVApplication();

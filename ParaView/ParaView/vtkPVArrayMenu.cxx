@@ -44,6 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
+#include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
@@ -57,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.32");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 
@@ -330,16 +334,16 @@ void vtkPVArrayMenu::SetValue(const char* name)
 }
 
 //----------------------------------------------------------------------------
-vtkDataArray *vtkPVArrayMenu::GetVTKArray()
+vtkPVArrayInformation *vtkPVArrayMenu::GetArrayInformation()
 {
-  vtkDataSet *ds;
+  vtkPVData *pvd;
 
   if (this->InputMenu == NULL)
     {
     return NULL;
     }
-  ds = this->InputMenu->GetVTKData();
-  if (ds == NULL)
+  pvd = this->InputMenu->GetPVData();
+  if (pvd == NULL)
     {
     return NULL;
     }
@@ -350,10 +354,10 @@ vtkDataArray *vtkPVArrayMenu::GetVTKArray()
       vtkErrorMacro("We do not handle data object fields yet.");
       return NULL;
     case vtkDataSet::POINT_DATA_FIELD:
-      return ds->GetPointData()->GetArray(this->ArrayName);
+      return pvd->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(this->ArrayName);
       break;
     case vtkDataSet::CELL_DATA_FIELD:
-      return ds->GetCellData()->GetArray(this->ArrayName);
+      return pvd->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(this->ArrayName);
       break;
     }
 
@@ -527,12 +531,12 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 {
   int i, num;
   char methodAndArgs[1024];
-  vtkDataArray *array;
+  vtkPVDataSetAttributesInformation *attrInfo;
+  vtkPVArrayInformation *ai;
   int arrayFound = 0;
   const char *first = NULL;
   const char* attributeName;
-  vtkDataSetAttributes *field;
-  vtkDataSet *ds;
+  vtkPVData *pvd;
 
   attributeName = 
     vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
@@ -556,8 +560,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 
   this->InputMenu->CompleteArrays();
 
-  ds = this->InputMenu->GetVTKData();
-  if (ds == NULL)
+  pvd = this->InputMenu->GetPVData();
+  if (pvd == NULL)
     {
     this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
@@ -565,38 +569,42 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     return;
     }
 
-  switch (this->FieldSelection)
+  if (this->FieldSelection != vtkDataSet::POINT_DATA_FIELD &&
+      this->FieldSelection != vtkDataSet::CELL_DATA_FIELD)
     {
-    case vtkDataSet::POINT_DATA_FIELD:
-      field = ds->GetPointData();
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      field = ds->GetCellData();
-      break;
-    default:
-      vtkErrorMacro("Unknown field type.");
-      return;
+    vtkErrorMacro("Unknown field type.");
+    return;
     }
 
-  num = field->GetNumberOfArrays();
+  // It would be a little more elegant to have AttributeInformation ...
+  if (this->FieldSelection == vtkDataSet::POINT_DATA_FIELD)
+    {
+    attrInfo = pvd->GetDataInformation()->GetPointDataInformation();
+    }
+  else
+    {
+    attrInfo = pvd->GetDataInformation()->GetCellDataInformation();
+    }
+
+  num = attrInfo->GetNumberOfArrays();
   for (i = 0; i < num; ++i)
     {
-    array = field->GetArray(i);
-    // It the array does not have a name, then we can do nothing with it.
-    if (array->GetName())
+    ai = attrInfo->GetArrayInformation(i);
+    // If the array does not have a name, then we can do nothing with it.
+    if (ai->GetName())
       {
       // Match the requested number of componenets.
       if (this->NumberOfComponents <= 0 || this->ShowComponentMenu ||
-          array->GetNumberOfComponents() == this->NumberOfComponents) 
+          ai->GetNumberOfComponents() == this->NumberOfComponents) 
         {
-        sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", array->GetName());
-        this->ArrayMenu->AddEntryWithCommand(array->GetName(), 
+        sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", ai->GetName());
+        this->ArrayMenu->AddEntryWithCommand(ai->GetName(), 
                                       this, methodAndArgs);
         if (first == NULL)
           {
-          first = array->GetName();
+          first = ai->GetName();
           }
-        if (this->ArrayName && strcmp(this->ArrayName, array->GetName()) == 0)
+        if (this->ArrayName && strcmp(this->ArrayName, ai->GetName()) == 0)
           {
           arrayFound = 1;
           }
@@ -609,12 +617,12 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   if (arrayFound == 0)
     { // If the current value is not in the menu, then look for another to use.
     // First look for a default attribute.
-    array = field->GetAttribute(this->AttributeType); 
-    if (array == NULL || array->GetName() == NULL)
+    ai = attrInfo->GetAttributeInformation(this->AttributeType);
+    if (ai == NULL || ai->GetName() == NULL)
       { // lets just use the first in the menu.
       if (first)
         {
-        array = field->GetArray(first); 
+        ai = attrInfo->GetArrayInformation(first);
         }
       else
         {
@@ -627,9 +635,9 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     // In this case, the widget does not match the object.
     this->ModifiedFlag = 1;
 
-    if (array)
+    if (ai)
       {
-      this->SetArrayName(array->GetName());
+      this->SetArrayName(ai->GetName());
       }
 
     // Now set the menu's value.
@@ -648,10 +656,10 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   int i;
   char methodAndArgs[1024];
   char label[124];
-  vtkDataArray *array;
+  vtkPVDataSetAttributesInformation *attrInfo;
+  vtkPVArrayInformation *ai;
   int currentComponent;
-  vtkDataSetAttributes *field;
-  vtkDataSet *ds;
+  vtkPVData *pvd;
 
   if (this->Application == NULL)
     {
@@ -672,8 +680,8 @@ void vtkPVArrayMenu::UpdateComponentMenu()
     vtkErrorMacro("Input menu has not been set.");
     return;
     } 
-  ds = this->InputMenu->GetVTKData();
-  if (ds == NULL)
+  pvd = this->InputMenu->GetPVData();
+  if (pvd == NULL)
     {
     this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
@@ -682,25 +690,28 @@ void vtkPVArrayMenu::UpdateComponentMenu()
     }
 
   // Point or cell data.
-  switch (this->FieldSelection)
+  if (this->FieldSelection != vtkDataSet::POINT_DATA_FIELD &&
+      this->FieldSelection != vtkDataSet::CELL_DATA_FIELD)
     {
-    case vtkDataSet::POINT_DATA_FIELD:
-      field = ds->GetPointData();
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      field = ds->GetCellData();
-      break;
-    default:
-      vtkErrorMacro("Unknown field type.");
-      return;
+    vtkErrorMacro("Unknown field type.");
+    return;
     }
 
-  array = field->GetArray(this->ArrayName);
-  if (array == NULL)
+  if (this->FieldSelection == vtkDataSet::POINT_DATA_FIELD)
+    {
+    attrInfo = pvd->GetDataInformation()->GetPointDataInformation();
+    }
+  else
+    {
+    attrInfo = pvd->GetDataInformation()->GetCellDataInformation();
+    }
+  ai = attrInfo->GetArrayInformation(this->ArrayName);
+
+  if (ai == NULL)
     {
     return;
     }
-  this->ArrayNumberOfComponents = array->GetNumberOfComponents();
+  this->ArrayNumberOfComponents = ai->GetNumberOfComponents();
 
   if ( ! this->ShowComponentMenu || this->ArrayNumberOfComponents == 1)
     {

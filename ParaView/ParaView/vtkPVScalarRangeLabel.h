@@ -77,7 +77,7 @@ public:
 
   // Description:
   // Access to the range values.  This is used in a regression test.
-  vtkGetVector2Macro(Range, float);
+  vtkGetVector2Macro(Range, double);
 
 //BTX
   // Description:
@@ -95,7 +95,7 @@ protected:
   vtkPVArrayMenu *ArrayMenu;
   vtkKWLabel *Label;
 
-  float Range[2];
+  double Range[2];
 
 
 //BTX

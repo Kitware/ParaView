@@ -59,7 +59,7 @@ $kw(vtkTemp509) ColorByProperty
 
 
 set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
-$kw(vtkTemp309) ColorByPointField {Normals}
+$kw(vtkTemp309) ColorByPointField {Normals} 3
 
 
 

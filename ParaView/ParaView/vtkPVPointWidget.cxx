@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -60,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.13");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -100,7 +101,7 @@ vtkPVPointWidget::~vtkPVPointWidget()
 void vtkPVPointWidget::PositionResetCallback()
 {
   vtkPVData *input;
-  float bds[6];
+  double bds[6];
 
   if (this->PVSource == NULL)
     {
@@ -113,7 +114,7 @@ void vtkPVPointWidget::PositionResetCallback()
     {
     return;
     }
-  input->GetBounds(bds);
+  input->GetDataInformation()->GetBounds(bds);
   this->SetPosition(0.5*(bds[0]+bds[1]),
                   0.5*(bds[2]+bds[3]),
                   0.5*(bds[4]+bds[5]));
@@ -277,16 +278,18 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->PositionResetButton->SetCommand(this, "PositionResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
                this->PositionResetButton->GetWidgetName());
+
+  // This appears to be doing nothing.  Take it out !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // Initialize the center of the point based on the input bounds.
-  if (this->PVSource)
-    {
-    vtkPVData *input = this->PVSource->GetPVInput();
-    if (input)
-      {
-      float bds[6];
-      input->GetBounds(bds);
-      }
-    }
+  //if (this->PVSource)
+  //  {
+  //  vtkPVData *input = this->PVSource->GetPVInput();
+  //  if (input)
+  //    {
+  //    float bds[6];
+  //    input->GetBounds(bds);
+  //    }
+  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -318,8 +321,8 @@ void vtkPVPointWidget::ActualPlaceWidget()
 {
   this->Superclass::ActualPlaceWidget();
 
-  float bounds[6];
-  this->PVSource->GetPVInput()->GetBounds(bounds);
+  double bounds[6];
+  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bounds);
 
   this->SetPosition((bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2, 
                     (bounds[4]+bounds[5])/2);

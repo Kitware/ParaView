@@ -47,13 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -145,7 +146,7 @@ void vtkPVBoundsDisplay::Update()
     }
   else
     {
-    input->GetBounds(bds);
+    input->GetDataInformation()->GetBounds(bds);
     }
 
   this->Widget->SetBounds(bds);

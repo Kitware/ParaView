@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 
 class vtkCubeAxesActor2D;
-class vtkDataSet;
 class vtkKWBoundsDisplay;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
@@ -72,10 +71,14 @@ class vtkPVApplication;
 class vtkPVColorMap;
 class vtkPVRenderView;
 class vtkPVSource;
-class vtkPVSource;
-class vtkPolyDataMapper;
-class vtkProp;
-class vtkProperty;
+
+class vtkCollection;
+class vtkDataSet;
+class vtkPVPart;
+class vtkPVDataInformation;
+
+// Try to eliminate this !!!!
+class vtkData;
 
 class VTK_EXPORT vtkPVData : public vtkKWObject
 {
@@ -105,36 +108,15 @@ public:
   // The composite sets this so this data widget will know who owns it.
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource, vtkPVSource);
-  
+
   // Description:
-  // This is for setting up the links between VTK objects and PV object.
-  // This call also sets the input to the mapper.
-  // SetVTKData should be called after the application has been set, but before
-  // PVData is used as input a filter or output of a source.
-  // We could change the object so that it creates its own data (during initialization), 
-  // but then we would have to tell it what type of data to create.
+  // Access to individual parts.
+  void SetPVPart(vtkPVPart *part);
+  vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
+  vtkPVPart *GetPVPart(int idx); 
+  // This will create and set the part.
   void SetVTKData(vtkDataSet *data, const char *name);
-  vtkGetObjectMacro(VTKData,vtkDataSet);  
 
-  // Description:
-  // The tcl name of the vtk data object.  This should be the primary method of 
-  // manipulating the data since it exists on all processes.
-  vtkGetStringMacro(VTKDataTclName);  
-  
-  // Description:
-  // This method collects the bounds from all processes.
-  // It expects the data to be up to date.
-  void GetBounds(float bounds[6]);
-
-  // Description:
-  // This method collects the number of cells from all processes.
-  // It expects the data to be up to date.
-  int GetNumberOfCells();
-  
-  // Description:
-  // This method collects the number of points from all processes.
-  // It expects the data to be up to date.
-  int GetNumberOfPoints();
 
   // Description:
   // Get the number of consumers
@@ -149,6 +131,7 @@ public:
   
   // Description:
   // This methiod updates the piece that has been assinged to this process.
+  // It update all parts and gathers data information.
   void Update();
 
   // Description:
@@ -243,17 +226,11 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-
-  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
   // Description:
   // to change the ambient component of the light
   void AmbientChanged();
   void SetAmbient(float ambient);
-
-  // Description:
-  // Tcl name of the actor across all processes.
-  vtkGetStringMacro(PropTclName);  
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
@@ -332,12 +309,8 @@ public:
   // Description:
   // Callback methods when item chosen from ColorMenu
   void ColorByProperty();
-  void ColorByPointField(const char *name);
-  void ColorByCellField(const char *name);
-
-  // Description:
-  // Get the tcl name of the vtkPVGeometryFilter.
-  vtkGetStringMacro(GeometryTclName);
+  void ColorByPointField(const char *name, int numComps);
+  void ColorByCellField(const char *name, int numComps);
   
   vtkPVRenderView *PVRenderView;
 
@@ -352,12 +325,6 @@ public:
   // Description:
   // Returns true if CreateProperties() has been called.
   vtkGetMacro(PropertiesCreated, int);
-
-  // Description:
-  // This method returns the range of an arrays component.
-  // It gathers range from partitions on all processes.
-  void GetArrayComponentRange(int pointDataFlag, const char *arrayName, 
-                              int component, float *range);
 
   void ForceUpdate(vtkPVApplication* pvApp);
 
@@ -378,13 +345,15 @@ public:
   void SetCollectThreshold(float size);
   vtkGetMacro(CollectThreshold, float)
 
-  //=============================================================== 
   // Description:
-  // These access methods are neede for process module abstraction.
-  vtkGetStringMacro(UpdateSuppressorTclName);
-  vtkGetStringMacro(LODUpdateSuppressorTclName);
-  vtkGetStringMacro(MapperTclName);
-  vtkGetStringMacro(LODMapperTclName);
+  // Moving away from direct access to VTK data objects.
+  vtkPVDataInformation* GetDataInformation() {return this->DataInformation;}
+  
+  // Description:
+  // This method collects data information from all processes.
+  // This needs to be called before this parts information\
+  // is valid.
+  void GatherDataInformation();
 
 
 protected:
@@ -395,8 +364,10 @@ protected:
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is, const char token[1024]);
   
-  vtkDataSet *VTKData;
-  char *VTKDataTclName;
+  int InstanceCount;
+  vtkCollection *PVParts;
+
+  vtkPVDataInformation *DataInformation;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
@@ -412,18 +383,14 @@ protected:
   //==================================================================
   // Internal versions that do not add to the trace.
   void ColorByPropertyInternal();
-  void ColorByPointFieldInternal(const char *name);
-  void ColorByCellFieldInternal(const char *name);
+  void ColorByPointFieldInternal(const char *name, int numComps);
+  void ColorByCellFieldInternal(const char *name, int numComps);
   void SetColorRangeInternal(float min, float max);
   void SetActorColor(float r, float g, float b);
 
   // A flag that helps UpdateProperties determine 
   // whether tho set the default color.
   int ColorSetByUser;
-
-  // Problems with vtkLODActor led me to use these.
-  vtkProperty *Property;
-  vtkProp *Prop;
   
   // Not properties does not mean the same thing as vtk.
   vtkKWFrame *Properties;
@@ -464,42 +431,6 @@ protected:
   // color map "UseCount".
   int Visibility;
     
-  char *PropTclName;
-  vtkSetStringMacro(PropTclName);
-  
-  char *PropertyTclName;
-  vtkSetStringMacro(PropertyTclName);
-  
-  char *MapperTclName;
-  vtkSetStringMacro(MapperTclName);
-
-  char *LODMapperTclName;
-  vtkSetStringMacro(LODMapperTclName);
-  
-  char *LODDeciTclName;
-  vtkSetStringMacro(LODDeciTclName);
-  
-  char *OutlineTclName;
-  vtkSetStringMacro(OutlineTclName);
-  
-  char *GeometryTclName;
-  vtkSetStringMacro(GeometryTclName);
-
-  char *UpdateSuppressorTclName;
-  vtkSetStringMacro(UpdateSuppressorTclName);
-  
-  char *LODUpdateSuppressorTclName;
-  vtkSetStringMacro(LODUpdateSuppressorTclName);
-  
-  char *CollectTclName;
-  vtkSetStringMacro(CollectTclName);
-
-  char *LODCollectTclName;
-  vtkSetStringMacro(LODCollectTclName);
-  
-  // Here to create unique names.
-  int InstanceCount;
-
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
 
@@ -531,8 +462,6 @@ protected:
   float PreviousDiffuse;
   float PreviousSpecular;
   int PreviousWasSolid;
-
-  vtkPolyDataMapper *Mapper;
 
   vtkPVColorMap *PVColorMap;
 

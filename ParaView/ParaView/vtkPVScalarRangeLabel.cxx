@@ -49,12 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.12");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -106,9 +108,7 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 void vtkPVScalarRangeLabel::Update()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVInputMenu *inputMenu;
-  vtkPVData *pvd;
-  vtkDataArray *array;
+  vtkPVArrayInformation *ai;
 
   if (this->ArrayMenu == NULL)
     {
@@ -116,8 +116,8 @@ void vtkPVScalarRangeLabel::Update()
     return;
     }
 
-  array = this->ArrayMenu->GetVTKArray();
-  if (array == NULL || array->GetName() == NULL)
+  ai = this->ArrayMenu->GetArrayInformation();
+  if (ai == NULL || ai->GetName() == NULL)
     {
     this->Range[0] = VTK_LARGE_FLOAT;
     this->Range[1] = -VTK_LARGE_FLOAT;
@@ -125,22 +125,7 @@ void vtkPVScalarRangeLabel::Update()
     return;
     }
 
-  inputMenu = this->ArrayMenu->GetInputMenu();
-  if (inputMenu == NULL)
-    {
-    vtkErrorMacro("Could not find input menu.");
-    return;
-    }
-
-  pvd = inputMenu->GetPVData();
-  if (pvd == NULL)
-    {
-    vtkErrorMacro("Could not find PVData.");
-    return;
-    }
-
-  pvApp->GetPVDataArrayComponentRange(pvd, 1, array->GetName(), 0, 
-                                      this->Range);
+  ai->GetComponentRange(0, this->Range);
 
   char str[512];
   if (this->Range[0] > this->Range[1])

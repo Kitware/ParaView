@@ -121,9 +121,10 @@ public:
   // so the menu can be used more naturally.
   vtkPVData* GetPVData();
 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!
   // Description:
   // Get the vtk data set of the current value.
-  vtkDataSet* GetVTKData();
+  //vtkDataSet* GetVTKData();
 
   // Description:
   // Menu callback when an item is selected.

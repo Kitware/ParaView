@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
@@ -60,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.17");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -107,7 +108,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
 void vtkPVSphereWidget::CenterResetCallback()
 {
   vtkPVData *input;
-  float bds[6];
+  double bds[6];
 
   if (this->PVSource == NULL)
     {
@@ -120,7 +121,7 @@ void vtkPVSphereWidget::CenterResetCallback()
     {
     return;
     }
-  input->GetBounds(bds);
+  input->GetDataInformation()->GetBounds(bds);
   this->SetCenter(0.5*(bds[0]+bds[1]),
                   0.5*(bds[2]+bds[3]),
                   0.5*(bds[4]+bds[5]));
@@ -374,8 +375,8 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     vtkPVData *input = this->PVSource->GetPVInput();
     if (input)
       {
-      float bds[6];
-      input->GetBounds(bds);
+      double bds[6];
+      input->GetDataInformation()->GetBounds(bds);
       pvApp->BroadcastScript("%s SetCenter %f %f %f", sphereTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));

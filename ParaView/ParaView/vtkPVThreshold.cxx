@@ -50,6 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVPart.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVMinMax.h"
 #include "vtkPVWindow.h"
@@ -59,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.51");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.52");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -130,11 +134,14 @@ void vtkPVThreshold::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  vtkDataArray* scalars =
-    this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars();
-  if (scalars)
+
+  // Well ... I do not know why we need a special PV object for threshold.
+  // Get rid of this special object !!!!!!!!!!!!!!!!!
+  vtkPVArrayInformation *ai;
+  ai = this->GetPVInput()->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  if (ai)
     {
-    scalars->GetRange(range);
+    ai->GetComponentRange(0,range);
     }
   else
     {
@@ -199,33 +206,24 @@ void vtkPVThreshold::UpdateMinMaxScale()
   vtkPVData* input = this->GetPVInput();
   if (input)
     {
-    vtkDataSet* thresholdInput = input->GetVTKData();
-    vtkDataArray* scalars=0;
     int pointDataFlag = 0;
+    vtkPVArrayInformation *scalarInfo = NULL;
     
     mode = this->AttributeModeMenu->GetValue();
     if (mode && strcmp(mode, "Point Data") == 0)
       {
-      scalars = thresholdInput->GetPointData()->GetScalars();
+      scalarInfo = input->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
       pointDataFlag=1;
       }
     else if (mode && strcmp(mode, "Cell Data") == 0)
       {
-      scalars = thresholdInput->GetCellData()->GetScalars();
+      scalarInfo = input->GetDataInformation()->GetCellDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
       pointDataFlag=0;
       }
     
-    if (scalars)
+    if (scalarInfo)
       {
-      const char* name = scalars->GetName();
-      if (name)
-        {
-        input->GetArrayComponentRange(pointDataFlag, name, 0, range);
-        }
-      else
-        {
-        scalars->GetRange(range, 0);
-        }
+      scalarInfo->GetComponentRange(0, range);
       }
     }
 

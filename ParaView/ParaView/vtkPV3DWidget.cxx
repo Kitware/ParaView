@@ -49,13 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.29");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.30");
 
 //===========================================================================
 //***************************************************************************
@@ -290,11 +292,11 @@ void vtkPV3DWidget::ActualPlaceWidget()
   vtkDataSet* data = 0;
   if ( this->PVSource->GetPVInput() )
     {
-    data = this->PVSource->GetPVInput()->GetVTKData();
+    data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
     }
   this->Widget3D->SetInput(data);
   float bounds[6];
-  this->PVSource->GetPVInput()->GetBounds(bounds);
+  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bounds);
   this->Widget3D->PlaceWidget(bounds);
 }
 
@@ -304,7 +306,7 @@ void vtkPV3DWidget::PlaceWidget()
   vtkDataSet* data = 0;
   if ( this->PVSource->GetPVInput() )
     {
-    data = this->PVSource->GetPVInput()->GetVTKData();
+    data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
     }
   if (!this->Placed || data != this->Widget3D->GetInput())
     {

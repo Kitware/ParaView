@@ -82,7 +82,7 @@ for {set i 0} {$i < $num} {incr i 1} {
 # Rotate isosuface
 AdjustContourValue $cInt 0.3
 
-$cntOutput ColorByPointField Momentum
+$cntOutput ColorByPointField Momentum 3
 $cntOutput SetScalarBarVisibility 1
 $cInt UpdateParameterWidgets
 
@@ -125,7 +125,7 @@ $pvExtract AcceptCallback
 RenWin1 Render
 
 set extOutput [$pvExtract GetPVOutput]
-$extOutput ColorByPointField {Density}
+$extOutput ColorByPointField {Density} 1
 $extOutput SetScalarBarVisibility 1
 
 for {set i 55} {$i < 56} {incr i 1} {

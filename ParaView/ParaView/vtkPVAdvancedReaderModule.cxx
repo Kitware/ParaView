@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkString.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.8");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -121,7 +122,7 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
     }
 
   this->Script("%s UpdateInformation", 
-               this->GetPVOutput()->GetVTKDataTclName());
+               this->GetPVOutput()->GetPVPart()->GetVTKDataTclName());
 
   // We called UpdateInformation, we need to update the widgets.
   vtkPVWidget *pvw;

@@ -60,6 +60,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -71,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.40");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.41");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1392,24 +1395,33 @@ void vtkPVColorMap::ResetScalarRange()
     {
     pvd = pvs->GetPVOutput();
     // For point data ...
-    pvd->GetArrayComponentRange(1, this->ArrayName, component, tmp);
-    if (tmp[0] < range[0])
+    vtkPVArrayInformation *ai;
+    ai = pvd->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(this->ArrayName);
+    if (ai)
       {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
+      ai->GetComponentRange(component, tmp);
+      if (tmp[0] < range[0])
+        {
+        range[0] = tmp[0];
+        }
+      if (tmp[1] > range[1])
+        {
+        range[1] = tmp[1];
+        }
       }
     // For cell data ...
-    pvd->GetArrayComponentRange(0, this->ArrayName, component, tmp);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
+    ai = pvd->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(this->ArrayName);
+    if (ai)
+      {  
+      ai->GetComponentRange(component, tmp);
+      if (tmp[0] < range[0])
+        {
+        range[0] = tmp[0];
+        }
+      if (tmp[1] > range[1])
+        {
+        range[1] = tmp[1];
+        }
       }
     }
 

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkDummyController.h"
 #include "vtkPVApplication.h"
+#include "vtkPVDataInformation.h"
 #include "vtkDataSet.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
@@ -58,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
 #include "vtkString.h"
-#include "vtkPVData.h"
+#include "vtkPVPart.h"
 
 
 
@@ -72,7 +73,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.2");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.3");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -81,7 +82,8 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
-  this->Controller = NULL;  
+  this->Controller = NULL;
+  this->TemporaryInformation;  
 }
 
 //----------------------------------------------------------------------------
@@ -229,11 +231,6 @@ void vtkPVProcessModule::RemoteSimpleScript(int remoteId, const char *str)
   }
 
 
-
-
-
-
-
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetNumberOfPartitions()
 { 
@@ -241,73 +238,31 @@ int vtkPVProcessModule::GetNumberOfPartitions()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::GetPVDataBounds(vtkPVData *pvd, float bounds[6])
-{
-  vtkDataSet *ds = pvd->GetVTKData();
 
-  ds->GetBounds(bounds);
-}
 
 //----------------------------------------------------------------------------
-int vtkPVProcessModule::GetPVDataNumberOfCells(vtkPVData *pvd)
+void vtkPVProcessModule::GatherDataInformation(vtkPVDataInformation* info, 
+                                               char *dataTclName)
 {
-  vtkDataSet *ds = pvd->GetVTKData();
-
-  return ds->GetNumberOfCells();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::GetPVDataNumberOfPoints(vtkPVData *pvd)
-{
-  vtkDataSet *ds = pvd->GetVTKData();
-
-  return ds->GetNumberOfPoints();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                            const char *arrayName, int component, float *range)
-{
-  vtkDataArray *array;
-
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
-
-  if (pointDataFlag)
-    {
-    array = pvd->GetVTKData()->GetPointData()->GetArray(arrayName);
-    }
-  else
-    {
-    array = pvd->GetVTKData()->GetCellData()->GetArray(arrayName);
-    }
-
-  if (array == NULL || array->GetName() == NULL)
-    {
-    return;
-    }
-
-  array->GetRange(range, component);  
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
-{
-  mapper = mapper;
-  mapperTclName = mapperTclName;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::CompleteArrays(vtkDataSet *data, char *dataTclName)
-{
-  data = data;
-  dataTclName = dataTclName;
+  // This ivar is so temprary, we do not need to increase the reference count.
+  this->TemporaryInformation = info;
+  this->BroadcastScript("[$Application GetProcessModule] GatherDataInformation %s",
+                        dataTclName); 
+  this->TemporaryInformation = NULL; 
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::InitializePVDataPartition(vtkPVData *pvd)
+void vtkPVProcessModule::GatherDataInformation(vtkDataSet *data)
+{
+  this->TemporaryInformation->CopyFromData(data);
+}
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InitializePVPartPartition(vtkPVPart *part)
 {
   int numProcs = 1;
 
@@ -316,19 +271,19 @@ void vtkPVProcessModule::InitializePVDataPartition(vtkPVData *pvd)
     numProcs = 2;
     }
   this->Script("%s SetNumberOfPieces %d",
-               pvd->GetMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", pvd->GetMapperTclName(), 0);
+               part->GetMapperTclName(), numProcs);
+  this->Script("%s SetPiece %d", part->GetMapperTclName(), 0);
   this->Script("%s SetUpdateNumberOfPieces %d",
-               pvd->GetUpdateSuppressorTclName(), numProcs);
+               part->GetUpdateSuppressorTclName(), numProcs);
   this->Script("%s SetUpdatePiece %d", 
-               pvd->GetUpdateSuppressorTclName(), 0);
+               part->GetUpdateSuppressorTclName(), 0);
   this->Script("%s SetNumberOfPieces %d",
-               pvd->GetLODMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", pvd->GetLODMapperTclName(), 0);
+               part->GetLODMapperTclName(), numProcs);
+  this->Script("%s SetPiece %d", part->GetLODMapperTclName(), 0);
   this->Script("%s SetUpdateNumberOfPieces %d",
-               pvd->GetLODUpdateSuppressorTclName(), numProcs);
+               part->GetLODUpdateSuppressorTclName(), numProcs);
   this->Script("%s SetUpdatePiece %d", 
-               pvd->GetLODUpdateSuppressorTclName(), 0);
+               part->GetLODUpdateSuppressorTclName(), 0);
 }
 
 //----------------------------------------------------------------------------

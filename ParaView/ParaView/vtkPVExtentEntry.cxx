@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
 #include "vtkPVSource.h"
@@ -59,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.13");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -114,7 +115,7 @@ void vtkPVExtentEntry::Update()
     {
     this->Script("eval %s SetRange [%s GetWholeExtent]",
                  this->GetTclName(),
-                 input->GetVTKDataTclName());
+                 input->GetPVPart()->GetVTKDataTclName());
     }
 
 }
@@ -222,11 +223,11 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->Script("eval %s Set%s [%s GetWholeExtent]",
                  this->PVSource->GetVTKSourceTclName(), 
                  this->GetVariableName(),
-                 this->PVSource->GetPVInput()->GetVTKDataTclName());
+                 this->PVSource->GetPVInput()->GetPVPart()->GetVTKDataTclName());
 
     this->Script("eval %s SetRange [%s GetWholeExtent]",
                  this->GetTclName(),
-                 this->PVSource->GetPVInput()->GetVTKDataTclName());
+                 this->PVSource->GetPVInput()->GetPVPart()->GetVTKDataTclName());
     }
 
   for(i=0; i<3; i++)

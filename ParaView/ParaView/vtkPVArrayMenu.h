@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVInputMenu;
 class vtkCollection;
 class vtkDataArray;
+class vtkPVArrayInformation;
 class vtkKWOptionMenu;
 class vtkKWLabel;
 class vtkPVInputMenu;
@@ -158,7 +159,7 @@ public:
 
   // Description:
   // A convenience method that reutrns the VTK array selected.
-  vtkDataArray *GetVTKArray();
+  vtkPVArrayInformation *GetArrayInformation();
 
   // Description:
   // This is the number of components the selected array has.

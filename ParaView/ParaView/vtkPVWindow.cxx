@@ -75,10 +75,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPart.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -124,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.403");
+vtkCxxRevisionMacro(vtkPVWindow, "1.404");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1324,8 +1326,8 @@ void vtkPVWindow::ResetCenterCallback()
     return;
     }
   
-  float bounds[6];
-  this->CurrentPVData->GetBounds(bounds);
+  double bounds[6];
+  this->CurrentPVData->GetDataInformation()->GetBounds(bounds);
 
   float center[3];
   center[0] = (bounds[0]+bounds[1])/2.0;
@@ -2083,7 +2085,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
       msg << " serial writing of ";
       }
     
-    msg << this->GetCurrentPVData()->GetVTKData()->GetClassName()
+    msg << this->GetCurrentPVData()->GetDataInformation()->GetDataSetTypeAsString()
         << " to file with name \"" << filename << "\"" << ends;
     
     if (this->UseMessageDialog)
@@ -2106,7 +2108,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                        filename, ghostLevel);
   
   // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVData()->GetVTKDataTclName(),
+  writer->Write(filename, this->GetCurrentPVData()->GetPVPart()->GetVTKDataTclName(),
                 numParts, ghostLevel);
 }
 
@@ -2122,7 +2124,7 @@ void vtkPVWindow::WriteData()
       vtkKWMessageDialog::ErrorIcon);
     return;
     }
-  vtkDataSet* data = this->GetCurrentPVData()->GetVTKData();  
+  vtkDataSet* data = this->GetCurrentPVData()->GetPVPart()->GetVTKData();  
 
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -2168,7 +2170,7 @@ void vtkPVWindow::WriteData()
       msg << " serial writing of ";
       }
     
-    msg << this->GetCurrentPVData()->GetVTKData()->GetClassName()
+    msg << this->GetCurrentPVData()->GetDataInformation()->GetDataSetTypeAsString()
         << "." << ends;
 
     vtkKWMessageDialog::PopupMessage(
@@ -2238,7 +2240,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
   
-  vtkDataSet* data = this->GetCurrentPVData()->GetVTKData();  
+  vtkDataSet* data = this->GetCurrentPVData()->GetPVPart()->GetVTKData();  
   vtkLinkedListIterator<vtkPVWriter*>* it =
     this->FileWriterList->NewIterator();
   while(!it->IsDoneWithTraversal())
@@ -3137,7 +3139,7 @@ vtkPVSource *vtkPVWindow::ExtractGridCallback()
     return NULL;
     }
 
-  int type = this->CurrentPVData->GetVTKData()->GetDataObjectType();
+  int type = this->CurrentPVData->GetDataInformation()->GetDataSetType();
   if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS)
     {
     return this->CreatePVSource("ExtractVOI"); 
@@ -3830,7 +3832,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.403 $");
+  this->ExtractRevision(os,"$Revision: 1.404 $");
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPLOT3DReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectionList.h"
@@ -59,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.9");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -181,7 +183,18 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   
       pvd = vtkPVData::New();
       pvd->SetPVApplication(pvApp);
-      pvd->SetVTKData(d, outputTclName);
+
+      int LODRes = this->GetPVRenderView()->GetLODResolution();
+      vtkPVPart *part = vtkPVPart::New();
+      part->SetPVApplication(pvApp);
+      part->SetVTKData(d, outputTclName);
+      pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                             part->GetLODDeciTclName(), 
+                             LODRes, LODRes, LODRes); 
+      pvApp->GetProcessModule()->InitializePVPartPartition(part);
+      pvd->SetPVPart(part);
+      part->Delete();
+
       this->SetPVOutput(i, pvd);
       
       if (numOutputs <= 1)
@@ -224,7 +237,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
                                this->ExtentTranslatorTclName);
 
 
-        int len = strlen(tclName)+ 2 + 
+        int len = static_cast<int>(strlen(tclName))+ 2 + 
           static_cast<int>(log10(static_cast<double>(i+1))) + 3;
         connectionTclName = new char[len];
         sprintf(connectionTclName, "%s_%d", tclName, i+1);
@@ -238,12 +251,12 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         
         if ( i == 0 )
           {
-          len = strlen(connectionTclName)+ strlen("Output") + 3;
+          len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 3;
           }
         else
           {
-          len = strlen(connectionTclName)+ strlen("Output") + 
-            static_cast<int>(log10(static_cast<double>(i))) + 3;
+          len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 
+                static_cast<int>(log10(static_cast<double>(i))) + 3;
           }
         outputTclName = new char[len];
         sprintf(outputTclName, "%sOutput%d", connectionTclName, i);
@@ -252,7 +265,13 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         
         connectionOutput = vtkPVData::New();
         connectionOutput->SetPVApplication(pvApp);
-        connectionOutput->SetVTKData(d, outputTclName);
+
+        vtkPVPart *part = vtkPVPart::New();
+        part->SetPVApplication(pvApp);
+        part->SetVTKData(d, outputTclName);
+        pvApp->GetProcessModule()->InitializePVPartPartition(part);
+        connectionOutput->SetPVPart(part);
+        part->Delete();
         connection->SetPVOutput(connectionOutput);
         
         connection->CreateProperties();

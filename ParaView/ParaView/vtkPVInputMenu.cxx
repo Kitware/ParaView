@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVPart.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
@@ -56,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.36");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
@@ -182,7 +184,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     }
 
   if (this->InputType == NULL || 
-      ! pvs->GetPVOutput()->GetVTKData()->IsA(this->InputType))
+      ! pvs->GetPVOutput()->GetDataInformation()->DataSetTypeIsA(this->InputType))
     {
     return 0;
     }
@@ -280,17 +282,18 @@ vtkPVData *vtkPVInputMenu::GetPVData()
   return pvs->GetPVOutput();
 }
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //----------------------------------------------------------------------------
-vtkDataSet *vtkPVInputMenu::GetVTKData()
-{
-  vtkPVSource *pvs = this->GetCurrentValue();
-
-  if (pvs == NULL)
-    {
-    return NULL;
-    }
-  return pvs->GetPVOutput()->GetVTKData();
-}
+//vtkDataSet *vtkPVInputMenu::GetVTKData()
+//{
+//  vtkPVSource *pvs = this->GetCurrentValue();
+//
+//  if (pvs == NULL)
+//    {
+//    return NULL;
+//    }
+//  return pvs->GetPVOutput()->GetPVPart()->GetVTKData();
+//}
 
 
 //----------------------------------------------------------------------------
@@ -494,21 +497,21 @@ void vtkPVInputMenu::ClearEntries()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::CompleteArrays()
 {
-  vtkPVSource* pvs = this->GetCurrentValue();
-  vtkDataSet*  data;
+  vtkPVSource* pvs;
+  vtkPVData*  pvd;
 
+  pvs = this->GetCurrentValue();
   if (pvs == NULL)
     {
     return;
     }
-  data = pvs->GetPVOutput()->GetVTKData();
-  if (data == NULL)
+  pvd = pvs->GetPVOutput();
+  if (pvd == NULL)
     {
     return;
     }
 
-  this->GetPVApplication()->CompleteArrays(data, 
-                      pvs->GetPVOutput()->GetVTKDataTclName());
+  pvd->GatherDataInformation();
 }
 
 

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
+#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
@@ -65,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.83");
+vtkCxxRevisionMacro(vtkPVProbe, "1.84");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -152,7 +153,7 @@ void vtkPVProbe::SetPVInput(vtkPVData *pvd)
   // This fits the interface better and was necessary for the
   // rather inflexible vtkPVArrayMenu.
   pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
-                         pvd->GetVTKDataTclName());
+                         pvd->GetPVPart()->GetVTKDataTclName());
 }
 
 
@@ -278,7 +279,7 @@ void vtkPVProbe::AcceptCallbackInternal()
   
   int error;
   vtkPolyData *probeOutput = (vtkPolyData *)
-    (vtkTclGetPointerFromObject(this->GetNthPVOutput(0)->GetVTKDataTclName(),
+    (vtkTclGetPointerFromObject(this->GetPVOutput()->GetPVPart()->GetVTKDataTclName(),
                                 "vtkPolyData", pvApp->GetMainInterp(),
                                 error));
 
@@ -361,7 +362,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       {
       array = pd->GetArray(i);
       arrayName = array->GetName();
-      xyp->AddInput(this->GetPVOutput()->GetVTKData(), arrayName, component);
+      xyp->AddInput(this->GetPVOutput()->GetPVPart()->GetVTKData(), arrayName, component);
       xyp->SetPlotLabel(i, arrayName);
       float r, g, b;
       this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
@@ -375,7 +376,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       sprintf(tmp, "Point %s", arrayName);
       this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
       }
-    this->GetPVOutput()->ColorByPointField(arrayName);
+    this->GetPVOutput()->ColorByPointField(arrayName, array->GetNumberOfComponents());
     
     if ( numArrays > 1 )
       {

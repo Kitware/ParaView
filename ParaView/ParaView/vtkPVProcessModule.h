@@ -50,8 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 class vtkMultiProcessController;
-class vtkPVData;
+class vtkPVPart;
 class vtkPVApplication;
+class vtkPVDataInformation;
 class vtkMapper;
 class vtkDataSet;
 
@@ -94,13 +95,18 @@ public:
   // Description:
   // The controller is needed for filter that communicate internally.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  
-  // Description:
-  // Temporary fix because empty VTK objects do not have arrays.
-  // This will create arrays if they exist on other processes.
-  virtual void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
-  virtual void CompleteArrays(vtkDataSet *data, char *dataTclName);
 
+  // Description:
+  // This should evenetually replace "CompleteArrays" ...
+  // User calls the first method passing info object.
+  // Second method gets broadcasted to all procs.
+  // I dislike this, but the info get temporarily stored as an ivar.
+  // If vtkPVPart existed on all processes, 
+  // it would make this method cleaner.
+  void GatherDataInformation(vtkPVDataInformation *info, 
+                             char *dataTclName);
+  virtual void GatherDataInformation(vtkDataSet *data);
+  
   // Description:
   // Get the partition piece.  -1 means no assigned piece.
   virtual int GetPartitionId();
@@ -110,33 +116,15 @@ public:
   virtual int GetNumberOfPartitions();
   
   // Description:
-  // Get the bounds of the distributed data.
-  virtual void GetPVDataBounds(vtkPVData *pvd, float bounds[6]);
-
-  // Description:
-  // Get the total number of points across all processes.
-  virtual int GetPVDataNumberOfPoints(vtkPVData *pvd);
-
-  // Description:
-  // Get the total number of cells across all processes.
-  virtual int GetPVDataNumberOfCells(vtkPVData *pvd);
-
-  // Description:
-  // Get the range across all processes of a component of an array.
-  // If the component is -1, then the magnitude range is returned.
-  virtual void GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                                           const char *arrayName, int component, 
-                                           float *range);
-
-  // Description:
   // This initializes the data object to request the correct partiaion.
-  virtual void InitializePVDataPartition(vtkPVData *pvd);
+  virtual void InitializePVPartPartition(vtkPVPart* part);
 
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
   vtkMultiProcessController *Controller;
+  vtkPVDataInformation *TemporaryInformation;
 
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

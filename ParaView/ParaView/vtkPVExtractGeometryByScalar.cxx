@@ -49,11 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVComponentSelection.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVPart.h"
 #include "vtkPVWindow.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.7");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.8");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
@@ -87,8 +91,17 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   select->SetObjectVariable(this->VTKSourceTclName, "Value");
   
   float range[2];
-  this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars()->
-    GetRange(range);
+  vtkPVArrayInformation *ai;
+  ai = this->GetPVInput()->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  if (ai)
+    {
+    ai->GetComponentRange(0, range);
+    }
+  else
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
   select->SetNumberOfComponents((int)range[1]);
   select->Create(pvApp);
   select->SetTraceName("ComponentSelect");

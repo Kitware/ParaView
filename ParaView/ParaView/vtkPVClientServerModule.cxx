@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSocketCommunicator.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSet.h"
+#include "vtkPVDataInformation.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
@@ -66,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
-#include "vtkPVData.h"
+#include "vtkPVPart.h"
 
 #define VTK_PV_BROADCAST_SCRIPT_RMI_TAG      838422
 #define VTK_PV_REMOTE_SCRIPT_RMI_TAG         838427
@@ -112,7 +113,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.8");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.9");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -509,946 +510,79 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::GetPVDataBounds(vtkPVData *pvd, float bounds[6])
-{
-  if ( ! this->ClientMode)
-    {
-    vtkErrorMacro("Not expecting this call an the server.");
-    return;
-    }
 
-  this->BroadcastScript("[$Application GetProcessModule] SendDataBounds %s", 
-                        pvd->GetVTKDataTclName());
-
-  this->SocketController->Receive(bounds, 6, 1, 1967);
-}
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendDataBounds(vtkDataSet *data)
+// This method is broadcast to all processes.
+void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
 {
-  float bounds[6];
-  
+  int length;
+  unsigned char *msg;
+
   if (this->ClientMode)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() > 0)
-    {
-    data->GetBounds(bounds);
-    this->Controller->Send(bounds, 6, 0, 1967);
-    return;
-    }
-
-  // Only process 0 of the server gets to this point.
-  int num, id;
-  float tmp[6];
-
-  data->GetBounds(bounds);
-  num = this->Controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    this->Controller->Receive(tmp, 6, id, 1967);
-    if (tmp[0] < bounds[0])
-      {
-      bounds[0] = tmp[0];
-      }
-    if (tmp[1] > bounds[1])
-      {
-      bounds[1] = tmp[1];
-      }
-    if (tmp[2] < bounds[2])
-      {
-      bounds[2] = tmp[2];
-      }
-    if (tmp[3] > bounds[3])
-      {
-      bounds[3] = tmp[3];
-      }
-    if (tmp[4] < bounds[4])
-      {
-      bounds[4] = tmp[4];
-      }
-    if (tmp[5] > bounds[5])
-      {
-      bounds[5] = tmp[5];
-      }
-    }
-  
-  // Now send the results back to the client.
-  this->SocketController->Send(bounds, 6, 1, 1967);
-}
-
-
-
-
-//----------------------------------------------------------------------------
-int vtkPVClientServerModule::GetPVDataNumberOfCells(vtkPVData *pvd)
-{
-  int numCells;
-
-  if ( ! this->ClientMode)
-    {
-    vtkErrorMacro("Not expecting this call an the server.");
-    return 0;
-    }
-
-  this->BroadcastScript("[$Application GetProcessModule] SendDataNumberOfCells %s", 
-                        pvd->GetVTKDataTclName());
-
-  this->SocketController->Receive(&numCells, 1, 1, 1968);
-  return numCells;
-}
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendDataNumberOfCells(vtkDataSet *data)
-{
-  int numCells = 0;
-  
-  if (this->ClientMode)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() > 0)
-    {
-    numCells = data->GetNumberOfCells();
-    this->Controller->Send(&numCells, 1, 0, 1968);
-    return;
-    }
-
-  // Only process 0 of the server gets to this point.
-  int num, id;
-  int tmp = 0;
-
-  numCells = data->GetNumberOfCells();
-  num = this->Controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    this->Controller->Receive(&tmp, 1, id, 1968);
-    numCells += tmp;
-    }
-  
-  // Now send the results back to the client.
-  this->SocketController->Send(&numCells, 1, 1, 1968);
-}
-
-
-
-//----------------------------------------------------------------------------
-int vtkPVClientServerModule::GetPVDataNumberOfPoints(vtkPVData *pvd)
-{
-  int numPoints;
-
-  if ( ! this->ClientMode)
-    {
-    vtkErrorMacro("Not expecting this call an the server.");
-    return 0;
-    }
-
-  this->BroadcastScript("[$Application GetProcessModule] SendDataNumberOfPoints %s", 
-                        pvd->GetVTKDataTclName());
-
-  this->SocketController->Receive(&numPoints, 1, 1, 1969);
-  return numPoints;
-}
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendDataNumberOfPoints(vtkDataSet *data)
-{
-  int numPoints = 0;
-  
-  if (this->ClientMode)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() > 0)
-    {
-    numPoints = data->GetNumberOfPoints();
-    this->Controller->Send(&numPoints, 1, 0, 1969);
-    return;
-    }
-
-  // Only process 0 of the server gets to this point.
-  int num, id;
-  int tmp = 0;
-
-  numPoints = data->GetNumberOfPoints();
-  num = this->Controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    this->Controller->Receive(&tmp, 1, id, 1969);
-    numPoints += tmp;
-    }
-  
-  // Now send the results back to the client.
-  this->SocketController->Send(&numPoints, 1, 1, 1969);
-}
-
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
-                            const char *arrayName, int component, float *range)
-{
-  if ( ! this->ClientMode)
-    {
-    vtkErrorMacro("Not expecting this call an the server.");
-    return;
-    }
-
-  this->BroadcastScript("[$Application GetProcessModule] SendDataArrayRange %s %d {%s} %d",
-                         pvd->GetVTKDataTclName(),
-                         pointDataFlag, arrayName, component);
-
-  this->SocketController->Receive(range, 2, 1, 1970);
-}
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendDataArrayRange(vtkDataSet *data, 
-                                                 int pointDataFlag, 
-                                                 char *arrayName,
-                                                 int component)
-{
-  float range[2];
-  vtkDataArray *array;
-  
-  if (this->ClientMode)
-    {
-    return;
-    }
-
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
-
-  if (pointDataFlag)
-    {
-    array = data->GetPointData()->GetArray(arrayName);
-    }
-  else
-    {
-    array = data->GetCellData()->GetArray(arrayName);
-    }
-  if (array)
-    {
-    array->GetRange(range, component);  
-    }
-
-  if (this->Controller->GetLocalProcessId() > 0)
-    {
-    this->Controller->Send(range, 2, 0, 1970);
-    return;
-    }
-
-  // Only process 0 of the server gets to this point.
-  int num, id;
-  float tmp[2];
-
-  num = this->Controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    this->Controller->Receive(tmp, 2, id, 1970);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
-      }
-    }
-  
-  // Now send the results back to the client.
-  this->SocketController->Send(range, 2, 1, 1970);
-}
-
-
-
-
-
-
-
-//----------------------------------------------------------------------------
-// Ask for one process to return a listing of arrays.
-// This method is designed to use BroadcastScript 
-// instead of RemoteScript.
-void vtkPVClientServerModule::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
-{
-  int j;
-  int activeAttributes[5];
-
-  if (mapper->GetInput() == NULL || this->Controller == NULL)
-    {
-    return;
-    }
-  if (mapper->GetInput()->GetNumberOfPoints() > 0)
-    {
-    return;
-    }
-
-  this->BroadcastScript("[$Application GetProcessModule] SendCompleteArrays %s", mapperTclName);
-
-  int num = 0;
-  vtkDataArray *array = 0;
-  char *name;
-  int nameLength = 0;
-  int type = 0;
-  int numComps = 0;
-      
-  // First Point data.
-  mapper->GetInput()->GetPointData()->Initialize();
-  this->SocketController->Receive(&num, 1, 1, 987244);
-  for (j = 0; j < num; ++j)
-    {
-    this->SocketController->Receive(&type, 1, 1, 987245);
-    switch (type)
-      {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      }
-    this->SocketController->Receive(&numComps, 1, 1, 987246);
-    array->SetNumberOfComponents(numComps);
-    this->SocketController->Receive(&nameLength, 1, 1, 987247);
-    name = new char[nameLength];
-    this->SocketController->Receive(name, nameLength, 1, 987248);
-    array->SetName(name);
-    delete [] name;
-    mapper->GetInput()->GetPointData()->AddArray(array);
-    array->Delete();
-    } // end of loop over point arrays.
-  // Which scalars, ... are active?
-  this->SocketController->Receive(activeAttributes, 5, 1, 987258);
-  mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
-  mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
-  mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
-  mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
-  mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
-
-  // Next Cell data.
-  mapper->GetInput()->GetCellData()->Initialize();
-  this->SocketController->Receive(&num, 1, 1, 987244);
-  for (j = 0; j < num; ++j)
-    {
-    this->SocketController->Receive(&type, 1, 1, 987245);
-    switch (type)
-      {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      }
-    this->SocketController->Receive(&numComps, 1, 1, 987246);
-    array->SetNumberOfComponents(numComps);
-    this->SocketController->Receive(&nameLength, 1, 1, 987247);
-    name = new char[nameLength];
-    this->SocketController->Receive(name, nameLength, 1, 987248);
-    array->SetName(name);
-    delete [] name;
-    mapper->GetInput()->GetCellData()->AddArray(array);
-    array->Delete();
-    } // end of loop over cell arrays.
-  // Which scalars, ... are active?
-  this->SocketController->Receive(activeAttributes, 5, 1, 987258);
-  mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
-  mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
-  mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
-  mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
-  mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
-}
-//----------------------------------------------------------------------------
-// This method is broadcast, so is called on every process (even the client).
-void vtkPVClientServerModule::SendCompleteArrays(vtkMapper *mapper)
-{
-  if (this->ClientMode)
-    {
+    { // Just get the information from the server.
+    this->SocketController->Receive(&length, 1, 1, 398798);
+    msg = new unsigned char[length];
+    this->SocketController->Receive(msg, length, 1, 398799);
+    this->TemporaryInformation->CopyFromMessage(msg);
+    delete [] msg;
+    msg = NULL;
     return;
     }
 
   int myId = this->Controller->GetLocalProcessId();
+  vtkPVDataInformation *tmp = vtkPVDataInformation::New();
+  if (myId != 0)
+    {
+    tmp->CopyFromData(data);
+    msg = tmp->NewMessage(length);
+    this->Controller->Send(&length, 1, 0, 398798);
+    this->Controller->Send(msg, length, 0, 398799);
+    delete [] msg;
+    msg = NULL;
+    tmp->Delete();
+    tmp = NULL;
+    return;
+    }
+
+  // Node 0 of server:  Collect and send to client.
   int numProcs = this->Controller->GetNumberOfProcesses();
-  vtkDataSet *data = mapper->GetInput();
-  int nonEmptyFlag;
-  int requestFlag;
-  int i;
-
-  // Info for sends.
-  int num = 0;
-  int type;
-  int numComps;
-  int nameLength;
-  const char *name = NULL;
-  vtkDataArray *array;
-  int activeAttributes[5];
-
-
-  // ---- Are we a candidate to send.
-  if (data->GetNumberOfPoints() == 0 &&
-      data->GetNumberOfCells() == 0)
+  int idx;
+  vtkPVDataInformation *tmp2 = vtkPVDataInformation::New();
+  for (idx = 1; idx < numProcs; ++idx)
     {
-    nonEmptyFlag = 0;
+    this->Controller->Receive(&length, 1, idx, 398798);
+    msg = new unsigned char[length];
+    this->SocketController->Receive(msg, length, idx, 398799);
+    tmp->CopyFromMessage(msg);
+    tmp2->AddInformation(tmp);
+    delete [] msg;
+    msg = NULL;
     }
-  else
-    {
-    nonEmptyFlag = 1;
-    }
-  // Special case: All procs are empty.
-  // The last proc should send anyway.
-  if (myId == numProcs-1)
-    {
-    nonEmptyFlag = 1;
-    }
+  msg = tmp2->NewMessage(length);
+  this->SocketController->Send(&length, 1, 0, 398798);
+  this->SocketController->Send(msg, length, 0, 398799);
+  delete [] msg;
+  msg = NULL;
+  tmp->Delete();
+  tmp = NULL;  
+  tmp2->Delete();
+  tmp2 = NULL;
+}    
+ 
 
-  // ---- Does the client want us to send.
-  // Process 0 is always requested.
-  requestFlag = 1;
-  if (myId > 0)
-    {
-    this->Controller->Receive(&requestFlag, 1, 0, 778432);
-    // If this process is requested to send info,
-    // respond whether we have info to send..
-    if (requestFlag)
-      {
-      this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-      }
-    else
-      { // Our information is not needed. Our job is finished.
-      return;
-      }
-    if ( ! nonEmptyFlag)
-      { // We do not have anything to send. Our job is finished.
-      return;
-      }
-    }
-
-  // ---- Send info.  Convert arrays to info and send.
-  if (requestFlag && nonEmptyFlag)
-    { // We are the process choosen to send.
-    vtkMultiProcessController *controller;
-    int toId;
-    
-    if (myId == 0)
-      { // Root node has to dismiss all other processes.
-      for (i = 1; i < numProcs; ++i)
-        {
-        requestFlag = 0;
-        this->Controller->Send(&requestFlag, 1, i, 778432);
-        }
-      // Root has to send through the socket controller.
-      controller = this->SocketController;
-      toId = 1;
-      }
-    else
-      { // Other processes have to relay through Root (process 0).
-      controller = this->Controller;
-      toId = 0;
-      }
-
-    // Send all the array info.
-    // First point data.
-    num = data->GetPointData()->GetNumberOfArrays();
-    controller->Send(&num, 1, toId, 987244);
-    for (i = 0; i < num; ++i)
-      {
-      array = data->GetPointData()->GetArray(i);
-      type = array->GetDataType();
-
-      controller->Send(&type, 1, toId, 987245);
-      numComps = array->GetNumberOfComponents();
-
-      controller->Send(&numComps, 1, toId, 987246);
-      name = array->GetName();
-      if (name == NULL)
-        {
-        name = "";
-        }
-      nameLength = vtkString::Length(name)+1;
-      controller->Send(&nameLength, 1, toId, 987247);
-      // I am pretty sure that Send does not modify the string.
-      controller->Send(const_cast<char*>(name), nameLength, toId, 987248);
-      }
-    data->GetPointData()->GetAttributeIndices(activeAttributes);
-    controller->Send(activeAttributes, 5, toId, 987258);
-    // Next cell data.
-    num = data->GetCellData()->GetNumberOfArrays();
-    controller->Send(&num, 1, toId, 987244);
-    for (i = 0; i < num; ++i)
-      {
-      array = mapper->GetInput()->GetCellData()->GetArray(i);
-      type = array->GetDataType();
-      controller->Send(&type, 1, toId, 987245);
-      numComps = array->GetNumberOfComponents();
-      controller->Send(&numComps, 1, toId, 987246);
-      name = array->GetName();
-      if (name == NULL)
-        {
-        name = "";
-        }
-      nameLength = vtkString::Length(name+1);
-      controller->Send(&nameLength, 1, toId, 987247);
-      controller->Send(const_cast<char*>(name), nameLength, toId, 987248);
-      }
-    data->GetCellData()->GetAttributeIndices(activeAttributes);
-    controller->Send(activeAttributes, 5, toId, 987258);
-    
-    return;
-    } // End sending array info.
-
-  // ---- Relay information
-  // Only process 0 (that has no data) should make it to this point.
-  // Tell the satellites (one bby one) we need their information.
-  requestFlag = 1;
-  for (i = 1; i < numProcs; ++i)
-    {
-    this->Controller->Send(&requestFlag, 1, i, 778432);
-    if (requestFlag)
-      {
-      this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
-      if (nonEmptyFlag)
-        {
-        // We have picked this process to send information.
-        // Do not request processes from any other process.
-        requestFlag = 0;
-
-        // Relay.
-        // First point data.
-        this->Controller->Receive(&num, 1, i, 987244);
-        this->SocketController->Send(&num, 1, 1, 987244);
-        for (i = 0; i < num; ++i)
-          {
-          this->Controller->Receive(&type, 1, i, 987245);
-          this->SocketController->Send(&type, 1, 1, 987245);
-          this->Controller->Receive(&numComps, 1, i, 987246);
-          this->SocketController->Send(&numComps, 1, 1, 987246);
-          this->Controller->Receive(&nameLength, 1, i, 987247);
-          this->SocketController->Send(&nameLength, 1, 1, 987247);
-          char *buffer = new char[nameLength+1];
-          this->Controller->Receive(const_cast<char*>(buffer), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(buffer), nameLength, 1, 987248);
-          delete [] buffer;
-          }
-        this->Controller->Receive(activeAttributes, 5, i, 987258);
-        this->SocketController->Send(activeAttributes, 5, 1, 987258);
-        // Next cell data.
-        this->Controller->Receive(&num, 1, i, 987244);
-        this->SocketController->Send(&num, 1, 1, 987244);
-        for (i = 0; i < num; ++i)
-          {
-          this->Controller->Receive(&type, 1, i, 987245);
-          this->SocketController->Send(&type, 1, 1, 987245);
-          this->Controller->Receive(&numComps, 1, i, 987246);
-          this->SocketController->Send(&numComps, 1, 1, 987246);
-          this->Controller->Receive(&nameLength, 1, i, 987247);
-          this->SocketController->Send(&nameLength, 1, 1, 987247);
-          this->Controller->Receive(const_cast<char*>(name), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(name), nameLength, 1, 987248);
-          }
-        this->Controller->Receive(activeAttributes, 5, i, 987258);
-        this->SocketController->Send(activeAttributes, 5, 1, 987258);
-        } // end choosen process (for sending)
-      } // if requested
-    } // i numProcs loop
-}
-
-//----------------------------------------------------------------------------
-// Ask for one process to return a listing of arrays.
-// This method is designed to use BroadcastScript 
-// instead of RemoteScript.
-void vtkPVClientServerModule::CompleteArrays(vtkDataSet *data, char *dataTclName)
-{
-  int j;
-  int activeAttributes[5];
-
-  if (data == NULL || this->Controller == NULL)
-    {
-    return;
-    }
-  if (data->GetNumberOfPoints() > 0)
-    { // If we have points we are not empty and we can exit early.
-    return;
-    }
-
-  this->BroadcastScript("[$Application GetProcessModule] SendCompleteArrays %s", dataTclName);
-
-  int num = 0;
-  vtkDataArray *array = 0;
-  char *name;
-  int nameLength = 0;
-  int type = 0;
-  int numComps = 0;
-      
-  // First Point data.
-  data->GetPointData()->Initialize();
-  this->SocketController->Receive(&num, 1, 1, 987244);
-  for (j = 0; j < num; ++j)
-    {
-    this->SocketController->Receive(&type, 1, 1, 987245);
-    switch (type)
-      {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      }
-    this->SocketController->Receive(&numComps, 1, 1, 987246);
-    array->SetNumberOfComponents(numComps);
-    this->SocketController->Receive(&nameLength, 1, 1, 987247);
-    name = new char[nameLength];
-    this->SocketController->Receive(name, nameLength, 1, 987248);
-    array->SetName(name);
-    delete [] name;
-    data->GetPointData()->AddArray(array);
-    array->Delete();
-    } // end of loop over point arrays.
-  // Which scalars, ... are active?
-  this->SocketController->Receive(activeAttributes, 5, 1, 987258);
-  data->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
-  data->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
-  data->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
-  data->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
-  data->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
-
-  // Next Cell data.
-  data->GetCellData()->Initialize();
-  this->SocketController->Receive(&num, 1, 1, 987244);
-  for (j = 0; j < num; ++j)
-    {
-    this->SocketController->Receive(&type, 1, 1, 987245);
-    switch (type)
-      {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      }
-    this->SocketController->Receive(&numComps, 1, 1, 987246);
-    array->SetNumberOfComponents(numComps);
-    this->SocketController->Receive(&nameLength, 1, 1, 987247);
-    name = new char[nameLength];
-    this->SocketController->Receive(name, nameLength, 1, 987248);
-    array->SetName(name);
-    delete [] name;
-    data->GetCellData()->AddArray(array);
-    array->Delete();
-    } // end of loop over cell arrays.
-  // Which scalars, ... are active?
-  this->SocketController->Receive(activeAttributes, 5, 1, 987258);
-  data->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
-  data->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
-  data->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
-  data->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
-  data->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
-}
-//----------------------------------------------------------------------------
-// This method is broadcast, so is called on every process (even the client).
-void vtkPVClientServerModule::SendCompleteArrays(vtkDataSet *data)
-{
-  if (this->ClientMode)
-    {
-    return;
-    }
-
-  int myId = this->Controller->GetLocalProcessId();
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int nonEmptyFlag;
-  int requestFlag;
-  int i;
-
-  // Info for sends.
-  int num;
-  int type;
-  int numComps;
-  int nameLength;
-  const char *name = NULL;
-  vtkDataArray *array;
-  int activeAttributes[5];
-
-
-  // ---- Are we a candidate to send.
-  if (data->GetNumberOfPoints() == 0 &&
-      data->GetNumberOfCells() == 0)
-    {
-    nonEmptyFlag = 0;
-    }
-  else
-    {
-    nonEmptyFlag = 1;
-    }
-  // Special case: All procs are empty.
-  // The last proc should send anyway.
-  if (myId == numProcs-1)
-    {
-    nonEmptyFlag = 1;
-    }
-
-  // ---- Does the client want us to send.
-  // Process 0 is always requested.
-  requestFlag = 1;
-  if (myId > 0)
-    {
-    this->Controller->Receive(&requestFlag, 1, 0, 778432);
-    // If this process is requested to send info,
-    // respond whether we have info to send..
-    if (requestFlag)
-      {
-      this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-      }
-    else
-      { // Our information is not needed. Our job is finished.
-      return;
-      }
-    if ( ! nonEmptyFlag)
-      { // We do not have anything to send. Our job is finished.
-      return;
-      }
-    }
-
-  // ---- Send info.  Convert arrays to info and send.
-  if (requestFlag && nonEmptyFlag)
-    { // We are the process choosen to send.
-    vtkMultiProcessController *controller;
-    int toId;
-    
-    if (myId == 0)
-      { // Root node has to dismiss all other processes.
-      for (i = 1; i < numProcs; ++i)
-        {
-        requestFlag = 0;
-        this->Controller->Send(&requestFlag, 1, i, 778432);
-        }
-      // Root has to send through the socket controller.
-      controller = this->SocketController;
-      toId = 1;
-      }
-    else
-      { // Other processes have to relay through Root (process 0).
-      controller = this->Controller;
-      toId = 0;
-      }
-
-    // Send all the array info.
-    // First point data.
-    num = data->GetPointData()->GetNumberOfArrays();
-    controller->Send(&num, 1, toId, 987244);
-    for (i = 0; i < num; ++i)
-      {
-      array = data->GetPointData()->GetArray(i);
-      type = array->GetDataType();
-
-      controller->Send(&type, 1, toId, 987245);
-      numComps = array->GetNumberOfComponents();
-
-      controller->Send(&numComps, 1, toId, 987246);
-      name = array->GetName();
-      if (name == NULL)
-        {
-        name = "";
-        }
-      nameLength = vtkString::Length(name)+1;
-      controller->Send(&nameLength, 1, toId, 987247);
-      // I am pretty sure that Send does not modify the string.
-      controller->Send(const_cast<char*>(name), nameLength, toId, 987248);
-      }
-    data->GetPointData()->GetAttributeIndices(activeAttributes);
-    controller->Send(activeAttributes, 5, toId, 987258);
-    // Next cell data.
-    num = data->GetCellData()->GetNumberOfArrays();
-    controller->Send(&num, 1, toId, 987244);
-    for (i = 0; i < num; ++i)
-      {
-      array = data->GetCellData()->GetArray(i);
-      type = array->GetDataType();
-      controller->Send(&type, 1, toId, 987245);
-      numComps = array->GetNumberOfComponents();
-      controller->Send(&numComps, 1, toId, 987246);
-      name = array->GetName();
-      if (name == NULL)
-        {
-        name = "";
-        }
-      nameLength = vtkString::Length(name+1);
-      controller->Send(&nameLength, 1, toId, 987247);
-      controller->Send(const_cast<char*>(name), nameLength, toId, 987248);
-      }
-    data->GetCellData()->GetAttributeIndices(activeAttributes);
-    controller->Send(activeAttributes, 5, toId, 987258);
-    
-    return;
-    } // End sending array info.
-
-  // ---- Relay information
-  // Only process 0 (that has no data) should make it to this point.
-  // Tell the satellites (one bby one) we need their information.
-  requestFlag = 1;
-  for (i = 1; i < numProcs; ++i)
-    {
-    this->Controller->Send(&requestFlag, 1, i, 778432);
-    if (requestFlag)
-      {
-      this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
-      if (nonEmptyFlag)
-        {
-        // We have picked this process to send information.
-        // Do not request processes from any other process.
-        requestFlag = 0;
-
-        // Relay.
-        // First point data.
-        this->Controller->Receive(&num, 1, i, 987244);
-        this->SocketController->Send(&num, 1, 1, 987244);
-        for (i = 0; i < num; ++i)
-          {
-          this->Controller->Receive(&type, 1, i, 987245);
-          this->SocketController->Send(&type, 1, 1, 987245);
-          this->Controller->Receive(&numComps, 1, i, 987246);
-          this->SocketController->Send(&numComps, 1, 1, 987246);
-          this->Controller->Receive(&nameLength, 1, i, 987247);
-          this->SocketController->Send(&nameLength, 1, 1, 987247);
-          char *buffer = new char[nameLength+1];
-          this->Controller->Receive(const_cast<char*>(buffer), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(buffer), nameLength, 1, 987248);
-          delete [] buffer;
-          }
-        this->Controller->Receive(activeAttributes, 5, i, 987258);
-        this->SocketController->Send(activeAttributes, 5, 1, 987258);
-        // Next cell data.
-        this->Controller->Receive(&num, 1, i, 987244);
-        this->SocketController->Send(&num, 1, 1, 987244);
-        for (i = 0; i < num; ++i)
-          {
-          this->Controller->Receive(&type, 1, i, 987245);
-          this->SocketController->Send(&type, 1, 1, 987245);
-          this->Controller->Receive(&numComps, 1, i, 987246);
-          this->SocketController->Send(&numComps, 1, 1, 987246);
-          this->Controller->Receive(&nameLength, 1, i, 987247);
-          this->SocketController->Send(&nameLength, 1, 1, 987247);
-          this->Controller->Receive(const_cast<char*>(name), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(name), nameLength, 1, 987248);
-          }
-        this->Controller->Receive(activeAttributes, 5, i, 987258);
-        this->SocketController->Send(activeAttributes, 5, 1, 987258);
-        } // end choosen process (for sending)
-      } // if requested
-    } // i numProcs loop
-}
 
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::InitializePVDataPartition(vtkPVData *pvd)
+void vtkPVClientServerModule::InitializePVPartPartition(vtkPVPart *part)
 {
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        pvd->GetMapperTclName());
+                        part->GetMapperTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        pvd->GetLODMapperTclName());
+                        part->GetLODMapperTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        pvd->GetUpdateSuppressorTclName());
+                        part->GetUpdateSuppressorTclName());
   this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        pvd->GetLODUpdateSuppressorTclName());
+                        part->GetLODUpdateSuppressorTclName());
 }
 
 //----------------------------------------------------------------------------

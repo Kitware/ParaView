@@ -60,6 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
@@ -71,7 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.255");
+vtkCxxRevisionMacro(vtkPVSource, "1.256");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -291,7 +293,7 @@ void vtkPVSource::SetPVInput(vtkPVData *pvd)
   this->SetNthPVInput(0, pvd);
 
   pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-                         pvd->GetVTKDataTclName());
+                         pvd->GetPVPart()->GetVTKDataTclName());
 
 
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
@@ -971,17 +973,17 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   if ( ! this->Initialized)
     { // This is the first time, initialize data.    
     vtkPVData *input;
-    vtkPVData *ac;
+    vtkPVData *pvd;
     
-    ac = this->GetPVOutput(0);
-    if (ac == NULL)
+    pvd = this->GetPVOutput(0);
+    if (pvd == NULL)
       { // I suppose we should try and delete the source.
       vtkErrorMacro("Could not get output.");
       this->DeleteCallback();    
       return;
       }
     
-    window->GetMainView()->AddPVData(ac);
+    window->GetMainView()->AddPVData(pvd);
     if (!this->GetHideDisplayPage())
       {
       this->Notebook->AddPage("Display");
@@ -990,8 +992,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       this->Notebook->AddPage("Information");
       }
-    ac->CreateProperties();
-    ac->Initialize();
+    pvd->CreateProperties();
+    pvd->Initialize();
     // Make the last data invisible.
     input = this->GetPVInput();
     if (input)
@@ -1019,7 +1021,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     if (window->GetSourceList("Sources")->GetNumberOfItems() == 1)
       {
       float bds[6];
-      ac->GetBounds(bds);
+      pvd->GetDataInformation()->GetBounds(bds);
       window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
                                   0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
@@ -1699,7 +1701,7 @@ int vtkPVSource::GetIsValidInput(vtkPVData *pvd)
     const char* item;
     if ( this->InputClassNames->GetItem(i, item) == VTK_OK )
       {
-      data = pvd->GetVTKData();
+      data = pvd->GetPVPart()->GetVTKData();
       if ( data && data->IsA(item) )
         {
         match = 1;
@@ -1928,7 +1930,7 @@ int vtkPVSource::InitializeClone(vtkPVData* input,
   const char* inputDataType=0;
   if ( input )
     {
-    inputDataType = input->GetVTKData()->GetClassName();
+    inputDataType = input->GetPVPart()->GetVTKData()->GetClassName();
     }
 
   // let's see if we can determine the output type.
@@ -1968,14 +1970,14 @@ int vtkPVSource::InitializeClone(vtkPVData* input,
   
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", this->GetVTKSourceTclName(),
-                         pvd->GetVTKDataTclName());   
+                         pvd->GetPVPart()->GetVTKDataTclName());   
 
   // Create the extent translator
   if (input)
     {
     pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
-                           pvd->GetVTKDataTclName(), 
-                           input->GetVTKDataTclName());
+                           pvd->GetPVPart()->GetVTKDataTclName(), 
+                           input->GetPVPart()->GetVTKDataTclName());
     }
   else
     {
@@ -1985,7 +1987,7 @@ int vtkPVSource::InitializeClone(vtkPVData* input,
                            otherTclName, 
                            this->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                           pvd->GetVTKDataTclName(), 
+                            pvd->GetPVPart()->GetVTKDataTclName(), 
                            otherTclName);
     // Hold onto name so it can be deleted.
     this->SetExtentTranslatorTclName(otherTclName);
@@ -2186,7 +2188,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.255 $");
+  this->ExtractRevision(os,"$Revision: 1.256 $");
 }
 
 //----------------------------------------------------------------------------

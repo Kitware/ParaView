@@ -32,7 +32,7 @@ $kw(vtkTemp294) SetInterpolationToFlat
 $kw(vtkTemp294) SetInterpolationToGouraud
 $kw(vtkTemp294) ColorByProperty
 $kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
-$kw(vtkTemp294) ColorByPointField {Elevation}
+$kw(vtkTemp294) ColorByPointField {Elevation} 1
 $kw(vtkTemp294) SetColorRange 0.100000 0.433010
 $kw(vtkTemp294) SetColorRange 0.200000 0.433010
 $kw(vtkTemp294) SetColorRange 0.000000 0.433010

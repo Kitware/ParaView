@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
@@ -64,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.9");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -138,7 +139,7 @@ void vtkPVImplicitPlaneWidget::CenterResetCallback()
     {
     return;
     }
-  input->GetBounds(bds);
+  input->GetDataInformation()->GetBounds(bds);
   this->CenterEntry[0]->SetValue(0.5*(bds[0]+bds[1]), 3);
   this->CenterEntry[1]->SetValue(0.5*(bds[2]+bds[3]), 3);
   this->CenterEntry[2]->SetValue(0.5*(bds[4]+bds[5]), 3);
@@ -506,7 +507,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     if (input)
       {
       float bds[6];
-      input->GetBounds(bds);
+      input->GetDataInformation()->GetBounds(bds);
       pvApp->BroadcastScript("%s SetOrigin %f %f %f", planeTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
