@@ -57,11 +57,15 @@ IF(USE_INCLUDED_TCLTK)
       ENDIF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
     ENDIF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
 
+    # On UNIX, Tcl needs the math library.
+    IF(UNIX)
+      SET(TCL_LIBRARY ${TCL_LIBRARY} -lm)
+    ENDIF(UNIX)
+
     # If using X with Tk, we need to link to X when we link
     # to Tk in order to support static linking.
     IF(CMAKE_HAS_X)
       SET(TK_LIBRARY ${TK_LIBRARY} -lXt ${CMAKE_X_LIBS})
-       MESSAGE("TK: [${TK_LIBRARY}]")
     ENDIF(CMAKE_HAS_X)
 
     IF (CMAKE_ESCAPES_SC)
