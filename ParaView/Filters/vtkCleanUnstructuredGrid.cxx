@@ -21,7 +21,6 @@
 
 #include "vtkCleanUnstructuredGrid.h"
 
-#include "vtkIdType.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
 #include "vtkPoints.h"
@@ -32,7 +31,7 @@
 #include "vtkCollection.h"
 #include "vtkPointLocator.h"
 
-vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.4");
+vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.5");
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 
 vtkCleanUnstructuredGrid::vtkCleanUnstructuredGrid()

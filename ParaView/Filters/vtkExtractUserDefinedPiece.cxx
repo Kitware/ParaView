@@ -24,13 +24,12 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkCell.h"
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.3");
+vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.4");
 vtkStandardNewMacro(vtkExtractUserDefinedPiece);
 
 vtkExtractUserDefinedPiece::vtkExtractUserDefinedPiece()

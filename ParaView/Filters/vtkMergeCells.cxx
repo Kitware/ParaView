@@ -19,7 +19,6 @@
 
 #include "vtkMergeCells.h"
 
-#include "vtkIdType.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
 #include "vtkPoints.h"
@@ -40,7 +39,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.11");
+vtkCxxRevisionMacro(vtkMergeCells, "1.12");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
