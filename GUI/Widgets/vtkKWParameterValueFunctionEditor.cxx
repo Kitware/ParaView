@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.25");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.26");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -56,7 +56,8 @@ int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, 
 #ifndef _WIN32
 #define LSTRANGE 0
 #else
-#define LSTRANGE 1
+//#define LSTRANGE 1
+#define LSTRANGE 0
 #endif
 #define RSTRANGE 1
 
@@ -4277,25 +4278,25 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
         {
-        tk_cmd << canv << " create line 0 0 0 0 "
+        tk_cmd << canv << " create line 0 0 0 0 -capstyle projecting "
                << "-tags {framefg_l " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
         {
-        tk_cmd << canv << " create line 0 0 0 0 "
+        tk_cmd << canv << " create line 0 0 0 0 -capstyle projecting "
                << "-tags {framefg_r " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
         {
-        tk_cmd << canv << " create line 0 0 0 0 "
+        tk_cmd << canv << " create line 0 0 0 0 -capstyle projecting "
                << "-tags {framefg_t " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
         }
       if (this->CanvasOutlineStyle & 
           vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
         {
-        tk_cmd << canv << " create line 0 0 0 0 "
+        tk_cmd << canv << " create line 0 0 0 0 -capstyle projecting "
                << "-tags {framefg_b " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
         }
       tk_cmd << canv << " lower " << VTK_KW_PVFE_FRAME_FG_TAG
@@ -4377,29 +4378,25 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
       {
       tk_cmd << canv << " coords framefg_l " 
-             << c1_x << " " << c2_y << " " 
-             << c1_x << " " << c1_y - LSTRANGE << endl;
+             << c1_x << " " << c2_y << " " << c1_x << " " << c1_y << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
       {
       tk_cmd << canv << " coords framefg_r " 
-             << c2_x << " " << c2_y << " " 
-             << c2_x << " " << c1_y - LSTRANGE << endl;
+             << c2_x << " " << c2_y << " " << c2_x << " " << c1_y << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
       {
       tk_cmd << canv << " coords framefg_t " 
-             << c2_x << " " << c1_y << " " 
-             << c1_x - LSTRANGE << " " << c1_y << endl;
+             << c2_x << " " << c1_y << " " << c1_x << " " << c1_y << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
       {
       tk_cmd << canv << " coords framefg_b " 
-             << c2_x << " " << c2_y << " " 
-             << c1_x - LSTRANGE << " " << c2_y << endl;
+             << c2_x << " " << c2_y << " " << c1_x << " " << c2_y << endl;
       }
     }
 
@@ -4642,7 +4639,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
     {
     if (this->ShowParameterCursor)
       {
-      tk_cmd << canv << " create line 0 0 0 0 "
+      tk_cmd << canv << " create line 0 0 0 0 -capstyle projecting "
              << " -tags {" << VTK_KW_PVFE_PARAMETER_CURSOR_TAG << "}" << endl;
       tk_cmd << canv << " lower " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
              << " {" << VTK_KW_PVFE_FUNCTION_TAG << "}" << endl;
@@ -4670,7 +4667,7 @@ void vtkKWParameterValueFunctionEditor::RedrawParameterCursor()
            << " " << this->ParameterCursorPosition * factors[0]
            << " " << v_v_range[0] * factors[1]
            << " " << this->ParameterCursorPosition * factors[0]
-           << " " << v_v_range[1] * factors[1] + LSTRANGE
+           << " " << v_v_range[1] * factors[1]
            << endl;
 
     char color[10];
