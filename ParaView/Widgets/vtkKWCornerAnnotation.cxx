@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.41");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.42");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -102,27 +102,6 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
 {
-  // CornerProp was either pointing to InternalCornerProp in vtkKWView mode, or
-  // vtkKWRenderWidget::GetCornerProp() in vtkKWRenderWidget mode.
-
-  this->SetRenderWidget(NULL);
-  this->SetView(NULL);
-
-  // If in vtkKWView mode, we createed and maintained the corner prop and
-  // composite
-
-  if (this->InternalCornerComposite)
-    {
-    this->InternalCornerComposite->Delete();
-    this->InternalCornerComposite = NULL;
-    }
-
-  if (this->InternalCornerProp)
-    {
-    this->InternalCornerProp->Delete();
-    this->InternalCornerProp = NULL;
-    }
-
   // GUI
 
   if (this->CornerVisibilityButton)
@@ -156,6 +135,27 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
     {
     this->TextPropertyWidget->Delete();
     this->TextPropertyWidget = NULL;
+    }
+
+  // CornerProp was either pointing to InternalCornerProp in vtkKWView mode, or
+  // vtkKWRenderWidget::GetCornerProp() in vtkKWRenderWidget mode.
+
+  this->SetRenderWidget(NULL);
+  this->SetView(NULL);
+
+  // If in vtkKWView mode, we createed and maintained the corner prop and
+  // composite
+
+  if (this->InternalCornerComposite)
+    {
+    this->InternalCornerComposite->Delete();
+    this->InternalCornerComposite = NULL;
+    }
+
+  if (this->InternalCornerProp)
+    {
+    this->InternalCornerProp->Delete();
+    this->InternalCornerProp = NULL;
     }
 }
 
@@ -205,9 +205,10 @@ void vtkKWCornerAnnotation::SetView(vtkKWView *_arg)
 
   this->Modified();
 
-  // Update the GUI
+  // Update the GUI. Test if it is alive because we might be in the middle
+  // of destructing the whole GUI
 
-  if (this->View)
+  if (this->IsAlive())
     {
     this->Update();
     }
@@ -246,9 +247,10 @@ void vtkKWCornerAnnotation::SetRenderWidget(vtkKWRenderWidget *_arg)
 
   this->Modified();
 
-  // Update the GUI
+  // Update the GUI. Test if it is alive because we might be in the middle
+  // of destructing the whole GUI
 
-  if (this->RenderWidget)
+  if (this->IsAlive())
     {
     this->Update();
     }
@@ -432,6 +434,10 @@ void vtkKWCornerAnnotation::Update()
     return;
     }
 
+  // If no widget or view, let's just disable everything
+
+  // this->SetEnabled(this->View || this->RenderWidget);
+
   // Annotation visibility
 
   if (this->CornerVisibilityButton)
@@ -511,6 +517,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
     {
     if (state)
       {
+      this->CornerProp->VisibilityOn();
       if (this->View && 
           this->InternalCornerComposite &&
           !this->View->HasComposite(this->InternalCornerComposite))
@@ -525,6 +532,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
       }
     else
       {
+      this->CornerProp->VisibilityOff();
       if (this->View && 
           this->InternalCornerComposite &&
           this->View->HasComposite(this->InternalCornerComposite))
@@ -751,7 +759,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
