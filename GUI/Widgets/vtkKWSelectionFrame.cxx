@@ -24,7 +24,7 @@
 #include "vtkKWToolbarSet.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.25");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -60,7 +60,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 
   this->Selected          = 0;
   this->ShowSelectionList = 1;
-  this->ShowCloseButton = 0;
+  this->ShowCloseButton   = 0;
   this->ShowToolbarSet    = 0;
 }
 
@@ -220,6 +220,7 @@ void vtkKWSelectionFrame::Pack()
 
   if (this->TitleBar->IsCreated())
     {
+    this->TitleBar->UnpackChildren();
     tk_cmd << "pack " << this->TitleBar->GetWidgetName()
            << " -side top -fill x -expand n" << endl;
     }
