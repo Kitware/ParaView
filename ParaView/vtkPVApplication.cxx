@@ -64,9 +64,13 @@ vtkPVApplication* vtkPVApplication::New()
   return new vtkPVApplication;
 }
 
+int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
+			    int argc, char *argv[]);
+
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->CommandFunction = vtkPVApplicationCommand;
   this->SetApplicationName("ParaView");
 
   this->Controller = NULL;
@@ -140,13 +144,6 @@ int vtkPVApplication::AcceptEvaluation()
 {
   return 1;
 }
-
-#ifdef _WIN32
-//----------------------------------------------------------------------------
-void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
-{
-}
-#endif
 
 //----------------------------------------------------------------------------
 int VerifyKey(unsigned long key, const char *name, int id)
