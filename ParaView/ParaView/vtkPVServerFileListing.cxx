@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 #if defined(_WIN32)
-# include <windows.h>   // FindFirstFile, FindNextFile, FindClose
+# include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
 # include <direct.h>    // _getcwd
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.4");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -281,5 +281,27 @@ int vtkPVServerFileListing::FileIsDirectory(const char* dirname)
     return S_ISDIR(fs.st_mode)? 1:0;
 #endif
     }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVServerFileListing::FileIsReadable(const char* name)
+{
+#if defined(_WIN32)
+  DWORD atts = GetFileAttributes(name);
+  if((atts & FILE_ATTRIBUTE_NORMAL) ||
+     (!(atts & FILE_ATTRIBUTE_HIDDEN) &&
+      !(atts & FILE_ATTRIBUTE_SYSTEM) &&
+      !(atts & FILE_ATTRIBUTE_DIRECTORY)))
+    {
+    return 1;
+    }
+#else
+  // Check if we are able to access the file.
+  if(access(name, R_OK) == 0)
+    {
+    return 1;
+    }
+#endif
   return 0;
 }

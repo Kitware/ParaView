@@ -69,6 +69,10 @@ public:
   // Description:
   // Check if the given directory exists on the server.
   int FileIsDirectory(const char* dirname);
+
+  // Description:
+  // Check if the given file is readable on the server.
+  int FileIsReadable(const char* name);
 protected:
   vtkPVServerFileListing();
   ~vtkPVServerFileListing();
