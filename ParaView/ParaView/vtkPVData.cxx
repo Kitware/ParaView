@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.227");
+vtkCxxRevisionMacro(vtkPVData, "1.228");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2083,6 +2083,7 @@ void vtkPVData::VisibilityCheckCallback()
   this->GetPVSource()->SetVisibility(this->VisibilityCheck->GetState());
   if ( this->GetPVRenderView() )
     {
+    this->GetPVRenderView()->UpdateNavigationWindow(this->GetPVSource(), 0);
     this->GetPVRenderView()->EventuallyRender();
     }
 }
