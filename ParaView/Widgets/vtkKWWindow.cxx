@@ -67,11 +67,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
-#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.3");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.4");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -497,16 +496,16 @@ void vtkKWWindow::CloseNoPrompt()
 
   if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
       this->Application->HasRegisteryValue(
-        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
     this->Script("wm geometry %s", this->GetWidgetName());
     this->Application->SetRegisteryValue(
-      2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
+      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
       this->Application->GetMainInterp()->result);
     this->Application->SetRegisteryValue(
-      2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
+      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
       this->MiddleFrame->GetFrame1Size());
     }
 
@@ -644,15 +643,15 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   // Restore window geometry
 
   if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->HasRegisteryValue(
-        2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
+        2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
     {
     char geometry[40];
     if (this->Application->GetRegisteryValue(
-      2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
+      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
       {
       this->Script("wm geometry %s %s", wname, geometry);
       }
@@ -711,14 +710,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MiddleFrame->SetFrame1MinimumSize(360);
 
   if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->HasRegisteryValue(
-        2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
     {
     this->MiddleFrame->SetFrame1Size(this->Application->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
+      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
     }
   else
     {
@@ -912,16 +911,16 @@ void vtkKWWindow::CreatePreferencesProperties()
     this->Application, "-text {Save window geometry on exit}");
   
   if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
     this->DialogSettingsSaveWindowGeometry->SetState(
       this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
     }
   else
     {
     this->Application->SetRegisteryValue(
-      2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
+      2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
     this->DialogSettingsSaveWindowGeometry->SetState(1);
     }
   
@@ -985,7 +984,7 @@ void vtkKWWindow::OnDialogSettingsChange()
  if (this->DialogSettingsSaveWindowGeometry)
    {
    this->Application->SetRegisteryValue(
-     2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY,
+     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY,
      "%d", this->DialogSettingsSaveWindowGeometry->GetState());
    }
 
@@ -1253,7 +1252,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.3 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.4 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1481,10 +1480,12 @@ void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
     }
 }
 
-int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key, 
+int vtkKWWindow::BooleanRegisteryCheck(int level, 
+                                       const char* subkey,
+                                       const char* key, 
                                        const char* trueval)
 {
-  return this->GetApplication()->BooleanRegisteryCheck(level, key, trueval);
+  return this->GetApplication()->BooleanRegisteryCheck(level, subkey, key, trueval);
 }
 
 

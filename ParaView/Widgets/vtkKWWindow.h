@@ -72,6 +72,7 @@ template<class DType> class vtkVector;
 
 #define VTK_KW_PREFERENCES_PAGE_LABEL "Preferences"
 #define VTK_KW_PAGE_SETUP_MENU_LABEL "Page Setup"
+#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -284,7 +285,7 @@ public:
   // Description:
   // Perform a boolean check of the value in registery. If the value 
   // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegisteryCheck(int level, const char* key, const char* trueval);
+  int BooleanRegisteryCheck(int level, const char* subkey, const char* key, const char* trueval);
   
   // Description:
   // Save or retrieve color from registery. If color does not 
