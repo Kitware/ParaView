@@ -39,6 +39,10 @@ public:
   vtkTypeRevisionMacro(vtkPVCompositeBuffer,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Access to the color buffer.  Used when the buffer has not been compressed.
+  vtkUnsignedCharArray* GetPData();
+
 protected:
   vtkPVCompositeBuffer();
   ~vtkPVCompositeBuffer();

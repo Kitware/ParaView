@@ -51,10 +51,20 @@ public:
   // This will return a special object to hold a compressed buffer.
   vtkPVCompositeBuffer* NewCompositeBuffer(int numPixels);
 
+  // Description:
+  // This is used to create a buffer when not using compositing.
+  vtkPVCompositeBuffer* NewCompositeBuffer(
+                                     vtkUnsignedCharArray* pData,
+                                     vtkFloatArray* zData);
 
+  // Description:
+  // Send a buffer in one easy call.
   static void SendBuffer(vtkMultiProcessController* controller,
                     vtkPVCompositeBuffer* buf, int otherProc, int tag); 
 
+  // Description:
+  // Receive a buffer in one easy call.  The caller is responsible
+  // for deleting the returned buffer.
   vtkPVCompositeBuffer* ReceiveNewBuffer(vtkMultiProcessController* controller,
                                          int otherProc, int tag);
 
@@ -65,7 +75,8 @@ public:
                        vtkPVCompositeBuffer* outBuf);
 
   // Description:
-  // This method returns the length of a compressed buffer.
+  // This method predicts the length of a compressed buffer.
+  // It is used to get the best size array for compressed buffer.
   static int GetCompressedLength(vtkFloatArray* zIn);
 
   static void Uncompress(vtkPVCompositeBuffer* inBuf,
@@ -90,6 +101,10 @@ public:
   // as needed.
   vtkSetMacro(MaximumMemoryUsage, unsigned long);
   vtkGetMacro(MaximumMemoryUsage, unsigned long);
+
+  // Description:
+  // Access for debugging purposes.
+  unsigned long GetTotalMemoryUsage();
 
 protected:
   vtkPVCompositeUtilities();

@@ -81,7 +81,7 @@ public:
   // Description:
   void SetUseCompositeWithFloat(int val);
   void SetUseCompositeWithRGBA(int val);
-  void SetUseCompositeCompression(int val);
+  virtual void SetUseCompositeCompression(int val);
   
   // Description:
   // The center of rotation picker needs the compositers zbuffer.

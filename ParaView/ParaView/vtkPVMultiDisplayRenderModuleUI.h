@@ -62,6 +62,8 @@ public:
   vtkTypeRevisionMacro(vtkPVMultiDisplayRenderModuleUI,vtkPVCompositeRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void Create(vtkKWApplication *app, const char *);
+
 protected:
   vtkPVMultiDisplayRenderModuleUI();
   ~vtkPVMultiDisplayRenderModuleUI();

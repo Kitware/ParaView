@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.1");
 
 
 
@@ -70,8 +70,6 @@ vtkPVMultiDisplayRenderModule::~vtkPVMultiDisplayRenderModule()
 {
 
 }
-
-
 
 
 //----------------------------------------------------------------------------
@@ -348,9 +346,16 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
+{
+  if (this->CompositeTclName)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s SetUseCompositeCompression %d", 
+                            this->CompositeTclName, val);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModule::PrintSelf(ostream& os, vtkIndent indent)

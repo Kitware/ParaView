@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.1");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -95,19 +95,16 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    if (this->CompositeRenderModule->GetComposite() || pvapp->GetClientMode())
-      {
-      pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
-                               this->CollectThreshold);
-      pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
-                               this->RenderInterruptsEnabled);
-      pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-                               this->CompositeWithFloatFlag);
-      pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-                               this->CompositeWithRGBAFlag);
-      pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-                               this->CompositeCompressionFlag);
-      }
+    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
+                             this->CollectThreshold);
+    pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
+                             this->RenderInterruptsEnabled);
+    pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
+                             this->CompositeWithFloatFlag);
+    pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+                             this->CompositeWithRGBAFlag);
+    pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
+                             this->CompositeCompressionFlag);
     }
 
   this->ParallelRenderParametersFrame->Delete();
@@ -224,8 +221,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     }
   // Parallel rendering parameters
   // Conditional interface should really be part of a module !!!!!!
-  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 && 
-      this->CompositeRenderModule->GetComposite())
+  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1)
     {
     this->ParallelRenderParametersFrame->SetParent(this); 
     this->ParallelRenderParametersFrame->ShowHideFrameOn();
@@ -443,26 +439,15 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 
   this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
                       this->GetTclName(), val);
+
   this->CompositeCompressionFlag = val;
   if ( this->CompositeCompressionCheck->GetState() != val )
     {
     this->CompositeCompressionCheck->SetState(val);
     }
-  if (this->CompositeRenderModule->GetComposite())
-    {
-    if (val)
-      {
-      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
-      }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", 
-                           this->CompositeRenderModule->GetCompositeTclName());
-    pvApp->BroadcastScript("pvTemp Delete");
-    this->GetPVApplication()->GetMainView()->EventuallyRender();
-    }
+
+  // Let the render module do what it needs to.
+  this->CompositeRenderModule->SetUseCompositeCompression(val);
 
   if (val)
     {
@@ -472,8 +457,8 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
     {
     vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
     }
-
 }
+
 
 
 

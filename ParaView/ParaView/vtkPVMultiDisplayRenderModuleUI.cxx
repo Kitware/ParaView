@@ -42,12 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVMultiDisplayRenderModuleUI.h"
 #include "vtkPVMultiDisplayRenderModule.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWCheckButton.h"
 
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.1.2.1");
 
 int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -65,6 +66,17 @@ vtkPVMultiDisplayRenderModuleUI::~vtkPVMultiDisplayRenderModuleUI()
 {
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
+{
+  this->Superclass::Create(app, NULL);
+
+  // We do not have these options.
+  this->CompositeWithFloatCheck->SetState(0);
+  this->CompositeWithFloatCheck->SetEnabled(0);
+  this->CompositeWithRGBACheck->SetState(0);
+  this->CompositeWithRGBACheck->SetEnabled(0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)

@@ -60,6 +60,10 @@ public:
   // Description:
   // Set the application right after construction.
   virtual void SetPVApplication(vtkPVApplication *pvApp);
+
+  // Description:
+  // Compression uses active pixel encoding of color and zbuffer.
+  virtual void SetUseCompositeCompression(int val);
   
 protected:
   vtkPVMPIRenderModule();

@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.5");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.5.2.1");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -29,12 +29,27 @@ vtkStandardNewMacro(vtkTiledDisplaySchedule);
 class vtkTiledDisplayElement 
 {
 public:
+  // Which tile is this step for.  This is used to set/get
+  // the correct tile buffer.
   int TileId;
+  // This is not used.  It was just for debuggin purposes.
   int CompositeLevel;
-  int VoidFlag;
+  // Does ths element send or receive a buffer.
   int ReceiveFlag;
+  // Used temporarily for creation of single tile schedule.
+  // Id relative to the standard tree.
   int OtherCompositeId;
+  // After processes have been shuffled, the compositeId is
+  // converted into this absolute process id.  This conversion uses
+  // the compositeId stored in the process.
   int OtherProcessId;
+  // This step can be dependant on a previous step.
+  // This reference is here to make sure we keep the
+  // dependent ording intack which shuffling schedules together.
+  // These values are only used for creating/shuffling the schedules.
+  // Only the sending elements have a dependencies.
+  vtkTiledDisplayElement* Dependency;
+  int Shuffled;
 };
 
 class vtkTiledDisplayProcess 
@@ -224,10 +239,11 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
   vtkTiledDisplayElement* e;
   int maxLevels;
   int level;
-
+  int power2;
 
   // I could just set this to be NumberOfProcesses, but that would be wasteful.
   maxLevels = (int)(ceil(log((double)(numProcs))/log(2.0)));
+  power2 = 1 << maxLevels;
 
   this->NumberOfProcesses = numProcs;
   this->NumberOfTiles = 1;
@@ -247,47 +263,57 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
     p->Length = 0; // Actual number not max.
     p->TileId = tileId;
     p->CompositeId = pIdx; // Initially, composite id and process id are same.
+
     }
 
   // Loop over tree levels.
   // only works for power of two for now.
   level = 0;
-  while (numProcs > 1)
+  while (power2 > 1)
     {
     // Loop over and create send and receive elements
-    numProcs = numProcs >> 1;
-    for (pIdx = 0; pIdx < numProcs; ++ pIdx)
+    power2 = power2 >> 1;
+    for (pIdx = 0; pIdx < power2; ++ pIdx)
       {
-      pIdxSend = pIdx+numProcs;
-      // Receiving process    
-      p = this->Processes[pIdx];
-      e = new vtkTiledDisplayElement;
-      p->Elements[p->Length] = e;
-      e->ReceiveFlag = 1;
-      e->VoidFlag = 0;
-      e->TileId = tileId;
-      e->OtherCompositeId = pIdxSend;
-      e->OtherProcessId = -1;
-      e->CompositeLevel = level;
-      ++(p->Length);
-      if (p->Length > maxLevels)
-        { // Sanity check
-        vtkGenericWarningMacro("Too many levels.");
-        }
-      // Sending process
-      p = this->Processes[pIdxSend];
-      e = new vtkTiledDisplayElement;
-      p->Elements[p->Length] = e;
-      e->ReceiveFlag = 0;
-      e->VoidFlag = 0;
-      e->TileId = tileId;
-      e->OtherCompositeId = pIdx;
-      e->OtherProcessId = -1;
-      e->CompositeLevel = level;
-      ++(p->Length);
-      if (p->Length > maxLevels)
-        { // Sanity check
-        vtkGenericWarningMacro("Too many levels.");
+      pIdxSend = pIdx+power2;
+      if (pIdxSend < numProcs)
+        {
+        // Receiving process    
+        p = this->Processes[pIdx];
+        e = new vtkTiledDisplayElement;
+        p->Elements[p->Length] = e;
+        e->ReceiveFlag = 1;
+        e->TileId = tileId;
+        e->OtherCompositeId = pIdxSend;
+        e->OtherProcessId = -1;
+        e->CompositeLevel = level;
+        e->Dependency = NULL;
+        e->Shuffled = 0;
+        ++(p->Length);
+        if (p->Length > maxLevels)
+          { // Sanity check
+          vtkGenericWarningMacro("Too many levels.");
+          }
+        // Sending process
+        p = this->Processes[pIdxSend];
+        e = new vtkTiledDisplayElement;
+        p->Elements[p->Length] = e;
+        e->ReceiveFlag = 0;
+        e->TileId = tileId;
+        e->OtherCompositeId = pIdx;
+        e->OtherProcessId = -1;
+        e->CompositeLevel = level;
+        e->Dependency = NULL;
+        if (p->Length > 0)
+          { // Do not shuffle this until previous element is shuffled.
+          e->Dependency = p->Elements[p->Length-1];
+          }
+        e->Shuffled = 0;
+        ++(p->Length);
+        if (p->Length > maxLevels)
+          { // Sanity check
+          vtkGenericWarningMacro("Too many levels.");
+          }
         }
       }
     ++level;
@@ -534,11 +560,11 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
 
   // Ok, so now how do we add/shuffle elements?
   int flag = 1;
-  i = 0;
+  int shuffledLevel = 0;
   while (flag)
     {
-    flag = this->ShuffleLevel(i, numTiles, tileSchedules);
-    ++i;
+    flag = this->ShuffleLevel(shuffledLevel, numTiles, tileSchedules);
+    ++shuffledLevel;
     }
 
   // Delete the tile schedules.
@@ -553,16 +579,24 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
 
 //-------------------------------------------------------------------------
 // I am just going to try brute force adding one level at a time.
-// Returns 0 when all leves are finished.
+// Only when a send and receive can be in the same level (or less)
+// does it get copied over.  The tile first loop is ideal because
+// it composites as much of one tile as possible before moving (rendering)
+// onto the next tile.  This is good for buffer management, and
+// should be more efficient for communication.
 int vtkTiledDisplaySchedule::ShuffleLevel(int level, int numTiles, 
                                     vtkTiledDisplaySchedule** tileSchedules)
 {
   int flag = 0;
   int tIdx, pIdx, eIdx;
+  int pIdxOther, eIdxOther;
   vtkTiledDisplaySchedule* ts;
   vtkTiledDisplayProcess* p;
+  vtkTiledDisplayProcess* pOther;
   vtkTiledDisplayElement* e;
+  vtkTiledDisplayElement* eOther;
   vtkTiledDisplayProcess* p2;
+  vtkTiledDisplayProcess* p2Other;
 
   for (tIdx = 0; tIdx < numTiles; ++tIdx)
     {
@@ -573,18 +607,75 @@ int vtkTiledDisplaySchedule::ShuffleLevel(int level, int numTiles,
       for (eIdx = 0; eIdx < p->Length; ++eIdx)
         {
         e = p->Elements[eIdx];
-        if (e && e->CompositeLevel <= level)
+        if (e)
           {
-          flag = 1;
-          p->Elements[eIdx] = NULL;
+          // Consider sends and receive as pair.
+          pIdxOther = e->OtherProcessId;
+          pOther = ts->Processes[pIdxOther];
+          eIdxOther = this->FindOtherElementIdx(pOther, e, pIdx);
+          eOther = pOther->Elements[eIdxOther];
+          if (eOther == NULL)
+            { // Sanity check.
+            vtkErrorMacro("Schedule bug: Could not locate other element.");
+            } 
           p2 = this->Processes[pIdx];
-          p2->Elements[p2->Length] = e;
-          ++(p2->Length);
+          p2Other = this->Processes[pIdxOther];
+          if (p2->Length <= level && p2Other->Length <= level)
+            { // We still have space in the combined/shuffled level.
+            // Check to make sure we have already taken care of dependencies.
+            if (e->Dependency == NULL || e->Dependency->Shuffled)
+              { // e dependencies OK.
+              if (eOther->Dependency == NULL || eOther->Dependency->Shuffled)
+                { // eOther dependencies OK.
+                // Shuffle them into the final schedule.
+                p->Elements[eIdx] = NULL;
+                p2->Elements[p2->Length] = e;
+                e->Shuffled = 1;
+                ++(p2->Length);
+                pOther->Elements[eIdxOther] = NULL;
+                p2Other->Elements[p2Other->Length] = eOther;
+                eOther->Shuffled = 1;
+                ++(p2Other->Length);
+                }
+              }
+            }
+          if ( ! e->Shuffled || ! eOther->Shuffled)
+            { // One check would be enough ...
+            // We skipped this element pair.  Call this method again.
+            flag = 1;
+            }
+          }
+        }
+      }
+    }
+  return flag;
+}
+
+
+//-------------------------------------------------------------------------
+int vtkTiledDisplaySchedule::FindOtherElementIdx(vtkTiledDisplayProcess* p, 
+                                                 vtkTiledDisplayElement* e,
+                                                 int pId)
+{
+  int idx;
+  vtkTiledDisplayElement* e2;
+
+  for (idx = 0; idx < p->Length; ++idx)
+    {
+    e2 = p->Elements[idx];
+    if (e2 && e2->TileId == e->TileId)
+      {
+      if ((e2->ReceiveFlag == 1 && e->ReceiveFlag == 0) ||
+          (e2->ReceiveFlag == 0 && e->ReceiveFlag == 1))
+        {
+        if (e2->OtherProcessId == pId)
+          {
+          return idx;
           }
         }
       }
     }
 
-  return flag;
+  vtkErrorMacro("Could not find other element.");
+  return -1;
 }
-

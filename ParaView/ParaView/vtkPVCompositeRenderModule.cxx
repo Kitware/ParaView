@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.1");
 
 
 
@@ -411,30 +411,10 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::SetUseCompositeCompression(int val)
 {
-  if (this->Composite)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    if (val)
-      {
-      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
-      }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
-    pvApp->BroadcastScript("pvTemp Delete");
-    }
-
-  if (val)
-    {
-    vtkTimerLog::MarkEvent("--- Enable compression when compositing.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
-    }
+  vtkErrorMacro("SetUseCompositeCompression not "
+                "implemented for " << this->GetClassName());
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkPVCompositeRenderModule::MakeCollectionDecision()

@@ -21,7 +21,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeBuffer, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeBuffer, "1.2.2.1");
 vtkStandardNewMacro(vtkPVCompositeBuffer);
 
 //-------------------------------------------------------------------------
@@ -33,6 +33,21 @@ vtkPVCompositeBuffer::vtkPVCompositeBuffer()
 }
 
   
+//-------------------------------------------------------------------------
+vtkUnsignedCharArray* vtkPVCompositeBuffer::GetPData()
+{
+  if (this->PData == NULL)
+    {
+    return NULL;
+    }
+  if (this->PData->GetNumberOfTuples() != this->UncompressedLength)
+    {
+    vtkErrorMacro("This buffer looks compressed.");
+    }
+  return this->PData;
+}
+
+
 //-------------------------------------------------------------------------
 vtkPVCompositeBuffer::~vtkPVCompositeBuffer()
 {

@@ -30,7 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.6.2.1");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -269,6 +269,35 @@ vtkPVCompositeUtilities::NewCompositeBuffer(int numPixels)
 
 
 //-------------------------------------------------------------------------
+vtkPVCompositeBuffer* 
+vtkPVCompositeUtilities::NewCompositeBuffer(vtkUnsignedCharArray* pData,
+                                            vtkFloatArray* zData)
+{
+  if (pData == NULL || zData == NULL)
+    {
+    vtkErrorMacro("Missing array.");
+    return NULL;
+    }
+
+  vtkPVCompositeBuffer* b = vtkPVCompositeBuffer::New();
+  
+  // RGB
+  b->PData = pData;
+  b->ZData = zData;
+  pData->Register(this);
+  zData->Register(this);
+
+  b->UncompressedLength = pData->GetNumberOfTuples();
+  if (b->UncompressedLength != zData->GetNumberOfTuples())
+    {
+    vtkErrorMacro("Inconsistent number of pixels.");
+    }
+
+  return b;
+}
+
+
+//-------------------------------------------------------------------------
 void vtkPVCompositeUtilities::SendBuffer(vtkMultiProcessController* controller,
                                          vtkPVCompositeBuffer* buf, 
                                          int otherProc, int tag) 
@@ -276,6 +305,8 @@ void vtkPVCompositeUtilities::SendBuffer(vtkMultiProcessController* controller,
   int lengths[2];
   lengths[0] = buf->PData->GetNumberOfTuples();
   lengths[1] = buf->UncompressedLength;
+
+  //cout << "Send " << otherProc << ", " << tag << endl;
 
   controller->Send(lengths, 2, otherProc, tag);
   controller->Send(buf->ZData->GetPointer(0), lengths[0], otherProc, tag*2);
@@ -290,6 +321,8 @@ vtkPVCompositeBuffer* vtkPVCompositeUtilities::ReceiveNewBuffer(
 {
   int lengths[2];
   vtkPVCompositeBuffer *buf;
+
+  //cout << "Recv " << otherProc << ", " << tag << endl;
 
   controller->Receive(lengths, 2, otherProc, tag);
   buf = this->NewCompositeBuffer(lengths[0]);
@@ -346,6 +379,14 @@ int vtkPVCompositeUtilities::GetCompressedLength(vtkFloatArray *zArray)
     }
   // 1 more for last pixel.
   ++length;
+
+  zIn = zArray->GetPointer(0);
+
+  // This uncovered a bug with the NVidia drivers.
+  // Getting the buffere of a sub window messed up the zbuffer.
+  //fprintf(stdout, "Compress (%.1f,%.1f,%.1f,%.1f) %d, %d)\n",
+  //        zIn[0],zIn[1],zIn[2],zIn[3],zArray->GetNumberOfTuples(), length);
+
   return length;
 }
 
@@ -919,17 +960,42 @@ void vtkPVCompositeUtilities::MagnifyBuffer(vtkDataArray* localP,
   
 }
   
-
-
 //----------------------------------------------------------------------------
-void vtkPVCompositeUtilities::PrintSelf(ostream& os, vtkIndent indent)
+unsigned long vtkPVCompositeUtilities::GetTotalMemoryUsage()
 {
   unsigned long         arrayMemory;
   unsigned long         totalMemory = 0;
   vtkFloatArray*        floatArray;
   vtkUnsignedCharArray* ucharArray;
 
-  this->vtkObject::PrintSelf(os, indent);
+  this->FloatArrayCollection->InitTraversal();
+  while( (floatArray = (vtkFloatArray*)(this->FloatArrayCollection->GetNextItemAsObject())) )
+    {
+    arrayMemory = floatArray->GetActualMemorySize();
+    totalMemory += arrayMemory;
+    }
+
+  this->UnsignedCharArrayCollection->InitTraversal();
+  while( (ucharArray = (vtkUnsignedCharArray*)(this->UnsignedCharArrayCollection->GetNextItemAsObject())) )
+    {
+    arrayMemory = ucharArray->GetActualMemorySize();
+    totalMemory += arrayMemory;
+    }
+
+  return totalMemory;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeUtilities::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+
+  unsigned long         arrayMemory;
+  unsigned long         totalMemory = 0;
+  vtkFloatArray*        floatArray;
+  vtkUnsignedCharArray* ucharArray;
 
   this->FloatArrayCollection->InitTraversal();
   while( (floatArray = (vtkFloatArray*)(this->FloatArrayCollection->GetNextItemAsObject())) )
@@ -948,7 +1014,6 @@ void vtkPVCompositeUtilities::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << "Total Memory Usage: " << totalMemory << " kB \n";
-
   os << "Maximum Memory Usage: " << this->MaximumMemoryUsage << " kB \n";
 }
 
