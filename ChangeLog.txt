@@ -2,6 +2,22 @@ Changes in 1.8.3
 
 - Added support for writing AVI animations on Windows platforms
 
+- Fixed "IntegrateAttributes" to work in parallel.
+
+- Added three filters to the filter menu.
+   1) Integrate Attributes: Integrates attributes over 2D surfaces.  Creates
+   one point and one vert in output.  Point and cell data for this point and
+   cell contain the integrated values.  A new "area" cell array is created.
+   All of the integrated attribute values are displayed in the GUI.
+
+   2) Surface Vectors Will either project vectors onto the surface, or give
+   the component of the vector perpendicular to the surface.  The new output
+   vector point attribute has the same name as the input vector attribute.  A
+   glyph filter is still needed to show the vectors.
+
+   3) Surface flow.  Outputs a point and vertex.  It integrates the dot
+   product of a vector field with the surface normal.  It puts the result in
+   a attribute called surface flow.  The value is also displayed in the GUI.
 
 Changes in 1.8.2
 
