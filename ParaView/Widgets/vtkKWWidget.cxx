@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.83");
+vtkCxxRevisionMacro(vtkKWWidget, "1.84");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.83 $");
+  this->ExtractRevision(os,"$Revision: 1.84 $");
 }
 
 //----------------------------------------------------------------------------
@@ -670,10 +670,11 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
   // Shall we remove the curly braces so that we can use the {%s}
   // syntax to use the string inside this->Script ?
 
-  const char *clean_str = NULL;
+  char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    str = clean_str = vtkString::RemoveChars(str, "{}");
+    clean_str = vtkString::RemoveChars(str, "{}");
+    str = clean_str;
     }
 
   // No encoding known ? The fast way, return unchanged
@@ -733,10 +734,11 @@ const char* vtkKWWidget::ConvertTclStringToInternalString(
   // Shall we remove the curly braces so that we can use the {%s}
   // syntax to use the string inside this->Script ?
   
-  const char *clean_str = NULL;
+  char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    str = clean_str = vtkString::RemoveChars(str, "{}");
+    clean_str = vtkString::RemoveChars(str, "{}");
+    str = clean_str;
     }
 
   // No encoding known ? The fast way, return unchanged
