@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.566");
+vtkCxxRevisionMacro(vtkPVWindow, "1.567");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -599,6 +599,18 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->GlyphMenu->Delete();
     this->GlyphMenu = NULL;
+    }
+
+  if(this->PreferencesMenu!=NULL)
+    {
+      this->PreferencesMenu->Delete();
+      this->PreferencesMenu=NULL;
+    }
+
+  if(this->PluginsDialog!=NULL)
+    {
+      this->PluginsDialog->Delete();
+      this->PluginsDialog=NULL;
     }
 }
 
