@@ -87,7 +87,7 @@ $pv(vtkTemp723) SetValue 5000
 set pv(vtkTemp728) [$pv(vtkTemp711) GetPVWidget {MaskPoints}]
 $pv(vtkTemp728) SetState 1
 set pv(vtkTemp731) [$pv(vtkTemp711) GetPVWidget {RandomMask}]
-$pv(vtkTemp731) SetState 1
+$pv(vtkTemp731) SetState 0
 $pv(vtkTemp711) AcceptCallback
 
 $pv(vtkTemp41) ColorByProperty
