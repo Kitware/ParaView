@@ -341,7 +341,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.33 $");
+  this->ExtractRevision(os,"$Revision: 1.34 $");
 }
 
 //------------------------------------------------------------------------------
@@ -515,4 +515,5 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Parent: " << this->GetParent() << endl;
   os << indent << "TraceName: " << (this->TraceName?this->TraceName:"none") 
      << endl;
+  os << indent << "Enabled: " << (this->Enabled ? "on" : "off") << endl;
 }
