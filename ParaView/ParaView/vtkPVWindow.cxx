@@ -1082,8 +1082,14 @@ void vtkPVWindow::ResetCenterCallback()
     return;
     }
   
+  float bounds[6];
+  this->CurrentPVData->GetBounds(bounds);
+
   float center[3];
-  this->CurrentPVData->GetVTKData()->GetCenter(center);
+  center[0] = (bounds[0]+bounds[1])/2.0;
+  center[1] = (bounds[2]+bounds[3])/2.0;
+  center[2] = (bounds[4]+bounds[5])/2.0;
+
   this->RotateCameraStyle->SetCenter(center);
   this->CenterXEntry->SetValue(center[0], 3);
   this->CenterYEntry->SetValue(center[1], 3);
