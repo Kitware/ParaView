@@ -32,6 +32,9 @@
 
 //----------------------------------------------------------------------------
 //============================================================================
+class vtkKWArgumentsInternalVectorOfStrings : public vtkstd::vector<vtkstd::string> {};
+class vtkKWArgumentsInternalMapOfStrucs : public vtkstd::map<vtkstd::string,
+    vtkKWArguments::CallbackStructure> {};
 class vtkKWArgumentsInternal
 {
 public:
@@ -42,9 +45,8 @@ public:
     this->LastArgument = 0;
     }
 
-  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
-  typedef vtkstd::map<vtkstd::string,
-    vtkKWArguments::CallbackStructure> CallbacksMap;
+  typedef vtkKWArgumentsInternalVectorOfStrings VectorOfStrings;
+  typedef vtkKWArgumentsInternalMapOfStrucs CallbacksMap;
 
   VectorOfStrings Argv;
   CallbacksMap Callbacks;
@@ -59,7 +61,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.14");
+vtkCxxRevisionMacro(vtkKWArguments, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
