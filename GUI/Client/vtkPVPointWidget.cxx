@@ -31,11 +31,11 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPointWidget.h"
+#include "vtkPickPointWidget.h"
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.28");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -206,10 +206,18 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->Widget3DID = pm->NewStreamObject("vtkPointWidget");
+  this->Widget3DID = pm->NewStreamObject("vtkPickPointWidget");
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndRenderServer();
+
+  // Widget needs the RenderModule for picking.
+  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(
+             pm->GetObjectFromID(Widget3DID));
+  if (widget)
+    {
+    widget->SetRenderModule(pvApp->GetRenderModule());
+    }
   
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -288,7 +296,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  vtkPointWidget *widget = vtkPointWidget::SafeDownCast(wdg);
+  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
   if ( !widget )
     {
     vtkErrorMacro( "This is not a point widget" );
