@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.489");
+vtkCxxRevisionMacro(vtkPVWindow, "1.490");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1234,6 +1234,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     this->MainView->SetupCameraManipulators();     
     }
 
+  // Udpate the enable state
+
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -2244,7 +2247,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   pm->RootScript("%s GetClassName",
                  this->GetCurrentPVSource()->GetPart()->GetVTKDataTclName());
 
-  vtkDataSet* data;
+  vtkDataSet* data = NULL;
   const char* dataClassName = pm->GetRootResult();
   if (strcmp(dataClassName, "vtkImageData") == 0)
     {
