@@ -170,6 +170,14 @@ SOURCE=.\vtkKWLabeledFrameTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWListBox.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWListBoxTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWMenu.cxx
 # End Source File
 # Begin Source File
@@ -579,6 +587,35 @@ InputName=vtkKWLabeledFrame
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWListBox.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWListBox.h
+InputName=vtkKWListBox
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWListBox.h
+InputName=vtkKWListBox
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWMenu.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
@@ -921,6 +958,31 @@ InputName=vtkKWViewCollection
 # Begin Source File
 
 SOURCE=.\vtkKWVolumeComposite.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWVolumeComposite.h
+InputName=vtkKWVolumeComposite
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWVolumeComposite.h
+InputName=vtkKWVolumeComposite
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
