@@ -90,6 +90,15 @@ public:
   virtual void SetCommand(vtkKWObject* CalledObject, const char *CommandString);
 
   // Description:
+  // Play beep when the dialog is displayed
+  vtkSetClampMacro( Beep, int, 0, 1 );
+  vtkBooleanMacro( Beep, int );
+
+  // Description:
+  // Sets the beep type
+  vtkSetMacro( BeepType, int );
+
+  // Description:
   // Set the title of the dialog. Default is "Kitware Dialog".
   void SetTitle(const char *);
 
@@ -107,6 +116,8 @@ protected:
   char *Command;
   char *TitleString;
   int Done;
+  int Beep;
+  int BeepType;
 };
 
 

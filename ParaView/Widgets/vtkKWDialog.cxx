@@ -68,6 +68,7 @@ vtkKWDialog::vtkKWDialog()
   this->Done = 1;
   this->TitleString = 0;
   this->SetTitleString("Kitware Dialog");
+  this->Beep = 0;
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -87,6 +88,11 @@ int vtkKWDialog::Invoke()
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
   this->Script("grab %s",this->GetWidgetName());
+  if ( this->Beep )
+    {
+    this->Script("bell");
+    }
+
 
   // do a grab
   // wait for the end
