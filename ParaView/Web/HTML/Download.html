@@ -13,59 +13,125 @@
 
     <td width="550" valign="top" bgcolor="#FFFFFF">
     <div align="left">
-    <font size=5>Download </font>ParaView via CVS access. To use ParaView,
-    you will also have to download and install VTK and CMake. (VTK serves 
-    as the visualization engine; CMake is the build environment.) Note that
-    the current version of ParaView requires a specific branch of the VTK
-    CVS tree, it will not compile with the main branch. There is 
-    currently no method to obtain ParaView as a packaged zip or tar file. 
-    Packaged releases will become available in the near future.
-    <p>
-    (Note: CVS is a source code revision control system used by many participants 
-    in the open-source community. To use CVS, you must have it installed on your 
-    system. You may wish to use the 
-    <a href="http://sources.redhat.com/cygwin/">Cygwin</a> tools on Windows
-    platforms, or <a href="http://www.wincvs.org">WinCVS</a> which provides 
-    a very nice GUI to CVS.
-    <p>
-    <hr>
-    <p>
-    <u><b>CMake</b></u> can be obtained via CVS using the following procedure.
-    <p>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/CMake login</b><br>
-    (respond with password cmake)
-    <p>
-    Follow this command by checking out the source code:<br>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/CMake co CMake</b>
-    <p>
-    If you are on a Windows system, CMake can also be downloaded and installed
-    using the self-extraction distribution found 
-    <a href="http://public.kitware.com/CMake/CMSetup.exe">here</a>.
-    <p>
-    <hr>
-    <p>
-    <u><b>VTK</b></u> can be obtained via CVS using the following procedure.
-    <p>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login</b><br>
-    (respond with password vtk)
-    <p>
-    Follow this command by checking out the source code:<br>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK co -r ParaView-0-2 VTK</b>
-    <p>
-    (Be careful that you don't check the new VTK CVS repository on top of an existing
-    VTK 3.3 or earlier release. Remember, in Windows "vtk" and "VTK" are the same 
-    directory name.)
-    <p>
-    <hr>
-    <p>
-    <u><b>ParaView</b></u> can be obtained via CVS using the following procedure.
+  You can either download binaries or source code archives for the
+  latest release or access the current development distribution through
+  CVS. 
+
+  <h2>Latest Release (0.2)</h2>
+  <ul><b>Pre-compiled binaries:</b><p>
+    <li>CMakeSetup.exe:
+         intended for Windows users :
+        <a href="http://public.kitware.com/ParaView/Release/PVSetup.exe">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/PVSetup.exe">
+        ftp</a>
+  </ul>
+  <ul><b>Source code archives:</b><p>
+    We recommend using ParaViewComplete since it contains the appropriate
+    snapshot of VTK and Tcl/Tk 8.2.3 required to build VTK. However, If you
+    want to compile ParaView against VTK you built separately, you can
+    download ParaView alone (make sure that you use Tcl/Tk 8.2.3, other
+    versions will not work). If you have not already done so, you will need
+    to download and compile/install <a href="http://public.kitware.com/CMake">
+    CMake</a> to compile ParaView. Also, on Windows, you will have to install
+    the HTML Help library from Microsoft. See
+    <a href="http://msdn.microsoft.com">http://msdn.microsoft.com</a>.
+    <li>ParaViewComplete-0-2.tar.gz: Unix style, gzip'ed, contains
+        ParaView, VTK and Tcl/Tk 8.2.3:
+        <a href="http://public.kitware.com/ParaView/Release/ParaViewComplete-0-2.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete-0-2.tar.gz">
+        ftp</a>
+    <li>ParaViewComplete-0-2.tar.Z: Unix style, compresseded, contains
+        ParaView, VTK and Tcl/Tk 8.2.3:
+        <a href="http://public.kitware.com/ParaView/Release/ParaViewComplete-0-2.tar.Z">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/ParaViewComplete-0-2.tar.Z">
+        ftp</a>
+    <li>ParaView-0-2.tar.gz: Unix style, gzip'ed, contains
+        ParaView only, you will have to download VTK and Tcl/Tk 8.2.3
+        separately:
+        <a href="http://public.kitware.com/ParaView/Release/ParaView-0-2.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/ParaView-0-2.tar.gz">
+        ftp</a>
+    <li>ParaView-0-2.tar.Z: Unix style, compresseded, contains
+        ParaView only, you will have to download VTK and Tcl/Tk 8.2.3
+        separately:
+        <a href="http://public.kitware.com/ParaView/Release/ParaView-0-2.tar.Z">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/ParaView-0-2.tar.Z">
+        ftp</a>
+    <li>VTK-0-2.tar.gz: Unix style, gzip'ed, contains
+        VTK snapshot for ParaView 0.2:
+        <a href="http://public.kitware.com/ParaView/Release/VTK-0-2.tar.gz">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/VTK-0-2.tar.gz">
+        ftp</a>
+    <li>VTK-0-2.tar.Z: Unix style, compresseded, contains
+        VTK snapshot for ParaView 0.2:
+        <a href="http://public.kitware.com/ParaView/Release/VTK-0-2.tar.Z">
+        http</a>, 
+        <a href="ftp://public.kitware.com/pub/paraview/VTK-0-2.tar.Z">
+        ftp</a>
+  </ul>
+  <ul><b>CVS:</b><p>
+    <li>ParaViewComplete: contains ParaView, VTK and Tcl/Tk 8.2.3:
+        <pre>
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login
+        (respond with password paraview)
+
+        Follow this command by checking out the source code:
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaViewComplete
+        </pre>
+    <li>ParaView: contains ParaView,  you will have to download VTK and
+        Tcl/Tk 8.2.3 separately:
+        <pre>
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login
+        (respond with password paraview)
+
+        Follow this command by checking out the source code:
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaView
+        </pre>
+    <li>VTK: VTK snapshot for ParaView 0.2:
+        <pre>
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login
+        (respond with password vtk)
+
+        Follow this command by checking out the source code:
+        cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 VTK
+        </pre>
+  </ul>
+  <h2>Current development distribution</h2>
+  Download ParaView Complete (contains ParaView, VTK and Tcl/Tk 8.2.3)
+  source via CVS access: 
     <p>
     <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b><br>
     (respond with password paraview)
     <p>
     Follow this command by checking out the source code:<br>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaView</b>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co ParaViewComplete</b>
     <p>
+  Alternatively, if you already have VTK, download ParaView source alone via
+  CVS access (you will need Tcl/Tk 8.2.3, other versions will not work): 
+    <p>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b><br>
+    (respond with password paraview)
+    <p>
+    Follow this command by checking out the source code:<br>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co ParaView</b>
+    <p>
+  If you have not already done so, you will need
+  to download and compile/install <a href="http://public.kitware.com/CMake">
+  CMake</a> to compile ParaView. Also, on Windows, you will have to install
+  the HTML Help library from Microsoft. See
+  <a href="http://msdn.microsoft.com">http://msdn.microsoft.com</a>.<p>
+  (Note: CVS is a source code revision control system used by many
+  participants in the open-source community. To use CVS, you must have it
+  installed on your system. You may wish to use the 
+  <a href="http://sources.redhat.com/cygwin/">Cygwin</a> tools on Windows
+  platforms, or <a href="http://www.wincvs.org">WinCVS</a> which provides 
+  a very nice GUI to CVS.
 
     </div>
     </td>
