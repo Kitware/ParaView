@@ -883,12 +883,14 @@ int vtkKWApplication::LoadScript(const char* filename)
   int res = 1;
   char* file = vtkString::Duplicate(filename);
   // add this window as a variable
-  this->Script("set InitialWindow %s", this->GetTclName());
   if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
     {
     vtkErrorMacro("\n    Script: \n" << filename << "\n    Returned Error on line "
 		  << this->MainInterp->errorLine << ": \n      "  
 		  << Tcl_GetStringResult(this->MainInterp) << endl);
+    cout << "\n    Script: \n" << filename << "\n    Returned Error on line "
+	 << this->MainInterp->errorLine << ": \n      "  
+	 << Tcl_GetStringResult(this->MainInterp) << endl;
     res = 0;
     }
   delete [] file;
