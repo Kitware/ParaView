@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -218,7 +218,7 @@ void vtkPVFileEntry::Accept()
                          this->GetValue());
     }
 
-  pvApp->BroadcastScript("%s Set%s %s",
+  pvApp->BroadcastScript("%s Set%s {%s}",
                          this->ObjectTclName, this->VariableName, 
                          this->Entry->GetValue());
 
