@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.3");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -578,17 +578,6 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  // Application Icon 
-#ifdef _WIN32
-  this->Script("SetApplicationIcon %s.exe %d big",
-               this->GetApplicationName(),
-               IDI_PARAVIEWICO32);
-  // No, we can't set the same icon, even if it has both 32x32 and 16x16
-  this->Script("SetApplicationIcon %s.exe %d small",
-               this->GetApplicationName(),
-               IDI_PARAVIEWICO16);
-#endif
-
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
@@ -825,6 +814,16 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->SplashScreen->SetProgressMessage("Initializing application...");
     }
 
+  // Application Icon 
+#ifdef _WIN32
+  this->Script("SetApplicationIcon %s.exe %d big",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO32);
+  // No, we can't set the same icon, even if it has both 32x32 and 16x16
+  this->Script("SetApplicationIcon %s.exe %d small",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO16);
+#endif
 
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
