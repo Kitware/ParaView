@@ -35,8 +35,6 @@
 #include "vtkFloatArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
-// Until we trigger LOD from AllocatedRenderTime ...
-#include "vtkPVApplication.h"
 #include "vtkByteSwap.h"
 #include "vtkIceTRenderManager.h"
 
@@ -48,7 +46,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.10");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.11");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
