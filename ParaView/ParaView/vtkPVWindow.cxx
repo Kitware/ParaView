@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.1");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1885,7 +1885,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
       }
     else
       {
-      vtkErrorMacro(<<error);
+      vtkErrorMacro(<<error.str());
       }
     error.rdbuf()->freeze(0);
     return VTK_ERROR;
@@ -2461,7 +2461,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   // We may want different questions if there is no animation.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && script[0])
+  if (script && script[0] && this->AnimationInterface->GetScriptAvailable())
     {
     animationFlag = 1;
     }
@@ -2836,6 +2836,8 @@ void vtkPVWindow::SaveState(const char* filename)
   *file << "set kw(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
   *file << "set kw(" << this->GetMainView()->GetTclName() 
         << ") [$kw(" << this->GetTclName() << ") GetMainView]" << endl;
+  *file << "set kw(" << this->AnimationInterface->GetTclName() 
+        << ") [$kw(" << this->GetTclName() << ") GetAnimationInterface]" << endl;
 
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
@@ -2881,6 +2883,9 @@ void vtkPVWindow::SaveState(const char* filename)
 
   // Save the view at the end so camera get set properly.
   this->GetMainView()->SaveState(file);
+
+  // Save state of the animation interface
+  this->AnimationInterface->SaveState(file);
 
   delete file;
   file = NULL;

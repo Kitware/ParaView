@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.1");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -81,6 +81,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Prefix = 0;
   this->Ext = 0;
   this->Path = 0;
+  this->Range[0] = this->Range[1] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -338,6 +339,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     this->ModifiedCallback();
     return;
     }
+  this->Range[0] = this->Range[1] = 0;
 
   // Have to regenerate prefix, pattern...
 
@@ -701,6 +703,8 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
   sprintf(script, "AnimationMenuCallback $kw(%s)", 
     ai->GetTclName());
+  ai->SetSaveStateScript(script);
+  ai->SetSaveStateObject(this);
   ai->Update();
 }
 

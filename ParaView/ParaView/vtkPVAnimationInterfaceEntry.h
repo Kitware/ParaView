@@ -102,6 +102,7 @@ public:
   const char* GetTimeEquation(float vtkNotUsed(tmax));
 
   void SetupBinds();
+  void RemoveBinds();
 
   void SetTypeToFloat();
 
@@ -133,6 +134,18 @@ public:
 
   void NoMethodCallback();
 
+  // Description:
+  // This method saves state of animation entry.
+  void SaveState(ofstream *file);
+
+  // Description:
+  // Set the save state script.
+  vtkSetStringMacro(SaveStateScript);
+  void SetSaveStateObject(vtkKWObject* o)
+    {
+    this->SaveStateObject = o;
+    }
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -150,7 +163,10 @@ protected:
   vtkPVSource*       PVSource;
 
   vtkKWRange*        TimeRange;
-  
+
+
+  vtkKWObject*       SaveStateObject;
+  char*              SaveStateScript;
   char*              Script;
   char*              CurrentMethod;
   char*              TimeEquation;

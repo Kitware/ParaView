@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -123,6 +123,9 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->CurrentIndex = -1;
 
   this->UpdatingEntries = 0;
+
+  this->SaveStateScript = 0;
+  this->SaveStateObject = 0;
 
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -290,6 +293,9 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->SetCurrentMethod(0);
   this->SetTimeEquation(0);
   this->SetLabel(0);
+
+  this->SetSaveStateObject(0);
+  this->SetSaveStateScript(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -512,6 +518,15 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::RemoveBinds()
+{
+  this->StartTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->StartTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->EndTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->EndTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetupBinds()
 {
   this->StartTimeEntry->GetEntry()->SetBind(this, "<FocusOut>",
@@ -565,7 +580,8 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
   if ( this->Dirty )
     {
     this->SetTypeToFloat();
-    this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", this->GetTclName(), label, script);
+    //this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
+    //  this->GetTclName(), label, script);
     }
   this->Parent->UpdateNewScript();
 }
@@ -576,6 +592,25 @@ void vtkPVAnimationInterfaceEntry::Update()
   //cout << "Type is: " << this->TypeIsInt << endl;
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
+{
+  if ( this->GetPVSource() )
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetPVSource $kw(" 
+          << this->GetPVSource()->GetTclName() << ")" << endl;
+    if ( this->CurrentMethod )
+      {
+      *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
+      if ( this->SaveStateScript  && this->SaveStateObject )
+        {
+        *file << "$kw(" << this->SaveStateObject->GetTclName() << ") " << this->SaveStateScript << endl;
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -595,5 +630,8 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenuButton: " << this->SourceMenuButton << endl;
   os << indent << "MethodMenuButton: " << this->MethodMenuButton << endl;
   os << indent << "PVSource: " << this->PVSource<< endl;
+
+  os << indent << "SaveStateScript: " 
+    << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
 }
 

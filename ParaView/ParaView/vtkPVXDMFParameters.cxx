@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.7");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.7.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -415,13 +415,13 @@ void vtkPVXDMFParameters::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, const char *name)
 {
   char script[1024];
-  
+
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
-                        this->GetTclName(), ai->GetTclName(), name);
+      this->GetTclName(), ai->GetTclName(), name);
     }
-  
+
   sprintf(script, "%s SetParameterIndex {%s} $pvTime",
     this->GetPVSource()->GetVTKSourceTclName(),
     name);
@@ -431,6 +431,10 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai
   //ai->SetCurrentTime(p->Value);
   ai->SetTimeEnd(p->Max);
   ai->SetTypeToInt();
+  sprintf(script, "AnimationMenuCallback $kw(%s)", 
+    ai->GetTclName());
+  ai->SetSaveStateScript(script);
+  ai->SetSaveStateObject(this);
   ai->Update();
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
 }

@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -222,6 +222,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->AnimationEntriesMenu = vtkKWMenuButton::New();
 
   this->Dirty = 1;
+  this->ScriptAvailable = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -863,8 +864,10 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
     {
     float ctime = static_cast<float>(this->GetCurrentTime()) / 
       static_cast<float>(this->NumberOfFrames-1);
-    pvApp->BroadcastScript("set globalPVTime %g", ctime);
-    pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
+    const char* script = this->ScriptEditor->GetValue();
+    pvApp->BroadcastScript(
+      "set globalPVTime %g\n"
+      "catch {%s}", ctime, script);
 
     if (this->ControlledWidget)
       {
@@ -1464,7 +1467,7 @@ vtkPVApplication* vtkPVAnimationInterface::GetPVApplication()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::AddEmptySourceItem()
+vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::AddEmptySourceItem()
 {
   vtkPVAnimationInterfaceEntry* entry = vtkPVAnimationInterfaceEntry::New();
   entry->SetApplication(this->Application);
@@ -1480,6 +1483,7 @@ void vtkPVAnimationInterface::AddEmptySourceItem()
   this->AddTraceEntry("$kw(%s) AddEmptySourceItem", this->GetTclName());
   entry->Delete();
   this->Dirty = 1;
+  return entry;
 }
 
 //-----------------------------------------------------------------------------
@@ -1627,6 +1631,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
     return;
     }
   ostrstream str;
+  ostrstream cstr;
   //str << "puts \"------------- start --------------\"" << endl;
   str << "# globalPVTime is provided by the animation " << endl;
   str << "# interface for convenience. " << endl;
@@ -1634,6 +1639,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   str << "# first frame, 1 at the last frame).\n" << endl;
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
   int cnt = 0;
+  int script_available = 0;
   if ( this->AnimationEntries->GetNumberOfItems() > 0 )
     {
     typedef vtkstd::map<vtkstd::string, int> smaptype;
@@ -1644,11 +1650,10 @@ void vtkPVAnimationInterface::UpdateNewScript()
       {
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
-      if ( entry->GetPVSource() )
+      if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceTclName() )
         {
-        smap[entry->GetPVSource()->GetName()] = 1;
+        smap[entry->GetPVSource()->GetVTKSourceTclName()] = 1;
         cnt ++;
-        //cout << "Add new source: " << entry->GetPVSource()->GetName() << endl;
         }
       if ( entry->GetDirty() )
         {
@@ -1667,6 +1672,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
         str << sit->first.c_str() << " ";
         }
       str << endl;
+      script_available = 1;
       }
     }
   if ( !cnt )
@@ -1689,15 +1695,20 @@ void vtkPVAnimationInterface::UpdateNewScript()
       {
       str << entry->GetTimeEquation(this->NumberOfFrames) << endl;
       str << entry->GetScript() << endl;
+      script_available = 1;
       }
     entry->SetDirty(0);
     }
   //str << "puts \"-------------- end ---------------\"" << endl;
   str << ends;
+  cstr << ends;
   this->SetNewScriptString(str.str());
   str.rdbuf()->freeze(0);
+  cstr.rdbuf()->freeze(0);
   this->ScriptEditor->SetValue(this->NewScriptString);
   this->Dirty = 0;
+
+  this->ScriptAvailable = script_available;
 }
 
 //-----------------------------------------------------------------------------
@@ -1750,6 +1761,48 @@ void vtkPVAnimationInterface::PrepareForDelete()
   this->AnimationEntries->Delete();
   this->AnimationEntries = 0;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::DeleteSource(vtkPVSource* src)
+{
+  vtkCollectionIterator* it = this->AnimationEntriesIterator;
+  int cc = 0;
+  for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem(), cc++ )
+    {
+    vtkPVAnimationInterfaceEntry* entry
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+    if ( entry->GetPVSource() == src )
+      {
+      this->DeleteSourceItem(cc);
+      it->InitTraversal();
+      cc = 0;
+      }
+    }
+  if ( this->AnimationEntries->GetNumberOfItems() == 0 )
+    {
+    this->AddEmptySourceItem();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveState(ofstream* file)
+{
+  int numberFrames = this->NumberOfFramesEntry->GetValueAsInt();
+  int frame = static_cast<int>(this->TimeScale->GetValue());
+
+  int cc;
+  for ( cc = 0; cc < this->AnimationEntries->GetNumberOfItems(); cc ++ )
+    {
+    vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(cc);
+    *file << "set kw(" << entry->GetTclName() << ") [$kw(" << this->GetTclName() 
+          << ") AddEmptySourceItem]" << endl;
+    entry->SaveState(file);
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetNumberOfFrames " << numberFrames << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetCurrentTime " << frame << endl;
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
 {

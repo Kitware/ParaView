@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.26");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.26.2.1");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -472,6 +472,9 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
           this->PVSource->GetVTKSourceTclName());
 
   ai->SetLabelAndScript(this->GetTraceName(), script);
+  sprintf(script, "AnimationMenuCallback $kw(%s)", ai->GetTclName());
+  ai->SetSaveStateScript(script);
+  ai->SetSaveStateObject(this);
   ai->Update();
 }
 
