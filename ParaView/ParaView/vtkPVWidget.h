@@ -84,6 +84,7 @@ public:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
   virtual void Reset();
+  void ForceReset();
 
   // Description:
   // The methods get called when reset is called.  
@@ -177,7 +178,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVWidget* ClonePrototype(vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
     {
       return this->ClonePrototypeInternal(pvSource, map);
     }
@@ -205,9 +206,9 @@ protected:
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 
 
   vtkLinkedList<void*>* Dependents;

@@ -104,6 +104,13 @@ void vtkPVWidget::Accept()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWidget::ForceReset()
+{
+  this->ModifiedFlag = 1;
+  this->Reset();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWidget::Reset()
 {
   this->Update();
@@ -181,7 +188,7 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
-				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if a clone of this widget has already been created
@@ -206,7 +213,7 @@ vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   // Copy the tracename and help (note that SetBalloonHelpString
   // is virtual and is redefined by subclasses when necessary).
@@ -251,7 +258,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 
   clone->SetPVSource(pvSource);
   clone->SetModifiedCommand(pvSource->GetTclName(), 
-			    "SetAcceptButtonColorToRed");
+                            "SetAcceptButtonColorToRed");
 }
 
 //----------------------------------------------------------------------------
@@ -295,7 +302,7 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
           }
         delete [] entry;
         this->Dependents->AppendItem(dep);
-	dep->Delete();
+        dep->Delete();
         }
       start = end;
       }
