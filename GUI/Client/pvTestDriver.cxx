@@ -402,7 +402,7 @@ int pvTestDriver::Main(int argc, char* argv[])
                             this->ParaView.c_str(),
                             "--render-server",
                             this->MPIRenderServerNumProcessFlag.c_str());
-    ReportCommand(&renderServerCommand[0], "renderserver");
+    this->ReportCommand(&renderServerCommand[0], "renderserver");
     kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
     }
   
@@ -413,7 +413,7 @@ int pvTestDriver::Main(int argc, char* argv[])
                             this->ParaViewServer.c_str(),
                             "--server",
                             this->MPIServerNumProcessFlag.c_str());
-    ReportCommand(&serverCommand[0], "server");
+    this->ReportCommand(&serverCommand[0], "server");
     kwsysProcess_SetCommand(server, &serverCommand[0]);
     }
 
@@ -448,7 +448,7 @@ int pvTestDriver::Main(int argc, char* argv[])
                           clientFlag.c_str(),
                           this->MPIClientNumProcessFlag.c_str(),
                           this->ArgStart, argc, argv);
-  ReportCommand(&clientCommand[0], "client");
+  this->ReportCommand(&clientCommand[0], "client");
   kwsysProcess_SetCommand(client, &clientCommand[0]);
 
   // Kill the processes if they are taking too long.
@@ -564,12 +564,12 @@ int pvTestDriver::Main(int argc, char* argv[])
   int serverResult = 0;
   if(server)
     {
-    ReportStatus(server, "server");
+    this->ReportStatus(server, "server");
     }
   int renderServerResult = 0;
   if(renderServer)
     {
-    renderServerResult = ReportStatus(renderServer, "renderserver");
+    renderServerResult = this->ReportStatus(renderServer, "renderserver");
     }
 
   // Free process managers.
