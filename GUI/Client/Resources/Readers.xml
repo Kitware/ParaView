@@ -509,7 +509,6 @@
                    property="GenerateGlobalNodeIdArray"
                    trace_name="global_node_ids"
                    help="Select whether the reader generates global node ids"/>
-
     <LabeledToggle label="Global Element Ids"
                    property="GenerateGlobalElementIdArray"
                    trace_name="global_element_ids"
@@ -518,6 +517,10 @@
                    property="GenerateFileIdArray"
                    trace_name="global_file_ids"
                    help="Select whether the reader generates cell based disk file ids"/>
+    <LabeledToggle label="Include metadata"
+                   property="ExodusModelMetadata"
+                   trace_name="metadata"
+                   help="Turn this ON if you plan to write Exodus or EnSight files"/>
   </Module>
 #else
     <Module name="byureader"
