@@ -244,7 +244,6 @@ void vtkKWScale::ScaleValueChanged(float num)
     {
     this->Script("eval %s",this->Command);
     }
-  this->Script( "update idletasks");
 }
 
 
