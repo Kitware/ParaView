@@ -8,7 +8,7 @@ class Output
 public:
   Output()
     {
-    this->MaxLen = 16000;
+    this->MaxLen = 10000;
     this->CurrentPosition = 0;
     }
   ~Output()
