@@ -1423,6 +1423,7 @@ void vtkPVData::ResetColorRange()
   if (this->PVColorMap == NULL)
     {
     vtkErrorMacro("Color map is missing.");
+    return;
     }
 
   this->PVColorMap->ResetScalarRange();
