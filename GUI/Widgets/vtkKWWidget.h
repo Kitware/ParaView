@@ -194,6 +194,7 @@ public:
   // Convenience method to Set/Get the -state option to "normal" (if true) or
   // "disabled" (if false).
   void SetStateOption(int flag);
+  int GetStateOption();
 
   // Description:
   // Query if widget is packed

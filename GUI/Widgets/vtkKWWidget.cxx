@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.107");
+vtkCxxRevisionMacro(vtkKWWidget, "1.108");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -467,7 +467,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.107 $");
+  this->ExtractRevision(os,"$Revision: 1.108 $");
 }
 
 //----------------------------------------------------------------------------
@@ -654,11 +654,22 @@ void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetStateOption(int flag)
 {
-    if (this->IsAlive())
+  if (this->IsAlive())
     {
     this->Script("%s configure -state %s", 
                  this->GetWidgetName(), (flag ? "normal" : "disabled")); 
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::GetStateOption()
+{
+  if (this->IsAlive())
+    {
+    const char *state = this->Script("%s cget -state", this->GetWidgetName());
+    return !strcmp(state, "normal") ? 1 : 0; 
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
