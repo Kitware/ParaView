@@ -25,7 +25,6 @@
 
 class vtkKWApplication;
 class vtkKWIcon;
-class vtkImageData;
 
 class VTK_EXPORT vtkKWIcon : public vtkObject
 {
@@ -125,19 +124,25 @@ public:
   void SetImage(int image);
 
   // Description:
-  // Set image data from vtkImageData. 
-  // Pixel data is converted/padded to RGBA for backward compatibility.
-  void SetImage(vtkImageData*);
-
-  // Description:
   // Set image data from another vtkKWIcon.
   void SetImage(vtkKWIcon*);
 
   // Description:
   // Set image data from pixel data, eventually zlib and base64.
+  // If 'buffer_length' is 0, compute it automatically by multiplying
+  // 'pixel_size', 'width' and 'height' together.
+  // If IMAGE_OPTION_FLIP_V is set in 'option', flip the image vertically
+  //BTX
+  enum 
+  { 
+    IMAGE_OPTION_FLIP_V = 1
+  };
+  //ETX
   void SetImage(const unsigned char* data, 
-                int width, int height, int pixel_size, 
-                unsigned long buffer_length);
+                int width, int height, 
+                int pixel_size, 
+                unsigned long buffer_length = 0,
+                int options = 0);
 
   // Description:
   // Get the raw image data.
@@ -162,20 +167,14 @@ protected:
   // Description:
   // Set icon to the custom data.
   void SetData(const unsigned char* data, 
-               int width, int height, int pixel_size);
+               int width, int height, 
+               int pixel_size,
+               int options = 0);
 
   unsigned char* Data;
   int Width;
   int Height;
   int PixelSize;
-
-  // Description:
-  // Set data to the internal image.
-  void SetInternalData(const unsigned char* data, 
-                       int width, int height, int pixel_size);
-  
-  const unsigned char* InternalData;
-  int Internal;
 
 private:
   vtkKWIcon(const vtkKWIcon&); // Not implemented

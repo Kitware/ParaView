@@ -13,9 +13,6 @@
 =========================================================================*/
 #include "vtkKWIcon.h"
 
-#include "vtkImageConstantPad.h"
-#include "vtkImageData.h"
-#include "vtkImageFlip.h"
 #include "vtkObjectFactory.h"
 #include "vtkBase64Utilities.h"
 
@@ -29,72 +26,21 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.5");
+vtkCxxRevisionMacro(vtkKWIcon, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
 {
   this->Data         = 0;
-  this->InternalData = 0;
   this->Width        = 0;
   this->Height       = 0;
   this->PixelSize    = 0;
-  this->Internal     = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWIcon::~vtkKWIcon()
 {
   this->SetData(0, 0, 0, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWIcon::SetImage(vtkImageData* id)
-{
-  if (!id )
-    {
-    vtkErrorMacro("No image data specified");
-    return;
-    }
-  id->Update();
-
-  int *ext = id->GetWholeExtent();
-  if ((ext[5] - ext[4]) > 0)
-    {
-    vtkErrorMacro("Can only handle 2D image data");
-    return;
-    }
-
-  int width  = ext[1] - ext[0]+1;
-  int height = ext[3] - ext[2]+1;
-  int components = id->GetNumberOfScalarComponents();
-
-  vtkImageData *image = id;
-  image->Register(this);
-  if (components < 4)
-    {
-    image->UnRegister(this);
-    vtkImageConstantPad *pad = vtkImageConstantPad::New();
-    pad->SetInput(id);
-    pad->SetConstant(255);
-    pad->SetOutputNumberOfScalarComponents(4);
-    pad->Update();
-    image = pad->GetOutput();
-    image->Register(this);
-    pad->Delete();
-    }
-
-  vtkImageFlip *flip = vtkImageFlip::New();
-  flip->SetInput(image);
-  flip->SetFilteredAxis(1);
-  flip->Update();
-  image->UnRegister(this);
-
-  this->SetData(
-    static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
-    width, height, 4);
-
-  flip->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -107,15 +53,21 @@ void vtkKWIcon::SetImage(vtkKWIcon* icon)
     }
 
   this->SetData(icon->GetData(), 
-                icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+                icon->GetWidth(), icon->GetHeight(), 
+                icon->GetPixelSize());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWIcon::SetImage(const unsigned char *data, 
                          int width, int height, int pixel_size, 
-                         unsigned long buffer_length)
+                         unsigned long buffer_length,
+                         int options)
 {
   unsigned long nb_of_raw_bytes = width * height * pixel_size;
+  if (!buffer_length)
+    {
+    buffer_length = nb_of_raw_bytes;
+    }
   const unsigned char *data_ptr = data;
 
   // If the buffer_lenth has been provided, and if it's different than the
@@ -174,7 +126,7 @@ void vtkKWIcon::SetImage(const unsigned char *data,
 
   if (data_ptr)
     {
-    this->SetData(data_ptr, width, height, pixel_size);
+    this->SetData(data_ptr, width, height, pixel_size, options);
     }
 
   if (base64)
@@ -191,67 +143,52 @@ void vtkKWIcon::SetImage(const unsigned char *data,
 
 //----------------------------------------------------------------------------
 void vtkKWIcon::SetData(const unsigned char *data, 
-                        int width, int height, int pixel_size)
+                        int width, int height, 
+                        int pixel_size,
+                        int options)
 {
-  if (this->Data || this->InternalData)
+  if (this->Data)
     {
     if (this->Data)
       {
       delete [] this->Data;
       }
     this->Data         = 0;
-    this->InternalData = 0;
     this->Width        = 0;
     this->Height       = 0;
     this->PixelSize    = 0;
     }
 
-  int len = width * height * pixel_size;
-  if (data && len > 0)
+  unsigned long stride = width * pixel_size;
+  unsigned long buffer_length = stride * height;
+  if (data && buffer_length > 0)
     {
     this->Width  = width;
     this->Height = height;
     this->PixelSize = pixel_size;
-    this->Data = new unsigned char [len];
-    memcpy(this->Data, data, len);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWIcon::SetInternalData(const unsigned char *data, 
-                                int width, int height, int pixel_size)
-{
-  if (this->Data || this->InternalData)
-    {
-    if (this->Data)
+    this->Data = new unsigned char [buffer_length];
+    if (options & vtkKWIcon::IMAGE_OPTION_FLIP_V)
       {
-      delete [] this->Data;
+      const unsigned char *src = data + buffer_length - stride;
+      unsigned char *dest = this->Data;
+      unsigned char *dest_end = this->Data + buffer_length;
+      while (dest < dest_end)
+        {
+        memcpy(dest, src, stride);
+        dest += stride;
+        src -= stride;
+        }
       }
-    this->Data         = 0;
-    this->InternalData = 0;
-    this->Width        = 0;
-    this->Height       = 0;
-    this->PixelSize    = 0;
-    }
-
-  int len = width * height * pixel_size;
-  if (data && len > 0)
-    {
-    this->Width  = width;
-    this->Height = height;
-    this->PixelSize = pixel_size;
-    this->InternalData = data;
+    else
+      {
+      memcpy(this->Data, data, buffer_length);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWIcon::SetImage(int image)
 {
-  if (this->Internal == image)
-    {
-    return;
-    }
-
   this->SetData(0, 0, 0, 0);
 
   if (image == vtkKWIcon::ICON_NOICON)
@@ -870,17 +807,11 @@ void vtkKWIcon::SetImage(int image)
         image_window_level_buffer_length);
       break;
     }
-  this->Internal = image;
 }
 
 //----------------------------------------------------------------------------
 const unsigned char* vtkKWIcon::GetData()
 {
-  if (this->InternalData)
-    {
-    return this->InternalData;
-    }
-
   return this->Data;
 }
 
