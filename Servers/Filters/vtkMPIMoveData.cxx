@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.2");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.3");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -856,6 +856,8 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
+  os << indent "DefineCollectAsClone: " << this->DefineCollectAsClone << endl;
+
   //os << indent << "MToN
 }
 
