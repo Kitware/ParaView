@@ -55,11 +55,19 @@ public:
   // Description:
   int GetElement(int idx);
 
+  // Description:
+  vtkGetMacro(ArgumentIsArray, int);
+  vtkSetMacro(ArgumentIsArray, int);
+
 protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();
 
+  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+
   vtkSMIntVectorPropertyInternals* Internals;
+
+  int ArgumentIsArray;
 
   //BTX  
   // Description:

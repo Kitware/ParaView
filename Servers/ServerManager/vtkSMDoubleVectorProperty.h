@@ -55,9 +55,15 @@ public:
   // Description:
   double GetElement(int idx);
 
+  // Description:
+  vtkGetMacro(ArgumentIsArray, int);
+  vtkSetMacro(ArgumentIsArray, int);
+
 protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();
+
+  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
 //BTX  
   // Description:
@@ -68,6 +74,8 @@ protected:
 //ETX
 
   vtkSMDoubleVectorPropertyInternals* Internals;
+
+  int ArgumentIsArray;
 
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented

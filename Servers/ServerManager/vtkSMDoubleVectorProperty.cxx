@@ -16,12 +16,13 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMCommunicationModule.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.2");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -32,6 +33,7 @@ struct vtkSMDoubleVectorPropertyInternals
 vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkSMDoubleVectorPropertyInternals;
+  this->ArgumentIsArray = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -53,9 +55,17 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
     int numArgs = this->GetNumberOfElements();
-    for(int i=0; i<numArgs; i++)
+    if (this->ArgumentIsArray)
       {
-      *str << this->GetElement(i);
+      *str << vtkClientServerStream::InsertArray(
+        &(this->Internals->Values[0]), numArgs);
+      }
+    else
+      {
+      for(int i=0; i<numArgs; i++)
+        {
+        *str << this->GetElement(i);
+        }
       }
     *str << vtkClientServerStream::End;
     }
@@ -66,13 +76,22 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
     for(int i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
-      for (int j=0; j<this->NumberOfElementsPerCommand; j++)
+      if (this->ArgumentIsArray)
         {
-        if (this->UseIndex)
+        *str << vtkClientServerStream::InsertArray(
+          &(this->Internals->Values[i*this->NumberOfElementsPerCommand]),
+          this->NumberOfElementsPerCommand);
+        }
+      else
+        {
+        for (int j=0; j<this->NumberOfElementsPerCommand; j++)
           {
-          *str << i;
+          if (this->UseIndex)
+            {
+            *str << i;
+            }
+          *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
           }
-        *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
         }
       *str << vtkClientServerStream::End;
       }
@@ -137,6 +156,27 @@ void vtkSMDoubleVectorProperty::SetElements(double* values)
   int numArgs = this->GetNumberOfElements();
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(double));
   this->Modified();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+{
+  int retVal;
+
+  retVal = this->Superclass::ReadXMLAttributes(element);
+  if (!retVal)
+    {
+    return retVal;
+    }
+
+  int arg_is_array;
+  retVal = element->GetScalarAttribute("argument_is_array", &arg_is_array);
+  if(retVal) 
+    { 
+    this->SetArgumentIsArray(arg_is_array); 
+    }
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------
