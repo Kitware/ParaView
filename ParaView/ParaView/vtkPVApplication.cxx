@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
@@ -86,6 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPNGReader.h"
 #include "vtkProbeFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -97,6 +99,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+
+#include "vtkPVSourceInterfaceDirectories.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -112,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.127");
+vtkCxxRevisionMacro(vtkPVApplication, "1.128");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1014,46 +1018,96 @@ void vtkPVApplication::SendDataArrayRange(vtkDataSet *data,
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
 {
-  this->CreatePhoto("KWResetViewButton", KW_RESET_VIEW_BUTTON, 
-              KW_RESET_VIEW_BUTTON_WIDTH, KW_RESET_VIEW_BUTTON_HEIGHT);
-  this->CreatePhoto("KWTranslateViewButton", KW_TRANSLATE_VIEW_BUTTON, 
-              KW_TRANSLATE_VIEW_BUTTON_WIDTH, KW_TRANSLATE_VIEW_BUTTON_HEIGHT);
-  this->CreatePhoto("KWActiveTranslateViewButton", KW_ACTIVE_TRANSLATE_VIEW_BUTTON, 
-              KW_ACTIVE_TRANSLATE_VIEW_BUTTON_WIDTH, KW_ACTIVE_TRANSLATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("KWResetViewButton", 
+                    KW_RESET_VIEW_BUTTON, 
+                    KW_RESET_VIEW_BUTTON_WIDTH, 
+                    KW_RESET_VIEW_BUTTON_HEIGHT);
 
-  this->CreatePhoto("KWFlyButton", KW_FLY_BUTTON, 
-              KW_FLY_BUTTON_WIDTH, KW_FLY_BUTTON_HEIGHT);
-  this->CreatePhoto("KWActiveFlyButton", KW_ACTIVE_FLY_BUTTON, 
-              KW_ACTIVE_FLY_BUTTON_WIDTH, KW_ACTIVE_FLY_BUTTON_HEIGHT);
-  this->CreatePhoto("KWRotateViewButton", KW_ROTATE_VIEW_BUTTON, 
-              KW_ROTATE_VIEW_BUTTON_WIDTH, KW_ROTATE_VIEW_BUTTON_HEIGHT);
-  this->CreatePhoto("KWActiveRotateViewButton", KW_ACTIVE_ROTATE_VIEW_BUTTON, 
-              KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
-  this->CreatePhoto("KWPickCenterButton", KW_PICK_CENTER_BUTTON, 
-              KW_PICK_CENTER_BUTTON_WIDTH, KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("KWTranslateViewButton", 
+                    KW_TRANSLATE_VIEW_BUTTON, 
+                    KW_TRANSLATE_VIEW_BUTTON_WIDTH, 
+                    KW_TRANSLATE_VIEW_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWActiveTranslateViewButton", 
+                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON, 
+                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_WIDTH, 
+                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWFlyButton", 
+                    KW_FLY_BUTTON, 
+                    KW_FLY_BUTTON_WIDTH, 
+                    KW_FLY_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWActiveFlyButton", 
+                    KW_ACTIVE_FLY_BUTTON, 
+                    KW_ACTIVE_FLY_BUTTON_WIDTH, 
+                    KW_ACTIVE_FLY_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWRotateViewButton", 
+                    KW_ROTATE_VIEW_BUTTON, 
+                    KW_ROTATE_VIEW_BUTTON_WIDTH, 
+                    KW_ROTATE_VIEW_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWActiveRotateViewButton", 
+                    KW_ACTIVE_ROTATE_VIEW_BUTTON, 
+                    KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, 
+                    KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
+
+  this->CreatePhoto("KWPickCenterButton", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
   
-  this->CreatePhoto("PVCalculatorButton", PV_CALCULATOR_BUTTON,
-                    PV_CALCULATOR_BUTTON_WIDTH, PV_CALCULATOR_BUTTON_HEIGHT);
-  this->CreatePhoto("PVThresholdButton", PV_THRESHOLD_BUTTON,
-                    PV_THRESHOLD_BUTTON_WIDTH, PV_THRESHOLD_BUTTON_HEIGHT);
-  this->CreatePhoto("PVContourButton", PV_CONTOUR_BUTTON,
-                    PV_CONTOUR_BUTTON_WIDTH, PV_CONTOUR_BUTTON_HEIGHT);
-  this->CreatePhoto("PVProbeButton", PV_PROBE_BUTTON,
-                    PV_PROBE_BUTTON_WIDTH, PV_PROBE_BUTTON_HEIGHT);
-  this->CreatePhoto("PVGlyphButton", PV_GLYPH_BUTTON,
-                    PV_GLYPH_BUTTON_WIDTH, PV_GLYPH_BUTTON_HEIGHT);
-  this->CreatePhoto("PV3DCursorButton", PV_3D_CURSOR_BUTTON,
-                    PV_3D_CURSOR_BUTTON_WIDTH, PV_3D_CURSOR_BUTTON_HEIGHT);
-  this->CreatePhoto("PVActive3DCursorButton", PV_ACTIVE_3D_CURSOR_BUTTON,
+  this->CreatePhoto("PVCalculatorButton", 
+                    PV_CALCULATOR_BUTTON,
+                    PV_CALCULATOR_BUTTON_WIDTH, 
+                    PV_CALCULATOR_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVThresholdButton", 
+                    PV_THRESHOLD_BUTTON,
+                    PV_THRESHOLD_BUTTON_WIDTH, 
+                    PV_THRESHOLD_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVContourButton", 
+                    PV_CONTOUR_BUTTON,
+                    PV_CONTOUR_BUTTON_WIDTH, 
+                    PV_CONTOUR_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVProbeButton", 
+                    PV_PROBE_BUTTON,
+                    PV_PROBE_BUTTON_WIDTH, 
+                    PV_PROBE_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVGlyphButton", 
+                    PV_GLYPH_BUTTON,
+                    PV_GLYPH_BUTTON_WIDTH, 
+                    PV_GLYPH_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PV3DCursorButton", 
+                    PV_3D_CURSOR_BUTTON,
+                    PV_3D_CURSOR_BUTTON_WIDTH, 
+                    PV_3D_CURSOR_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVActive3DCursorButton", 
+                    PV_ACTIVE_3D_CURSOR_BUTTON,
                     PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, 
                     PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
-  this->CreatePhoto("PVCutButton", PV_CUT_BUTTON,
-                    PV_CUT_BUTTON_WIDTH, PV_CUT_BUTTON_HEIGHT);
-  this->CreatePhoto("PVClipButton", PV_CLIP_BUTTON,
-                    PV_CLIP_BUTTON_WIDTH, PV_CLIP_BUTTON_HEIGHT);
-  this->CreatePhoto("PVExtractGridButton", PV_EXTRACT_GRID_BUTTON,
+
+  this->CreatePhoto("PVCutButton", 
+                    PV_CUT_BUTTON,
+                    PV_CUT_BUTTON_WIDTH, 
+                    PV_CUT_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVClipButton", 
+                    PV_CLIP_BUTTON,
+                    PV_CLIP_BUTTON_WIDTH, 
+                    PV_CLIP_BUTTON_HEIGHT);
+
+  this->CreatePhoto("PVExtractGridButton", 
+                    PV_EXTRACT_GRID_BUTTON,
                     PV_EXTRACT_GRID_BUTTON_WIDTH, 
                     PV_EXTRACT_GRID_BUTTON_HEIGHT);
+
   this->CreatePhoto("PVVectorDisplacementButton", 
                     PV_VECTOR_DISPLACEMENT_BUTTON,
                     PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
@@ -1061,34 +1115,54 @@ void vtkPVApplication::CreateButtonPhotos()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::CreatePhoto(char *name, unsigned char *data, 
-                                    int width, int height)
+void vtkPVApplication::CreatePhoto(char *name, 
+                                   unsigned char *data, 
+                                   int width, int height,
+                                   char *filename)
 {
-  Tk_PhotoHandle photo;
-  Tk_PhotoImageBlock block;
+  // Try to use the filename if provided
 
-  this->Script("image create photo %s -height %d -width %d", 
-               name, height, width);
-  block.width = width;
-  block.height = height;
-  block.pixelSize = 3;
-  block.pitch = block.width*block.pixelSize;
-  block.offset[0] = 0;
-  block.offset[1] = 1;
-  block.offset[2] = 2;
-  block.pixelPtr = data;
-
-  photo = Tk_FindPhoto(this->GetMainInterp(), name);
-  if (!photo)
+  if (filename)
     {
-    vtkWarningMacro("error looking up color ramp image");
+    if (this->EvaluateBooleanExpression(
+      "catch {image create photo %s -file {%s}}", name, filename))
+      {
+      vtkWarningMacro("Error creating photo from file " << filename);
+      }
     return;
-    }  
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
-  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
-#else
-  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
-#endif
+    }
+
+  // Otherwise try to find a file with the same name in the Resources dir
+
+  this->Script("image create photo %s -height %d -width %d",
+               name, height, width);
+
+  struct stat fs;
+  char buffer[1024];
+  sprintf(buffer, "%s/../ParaView/Resources/%s.png", 
+          VTK_PV_SOURCE_CONFIG_DIR, name);
+
+  if (stat(buffer, &fs) == 0)
+    {
+    vtkPNGReader *png_reader = vtkPNGReader::New();
+    png_reader->SetFileName(buffer);
+    if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
+                                       name, 
+                                       png_reader->GetOutput()))
+      {
+      vtkWarningMacro("Error creating photo from file " << buffer);
+      }
+    png_reader->Delete();
+    return;
+    }
+
+  // Otherwise use the provided data
+
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
+                                     name, data, width, height, 3))
+    {
+    vtkWarningMacro("Error updating Tk photo " << name);
+    }
 }
 
 //----------------------------------------------------------------------------
