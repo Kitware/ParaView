@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.24");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.25");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -52,6 +52,7 @@ vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
 
   this->BackButton                   = NULL;
   this->PVSource                     = NULL;
+  this->ArrayInfo                    = NULL;
 
   this->VolumePropertyWidget         = NULL;
   this->InternalVolumeProperty       = NULL;
