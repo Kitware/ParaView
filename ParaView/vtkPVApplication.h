@@ -34,10 +34,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWApplication.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPolyDataMapper.h"
 
 class vtkPVSource;
-
+class vtkPolyDataMapper;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100

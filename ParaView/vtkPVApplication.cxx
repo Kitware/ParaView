@@ -37,20 +37,20 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
-
+#include "vtkPolyDataMapper.h"
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
+//extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
   
-  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Parallel error\n";
-    }
+  //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
+  //  {
+   // cerr << "Init Parallel error\n";
+   // }
 
   // Why is this here?  Doesn't the superclass initialize this?
   if (vtkKWApplication::GetWidgetVisibility())
