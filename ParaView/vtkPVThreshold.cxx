@@ -112,7 +112,7 @@ void vtkPVThreshold::CreateProperties()
   else
     {
     range[0] = 0;
-    range[1] = 1;
+    range[1] = 500;
     }
   
   this->UpperValueScale->SetParent(this->GetParameterFrame()->GetFrame());

@@ -170,6 +170,13 @@ public:
   vtkGetMacro(UseReductionFactor, int);
   vtkBooleanMacro(UseReductionFactor, int);
   
+  // Description:
+  // The render view keeps track of these times but does not use them.
+  vtkGetMacro(StillRenderTime, double);
+  vtkGetMacro(InteractiveRenderTime, double);
+  vtkGetMacro(StillCompositeTime, double);
+  vtkGetMacro(InteractiveCompositeTime, double);
+
 protected:
 
   vtkPVRenderView();
@@ -197,6 +204,12 @@ protected:
   vtkKWInteractor *CurrentInteractor;
 
   int EventuallyRenderFlag;
+
+
+  double StillRenderTime;
+  double InteractiveRenderTime;
+  double StillCompositeTime;
+  double InteractiveCompositeTime;
 };
 
 

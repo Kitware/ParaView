@@ -332,7 +332,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
   this->NavigationCanvas->SetParent(this->NavigationFrame->GetFrame());
+
+  // 360
+#ifdef _WIN32
+  this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 356 -bg white"); 
+#else
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 440 -bg white"); 
+#endif
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
 
   // Application has to be set before we can get a tcl name.
@@ -699,6 +705,7 @@ void vtkPVRenderView::StartRender()
   if (!this->UseReductionFactor)
     {
     this->GetComposite()->SetReductionFactor(1);
+    return;
     }
   
   // Do not let the width go below 150.
@@ -710,7 +717,7 @@ void vtkPVRenderView::StartRender()
   reducedArea = area / (reductionFactor * reductionFactor);
   getBuffersTime = this->GetComposite()->GetGetBuffersTime();
   setBuffersTime = this->GetComposite()->GetSetBuffersTime();
-  transmitTime = this->GetComposite()->GetTransmitTime();
+  transmitTime = this->GetComposite()->GetCompositeTime();
 
   // Do not consider SetBufferTime because 
   //it is not dependent on reduction factor.,
@@ -745,8 +752,8 @@ void vtkPVRenderView::Render()
 
   this->Update();
 
-  //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  this->RenderWindow->SetDesiredUpdateRate(20.0);
+  this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
+  //this->RenderWindow->SetDesiredUpdateRate(20.0);
 
   abort = this->ShouldIAbort();
   if (abort)
@@ -760,6 +767,11 @@ void vtkPVRenderView::Render()
 
   this->StartRender();
   this->RenderWindow->Render();
+
+  this->InteractiveRenderTime = this->Composite->GetMaxRenderTime();
+  this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
+                                     + this->Composite->GetGetBuffersTime()
+                                     + this->Composite->GetSetBuffersTime();
 }
 
 //----------------------------------------------------------------------------
@@ -805,6 +817,11 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   this->ResetCameraClippingRange();
   this->StartRender();
   this->RenderWindow->Render();
+
+  this->StillRenderTime = this->Composite->GetMaxRenderTime();
+  this->StillCompositeTime = this->Composite->GetCompositeTime()
+                               + this->Composite->GetGetBuffersTime()
+                               + this->Composite->GetSetBuffersTime();
 }
 
 //----------------------------------------------------------------------------

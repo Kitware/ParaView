@@ -538,6 +538,7 @@ void vtkPVActorComposite::UpdateProperties()
   vtkDataArray *array;
   char *currentColorBy;
   int currentColorByFound = 0;
+  float time;
 
   
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
@@ -553,8 +554,17 @@ void vtkPVActorComposite::UpdateProperties()
   pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
   this->GetPVData()->GetBounds(bounds);
   timer->StopTimer();
+
+  time = timer->GetElapsedTime();
+  if (time > 0.0)
+    {
+    sprintf(tmp, "%s : took %f seconds", 
+            this->PVData->GetVTKDataTclName(), time); 
+    this->GetView()->GetParentWindow()->SetStatusText(tmp);
+    }
+
   vtkDebugMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
-                  << timer->GetElapsedTime() << " seconds.");
+                  << time << " seconds.");
   timer->Delete();
   
   

@@ -352,7 +352,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   this->FrameRateScale->SetParent(this->GetToolbarFrame());
   this->FrameRateScale->Create(app, "-resolution 0.1 -orient horizontal");
-  this->FrameRateScale->SetRange(0, 100);
+  this->FrameRateScale->SetRange(0, 50);
   this->FrameRateScale->SetValue(3.0);
   this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
   this->FrameRateScale->SetBalloonHelpString(
@@ -830,7 +830,11 @@ void vtkPVWindow::ResetCameraCallback()
 void vtkPVWindow::FrameRateScaleCallback()
 {
   float newRate = this->FrameRateScale->GetValue();
-  this->GetMainView()->GetRenderWindow()->SetDesiredUpdateRate(newRate);
+  if (newRate <= 0.0)
+    {
+    newRate = 0.00001;
+    }
+  this->GetMainView()->SetInteractiveUpdateRate(newRate);
 }
 
 //----------------------------------------------------------------------------

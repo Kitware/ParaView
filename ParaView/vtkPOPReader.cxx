@@ -603,9 +603,9 @@ void vtkPOPReader::ReadFlow()
   int updateExt[6], wholeExt[6], ext[6];
   int idx, u, v, w;
   float *pf, *pu, *pv;
-  float v0, v2, w0, w1, u0, u2;
+  float v0, v2, w0, u0, u2;
   int uvInc0, uvInc1, wInc2;
-  int vMin, vMax, wMax, wMin;
+  int vMin, vMax, wMax;
 
   if (this->UFlowFileName == NULL || this->VFlowFileName == NULL)
     {
@@ -618,10 +618,6 @@ void vtkPOPReader::ReadFlow()
   ext[1] = this->Dimensions[0]-1;
   ext[3] = this->Dimensions[1]-1;
   ext[5] = this->DepthValues->GetNumberOfTuples()-1;
-
-  vMin = ext[2];
-  vMax = ext[3];
-  wMax = ext[5];
 
   vtkImageReader *reader = vtkImageReader::New();
   reader->SetFileDimensionality(3);
@@ -643,7 +639,7 @@ void vtkPOPReader::ReadFlow()
   // Figure out what extent we need for the request.
   wrap->GetOutputWholeExtent(wholeExt);
   output->GetUpdateExtent(updateExt);
-  if (wholeExt[1] != updateExt[1])
+  if (wholeExt[5] != updateExt[5])
     {
     vtkErrorMacro("Requested extent does not have bottom slice required for correct completion of the flow vectors.");
     }
@@ -681,6 +677,9 @@ void vtkPOPReader::ReadFlow()
 
   uvInc0 = 1;
   uvInc1 = ext[1]-ext[0]+1;
+  vMin = ext[2];
+  vMax = ext[3];
+  wMax = ext[5];
 
   reader->Delete();
   reader = NULL;
@@ -693,7 +692,7 @@ void vtkPOPReader::ReadFlow()
   fImage->SetScalarType(VTK_FLOAT);
   fImage->AllocateScalars();
 
-  wInc2 = (updateExt[1]-updateExt[0])*(updateExt[3]-updateExt[2])*3;
+  wInc2 = (updateExt[1]-updateExt[0]+1)*(updateExt[3]-updateExt[2]+1)*3;
 
   // Central differences is good, but I do not like it for the
   // z/propagation direction (alternation).  Normal difference
@@ -701,14 +700,15 @@ void vtkPOPReader::ReadFlow()
   // I could always average the top and bottom versions...
 
   // Now do the computation from bottom to top.
-  pf = (float*)fImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
-  pu = (float*)uImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
-  pv = (float*)vImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
   
-  for (w = updateExt[4]; w <= updateExt[5]; ++w)
+  for (w = updateExt[5]; w >= updateExt[4]; --w)
     {
     for (v = updateExt[2]; v <= updateExt[3]; ++v)
       {
+      // Loose a little efficiency here, but ...
+      pf = (float*)fImage->GetScalarPointer(updateExt[0], v, w);
+      pu = (float*)uImage->GetScalarPointer(updateExt[0], v, w);
+      pv = (float*)vImage->GetScalarPointer(updateExt[0], v, w);
       for (u = updateExt[0]; u <= updateExt[1]; ++u)
         {
         // Find the five important values for this point.
@@ -724,22 +724,24 @@ void vtkPOPReader::ReadFlow()
           {
           v2 = pv[uvInc0];
           }
-        if (w > wMin)
+        if (w < wMax)
           {
-          w0 = pf[-wInc2+2];
+          w0 = pf[wInc2+2];
           }
         // Now fill the vector for this point.
         pf[0] =  *pu;
         pf[1] =  *pv;
-        pf[2] = w0 + 0.5 * (u0 - u2 + v0 - v2);
-        // Move to the next point. Do not worry about continue increments.
+        pf[2] = w0 - 0.5 * (u0 - u2 + v0 - v2);
+        // Move to the next point.
+        pf += 3;
+        pu += 1;
+        pv += 1;
+        
         }
       }
     }
     
   // Delete 
-  reader->Delete();
-  wrap->Delete();
   uImage->Delete();
   vImage->Delete();
 
