@@ -39,11 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWPopupButton - a popup button with a label
+// .NAME vtkKWPopupButton - a button that triggers a popup
 // .SECTION Description
-// The vtkKWPopupButton class creates a push button with a label in 
-// front of it (just as its parent vtkKWLabeledPushButton does), but
-// it will popup a window. User widgets should be inserted inside
+// The vtkKWPopupButton class creates a push button that
+// will popup a window. User widgets should be inserted inside
 // the PopupFrame ivar.
 
 #ifndef __vtkKWPopupButton_h

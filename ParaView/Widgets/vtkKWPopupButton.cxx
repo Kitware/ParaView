@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.1");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.2");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -95,7 +95,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("LabeledPopupButton already created");
+    vtkErrorMacro("PopupButton already created");
     return;
     }
 

@@ -39,9 +39,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWLabeledPopupButton - a push button with a label
+// .NAME vtkKWLabeledPopupButton - a popup button with a label
 // .SECTION Description
-// The vtkKWLabeledPopupButton class creates a push button with a label in 
+// The vtkKWLabeledPopupButton class creates a popup button with a label in 
 // front of it
 
 #ifndef __vtkKWLabeledPopupButton_h
