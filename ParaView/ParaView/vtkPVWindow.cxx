@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.380");
+vtkCxxRevisionMacro(vtkPVWindow, "1.381");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -891,7 +891,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->UpdateStatusImage();
   this->ProgressGauge->SetHeight(
     vtkKWTkUtilities::GetPhotoHeight(this->Application->GetMainInterp(), 
-                                     this->StatusImageName) - 2);
+                                     this->StatusImageName) - 4);
 
   // Init menus
 
@@ -3779,7 +3779,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.380 $");
+  this->ExtractRevision(os,"$Revision: 1.381 $");
 }
 
 //----------------------------------------------------------------------------
