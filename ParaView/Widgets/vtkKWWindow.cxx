@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.5");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.6");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -927,7 +927,7 @@ void vtkKWWindow::CreatePreferencesProperties()
   this->InterfaceSettingsSaveWindowGeometry->SetCommand(
     this, "OnInterfaceSettingsChange");
   this->InterfaceSettingsSaveWindowGeometry->SetBalloonHelpString(
-    "Save the window geometry on exit and restore it on startup.");
+    "Save the window size and location on exit and restore it on startup.");
 
   this->Script("pack %s -side top -anchor w -expand no -fill none",
                this->InterfaceSettingsSaveWindowGeometry->GetWidgetName());
@@ -961,6 +961,8 @@ void vtkKWWindow::CreatePreferencesProperties()
 
     this->InterfaceSettingsShowSplashScreenCheck->SetCommand(
       this, "OnInterfaceSettingsChange");
+  this->InterfaceSettingsShowSplashScreenCheck->SetBalloonHelpString(
+    "Display the splash information screen at startup.");
 
     this->Script("pack %s -side top -anchor w -expand no -fill none",
                  this->InterfaceSettingsShowSplashScreenCheck->GetWidgetName());
@@ -1252,7 +1254,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.6 $");
 }
 
 int vtkKWWindow::ExitDialog()
