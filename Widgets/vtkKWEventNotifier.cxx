@@ -439,7 +439,7 @@ void vtkKWEventNotifier::InvokeCallbacks( vtkKWObject *object,
       if ( !strcmp( tmp->GetEventString(), event ) &&
 	   ( window == NULL || tmp->GetWindow() == NULL ||
 	     tmp->GetWindow() == window ) &&
-           tmp->GetCalledObject() != object )
+           ( object == NULL || tmp->GetCalledObject() != object ) )
 	{
         if ( tmp->GetCommandString() )
           {
