@@ -45,7 +45,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.1.2.6");
+vtkCxxRevisionMacro(vtkKdTree, "1.1.2.7");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -2974,7 +2974,7 @@ void vtkKdTree::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "CellRegionList: " << this->CellRegionList << endl;
   os << indent << "ComputeIntersectionsUsingDataBounds: ";
-    os << ComputeIntersectionsUsingDataBounds << endl;
+  os << this->ComputeIntersectionsUsingDataBounds << endl;
 }
 
 
