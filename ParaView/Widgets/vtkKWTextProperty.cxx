@@ -129,7 +129,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.12");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.13");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -214,9 +214,9 @@ vtkKWTextProperty::~vtkKWTextProperty()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::Create(vtkKWApplication *app)
 {
-  // Set application
+  // Set the application
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("vtkKWTextProperty already created");
     return;
@@ -582,6 +582,12 @@ void vtkKWTextProperty::Pack()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateInterface()
 {
+  // Update enable state
+
+  this->UpdateEnableState();
+
+  // Update all components
+
   this->UpdateLabel();
   this->UpdateColorButton();
   this->UpdateFontFamilyOptionMenu();
@@ -1220,39 +1226,34 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::SetEnabled(int e)
+void vtkKWTextProperty::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  if (this->Label)
     {
-    if (this->Label)
-      {
-      this->Label->SetEnabled(e);
-      }
-    if (this->ChangeColorButton)
-      {
-      this->ChangeColorButton->SetEnabled(e);
-      }
-    if (this->FontFamilyOptionMenu)
-      {
-      this->FontFamilyOptionMenu->SetEnabled(e);
-      }
-    if (this->StylesCheckButtonSet)
-      {
-      this->StylesCheckButtonSet->SetEnabled(e);
-      }
-    if (this->OpacityScale)
-      {
-      this->OpacityScale->SetEnabled(e);
-      }
+    this->Label->SetEnabled(this->Enabled);
     }
 
-  // Then call superclass, which will 
-  // update the internal Enabled ivar (although it is not of much use here)
+  if (this->ChangeColorButton)
+    {
+    this->ChangeColorButton->SetEnabled(this->Enabled);
+    }
 
-  this->Superclass::SetEnabled(e);
+  if (this->FontFamilyOptionMenu)
+    {
+    this->FontFamilyOptionMenu->SetEnabled(this->Enabled);
+    }
+
+  if (this->StylesCheckButtonSet)
+    {
+    this->StylesCheckButtonSet->SetEnabled(this->Enabled);
+    }
+
+  if (this->OpacityScale)
+    {
+    this->OpacityScale->SetEnabled(this->Enabled);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.4");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.5");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -195,9 +195,9 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
 {
   const char *wname;
 
-  // Must set the application
+  // Set the application
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Thumbwheel already created");
     return;
@@ -266,6 +266,10 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
   this->UpdateThumbWheelImage();
   this->Bind();
   this->PackWidget();
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 // ---------------------------------------------------------------------------
@@ -1315,35 +1319,28 @@ void vtkKWThumbWheel::SetBalloonHelpJustification(int j)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetEnabled(int e)
+void vtkKWThumbWheel::UpdateEnableState()
 {
-  if (this->Enabled == e)
+  this->Superclass::UpdateEnableState();
+
+  if (this->Entry)
     {
-    return;
+    this->Entry->SetEnabled(this->Enabled);
     }
 
-  this->Enabled = e;
-  this->Modified();
-
-  if (this->Entry && this->Entry->IsCreated())
+  if (this->Label)
     {
-    this->Entry->SetEnabled(e);
+    this->Label->SetEnabled(this->Enabled);
     }
 
-  if (this->Label && this->Label->IsCreated())
+  if (this->ThumbWheel)
     {
-    this->Label->SetEnabled(e);
+    this->ThumbWheel->SetEnabled(this->Enabled);
     }
 
-  if (this->ThumbWheel->IsCreated())
+  if (this->PopupPushButton)
     {
-    this->ThumbWheel->SetEnabled(e);
-    }
-
-  if (this->PopupMode && 
-      this->PopupPushButton && this->PopupPushButton->IsCreated())
-    {
-    this->PopupPushButton->SetEnabled(e);
+    this->PopupPushButton->SetEnabled(this->Enabled);
     }
 }
 

@@ -236,10 +236,6 @@ public:
   virtual void SetBalloonHelpJustification(int j);
 
   // Description:
-  // Set/get enabled state.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Bind/Unbind all components so that values can be changed, but
   // no command will be called.
   void Bind();
@@ -337,6 +333,10 @@ protected:
   NonLinearMotionState StartNonLinearMotionState;
 
   int InInvokeCommand;
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWThumbWheel(const vtkKWThumbWheel&); // Not implemented

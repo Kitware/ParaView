@@ -177,11 +177,6 @@ public:
   // Save out the text properties to a file.
   void SaveInTclScript(ofstream *file, const char *tcl_name = 0);
 
-  // Description:
-  // Set/Get the enabled state.
-  // Override to pass down to children.
-  virtual void SetEnabled(int);
-
 protected:
   vtkKWTextProperty();
   ~vtkKWTextProperty();
@@ -225,6 +220,10 @@ protected:
 
   int ShowCopy;
   vtkKWLabeledPushButtonSet *PushButtonSet;
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWTextProperty(const vtkKWTextProperty&); // Not implemented
