@@ -26,7 +26,8 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ESCAPE_QUOTES)
 
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkSelectStreamsLibrary.cmake)
-VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB)
+VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB
+                           ${ParaView_SOURCE_DIR}/VTK)
 
 #########################################################################
 # Configure Testing
