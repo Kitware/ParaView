@@ -1,0 +1,18 @@
+/*=========================================================================
+This source has no copyright.  It is intended to be copied by users
+wishing to create their own ParaView plugin classes locally.
+=========================================================================*/
+#ifndef __vtk@PROJECT_NAME@_h
+#define __vtk@PROJECT_NAME@_h
+
+#if defined(_WIN32)
+# if defined(@PROJECT_NAME@_EXPORTS)
+#  define VTK_@PROJECT_NAME@_EXPORT __declspec(dllexport)
+# else
+#  define VTK_@PROJECT_NAME@_EXPORT __declspec(dllimport)
+# endif
+#else
+# define VTK_@PROJECT_NAME@_EXPORT
+#endif
+
+#endif

@@ -1,22 +1,12 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkLocalConeSource.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
+This source has no copyright.  It is intended to be copied by users
+wishing to create their own ParaView plugin classes locally.
 =========================================================================*/
 #include "vtkLocalConeSource.h"
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkLocalConeSource, "1.1");
+vtkCxxRevisionMacro(vtkLocalConeSource, "1.2");
 vtkStandardNewMacro(vtkLocalConeSource);
 
 //----------------------------------------------------------------------------

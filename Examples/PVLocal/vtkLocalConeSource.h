@@ -1,16 +1,6 @@
 /*=========================================================================
-
-  Program:   ParaView
-  Module:    vtkLocalConeSource.h
-
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
+This source has no copyright.  It is intended to be copied by users
+wishing to create their own ParaView plugin classes locally.
 =========================================================================*/
 // .NAME vtkLocalConeSource - Example ParaView Plugin Source
 // .SECTION Description
@@ -22,7 +12,7 @@
 
 #include "vtkConeSource.h"
 
-#include "vtkPVLocal.h" // VTK_PVLocal_EXPORT
+#include "vtkPVLocalConfigure.h" // VTK_PVLocal_EXPORT
 
 class VTK_PVLocal_EXPORT vtkLocalConeSource : public vtkConeSource
 {
