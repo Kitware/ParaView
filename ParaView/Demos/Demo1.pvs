@@ -3512,7 +3512,7 @@ proc threshold_init {} {
     set threshold(vtkTemp384) [$threshold(vtkTemp1) CreatePVSource RTAnalyticSource]
     $threshold(vtkTemp384) AcceptCallback
     set threshold(vtkTemp482) [$threshold(vtkTemp1) CreatePVSource Threshold]
-    set threshold(vtkTemp492) [$threshold(vtkTemp482) GetPVWidget {Lower Threshold}]
+    set threshold(vtkTemp492) [$threshold(vtkTemp482) GetPVWidget {MinMax}]
     $threshold(vtkTemp492) SetMaxValue 278.000000
     $threshold(vtkTemp492) SetMinValue 0
     $threshold(vtkTemp482) AcceptCallback
