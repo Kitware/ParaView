@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -537,4 +537,5 @@ void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << "InputMenu: " << this->InputMenu << endl;
   os << "Label: " << (this->Label ? this->Label : "(none)") << endl;
+  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
 }
