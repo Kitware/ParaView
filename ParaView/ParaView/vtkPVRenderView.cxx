@@ -881,10 +881,19 @@ void vtkPVRenderView::AddPVData(vtkPVData *pvc)
     }  
 
   pvc->SetView(this);
+    
   if (pvc->GetPropTclName() != NULL)
     {
-    pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-			   pvc->GetPropTclName());
+    if (pvc->GetRenderOnlyLocally())
+      {
+      pvApp->Script("%s AddProp %s", this->RendererTclName,
+		    pvc->GetPropTclName());
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
+			     pvc->GetPropTclName());
+      }
     }
 }
 
@@ -901,8 +910,16 @@ void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
   pvc->SetView(NULL);
   if (pvc->GetPropTclName() != NULL)
     {
-    pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-			   pvc->GetPropTclName());
+    if (pvc->GetRenderOnlyLocally() )
+      {
+      pvApp->Script("%s RemoveProp %s", this->RendererTclName,
+		    pvc->GetPropTclName());
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
+			     pvc->GetPropTclName());
+      }
     }
 }
 

@@ -175,6 +175,8 @@ vtkPVData::vtkPVData()
   this->PreviousWasSolid = 1;
 
   this->PVColorMap = NULL;
+
+  this->RenderOnlyLocally = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -697,38 +699,41 @@ void vtkPVData::GetBounds(float bounds[6])
     return;
     }
 
-  pvApp->BroadcastScript("Application SendDataBounds %s", 
-			this->VTKDataTclName);
-  
   this->VTKData->GetBounds(bounds);
-  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
+
+  if (!this->RenderOnlyLocally)
     {
-    controller->Receive(tmp, 6, id, 1967);
-    if (tmp[0] < bounds[0])
+    pvApp->BroadcastScript("Application SendDataBounds %s", 
+			   this->VTKDataTclName);
+    
+    num = controller->GetNumberOfProcesses();
+    for (id = 1; id < num; ++id)
       {
-      bounds[0] = tmp[0];
-      }
-    if (tmp[1] > bounds[1])
-      {
-      bounds[1] = tmp[1];
-      }
-    if (tmp[2] < bounds[2])
-      {
-      bounds[2] = tmp[2];
-      }
-    if (tmp[3] > bounds[3])
-      {
-      bounds[3] = tmp[3];
-      }
-    if (tmp[4] < bounds[4])
-      {
-      bounds[4] = tmp[4];
-      }
-    if (tmp[5] > bounds[5])
-      {
-      bounds[5] = tmp[5];
+      controller->Receive(tmp, 6, id, 1967);
+      if (tmp[0] < bounds[0])
+	{
+	bounds[0] = tmp[0];
+	}
+      if (tmp[1] > bounds[1])
+	{
+	bounds[1] = tmp[1];
+	}
+      if (tmp[2] < bounds[2])
+	{
+	bounds[2] = tmp[2];
+	}
+      if (tmp[3] > bounds[3])
+	{
+	bounds[3] = tmp[3];
+	}
+      if (tmp[4] < bounds[4])
+	{
+	bounds[4] = tmp[4];
+	}
+      if (tmp[5] > bounds[5])
+	{
+	bounds[5] = tmp[5];
+	}
       }
     }
 }
@@ -747,16 +752,19 @@ int vtkPVData::GetNumberOfCells()
     return 0;
     }
 
-  pvApp->BroadcastScript("Application SendDataNumberOfCells %s", 
-			this->VTKDataTclName);
-  
   numCells = this->VTKData->GetNumberOfCells();
-  
-  numProcs = controller->GetNumberOfProcesses();
-  for (id = 1; id < numProcs; ++id)
+
+  if (!this->RenderOnlyLocally)
     {
-    controller->Receive(&tmp, 1, id, 1968);
-    numCells += tmp;
+    pvApp->BroadcastScript("Application SendDataNumberOfCells %s", 
+			   this->VTKDataTclName);
+    
+    numProcs = controller->GetNumberOfProcesses();
+    for (id = 1; id < numProcs; ++id)
+      {
+      controller->Receive(&tmp, 1, id, 1968);
+      numCells += tmp;
+      }
     }
   return numCells;
 }
@@ -775,16 +783,19 @@ int vtkPVData::GetNumberOfPoints()
     return 0;
     }
 
-  pvApp->BroadcastScript("Application SendDataNumberOfPoints %s", 
-			this->VTKDataTclName);
-  
   numPoints = this->VTKData->GetNumberOfPoints();
   
-  numProcs = controller->GetNumberOfProcesses();
-  for (id = 1; id < numProcs; ++id)
+  if (!this->RenderOnlyLocally)
     {
-    controller->Receive(&tmp, 1, id, 1969);
-    numPoints += tmp;
+    pvApp->BroadcastScript("Application SendDataNumberOfPoints %s", 
+			   this->VTKDataTclName);
+    
+    numProcs = controller->GetNumberOfProcesses();
+    for (id = 1; id < numProcs; ++id)
+      {
+      controller->Receive(&tmp, 1, id, 1969);
+      numPoints += tmp;
+      }
     }
   return numPoints;
 }
@@ -2419,32 +2430,35 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
     return;
     }
 
-  pvApp->BroadcastScript("Application SendDataArrayRange %s %d {%s} %d",
-                         this->GetVTKDataTclName(),
-                         pointDataFlag, array->GetName(), component);
-  
   array->GetRange(range, 0);  
 
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; id++)
+  if (!this->RenderOnlyLocally)
     {
-    controller->Receive(temp, 2, id, 1976);
-    // try to protect against invalid ranges.
-    if (range[0] > range[1])
+    pvApp->BroadcastScript("Application SendDataArrayRange %s %d {%s} %d",
+			   this->GetVTKDataTclName(),
+			   pointDataFlag, array->GetName(), component);
+    
+    num = controller->GetNumberOfProcesses();
+    for (id = 1; id < num; id++)
       {
-      range[0] = temp[0];
-      range[1] = temp[1];
-      }
-    else if (temp[0] <= temp[1])
-      {
-      if (temp[0] < range[0])
-        {
-        range[0] = temp[0];
-        }
-      if (temp[1] > range[1])
-        {
-        range[1] = temp[1];
-        }
+      controller->Receive(temp, 2, id, 1976);
+      // try to protect against invalid ranges.
+      if (range[0] > range[1])
+	{
+	range[0] = temp[0];
+	range[1] = temp[1];
+	}
+      else if (temp[0] <= temp[1])
+	{
+	if (temp[0] < range[0])
+	  {
+	  range[0] = temp[0];
+	  }
+	if (temp[1] > range[1])
+	  {
+	  range[1] = temp[1];
+	  }
+	}
       }
     }
 }

@@ -195,6 +195,8 @@ protected:
 
   float PointPosition[3];
 
+  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
+
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
 };

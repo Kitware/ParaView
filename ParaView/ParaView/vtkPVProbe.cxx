@@ -984,6 +984,14 @@ void vtkPVProbe::SetPointPosition(float point[3])
 }
 
 //----------------------------------------------------------------------------
+int vtkPVProbe::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
+{
+  int retVal = this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
+  clone->GetPVOutput(0)->SetRenderOnlyLocally(1);
+  return retVal;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
