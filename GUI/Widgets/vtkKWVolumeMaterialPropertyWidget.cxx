@@ -25,14 +25,11 @@
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkVolumeProperty.h"
-#ifndef DO_NOT_BUILD_XML_RW
-#include "vtkXMLVolumePropertyWriter.h"
-#endif
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -423,22 +420,7 @@ void vtkKWVolumeMaterialPropertyWidget::SendStateEvent(int event)
     return;
     }
   
-#ifdef DO_NOT_BUILD_XML_RW
   this->InvokeEvent(event, NULL);
-#else
-  ostrstream event_str;
-
-  vtkXMLVolumePropertyWriter *xmlw = vtkXMLVolumePropertyWriter::New();
-  xmlw->SetObject(this->VolumeProperty);
-  xmlw->OutputShadingOnlyOn();
-  xmlw->SetNumberOfComponents(this->NumberOfComponents);
-  xmlw->WriteToStream(event_str);
-  xmlw->Delete();
-
-  event_str << ends;
-  this->InvokeEvent(event, event_str.str());
-  event_str.rdbuf()->freeze(0);
-#endif
 }
 
 //----------------------------------------------------------------------------

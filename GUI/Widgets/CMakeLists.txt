@@ -4,18 +4,10 @@ PROJECT(KWWidgets)
 # to use this library in your code you will need to SUBDIR into this
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
-IF (DO_NOT_BUILD_XML_RW)
-  SET (KWWidgets_INCLUDE_PATH 
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    CACHE INTERNAL "include paths for KWWidgets"
-    )
-ELSE (DO_NOT_BUILD_XML_RW)
-  SET (KWWidgets_INCLUDE_PATH 
-    "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/XML"
-    CACHE INTERNAL "include paths for KWWidgets"
-    )
-ENDIF (DO_NOT_BUILD_XML_RW)
-
+SET (KWWidgets_INCLUDE_PATH 
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  CACHE INTERNAL "include paths for KWWidgets"
+  )
 
 SET (KWWidgets_LIBRARIES KWWidgetsTCL
   CACHE INTERNAL "libraries for KWWidgets")
@@ -146,18 +138,6 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
-IF (DO_NOT_BUILD_XML_RW)
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkKWApplication.cxx 
-    vtkKWCornerAnnotation.cxx 
-    vtkKWHeaderAnnotation.cxx 
-    vtkKWScalarBarAnnotation.cxx 
-    vtkKWVolumeMaterialPropertyWidget.cxx
-    vtkKWVolumePropertyWidget.cxx
-    COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
-    )
-ENDIF (DO_NOT_BUILD_XML_RW)
-
 # If needed, copy the Tcl/Tk support files needed for vtkKWApplication
 # at run-time to initialize Tcl/Tk
 
@@ -245,10 +225,6 @@ ENDIF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
 IF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES(KWWidgetsTCL vtkPatentedTCL)
 ENDIF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
-
-IF (NOT DO_NOT_BUILD_XML_RW)
-  TARGET_LINK_LIBRARIES(KWWidgetsTCL KWCommonPro)
-ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 

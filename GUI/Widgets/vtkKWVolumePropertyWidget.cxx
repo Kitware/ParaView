@@ -40,9 +40,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkVolumeProperty.h"
-#ifndef DO_NOT_BUILD_XML_RW
-#include "vtkXMLVolumePropertyWriter.h"
-#endif
 
 #define VTK_KW_VPW_INTERPOLATION_LINEAR     "Linear"
 #define VTK_KW_VPW_INTERPOLATION_NEAREST    "Nearest"
@@ -50,7 +47,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.3");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1516,29 +1513,7 @@ void vtkKWVolumePropertyWidget::InvokeVolumePropertyChangedCommand()
 {
   this->InvokeCommand(this->VolumePropertyChangedCommand);
 
-#ifdef DO_NOT_BUILD_XML_RW
   this->InvokeEvent(vtkKWEvent::VolumePropertyChangedEvent, NULL);
-#else
-  if (!this->VolumeProperty)
-    {
-    this->InvokeEvent(vtkKWEvent::VolumePropertyChangedEvent, NULL);
-    }
-  else
-    {
-    ostrstream event;
-
-    vtkXMLVolumePropertyWriter *xmlw = vtkXMLVolumePropertyWriter::New();
-    xmlw->SetObject(this->VolumeProperty);
-    xmlw->SetNumberOfComponents(this->GetDataSetNumberOfComponents());
-    xmlw->WriteToStream(event);
-    xmlw->Delete();
-
-    event << ends;
-    
-    this->InvokeEvent(vtkKWEvent::VolumePropertyChangedEvent, event.str());
-    event.rdbuf()->freeze(0);
-    }
-#endif
 }
 
 //----------------------------------------------------------------------------
