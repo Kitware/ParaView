@@ -40,6 +40,36 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObject.h"
 #include "vtkTclUtil.h"
 
+/*
+ * Make sure all the kits register their classes with vtkInstantiator.
+ * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
+ * anyway.  The instantiators will add no more code for the linker to
+ * collect.
+ */
+#include "vtkCommonInstantiator.h"
+#include "vtkFilteringInstantiator.h"
+#include "vtkIOInstantiator.h"
+#include "vtkImagingInstantiator.h"
+#include "vtkGraphicsInstantiator.h"
+
+#ifdef VTK_USE_RENDERING
+#include "vtkRenderingInstantiator.h"
+#endif
+
+#ifdef VTK_USE_PATENTED
+#include "vtkPatentedInstantiator.h"
+#endif
+
+#ifdef VTK_USE_HYBRID
+#include "vtkHybridInstantiator.h"
+#endif
+
+#ifdef VTK_USE_PARALLEL
+#include "vtkParallelInstantiator.h"
+#endif
+
+#include "vtkParaViewInstantiator.h"
+
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
 {
