@@ -62,6 +62,10 @@ public:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
 
+  // Description:
+  // Initializes widget after creation
+  virtual void Initialize();
+
   //BTX
   // Description:
   // Called when the PVSources accept button is called.

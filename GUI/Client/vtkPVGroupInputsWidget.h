@@ -30,6 +30,7 @@ class vtkKWListBox;
 class vtkCollection;
 class vtkPVSourceCollection;
 class vtkPVSourceVectorInternals;
+class vtkSMInputProperty;
 
 class VTK_EXPORT vtkPVGroupInputsWidget : public vtkPVWidget
 {
@@ -58,6 +59,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Called after widget creation, sets the initial state of the widget.
+  virtual void Initialize();
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
@@ -84,6 +89,9 @@ protected:
 
   // Called to inactivate widget (after accept is called).
   void Inactivate();
+  
+  vtkSMInputProperty* GetInputProperty();
+  int CheckSource(vtkPVSource *pvs);
 
   
   vtkPVGroupInputsWidget(const vtkPVGroupInputsWidget&); // Not implemented

@@ -118,6 +118,10 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // Initialize the widget after creation
+  virtual void Initialize();
  
 protected:
   vtkPVArrayMenu();

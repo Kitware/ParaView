@@ -316,6 +316,8 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
         <GroupRequirement quantity="Multiple"/>
       </Input>
     </Filter>
+    <GroupInputsWidget trace_name="inputs" property="Input"
+                       help="Choose inputs to append."/>
     <Documentation>
 The Append Attributes filter takes multiple input data sets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
@@ -329,9 +331,10 @@ The Append Attributes filter takes multiple input data sets with the same geomet
     <Filter class="vtkAppendPolyData">
       <Input name="Input"
              class="vtkPolyData" quantity="Multiple">
-        <GroupRequirement quantity="Multiple"/>
       </Input>
     </Filter>
+    <GroupInputsWidget trace_name="inputs" property="Input"
+                       help="Choose inputs to append."/>
     <Documentation>
 The Append Geometry filter operates on multiple polygonal data sets. The data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets. It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output.
     </Documentation>
@@ -348,6 +351,8 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
         <GroupRequirement quantity="Multiple"/>
       </Input>
     </Filter>
+    <GroupInputsWidget trace_name="inputs" property="Input"
+                       help="Choose inputs to append."/>
     <Documentation>
 The Append Datasets filter operates on multiple data sets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
@@ -747,6 +752,11 @@ The Extract Edges filter produces a wireframe version of the input data set by e
         <GroupRequirement quantity="Multiple"/>
       </Input>
     </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"  hide_gui="1"
+               help="Set the input to this filter."
+               input_name="Input"/>
+
     <ExtractPartsWidget trace_name="parts"
                         property="InputMask"
                         help="Choose the parts to extract."/>
@@ -953,7 +963,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple"/>
     </Filter>
-    <GroupInputsWidget trace_name="inputs"
+    <GroupInputsWidget trace_name="inputs" property="Input"
                        help="Choose inputs to group."/>
     <Documentation>
 The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. All the data objects currently in ParaView will appear in the selection list. Only visible data objects are selected by default. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
@@ -1593,6 +1603,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
           module_type="Filter"
           long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
           short_help="Creates a surface with more triangles than the input.">
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
     <Scale label="Num. divisions"
            trace_name="NumberOfSubdivisions"
            property="NumberOfSubdivisions"
@@ -2116,7 +2129,7 @@ The Contour filter operates on any type of data set, but the input is required t
                id="im2"
                label="Glyph"
                help="Select the glyph source."
-               input_name="Source"
+               input_name="Source" initialize_with_current="0"
                source_list="GlyphSources"/>
     <OrientScaleWidget trace_name="OrientScale" input_menu="im"
                        scalar_property="SelectInputScalars"
@@ -2215,13 +2228,13 @@ The Pick filter operates on any type of data and produces unstructured grid outp
       <Item label="Point"
             value="Output">
       <PointSourceWidget trace_name="Point"
-                         default_radius="0"
+                         default_radius="0" input_menu="im"
                          default_number_of_points="1"
                          show_entries="0"/>
       </Item>
         <Item label="Line"
               value="Output">
-        <LineSourceWidget trace_name="Line"/>
+        <LineSourceWidget trace_name="Line" input_menu="im"/>
       </Item>
     </SelectWidget>
     <Documentation>
@@ -2270,7 +2283,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </Item>
       <Item label="Line"
             value="Output">
-        <LineSourceWidget trace_name="Line"/>
+        <LineSourceWidget trace_name="Line" input_menu="im"/>
       </Item>
     </SelectWidget>
     <ContainerWidget pack_direction="left" trace_name="MaxProp">

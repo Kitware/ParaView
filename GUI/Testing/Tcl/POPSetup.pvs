@@ -46,7 +46,7 @@ puts "ExtractGrid"
 set sInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
 set pvExtractGrid [$sInt CreateCallback]
 [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 0 0
-$pvExtractGrid UpdateParameterWidgets
+$pvExtractGrid Reset
 $pvExtractGrid AcceptCallback
 
 # Setup color map to show temperature.
@@ -66,7 +66,7 @@ set pvContour [$pvWindow ContourCallback]
 [$pvContour GetVTKSource] SetValue 0 0.035
 [$pvContour GetVTKSource] ComputeScalarsOff
 [$pvContour GetVTKSource] ComputeNormalsOff
-$pvContour UpdateParameterWidgets
+$pvContour Reset
 
 [$pvContour GetScalarOperationMenu] SetValue "Salinity"
 $pvContour ChangeScalars

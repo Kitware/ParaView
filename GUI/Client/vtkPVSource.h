@@ -215,7 +215,7 @@ public:
   // Description:
   // This method resets the UI values (Widgets added with the following
   // methods).  It uses the GetCommand supplied to the interface.
-  virtual void UpdateParameterWidgets();
+  virtual void Reset();
   
   // Description:
   // Updates delete button and description frame.
@@ -315,7 +315,7 @@ public:
   // current (if makeCurrent is true), 4. creates output (vtkPVDisplayGUI) which
   // contains a vtk data object of type outputDataType, 5. assigns or
   // creates an extent translator to the output.
-  virtual int InitializeClone(vtkPVSource* input, int makeCurrent);
+  virtual int InitializeClone(int makeCurrent);
 
   // Description:
   // This sets up the PVData.  This method is called when
@@ -496,6 +496,8 @@ protected:
 
   void SaveFilterInBatchScript(ofstream *file);
 
+  virtual void InitializeWidgets();  
+
   // Description:
   void MarkSourcesForUpdate();
 
@@ -598,6 +600,7 @@ protected:
   int UpdateSourceInBatch;
 
   int LabelSetByUser;
+  int ResetInSelect;
   
   // CubeAxes should be moved into a display of its own.
   vtkSMCubeAxesDisplay* CubeAxesDisplay;

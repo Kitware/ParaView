@@ -51,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -197,75 +197,78 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::CommonReset()
+{
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Origin"));
+  if(sdvp)
+    {
+    double center[3];
+    center[0] = sdvp->GetElement(0);
+    center[1] = sdvp->GetElement(1);
+    center[2] = sdvp->GetElement(2);
+    this->SetCenterInternal(center[0],center[1],center[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Origin for widget: "<< 
+                  this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Normal"));
+  if(sdvp)
+    {
+    double normal[3];
+    normal[0] = sdvp->GetElement(0);
+    normal[1] = sdvp->GetElement(1);
+    normal[2] = sdvp->GetElement(2);
+    this->SetNormalInternal(normal[0],normal[1],normal[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Normal for widget: "<< 
+                  this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Offset"));
+  if(sdvp)
+    {
+    double offset = sdvp->GetElement(0);
+    this->OffsetEntry->SetValue(offset);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Offset for widget: "<< 
+                  this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Initialize()
+{
+  this->PlaceWidget();
+  this->SetNormalInternal(0,0,1);
+  this->UpdateOffsetRange();
+
+  this->Accept();
+
+  this->CommonReset();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ResetInternal()
 {
-
-  if ( !this->AcceptCalled)
+  this->CommonReset();
+  
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("DrawPlane"));
+  if (ivp)
     {
-    this->ActualPlaceWidget();
-    this->SetNormalInternal(0,0,1);
+    ivp->SetElements1(0);
     }
-
-  if ( ! this->ModifiedFlag || this->SuppressReset)
-    {
-    return;
-    }
-
-  if ( this->AcceptCalled )
-    {
-    vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Origin"));
-    if(sdvp)
-      {
-      double center[3];
-      center[0] = sdvp->GetElement(0);
-      center[1] = sdvp->GetElement(1);
-      center[2] = sdvp->GetElement(2);
-      this->SetCenterInternal(center[0],center[1],center[2]);
-      }
-    else
-      {
-      vtkErrorMacro("Could not find property Origin for widget: "<< 
-                    this->ImplicitFunctionProxy->GetVTKClassName());
-      }
-    
-    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Normal"));
-    if(sdvp)
-      {
-      double normal[3];
-      normal[0] = sdvp->GetElement(0);
-      normal[1] = sdvp->GetElement(1);
-      normal[2] = sdvp->GetElement(2);
-      this->SetNormalInternal(normal[0],normal[1],normal[2]);
-      }
-    else
-      {
-      vtkErrorMacro("Could not find property Normal for widget: "<< 
-                    this->ImplicitFunctionProxy->GetVTKClassName());
-      }
-
-    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Offset"));
-    if(sdvp)
-      {
-      double offset = sdvp->GetElement(0);
-      this->OffsetEntry->SetValue(offset);
-      }
-    else
-      {
-      vtkErrorMacro("Could not find property Offset for widget: "<< 
-                    this->ImplicitFunctionProxy->GetVTKClassName());
-      }
-    
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->WidgetProxy->GetProperty("DrawPlane"));
-    if (ivp)
-      {
-      ivp->SetElements1(0);
-      }
-    this->WidgetProxy->UpdateVTKObjects();
-    }
+  this->WidgetProxy->UpdateVTKObjects();
 
   this->UpdateOffsetRange();
 
@@ -347,7 +350,6 @@ void vtkPVImplicitPlaneWidget::Accept()
     }
 
   this->ValueChanged = 0;
-  this->AcceptCalled = 1;
 }
 //---------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
@@ -788,6 +790,13 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Center"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+  this->Render();
+
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z);
+
+  this->UpdateOffsetRange();
 }
 
 //----------------------------------------------------------------------------
@@ -826,6 +835,13 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Normal"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+  this->Render();
+
+  this->NormalEntry[0]->SetValue(x);
+  this->NormalEntry[1]->SetValue(y);
+  this->NormalEntry[2]->SetValue(z);
+
+  this->UpdateOffsetRange();
 }
 
 //----------------------------------------------------------------------------
@@ -930,7 +946,6 @@ void vtkPVImplicitPlaneWidget::UpdateOffsetRange()
 void vtkPVImplicitPlaneWidget::Update()
 {
   vtkPVSource *input;
-  double bds[6];
 
   this->Superclass::Update();
 
@@ -942,6 +957,24 @@ void vtkPVImplicitPlaneWidget::Update()
   input = this->InputMenu->GetCurrentValue();
   if (input)
     {
+    double bds[6];
+    input->GetDataInformation()->GetBounds(bds);
+    this->PlaceWidget(bds);
+
+    double center[3];
+    double normal[3];
+    this->WidgetProxy->UpdateInformation();
+    this->GetCenterInternal(center);
+    this->GetNormalInternal(normal);
+  
+    this->CenterEntry[0]->SetValue(center[0]);
+    this->CenterEntry[1]->SetValue(center[1]);
+    this->CenterEntry[2]->SetValue(center[2]);
+    
+    this->NormalEntry[0]->SetValue(normal[0]);
+    this->NormalEntry[1]->SetValue(normal[1]);
+    this->NormalEntry[2]->SetValue(normal[2]);
+
     vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
     vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
     prop->GetDomain("range"));
@@ -952,9 +985,6 @@ void vtkPVImplicitPlaneWidget::Update()
       }
 
     prop->UpdateDependentDomains();
-
-    input->GetDataInformation()->GetBounds(bds);
-    this->PlaceWidget(bds);
     }
 }
 

@@ -72,6 +72,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Initialize after creation.
+  virtual void Initialize();
+
+  // Description:
   // This input menu supplies the array options.
   virtual void SetInputMenu(vtkPVInputMenu*);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.33");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -183,24 +183,21 @@ void vtkPVLabeledToggle::Accept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::ResetInternal()
+void vtkPVLabeledToggle::Initialize()
 {
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
   if (ivp)
     {
     this->SetState(ivp->GetElement(0));
     }
+}
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -16,8 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
@@ -25,10 +28,12 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.27");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
+
+vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 vtkPVLineSourceWidget::vtkPVLineSourceWidget()
@@ -36,6 +41,7 @@ vtkPVLineSourceWidget::vtkPVLineSourceWidget()
   this->CommandFunction = vtkPVLineSourceWidgetCommand;
   this->SourceProxyName = 0;
   this->SourceProxy = 0;
+  this->InputMenu = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +58,7 @@ vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
     this->SourceProxy->Delete();
     this->SourceProxy = 0;
     }
+  this->SetInputMenu(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -74,14 +81,17 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::Initialize()
+{
+  this->PlaceWidget();
+
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::ResetInternal()
 {
-  if ( !this->AcceptCalled )
-    {
-    this->ActualPlaceWidget();
-    return;
-    }
-  if ( this->SuppressReset || !this->ModifiedFlag)
+  if ( !this->ModifiedFlag)
     {
     return;
     }
@@ -106,6 +116,8 @@ void vtkPVLineSourceWidget::ResetInternal()
     this->SetResolution(resp->GetElement(0));
     }
   this->ModifiedFlag = 0;
+
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -148,6 +160,30 @@ void vtkPVLineSourceWidget::Accept()
   // I actually want to call vtkPVWidget::Accept, not the Accept method of
   // the superclass (vtkPVLineWidget).
   this->vtkPVWidget::Accept();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::Update()
+{
+  if (this->InputMenu)
+    {
+    vtkPVSource *input = this->InputMenu->GetCurrentValue();
+    if (input)
+      {
+      double bds[6];
+      double x, y, z;
+      input->GetDataInformation()->GetBounds(bds);
+      x = (bds[0]+bds[1])/2; 
+      y = bds[2]; 
+      z = (bds[4]+bds[5])/2;
+      this->SetPoint1(x, y, z);
+      x = (bds[0]+bds[1])/2; 
+      y = bds[3]; 
+      z = (bds[4]+bds[5])/2;
+      this->SetPoint2(x, y, z);
+      this->PlaceWidget(bds);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -216,4 +252,60 @@ void vtkPVLineSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceProxyName: " << 
     (this->SourceProxyName? this->SourceProxyName: "None") << endl;
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::CopyProperties(
+  vtkPVWidget *clone, vtkPVSource *pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVLineSourceWidget *psw = vtkPVLineSourceWidget::SafeDownCast(clone);
+  if (psw)
+    {
+    if (this->InputMenu)
+      {
+      vtkPVInputMenu *im = this->InputMenu->ClonePrototype(pvSource, map);
+      psw->SetInputMenu(im);
+      im->Delete();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVLineSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
+  vtkPVXMLPackageParser *parser)
+{
+  if (!this->Superclass::ReadXMLAttributes(element, parser))
+    {
+    return 0;
+    }
+
+  const char *input_menu = element->GetAttribute("input_menu");
+  if (input_menu)
+    {
+    vtkPVXMLElement *ime = element->LookupElement(input_menu);
+    if (!ime)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+      return 0;
+      }
+
+    vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
+    vtkPVInputMenu *imw = vtkPVInputMenu::SafeDownCast(w);
+    if (!imw)
+      {
+      if (w)
+        {
+        w->Delete();
+        }
+      vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+      return 0;
+      }
+    imw->AddDependent(this);
+    this->SetInputMenu(imw);
+    imw->Delete();
+    }
+
+  return 1;
 }

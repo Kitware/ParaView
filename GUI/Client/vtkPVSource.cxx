@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.399");
+vtkCxxRevisionMacro(vtkPVSource, "1.400");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -146,6 +146,8 @@ vtkPVSource::vtkPVSource()
   this->PointLabelVisibility = 0;
   
   this->PVColorMap = 0;  
+
+  this->ResetInSelect = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -569,8 +571,11 @@ void vtkPVSource::CreateProperties()
     pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
     pvWidget->Create(this->GetApplication());
-    this->Script("pack %s -side top -fill x -expand t", 
-                 pvWidget->GetWidgetName());
+    if (!pvWidget->GetHideGUI())
+      {
+      this->Script("pack %s -side top -fill x -expand t", 
+                   pvWidget->GetWidgetName());
+      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -623,7 +628,10 @@ void vtkPVSource::Select()
   // This may best be merged with the UpdateProperties call but ...
   // We make the call here to update the input menu, 
   // which is now just another pvWidget.
-  this->UpdateParameterWidgets();
+  if (this->ResetInSelect)
+    {
+    this->ResetCallback();
+    }
   
   if (this->Notebook)
     {
@@ -1335,7 +1343,7 @@ void vtkPVSource::MarkSourcesForUpdate()
 //----------------------------------------------------------------------------
 void vtkPVSource::ResetCallback()
 {
-  this->UpdateParameterWidgets();
+  this->Reset();
   if (this->Initialized)
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1494,7 +1502,7 @@ void vtkPVSource::DeleteCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::UpdateParameterWidgets()
+void vtkPVSource::Reset()
 {
   vtkPVWidget *pvw;
   vtkCollectionIterator *it = this->Widgets->NewIterator();
@@ -1503,7 +1511,7 @@ void vtkPVSource::UpdateParameterWidgets()
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
     // Do not try to reset the widget if it is not initialized
-    if (pvw->GetApplication())
+    if (pvw && (pvw->GetModifiedFlag() || !this->Initialized))
       {
       pvw->Reset();
       }
@@ -1545,7 +1553,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
   while( !it->IsDoneWithTraversal() )
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    if (pvw && pvw->GetModifiedFlag())
+    if (pvw && (!this->Initialized || pvw->GetModifiedFlag()))
       {
       pvw->Accept();
       }
@@ -2000,7 +2008,6 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
   pvw->SetTraceReferenceObject(this);
   sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
   pvw->SetTraceReferenceCommand(str);
-  pvw->Select();
 }
 
 //----------------------------------------------------------------------------
@@ -2113,8 +2120,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
     return retVal;
     }
 
-  vtkPVSource *current = this->GetPVWindow()->GetCurrentPVSource();
-  retVal = clone->InitializeClone(current, makeCurrent);
+  retVal = clone->InitializeClone(makeCurrent);
 
 
   if (retVal != VTK_OK)
@@ -2325,32 +2331,57 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSource::InitializeClone(vtkPVSource* input,
-                                 int makeCurrent)
+void vtkPVSource::InitializeWidgets()
 
 {
-  // Set the input if necessary.
-  if (this->GetNumberOfInputProperties() > 0)
+  vtkPVWidget *pvw;
+  vtkCollectionIterator *it;
+  
+  it = this->Widgets->NewIterator();
+
+  // First initialize the input widgets (since others tend to depend
+  // on input being set)
+  it->InitTraversal();
+  while( !it->IsDoneWithTraversal() )
     {
-    // Set the VTK reference to the new input.
-    vtkPVInputProperty* ip = this->GetInputProperty(0);
-    if (ip)
+    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    if (pvw && vtkPVInputMenu::SafeDownCast(pvw))
       {
-      this->SetPVInput(ip->GetName(), 0, input);
+      pvw->Initialize();
       }
-    else
-      {
-      this->SetPVInput("Input",  0, input);
-      }
+    it->GoToNextItem();
     }
 
+  // Next initialize the rest
+  it->InitTraversal();
+  while( !it->IsDoneWithTraversal() )
+    {
+    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    if (pvw && !vtkPVInputMenu::SafeDownCast(pvw))
+      {
+      pvw->Initialize();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+  
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSource::InitializeClone(int makeCurrent)
+
+{
   // Create the properties frame etc.
   this->CreateProperties();
-  
+
+  this->InitializeWidgets();
+
   // Display page must be created before source is selected.
   if (makeCurrent)
     {
+    this->ResetInSelect = 0;
     this->GetPVWindow()->SetCurrentPVSourceCallback(this);
+    this->ResetInSelect = 1;
     } 
     
   // Show the source page, and hide the display and information pages.

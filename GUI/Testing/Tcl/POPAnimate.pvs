@@ -46,7 +46,7 @@ $pvContOutput ChangeActorColor 1 0 0
 for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
     puts "Salt depth $i"
     [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
-    $pvExtractGrid UpdateParameterWidgets
+    $pvExtractGrid Reset
     $pvExtractGrid AcceptCallback
 }
 
@@ -62,7 +62,7 @@ update
 set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
 [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
 $pvExtractGridOutput ColorByPointField Temperature 1
-$pvExtractGrid UpdateParameterWidgets
+$pvExtractGrid Reset
 [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvExtractGridOutput ChangeColorMap
 $pvExtractGridOutput SetScalarRange -5.5 30.8804
@@ -77,7 +77,7 @@ $pvContOutput ChangeActorColor 0 [expr 170.0/255.0] 1.0
 for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
     puts "Temperature depth $i"
     [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
-    $pvExtractGrid UpdateParameterWidgets
+    $pvExtractGrid Reset
     $pvExtractGrid AcceptCallback
 }
 
@@ -94,7 +94,7 @@ $pvCont SetVisibility 0
 $pvFloor SetVisibility 0
 
 [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 1 1
-$pvExtractGrid UpdateParameterWidgets
+$pvExtractGrid Reset
 $pvExtractGrid AcceptCallback
 
 
@@ -121,7 +121,7 @@ update
 for {set i 0.035} {$i <= 0.039} { set i [expr $i + $IsoStep]} {
     puts "Contour value $i"
     [$pvContour GetVTKSource] SetValue 0 $i
-    $pvContour UpdateParameterWidgets
+    $pvContour Reset
     $pvContour AcceptCallback
 }
 

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.25");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.26");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -255,7 +255,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER);
 
-  int retVal = this->InitializeClone(0, 1);
+  int retVal = this->InitializeClone(1);
   if (retVal != VTK_OK)
     {
     return retVal;
@@ -267,15 +267,9 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     return retVal;
     }
 
-  // We called UpdateInformation, we need to update the widgets.
-  vtkCollectionIterator* it = this->GetWidgets()->NewIterator();
-  for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
-    {
-    vtkPVWidget *pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    pvw->ModifiedCallback();
-    }
-  it->Delete();
-  this->UpdateParameterWidgets();
+  // Re-initialize widgets to get the information from the reader.
+  this->InitializeWidgets();
+
   return VTK_OK;
 }
 

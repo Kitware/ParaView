@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -145,6 +145,22 @@ void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Point1"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->Point1[0]->SetValue(x);
+  this->Point1[1]->SetValue(y);
+  this->Point1[2]->SetValue(z);
+
+  double pos2[3];
+  for (int i=0; i<3; i++)
+    {
+    pos2[i] = this->Point2[i]->GetValueAsFloat();
+    }
+
+  double d0, d1, d2;
+  d0 = pos2[0]-x;
+  d1 = pos2[1]-y;
+  d2 = pos2[2]-z;
+  this->DisplayLength(sqrt(d0*d0 + d1*d1 + d2*d2));
 }
 
 //----------------------------------------------------------------------------
@@ -184,6 +200,23 @@ void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Point2"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->Point2[0]->SetValue(x);
+  this->Point2[1]->SetValue(y);
+  this->Point2[2]->SetValue(z);
+
+  double pos1[3];
+  for (int i=0; i<3; i++)
+    {
+    pos1[i] = this->Point1[i]->GetValueAsFloat();
+    }
+
+  double d0, d1, d2;
+  d0 = pos1[0]-x;
+  d1 = pos1[1]-y;
+  d2 = pos1[2]-z;
+  this->DisplayLength(sqrt(d0*d0 + d1*d1 + d2*d2));
+
 }
 
 //----------------------------------------------------------------------------
@@ -385,7 +418,6 @@ void vtkPVLineWidget::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -466,14 +498,18 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLineWidget::Initialize()
+{
+  this->PlaceWidget();
+
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLineWidget::ResetInternal()
 {
-  if ( !this->AcceptCalled )
-    {
-    this->ActualPlaceWidget();
-    return;
-    }
-  if (this->SuppressReset || !this->ModifiedFlag)
+
+  if (!this->ModifiedFlag)
     {
     return;
     }
@@ -613,6 +649,14 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLineWidget::DisplayLength(double len)
+{
+  char tmp[1024];
+  sprintf(tmp, "%.5g", len);
+  this->LengthValue->SetLabel(tmp);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   if(l == vtkKWEvent::WidgetModifiedEvent)
@@ -635,10 +679,8 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     double d0, d1, d2;
     d0 = pos2[0]-pos1[0];
     d1 = pos2[1]-pos1[1];
-    d2 = pos2[2]-pos1[2];    
-    char tmp[1024];
-    sprintf(tmp, "%.5g", sqrt(d0*d0 + d1*d1 + d2*d2));
-    this->LengthValue->SetLabel(tmp);
+    d2 = pos2[2]-pos1[2];
+    this->DisplayLength(sqrt(d0*d0 + d1*d1 + d2*d2));
 
     res = this->GetResolutionInternal();
     this->ResolutionEntry->SetValue(res);

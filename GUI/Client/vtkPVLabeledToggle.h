@@ -72,6 +72,10 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
+  // Initialize the widget after creation.
+  virtual void Initialize();
+  
+  // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
@@ -88,7 +92,7 @@ protected:
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
   virtual void ResetInternal();
-  
+
   // This serves a dual purpose.  For tracing and Resources/for saving state.
   virtual void Trace(ofstream *file);
 

@@ -79,6 +79,10 @@ public:
   //ETX
 
   // Description:
+  // Set the default values.
+  virtual void Initialize();
+
+  // Description:
   // This method resets the widget values from the VTK filter.
   virtual void ResetInternal();
     

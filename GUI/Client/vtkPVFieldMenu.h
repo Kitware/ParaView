@@ -87,9 +87,13 @@ public:
   //BTX
   // Description:
   // Called when the accept or reset button is pressed.
-  // This internal version is passed VTK source name,
   virtual void Accept();
   virtual void ResetInternal();
+
+  // Description:
+  // Called after the widget is created. Initializes the gui from
+  // server manager
+  virtual void Initialize();
   //ETX
 
   // Description:

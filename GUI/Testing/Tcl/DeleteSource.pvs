@@ -28,11 +28,11 @@ proc decipadString { str before total } {
 
 
 set pvSphere [$pvWindow CreatePVSource SphereSource]
-$pvSphere UpdateParameterWidgets
+$pvSphere Reset
 $pvSphere AcceptCallback
 
 set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
-$pvShrink UpdateParameterWidgets
+$pvShrink Reset
 $pvShrink AcceptCallback
 
 

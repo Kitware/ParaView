@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.23");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -806,18 +806,16 @@ void vtkPVOrientScaleWidget::Accept()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVOrientScaleWidget::Initialize()
+{
+  this->Update();
+  // Push the values to the property so that reset works properly
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::ResetInternal()
 {
-  if (!this->ModifiedFlag)
-    {
-    return;
-    }
-
-  if (!this->AcceptCalled)
-    {
-    this->Update();
-    return;
-    }
 
   vtkSMStringVectorProperty *scalarProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
@@ -858,10 +856,7 @@ void vtkPVOrientScaleWidget::ResetInternal()
     this->ScaleFactorEntry->SetValue(scaleFactorProp->GetElement(0));
     }
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -52,6 +52,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Initialize the widget after creation.
+  virtual void Initialize();
+
+  // Description:
   // Adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                          vtkPVAnimationInterfaceEntry *ai);
@@ -106,6 +110,8 @@ protected:
 
   vtkPVSelectTimeSet(const vtkPVSelectTimeSet&); // Not implemented
   void operator=(const vtkPVSelectTimeSet&); // Not implemented
+
+  void CommonReset();
 
   vtkSetStringMacro(FrameLabel);
   vtkGetStringMacro(FrameLabel);

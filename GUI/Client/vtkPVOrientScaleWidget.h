@@ -46,6 +46,7 @@ public:
   // Move widget state to vtk object or back.
   virtual void Accept();
   virtual void ResetInternal();
+  virtual void Initialize();
   //ETX
 
   // Description:

@@ -112,7 +112,7 @@ $pvWindow SetCurrentPVSource $cInt
 set cntOutput [$cInt GetPVOutput]
 $cntOutput ColorByPointField Momentum 3
 $cntOutput SetScalarBarVisibility 1
-$cInt UpdateParameterWidgets
+$cInt Reset
 
 set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 300 300

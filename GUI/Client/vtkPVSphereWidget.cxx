@@ -43,7 +43,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -139,15 +139,17 @@ void vtkPVSphereWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSphereWidget::Initialize()
+{
+  this->PlaceWidget();
+
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSphereWidget::ResetInternal()
 {
-  if( !this->AcceptCalled)
-    {
-    this->ActualPlaceWidget();
-    this->Superclass::ResetInternal();
-    return;
-    }
-  if ( ! this->ModifiedFlag || this->SuppressReset)
+  if ( ! this->ModifiedFlag )
     {
     return;
     }
@@ -232,7 +234,6 @@ void vtkPVSphereWidget::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
   this->ValueChanged = 0;
 }
 //---------------------------------------------------------------------------
@@ -661,7 +662,12 @@ void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Center"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z);
 }
+
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadiusInternal(double r)
 {
@@ -674,6 +680,8 @@ void vtkPVSphereWidget::SetRadiusInternal(double r)
     this->WidgetProxy->GetProperty("Radius"));
   dvp->SetElements1(r);
   this->WidgetProxy->UpdateVTKObjects(); 
+
+  this->RadiusEntry->SetValue(r);
 }
 
 //----------------------------------------------------------------------------

@@ -111,6 +111,10 @@ public:
   virtual void Update();
 
   // Description:
+  // Place the widget
+  virtual void Initialize();
+
+  // Description:
   // Overloaded to create the ImplicitFunction proxy
   //BTX
   virtual void Create(vtkKWApplication *app);

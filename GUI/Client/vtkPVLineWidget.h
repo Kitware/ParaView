@@ -112,6 +112,10 @@ public:
   //ETX
 
   // Description:
+  // Initialize widget after creation
+  virtual void Initialize();
+
+  // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
@@ -169,6 +173,8 @@ protected:
   void GetPoint1Internal(double pt[3]);
   void GetPoint2Internal(double pt[3]);
   int GetResolutionInternal();
+
+  void DisplayLength(double len);
 
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];

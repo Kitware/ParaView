@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.41");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -189,44 +189,38 @@ void vtkPVStringEntry::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVStringEntry::Initialize()
+{
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+
+  vtkSMStringListDomain* dom = vtkSMStringListDomain::SafeDownCast(
+    svp->GetDomain("default_value"));
+  if (dom && dom->GetNumberOfStrings() > 0)
+    {
+    if (dom->GetNumberOfStrings() > 0)
+      {
+      this->SetValue(dom->GetString(0));
+      }
+    }
+  else
+    {
+    this->SetValue(svp->GetElement(0));
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVStringEntry::ResetInternal()
 {
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
   if (svp)
     {
-    if (!this->AcceptCalled)
-      {
-      vtkSMStringListDomain* dom = vtkSMStringListDomain::SafeDownCast(
-        svp->GetDomain("default_value"));
-      if (dom && dom->GetNumberOfStrings() > 0)
-        {
-        if (dom->GetNumberOfStrings() > 0)
-          {
-          this->SetValue(dom->GetString(0));
-          }
-        }
-      else
-        {
-        this->SetValue(svp->GetElement(0));
-        }
-      }
-    else
-      {
-      this->SetValue(svp->GetElement(0));
-      }
+    this->SetValue(svp->GetElement(0));
     }
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -373,8 +373,7 @@
     <SelectionList label="Byte order"
                    trace_name="DataByteOrder"
                    property="DataByteOrder"
-                   help="Select the byte order of the binary file"
-                   suppress_reset="1">
+                   help="Select the byte order of the binary file">
       <Item name="big endian"
             value="0"/>
       <Item name="little endian"

@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.65");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.66");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -306,9 +306,8 @@ void vtkPVVectorEntry::Trace(ofstream *file)
 }
 
 
-
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::ResetInternal()
+void vtkPVVectorEntry::Initialize()
 {
   int i;
   
@@ -349,10 +348,13 @@ void vtkPVVectorEntry::ResetInternal()
       }
     }
   
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -712,7 +714,6 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
     << (this->ScriptValue?this->ScriptValue:"none") << endl;
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
   os << indent << "VectorLength: " << this->VectorLength << endl;
-  os << indent << "AcceptCalled: " << this->AcceptCalled << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.61");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -131,7 +131,6 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   if (len > 0 && this->CurrentIndex < 0)
     {
     this->Menu->SetValue(this->Labels->GetString(0));
-    this->SetCurrentIndex(0);
     }
 }
 
@@ -341,98 +340,116 @@ void vtkPVSelectWidget::Trace(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSelectWidget::Initialize()
+{
+  this->SetCurrentIndex(0);
+  vtkCollectionIterator* it = this->Widgets->NewIterator();
+  for ( it->InitTraversal();
+    !it->IsDoneWithTraversal();
+    it->GoToNextItem() )
+    {
+    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetObject());
+    if (widget)
+      {
+      widget->Initialize();
+      }
+    }
+  it->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::Reset()
+{
+  // Always forward the reset to contained widget since the select
+  // widget never becomes modified.
+  this->ResetInternal();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::ResetInternal()
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
 
-  if (this->AcceptCalled)
+  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (pp && pp->GetNumberOfProxies() > 0)
     {
-    vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-      this->GetSMProperty());
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetSMProperty());
-    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->GetSMProperty());
-    vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetSMProperty());
-    if (pp)
+    vtkSMProxy *proxy = pp->GetProxy(0);
+    for (i = 0; i < num; i++)
       {
-      vtkSMProxy *proxy = pp->GetProxy(0);
-      for (i = 0; i < num; i++)
+      vtkPV3DWidget *w3d = vtkPV3DWidget::SafeDownCast(
+        this->Widgets->GetItemAsObject(i));
+      if (w3d)
         {
-        vtkPV3DWidget *w3d = vtkPV3DWidget::SafeDownCast(
-          this->Widgets->GetItemAsObject(i));
-        if (w3d)
-          {
-          if (w3d->GetProxyByName(this->GetVTKValue(i)) == proxy)
-            {
-            index = i;
-            break;
-            }
-          }
-        }
-      }
-    else if (ivp)
-      {
-      const char* value;
-      int propValue = ivp->GetElement(0);
-      for (i = 0; i < num; i++)
-        {
-        value = this->GetVTKValue(i);
-        if (value && atoi(value) == propValue)
+        if (w3d->GetProxyByName(this->GetVTKValue(i)) == proxy)
           {
           index = i;
           break;
           }
         }
       }
-    else if (dvp)
+    }
+  else if (ivp && ivp->GetNumberOfElements() > 0)
+    {
+    const char* value;
+    int propValue = ivp->GetElement(0);
+    for (i = 0; i < num; i++)
       {
-      const char* value;
-      double propValue = dvp->GetElement(0);
-      for (i = 0; i < num; i++)
+      value = this->GetVTKValue(i);
+      if (value && atoi(value) == propValue)
         {
-        value = this->GetVTKValue(i);
-        if (value && atof(value) == propValue)
-          {
-          index = i;
-          break;
-          }
+        index = i;
+        break;
         }
       }
-    else if (svp)
+    }
+  else if (dvp && dvp->GetNumberOfElements() > 0)
+    {
+    const char* value;
+    double propValue = dvp->GetElement(0);
+    for (i = 0; i < num; i++)
       {
-      const char* value;
-      const char* propValue = svp->GetElement(0);
-      for (i = 0; i < num; i++)
+      value = this->GetVTKValue(i);
+      if (value && atof(value) == propValue)
         {
-        value = this->GetVTKValue(i);
-        if (value && propValue && !strcmp(value, propValue))
-          {
-          index = i;
-          break;
-          }
+        index = i;
+        break;
         }
       }
+    }
+  else if (svp && svp->GetNumberOfElements() > 0)
+    {
+    const char* value;
+    const char* propValue = svp->GetElement(0);
+    for (i = 0; i < num; i++)
+      {
+      value = this->GetVTKValue(i);
+      if (value && propValue && !strcmp(value, propValue))
+        {
+        index = i;
+        break;
+        }
+      }
+    }
 
-    if ( index >= 0 )
-      {
-      this->Menu->SetValue(this->Labels->GetString(index));
-      this->SetCurrentIndex(index);
-      }
-    this->ModifiedFlag = 0;
+  if ( index >= 0 )
+    {
+    this->Menu->SetValue(this->Labels->GetString(index));
+    this->SetCurrentIndex(index);
     }
-  else
-    { 
-    // The value is not set. 
-    // Keep the modified flag so that accept will set the default value.
-    this->ModifiedFlag = 1;
-    }
+  this->ModifiedFlag = 0;
 
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidget *widget = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    vtkPVWidget *widget = 
+      (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
     widget->ResetInternal();
     }
 }
@@ -603,7 +620,6 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   // Pack the new widget.
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
-  pvw->Reset();
   pvw->Select();
 
   this->ModifiedCallback();

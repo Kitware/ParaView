@@ -51,7 +51,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -126,16 +126,18 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVBoxWidget::Initialize()
+{
+  this->PlaceWidget();
+
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVBoxWidget::ResetInternal()
 {
-  if ( !this->ModifiedFlag || this->SuppressReset)
+  if ( !this->ModifiedFlag )
     {
-    return;
-    }
-  
-  if ( !this->AcceptCalled)
-    {
-    this->ActualPlaceWidget();
     return;
     }
   
@@ -217,7 +219,6 @@ void vtkPVBoxWidget::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------

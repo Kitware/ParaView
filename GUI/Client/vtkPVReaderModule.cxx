@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.55");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.56");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -216,6 +216,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 
   // Update the reader's information.
   this->Proxy->UpdateInformation();
+
   return VTK_OK;
 }
 

@@ -132,6 +132,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Initialize widget after creation
+  virtual void Initialize();
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
@@ -148,10 +152,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
-  // Description:
-  // Set the AcceptCalled flag (vtkPVPointSourceWidget needs access to it.)
-  vtkSetMacro(AcceptCalled, int);
-
   // Description:
   // Resets the animation entries (start and end) to values obtained
   // from the range domain

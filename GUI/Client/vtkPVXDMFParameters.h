@@ -58,6 +58,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Initializes widget after creation
+  virtual void Initialize();
+
+  // Description:
   // Called during animation and from trace file to set a parameter on
   // the reader on the server.
   void SetParameterIndex(const char* label, int value);

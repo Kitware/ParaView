@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.48");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -294,30 +294,24 @@ void vtkPVExtentEntry::Trace(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVExtentEntry::Initialize()
+{
+  this->Update();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::ResetInternal()
 {
-  if ( ! this->ModifiedFlag)
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (ivp)
     {
-    return;
+    this->SetValue(ivp->GetElement(0), ivp->GetElement(1),
+                   ivp->GetElement(2), ivp->GetElement(3),
+                   ivp->GetElement(4), ivp->GetElement(5));
     }
-
-  if (this->AcceptCalled)
-    {
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetSMProperty());
-    if (ivp)
-      {
-      this->SetValue(ivp->GetElement(0), ivp->GetElement(1),
-                     ivp->GetElement(2), ivp->GetElement(3),
-                     ivp->GetElement(4), ivp->GetElement(5));
-      }
   
-    this->ModifiedFlag = 0;
-    }
-  else
-    {
-    this->Update();
-    }
+  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------

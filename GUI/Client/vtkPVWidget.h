@@ -62,6 +62,12 @@ public:
   virtual void Reset();
 
   // Description:
+  // Called right after the widgets are created, this virtual method allows
+  // widgets to set appropriate initial values, 3d widgets to place themselves
+  // etc. 
+  virtual void Initialize() = 0;
+
+  // Description:
   // The methods get called when reset is called.  
   // It can also get called on its own.  If the widget has options 
   // or configuration values dependent on the VTK object, this method
@@ -221,10 +227,8 @@ public:
 
   //BTX
   // Description:
-  // Most subclasses implement these methods to move state from VTK objects
-  // to the widget.  The id of the VTK object is supplied as a parameter.
-  virtual void AcceptInternal(vtkClientServerID);
-  virtual void ResetInternal();
+  // Called by Reset() if PVSource is set.
+  virtual void ResetInternal() {};
   //ETX
 
   // Description:
@@ -247,7 +251,11 @@ public:
   // If false, the corresponding widget is not displayed as an
   // action item in the animation menu. True by default
   vtkGetMacro(SupportsAnimation, int);
-  
+
+  // Description:
+  // If HideGUI is true, the widget is not shown in the property page.
+  vtkGetMacro(HideGUI, int);
+
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -266,15 +274,9 @@ protected:
   // added to the trace file.
   int ModifiedFlag;
 
-  // This flag stops resets until accept has been called.
-  // It is used to let the widget set the default value.
-  int SuppressReset;
-
   int SupportsAnimation;
 
   vtkPVSource* PVSource;
-
-  int AcceptCalled;
 
   int UseWidgetRange;
   double WidgetRange[2];
@@ -293,6 +295,8 @@ protected:
 //ETX
 
   int TraceNameState;
+
+  int HideGUI;
 
   vtkPVWidget* GetPVWidgetFromParser(vtkPVXMLElement* element,
                                      vtkPVXMLPackageParser* parser);

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.20");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.21");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -189,6 +189,11 @@ void vtkPVFieldMenu::Trace(ofstream *file)
         << this->Value << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVFieldMenu::Initialize()
+{
+  this->Update();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::ResetInternal()
@@ -201,10 +206,8 @@ void vtkPVFieldMenu::ResetInternal()
     this->SetValue(ivp->GetElement(0));
     }
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
+
   // Do we really need to update?
   // What causes dependent widgets like ArrayMenu to update?
   this->Update();

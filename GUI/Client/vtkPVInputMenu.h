@@ -58,6 +58,12 @@ public:
   void SetSources(vtkPVSourceCollection *sources);
   vtkPVSourceCollection *GetSources();
   //ETX
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is selected. Updates the menu in case more sources have been
+  // created
+  virtual void Select();
   
   int GetNumberOfSources();
   vtkPVSource* GetSource(int i);
@@ -79,6 +85,7 @@ public:
   // Used by the Accept and Reset callbacks.
   void SetCurrentValue(vtkPVSource *pvs);
   vtkPVSource* GetCurrentValue() { return this->CurrentValue;}
+  vtkPVSource* GetLastAcceptedValue();
   
   // Description:
   // Menu callback when an item is selected.
@@ -104,6 +111,10 @@ public:
   // This method may add an entry to the trace file.
   virtual void Accept();
   //ETX
+
+  // Description:
+  // Initializes the input.
+  virtual void Initialize();
 
   // Description:
   // Gets called when the reset button is pressed.
@@ -133,6 +144,7 @@ protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
 
+  int InitializeWithCurrent;
 
   char* InputName;
   

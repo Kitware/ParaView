@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.50");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.51");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -230,7 +230,7 @@ void vtkPVSelectionList::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::ResetInternal()
+void vtkPVSelectionList::Initialize()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -240,11 +240,13 @@ void vtkPVSelectionList::ResetInternal()
     // Get the selected item.
     this->SetCurrentValue(ivp->GetElement(0));
     }
-  
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  }
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 

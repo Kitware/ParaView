@@ -34,8 +34,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.19");
+vtkCxxRevisionMacro(vtkPVValueList, "1.20");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -73,8 +72,6 @@ vtkPVValueList::vtkPVValueList()
   this->GenerateRangeWidget = vtkKWRange::New();
   this->GenerateRangeWidget->ClampRangeOff();
   
-  this->SuppressReset = 1;
-
   this->ContourValues = vtkContourValues::New();
 }
 
@@ -532,13 +529,19 @@ void vtkPVValueList::GenerateValuesCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVValueList::AddValue(double val)
+void vtkPVValueList::AddValueNoModified(double val)
 {
   this->ContourValues->SetValue(this->ContourValues->GetNumberOfContours(),
                                 val);
   char str[256];
   sprintf(str, "%g", val);
   this->ContourValuesList->AppendUnique(str);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVValueList::AddValue(double val)
+{
+  this->AddValueNoModified(val);
   this->ModifiedCallback();
 }
 

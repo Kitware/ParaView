@@ -118,7 +118,12 @@ public:
   // Description:
   // Called when reset button is pushed.
   // Sets UI current value from objects variable.
+  virtual void Reset();
   virtual void ResetInternal();
+
+  // Description:
+  // Calls Initialiaze() on currently selected widget.
+  virtual void Initialize();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

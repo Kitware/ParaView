@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.21");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.22");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -285,13 +285,20 @@ void vtkPVSelectCTHArrays::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectCTHArrays::ResetInternal()
+void vtkPVSelectCTHArrays::Initialize()
 {
   if (this->Active)
     {
     this->ArraySelectionList->DeleteAll();
     this->Update();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectCTHArrays::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

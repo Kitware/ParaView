@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.32");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -525,7 +525,6 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
   this->VectorsMenu->Create(pvApp, "");
   this->VectorsMenu->SetButtonText("vectors");
   this->VectorsMenu->SetBalloonHelpString("Select a vector array to operate on");
-  this->ChangeAttributeMode("point");
   this->Script("grid %s -row 6 -column 3 -columnspan 4 -sticky news",
                this->ScalarsMenu->GetWidgetName());
   this->Script("grid %s -row 7 -column 3 -columnspan 4 -sticky news",
@@ -813,11 +812,11 @@ void vtkPVCalculatorWidget::Accept()
     {
     if (strcmp(mode, "Point Data") == 0)
       {
-      attributeProp->SetElement(0, 0);
+      attributeProp->SetElement(0, 1);
       }
     else
       {
-      attributeProp->SetElement(0, 1);
+      attributeProp->SetElement(0, 2);
       }
     }
 
@@ -855,6 +854,12 @@ void vtkPVCalculatorWidget::Accept()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::Initialize()
+{
+  this->ChangeAttributeMode("point");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::ResetInternal()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -880,10 +885,7 @@ void vtkPVCalculatorWidget::ResetInternal()
     this->FunctionLabel->SetValue(svp->GetElement(0));
     }
   
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

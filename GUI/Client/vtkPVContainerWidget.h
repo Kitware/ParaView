@@ -101,6 +101,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Calls Initialize on all contained widgets
+  virtual void Initialize();
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 

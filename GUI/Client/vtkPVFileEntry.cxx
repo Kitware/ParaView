@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.96");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.97");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -738,7 +738,7 @@ void vtkPVFileEntry::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::ResetInternal()
+void vtkPVFileEntry::Initialize()
 {
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -781,11 +781,14 @@ void vtkPVFileEntry::ResetInternal()
   this->IgnoreFileListEvents = 0;
 
   this->UpdateAvailableFiles();
+}
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::ResetInternal()
+{
+
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 #include "vtkSMBoundsDomain.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.13");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.14");
 
 vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
@@ -34,13 +34,9 @@ vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
 {
 }
 
-void vtkPVScaleFactorEntry::ResetInternal()
+void vtkPVScaleFactorEntry::Initialize()
 {
-  if (this->AcceptCalled)
-    {
-    this->Superclass::ResetInternal();
-    return;
-    }
+  this->Superclass::Initialize();
   this->Update();
 }
 

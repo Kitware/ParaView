@@ -121,6 +121,10 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Initialize widget right after creation
+  virtual void Initialize();
+
+  // Description:
   // Set the names of the tessellator filter's methods used to
   // add or reset subdivision criteria.
   vtkSetStringMacro(ResetCriteriaCommand);

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.15");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.16");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -500,16 +500,8 @@ void vtkPVTempTessellatorEntry::Trace( ofstream *file )
     }
 }
 
-void vtkPVTempTessellatorEntry::ResetInternal()
+void vtkPVTempTessellatorEntry::Initialize()
 {
-  if ( ! this->PVSource )
-    {
-    vtkWarningMacro( "vtkPVTempTessellatorEntry::ResetInternal expects PVSource to be set" );
-    return;
-    }
-
-  this->Superclass::ResetInternal();
-
   vtkTessellatorEntryData* d = this->Data;
   d->ScalarFieldList->DeleteAll();
   d->LastSelectionIndex = -1;
@@ -555,6 +547,19 @@ void vtkPVTempTessellatorEntry::ResetInternal()
                   active ? "006600" : "777744" );
     delete[] listEntry;
     }
+}
+
+void vtkPVTempTessellatorEntry::ResetInternal()
+{
+  if ( ! this->PVSource )
+    {
+    vtkWarningMacro( "vtkPVTempTessellatorEntry::ResetInternal expects PVSource to be set" );
+    return;
+    }
+
+  this->Superclass::ResetInternal();
+
+  this->Initialize();
 }
 
 void vtkPVTempTessellatorEntry::UpdateEnableState()

@@ -34,7 +34,6 @@ class vtkKWScale;
 class VTK_EXPORT vtkPVValueList : public vtkPVWidget
 {
 public:
-  static vtkPVValueList* New();
   vtkTypeRevisionMacro(vtkPVValueList, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
@@ -124,6 +123,8 @@ protected:
   vtkKWPushButton* GenerateButton;
 
   vtkKWRange* GenerateRangeWidget;
+
+  void AddValueNoModified(double val);
 
   virtual int ComputeWidgetRange() {return 0;}
   

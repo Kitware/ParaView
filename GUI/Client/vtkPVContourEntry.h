@@ -42,6 +42,10 @@ public:
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
+  // Initialize widget after creation
+  virtual void Initialize();
+
+  // Description:
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
 

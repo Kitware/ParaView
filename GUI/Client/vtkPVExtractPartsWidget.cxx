@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.24");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -109,19 +109,6 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand t",
                this->PartSelectionList->GetWidgetName());
 
-  int num = this->PVSource->GetPVInput(0)->GetNumberOfParts();
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetSMProperty());
-  if (ivp)
-    {
-    int i;
-
-    for (i = 0; i < num; i++)
-      {
-      ivp->SetElement(i, 1);
-      }
-    }
-  
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
   this->ModifiedCallback();
@@ -216,9 +203,9 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::ResetInternal()
+void vtkPVExtractPartsWidget::CommonInit()
 {
-  vtkPVSource *input;
+    vtkPVSource *input;
   vtkSMPart *part;
   int num, idx;
 
@@ -247,11 +234,33 @@ void vtkPVExtractPartsWidget::ResetInternal()
       idx, ivp->GetElement(idx));
     }
 
-  // Because list box does not notify us when it is modified ...
-  if (this->AcceptCalled)
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::Initialize()
+{
+  int num = this->PVSource->GetPVInput(0)->GetNumberOfParts();
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (ivp)
     {
-    this->ModifiedFlag = 0;
+    int i;
+
+    for (i = 0; i < num; i++)
+      {
+      ivp->SetElement(i, 1);
+      }
     }
+
+  this->CommonInit();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::ResetInternal()
+{
+  this->CommonInit();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

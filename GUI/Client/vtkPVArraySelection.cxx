@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.60");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.61");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -292,26 +292,24 @@ void vtkPVArraySelection::UpdateGUI()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVArraySelection::Initialize()
+{
+  // Update our local vtkDataArraySelection instance with the reader's
+  // settings.
+  this->UpdateSelections(1);
+
+  this->UpdateGUI();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVArraySelection::ResetInternal()
 {
-  if (!this->AcceptCalled)
-    {
-    // Update our local vtkDataArraySelection instance with the reader's
-    // settings.
-    this->UpdateSelections(1);
-    }
-  else
-    {
-    // Or update from the property
-    this->UpdateSelections(0);
-    }
+  // Or update from the property
+  this->UpdateSelections(0);
 
   this->UpdateGUI();
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
 }
 
 //---------------------------------------------------------------------------

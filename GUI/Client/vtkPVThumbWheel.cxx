@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.11");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -306,7 +306,7 @@ void vtkPVThumbWheel::Accept()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVThumbWheel::ResetInternal()
+void vtkPVThumbWheel::Initialize()
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -321,11 +321,13 @@ void vtkPVThumbWheel::ResetInternal()
     {
     this->SetValue(ivp->GetElement(0));
     }
-  
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVThumbWheel::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------

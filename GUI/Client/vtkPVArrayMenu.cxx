@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.67");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.68");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -218,9 +218,8 @@ void vtkPVArrayMenu::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::ResetInternal()
+void vtkPVArrayMenu::Initialize()
 {
-
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
 
@@ -230,11 +229,14 @@ void vtkPVArrayMenu::ResetInternal()
     this->SetValue(svp->GetElement(0));
     }
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
   this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

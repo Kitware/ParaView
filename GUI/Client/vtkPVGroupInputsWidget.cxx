@@ -26,12 +26,14 @@
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.29");
 
 class vtkPVSourceVectorInternals
 {
@@ -92,7 +94,37 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::ResetInternal()
+int vtkPVGroupInputsWidget::CheckSource(vtkPVSource *pvs)
+{
+  if (pvs == this->PVSource || pvs == NULL)
+    {
+    return 0;
+    }
+
+  // Has to meet all requirments from XML filter description.
+  vtkSMInputProperty* ip = this->GetInputProperty();
+  if ( !ip )
+    {
+    return 0;
+    }
+  ip->RemoveAllUncheckedProxies();
+  ip->AddUncheckedProxy(pvs->GetProxy());
+  if (!ip->IsInDomains())
+    {
+    return 0;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSMInputProperty* vtkPVGroupInputsWidget::GetInputProperty()
+{
+  return vtkSMInputProperty::SafeDownCast(this->GetSMProperty());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::Initialize()
 {
   int idx;
   vtkPVWindow *pvWin;
@@ -109,10 +141,13 @@ void vtkPVGroupInputsWidget::ResetInternal()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    char* label = pvApp->GetTextRepresentation(pvs);
-    this->PartSelectionList->InsertEntry(idx, label);
-    delete[] label;
-    ++idx;
+    if (this->CheckSource(pvs))
+      {
+      char* label = pvApp->GetTextRepresentation(pvs);
+      this->PartSelectionList->InsertEntry(idx, label);
+      delete[] label;
+      ++idx;
+      }
     }
 
   // Set visible inputs to selected.
@@ -120,18 +155,22 @@ void vtkPVGroupInputsWidget::ResetInternal()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    if (pvs->GetVisibility())
+    if (this->CheckSource(pvs))
       {
-      this->PartSelectionList->SetSelectState(idx, 1);
+      if (pvs->GetVisibility())
+        {
+        this->PartSelectionList->SetSelectState(idx, 1);
+        }
+      ++idx;
       }
-    ++idx;
     }
+}
 
-  // Because list box does not notify us when it is modified ...
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+//----------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 
@@ -163,7 +202,7 @@ void vtkPVGroupInputsWidget::Inactivate()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::Accept()
 {
-  int num, idx;
+  int idx=0;
   int state;
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
@@ -171,11 +210,6 @@ void vtkPVGroupInputsWidget::Accept()
 
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");
-  sources->InitTraversal();
-
-  num = this->PartSelectionList->GetNumberOfItems();
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ModifiedFlag)
     {
@@ -183,31 +217,28 @@ void vtkPVGroupInputsWidget::Accept()
     }
 
   // Now loop through the input mask setting the selection states.
-  pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
   this->PVSource->RemoveAllPVInputs();  
   sources->InitTraversal();
-  for (idx = 0; idx < num; ++idx)
+  while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvs = sources->GetNextPVSource();
-    if (pvs == NULL)
-      { // sanity check.
-      vtkErrorMacro("Source mismatch.");
-      return;
-      }
-    state = this->PartSelectionList->GetSelectState(idx);
-    if (state)
+    if (this->CheckSource(pvs))
       {
-      // Keep a list of selected inputs for later use.
-      this->Internal->InputsVector.push_back(pvs);
-
-      this->PVSource->AddPVInput(pvs);
-      // SetPVinput does all this for us.
-      // Special replace input feature.
-      // Visibility of ALL selected input turned off.
-      // Setting the input should change visibility, but
-      // for some reason it only works for the first input.
-      // I am lazy and do not want to debug this ...
-      pvs->SetVisibility(0);
+      state = this->PartSelectionList->GetSelectState(idx);
+      if (state)
+        {
+        // Keep a list of selected inputs for later use.
+        this->Internal->InputsVector.push_back(pvs);
+        
+        this->PVSource->AddPVInput(pvs);
+        // SetPVinput does all this for us.
+        // Special replace input feature.
+        // Visibility of ALL selected input turned off.
+        // Setting the input should change visibility, but
+        // for some reason it only works for the first input.
+        // I am lazy and do not want to debug this ...
+        pvs->SetVisibility(0);
+        }
+      ++idx;
       }
     }
 

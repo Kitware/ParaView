@@ -45,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVWidget, "1.58");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -63,8 +63,6 @@ vtkPVWidget::vtkPVWidget()
   this->PVSource = 0;
 
   this->TraceNameState = vtkPVWidget::Uninitialized;
-  this->SuppressReset = 0;
-  this->AcceptCalled = 0;
   
   this->UseWidgetRange = 0;
   this->WidgetRange[0] = 0;
@@ -73,6 +71,8 @@ vtkPVWidget::vtkPVWidget()
   this->SMPropertyName = 0;
 
   this->SupportsAnimation = 1;
+
+  this->HideGUI = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +110,6 @@ void vtkPVWidget::SetAcceptedCommand(const char* cmdObject,
 //-----------------------------------------------------------------------------
 void vtkPVWidget::Accept()
 {
-  int num, idx;
   int modFlag = this->GetModifiedFlag();
 
 
@@ -119,12 +118,6 @@ void vtkPVWidget::Accept()
     vtkErrorMacro("Superclass expect PVSource to be set. " 
                   << this->GetClassName());
     return;
-    }
-
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->AcceptInternal(this->PVSource->GetVTKSourceID(idx));
     }
 
   this->ModifiedFlag = 0;
@@ -142,27 +135,10 @@ void vtkPVWidget::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVWidget::AcceptInternal(vtkClientServerID)
-{
-  // Suppress reset just allows the widget to set its own default value.
-  // After accept is called, we want to enable the reset.
-  this->SuppressReset = 0;
-  this->AcceptCalled = 1;
-}
-
-//-----------------------------------------------------------------------------
-// I have to think how to get rid of this method.
 void vtkPVWidget::Reset()
 {
-  if (this->SuppressReset)
-    {
-    return;
-    }
-
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("Superclass expect PVSource to be set. " 
@@ -170,25 +146,8 @@ void vtkPVWidget::Reset()
     return;
     }
 
-  if (this->PVSource->GetNumberOfVTKSources() < 1)
-    {
-    return;
-    }
   this->ResetInternal();
 }
-
-//-----------------------------------------------------------------------------
-void vtkPVWidget::ResetInternal()
-{
-  // Get rid of this eventually.  Display widgets (label) do not really
-  // need to implement this method.
-  //vtkErrorMacro("ResetInternal not defined. " << this->GetClassName());
-}
-
-
-
-
-
 
 //-----------------------------------------------------------------------------
 void vtkPVWidget::Update()
@@ -333,8 +292,8 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
   clone->SetSMPropertyName(this->GetSMPropertyName());
-  clone->SuppressReset = this->SuppressReset;
   clone->SupportsAnimation = this->SupportsAnimation;
+  clone->HideGUI = this->HideGUI;
 
   // Now copy the dependencies
   vtkPVWidget* dep;
@@ -414,6 +373,11 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SupportsAnimation = 1;
     }
 
+  if(!element->GetScalarAttribute("hide_gui", &this->HideGUI))
+    {
+    this->HideGUI = 0;
+    }
+
   const char* trace_name = element->GetAttribute("trace_name");
   if (trace_name) 
     { 
@@ -429,8 +393,6 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     // files might not work.
     // return 0;
     }
-
-  element->GetScalarAttribute("suppress_reset", &this->SuppressReset);
 
   const char* property = element->GetAttribute("property");
   if (property)
@@ -467,6 +429,7 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
          this->ModifiedCommandObjectTclName:"(none)") << endl;
   os << indent << "TraceNameState: " << this->TraceNameState << endl;
   os << indent << "UseWidgetRange: " << this->UseWidgetRange << endl;
+  os << indent << "HideGUI: " << this->HideGUI << endl;
   os << indent << "WidgetRange: " << this->WidgetRange[0] << " "
      << this->WidgetRange[1] << endl;
   os << indent << "SMPropertyName: ";

@@ -34,8 +34,8 @@ public:
   virtual void Update();
 
   // Description:
-  // Move widget state to vtk object or back.
-  virtual void ResetInternal();
+  // Initialize after creation
+  virtual void Initialize();
 
   vtkSetMacro(ScaleFactor, float);
   

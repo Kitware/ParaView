@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.54");
+vtkCxxRevisionMacro(vtkPVScale, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -335,7 +335,7 @@ void vtkPVScale::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::ResetInternal()
+void vtkPVScale::Initialize()
 {
   vtkSMProperty* prop = this->GetSMProperty();
 
@@ -385,10 +385,13 @@ void vtkPVScale::ResetInternal()
     this->SetValue(ivp->GetElement(0));
     }
 
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------

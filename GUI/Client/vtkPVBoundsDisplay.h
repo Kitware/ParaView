@@ -42,6 +42,10 @@ public:
   virtual void Update();
 
   // Description:
+  // Does nothing.
+  virtual void Initialize() {};
+
+  // Description:
   // Access to the KWWidget.  
   virtual void SetWidget(vtkKWBoundsDisplay*);
   vtkGetObjectMacro(Widget, vtkKWBoundsDisplay);

@@ -17,6 +17,7 @@
 #include "vtkKWEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVScaleFactorEntry.h"
@@ -32,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.38");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -228,29 +229,29 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
 
 
 //-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::Initialize()
+{
+  this->PlaceWidget();
+
+  this->Accept();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::ResetInternal()
 {
-  if (this->AcceptCalled)
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Center"));
+  if (dvp)
     {
-    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->SourceProxy->GetProperty("Center"));
-    if (dvp)
-      {
-      this->SetPosition(dvp->GetElement(0), dvp->GetElement(1),
-        dvp->GetElement(2));
-      }
-    }
-  else
-    {
-    this->ActualPlaceWidget();
+    this->SetPositionInternal(
+      dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
     }
 
   this->RadiusWidget->ResetInternal();
   this->NumberOfPointsWidget->ResetInternal();
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+  this->ModifiedFlag = 0;
+
+  this->Render();
 }
 
 //-----------------------------------------------------------------------------
@@ -387,6 +388,15 @@ void vtkPVPointSourceWidget::Update()
   if (this->InputMenu)
     {
     this->RadiusWidget->Update();
+
+    vtkPVSource *input = this->InputMenu->GetCurrentValue();
+    if (input)
+      {
+      double bds[6];
+      input->GetDataInformation()->GetBounds(bds);
+      this->PlaceWidget(bds);
+      }
+
     }
 }
 

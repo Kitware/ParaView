@@ -42,7 +42,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.38");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -119,18 +119,14 @@ void vtkPVPointWidget::SetVisibility(int v)
 
 
 //----------------------------------------------------------------------------
+void vtkPVPointWidget::Initialize()
+{
+  this->PlaceWidget();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPointWidget::ResetInternal()
 {
-  if (!this->AcceptCalled)
-    {
-    this->ActualPlaceWidget();
-    return;
-    }
-  if (this->SuppressReset || !this->ModifiedFlag)
-    {
-    return;
-    }
-
   double pt[3];
   const char*variablename;
   
@@ -192,7 +188,6 @@ void vtkPVPointWidget::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -328,13 +323,13 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-      double pos[3];
-      this->WidgetProxy->UpdateInformation();
-      this->GetPositionInternal(pos);
-      this->PositionEntry[0]->SetValue(pos[0]);
-      this->PositionEntry[1]->SetValue(pos[1]);
-      this->PositionEntry[2]->SetValue(pos[2]);
-      this->Render();
+    double pos[3];
+    this->WidgetProxy->UpdateInformation();
+    this->GetPositionInternal(pos);
+    this->PositionEntry[0]->SetValue(pos[0]);
+    this->PositionEntry[1]->SetValue(pos[1]);
+    this->PositionEntry[2]->SetValue(pos[2]);
+    this->Render();
     }
  this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -371,6 +366,10 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Position")); 
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->PositionEntry[0]->SetValue(x);
+  this->PositionEntry[1]->SetValue(y);
+  this->PositionEntry[2]->SetValue(z);
 }
 
 //----------------------------------------------------------------------------

@@ -68,6 +68,7 @@ public:
   // Description:
   // This method resets the widget values from the VTK filter.
   virtual void ResetInternal();
+  virtual void Initialize();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -92,6 +93,8 @@ protected:
 
   // Called to inactivate widget (after accept is called).
   void Inactivate();
+
+  void CommonInit();
 
   vtkPVExtractPartsWidget(const vtkPVExtractPartsWidget&); // Not implemented
   void operator=(const vtkPVExtractPartsWidget&); // Not implemented

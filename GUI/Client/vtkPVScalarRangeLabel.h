@@ -45,6 +45,10 @@ public:
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
   // Description:
+  // Does nothing.
+  virtual void Initialize() {};
+
+  // Description:
   // This calculates new range to display (using the array menu).
   virtual void Update();
 

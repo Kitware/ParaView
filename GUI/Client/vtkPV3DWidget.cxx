@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.62");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.63");
 
 //===========================================================================
 //***************************************************************************
@@ -176,7 +176,6 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   this->WidgetProxy->CreateVTKObjects(1);
   this->InitializeObservers(this->WidgetProxy);
   this->ChildCreate(pvApp);
-  this->PlaceWidget();
 }
 
 //----------------------------------------------------------------------------
@@ -213,18 +212,20 @@ void vtkPV3DWidget::Accept()
 {
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;
-  this->AcceptCalled = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Initialize()
+{
+  this->ValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ResetInternal()
 {
   this->Superclass::ResetInternal();
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
   this->ValueChanged = 0;
+  this->Render();
 }
 
 //----------------------------------------------------------------------------

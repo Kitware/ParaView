@@ -89,6 +89,10 @@ public:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
 
+  // Description:
+  // Place the widget.
+  virtual void Initialize();
+
   //BTX
   // Description:
   // Called when the PVSources accept button is called.
@@ -187,6 +191,8 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  void CommonReset();
 
 //BTX
   // Description:

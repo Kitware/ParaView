@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.54");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -141,9 +141,7 @@ void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-// If we had access to the ContourValues object of the filter,
-// this would be much easier.  We would not have to rely on Tcl calls.
-void vtkPVContourEntry::ResetInternal()
+void vtkPVContourEntry::Initialize()
 {
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
@@ -158,15 +156,19 @@ void vtkPVContourEntry::ResetInternal()
 
     for (unsigned int i = 0; i < numContours; i++)
       {
-      this->AddValue(prop->GetElement(i));
+      this->AddValueNoModified(prop->GetElement(i));
       }
     }
   
-  // Since the widget now matches the fitler, it is no longer modified.
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
-    }
+}
+
+//-----------------------------------------------------------------------------
+// If we had access to the ContourValues object of the filter,
+// this would be much easier.  We would not have to rely on Tcl calls.
+void vtkPVContourEntry::ResetInternal()
+{
+  this->Initialize();
+  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------

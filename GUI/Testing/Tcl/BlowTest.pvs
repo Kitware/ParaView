@@ -10,7 +10,7 @@ $pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
 $pvWindow Open "$DataDir/Data/blow data.vtk"
 
 set pvWarp [$pvWindow CreatePVSource WarpVector]
-$pvWarp UpdateParameterWidgets
+$pvWarp Reset
 $pvWarp AcceptCallback
 
 set warpOutput [$pvWarp GetPVOutput]

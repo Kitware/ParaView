@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.66");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.67");
 
 
 //----------------------------------------------------------------------------
@@ -47,6 +47,8 @@ vtkPVInputMenu::vtkPVInputMenu()
 
   this->Label = vtkKWLabel::New();
   this->Menu = vtkKWOptionMenu::New();
+
+  this->InitializeWithCurrent = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -174,13 +176,6 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   this->Menu->AddEntryWithCommand(label, this, methodAndArgs);
   delete[] label;
   
-  // If there is not an input yet, default to the first in the list.
-  // Primarily for glyph source input default.
-  if (this->CurrentValue == NULL)
-    {
-    this->CurrentValue = pvs;
-    }
-
   return 1;
 }
 
@@ -239,7 +234,9 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     }
   if (pvs)
     {
-    this->Menu->SetValue(pvs->GetName());
+    char* label = this->GetPVApplication()->GetTextRepresentation(pvs);
+    this->Menu->SetValue(label);
+    delete[] label;
     }
   else
     {
@@ -385,6 +382,51 @@ void vtkPVInputMenu::Trace(ofstream *file)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::Initialize()
+{
+  // If there is not an input yet, default to the current source
+  // or the first one in the list.
+  if (this->CurrentValue == NULL)
+    {
+    if (this->InitializeWithCurrent)
+      {
+      this->CurrentValue = 
+        this->GetPVSource()->GetPVWindow()->GetCurrentPVSource();
+      }
+    else
+      {
+      this->Sources->InitTraversal();
+      vtkPVSource* pvs = vtkPVSource::SafeDownCast(
+        this->Sources->GetNextItemAsObject());
+      if (pvs)
+        {
+        this->CurrentValue = pvs;
+        }
+      }
+    this->PVSource->SetPVInput(
+      this->InputName, this->GetPVInputIndex(), this->CurrentValue);
+    }
+
+  // The list of possible inputs could have changed.
+  this->AddSources(this->Sources);
+
+  // Update any widgets that depend on this input menu.
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVInputMenu::GetLastAcceptedValue()
+{
+  return this->PVSource->GetPVInput(this->GetPVInputIndex());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::Select()
+{
+  // The list of possible inputs could have changed.
+  this->AddSources(this->Sources);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::ResetInternal()
@@ -395,21 +437,12 @@ void vtkPVInputMenu::ResetInternal()
     return;
     }
 
-  // The list of possible inputs could have changed.
-  this->AddSources(this->Sources);
-
-  // Set the current value.  The catch is here because GlyphSource is
-  // initially NULL which causes an error.
   vtkPVSource* input = this->PVSource->GetPVInput(this->GetPVInputIndex());
   if (input)
-    { // Use our default if there in no input set (glyph source).
+    {
     this->Script("%s SetCurrentValue %s", 
-               this->GetTclName(), input->GetTclName());
-    // Only turn off modified if we successfully set input.
-    if (this->AcceptCalled)
-      {
-      this->ModifiedFlag = 0;
-      }
+                 this->GetTclName(), 
+                 input->GetTclName());
 
     // Update any widgets that depend on this input menu.
     this->Update();
@@ -435,6 +468,7 @@ void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvim->SetLabel(this->Label->GetLabel());
     pvim->SetInputName(this->InputName);
     pvim->SetSources(this->GetSources());
+    pvim->InitializeWithCurrent = this->InitializeWithCurrent;
     }
   else 
     {
@@ -466,6 +500,12 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   else
     {
     this->SetInputName("Input");
+    }
+
+  if(!element->GetScalarAttribute("initialize_with_current", 
+                                  &this->InitializeWithCurrent))
+    {
+    this->InitializeWithCurrent = 1;
     }
     
   vtkPVWindow* window = this->GetPVWindowFormParser(parser);

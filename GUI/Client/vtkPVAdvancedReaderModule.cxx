@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.23");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -69,24 +69,8 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
     return retVal;
     }
   
-  // We need to update the widgets.
-  vtkPVWidget *pvw;
-  
-  vtkCollection* widgets = this->GetWidgets();
-  if (widgets)
-    {
-    vtkCollectionIterator *it = widgets->NewIterator();
-    it->InitTraversal();
-
-    for (int i = 0; i < widgets->GetNumberOfItems(); i++)
-      {
-      pvw = static_cast<vtkPVWidget*>(it->GetObject());
-      pvw->ModifiedCallback();
-      it->GoToNextItem();
-      }
-    it->Delete();
-    this->UpdateParameterWidgets();
-    }
+  // Re-initialize widgets to get the information from the reader.
+  this->InitializeWidgets();
 
   return VTK_OK;
 }

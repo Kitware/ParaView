@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.47");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.48");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -281,13 +281,8 @@ void vtkPVSelectTimeSet::Trace(ofstream *file)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::ResetInternal()
+void vtkPVSelectTimeSet::CommonReset()
 {
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
   // Command to update the UI.
   if (!this->Tree)
     {
@@ -367,11 +362,29 @@ void vtkPVSelectTimeSet::ResetInternal()
     }
   
   this->SetTimeValue(actualTimeValue);
+
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::Initialize()
+{
+  this->CommonReset();
+
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
   
-  if (this->AcceptCalled)
+  if (dvp && this->TimeSets->GetNumberOfItems() > 0)
     {
-    this->ModifiedFlag = 0;
+    dvp->SetElement(0, this->TimeSets->GetItem(0)->GetComponent(0, 0));
     }
+  
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::ResetInternal()
+{
+  this->CommonReset();
+  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -522,14 +535,6 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
     timeSet->Delete();
     }
   
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetSMProperty());
-  
-  if (dvp && !this->AcceptCalled &&
-      this->TimeSets->GetNumberOfItems() > 0)
-    {
-    dvp->SetElement(0, this->TimeSets->GetItem(0)->GetComponent(0, 0));
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -51,6 +51,11 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Update our local vtkDataArraySelection instance with the reader's
+  // settings.
+  virtual void Initialize();
+
+  // Description:
   // Used to change the label of the widget. If not specified,
   // the label is constructed using the AttributeName
   vtkSetStringMacro(LabelText);
