@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.169");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.170");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1264,16 +1264,17 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       {
       dlg->SetText(
         "Specify the width and height of the mpeg to be saved from this "
-        "animation. Each dimension must be a multiple of 32. Each will be "
-        "resized to the next smallest multiple of 32 if it does not meet this "
-        "criterion.");
+        "animation. The width must be a multiple of 32 and the height a "
+        "multiple of 8. Each will be resized to the next smallest multiple "
+        "if it does not meet this criterion. The maximum size allowed is "
+        "1920 by 1080");
       }
     else
       { 
       dlg->SetText(
         "Specify the width and height of the images to be saved from this "
-        "animation. Each dimension must be a multiple of 32. Each will be "
-        "resized to the next smallest multiple of 32 if it does not meet this "
+        "animation. Each dimension must be a multiple of 4. Each will be "
+        "resized to the next smallest multiple of 4 if it does not meet this "
         "criterion.");
       }
     vtkKWWidget *frame = vtkKWWidget::New();
@@ -1331,10 +1332,18 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         {
         width -= width % 32;
         }
-      if ((height % 32) > 0)
+      if ((height % 8) > 0)
         {
-        height -= height % 32;
+        height -= height % 8;
         }
+      if (width > 1920)
+        {
+        width = 1920;
+        }
+      if (height > 1080)
+        {
+        height = 1080;
+        }      
       }
     else
       {
