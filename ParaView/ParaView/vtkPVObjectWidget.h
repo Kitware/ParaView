@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVCutPlane.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVObjectWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,33 +39,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCutPlane - A class to handle the special case of cutting
-// with an implict plane
+// .NAME vtkPVObjectWidget - Widget the represents an objects variable.
 // .SECTION Description
+// vtkPVObjectWidget is a special class of vtkPVWidget that
+// represents a VTK object's variable.  It has ivars for the VTK objects
+// name and its variable name.  The Reset and Accept commands can format
+// scripts from these variables.  The name of this class may not be the best.
 
+#ifndef __vtkPVObjectWidget_h
+#define __vtkPVObjectWidget_h
 
-#ifndef __vtkPVCutPlane_h
-#define __vtkPVCutPlane_h
+#include "vtkPVWidget.h"
 
-#include "vtkPVSource.h"
-
-class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
+class VTK_EXPORT vtkPVObjectWidget : public vtkPVWidget
 {
 public:
-  static vtkPVCutPlane* New();
-  vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
-    
-  // Decription:
-  // VTKSource must be set before this is called.
-  void CreateProperties();
+  static vtkPVObjectWidget* New();
+  vtkTypeMacro(vtkPVObjectWidget, vtkPVWidget);
+
+  // Description:
+  // The point of a PV widget is that it is an interface for
+  // some objects state/ivars.  This is one way the object/variable
+  // can be specified. Subclasses may have seperate or addition
+  // variables for specifying the relationship.
+  void SetObjectVariable(const char *objectTclName, const char *var);
+
+  // Description:
+  // An interface for saving a widget into a script.
+  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
 
 protected:
-  vtkPVCutPlane();
-  ~vtkPVCutPlane();
-  vtkPVCutPlane(const vtkPVCutPlane&) {};
-  void operator=(const vtkPVCutPlane&) {};
+  vtkPVObjectWidget();
+  ~vtkPVObjectWidget();
+  vtkPVObjectWidget(const vtkPVObjectWidget&) {};
+  void operator=(const vtkPVObjectWidget&) {};
+
+  char *ObjectTclName;
+  char *VariableName;
+  vtkSetStringMacro(ObjectTclName);
+  vtkSetStringMacro(VariableName);
 };
-
-
 
 #endif

@@ -45,16 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVScale_h
 #define __vtkPVScale_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWScale.h"
 #include "vtkKWLabel.h"
 
-class VTK_EXPORT vtkPVScale : public vtkPVWidget
+class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
 public:
   static vtkPVScale* New();
-  vtkTypeMacro(vtkPVScale, vtkPVWidget);
+  vtkTypeMacro(vtkPVScale, vtkPVObjectWidget);
 
   void Create(vtkKWApplication *pvApp, char *label,
               float min, float max, float resolution,

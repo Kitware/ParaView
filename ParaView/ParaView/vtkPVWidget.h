@@ -64,25 +64,45 @@ public:
   vtkTypeMacro(vtkPVWidget, vtkKWWidget);
 
   // Description:
+  // !!! This is widget specific and should be moved down into subclasses. !!!
   // The point of a PV widget is that it is an interface for
   // some objects state/ivars.  This is one way the object/variable
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
-  void SetObjectVariable(const char *objectTclName, const char *var);
+  //void SetObjectVariable(const char *objectTclName, const char *var);
 
   // Description:
-  // This commands is an optional action that will be called when
-  // the widget is modified.
-  void SetModifiedCommand(const char* cmdObject, const char* methodAndArgs);
-
-  // Description:
-  // The methods get called by the source when 
-  // the Accept or Reset buttons are pressed.
+  // The methods get called when the Accept button is pressed. 
+  // It sets the VTK objects value using this widgets value.
   virtual void Accept();
+
+  // Description:
+  // The methods get called when the Reset button is pressed. 
+  // It sets this widgets value using the VTK objects value.
   virtual void Reset();
 
   // Description:
-  // This method gets called when the user changes the widgets value,
+  // The methods get called when reset is called.  
+  // It can also get called on its own.  If the widget has options 
+  // or configuration values dependant on the VTK object, this method
+  // set these configuation object using the VTK object.
+  virtual void Update();
+
+  // Description:
+  // Widgets that depend on the value of this widget can set up a dependance here.
+  // When ModifedCallback or Update is called on this widget, it will call Update
+  // on widgets in this list.  I could have used event callbacks, but descided
+  // it would be easier to just keep a collection of dependances.
+  void AddDependant(vtkPVWidget *widget);
+
+  // Description:
+  // This commands is an optional action that will be called when
+  // the widget is modified.  Really we should change "ModifiedFlag" 
+  // to some other name, because is gets confused with vtkObject::Modified().
+  void SetModifiedCommand(const char* cmdObject, const char* methodAndArgs);
+
+  // Description:
+  // This callback gets called when the user changes the widgets value,
   // or a script changes the widgets value.  Ideally, this method should 
   // be protected.
   virtual void ModifiedCallback();
@@ -109,10 +129,10 @@ protected:
   vtkPVWidget(const vtkPVWidget&) {};
   void operator=(const vtkPVWidget&) {};
 
-  char *ObjectTclName;
-  char *VariableName;
-  vtkSetStringMacro(ObjectTclName);
-  vtkSetStringMacro(VariableName);
+  //char *ObjectTclName;
+  //char *VariableName;
+  //vtkSetStringMacro(ObjectTclName);
+  //vtkSetStringMacro(VariableName);
 
   char *ModifiedCommandObjectTclName;
   char *ModifiedCommandMethod;
@@ -123,10 +143,9 @@ protected:
   // added to the trace file.
   int ModifiedFlag;
 
-  // Event for initializing the trace.
-
-
-
+  // There are ssveral ways I could do this.
+  // This sets up a widget tree of dependancies.
+  vtkCollection *DependantCollection;
 };
 
 #endif

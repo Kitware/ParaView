@@ -60,32 +60,37 @@ vtkPVWidget* vtkPVWidget::New()
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
-  this->ObjectTclName = NULL;
-  this->VariableName = NULL;
+  //this->ObjectTclName = NULL;
+  //this->VariableName = NULL;
 
   this->ModifiedCommandObjectTclName = NULL;
   this->ModifiedCommandMethod = NULL;
 
   // Start modified because empty widgets do not match their variables.
   this->ModifiedFlag = 1;
+
+  this->DependantCollection = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
-  this->SetObjectTclName(NULL);
-  this->SetVariableName(NULL);
+  //this->SetObjectTclName(NULL);
+  //this->SetVariableName(NULL);
 
   this->SetModifiedCommandObjectTclName(NULL);
   this->SetModifiedCommandMethod(NULL);
+
+  this->DependantCollection->Delete();
+  this->DependantCollection = NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::SetObjectVariable(const char* objName, const char* varName)
-{
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
-}
+//void vtkPVWidget::SetObjectVariable(const char* objName, const char* varName)
+//{
+//  this->SetObjectTclName(objName);
+//  this->SetVariableName(varName);
+//}
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
@@ -93,18 +98,6 @@ void vtkPVWidget::SetModifiedCommand(const char* cmdObject,
 {
   this->SetModifiedCommandObjectTclName(cmdObject);
   this->SetModifiedCommandMethod(methodAndArgs);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
-{
-  char *result;
-  
-  *file << sourceName << " Set" << this->VariableName;
-  this->Script("set tempValue [%s Get%s]", 
-               this->ObjectTclName, this->VariableName);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -116,10 +109,30 @@ void vtkPVWidget::Accept()
 //----------------------------------------------------------------------------
 void vtkPVWidget::Reset()
 {
+  this->Update();
   // We want the modifiedCallbacks to occur before we reset this flag.
   this->Script("update");
   this->ModifiedFlag = 0;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::Update()
+{
+  vtkPVWidget *pvw;
+  
+  this->DependantCollection->InitTraversal();
+  while ( (pvw = (vtkPVWidget*)(this->DependantCollection->GetNextItemAsObject())) )
+    {
+    pvw->Update();
+    }  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::AddDependant(vtkPVWidget *pvw)
+{
+  this->DependantCollection->AddItem(pvw);  
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::ModifiedCallback()
@@ -145,6 +158,14 @@ int vtkPVWidget::InitializeTrace()
   this->TraceInitialized = 1;
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
+{
+  file = file;
+  sourceName = sourceName;
+}
+
 
 
 

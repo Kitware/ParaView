@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVCutPlane.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVBoundsDisplay.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,33 +39,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCutPlane - A class to handle the special case of cutting
-// with an implict plane
+// .NAME vtkPVBoundsDisplay - an entry with a label
 // .SECTION Description
+// The LabeledEntry creates an entry with a label in front of it; both are
+// contained in a frame
 
 
-#ifndef __vtkPVCutPlane_h
-#define __vtkPVCutPlane_h
+#ifndef __vtkPVBoundsDisplay_h
+#define __vtkPVBoundsDisplay_h
 
-#include "vtkPVSource.h"
+#include "vtkPVWidget.h"
+#include "vtkKWBoundsDisplay.h"
+#include "vtkKWLabeledFrame.h"
 
-class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
+class vtkKWApplication;
+
+class VTK_EXPORT vtkPVBoundsDisplay : public vtkPVWidget
 {
 public:
-  static vtkPVCutPlane* New();
-  vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
-    
-  // Decription:
-  // VTKSource must be set before this is called.
-  void CreateProperties();
+  static vtkPVBoundsDisplay* New();
+  vtkTypeMacro(vtkPVBoundsDisplay, vtkPVWidget);
+
+  // Description:
+  // Create a Tk widget
+  void Create(vtkKWApplication *app);
+
+  // Description:
+  // The bounds display gets its data object from the input menu.
+  // THis is not reference counted because we want to avoid reference loops.
+  void SetInputMenu(vtkPVInputMenu *inMenu) {this->InputMenu = inMenu;}
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+
+  // Description:
+  // This calculates new bounds to display (using the input menu).
+  virtual void Update();
+
+  // Description:
+  // Access to the KWWidget.  
+  vtkSetObjectMacro(Widget, vtkKWBoundsDisplay);
+  vtkGetObjectMacro(Widget, vtkKWBoundsDisplay);
 
 protected:
-  vtkPVCutPlane();
-  ~vtkPVCutPlane();
-  vtkPVCutPlane(const vtkPVCutPlane&) {};
-  void operator=(const vtkPVCutPlane&) {};
-};
+  vtkPVBoundsDisplay();
+  ~vtkPVBoundsDisplay();
+  vtkPVBoundsDisplay(const vtkPVBoundsDisplay&) {};
+  void operator=(const vtkPVBoundsDisplay&) {};
 
+  vtkKWBoundsDisplay *Widget;
+  vtkPVInputMenu *InputMenu;
+};
 
 
 #endif

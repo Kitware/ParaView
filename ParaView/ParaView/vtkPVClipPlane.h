@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVClipPlane_h
 
 #include "vtkPVSource.h"
-class vtkKWBoundsDisplay;
 
 class VTK_EXPORT vtkPVClipPlane : public vtkPVSource
 {
@@ -60,17 +59,12 @@ public:
   // VTKSource must be set before this is called.
   void CreateProperties();
 
-  // Description:
-  // Also Update the bounds display.
-  virtual void UpdateParameterWidgets();
-    
 protected:
   vtkPVClipPlane();
   ~vtkPVClipPlane();
   vtkPVClipPlane(const vtkPVClipPlane&) {};
   void operator=(const vtkPVClipPlane&) {};
 
-  vtkKWBoundsDisplay* BoundsDisplay;
 };
 
 #endif

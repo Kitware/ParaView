@@ -45,16 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVLabeledToggle_h
 #define __vtkPVLabeledToggle_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 
-class VTK_EXPORT vtkPVLabeledToggle : public vtkPVWidget
+class VTK_EXPORT vtkPVLabeledToggle : public vtkPVObjectWidget
 {
 public:
   static vtkPVLabeledToggle* New();
-  vtkTypeMacro(vtkPVLabeledToggle, vtkPVWidget);
+  vtkTypeMacro(vtkPVLabeledToggle, vtkPVObjectWidget);
 
   // Description:
   // Setting the label also sets the name.

@@ -45,16 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVVectorEntry_h
 #define __vtkPVVectorEntry_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWWidgetCollection.h"
 
-class VTK_EXPORT vtkPVVectorEntry : public vtkPVWidget
+class VTK_EXPORT vtkPVVectorEntry : public vtkPVObjectWidget
 {
 public:
   static vtkPVVectorEntry* New();
-  vtkTypeMacro(vtkPVVectorEntry, vtkPVWidget);
+  vtkTypeMacro(vtkPVVectorEntry, vtkPVObjectWidget);
 
   void Create(vtkKWApplication *pvApp, char *label, int vectorLength,
               char **subLabels, char *help);

@@ -193,6 +193,7 @@ void vtkPVInputMenu::MenuEntryCallback(vtkPVSource *pvs)
     }
   this->CurrentValue = pvs;
   this->ModifiedCallback();
+  this->Update();
 }
 
 //----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVCutPlane.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVObjectWidget.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,33 +39,54 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCutPlane - A class to handle the special case of cutting
-// with an implict plane
-// .SECTION Description
+#include "vtkPVObjectWidget.h"
+#include "vtkObjectFactory.h"
 
-
-#ifndef __vtkPVCutPlane_h
-#define __vtkPVCutPlane_h
-
-#include "vtkPVSource.h"
-
-class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
+//----------------------------------------------------------------------------
+vtkPVObjectWidget* vtkPVObjectWidget::New()
 {
-public:
-  static vtkPVCutPlane* New();
-  vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
-    
-  // Decription:
-  // VTKSource must be set before this is called.
-  void CreateProperties();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVObjectWidget");
+  if (ret)
+    {
+    return (vtkPVObjectWidget*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVObjectWidget;
+}
 
-protected:
-  vtkPVCutPlane();
-  ~vtkPVCutPlane();
-  vtkPVCutPlane(const vtkPVCutPlane&) {};
-  void operator=(const vtkPVCutPlane&) {};
-};
+//----------------------------------------------------------------------------
+vtkPVObjectWidget::vtkPVObjectWidget()
+{
+  this->ObjectTclName = NULL;
+  this->VariableName = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkPVObjectWidget::~vtkPVObjectWidget()
+{
+  this->SetObjectTclName(NULL);
+  this->SetVariableName(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVObjectWidget::SetObjectVariable(const char* objName, const char* varName)
+{
+  this->SetObjectTclName(objName);
+  this->SetVariableName(varName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVObjectWidget::SaveInTclScript(ofstream *file, const char *sourceName)
+{
+  char *result;
+  
+  *file << sourceName << " Set" << this->VariableName;
+  this->Script("set tempValue [%s Get%s]", 
+               this->ObjectTclName, this->VariableName);
+  result = this->Application->GetMainInterp()->result;
+  *file << " " << result << "\n";
+}
 
 
-
-#endif
+ 

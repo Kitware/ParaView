@@ -45,16 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVStringEntry_h
 #define __vtkPVStringEntry_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 
-class VTK_EXPORT vtkPVStringEntry : public vtkPVWidget
+class VTK_EXPORT vtkPVStringEntry : public vtkPVObjectWidget
 {
 public:
   static vtkPVStringEntry* New();
-  vtkTypeMacro(vtkPVStringEntry, vtkPVWidget);
+  vtkTypeMacro(vtkPVStringEntry, vtkPVObjectWidget);
 
   void Create(vtkKWApplication *pvApp, char *label, char *help);
   

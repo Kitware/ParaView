@@ -14,6 +14,7 @@ vtkPVApplication
 vtkPVArrayCalculator 
 vtkPVArrayMenu 
 vtkPVArraySelection
+vtkPVBoundsDisplay
 vtkPVClipPlane
 vtkPVCutPlane
 vtkPVContour 
@@ -28,6 +29,7 @@ vtkPVInputMenu
 vtkPVLabeledToggle
 vtkPVLODActor
 vtkPVMethodInterface 
+vtkPVObjectWidget
 vtkPVPlaneWidget
 vtkPVMinMax
 vtkPVProbe

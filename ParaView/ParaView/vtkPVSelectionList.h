@@ -50,17 +50,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVSelectionList_h
 #define __vtkPVSelectionList_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 
 class vtkStringList;
 
-class VTK_EXPORT vtkPVSelectionList : public vtkPVWidget
+class VTK_EXPORT vtkPVSelectionList : public vtkPVObjectWidget
 {
 public:
   static vtkPVSelectionList* New();
-  vtkTypeMacro(vtkPVSelectionList, vtkPVWidget);
+  vtkTypeMacro(vtkPVSelectionList, vtkPVObjectWidget);
   
   // Description:
   // Creates common widgets.

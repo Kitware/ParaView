@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVBoundsDisplay.h"
 #include "vtkObjectFactory.h"
 
 int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
@@ -55,17 +57,12 @@ int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVClipPlane::vtkPVClipPlane()
 {
   this->CommandFunction = vtkPVClipPlaneCommand;
-
-  this->BoundsDisplay = vtkKWBoundsDisplay::New();
-
   this->ReplaceInputOn();
 }
 
 //----------------------------------------------------------------------------
 vtkPVClipPlane::~vtkPVClipPlane()
 {
-  this->BoundsDisplay->Delete();
-  this->BoundsDisplay = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -85,20 +82,28 @@ vtkPVClipPlane* vtkPVClipPlane::New()
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::CreateProperties()
 {
+  vtkPVInputMenu *inputMenu;
   vtkPVPlaneWidget *planeWidget;
   vtkPVVectorEntry *offsetEntry;
+  vtkPVBoundsDisplay *boundsDisplay;
 
   this->vtkPVSource::CreateProperties();
  
-  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
-                     "Set the input to this filter.",
-                     this->GetPVWindow()->GetSources());
+  inputMenu = this->AddInputMenu("Input", "PVInput", "vtkDataSet",
+                                 "Set the input to this filter.",
+                                 this->GetPVWindow()->GetSources());
 
-  this->BoundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
-  this->BoundsDisplay->Create(this->Application);
-  this->BoundsDisplay->SetLabel("Input Bounds");
+  boundsDisplay = vtkPVBoundsDisplay::New();
+  boundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
+  boundsDisplay->Create(this->Application);
+  boundsDisplay->GetWidget()->SetLabel("Input Bounds");
+  boundsDisplay->SetInputMenu(inputMenu);
+  inputMenu->AddDependant(boundsDisplay);
   this->Script("pack %s -side top -fill x",
-               this->BoundsDisplay->GetWidgetName());
+               boundsDisplay->GetWidgetName());
+  this->AddPVWidget(boundsDisplay);
+  boundsDisplay->Delete();
+  boundsDisplay = NULL;
 
   // The Plane widget makes its owns VTK object (vtkPlane) so we do not
   // need to make the association.
@@ -143,27 +148,6 @@ void vtkPVClipPlane::CreateProperties()
   this->UpdateParameterWidgets();
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::UpdateParameterWidgets()
-{
-  vtkPVData *input;
-  float bds[6];
-
-  this->vtkPVSource::UpdateParameterWidgets();
-  input = this->GetPVInput();
-  if (input == NULL)
-    {
-    bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
-    bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
-    }
-  else
-    {
-    input->GetBounds(bds);
-    }
-
-  this->BoundsDisplay->SetBounds(bds);
-}
 
 
 

@@ -45,16 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVMinMax_h
 #define __vtkPVMinMax_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkKWApplication.h"
 #include "vtkKWScale.h"
 #include "vtkKWLabel.h"
 
-class VTK_EXPORT vtkPVMinMax : public vtkPVWidget
+class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 {
 public:
   static vtkPVMinMax* New();
-  vtkTypeMacro(vtkPVMinMax, vtkPVWidget);
+  vtkTypeMacro(vtkPVMinMax, vtkPVObjectWidget);
 
   void Create(vtkKWApplication *pvApp, char *minLabel, char *maxLabel,
               float min, float max, float resolution,

@@ -144,8 +144,6 @@ void PVRenderViewAbortCheck(void *arg)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
-  char *str;
-
   // Get rid of renderer created by the superclass
   this->Renderer->Delete();
   this->Renderer = (vtkRenderer*)pvApp->MakeTclObject("vtkRenderer", "Ren1");
