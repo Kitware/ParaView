@@ -71,6 +71,8 @@ protected:
   int UpdatePiece;
   int UpdateNumberOfPieces;
 
+  vtkTimeStamp UpdateTime;
+
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
   void operator=(const vtkPVUpdateSuppressor&);  // Not implemented.
