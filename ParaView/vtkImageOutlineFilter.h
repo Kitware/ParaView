@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkImageOutlineFilter_h
 #define __vtkImageOutlineFilter_h
 
-#include "vtkDataSetToPolyDataFilter.h"
+#include "vtkPolyDataSource.h"
 class vtkOutlineSource;
 
 class VTK_EXPORT vtkImageOutlineFilter : public vtkPolyDataSource
