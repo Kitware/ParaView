@@ -54,9 +54,14 @@ proc FindString { InFile SearchString } {
 if [ catch { [ set files [ glob $FileExpression ] ] } result ] {
     regsub {\\\*} $FileExpression "*" FileExpression
     if [ catch { [ set files [ glob $FileExpression ] ] } nresult ] {
-	puts "Cannot expand the expression: \"$FileExpression\""
-	puts "Error: $nresult"
+	#puts "Cannot expand the expression: \"$FileExpression\""
+	#puts "Error: $nresult"
     }
+}
+
+if { [ llength $files ] < 1 } {
+    puts "Cannot find any files that match your file expression"
+    exit 1
 }
 
 set count 0
