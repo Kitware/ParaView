@@ -67,6 +67,10 @@ inline ostream& operator << (ostream& os, vtkClientServerStreamInt64 id)
   char buf[33];
   // Convert to string representation in base 10.
   return os << _i64toa(id.Value, buf, 10);
+#elif defined(__HP_aCC)
+  char buf[33];
+  sprintf(buf, "%lld", id.Value);
+  return os << buf;
 #else
   return os << id.Value;
 #endif
@@ -78,6 +82,10 @@ inline ostream& operator << (ostream& os, vtkClientServerStreamUInt64 id)
   char buf[33];
   // Convert to string representation in base 10.
   return os << _ui64toa(id.Value, buf, 10);
+#elif defined(__HP_aCC)
+  char buf[33];
+  sprintf(buf, "%llu", id.Value);
+  return os << buf;
 #else
   return os << id.Value;
 #endif
