@@ -263,14 +263,6 @@ public:
   vtkPVWindow *GetPVWindow();
 
   // Description:
-  // Callback for reduction check
-  void ReductionCheckCallback();
-  
-  // Description:
-  // Callback for frame rate slider
-  void FrameRateScaleCallback();
-
-  // Description:
   // Used to temporarily disable rendering. Useful for collecting a few
   // renders and flusing them out at the end with one render
   vtkSetMacro(DisableRenderingFlag, int);
@@ -320,6 +312,7 @@ public:
   // Description:
   // LOD resolution determines how many cells are in decimated model.
   void LODResolutionScaleCallback();
+  void LODResolutionLabelCallback();
 
   // Description:
   // This method sets the resolution without tracing or
@@ -354,8 +347,6 @@ public:
   vtkGetMacro(CollectThreshold, float);
   vtkBooleanMacro(CollectThreshold, float);
 
-
-
   // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
@@ -369,6 +360,15 @@ public:
   // Set the global variable for always displaying 3D widgets.
   void Display3DWidgetsCallback();
   void SetDisplay3DWidgets(int s);
+
+  // Description:
+  // Show the names in sources browser.
+  void SourcesBrowserAlwaysShowNameCallback();
+  void SetSourcesBrowserAlwaysShowName(int s);
+
+  // Description:
+  // Switch to the View Properties menu back and forth
+  void SwitchBackAndForthToViewProperties();
 
 protected:
   vtkPVRenderView();
@@ -417,24 +417,16 @@ protected:
 
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
+  vtkKWCheckButton *SourcesBrowserAlwaysShowName;
 
-  vtkKWCheckButton *ReductionCheck;
-  
-  vtkKWWidget *FrameRateFrame;
-  vtkKWLabel *FrameRateLabel;
-  vtkKWScale *FrameRateScale;
-
-  vtkKWWidget *LODThresholdFrame;
+  vtkKWWidget *LODScalesFrame;
+  vtkKWLabel *LODResolutionLabel;
+  vtkKWScale *LODResolutionScale;
+  vtkKWLabel *LODResolutionValue;
   vtkKWLabel *LODThresholdLabel;
   vtkKWScale *LODThresholdScale;
   vtkKWLabel *LODThresholdValue;
 
-  vtkKWWidget *LODResolutionFrame;
-  vtkKWLabel *LODResolutionLabel;
-  vtkKWScale *LODResolutionScale;
-  vtkKWLabel *LODResolutionValue;
-
-  vtkKWWidget *CollectThresholdFrame;
   vtkKWLabel *CollectThresholdLabel;
   vtkKWScale *CollectThresholdScale;
   vtkKWLabel *CollectThresholdValue;
@@ -476,6 +468,11 @@ protected:
   vtkPVCameraIcon* CameraIcons[6];
 
   vtkPVRenderViewObserver* Observer;
+
+  vtkKWPushButton *PropertiesButton;
+
+  char *MenuLabelSwitchBackAndForthToViewProperties;
+  vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
 
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

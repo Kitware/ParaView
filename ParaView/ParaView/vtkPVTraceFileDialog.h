@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVCutPlane.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVTraceFileDialog.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,35 +39,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCutPlane - A class to handle the special case of cutting
-// with an implict plane
+// .NAME vtkPVTraceFileDialog - asks the user if she wants to save the old trace
 // .SECTION Description
+// This is a dialog with three buttons which should normally be:
+// Delete, Do Nothing, Save. Use this to ask the user whether
+// he wants to save or delete an old tracefile. Invoke returns
+// 0 for do nothing, 1 for delete and 2 for save.
+// .SECTION See Also
+// vtkPVApplication
 
+#ifndef __vtkPVTraceFileDialog_h
+#define __vtkPVTraceFileDialog_h
 
-#ifndef __vtkPVCutPlane_h
-#define __vtkPVCutPlane_h
+#include "vtkKWMessageDialog.h"
 
-#include "vtkPVSource.h"
-
-class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
+class VTK_EXPORT vtkPVTraceFileDialog : public vtkKWMessageDialog
 {
 public:
-  static vtkPVCutPlane* New();
-  vtkTypeRevisionMacro(vtkPVCutPlane, vtkPVSource);
+  static vtkPVTraceFileDialog* New();
+  vtkTypeRevisionMacro(vtkPVTraceFileDialog,vtkKWMessageDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
-    
-  // Decription:
-  // VTKSource must be set before this is called.
-  void CreateProperties();
+
+  // Description:
+  // Create a Tk widget
+  void Create(vtkKWApplication *app, const char *args);
+
+  // Description:
+  // Sets the save flag.
+  virtual void Save();
 
 protected:
-  vtkPVCutPlane();
-  ~vtkPVCutPlane();
+  vtkPVTraceFileDialog();
+  ~vtkPVTraceFileDialog();
 
-  vtkPVCutPlane(const vtkPVCutPlane&); // Not implemented
-  void operator=(const vtkPVCutPlane&); // Not implemented
+  vtkKWWidget     *SaveButton;
+  vtkKWWidget     *SaveFrame;
+
+private:
+  vtkPVTraceFileDialog(const vtkPVTraceFileDialog&); // Not implemented
+  void operator=(const vtkPVTraceFileDialog&); // Not implemented
 };
 
 
-
 #endif
+
+

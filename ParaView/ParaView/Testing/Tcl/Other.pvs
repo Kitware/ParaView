@@ -18,8 +18,8 @@ $pvWindow OpenPackage "$DataDir/Data/Package.xml"
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource testConeSource]
-$kw(vtkTemp285) DescriptionEntryCallback
-$kw(vtkTemp285) SetDescription "This is a cone"
+$kw(vtkTemp285) LabelEntryCallback
+$kw(vtkTemp285) SetLabel "This is a cone"
 $kw(vtkTemp285) AcceptCallback
 set kw(vtkTemp331) [$kw(vtkTemp285) GetPVWidget {Resolution}]
 $kw(vtkTemp331) SetValue 10
@@ -86,8 +86,6 @@ $view StandardViewCallback 0 -1 0
 $view StandardViewCallback 0 0 1
 $view StandardViewCallback 0 0 -1
 
-$view FrameRateScaleCallback
-$view ReductionCheckCallback
 $view TriangleStripsCallback
 $view ImmediateModeCallback
 $view LODResolutionScaleCallback

@@ -26,10 +26,12 @@ _tmp_ensightreadermodule0 AddCellVariable cellVectors
 _tmp_ensightreadermodule0 AddCellVariable cellTensors
 _tmp_ensightreadermodule0 ReadFile  "$DataDir/Data/elements.case" 0.00000e+00 $Application $pv(vtkTemp1)
 _tmp_ensightreadermodule0 Delete
-set pv(vtkTemp104) [$pv(vtkTemp1) GetPreviousPVSource 1]
-set pv(vtkTemp145) [$pv(vtkTemp1) GetPreviousPVSource 0]
+set pv(vtkTemp104) [[[$pv(vtkTemp1) GetCurrentPVSource] GetPVOutput 0] GetPVConsumer 0]
+set pv(vtkTemp145) [[[$pv(vtkTemp1) GetCurrentPVSource] GetPVOutput 1] GetPVConsumer 0]
 
 $pv(vtkTemp1) ResetCameraCallback
+
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp145)
 
 set pv(vtkTemp159) [$pv(vtkTemp1) CreatePVSource Contour]
 set pv(vtkTemp170) [$pv(vtkTemp159) GetPVWidget {Contour Values}]

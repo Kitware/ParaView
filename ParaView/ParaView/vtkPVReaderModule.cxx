@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.14");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -154,6 +154,24 @@ void vtkPVReaderModule::AddExtension(const char* ext)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkPVReaderModule::RemovePath(const char* fname)
+{
+  char* ptr = strrchr(fname, '/');
+  if ( ptr )
+    {
+    if ( ptr[1] != '\0' )
+      {
+      return ptr+1;
+      }
+    else
+      {
+      return ptr;
+      }
+    }
+  return  0;
+}
+
+//----------------------------------------------------------------------------
 const char* vtkPVReaderModule::ExtractExtension(const char* fname)
 {
   return strrchr(fname, '.');
@@ -182,6 +200,11 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
 
   if (clone)
     {
+    const char* desc = this->RemovePath(fname);
+    if (desc)
+      {
+      clone->SetLabelNoTrace(desc);
+      }
     if (clone->GetTraceInitialized() == 0)
       { 
       vtkPVApplication* pvApp=this->GetPVApplication();

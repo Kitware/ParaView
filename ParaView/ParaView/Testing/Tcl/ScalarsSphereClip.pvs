@@ -19,9 +19,9 @@ set kw(vtkTemp288) [$kw(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp303) [$kw(vtkTemp288) GetPVWidget {Clip Function}]
 $kw(vtkTemp303) SetCurrentValue {Scalars}
 set kw(vtkTemp999) [$kw(vtkTemp303) GetPVWidget {Scalars}]
-set kw(vtkTemp313) [$kw(vtkTemp999) GetPVWidget 1]
+set kw(vtkTemp313) [$kw(vtkTemp999) GetPVWidget {Scalars}]
 $kw(vtkTemp313) SetValue {RTData}
-set kw(vtkTemp314) [$kw(vtkTemp288) GetPVWidget {Offset}]
+set kw(vtkTemp314) [$kw(vtkTemp999) GetPVWidget {Offset}]
 $kw(vtkTemp314) SetValue 200
 $kw(vtkTemp288) AcceptCallback
 [$kw(vtkTemp1) GetMainView] SetCameraState -33.506 28.392 54.140  0.000 0.000 0.000  0.071 0.901 -0.428
@@ -46,7 +46,7 @@ $Application StopRecordingScript
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
    file delete -force test.tmp
-   source "ParaViewTrace.pvs"
+   source "[$Application GetTraceFileName]"
 }
 
 # Fix the size of the image.

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.13");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.14");
 
 
 
@@ -178,6 +178,14 @@ void vtkKWSplitFrame::ConfigureCallback()
     this->Script( "winfo height %s", this->GetWidgetName());
     }
   size = vtkKWObject::GetIntegerResult(this->Application);   
+
+  // If size == 1 then the widget has not been packed, it will be later
+  // and the Configure event will bring us back here with the correct size
+
+  if (size == 1)
+    {
+    return;
+    }
 
   // First check to see if we have to make the window larger.
   tmp = this->Frame1MinimumSize + this->Frame2MinimumSize 

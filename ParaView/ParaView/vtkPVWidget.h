@@ -201,6 +201,27 @@ public:
   vtkGetStringMacro(ModifiedCommandObjectTclName);
   vtkGetStringMacro(ModifiedCommandMethod);
 
+  // Description:
+  // This variable is used to determine who set the TraceName of
+  // this widget. Initially, the TraceName is Unitializad. Then,
+  // usually, vtkPVXMLPackageParser assigns a Default name. Then,
+  // either it is set from XML, the user sets it or one is assigned 
+  // during Create.
+  vtkSetMacro(TraceNameState,int);
+  vtkGetMacro(TraceNameState,int);
+
+//BTX
+  enum TraceNameState_t
+  {
+    Uninitialized,
+    Default,
+    XMLInitialized,
+    SelfInitialized,
+    UserInitialized
+  };
+//ETX
+
+
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -232,6 +253,8 @@ protected:
 
   vtkLinkedList<void*>* Dependents;
 //ETX
+
+  int TraceNameState;
 
   vtkPVWidget(const vtkPVWidget&); // Not implemented
   void operator=(const vtkPVWidget&); // Not implemented

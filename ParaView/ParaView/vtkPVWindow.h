@@ -51,8 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SelectMenu   -> used to select existing data objects
 // GlyphMenu    -> used to select existing glyph objects (cascaded from
 //                 SelectMenu)
-// AdvancedMenu -> for advanced users, contains SourceMenu and FilterMenu,
-//                 buttons for command prompt, exporting VTK scripts...
 // Help         -> Brings up on-line help
 // 
 // @endverbatim
@@ -283,11 +281,11 @@ public:
   // These methods create a new data source/object given a name and a 
   // source list.
   vtkPVSource *CreatePVSource(const char *className)
-    { return this->CreatePVSource(className, 0, 1); }
+    { return this->CreatePVSource(className, 0, 1, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList)
-    { return this->CreatePVSource(className, sourceList, 1); }
+    { return this->CreatePVSource(className, sourceList, 1, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
-                              int addTraceEntry);
+                              int addTraceEntry, int grabFocus);
   
   // Description:
   // Access to the interactor styles from tcl.
@@ -320,11 +318,11 @@ public:
   void DisableToolbarButton(const char* buttonName);
 
   // Description:
-  // Re-populate the source menu (under Advanced).
+  // Re-populate the source menu.
   void UpdateSourceMenu();
 
   // Description:
-  // Re-populate the filter menu (under Advanced).
+  // Re-populate the filter menu.
   void UpdateFilterMenu();
 
   // Description:
@@ -481,6 +479,13 @@ public:
   // Access to the Tcl interactor.
   vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
 
+  // Descrition:
+  // Show/Hide the sources long help.
+  virtual void SetShowSourcesLongHelp(int);
+  vtkGetMacro(ShowSourcesLongHelp, int);
+  vtkBooleanMacro(ShowSourcesLongHelp, int);
+  void ShowSourcesLongHelpCheckButtonCallback();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -499,7 +504,6 @@ protected:
   vtkPVRenderView *MainView;
 
   // ParaView specific menus
-  vtkKWMenu *AdvancedMenu;
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
@@ -611,6 +615,7 @@ protected:
   vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
   vtkArrayMap<const char*, vtkKWPushButton*>* ToolbarButtons;
   vtkArrayMap<const char*, const char*>* Writers;
+  vtkArrayMap<const char*, int>* MenuState;
   vtkLinkedList<vtkPVReaderModule*>* ReaderList;
   vtkLinkedList<const char*>* PackageNames;
   vtkLinkedList<vtkPVWriter*>* FileWriterList;
@@ -648,6 +653,9 @@ protected:
   int Interaction;
 
   void UpdateStatusImage();
+
+  vtkKWCheckButton *ShowSourcesLongHelpCheckButton;
+  int ShowSourcesLongHelp;
 
 private:
 

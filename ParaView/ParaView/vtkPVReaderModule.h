@@ -107,6 +107,10 @@ public:
   const char* GetExtension(vtkIdType i);
 
   // Description:
+  // Remove the path and return the filename.
+  const char* RemovePath(const char* fname);
+
+  // Description:
   // This tells vtkPVWindow whether it should call Accept() on the module
   // returned by ReadFile. In the default implementation, the ReadFile()
   // creates a clone and sets up all the filename (which is the only user

@@ -93,8 +93,9 @@ public:
   virtual void ReleaseGraphicsResources(vtkWindow *);
 
   // Description:
-  // Set the text to be displayed for each corner
+  // Set/Get the text to be displayed for each corner
   void SetText(int i,const char *text);
+  char* GetText(int i);
 
   // Description:
   // Set an image actor to look at for slice information

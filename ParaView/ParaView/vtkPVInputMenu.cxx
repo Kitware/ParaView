@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.34");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
@@ -95,7 +95,13 @@ vtkPVInputMenu::~vtkPVInputMenu()
 void vtkPVInputMenu::SetLabel(const char* label)
 {
   this->Label->SetLabel(label);
-  this->SetTraceName(label);
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -368,8 +374,8 @@ void vtkPVInputMenu::Reset()
   // The list of possible inputs could have changed.
   this->AddSources(this->Sources);
 
-  // Set the current value.
-  // The catch is here because GlyphSource is initially NULL which causes an error.
+  // Set the current value.  The catch is here because GlyphSource is
+  // initially NULL which causes an error.
   this->Script("catch {%s SetCurrentValue [[%s Get%s] GetPVSource]}", 
                this->GetTclName(), 
                this->PVSource->GetTclName(), this->InputName);    

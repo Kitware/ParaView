@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.11");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.12");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -84,21 +84,31 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
-                                          const char *window,
-                                          int *r, int *g, int *b)
+void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
+                                      const char *window,
+                                      const char *option,
+                                      int *r, int *g, int *b)
 {
   ostrstream command;
-  command << "lindex [ " << window << " configure -bg ] end" << ends;
+  command << window << " cget " << option << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "Unable to get -bg option: " << interp->result);
+    vtkGenericWarningMacro(
+      << "Unable to get " << option << " option: " << interp->result);
     command.rdbuf()->freeze(0);     
     return;
     }
   command.rdbuf()->freeze(0);     
 
   vtkKWTkUtilities::GetRGBColor(interp, window, interp->result, r, g, b);
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
+                                          const char *window,
+                                          int *r, int *g, int *b)
+{
+  vtkKWTkUtilities::GetOptionColor(interp, window, "-bg", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +118,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   int width, int height,
                                   int pixel_size,
                                   unsigned long buffer_length,
-                                  const char *blend_with_name)
+                                  const char *blend_with_name,
+                                  const char *color_option)
 {
   // Find the photo
 
@@ -210,7 +221,10 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     int r, g, b;
     if (blend_with_name)
       {
-      vtkKWTkUtilities::GetBackgroundColor(interp, blend_with_name, &r, &g, &b);
+      vtkKWTkUtilities::GetOptionColor(interp, 
+                                       blend_with_name, 
+                                       (color_option ? color_option : "-bg"), 
+                                       &r, &g, &b);
       }
     else
       {
@@ -266,7 +280,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   const char *photo_name,
                                   vtkImageData *image, 
-                                  const char *blend_with_name)
+                                  const char *blend_with_name,
+                                  const char *color_option)
 {
   if (!image )
     {
@@ -298,7 +313,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     width, height,
     pixel_size,
     width * height * pixel_size,
-    blend_with_name);
+    blend_with_name,
+    color_option);
 
   flip->Delete();
   return res;
@@ -423,6 +439,146 @@ int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
     return 0;
     }
   sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPackSlavePadding(Tcl_Interp *interp,
+                                          const char *widget,
+                                          int *ipadx,
+                                          int *ipady,
+                                          int *padx,
+                                          int *pady)
+{
+  ostrstream packinfo;
+  packinfo << "pack info " << widget << ends;
+  int res = Tcl_GlobalEval(interp, packinfo.str());
+  packinfo.rdbuf()->freeze(0);
+  if (res != TCL_OK || !interp->result || !interp->result[0])
+    {
+    vtkGenericWarningMacro(<< "Unable to get pack info!");
+    return 0;
+    }
+  
+  // Parse (ex: -ipadx 0 -ipady 0 -padx 0 -pady 0)
+
+  char *ptr = strstr(interp->result, "-ipadx ");
+  if (ptr)
+    {
+    sscanf(ptr + 7, "%d", ipadx);
+    }
+  ptr = strstr(interp->result, "-ipady ");
+  if (ptr)
+    {
+    sscanf(ptr + 7, "%d", ipady);
+    }
+  ptr = strstr(interp->result, "-padx ");
+  if (ptr)
+    {
+    sscanf(ptr + 6, "%d", padx);
+    }
+  ptr = strstr(interp->result, "-pady ");
+  if (ptr)
+    {
+    sscanf(ptr + 6, "%d", pady);
+    }
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
+                                        const char *widget,
+                                        int *width,
+                                        int *height)
+{
+  ostrstream slaves;
+  slaves << "pack slaves " << widget << ends;
+  int res = Tcl_GlobalEval(interp, slaves.str());
+  slaves.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to get pack slaves!");
+    return 0;
+    }
+  
+  // No slaves
+  
+  if (!interp->result || !interp->result[0])
+    {
+    return 1;
+    }
+  
+  // Browse each slave for reqwidth, reqheight
+
+  int buffer_length = strlen(interp->result);
+  char *buffer = new char [buffer_length + 1];
+  strcpy(buffer, interp->result);
+  char *buffer_end = buffer + buffer_length;
+  char *ptr = buffer, *word_end;
+
+  while (ptr < buffer_end)
+    {
+    // Get the slave name
+
+    word_end = strchr(ptr + 1, ' ');
+    if (word_end == NULL)
+      {
+      word_end = buffer_end;
+      }
+    else
+      {
+      *word_end = 0;
+      }
+
+    // Get width / height
+
+    ostrstream geometry;
+    geometry << "concat [winfo reqwidth " << ptr << "] [winfo reqheight " 
+             << ptr << "]"<< ends;
+    res = Tcl_GlobalEval(interp, geometry.str());
+    geometry.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to query slave geometry!");
+      }
+    else
+      {
+      int w, h;
+      sscanf(interp->result, "%d %d", &w, &h);
+
+      // If w == h == 1 then again it might not have been packed, so call
+      // recursively
+
+      if (w == 1 && h == 1)
+        {
+        vtkKWTkUtilities::GetPackSlavesBbox(interp, ptr, &w, &h);
+        }
+
+      // Don't forget the padding
+
+      int ipadx = 0, ipady = 0, padx = 0, pady = 0;
+      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, 
+                                            &ipadx, &ipady, &padx, &pady);
+
+      w += 2 * (padx + ipadx);
+      h += 2 * (pady + ipady);
+
+      if (w > *width)
+        {
+        *width = w;
+        }
+      if (h > *height)
+        {
+        *height = h;
+        }
+      }
+    
+    ptr = word_end + 1;
+    }
+
+  delete [] buffer;
 
   return 1;
 }

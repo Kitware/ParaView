@@ -53,23 +53,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdarg.h>
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.16");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.17");
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
 {
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVNavigationWindow::~vtkPVNavigationWindow()
 {
 }
 
 
-//------------------------------------------------------------------------------
-void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
+//-----------------------------------------------------------------------------
+void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
 {
   vtkPVSource *source;
   vtkPVData **inputs = currentSource->GetPVInputs();
@@ -80,12 +80,14 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
 
   // Draw the name of the assembly.
+  char *text = this->GetTextRepresentation(currentSource);
   const char *res = this->CreateCanvasItem(
     "%s create text %d %d -text {%s} -font %s -tags x",
-    this->Canvas->GetWidgetName(), 170, 10, currentSource->GetName(),font);
+    this->Canvas->GetWidgetName(), 170, 10, text,font);
+  delete [] text;
   char* tmp = vtkString::Duplicate(res);
   
-  if ( !NoBind )
+  if (this->CreateSelectionBindings)
     {
     this->Script("%s bind %s <ButtonPress-3> "
                  "{ %s DisplayModulePopupMenu %s %%X %%Y }",
@@ -110,15 +112,16 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
         {
         // Draw the name of the assembly.
         
+        char *itext = this->GetTextRepresentation(source);
         const char* res = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor e "
           "-tags x -fill blue",
-          this->Canvas->GetWidgetName(), bboxSource[0]-50, y,
-          source->GetName(), font);
+          this->Canvas->GetWidgetName(), bboxSource[0]-50, y, itext, font);
+        delete [] itext;
         tmp = vtkString::Duplicate(res);
         
         this->CalculateBBox(this->Canvas, tmp, bboxIn);
-        if ( !NoBind )
+        if (this->CreateSelectionBindings)
           {
           this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSourceCallback %s}",
                        this->Canvas->GetWidgetName(), tmp,
@@ -228,16 +231,17 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
           }
         
         // Draw the name of the assembly .
+        char *otext = this->GetTextRepresentation(source);
         const char* res = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor w "
           "-tags x -fill blue",
-          this->Canvas->GetWidgetName(), bboxSource[2]+50, y,
-          source->GetName(), font);
+          this->Canvas->GetWidgetName(), bboxSource[2]+50, y, otext, font);
+        delete [] otext;
         tmp = vtkString::Duplicate(res);
         
         // Get the bounding box for the name.
         this->CalculateBBox(this->Canvas, tmp, bboxOut);
-        if ( !NoBind )
+        if (this->CreateSelectionBindings)
           {
           this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
                        this->Canvas->GetWidgetName(), tmp,
@@ -302,7 +306,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.54");
+vtkCxxRevisionMacro(vtkPVContour, "1.55");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -129,6 +129,7 @@ void vtkPVContour::CreateProperties()
   vtkPVScalarRangeLabel* scalarRange = vtkPVScalarRangeLabel::New();
   scalarRange->SetArrayMenu(this->ArrayMenu);
   scalarRange->SetTraceName("ScalarRangeLabel");
+  scalarRange->SetTraceNameState(vtkPVWidget::UserInitialized);
   scalarRange->SetParent(this->ParameterFrame->GetFrame());
   scalarRange->Create(this->Application);
   this->ArrayMenu->AddDependent(scalarRange);  
@@ -143,6 +144,7 @@ void vtkPVContour::CreateProperties()
   entry->SetParent(this->GetParameterFrame()->GetFrame());
   entry->SetLabel("Contour Values");
   entry->Create(pvApp);
+  entry->SetBalloonHelpString("List of the current contour values");
   this->AddPVWidget(entry);
   this->Script("pack %s", entry->GetWidgetName());
   entry->SetModifiedCommand(this->GetTclName(), 

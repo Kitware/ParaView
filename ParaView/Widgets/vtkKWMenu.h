@@ -50,6 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkKWMenu : public vtkKWWidget
 {
@@ -72,8 +76,8 @@ public:
   // Description:
   // Copy the radio button variable logic.
   char* CreateCheckButtonVariable(vtkKWObject* Object, const char* varname);
-  int GetCheckButtonValue(vtkKWObject* Object, const char* varname);
-  void CheckCheckButton(vtkKWObject *Object, const char *varname, int id);
+  int   GetCheckButtonValue(vtkKWObject* Object, const char* varname);
+  void  CheckCheckButton(vtkKWObject *Object, const char *varname, int id);
 
   // Description: 
   // Append a CheckButton menu item to the current menu.
@@ -135,15 +139,16 @@ public:
   // Add a radio button menu item.  You must create a variable to store
   // the value of the button.
   char* CreateRadioButtonVariable(vtkKWObject* Object, const char* varname);
-  int GetRadioButtonValue(vtkKWObject* Object, const char* varname);
-  void CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
-  void InsertRadioButton(int position, int value, const char* label, 
-                         const char* buttonVar, vtkKWObject* Called, 
-                         const char* MethodAndArgString, const char* help = 0);
-  void InsertRadioButton(int position, int value, const char* label, 
-                         const char* buttonVar, vtkKWObject* Called, 
-                         const char* MethodAndArgString, 
-                         int underline, const char* help = 0);
+  int   GetRadioButtonValue(vtkKWObject* Object, const char* varname);
+  void  CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
+  int  GetCheckedRadioButtonItem(vtkKWObject *Object, const char *varname);
+  void  InsertRadioButton(int position, int value, const char* label, 
+                          const char* buttonVar, vtkKWObject* Called, 
+                          const char* MethodAndArgString, const char* help = 0);
+  void  InsertRadioButton(int position, int value, const char* label, 
+                          const char* buttonVar, vtkKWObject* Called, 
+                          const char* MethodAndArgString, 
+                          int underline, const char* help = 0);
 
   // Description: 
   // Add a generic menu item (defined by addtype)
@@ -170,12 +175,22 @@ public:
   void DeleteAllMenuItems();
   
   // Description:
-  // Return the integer index of the menu item by string
+  // Returns the integer index of the menu item by string
   int GetIndex(const char* menuname);
+
+  // Description:
+  // Copies the label of the item at the given position
+  // to the given string ( with the given length ). Returns VTK_OK
+  // if there is label, VTK_ERROR otherwise.
+  int GetItemLabel(int position, char* label, int maxlen);
 
   // Description:
   // Checks if an item is in the menu
   int IsItemPresent(const char* menuname);
+
+  // Description:
+  // Returns the number of items
+  int GetNumberOfItems();
   
   // Description:
   // Call back for active menu item doc line help
@@ -188,9 +203,11 @@ public:
   vtkBooleanMacro(TearOff, int);
 
   // Description:
-  // Set state of the menu entry with a given index.
+  // Set/Get state of the menu entry with a given index or name.
   void SetState(int index, int state);
   void SetState(const char* item, int state);
+  int  GetState(int index);
+  int  GetState(const char* item);
 
   // Description:
   // Set cascade menu for menu entry.
@@ -201,8 +218,10 @@ public:
 
   // Description:
   // Set command of the menu entry with a given index.
-  void SetEntryCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
-  void SetEntryCommand(const char* item, vtkKWObject* object, const char* method);
+  void SetEntryCommand(int index, vtkKWObject* object, 
+                       const char* MethodAndArgString);
+  void SetEntryCommand(const char* item, vtkKWObject* object, 
+                       const char* method);
   void SetEntryCommand(const char* item, const char* method);
 
   // Description:
@@ -210,8 +229,20 @@ public:
   void ConfigureItem(int index, const char*);
 
 //BTX
-  enum { Normal = 0, Active, Disabled };
+  enum { Normal = 0, Active, Disabled, Unknown };
 //ETX
+
+//BTX
+  // Description:
+  // The following two methods allows one to store and restore
+  // the state of a menu. This can be used to, for example, to
+  // store the state, disable all the entries and then restore
+  // the menu to the previous. Note that only the state of menu
+  // entries with labels are stored.
+  void StoreMenuState(vtkArrayMap<const char*, int>* state);
+  void RestoreMenuState(vtkArrayMap<const char*, int>* state);
+//ETX
+
 protected:
   
   vtkKWMenu();

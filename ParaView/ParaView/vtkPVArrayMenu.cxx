@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.27");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
@@ -113,7 +113,13 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 void vtkPVArrayMenu::SetLabel(const char* label)
 {
   this->Label->SetLabel(label);
-  this->SetTraceName(label);
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -382,7 +388,7 @@ void vtkPVArrayMenu::Accept()
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
   if (attributeName == NULL)
     {
-    vtkErrorMacro("Could not find attribute name.");
+    //vtkErrorMacro("Could not find attribute name.");
     return;
     }
 
@@ -557,7 +563,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     {
     this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("COuld not get datra set from input menu.");
+    //vtkErrorMacro("Could not get data set from input menu.");
     return;
     }
 

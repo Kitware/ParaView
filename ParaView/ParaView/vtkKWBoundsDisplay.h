@@ -67,7 +67,16 @@ public:
   // Description:
   // Set the bounds to display.
   void SetBounds(float bounds[6]);
+  void SetExtent(int ext[6]); 
   vtkGetVector6Macro(Bounds, float);
+
+  // Description:
+  // I want to use this widget to display an extent (int values).
+  // This mode causes the extent to be printed as integers.
+  // This flag is set to Bounds by default.
+  // The mode is automatically set when the bounds or extent is set.
+  void SetModeToExtent() {this->ExtentMode = 1; this->UpdateWidgets();}
+  void SetModeToBounds() {this->ExtentMode = 0; this->UpdateWidgets();}
 
 protected:
   vtkKWBoundsDisplay();
@@ -80,6 +89,8 @@ protected:
   vtkKWLabel *ZRangeLabel;
 
   float Bounds[6];
+  int Extent[6];
+  int ExtentMode;
 
   vtkKWBoundsDisplay(const vtkKWBoundsDisplay&); // Not implemented
   void operator=(const vtkKWBoundsDisplay&); // Not implemented

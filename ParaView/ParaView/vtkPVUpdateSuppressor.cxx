@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.4");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.5");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -29,6 +29,9 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
   this->vtkSource::SetNthOutput(1,vtkPolyData::New());
   this->Outputs[1]->Delete();
+
+  this->UpdatePiece = 0;
+  this->UpdateNumberOfPieces = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -44,129 +47,42 @@ unsigned long vtkPVUpdateSuppressor::GetMTime()
   return mTime;
 }
 
+
+// All these recursive pipeline methods now do nothing.
+// I could use the UpdateExtent from the output, but
+// The user may not have called update before force update.
+
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::ForceUpdate()
+void vtkPVUpdateSuppressor::UpdateData(vtkDataObject *)
 {
-   vtkPolyData *input = this->GetInput();
-   if ( input )
-     {
-     //cout << "Do update on: " << input << endl;
-     input->Update();
-     }
+}
+//----------------------------------------------------------------------------
+void vtkPVUpdateSuppressor::UpdateInformation()
+{
+}
+//----------------------------------------------------------------------------
+void vtkPVUpdateSuppressor::PropagateUpdateExtent(vtkDataObject *)
+{
+}
+//----------------------------------------------------------------------------
+void vtkPVUpdateSuppressor::TriggerAsynchronousUpdate()
+{
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::UpdateData(vtkDataObject *output)
+void vtkPVUpdateSuppressor::ForceUpdate()
 {
-  int idx;
+  vtkPolyData *input = this->GetInput();
+  vtkPolyData *output = this->GetOutput();
 
-  // prevent chasing our tail
-  if (this->Updating)
+  input->SetUpdatePiece(this->UpdatePiece);
+  input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
+  input->Update();
+  if (input->GetPipelineMTime() > this->UpdateTime || output->GetDataReleased())
     {
-    return;
+    output->ShallowCopy(input);
+    this->UpdateTime.Modified();
     }
-
-  // Propagate the update call - make sure everything we
-  // might rely on is up-to-date
-  // Must call PropagateUpdateExtent before UpdateData if multiple 
-  // inputs since they may lead back to the same data object.
-  this->Updating = 1;
-  if ( this->NumberOfInputs == 1 )
-    {
-    if (this->Inputs[0] != NULL)
-      {
-      // Do not update input
-      //this->Inputs[0]->UpdateData();
-      }
-    }
-  else
-    { // To avoid serlializing execution of pipelines with ports
-    // we need to sort the inputs by locality (ascending).
-    this->SortInputsByLocality();
-    for (idx = 0; idx < this->NumberOfInputs; ++idx)
-      {
-      if (this->SortedInputs[idx] != NULL)
-        {
-        this->SortedInputs[idx]->PropagateUpdateExtent();
-        // Do not update input
-        //this->SortedInputs[idx]->UpdateData();
-        }
-      }
-    }
-  this->Updating = 0;     
-    
-  // Initialize all the outputs
-  for (idx = 0; idx < this->NumberOfOutputs; idx++)
-    {
-    if (this->Outputs[idx])
-      {
-      this->Outputs[idx]->PrepareForNewData(); 
-      }
-    }
- 
-  // If there is a start method, call it
-  this->InvokeEvent(vtkCommand::StartEvent,NULL);
-
-  // Execute this object - we have not aborted yet, and our progress
-  // before we start to execute is 0.0.
-  this->AbortExecute = 0;
-  this->Progress = 0.0;
-  if (this->NumberOfInputs < this->NumberOfRequiredInputs)
-    {
-    vtkErrorMacro(<< "At least " << this->NumberOfRequiredInputs << " inputs are required but only " << this->NumberOfInputs << " are specified");
-    }
-  else
-    {
-    this->ExecuteData(output);
-    // Pass the vtkDataObject's field data from the first input
-    // to all outputs
-    vtkFieldData* fd;
-    if ((this->NumberOfInputs > 0) && (this->Inputs[0]) && 
-        (fd = this->Inputs[0]->GetFieldData()))
-      {
-      vtkFieldData* outputFd;
-      for (idx = 0; idx < this->NumberOfOutputs; idx++)
-        {
-        if (this->Outputs[idx] && 
-            (outputFd=this->Outputs[idx]->GetFieldData()))
-          {
-          outputFd->PassData(fd);
-          }
-        }
-      }
-    }
-
-  // If we ended due to aborting, push the progress up to 1.0 (since
-  // it probably didn't end there)
-  if ( !this->AbortExecute )
-    {
-    this->UpdateProgress(1.0);
-    }
-
-  // Call the end method, if there is one
-  this->InvokeEvent(vtkCommand::EndEvent,NULL);
-    
-  // Now we have to mark the data as up to data.
-  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
-    {
-    if (this->Outputs[idx])
-      {
-      this->Outputs[idx]->DataHasBeenGenerated();
-      }
-    }
-  
-  // Release any inputs if marked for release
-  for (idx = 0; idx < this->NumberOfInputs; ++idx)
-    {
-    if (this->Inputs[idx] != NULL)
-      {
-      if ( this->Inputs[idx]->ShouldIReleaseData() )
-        {
-        this->Inputs[idx]->ReleaseData();
-        }
-      }  
-    }
-  
 }
 
 //----------------------------------------------------------------------------
@@ -181,28 +97,11 @@ void vtkPVUpdateSuppressor::Execute()
   output->ShallowCopy(input);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::SetUpdateNumberOfPieces(int p)
-{
-  vtkPolyData *input = this->GetInput();
-  if ( input )
-    {
-    input->SetUpdateNumberOfPieces(p);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::SetUpdatePiece(int p)
-{
-  vtkPolyData *input = this->GetInput();
-  if ( input )
-    {
-    input->SetUpdatePiece(p);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
+  os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
 }

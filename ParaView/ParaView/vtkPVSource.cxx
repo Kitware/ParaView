@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWSerializer.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -70,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248");
+vtkCxxRevisionMacro(vtkPVSource, "1.249");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -85,9 +86,12 @@ vtkPVSource::vtkPVSource()
   // Number of instances cloned from this prototype
   this->PrototypeInstanceCount = 0;
 
-  this->Name = NULL;
-  this->Description = NULL;
+  this->Name = 0;
+  this->Label = 0;
   this->ModuleName = 0;
+  this->MenuName = 0;
+  this->ShortHelp = 0;
+  this->LongHelp  = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
@@ -121,7 +125,8 @@ vtkPVSource::vtkPVSource()
   this->DescriptionFrame = vtkKWWidget::New();
   this->NameLabel = vtkKWLabeledLabel::New();
   this->TypeLabel = vtkKWLabeledLabel::New();
-  this->DescriptionEntry = vtkKWLabeledEntry::New();
+  this->LongHelpLabel = vtkKWLabeledLabel::New();
+  this->LabelEntry = vtkKWLabeledEntry::New();
       
   this->Widgets = vtkPVWidgetCollection::New();
     
@@ -178,10 +183,14 @@ vtkPVSource::~vtkPVSource()
 
   this->SetVTKSource(NULL, NULL);
 
-  // Do not use SetName() or SetDescription() here. These make
+  // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
   delete[] this->Name;
-  delete[] this->Description;
+  delete[] this->Label;
+
+  this->SetMenuName(0);
+  this->SetShortHelp(0);
+  this->SetLongHelp(0);
 
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
@@ -211,8 +220,11 @@ vtkPVSource::~vtkPVSource()
   this->TypeLabel->Delete();
   this->TypeLabel = NULL;
 
-  this->DescriptionEntry->Delete();
-  this->DescriptionEntry = NULL;
+  this->LongHelpLabel->Delete();
+  this->LongHelpLabel = NULL;
+
+  this->LabelEntry->Delete();
+  this->LabelEntry = NULL;
 
   this->ParameterFrame->Delete();
   this->ParameterFrame = NULL;
@@ -279,6 +291,8 @@ void vtkPVSource::SetPVInput(vtkPVData *pvd)
   pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
                          pvd->GetVTKDataTclName());
 
+
+  this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 
   // Try to set the actor translate
   //float *pt;
@@ -441,52 +455,71 @@ void vtkPVSource::CreateProperties()
 
   // Set the description frame
   // Try to do something that looks like the parameters, i.e. fixed-width
-  // labels and "expandable" values (this has to be done since an 'entry' 
-  // does not expand itself when 'gridded', so it has to be packed, hence
-  // the fixed-width label, etc. Tk stuff.
+  // labels and "expandable" values. This has to be fixed later when the
+  // parameters will be properly aligned (i.e. gridded)
 
   this->DescriptionFrame ->SetParent(this->Parameters);
   this->DescriptionFrame->Create(this->Application, "frame", "");
   this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
                this->DescriptionFrame->GetWidgetName());
 
+  const char *label1_opt = "-width 12 -anchor e";
+
   this->NameLabel->SetParent(this->DescriptionFrame);
   this->NameLabel->Create(this->Application);
   this->NameLabel->GetLabel1()->SetLabel("Name:");
   this->Script("%s configure -anchor w", 
                this->NameLabel->GetLabel2()->GetWidgetName());
-  this->Script("%s config -width 18", 
-               this->NameLabel->GetLabel1()->GetWidgetName());
+  this->Script("%s config %s", 
+               this->NameLabel->GetLabel1()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->NameLabel->GetLabel2()->GetWidgetName());
+  vtkKWTkUtilities::ChangeFontToBold(
+    this->Application->GetMainInterp(),
+    this->NameLabel->GetLabel2()->GetWidgetName());
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
   this->TypeLabel->Create(this->Application);
-  this->TypeLabel->GetLabel1()->SetLabel("Type:");
+  this->TypeLabel->GetLabel1()->SetLabel("Class:");
   this->Script("%s configure -anchor w", 
                this->TypeLabel->GetLabel2()->GetWidgetName());
-  this->Script("%s config -width 18", 
-               this->TypeLabel->GetLabel1()->GetWidgetName());
+  this->Script("%s config %s", 
+               this->TypeLabel->GetLabel1()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->TypeLabel->GetLabel2()->GetWidgetName());
 
-  this->DescriptionEntry->SetParent(this->DescriptionFrame);
-  this->DescriptionEntry->Create(this->Application);
-  this->DescriptionEntry->GetLabel()->SetLabel("Description:");
-  this->Script("%s config -width 18", 
-               this->DescriptionEntry->GetLabel()->GetWidgetName());
+  this->LabelEntry->SetParent(this->DescriptionFrame);
+  this->LabelEntry->Create(this->Application);
+  this->LabelEntry->GetLabel()->SetLabel("Label:");
+  this->Script("%s config %s", 
+               this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
   this->Script("pack %s -fill x -expand t", 
-               this->DescriptionEntry->GetEntry()->GetWidgetName());
-  this->Script("bind %s <KeyPress-Return> {%s DescriptionEntryCallback}",
-               this->DescriptionEntry->GetEntry()->GetWidgetName(), 
+               this->LabelEntry->GetEntry()->GetWidgetName());
+  this->Script("bind %s <KeyPress-Return> {%s LabelEntryCallback}",
+               this->LabelEntry->GetEntry()->GetWidgetName(), 
                this->GetTclName());
 
-  this->Script("pack %s %s %s -side top -expand yes -fill x", 
-               this->NameLabel->GetWidgetName(),
-               this->TypeLabel->GetWidgetName(),
-               this->DescriptionEntry->GetWidgetName());
+  this->LongHelpLabel->SetParent(this->DescriptionFrame);
+  this->LongHelpLabel->Create(this->Application);
+  this->LongHelpLabel->GetLabel1()->SetLabel("Description:");
+  this->LongHelpLabel->GetLabel2()->AdjustWrapLengthToWidthOn();
+  this->Script("%s configure -anchor w", 
+               this->LongHelpLabel->GetLabel2()->GetWidgetName());
+  this->Script("%s config %s", 
+               this->LongHelpLabel->GetLabel1()->GetWidgetName(), label1_opt);
+  this->Script("pack %s -fill x -expand t", 
+               this->LongHelpLabel->GetLabel2()->GetWidgetName());
 
-  this->UpdateDescriptionFrame();
+  this->Script("grid %s -sticky news", 
+               this->NameLabel->GetWidgetName());
+  this->Script("grid %s -sticky news", 
+               this->TypeLabel->GetWidgetName());
+  this->Script("grid %s -sticky news", 
+               this->LabelEntry->GetWidgetName());
+  this->Script("grid %s -sticky news", 
+               this->LongHelpLabel->GetWidgetName());
+  this->Script("grid columnconfigure %s 0 -weight 1", 
+               this->LongHelpLabel->GetParent()->GetWidgetName());
 
   // The main parameter frame
 
@@ -522,8 +555,7 @@ void vtkPVSource::CreateProperties()
   this->ResetButton->Create(this->Application, "-text Reset");
   this->ResetButton->SetCommand(this, "ResetCallback");
   this->ResetButton->SetBalloonHelpString(
-    "Revert to the previous parameters of current module.  "
-    "If no values have been set, remove it.");
+    "Revert to the previous parameters of the module.");
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
@@ -539,13 +571,7 @@ void vtkPVSource::CreateProperties()
 
   frame->Delete();  
  
-  
   this->UpdateProperties();
-  
-  // Isolate events to this window until accept or reset is pressed.
-  this->GrabFocus();
-
-  //this->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------
@@ -569,9 +595,7 @@ void vtkPVSource::UpdateDescriptionFrame()
         this->GetVTKSource()->GetClassName());
       if (this->DescriptionFrame->IsPacked())
         {
-        this->Script("pack %s -after %s -expand y -fill x", 
-                     this->TypeLabel->GetWidgetName(),
-                     this->NameLabel->GetWidgetName());
+        this->Script("grid %s", this->TypeLabel->GetWidgetName());
         }
       }
     else
@@ -579,15 +603,36 @@ void vtkPVSource::UpdateDescriptionFrame()
       this->TypeLabel->GetLabel2()->SetLabel("");
       if (this->DescriptionFrame->IsPacked())
         {
-        this->Script("pack forget %s", 
-                     this->TypeLabel->GetWidgetName());
+        this->Script("grid remove %s", this->TypeLabel->GetWidgetName());
         }
       }
     }
 
-  if (this->DescriptionEntry && this->DescriptionEntry->IsCreated())
+  if (this->LabelEntry && this->LabelEntry->IsCreated())
     {
-    this->DescriptionEntry->GetEntry()->SetValue(this->Description);
+    this->LabelEntry->GetEntry()->SetValue(this->Label);
+    }
+
+  if (this->LongHelpLabel && this->LongHelpLabel->IsCreated())
+    {
+    if (this->LongHelp && 
+        !(this->GetPVWindow() && 
+          !this->GetPVWindow()->GetShowSourcesLongHelp())) 
+      {
+      this->LongHelpLabel->GetLabel2()->SetLabel(this->LongHelp);
+      if (this->DescriptionFrame->IsPacked())
+        {
+        this->Script("grid %s", this->LongHelpLabel->GetWidgetName());
+        }
+      }
+    else
+      {
+      this->LongHelpLabel->GetLabel2()->SetLabel("");
+      if (this->DescriptionFrame->IsPacked())
+        {
+        this->Script("grid remove %s", this->LongHelpLabel->GetWidgetName());
+        }
+      }
     }
 }
 
@@ -595,7 +640,7 @@ void vtkPVSource::UpdateDescriptionFrame()
 void vtkPVSource::GrabFocus()
 {
   this->SourceGrabbed = 1;
-  //this->Script("grab set %s", this->MainParameterFrame->GetWidgetName());
+
   this->GetPVWindow()->DisableToolbarButtons();
   this->GetPVWindow()->DisableMenus();
   this->GetPVRenderView()->UpdateNavigationWindow(this, 1);
@@ -604,11 +649,13 @@ void vtkPVSource::GrabFocus()
 //----------------------------------------------------------------------------
 void vtkPVSource::UnGrabFocus()
 {
-  //this->Script("grab release %s", 
-  //this->MainParameterFrame->GetWidgetName());    
-  this->GetPVWindow()->EnableToolbarButtons();
-  this->GetPVWindow()->EnableMenus();
-  this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
+
+  if ( this->SourceGrabbed )
+    {
+    this->GetPVWindow()->EnableToolbarButtons();
+    this->GetPVWindow()->EnableMenus();
+    this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
+    }
   this->SourceGrabbed = 0;
 }
 
@@ -726,55 +773,71 @@ void vtkPVSource::SetName (const char* arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetDescription(const char* arg) 
+char* vtkPVSource::GetLabel() 
 { 
-  this->SetDescriptionNoTrace(arg);
-  // Trace here, not in SetDescription (design choice)
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetDescription {%s}",
+  // Design choice: if the description is empty, initialize it with the
+  // Tcl name, so that the user knows what to overrides in the nav window.
+
+  if (this->Label == NULL)
+    {
+    this->SetLabelNoTrace(this->GetName());
+    }
+  return this->Label;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetLabel(const char* arg) 
+{ 
+  this->SetLabelNoTrace(arg);
+
+  // Update the nav window (that usually might display name + description)
+  vtkPVSource* current = this->GetPVWindow()->GetCurrentPVSource();
+  if (this->GetPVRenderView() && current)
+    {
+    this->GetPVRenderView()->UpdateNavigationWindow(
+      current, current->SourceGrabbed);
+    }
+  // Trace here, not in SetLabel (design choice)
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetLabel {%s}",
                                           this->GetTclName(),
-                                          this->Description);
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
+                                          this->Label);
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) LabelEntryCallback",
                                           this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetDescriptionNoTrace(const char* arg) 
+void vtkPVSource::SetLabelNoTrace(const char* arg) 
 { 
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting " 
-                << this->Description << " to " << arg ); 
-  if ( this->Description && arg && (!strcmp(this->Description,arg))) 
+                << this->Label << " to " << arg ); 
+  if ( this->Label && arg && (!strcmp(this->Label,arg))) 
     { 
     return;
     } 
-  if (this->Description) 
+  if (this->Label) 
     { 
-    delete [] this->Description; 
+    delete [] this->Label; 
     } 
   if (arg) 
     { 
-    this->Description = new char[strlen(arg)+1]; 
-    strcpy(this->Description,arg); 
+    this->Label = new char[strlen(arg)+1]; 
+    strcpy(this->Label,arg); 
     } 
   else 
     { 
-    this->Description = NULL;
+    this->Label = NULL;
     }
   this->Modified();
 
   // Make sure the description frame is upto date.
   this->UpdateDescriptionFrame();
 
-  // Update the nav window (that usually might display name + description)
-  if (this->GetPVRenderView())
-    {
-    this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
-    }
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::DescriptionEntryCallback()
+void vtkPVSource::LabelEntryCallback()
 {
-  this->SetDescription(this->DescriptionEntry->GetValue());
+  this->SetLabel(this->LabelEntry->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -923,6 +986,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         input->SetVisibilityInternal(0);
         }
       }
+
+    this->UnGrabFocus();
+
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -946,8 +1012,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       window->GetMainView()->ResetCamera();
       }
 
-    // Remove the local grab
-    this->UnGrabFocus();
     this->Initialized = 1;
     }
 
@@ -967,8 +1031,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   this->Script("update");  
 
-  window->EnableMenus();
-
 #ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
 #else
@@ -980,18 +1042,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 //----------------------------------------------------------------------------
 void vtkPVSource::ResetCallback()
 {
-  if ( ! this->Initialized)
-    { // Accept has not been called yet.  Delete the object.
-    // What about the local grab?
-    this->DeleteCallback();
-    return;
-    }
-
   this->UpdateParameterWidgets();
-  this->GetPVRenderView()->EventuallyRender();
-  this->Script("update");
+  if (this->Initialized)
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    this->Script("update");
 
-  this->SetAcceptButtonColorToWhite();
+    this->SetAcceptButtonColorToWhite();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1108,25 +1166,25 @@ void vtkPVSource::DeleteCallback()
     it->Delete();
     }
 
-  current = prev;
+  current = window->GetCurrentPVSource();
+  if ( this == current )
+    {
+    current = prev;
   
-  if (prev == NULL)
-    {
-    // Unpack the properties.  This is required if prev is NULL.
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-                 this->ParametersParent->GetWidgetName());
-
-    // Show the 3D View settings
-    vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-    vtkPVWindow *window = pvApp->GetMainWindow();
-    this->Script("%s invoke \"%s\"", 
-                 window->GetMenuView()->GetWidgetName(),
-                 VTK_PV_VIEW_MENU_LABEL);
-    }
-  else
-    {
-    //prev->GetPVOutput(0)->VisibilityOn();
-    //prev->ShowProperties();
+    if (prev == NULL)
+      {
+      // Unpack the properties.  This is required if prev is NULL.
+      this->Script("catch {eval pack forget [pack slaves %s]}",
+                   this->ParametersParent->GetWidgetName());
+      
+      // Show the 3D View settings
+      vtkPVApplication *pvApp = 
+        vtkPVApplication::SafeDownCast(this->Application);
+      vtkPVWindow *window = pvApp->GetMainWindow();
+      this->Script("%s invoke \"%s\"", 
+                   window->GetMenuView()->GetWidgetName(),
+                   VTK_PV_VIEW_MENU_LABEL);
+      }
     }
         
   // Remove all of the actors mappers. from the renderer.
@@ -1158,7 +1216,6 @@ void vtkPVSource::DeleteCallback()
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
   window->SetCurrentPVSourceCallback(current);
-  window->EnableMenus();
 }
 
 //----------------------------------------------------------------------------
@@ -1277,6 +1334,8 @@ void vtkPVSource::UpdateProperties()
     // Update the VTK data.
     this->GetPVOutput()->Update();
     }
+
+  this->UpdateDescriptionFrame();
 }
 
 //----------------------------------------------------------------------------
@@ -1594,6 +1653,7 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
   pvw->SetTraceReferenceObject(this);
   sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
   pvw->SetTraceReferenceCommand(str);
+  pvw->Select();
 }
 
 //----------------------------------------------------------------------------
@@ -1715,6 +1775,9 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetParametersParent(this->ParametersParent);
 
+  pvs->SetShortHelp(this->GetShortHelp());
+  pvs->SetLongHelp(this->GetLongHelp());
+
   vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
   vtkIdType id;
   for(id=0; id<numItems; id++)
@@ -1727,6 +1790,8 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     }
   pvs->SetOutputClassName(this->OutputClassName);
   pvs->SetSourceClassName(this->SourceClassName);
+
+  pvs->SetModuleName(this->ModuleName);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->Application);
   if (!pvApp)
@@ -2065,7 +2130,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248 $");
+  this->ExtractRevision(os,"$Revision: 1.249 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2074,8 +2139,15 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Initialized: " << (this->Initialized?"yes":"no") << endl;
   os << indent << "Name: " << (this->Name ? this->Name : "none") << endl;
-  os << indent << "Description: " << (this->Description ? this->Description : "none") << endl;
+  os << indent << "LongHelp: " << (this->LongHelp ? this->LongHelp : "none") 
+     << endl;
+  os << indent << "ShortHelp: " << (this->ShortHelp ? this->ShortHelp : "none") 
+     << endl;
+  os << indent << "Description: " 
+     << (this->Label ? this->Label : "none") << endl;
   os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
+     << endl;
+  os << indent << "MenuName: " << (this->MenuName?this->MenuName:"none")
      << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
   os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
@@ -2084,7 +2156,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() 
      << endl;
-  os << indent << "DescriptionFrame: " << this->GetDescriptionFrame() 
+  os << indent << "DescriptionFrame: " << this->DescriptionFrame 
      << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;

@@ -78,22 +78,6 @@ public:
   void SetCurrentTime(float time);
   float GetCurrentTime();
 
-  // Decription:
-  // Callback for setting the animation parameters from the
-  // entries.
-  void EntryCallback();
-
-  // Description:
-  // This sets the entries from the animation parameters.
-  // This will be called when the user sets the animation
-  // parameters programmatically.
-  void EntryUpdate();
-
-  // Description:
-  // This method gets called whenever the current time changes.
-  // It executes the script.
-  void CurrentTimeCallback();
-
   // Description:
   // Callback that starts an animation.
   void Play();
@@ -101,6 +85,20 @@ public:
   // Description:
   // Callback that stops the animation that is running.
   void Stop();
+
+  // Description:
+  // Callback that enable/disable the animation loop.
+  void SetLoop(int v);
+  vtkGetMacro(Loop, int);
+  vtkBooleanMacro(Loop, int);
+
+  // Description:
+  // Callback that sets the current time to the beginning of the time range.
+  void GoToBeginning();
+
+  // Description:
+  // Callback that sets the current time to the end of the time range.
+  void GoToEnd();
 
   // ------------------------------------------------
 
@@ -131,21 +129,11 @@ public:
   void UpdateMethodMenu();
 
   // Description:
-  // Method callback to toggle between source/method and script editor.
-  void ScriptCheckButtonCallback();
-
-  // Description:
   // Access to the interface from scripts.
   void SetScriptCheckButtonState(int);
   void SetScript(const char* script);
   void SetLabelAndScript(const char *label, const char* script);
   const char *GetScript();
-
-  // Description:
-  // This method gets called when the user types in the script
-  // editor.  All it does is invalidate the method menu value
-  // which may be invalid.
-  void ScriptEditorCallback();
 
   // Description:
   // Make the tcl script save the images of the animation.
@@ -159,6 +147,40 @@ public:
   virtual void SetControlledWidget(vtkPVWidget*);
   vtkGetObjectMacro(ControlledWidget, vtkPVWidget);
 
+  // ------------------------------------------------
+
+  // Description:
+  // Method callback to toggle between source/method and script editor.
+  void ScriptCheckButtonCallback();
+
+  // Description:
+  // This method gets called when the user types in the script
+  // editor.  All it does is invalidate the method menu value
+  // which may be invalid.
+  void ScriptEditorCallback();
+
+  // Description:
+  // This method gets called when the loop button is pressed
+  void LoopCheckButtonCallback();
+
+  // Decription:
+  // Callback for setting the animation parameters from the
+  // entries.
+  void TimeStartEntryCallback();
+  void TimeEndEntryCallback();
+  void TimeStepEntryCallback();
+
+  // Description:
+  // This sets the entries from the animation parameters.
+  // This will be called when the user sets the animation
+  // parameters programmatically.
+  void UpdateInterface();
+
+  // Description:
+  // This method gets called whenever the current time changes.
+  // It executes the script.
+  void TimeScaleCallback();
+
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -170,6 +192,9 @@ protected:
   vtkKWWidget *ControlButtonFrame;
   vtkKWPushButton *PlayButton;
   vtkKWPushButton *StopButton;
+  vtkKWPushButton *GoToBeginningButton;
+  vtkKWPushButton *GoToEndButton;
+  vtkKWCheckButton *LoopCheckButton;
 
   vtkKWScale *TimeScale;
 
@@ -178,11 +203,16 @@ protected:
   vtkKWLabeledEntry *TimeEndEntry;
   vtkKWLabeledEntry *TimeStepEntry;
 
+  void EntryCallback();
+
   // Animation parameters
   float TimeStart;
   float TimeEnd;
   float TimeStep;
+
   int StopFlag;
+  int InPlay;
+  int Loop;
 
   // New interface ------------------------------------------------
 

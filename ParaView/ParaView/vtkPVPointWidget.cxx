@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.12");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -210,7 +210,12 @@ vtkPVPointWidget* vtkPVPointWidget::ClonePrototype(vtkPVSource* pvSource,
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  this->SetTraceName("Point");
+  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName("Point");
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());

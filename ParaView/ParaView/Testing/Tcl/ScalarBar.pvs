@@ -11,7 +11,10 @@ if {[info exists argc]} {
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
-set kw(vtkTemp285) [vtkTemp1 GetCurrentPVSource]
+
+set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]
+$kw(vtkTemp285) AcceptCallback
+
 set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars}]
 $kw(vtkTemp321) SetScalarBarVisibility 1
 $kw(vtkTemp321) SetScalarBarPosition1 0.593485 0.250000
@@ -142,7 +145,7 @@ $Application StopRecordingScript
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
    file delete -force test.tmp
-   source "ParaViewTrace.pvs"
+   source "[$Application GetTraceFileName]"
 }
 
 # Fix the size of the image.

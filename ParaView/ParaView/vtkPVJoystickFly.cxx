@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.10");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.11");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -145,7 +145,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
   // We are flying now!
   this->FlyFlag = 1;
 
-  float speed, angle; 
+  float speed; 
   
   // The first time through we don't want to move
   int first = 1;
@@ -153,129 +153,111 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
   // As long as the mouse is still pressed
   while (this->FlyFlag)
     {
-    // Don't move - we need at least one time to determine
-    // what our increments should be
-    if ( first )
-      {
-      speed = 0;
-      angle = 0;
-      first = 0;
-      }
-    // This is not the first time - Figure out how long the last loop
-    // took. Use this plus the scale value and the distance
-    // between the near and the far plane to determine the
-    // forward/backward translation increment. This keeps the apparent 
-    // motion independent of rendering speed or scale of the data.
-    // For the angle, our factor is based soley on rendering speed here.
-    else
-      {
-      timer->StopTimer();
-      float t = timer->GetElapsedTime();
-      double *range = cam->GetClippingRange();
-      speed = ispeed * 
-        (range[1] - range[0])/100.0 * t;
-      angle = t;
-      }
-
-    double* range = cam->GetClippingRange();
-    speed *= range[1];
-
+    double *range = cam->GetClippingRange();
+    double dist = 0.5 * (range[1] + range[0]);
     float lastx = this->LastX;
     float lasty = size[1] - this->LastY - 1;
+
+    // Compute a new render time if appropriate (delta time).
+    if ( ! first )
+      {
+      // We need at least one time to determine
+      // what our increments should be.
+      timer->StopTimer();
+      this->LastRenderTime = timer->GetElapsedTime();
+      // Limit length of render time because we do not want such large jumps
+      // when rendering takes more than 1 second.
+      if (this->LastRenderTime > 1.0)
+        {
+        this->LastRenderTime = 1.0;
+        }
+      }
+    first = 0;
+
+    // Compute angle ralative to viewport.
+    // These values will be from -0.5 to 0.5
+    float vx = (size[0]/2 - lastx) / (float)(size[0]);
+    float vy = (size[1]/2 - lasty) / (float)(size[0]);
+
+    // Convert to world angle by multiplying by view angle.
+    // (Speed up rotation for wide angle views).
+    double viewAngle;
+    if ( cam->GetParallelProjection() )
+      {  // We need to compute a pseudo viewport angle.
+      double parallelScale = cam->GetParallelScale();
+      viewAngle = 360.0 * atan2(parallelScale*0.5, dist) / vtkMath::Pi();
+      }
+    else
+      {
+      viewAngle = cam->GetViewAngle();
+      }
+    vx = vx * viewAngle; 
+    vy = vy * viewAngle;
+
+    // Compute speed.
+    speed = ispeed * range[1];
+
+    // Scale speed and rotation by render time 
+    // to get constant perceived velocities.
+    speed = speed * this->LastRenderTime;
+    vx = vx * this->LastRenderTime;
+    vy = vy * this->LastRenderTime;
     
     // Start the timer up again
     timer->StartTimer();
     
-    // If our mouse is not in the center, rotate 
-    if ( size[0]/2 - lastx >  20 ||
-         size[0]/2 - lastx < -20 ||
-         size[1]/2 - lasty >  20 ||
-         size[1]/2 - lasty < -20 )
-      {
-      // The angle is a square value to increase rotation faster as
-      // you move out from the center
-      float vx = 0.001 * angle *
-        ((size[0]/2 - lastx>0)?(1):(-1)) *
-        (size[0]/2 - lastx)*
-        (size[0]/2 - lastx);
-      float vy = 0.001 * angle *
-        ((size[1]/2 - lasty>0)?(1):(-1)) *
-        (size[1]/2 - lasty)*
-        (size[1]/2 - lasty);
-
-      // If we are in parallel projection mode, we need to tone
-      // down this rotation if we are close in (small parallel
-      // scale)
-      if ( cam->GetParallelProjection() )
-        {
-        float reduce = 
-          cam->GetParallelScale() / 100.0;
-        reduce = (reduce > 1.0)?(1.0):(reduce);
-        vx *= reduce;
-        vy *= reduce;
-        }
-      
-      // Do the rotation
-      cam->Yaw(vx);
-      cam->Pitch(vy);
-      cam->OrthogonalizeViewUp();
-      
-      // Now figure out if we should slow down our speed because
-      // we are trying to make a sharp turn
-      vx = (vx<0)?(-vx):(vx);
-      vy = (vy<0)?(-vy):(vy);
-      vx += vy;
-      if ( vx >= 1.0 )
-        {
-        speed = 0;
-        }
-      else
-        {
-        speed *= (1.0 - vx);
-        }
-      }
     
+    // Do the rotation
+    cam->Yaw(vx);
+    cam->Pitch(vy);
+    cam->OrthogonalizeViewUp();
+    
+    // Now figure out if we should slow down our speed because
+    // we are trying to make a sharp turn
+    vx = (float)(size[0]/2 - lastx) / (float)(size[0]);
+    vy = (float)(size[1]/2 - lasty) / (float)(size[1]);
+    vx = (vx<0)?(-vx):(vx);
+    vy = (vy<0)?(-vy):(vy);
+    vx = (vx > vy)?(vx):(vy);
+    speed *= (1.0 - 2.0*vx);
+
+    // Move the camera forward based on speed.
+    // Although this has no effect for parallel projection,
+    // it helps keep the pseudo view angle constant.
+    float fp[3], pos[3];
+    cam->GetPosition(pos);
+    cam->GetFocalPoint(fp);  
+    float dir[3];
+    dir[0] = fp[0] - pos[0];
+    dir[1] = fp[1] - pos[1];
+    dir[2] = fp[2] - pos[2];
+    vtkMath::Normalize(dir);
+    dir[0] *= speed;
+    dir[1] *= speed;
+    dir[2] *= speed;
+    fp[0] += dir[0];
+    fp[1] += dir[1];
+    fp[2] += dir[2];
+    pos[0] += dir[0];
+    pos[1] += dir[1];
+    pos[2] += dir[2];
+    cam->SetPosition(pos);
+    cam->SetFocalPoint(fp);
+
     // In parallel we need to adjust the parallel scale
     if ( cam->GetParallelProjection() )
       {
       float scale = cam->GetParallelScale();
-      scale -= 0.004*speed*scale;
-      cam->SetParallelScale(scale);
-      }
-    // In perspective, we need to translate the position and
-    // focal point of the camera
-    else
-      {
-      float fp[3], pos[3];
-      cam->GetPosition(pos);
-      cam->GetFocalPoint(fp);
-    
-      float dir[3];
-      
-      dir[0] = fp[0] - pos[0];
-      dir[1] = fp[1] - pos[1];
-      dir[2] = fp[2] - pos[2];
-      vtkMath::Normalize(dir);
-  
-      dir[0] *= speed;
-      dir[1] *= speed;
-      dir[2] *= speed;
-      
-      fp[0] += dir[0];
-      fp[1] += dir[1];
-      fp[2] += dir[2];
-      
-      pos[0] += dir[0];
-      pos[1] += dir[1];
-      pos[2] += dir[2];
-      
-      cam->SetPosition(pos);
-      cam->SetFocalPoint(fp);
+      if (dist > 0.0 && dist > speed)
+        {
+        scale = scale * (dist-speed) / dist;
+        cam->SetParallelScale(scale);
+        }
       }
     
     ren->ResetCameraClippingRange();
     rwi->Render();
-    
+  
     // Update to process mouse events to get the new position
     // and to check for mouse up events
     this->Application->Script("update");

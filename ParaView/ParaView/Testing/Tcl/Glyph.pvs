@@ -21,7 +21,10 @@ $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp183) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp204) [$pv(vtkTemp183) GetPVWidget {Scale Factor}]
 $pv(vtkTemp204) SetValue 0.2
+set pv(vtkTemp389) [$pv(vtkTemp183) GetPVWidget {Orient}]
+$pv(vtkTemp389) SetCurrentValue {Off}
 $pv(vtkTemp183) AcceptCallback
+
 
 set pv(vtkTemp217) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp229) [$pv(vtkTemp217) GetPVWidget {Center}]
@@ -33,8 +36,6 @@ set pv(vtkTemp271) [$pv(vtkTemp262) GetPVWidget {Glyph}]
 $pv(vtkTemp271) SetCurrentValue $pv(vtkTemp93)
 set pv(vtkTemp283) [$pv(vtkTemp262) GetPVWidget {Scale Factor}]
 $pv(vtkTemp283) SetValue 0.2
-set pv(vtkTemp285) [$pv(vtkTemp262) GetPVWidget {Vector Mode}]
-$pv(vtkTemp285) SetCurrentValue {1}
 $pv(vtkTemp262) AcceptCallback
 
 # Test deleting before accept is called.
@@ -73,11 +74,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp458) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp479) [$pv(vtkTemp458) GetPVWidget {Scale Factor}]
 $pv(vtkTemp479) SetValue 0.4
-set pv(vtkTemp482) [$pv(vtkTemp458) GetPVWidget {Vector Mode}]
-$pv(vtkTemp482) SetCurrentValue {1}
-
-
 $pv(vtkTemp458) AcceptCallback
+
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

@@ -8,67 +8,66 @@ if {[info exists argc]} {
     }
 } 
 
+
 # This test is to see if the array menu gets updated properly
 # when the input menu is changed.
 
+
 set kw(vtkTemp1) [$Application GetMainWindow]
-set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
-set kw(vtkTemp90) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
-set kw(vtkTemp94) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
-set kw(vtkTemp98) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]
-set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource SphereSource]
-set kw(vtkTemp117) [$kw(vtkTemp99) GetPVWidget {Theta Resolution}]
-$kw(vtkTemp117) SetValue 16
-set kw(vtkTemp126) [$kw(vtkTemp99) GetPVWidget {Phi Resolution}]
-$kw(vtkTemp126) SetValue 16
-$kw(vtkTemp99) AcceptCallback
-
-
-$kw(vtkTemp44) SetBackgroundColor 0 0 0
-
-set kw(vtkTemp167) [$kw(vtkTemp1) CreatePVSource SphereSource]
-set kw(vtkTemp177) [$kw(vtkTemp167) GetPVWidget {Center}]
-$kw(vtkTemp177) SetValue 2 0 0
-set kw(vtkTemp185) [$kw(vtkTemp167) GetPVWidget {Theta Resolution}]
-$kw(vtkTemp185) SetValue 8
-set kw(vtkTemp194) [$kw(vtkTemp167) GetPVWidget {Phi Resolution}]
-$kw(vtkTemp194) SetValue 6
-$kw(vtkTemp167) AcceptCallback
-
-
+set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp290) [$kw(vtkTemp273) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp290) SetValue 16
+set kw(vtkTemp299) [$kw(vtkTemp273) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp299) SetValue 16
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp22) SetBackgroundColor 0.000000 0.000000 0.000000
+set kw(vtkTemp327) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp336) [$kw(vtkTemp327) GetPVWidget {Center}]
+$kw(vtkTemp336) SetValue 2 0 0
+set kw(vtkTemp344) [$kw(vtkTemp327) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp344) SetValue 8
+set kw(vtkTemp353) [$kw(vtkTemp327) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp353) SetValue 6
+$kw(vtkTemp327) AcceptCallback
 $kw(vtkTemp1) ResetCameraCallback
+set kw(vtkTemp381) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+set kw(vtkTemp394) [$kw(vtkTemp381) GetPVWidget {Line}]
+$kw(vtkTemp394) SetPoint1 0.00000 0.00000 0.00000
+$kw(vtkTemp394) SetPoint2 0.00000 0.00000 1.00000
+$kw(vtkTemp394) SetResolution 20
+$kw(vtkTemp381) AcceptCallback
+set kw(vtkTemp428) [$kw(vtkTemp1) CreatePVSource Calculator]
+$kw(vtkTemp428) AddScalarVariable Normals_0 Normals 0
+$kw(vtkTemp428) SetFunctionLabel {Normals_0}
+$kw(vtkTemp428) AcceptCallback
+set kw(vtkTemp482) [$kw(vtkTemp1) CreatePVSource WarpScalar]
+set kw(vtkTemp491) [$kw(vtkTemp482) GetPVWidget {Scalars}]
+$kw(vtkTemp491) SetValue {resultArray}
+$kw(vtkTemp482) AcceptCallback
+set kw(vtkTemp452) [$kw(vtkTemp428) GetPVOutput]
+$kw(vtkTemp452) SetVisibility 1
+set kw(vtkTemp506) [$kw(vtkTemp482) GetPVWidget {Input}]
+$kw(vtkTemp506) SetCurrentValue $kw(vtkTemp381)
+$kw(vtkTemp491) SetValue {Elevation}
+$kw(vtkTemp482) AcceptCallback
+set kw(vtkTemp509) [$kw(vtkTemp482) GetPVOutput]
+$kw(vtkTemp509) SetVisibility 0
+$kw(vtkTemp509) SetVisibility 1
+$kw(vtkTemp509) ColorByProperty
 
-set kw(vtkTemp209) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
-set kw(vtkTemp999) [$kw(vtkTemp209) GetPVWidget {Line}]
-$kw(vtkTemp999) SetPoint1 0 0 0
-$kw(vtkTemp999) SetPoint2 0 0 1
-$kw(vtkTemp209) AcceptCallback
-$kw(vtkTemp1) SetCurrentPVSource $kw(vtkTemp99)
-
-set kw(vtkTemp240) [$kw(vtkTemp1) CreatePVSource Calculator]
-$kw(vtkTemp240) AddScalarVariable Normals_0 Normals 0
-$kw(vtkTemp240) SetFunctionLabel {Normals_0}
-$kw(vtkTemp240) AcceptCallback
-
-set kw(vtkTemp267) [$kw(vtkTemp1) CreatePVSource WarpScalar]
-set kw(vtkTemp273) [$kw(vtkTemp267) GetPVWidget {Input}]
-$kw(vtkTemp273) SetCurrentValue $kw(vtkTemp240)
-set kw(vtkTemp274) [$kw(vtkTemp267) GetPVWidget {Scalars}]
-$kw(vtkTemp274) SetValue resultArray
-$kw(vtkTemp267) AcceptCallback
 
 
-# Change the input.
-$kw(vtkTemp273) SetCurrentValue $kw(vtkTemp209)
+set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
+$kw(vtkTemp309) ColorByPointFieldComponent {Normals} 0
 
-# We have to manually turn this back on.
-$kw(vtkTemp240) SetVisibility 1
+
 
 # Lets see if the array menu has the correct value.
 # Create a text files with the current menu value.
 # out.txt is a special name
 if { [catch {set fp [open "out.txt" w]}] == 0 } {
-  puts $fp [$kw(vtkTemp274) GetValue]
+  puts $fp [$kw(vtkTemp491) GetValue]
 }
 close $fp
 
@@ -78,7 +77,7 @@ file delete -force out.txt
 
 # Continue with the rest of the test.
  
-$kw(vtkTemp267) AcceptCallback
+#$kw(vtkTemp482) AcceptCallback
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

@@ -29,11 +29,6 @@ $pv(vtkTemp191) SetNormal 0.80121 0.53206 0.27383
 $pv(vtkTemp182) AcceptCallback
 $pv(vtkTemp191) SetCenter 0 0 4.5
 $pv(vtkTemp182) AcceptCallback
-set pv(vtkTemp194) [$pv(vtkTemp182) GetPVWidget {Offset}]
-$pv(vtkTemp194) SetValue 0.5
-$pv(vtkTemp182) AcceptCallback
-$pv(vtkTemp194) SetValue -0.5
-$pv(vtkTemp182) AcceptCallback
 set pv(vtkTemp213) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp214) [$pv(vtkTemp213) GetPVWidget {Cut Function}]
 set pv(vtkTemp222) [$pv(vtkTemp214) GetPVWidget {Plane}]
@@ -55,10 +50,6 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp191) SetNormal -0.80121 -0.53206 -0.27383
 $pv(vtkTemp182) AcceptCallback
-$pv(vtkTemp194) SetValue -0.7
-$pv(vtkTemp182) AcceptCallback
-$pv(vtkTemp194) SetValue -0.2
-$pv(vtkTemp182) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp213)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp249)
@@ -77,7 +68,7 @@ $Application StopRecordingScript
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
    file delete -force test.tmp
-   source "ParaViewTrace.pvs"
+   source "[$Application GetTraceFileName]"
 }
 
 # Fix the size of the image.

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.12");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -107,23 +107,24 @@ void vtkKWOptionMenu::AddEntry(const char *name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWOptionMenu::AddEntryWithCommand(const char *name, const char *obj, 
-                                          const char *method)
+void vtkKWOptionMenu::AddEntryWithCommand(const char *name, 
+                                          const char *obj, 
+                                          const char *method,
+                                          const char *options)
 {
   this->Script(
-    "%s add radiobutton -label {%s} -variable %sValue -command {%s %s}",
+    "%s add radiobutton -label {%s} -variable %sValue -command {%s %s} %s",
     this->Menu->GetWidgetName(), name, 
-    this->GetWidgetName(), obj, method);
+    this->GetWidgetName(), obj, method, (options ? options : ""));
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWOptionMenu::AddEntryWithCommand(const char *name, vtkKWObject *obj, 
-                                          const char *methodAndArgs)
+void vtkKWOptionMenu::AddEntryWithCommand(const char *name, 
+                                          vtkKWObject *obj, 
+                                          const char *methodAndArgs,
+                                          const char *options)
 {
-  this->Script(
-    "%s add radiobutton -label {%s} -variable %sValue -command {%s %s}",
-    this->Menu->GetWidgetName(), name, 
-    this->GetWidgetName(), obj->GetTclName(), methodAndArgs);
+  this->AddEntryWithCommand(name, obj->GetTclName(), methodAndArgs, options);
 }
 
 //-----------------------------------------------------------------------------

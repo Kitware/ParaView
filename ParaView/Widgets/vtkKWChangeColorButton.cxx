@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWChangeColorButton );
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.19");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.20");
 
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
@@ -130,8 +130,8 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   sprintf( textarg, "-text {%s}", this->Text );
   this->Label1->Create(this->Application,"label", textarg);
   this->Label2->Create(this->Application,
-                       "label","-width 2 -height 1");
-  this->Script("pack %s -padx 2 -pady 2 -side right",
+                       "frame", "-width 16");
+  this->Script("pack %s -padx 2 -pady 2 -side right -fill both",
                this->Label2->GetWidgetName());
   if (this->Text && strlen(this->Text) > 0)
     { 
@@ -189,12 +189,14 @@ void vtkKWChangeColorButton::ChangeColor()
   int r, g, b;
   char *result, tmp[3];
 
+  this->Application->SetDialogUp(1);
   this->Script(
      "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {Choose Color}",
      (int)(this->Color[0]*255.5), 
      (int)(this->Color[1]*255.5), 
      (int)(this->Color[2]*255.5) );
   result = this->Application->GetMainInterp()->result;
+  this->Application->SetDialogUp(0);
   if (strlen(result) > 6)
     {
     tmp[2] = '\0';
@@ -265,7 +267,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.19 $");
+  this->ExtractRevision(os,"$Revision: 1.20 $");
 }
 
 //----------------------------------------------------------------------------

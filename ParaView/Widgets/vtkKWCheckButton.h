@@ -75,6 +75,11 @@ public:
   void SetText(const char* txt);
   const char* GetText();
 
+  // Description:
+  // Set the variable name.
+  vtkGetStringMacro(VariableName);
+  virtual void SetVariableName(const char *);
+
 protected:
 
   vtkSetStringMacro(MyText);
@@ -83,7 +88,9 @@ protected:
   ~vtkKWCheckButton();
 
   int IndicatorOn;
-  char* MyText;
+  char *MyText;
+  char *VariableName;
+
 private:
   vtkKWCheckButton(const vtkKWCheckButton&); // Not implemented
   void operator=(const vtkKWCheckButton&); // Not Implemented

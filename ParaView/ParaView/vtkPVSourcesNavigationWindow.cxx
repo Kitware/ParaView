@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -64,6 +64,8 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->Canvas    = vtkKWWidget::New();
   this->ScrollBar = vtkKWWidget::New();
   this->PopupMenu = vtkKWMenu::New();
+  this->AlwaysShowName = 0;
+  this->CreateSelectionBindings = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,19 +109,19 @@ const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, .
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*,int)
+void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*)
 {
   vtkErrorMacro(<< "Subclass should do this.");
   vtkErrorMacro(<< "I am " << this->GetClassName());
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind)
+void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource)
 {
   // Clear the canvas
   this->Script("%s delete all", this->Canvas->GetWidgetName());
 
-  this->ChildUpdate(currentSource, nobind);
+  this->ChildUpdate(currentSource);
 
   this->Reconfigure();
 }
@@ -127,22 +129,25 @@ void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Reconfigure()
 {
-  this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
   int bbox[4];
   this->CalculateBBox(this->Canvas, "all", bbox);
   int height = atoi(this->Script("winfo height %s", 
                                  this->Canvas->GetWidgetName()));
-  if ( height > 1 && (bbox[3] - bbox[1]) > height )
+  if (height > 1 && (bbox[3] - bbox[1]) > height)
     {
-    this->Script("pack %s -fill both -side right", 
+    this->Script("grid %s -row 0 -column 1 -sticky news", 
                  this->ScrollBar->GetWidgetName());
     }
-
+  else
+    {
+    this->Script("grid remove %s", this->ScrollBar->GetWidgetName());
+    }
+  // You don't want to stick the visible part right at the border of the
+  // canvas, but let some space (2 pixels on top and left)
   this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
                this->Canvas->GetWidgetName(), 
-               0, bbox[1], 341, bbox[3]);
+               bbox[0] - 2, bbox[1] - 2, bbox[2], bbox[3]);
   this->PostChildUpdate();
-  
 }
 
 
@@ -164,8 +169,8 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, (args?args:""));
 
+  this->Script("frame %s %s", wname, (args?args:""));
   if (this->Width > 0 && this->Height > 0)
     {
     opts << " -width " << this->Width << " -height " << this->Height;
@@ -201,8 +206,10 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
 
   this->Canvas->SetBind(this, "<Configure>", "Reconfigure");
 
-  this->Script("pack %s -fill both -expand t -side left", 
+  this->Script("grid %s -row 0 -column 0 -sticky news", 
                this->Canvas->GetWidgetName());
+  this->Script("grid columnconfig %s 0 -weight 1", wname);
+  this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
   this->PopupMenu->Create(this->Application, "-tearoff 0");
   this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
@@ -236,7 +243,7 @@ void vtkPVSourcesNavigationWindow::SetWidth(int width)
   if (this->Application != NULL)
     {
     this->Script("%s configure -width %d", this->Canvas->GetWidgetName(), 
-                 width);
+                    width);
     }
 }
 
@@ -255,6 +262,31 @@ void vtkPVSourcesNavigationWindow::SetHeight(int height)
     {
     this->Script("%s configure -height %d", this->Canvas->GetWidgetName(), 
                  height);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::SetAlwaysShowName(int val)
+{
+  if (this->AlwaysShowName == val)
+    {
+    return;
+    }
+
+  this->AlwaysShowName = val;
+  this->Modified();
+
+  if (this->Application)
+    {
+    vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->Application);
+    if (app)
+      {
+      vtkPVWindow* window = app->GetMainWindow();
+      if (window && window->GetCurrentPVSource())
+        {
+        this->Update(window->GetCurrentPVSource());
+        }
+      }
     }
 }
 
@@ -338,14 +370,39 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
 }
 
 //-----------------------------------------------------------------------------
+char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
+{
+  char *buffer;
+  if (!comp->GetLabel())
+    {
+    buffer = new char [strlen(comp->GetName()) + 1];
+    sprintf(buffer, "%s", comp->GetName());
+    }
+  else
+    {
+    if (this->AlwaysShowName && comp->GetName() && *comp->GetName())
+      {
+      buffer = new char [strlen(comp->GetLabel())
+                        + 2
+                        + strlen(comp->GetName()) 
+                        + 1
+                        + 1];
+      sprintf(buffer, "%s (%s)", comp->GetLabel(), comp->GetName());
+      }
+    else
+      {
+      buffer = new char [strlen(comp->GetLabel()) + 1];
+      sprintf(buffer, "%s", comp->GetLabel());
+      }
+    }
+  return buffer;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Canvas: " << this->GetCanvas() << endl;
+  os << indent << "AlwaysShowName: " << this->AlwaysShowName << endl;
+ os << indent << "CreateSelectionBindings: " << this->CreateSelectionBindings << endl;
 }
-
-
-
-
-
-

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.11");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.12");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -142,7 +142,16 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s", wname);
+  if (this->MasterWindow)
+    {
+    this->Script("toplevel %s -class %s", 
+                 wname,
+                 this->MasterWindow->GetClassName());
+    }
+  else
+    {
+    this->Script("toplevel %s", wname);
+    }
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
   if (this->MasterWindow)

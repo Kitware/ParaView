@@ -136,7 +136,7 @@ public:
 
   // Description:
   // Set or get enabled state.
-  void SetEnabled(int);
+  virtual void SetEnabled(int);
   vtkBooleanMacro(Enabled, int);
   vtkGetMacro(Enabled, int);
 

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.16");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -230,6 +230,50 @@ vtkPVSphereWidget* vtkPVSphereWidget::ClonePrototype(vtkPVSource* pvSource,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
+    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
+
+    this->RadiusEntry->SetBalloonHelpString(this->BalloonHelpString);
+    this->CenterResetButton->SetBalloonHelpString(this->BalloonHelpString);
+    for (int i=0; i<3; i++)
+      {
+      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->CenterEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
+      }
+
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   static int instanceCount = 0;
@@ -237,7 +281,13 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3D->PlaceWidget(0, 1, 0, 1, 0, 1);
   ++instanceCount;
   sprintf(sphereTclName, "pvSphere%d", instanceCount);
-  this->SetTraceName("Sphere");
+
+  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName("Sphere");
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
   pvApp->BroadcastScript("vtkSphere %s", sphereTclName);
   this->SetSphereTclName(sphereTclName);
   
@@ -334,6 +384,9 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       this->Reset();
       }
     }
+
+  this->SetBalloonHelpString(this->BalloonHelpString);
+
 }
 
 //----------------------------------------------------------------------------

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.25");
+vtkCxxRevisionMacro(vtkKWDialog, "1.26");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -107,13 +107,11 @@ int vtkKWDialog::Invoke()
     y = sh / 2;
     }
 
-  this->Script("update idletasks");
+  sscanf(this->Script("winfo reqwidth %s", this->GetWidgetName() ), 
+         "%d", &width);
+  sscanf(this->Script("winfo reqheight %s", this->GetWidgetName()), 
+         "%d", &height);
 
-  // map the window
-  this->Script("wm deiconify %s",this->GetWidgetName());
-
-  sscanf(this->Script("wm geometry %s", this->GetWidgetName()),  "%dx%d+",
-         &width, &height);
   if ( x > width/2 )
     {
     x -= width/2;
@@ -125,6 +123,10 @@ int vtkKWDialog::Invoke()
 
   this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
                x, y);
+
+  // map the window
+  this->Script("wm deiconify %s",this->GetWidgetName());
+
 
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
@@ -196,7 +198,17 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s %s",wname,(args?args:""));
+  if (this->MasterWindow)
+    {
+    this->Script("toplevel %s -class %s %s",
+                 wname,
+                 this->MasterWindow->GetWindowClass(),
+                 (args?args:""));
+    }
+  else
+    {
+    this->Script("toplevel %s %s",wname,(args?args:""));
+    }
   this->Script("wm title %s \"%s\"",wname,this->TitleString);
   this->Script("wm iconname %s \"Dialog\"",wname);
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",

@@ -47,16 +47,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInitialize);
-vtkCxxRevisionMacro(vtkPVInitialize, "1.1");
+vtkCxxRevisionMacro(vtkPVInitialize, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkPVInitialize::Initialize(vtkPVWindow* win)
 {
-  win->ReadSourceInterfacesFromString(vtkPVInitialize::StandardSourceInterfaces);
-  win->ReadSourceInterfacesFromString(vtkPVInitialize::StandardFilterInterfaces);
-  win->ReadSourceInterfacesFromString(vtkPVInitialize::StandardReaderInterfaces);
-  win->ReadSourceInterfacesFromString(vtkPVInitialize::StandardManipulators);
-  win->ReadSourceInterfacesFromString(vtkPVInitialize::StandardWriters);
+  win->ReadSourceInterfacesFromString(
+    vtkPVInitialize::StandardSourceInterfaces);
+
+  win->ReadSourceInterfacesFromString(
+    vtkPVInitialize::StandardFilterInterfaces);
+
+  win->ReadSourceInterfacesFromString(
+    vtkPVInitialize::StandardReaderInterfaces);
+
+  win->ReadSourceInterfacesFromString(
+    vtkPVInitialize::StandardManipulators);
+
+  win->ReadSourceInterfacesFromString(
+    vtkPVInitialize::StandardWriters);
 }
 
 //----------------------------------------------------------------------------

@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVWidget, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -83,6 +83,8 @@ vtkPVWidget::vtkPVWidget()
 
   this->Dependents = vtkLinkedList<void*>::New();
   this->PVSource = 0;
+
+  this->TraceNameState = vtkPVWidget::Uninitialized;
 }
 
 //----------------------------------------------------------------------------
@@ -237,6 +239,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   // Copy the tracename and help (note that SetBalloonHelpString
   // is virtual and is redefined by subclasses when necessary).
   clone->SetTraceName(this->GetTraceName());
+  clone->SetTraceNameState(this->TraceNameState);
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
   
@@ -294,7 +297,11 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   if(help) { this->SetBalloonHelpString(help); }
   
   const char* trace_name = element->GetAttribute("trace_name");
-  if (trace_name) { this->SetTraceName(trace_name); }
+  if (trace_name) 
+    { 
+    this->SetTraceName(trace_name); 
+    this->SetTraceNameState(vtkPVWidget::XMLInitialized);
+    }
 
   const char* deps = element->GetAttribute("dependents");
   if(deps)
@@ -337,7 +344,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.26 $");
 }
 
 //----------------------------------------------------------------------------
@@ -370,4 +377,5 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ModifiedCommandObjectTclName: " 
      << (this->ModifiedCommandObjectTclName?
          this->ModifiedCommandObjectTclName:"(none)") << endl;
+  os << indent << "TraceNameState: " << this->TraceNameState << endl;
 }

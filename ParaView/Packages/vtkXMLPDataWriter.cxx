@@ -18,7 +18,7 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.7");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataWriter::vtkXMLPDataWriter()
@@ -170,7 +170,7 @@ void vtkXMLPDataWriter::SplitFileName()
 {
   // Split the FileName into its PathName, FileNameBase, and
   // FileNameExtension components.
-  int length = strlen(this->FileName);
+  size_t length = strlen(this->FileName);
   char* fileName = new char[length+1];
   strcpy(fileName, this->FileName);
   char* begin = fileName;

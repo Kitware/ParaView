@@ -67,7 +67,7 @@ protected:
   ~vtkPVNavigationWindow();
 
   // This method actually does everything
-  virtual void ChildUpdate(vtkPVSource*, int NoBind);
+  virtual void ChildUpdate(vtkPVSource*);
 
 private:
   vtkPVNavigationWindow(const vtkPVNavigationWindow&); // Not implemented

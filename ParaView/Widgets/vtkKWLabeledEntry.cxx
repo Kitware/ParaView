@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledEntry );
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.6");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.7");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -96,7 +96,12 @@ void vtkKWLabeledEntry::Create(vtkKWApplication *app)
   this->Label->Create(app, "");
   this->Entry->Create(app, "");
 
-  this->Script("pack %s %s -side left", this->Label->GetWidgetName(),
+  // Usually you will want the entry to expand itself
+
+  this->Script("pack %s -side left", 
+               this->Label->GetWidgetName());
+
+  this->Script("pack %s -side left -fill x -expand t", 
                this->Entry->GetWidgetName());
 }
 
@@ -128,6 +133,19 @@ int vtkKWLabeledEntry::GetValueAsInt()
 float vtkKWLabeledEntry::GetValueAsFloat()
 {
   return this->Entry->GetValueAsFloat();
+}
+
+void vtkKWLabeledEntry::SetEnabled(int e)
+{
+  if ( this->Enabled == e )
+    {
+    return;
+    }
+  this->Enabled = e;
+  this->Modified();
+
+  this->Entry->SetEnabled(e);
+  this->Label->SetEnabled(e);
 }
 
 //----------------------------------------------------------------------------

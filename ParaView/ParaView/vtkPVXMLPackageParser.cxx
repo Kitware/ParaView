@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.15");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.16");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -115,6 +115,7 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
     }
   tname << ends;
   pvWidget->SetTraceName(tname.str());
+  pvWidget->SetTraceNameState(vtkPVWidget::Default);
   tname.rdbuf()->freeze(0);
   return pvWidget;
 }
@@ -318,7 +319,7 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
   
   // Add this reader for its extensions instead of as a prototype.
   int i;
-  pvm->SetDescriptionNoTrace(file_description);
+  pvm->SetLabelNoTrace(file_description);
   for(i=0;i < pvm->GetNumberOfExtensions(); ++i)
     {
     this->Window->AddFileType(file_description, pvm->GetExtension(i), pvm);
@@ -462,6 +463,9 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 {
   pvm->SetApplication(this->Window->GetPVApplication());
   pvm->SetParametersParent(this->Window->GetMainView()->GetSourceParent());
+
+  const char* menu_name = me->GetAttribute("menu_name");
+  if(menu_name) { pvm->SetMenuName(menu_name); }
   
   const char* root_name = me->GetAttribute("root_name");
   if(root_name) { pvm->SetName(root_name); }
@@ -470,6 +474,12 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     vtkErrorMacro("Module missing root_name attribute.");
     return 0;
     }
+
+  const char* short_help = me->GetAttribute("short_help");
+  if(short_help) { pvm->SetShortHelp(short_help); }
+
+  const char* long_help = me->GetAttribute("long_help");
+  if(long_help) { pvm->SetLongHelp(long_help); }
 
   const char* multiprocess_support = me->GetAttribute("multiprocess_support");
   if(multiprocess_support) 
@@ -510,6 +520,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     }
   
   const char* name = me->GetAttribute("name");
+
   const char* button_image = me->GetAttribute("button_image");
   if(name && button_image) 
     {
@@ -523,7 +534,6 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     command.rdbuf()->freeze(0);
     pvm->SetToolbarModule(1);
     }
-
 
   const char* output = me->GetAttribute("output");
   if(output) { pvm->SetOutputClassName(output); }
@@ -565,6 +575,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
         }
       }
     }
+
   return 1;
 }
 

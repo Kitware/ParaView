@@ -48,13 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
 #include "vtkKWWindow.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.2");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -177,10 +179,25 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
   this->Script("toplevel %s", wname);
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
+
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
                  this->MasterWindow->GetWidgetName());
+    }
+  else
+    {
+    int sw, sh;
+    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
+                 this->GetWidgetName(), this->GetWidgetName());
+    sscanf(app->GetMainInterp()->result, "%d %d", &sw, &sh);
+
+    int ww, wh;
+    this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]",
+                 this->GetWidgetName(), this->GetWidgetName());
+    sscanf(app->GetMainInterp()->result, "%d %d", &ww, &wh);
+    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), 
+                 (sw-ww)/2, (sh-wh)/2);
     }
 
   this->ControlFrame->SetParent(this);
@@ -190,10 +207,12 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
   this->NumberLabel->SetParent(this->ControlFrame);
   this->NumberLabel->Create(app, "");
   this->NumberLabel->SetLabel("Number of Processes in Rendering Group:");
-  this->NumberLabel->SetBalloonHelpString("Specify how many processes you want to use for rendering.");
+  this->NumberLabel->SetBalloonHelpString(
+    "Specify how many processes you want to use for rendering.");
   this->NumberEntry->SetParent(this->ControlFrame);
   this->NumberEntry->Create(app, "");
-  this->NumberEntry->SetBalloonHelpString("This option filters out short duration events.");
+  this->NumberEntry->SetBalloonHelpString(
+    "This option filters out short duration events.");
   this->Script("pack %s %s -side left",
                this->NumberLabel->GetWidgetName(),
                this->NumberEntry->GetWidgetName());
@@ -226,11 +245,12 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
   this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
                wname, wname);
 
-
-  
   this->Script("wm withdraw %s", wname);
 
   this->Update();
+
+  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Accept }",
+               this->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -242,6 +262,7 @@ void vtkPVRenderGroupDialog::Invoke()
     }
   this->Script("wm deiconify %s", this->GetWidgetName());
   this->Script("grab %s", this->GetWidgetName());
+
   this->AcceptedFlag = 0;
   this->Update();
   while (this->AcceptedFlag == 0)
@@ -253,6 +274,7 @@ void vtkPVRenderGroupDialog::Invoke()
       this->Script("after 100");
       }
     }
+
   this->Script("grab release %s", this->GetWidgetName());
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
@@ -263,10 +285,14 @@ void vtkPVRenderGroupDialog::Invoke()
 void vtkPVRenderGroupDialog::Accept()
 {
   // Accept might be pressed to set the value of number of processes.
-  if (this->NumberOfProcessesInGroup != this->NumberEntry->GetValueAsInt())
+  if ((this->NumberOfProcessesInGroup != this->NumberEntry->GetValueAsInt()))
     {
     this->NumberEntryCallback();
-    return;
+    // They might want to change the display variables
+    if (this->DisplayStringRoot)
+      {
+      return;
+      }
     }
   this->AcceptedFlag = 1;
 }
@@ -288,6 +314,17 @@ void vtkPVRenderGroupDialog::NumberEntryCallback()
   if (num < 1)
     {
     num = 1;;
+    }
+  vtkPVApplication* pvApp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
+  if (pvApp)
+    {
+    vtkMultiProcessController* cont = pvApp->GetController();
+    if (cont)
+      {
+      int numProcs = cont->GetNumberOfProcesses();
+      if (num > numProcs) { num = numProcs; }
+      }
     }
   this->SetNumberOfProcessesInGroup(num);
 }
@@ -431,9 +468,20 @@ void vtkPVRenderGroupDialog::ComputeDisplayStringRoot(const char* str)
     i++;
     }
   
-  this->DisplayStringRoot = new char[len+1];
-  strncpy(this->DisplayStringRoot, str, len);
-  this->DisplayStringRoot[len] = '\0';
+  if (len == -1)
+    {
+    len = static_cast<int>(strlen(str));
+    this->DisplayStringRoot = new char[len+2];
+    strcpy(this->DisplayStringRoot, str);
+    this->DisplayStringRoot[len] = '.';
+    this->DisplayStringRoot[len+1] = '\0';
+    }
+  else
+    {
+    this->DisplayStringRoot = new char[len+1];
+    strncpy(this->DisplayStringRoot, str, len);
+    this->DisplayStringRoot[len] = '\0';
+    }
 }
 
 

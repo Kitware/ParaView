@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.13");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -71,6 +71,13 @@ vtkPVMinMax::vtkPVMinMax()
   this->MinHelp = 0;
   this->MaxHelp = 0;
 
+  this->PackVertically = 1;
+
+  this->ShowMinLabel = 1;
+  this->ShowMaxLabel = 1;
+
+  this->MinLabelWidth = 18;
+  this->MaxLabelWidth = 18;
 }
 
 //----------------------------------------------------------------------------
@@ -113,7 +120,10 @@ void vtkPVMinMax::SetMinimumHelp(const char* help)
     {
     this->SetMinHelp(help);
     }
-  this->MinLabel->SetBalloonHelpString(help);
+  if (this->ShowMinLabel)
+    {
+    this->MinLabel->SetBalloonHelpString(help);
+    }
   this->MinScale->SetBalloonHelpString(help);
   
 }
@@ -126,7 +136,10 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
     {
     this->SetMaxHelp(help);
     }
-  this->MaxLabel->SetBalloonHelpString(help);
+  if (this->ShowMaxLabel)
+    {
+    this->MaxLabel->SetBalloonHelpString(help);
+    }
   this->MaxScale->SetBalloonHelpString(help);
 }
 
@@ -140,37 +153,78 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(this->MinLabel->GetLabel());
-  
+  const char* label = this->MinLabel->GetLabel();
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
+
   this->SetApplication(pvApp);
 
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   this->MinFrame->Create(pvApp, "frame", "");
-  this->MaxFrame->Create(pvApp, "frame", "");
-  this->Script("pack %s %s -fill x -expand t",
-               this->MinFrame->GetWidgetName(),
-               this->MaxFrame->GetWidgetName());
+  this->Script("pack %s -side top -fill x -expand t", 
+               this->MinFrame->GetWidgetName());
+  if (this->PackVertically)
+    {
+    this->MaxFrame->Create(pvApp, "frame", "");
+    this->Script("pack %s -side top -fill x -expand t", 
+                 this->MaxFrame->GetWidgetName());
+    }
   
   // Now a label
-  this->MinLabel->SetParent(this->MinFrame);
-  this->MinLabel->Create(pvApp, "-width 18 -justify right");
-  this->Script("pack %s -side left", this->MinLabel->GetWidgetName());
-
-  this->MaxLabel->SetParent(this->MaxFrame);
-  this->MaxLabel->Create(pvApp, "-width 18 -justify right");
-  this->Script("pack %s -side left", this->MaxLabel->GetWidgetName());
+  if ( this->ShowMinLabel )
+    {
+    this->MinLabel->SetParent(this->MinFrame);
+    ostrstream opts;
+    opts << "-width " << this->MinLabelWidth << " -justify right" << ends;
+    this->MinLabel->Create(pvApp, opts.str());
+    opts.rdbuf()->freeze(0);
+    this->Script("pack %s -side left -anchor s", 
+                 this->MinLabel->GetWidgetName());
+    }
 
   this->MinScale->SetParent(this->MinFrame);
-  this->MinScale->Create(this->Application, "-showvalue 1 -digits 5");
+  this->MinScale->Create(this->Application, "");
   this->MinScale->SetCommand(this, "MinValueCallback");
-  this->Script("pack %s -fill x -expand t", this->MinScale->GetWidgetName());
-  
-  this->MaxScale->SetParent(this->MaxFrame);
-  this->MaxScale->Create(this->Application, "-showvalue 1 -digits 5");
+  this->Script("pack %s -side left -fill x -expand t -padx 5", 
+               this->MinScale->GetWidgetName());
+
+  if ( this->ShowMaxLabel )
+    {
+    if (this->PackVertically)
+      {
+      this->MaxLabel->SetParent(this->MaxFrame);
+      }
+    else
+      {
+      this->MaxLabel->SetParent(this->MinFrame);
+      }
+    ostrstream opts;
+    opts << "-width " << this->MaxLabelWidth << " -justify right" << ends;
+    this->MaxLabel->Create(pvApp, opts.str());
+    opts.rdbuf()->freeze(0);
+    this->Script("pack %s -side left -anchor s", 
+                 this->MaxLabel->GetWidgetName());
+    }
+
+  if (this->PackVertically)
+    {
+    this->MaxScale->SetParent(this->MaxFrame);
+    }
+  else
+    {
+    this->MaxScale->SetParent(this->MinFrame);
+    }
+  this->MaxScale->Create(this->Application, "");
   this->MaxScale->SetCommand(this, "MaxValueCallback");
-  this->Script("pack %s -fill x -expand t", this->MaxScale->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t -padx 5", 
+               this->MaxScale->GetWidgetName());
 
   this->SetMinimumHelp(this->MinHelp);
   this->SetMaximumHelp(this->MaxHelp);
@@ -213,10 +267,10 @@ void vtkPVMinMax::Accept()
 
   if (this->ModifiedFlag)
     {  
-    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
-                         this->MinScale->GetValue());
     this->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
                          this->MaxScale->GetValue());
+    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
+                         this->MinScale->GetValue());
     }
 
   pvApp->BroadcastScript("%s %s %f %f",
@@ -279,10 +333,15 @@ void vtkPVMinMax::SaveInTclScript(ofstream *file)
   char *result;
   
   *file << this->ObjectTclName << " " << this->SetCommand;
-  this->Script("set tempValue [%s %s]", this->ObjectTclName, this->GetMinCommand);
+  this->Script("set tempValue [%s %s]", 
+               this->ObjectTclName, 
+               this->GetMinCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result;
-  this->Script("set tempValue [%s %s]", this->ObjectTclName, this->GetMaxCommand);
+
+  this->Script("set tempValue [%s %s]", 
+               this->ObjectTclName, 
+               this->GetMaxCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
 }
@@ -412,4 +471,11 @@ void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)
   os << "GetMinCommand: " 
      << (this->GetGetMinCommand()?this->GetGetMinCommand():"none") << endl;
   os << "SetCommand: " << (this->SetCommand?this->SetCommand:"none") << endl;
+  os << "PackVertically: " << this->PackVertically << endl;
+  os << "MinScale: " << this->MinScale << endl;
+  os << "MaxScale: " << this->MaxScale << endl;
+  os << "ShowMinLabel: " << this->ShowMinLabel << endl;
+  os << "ShowMaxLabel: " << this->ShowMaxLabel << endl;
+  os << "MinLabelWidth: " << this->MinLabelWidth << endl;
+  os << "MaxLabelWidth: " << this->MaxLabelWidth << endl;
 }

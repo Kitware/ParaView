@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.78");
+vtkCxxRevisionMacro(vtkPVProbe, "1.79");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -433,10 +433,10 @@ vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName,
 
 //----------------------------------------------------------------------------
 void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag, 
-                                 int vtkFlag)
+                                  int vtkFlag)
 {
-  Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
-  
+  Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();  
+
   if (this->VisitedFlag)
     {
     return;
@@ -445,46 +445,47 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
 
   if (this->GetDimensionality() == 0)
     {
-    *file << "vtkIdList pointList\n";
-    *file << "\tpointList Allocate 1 1\n";
-    *file << "\tpointList InsertNextId 0\n\n";
+    *file << "vtkIdList pointList" << this->InstanceCount << "\n";
+    *file << "\tpointList" << this->InstanceCount << " Allocate 1 1\n";
+    *file << "\tpointList" << this->InstanceCount << " InsertNextId 0\n\n";
 
     this->Script("set coords [[%s GetInput] GetPoint 0]",
                  this->GetVTKSourceTclName());
-    *file << "vtkPoints points\n";
-    *file << "\tpoints Allocate 1 1\n";
-    *file << "\tpoints InsertNextPoint " << interp->result << "\n\n";
+    *file << "vtkPoints points" << this->InstanceCount << "\n";
+    *file << "\tpoints" << this->InstanceCount << " Allocate 1 1\n";
+    *file << "\tpoints" << this->InstanceCount << " InsertNextPoint " << interp->result << "\n\n";
     
-    *file << "vtkPolyData probeInput\n";
-    *file << "\tprobeInput Allocate 1 1\n";
-    *file << "\tprobeInput SetPoints points\n";
-    *file << "\tprobeInput InsertNextCell 1 pointList\n\n";
+    *file << "vtkPolyData probeInput" << this->InstanceCount << "\n";
+    *file << "\tprobeInput" << this->InstanceCount << " Allocate 1 1\n";
+    *file << "\tprobeInput" << this->InstanceCount << " SetPoints points" << this->InstanceCount << "\n";
+    *file << "\tprobeInput" << this->InstanceCount << " InsertNextCell 1 pointList" << this->InstanceCount << "\n\n";
     }
   else
     {
-    *file << "vtkLineSource line\n";
+    *file << "vtkLineSource line" << this->InstanceCount << "\n";
 
     this->Script("set point1 [[[%s GetInput] GetSource] GetPoint1]",
                  this->GetVTKSourceTclName());
-    *file << "\tline SetPoint1 " << interp->result << "\n";
+    *file << "\tline" << this->InstanceCount << " SetPoint1 " << interp->result << "\n";
     this->Script("set point2 [[[%s GetInput] GetSource] GetPoint2]",
                  this->GetVTKSourceTclName());
-    *file << "\tline SetPoint2 " << interp->result << "\n";
+    *file << "\tline" << this->InstanceCount << " SetPoint2 " << interp->result << "\n";
     this->Script("set res [[[%s GetInput] GetSource] GetResolution]",
                  this->GetVTKSourceTclName());
-    *file << "\tline SetResolution " << interp->result << "\n\n";
+    *file << "\tline" << this->InstanceCount << " SetResolution " << interp->result << "\n\n";
     }
   
   *file << this->VTKSource->GetClassName() << " "
         << this->GetVTKSourceTclName() << "\n";
   if (this->GetDimensionality() == 0)
     {
-    *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput\n";
+    *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput" 
+          << this->InstanceCount << "\n";
     }
   else
     {
     *file << "\t" << this->GetVTKSourceTclName()
-          << " SetInput [line GetOutput]\n";
+          << " SetInput [line" << this->InstanceCount << " GetOutput]\n";
     }
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";

@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.13");
 
 //-------------------------------------------------------------------
 
@@ -345,8 +345,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           numToReceive = goalNumCells[type][olast]-
             remoteSched[olast].NumberOfCells[type];
 
-          if (leftovers[type]>=(last-start-numProcZero[type]) || 
-              (recflag==1))
+          if ((leftovers[type]>=(last-start-numProcZero[type])&&
+              leftovers[type]>0) || (recflag==1))
             {
             // ... receiving processors are going to get some of 
             //  the leftover cells too ...
@@ -363,6 +363,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
             remoteSched[ostart].NumberOfCells[type] -= numToReceive;
             remoteSched[olast].NumberOfCells[type]  += numToReceive;
             last--;
+            olast = order[last];
             recflag = 0; // extra leftover point will have been 
                          // used
             }

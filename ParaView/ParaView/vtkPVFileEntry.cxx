@@ -41,17 +41,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVFileEntry.h"
 
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
+#include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWEntry.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVReaderModule.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -81,8 +82,15 @@ vtkPVFileEntry::~vtkPVFileEntry()
 void vtkPVFileEntry::SetLabel(const char* label)
 {
   // For getting the widget in a script.
-  this->SetTraceName(label);
   this->LabelWidget->SetLabel(label);
+
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -176,8 +184,10 @@ void vtkPVFileEntry::BrowseCallback()
 {
   if (this->Extension)
     {
-    this->Script("%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} {{All files} {*.*}}}]", 
-                 this->GetTclName(), this->Extension);
+    this->Script(
+      "%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} "
+      "{{All files} {*.*}}}]", 
+      this->GetTclName(), this->Extension);
     }
   else
     {
@@ -218,9 +228,20 @@ void vtkPVFileEntry::Accept()
                          this->GetValue());
     }
 
+  const char* fname = this->Entry->GetValue();
+
   pvApp->BroadcastScript("%s Set%s {%s}",
-                         this->ObjectTclName, this->VariableName, 
-                         this->Entry->GetValue());
+                         this->ObjectTclName, this->VariableName, fname);
+
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
+  if (rm && fname && fname[0])
+    {
+    const char* desc = rm->RemovePath(fname);
+    if (desc)
+      {
+      rm->SetLabelNoTrace(desc);
+      }
+    }
 
   // The supper does nothing but turn the modified flag off.
   this->vtkPVWidget::Accept();

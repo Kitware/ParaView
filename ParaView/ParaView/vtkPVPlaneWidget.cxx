@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.29");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -119,6 +119,7 @@ void vtkPVPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 }
 
+//----------------------------------------------------------------------------
 vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

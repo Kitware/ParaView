@@ -52,7 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVObjectWidget.h"
 
 class vtkKWEntry;
+class vtkKWFrame;
 class vtkKWLabel;
+class vtkKWLabeledFrame;
+class vtkPVInputMenu;
+class vtkPVMinMax;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -91,7 +95,25 @@ public:
 
   // Description:
   // The label.
-  void SetLabel(const char* label);
+  vtkSetStringMacro(Label);
+  vtkGetStringMacro(Label);
+
+  // Description:
+  virtual void SetInputMenu(vtkPVInputMenu*);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+
+  // Description:
+  virtual void Update();
+
+  // Description:
+  // The label.
+  void SetRange(int v0, int v1, int v2, int v3, int v4, int v5);
+
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
 
 //BTX
   // Description:
@@ -107,19 +129,12 @@ protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
   
-  vtkKWLabel *LabelWidget;
+  vtkKWLabeledFrame* LabeledFrame;
+  char* Label;
 
-  vtkKWEntry *XMinEntry;
-  vtkKWEntry *XMaxEntry;
-  vtkKWEntry *YMinEntry;
-  vtkKWEntry *YMaxEntry;
-  vtkKWEntry *ZMinEntry;
-  vtkKWEntry *ZMaxEntry;
+  vtkPVInputMenu* InputMenu;
 
-
-  vtkSetStringMacro(EntryLabel);
-  vtkGetStringMacro(EntryLabel);
-  char* EntryLabel;
+  vtkPVMinMax* MinMax[3];
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

@@ -94,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.18");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.19");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -1748,14 +1748,6 @@ void vtkRedistributePolyData::SendCells
         }
       }
 
-    inputNumCells = 0;
-    if (inputCellArrays[type])
-      {
-      inputNumCells = inputCellArrays[type]->GetNumberOfCells();
-      }
-    cellOffset += inputNumCells;
-
-
     // ... output needed for flags only (assumes flags are the same 
     //   on all processors) ...
 
@@ -1772,6 +1764,14 @@ void vtkRedistributePolyData::SendCells
       this->SendDataArrays (inputCellData, outputCellData, 
                             numCells[type],sendTo, fromIds, typetag);
       }
+
+    inputNumCells = 0;
+    if (inputCellArrays[type])
+      {
+      inputNumCells = inputCellArrays[type]->GetNumberOfCells();
+      }
+    cellOffset += inputNumCells;
+
     delete [] fromIds; // this array was allocated above in 
     // this case
     }
@@ -2879,7 +2879,7 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       {
       name = "";
       }
-    nameLength = strlen(name)+1;
+    nameLength = (int)strlen(name)+1;
     this->Controller->Send(&nameLength, 1, sendTo, 997247);
     // I am pretty sure that Send does not modify the string.
     this->Controller->Send(const_cast<char*>(name), nameLength, 
@@ -2941,7 +2941,7 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       {
       name = "";
       }
-    nameLength = strlen(name+1);
+    nameLength = (int)strlen(name+1);
     this->Controller->Send(&nameLength, 1, sendTo, 997247);
     this->Controller->Send(const_cast<char*>(name), nameLength, 
                            sendTo, 997248);

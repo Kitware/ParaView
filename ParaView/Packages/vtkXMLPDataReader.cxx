@@ -22,7 +22,7 @@
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataReader.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.7");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.8");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -356,7 +356,7 @@ char* vtkXMLPDataReader::CreatePieceFileName(const char* fileName)
 void vtkXMLPDataReader::SplitFileName()
 {
   // Pull the PathName component out of the FileName.
-  int length = strlen(this->FileName);
+  size_t length = strlen(this->FileName);
   char* fileName = new char[length+1];
   strcpy(fileName, this->FileName);
   char* begin = fileName;

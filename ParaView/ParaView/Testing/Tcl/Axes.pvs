@@ -47,7 +47,7 @@ $camera SetClippingRange 8.34501 19.084
 #if {[catch {set channel [open test.tmp w]}] == 0 } {
 #   close $channel
 #   file delete -force test.tmp
-#   source "ParaViewTrace.pvs"
+#   source "[$Application GetTraceFileName]"
 #}
 
 # Fix the size of the image.

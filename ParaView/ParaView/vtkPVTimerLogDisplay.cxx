@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.8");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -169,7 +169,16 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s", wname);
+  if (this->MasterWindow)
+    {
+    this->Script("toplevel %s -class %s", 
+                 wname, 
+                 this->MasterWindow->GetClassName());
+    }
+  else
+    {
+    this->Script("toplevel %s", wname);
+    }
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
   if (this->MasterWindow)

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.26");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -204,6 +204,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     firstSelect->SetLabel("Select initial time step:");
     firstSelect->SetObjectTclName(tclName);
     firstSelect->SetTraceName("selectTimeSet");
+    firstSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     firstSelect->SetReader(reader);
     firstSelect->Reset();
     this->Application->Script("pack %s -side top -fill x -expand t", 
@@ -215,21 +216,23 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
 
     vtkKWWidget* okbutton = vtkKWWidget::New();
     okbutton->SetParent(frame);
-    okbutton->Create(this->Application,"button","-text OK -width 16");
+    okbutton->Create(this->Application,"button","-text OK");
     okbutton->SetCommand(timeDialog, "OK");
-    this->Script("pack %s -side left -expand yes",
-                 okbutton->GetWidgetName());
-    okbutton->Delete();
 
     vtkKWWidget* cancelbutton = vtkKWWidget::New();
     cancelbutton->SetParent(frame);
-    cancelbutton->Create(this->Application,"button","-text CANCEL -width 16");
-    cancelbutton->SetCommand(timeDialog, "Cancel");
-    this->Script("pack %s -side left -expand yes",
+    cancelbutton->Create(this->Application,"button","-text Cancel");
+    cancelbutton->SetCommand(timeDialog, "Cancel2");
+
+    this->Script("pack %s %s -side left -expand t -fill both -padx 2 -pady 2",
+                 okbutton->GetWidgetName(),
                  cancelbutton->GetWidgetName());
+
+    okbutton->Delete();
     cancelbutton->Delete();
 
-    this->Script("pack %s -side top -expand yes", frame->GetWidgetName());
+    this->Script("pack %s -side top -expand yes -fill both", 
+                 frame->GetWidgetName());
     frame->Delete();
 
     int status = timeDialog->Invoke();
@@ -746,6 +749,13 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   window->GetMainView()->DisableRenderingFlagOn();
 
+  const char* desc = this->RemovePath(fname);
+  if (desc)
+    {
+    pvs->SetLabelNoTrace(desc);
+    }
+  window->GetSourceList("Sources")->AddItem(pvs);
+
   vtkPVPassThrough* connection;
   vtkPVData* connectionOutput;
   char* extentTranslatorName = 0;
@@ -842,6 +852,11 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       delete [] outputTclName;
       delete [] connectionTclName;
       
+      const char* desc = this->RemovePath(fname);
+      if (desc)
+        {
+        connection->SetLabelNoTrace(desc);
+        }
       window->GetSourceList("Sources")->AddItem(connection);
       connection->UpdateParameterWidgets();
       connection->Accept(0);
@@ -881,6 +896,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     select->GetLabeledFrame()->ShowHideFrameOn();
     select->SetObjectTclName(tclName);
     select->SetTraceName("selectTimeSet");
+    select->SetTraceNameState(vtkPVWidget::SelfInitialized);
     select->SetModifiedCommand(pvs->GetTclName(), 
                                "SetAcceptButtonColorToRed");
     select->SetReader(reader);
@@ -900,6 +916,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     pointSelect->SetAttributeName("Point");
     pointSelect->Create(pvApp);
     pointSelect->SetTraceName("selectPointVariables");
+    pointSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     pointSelect->SetModifiedCommand(pvs->GetTclName(),
                                     "SetAcceptButtonColorToRed");
 
@@ -910,6 +927,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     cellSelect->SetAttributeName("Cell");
     cellSelect->Create(pvApp);
     cellSelect->SetTraceName("selectCellVariables");
+    cellSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     cellSelect->SetModifiedCommand(pvs->GetTclName(),
                                    "SetAcceptButtonColorToRed");
 
@@ -930,7 +948,6 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     cellSelect->Delete();
     }
   
-  window->GetSourceList("Sources")->AddItem(pvs);
   pvs->UpdateParameterWidgets();
   vtkPVData *pvOutput;
   

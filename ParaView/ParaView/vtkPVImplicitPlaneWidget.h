@@ -108,9 +108,20 @@ public:
                                            vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+
+  // Description:
+  // Center of the plane.
   void SetCenter();
   virtual void SetCenter(float,float,float);
   virtual void SetCenter(float f[3]) { this->SetCenter(f[0], f[1], f[2]); }
+
+  // Description:
+  // The normal to the plane.
   void SetNormal();
   virtual void SetNormal(float,float,float);
   virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }

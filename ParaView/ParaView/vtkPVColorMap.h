@@ -57,14 +57,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
+class vtkKWEntry;
 class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
 class vtkKWMenu;
-class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
+class vtkKWTextProperty;
 class vtkKWWidget;
 class vtkLookupTable;
 class vtkPVApplication;
@@ -92,8 +93,9 @@ public:
   vtkPVRenderView* GetPVRenderView() { return this->PVRenderView;}
 
   // Description:
-  // The name of the color map serves as the label of the ScalarBar (e.g. Temperature).
-  // Currently it also indicates the arrays mapped by this color map object.
+  // The name of the color map serves as the label of the ScalarBar 
+  // (e.g. Temperature). Currently it also indicates the arrays mapped
+  // by this color map object.
   void SetScalarBarTitle(const char* Name);
   void SetScalarBarTitleNoTrace(const char* Name);
   const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
@@ -105,10 +107,16 @@ public:
   int MatchArrayName(const char* name);
 
   // Description:
+  // The format of the scalar bar labels.
+  void SetScalarBarLabelFormat(const char* Name);
+  vtkGetStringMacro(ScalarBarLabelFormat);
+
+  // Description:
   // Just like in vtk data objects, this method makes a data object
   // that is of the same type as the original.  It is used for creating
   // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVColorMap *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
+  virtual vtkPVColorMap *MakeObject()
+    { vtkErrorMacro("No MakeObject"); return NULL;}
       
   // Description:
   // This method should be called immediately after the object is constructed.
@@ -173,7 +181,12 @@ public:
 
   // Description:
   // This method is called when the user changes the name of the scalar bar.
-  void NameEntryCallback();
+  void ScalarBarTitleEntryCallback();
+
+  // Description:
+  // This method is called when the user changes the format of the scalar bar
+  // labels.
+  void ScalarBarLabelFormatEntryCallback();
 
   // Description:
   // Callbacks to change the color map.
@@ -206,12 +219,19 @@ public:
                             void* calldata);
 //ETX
 
+  // Description:
+  // GUI components access
+  vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
+  vtkGetObjectMacro(TitleTextProperty, vtkKWTextProperty);
+  vtkGetObjectMacro(LabelTextProperty, vtkKWTextProperty);
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
 
   char* ArrayName;
   char* ScalarBarTitle;
+  char* ScalarBarLabelFormat;
     
   // Here to create unique Tcl names.
   int InstanceCount;
@@ -228,6 +248,7 @@ protected:
   vtkScalarBarWidgetObserver* ScalarBarObserver;
 
   void UpdateScalarBarTitle();
+  void UpdateScalarBarLabelFormat();
   void UpdateLookupTable();
   void RGBToHSV(float rgb[3], float hsv[3]);
 
@@ -250,11 +271,16 @@ protected:
   vtkKWChangeColorButton* EndColorButton;
 
   vtkKWLabeledFrame* ScalarBarFrame;
-  vtkKWLabeledEntry* ScalarBarTitleEntry;
-  vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
-
-
+  vtkKWWidget*       ScalarBarTitleFrame;
+  vtkKWLabel*        ScalarBarTitleLabel;
+  vtkKWEntry*        ScalarBarTitleEntry;
+  vtkKWWidget*       ScalarBarLabelFormatFrame;
+  vtkKWLabel*        ScalarBarLabelFormatLabel;
+  vtkKWEntry*        ScalarBarLabelFormatEntry;
+  
+  vtkKWTextProperty *TitleTextProperty;
+  vtkKWTextProperty *LabelTextProperty;
   
   // For the map image.
   unsigned char *MapData;

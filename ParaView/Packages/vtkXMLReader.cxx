@@ -32,7 +32,7 @@
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLReader, "1.7");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -380,7 +380,7 @@ int vtkXMLReader::CanReadFile(const char* name)
 int vtkXMLReader::CanReadFileVersionString(const char* version)
 {
   // Extract the major and minor version numbers.
-  int length = strlen(version);
+  size_t length = strlen(version);
   int major = 0;
   int minor = 0;
   const char* begin = version;

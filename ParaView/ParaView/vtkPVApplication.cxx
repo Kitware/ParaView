@@ -52,13 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
+#include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWMessageDialog.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkPVTraceFileDialog.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
@@ -99,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156");
+vtkCxxRevisionMacro(vtkPVApplication, "1.157");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -251,36 +253,17 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
-  this->MinorVersion = 5;
+  this->MinorVersion = 6;
   this->SetApplicationName("ParaView");
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("development");
+  this->SetApplicationReleaseName("1");
 
   this->Controller = NULL;
   this->NumberOfPipes = 1;
 
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
-
-  struct stat fs;
-
-  if (stat("ParaViewTrace1.pvs", &fs) == 0) 
-    {
-    rename("ParaViewTrace1.pvs", "ParaViewTrace2.pvs");
-    }
-
-  if (stat("ParaViewTrace.pvs", &fs) == 0) 
-    {
-    rename("ParaViewTrace.pvs", "ParaViewTrace1.pvs");
-    }
-
-  this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
-  if (this->TraceFile && this->TraceFile->fail())
-    {
-    delete this->TraceFile;
-    this->TraceFile = NULL;
-    }
 
   // GUI style & consistency
 
@@ -309,6 +292,30 @@ vtkPVApplication::vtkPVApplication()
     {
     this->ShowSplashScreen = 1;
     }
+
+  this->TraceFileName = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication::~vtkPVApplication()
+{
+  if ( this->AboutDialog )
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = 0;
+    }
+  this->SetController(NULL);
+  if ( this->TraceFile )
+    {
+    delete this->TraceFile;
+    this->TraceFile = 0;
+    }
+  if (this->TraceFileName)
+    {
+    unlink(this->TraceFileName);
+    }
+  this->SetGroupFileName(0);
+  this->SetTraceFileName(0);
 }
 
 
@@ -342,23 +349,6 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   this->Controller = c;
 
   this->NumberOfPipes = 1;
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication::~vtkPVApplication()
-{
-  if ( this->AboutDialog )
-    {
-    this->AboutDialog->Delete();
-    this->AboutDialog = 0;
-    }
-  this->SetController(NULL);
-  if ( this->TraceFile )
-    {
-    delete this->TraceFile;
-    this->TraceFile = 0;
-    }
-  this->SetGroupFileName(0);
 }
 
 
@@ -594,34 +584,83 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
+{
+  char buf[256];
+  if ( vtkDirectory::GetCurrentWorkingDirectory(buf, 256) )
+    {
+    vtkDirectory* dir = vtkDirectory::New();
+    if ( !dir->Open(buf) )
+      {
+      dir->Delete();
+      return 0;
+      }
+    int retVal = 0;
+    int numFiles = dir->GetNumberOfFiles();
+    int len = strlen("ParaViewTrace");
+    for(int i=0; i<numFiles; i++)
+      {
+      const char* fname = dir->GetFile(i);
+      if ( strncmp(fname, "ParaViewTrace", len) == 0 )
+        {
+        retVal = 1;
+        strncpy(name, fname, maxlen);
+        break;
+        }
+      }
+    dir->Delete();
+    return retVal;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SaveTraceFile(const char* fname)
+{
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->GetMainWindow()->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->Create(this, 0);
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save ParaView Trace");
+  exportDialog->SetDefaultExt(".pvs");
+  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0 )
+    {
+    if (rename(fname, exportDialog->GetFileName()) != 0)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        this->GetApplication(), this->GetMainWindow(),
+        "Error Saving", "Could not save trace file.",
+        vtkKWMessageDialog::ErrorIcon);
+      }
+    else
+      {
+      this->GetMainWindow()->SaveLastPath(exportDialog, "SaveTracePath");
+      }
+    }
+  exportDialog->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  // Splash screen ?
-
-  if (this->ShowSplashScreen)
-    {
-    this->CreateSplashScreen();
-    this->SplashScreen->SetProgressMessage("Initializing application...");
-    }
-
-  // Application Icon 
-#ifdef _WIN32
-  this->Script("SetApplicationIcon %s.exe %d big",
-               this->GetApplicationName(),
-               IDI_PARAVIEWICO32);
-  // No, we can't set the same icon, even if it has both 32x32 and 16x16
-  this->Script("SetApplicationIcon %s.exe %d small",
-               this->GetApplicationName(),
-               IDI_PARAVIEWICO16);
-#endif
-
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
 #ifdef _WIN32
-  this->Script("option add *font {{MS Sans Serif} 8}");
+  this->Script("option add *font {{Tahoma} 8}");
 #else
-  this->Script("option add *font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
+  // Specify a font only if there isn't one in the database
+  this->Script(
+    "toplevel .tmppvwindow -class ParaView;"
+    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
+    "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
+    "destroy .tmppvwindow");
   this->Script("option add *highlightThickness 0");
   this->Script("option add *highlightBackground #ccc");
   this->Script("option add *activeBackground #eee");
@@ -777,6 +816,91 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 #endif
 
+  // Handle setting up the SGI pipes.
+  if (this->UseRenderingGroup)
+    {
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int numPipes = 1;
+    int id;
+    // Until I add a user interface to set the number of pipes,
+    // just read it from a file.
+    ifstream ifs;
+    if (this->GroupFileName)
+      {
+      ifs.open(this->GroupFileName,ios::in);
+      }
+    else
+      {
+      ifs.open("pipes.inp",ios::in);
+      }
+    if (ifs.fail())
+      {
+      if (this->GroupFileName)
+        {
+        vtkErrorMacro("Could not find the file " << this->GroupFileName);
+        }
+      else
+        {
+        vtkErrorMacro("Could not find the file pipes.inp");
+        }
+        numPipes = numProcs;
+      }
+    else
+      {
+      ifs >> numPipes;
+      if (numPipes > numProcs) { numPipes = numProcs; }
+      if (numPipes < 1) { numPipes = 1; }
+      }
+
+    
+    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
+    const char *displayString;
+    displayString = getenv("DISPLAY");
+    if (displayString)
+      {
+      rgDialog->SetDisplayString(0, displayString);
+      }
+    rgDialog->SetNumberOfProcessesInGroup(numPipes);
+    rgDialog->Create(this);
+
+    rgDialog->Invoke();
+    numPipes = rgDialog->GetNumberOfProcessesInGroup();
+    
+    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
+    
+    if (displayString)
+      {    
+      for (id = 1; id < numPipes; ++id)
+        {
+        // Format a new display string based on process.
+        displayString = rgDialog->GetDisplayString(id);
+        this->RemoteScript(
+          id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+          displayString);
+        }
+      }
+    rgDialog->Delete();
+    }
+
+  // Splash screen ?
+
+  if (this->ShowSplashScreen)
+    {
+    this->CreateSplashScreen();
+    this->SplashScreen->SetProgressMessage("Initializing application...");
+    }
+
+  // Application Icon 
+#ifdef _WIN32
+  this->Script("SetApplicationIcon %s.exe %d big",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO32);
+  // No, we can't set the same icon, even if it has both 32x32 and 16x16
+  this->Script("SetApplicationIcon %s.exe %d small",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO16);
+#endif
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
@@ -812,85 +936,91 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
-  this->Script("proc bgerror { m } { global Application; $Application DisplayTCLError $m }");
+  this->Script("proc bgerror { m } "
+               "{ global Application; $Application DisplayTCLError $m }");
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
+
+  // Check if there is an existing ParaViewTrace file.
+  if (this->ShowSplashScreen)
+    {
+    this->SplashScreen->SetProgressMessage("Looking for old trace files...");
+    }
+  char traceName[128];
+  int foundTrace = this->CheckForTraceFile(traceName, 128);
 
   if (this->ShowSplashScreen)
     {
     this->SplashScreen->Hide();
     }
 
-  // Handle setting up the SGI pipes.
-  if (this->UseRenderingGroup)
+  // If there is already an existing trace file, ask the
+  // user what she wants to do with it.
+  if (foundTrace && ! this->RunningParaViewScript) 
     {
-    int numProcs = this->Controller->GetNumberOfProcesses();
-    int numPipes = 1;
-    int id;
-    // Until I add a user interface to set the number of pipes,
-    // just read it from a file.
-    ifstream ifs;
-    if (this->GroupFileName)
+    vtkPVTraceFileDialog *dlg2 = vtkPVTraceFileDialog::New();
+    dlg2->SetMasterWindow(ui);
+    dlg2->Create(this,"");
+    ostrstream str;
+    str << "Do you want to save the existing tracefile?\n\n"
+        << "A tracefile called " << traceName << " was found in "
+        << "the current directory. This might mean that there is "
+        << "another instance of ParaView running or ParaView crashed "
+        << "previously and failed to delete it.\n"
+        << "If ParaView crashed previously, this tracefile can "
+        << "be useful in tracing the problem and you should consider "
+        << "saving it.\n"
+        << "If there is another instance of ParaView running, select "
+        << "\"Do Nothing\" to avoid potential problems."
+        << ends;
+    dlg2->SetText(str.str());
+    str.rdbuf()->freeze(0);
+    dlg2->SetTitle("Tracefile found");
+    dlg2->SetIcon();
+    int shouldSave = dlg2->Invoke();
+    dlg2->Delete();
+    if (shouldSave == 2)
       {
-      ifs.open(this->GroupFileName,ios::in);
+      this->SaveTraceFile(traceName);
       }
-    else
+    else if (shouldSave == 1)
       {
-      ifs.open("pipes.inp",ios::in);
+      unlink(traceName);
       }
-    if (ifs.fail())
-      {
-      if (this->GroupFileName)
-        {
-        vtkErrorMacro("Could not find the file " << this->GroupFileName);
-        }
-      else
-        {
-        vtkErrorMacro("Could not find the file pipes.inp");
-        }
-        numPipes = numProcs;
-      }
-    else
-      {
-      ifs >> numPipes;
-      if (numPipes > numProcs) numPipes = numProcs;
-      if (numPipes < 1) numPipes = 1;
-      }
-
-    
-    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
-    const char *displayString;
-    displayString = getenv("DISPLAY");
-    if (displayString)
-      {
-      rgDialog->SetDisplayString(0, displayString);
-      }
-    rgDialog->SetNumberOfProcessesInGroup(numPipes);
-    rgDialog->SetMasterWindow(ui);
-    rgDialog->SetParent(ui);
-    rgDialog->Create(this);
-
-    rgDialog->Invoke();
-    numPipes = rgDialog->GetNumberOfProcessesInGroup();
-    
-    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
-    
-    if (displayString)
-      {    
-      for (id = 1; id < numPipes; ++id)
-        {
-        // Format a new display string based on process.
-        displayString = rgDialog->GetDisplayString(id);
-        this->RemoteScript(id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-                           displayString);
-        }
-      }
-      rgDialog->SetParent(NULL);
-      rgDialog->Delete();
-      rgDialog = NULL;
     }
+
+  // Open the trace file.
+  int count = 0;
+  struct stat fs;
+  while(1)
+    {
+    ostrstream str;
+    str << "ParaViewTrace" << count++ << ".pvs" << ends;
+    if ( stat(str.str(), &fs) != 0 || count >= 10 )
+      {
+      this->SetTraceFileName(str.str());
+      str.rdbuf()->freeze(0);
+      break;
+      }
+    str.rdbuf()->freeze(0);
+    }
+
+  this->TraceFile = new ofstream(this->TraceFileName, ios::out);
+    
+  // Initialize a couple of variables in the trace file.
+  this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
+                      ui->GetTclName());
+  ui->SetTraceInitialized(1);
+  // We have to set this variable after the window variable is set,
+  // so it has to be done here.
+  this->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",
+                      ui->GetMainView()->GetTclName(), ui->GetTclName());
+  ui->GetMainView()->SetTraceInitialized(1);
+
+
+
 
   // If any of the argumens has a .pvs extension, load it as a script.
   for (i=1; i < argc; i++)
@@ -1125,6 +1255,7 @@ void vtkPVApplication::StartRecordingScript(char *filename)
   this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
                       this->GetMainWindow()->GetTclName());
   this->GetMainWindow()->SetTraceInitialized(1);
+  this->SetTraceFileName(filename);
 }
 
 //----------------------------------------------------------------------------
@@ -1590,8 +1721,12 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
-  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") << endl;
-  os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") << endl;
+  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") 
+     << endl;
+  os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
+     << endl;
+  os << indent << "TraceFileName: " 
+     << (this->TraceFileName ? this->TraceFileName : "(none)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

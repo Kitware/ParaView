@@ -50,11 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledFrame.h"
 
+class vtkCornerAnnotation;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
-class vtkKWText;
-class vtkCornerAnnotation;
 class vtkKWGenericComposite;
+class vtkKWScale;
+class vtkKWText;
 class vtkKWView;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
@@ -104,7 +105,12 @@ public:
     { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
   float *GetTextColor();
 
-  
+  // Description:
+  // Set/Get the maximum line height.
+  void SetMaximumLineHeight(float);
+  float GetMaximumLineHeight();
+  void MaximumLineHeightCallback();
+
   // Description:
   // Get at the underlying vtkCornerAnnotationClass
   vtkGetObjectMacro(CornerProp,vtkCornerAnnotation);
@@ -125,6 +131,7 @@ protected:
   vtkKWText              *CornerText[4];
   vtkCornerAnnotation    *CornerProp;
   vtkKWGenericComposite  *CornerComposite;
+  vtkKWScale             *MaximumLineHeightScale;
 
   vtkKWView *View;
 private:

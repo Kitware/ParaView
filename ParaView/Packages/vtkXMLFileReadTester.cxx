@@ -18,7 +18,7 @@
 #include "vtkXMLFileReadTester.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkXMLFileReadTester, "1.2");
+vtkCxxRevisionMacro(vtkXMLFileReadTester, "1.3");
 vtkStandardNewMacro(vtkXMLFileReadTester);
 
 //----------------------------------------------------------------------------
@@ -72,10 +72,7 @@ int vtkXMLFileReadTester::TestReadFile()
     {
     return 1;
     }
-  else
-    {
-    return 0;
-    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

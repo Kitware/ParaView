@@ -44,8 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWGenericComposite.h"
+#include "vtkKWScale.h"
 #include "vtkKWSerializer.h"
 #include "vtkKWText.h"
 #include "vtkKWView.h"
@@ -54,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.30");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -93,6 +95,8 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
   this->CornerProp->SetMaximumLineHeight(0.07);
   this->CornerComposite = vtkKWGenericComposite::New();
   this->CornerComposite->SetProp(this->CornerProp);
+
+  this->MaximumLineHeightScale = vtkKWScale::New();
 }
 
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
@@ -112,6 +116,11 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
   this->CornerComposite->Delete();
   this->CornerProp->Delete();
 
+  if (this->MaximumLineHeightScale)
+    {
+    this->MaximumLineHeightScale->Delete();
+    this->MaximumLineHeightScale = NULL;
+    }
 }
 
 void vtkKWCornerAnnotation::ShowProperties()
@@ -186,6 +195,9 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
     this->Script("bind %s <Return> {%s CornerChanged %i}",
                  this->CornerText[i]->GetWidgetName(), 
                  this->GetTclName(), i);
+    this->Script("bind %s <FocusOut> {%s CornerChanged %i}",
+                 this->CornerText[i]->GetWidgetName(), 
+                 this->GetTclName(), i);
     this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
                  this->CornerLabel[i]->GetWidgetName());
     this->Script("pack %s -side top -anchor w -padx 4 -pady 2 -expand yes -fill x",
@@ -202,8 +214,65 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
   this->CornerLabel[3]->SetBalloonHelpJustificationToRight();
   this->CornerLabel[3]->SetBalloonHelpString("Set the upper right corner annotation. The text will automatically scale to fit within the allocated space");
 
+  // Maximum line height
+
+  this->MaximumLineHeightScale->SetParent(this->GetFrame());
+  this->MaximumLineHeightScale->SetRange(0.01, 0.2);
+  this->MaximumLineHeightScale->SetResolution(0.01);
+  this->MaximumLineHeightScale->PopupScaleOn();
+  this->MaximumLineHeightScale->Create(this->Application, "");
+  this->MaximumLineHeightScale->SetValue(
+    this->CornerProp->GetMaximumLineHeight());
+  this->MaximumLineHeightScale->DisplayEntry();
+  this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
+  this->MaximumLineHeightScale->DisplayLabel("Max line height:");
+  this->Script("%s configure -width 5", 
+               this->MaximumLineHeightScale->GetEntry()->GetWidgetName());
+  this->MaximumLineHeightScale->SetBalloonHelpString("Set the maximum height of a line of text as a percentage of the vertical area allocated to this scaled text actor.");
+  this->MaximumLineHeightScale->SetCommand(
+    this, "MaximumLineHeightCallback");
+
+  this->Script("pack %s -padx 2 -side top -expand t -fill x", 
+               this->MaximumLineHeightScale->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+float vtkKWCornerAnnotation::GetMaximumLineHeight()
+{
+  if (this->MaximumLineHeightScale->IsCreated())
+    {
+    return this->MaximumLineHeightScale->GetValue();
+    }
+  return this->CornerProp->GetMaximumLineHeight();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
+{
+  if (this->MaximumLineHeightScale->IsCreated())
+    {
+    this->MaximumLineHeightScale->SetValue(v);
+    }
+  this->CornerProp->SetMaximumLineHeight(v);
+  if (this->CornerButton->GetState())
+    {
+    this->View->Render();
+    }
+  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
+  this->AddTraceEntry("$kw(%s) SetMaximumLineHeight %f",
+                      this->GetTclName(), v);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::MaximumLineHeightCallback()
+{
+  if (this->MaximumLineHeightScale->IsCreated())
+    {
+    this->SetMaximumLineHeight(this->MaximumLineHeightScale->GetValue());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 {
   float *ff = this->CornerProp->GetProperty()->GetColor();
@@ -221,6 +290,9 @@ void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
   color[2] = b;
   this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
+
+  this->AddTraceEntry("$kw(%s) SetTextColor %f %f %f",
+                      this->GetTclName(), r, g, b);
 }
 
 void vtkKWCornerAnnotation::OnDisplayCorner() 
@@ -233,11 +305,13 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
       this->CornerProp->SetText(i,this->GetCornerText(i));
       }
     this->View->Render();
+    this->AddTraceEntry("$kw(%s) SetVisibility 1", this->GetTclName());
     }
   else
     {
     this->View->RemoveComposite(this->CornerComposite);
     this->View->Render();
+    this->AddTraceEntry("$kw(%s) SetVisibility 0", this->GetTclName());
     }
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
 }
@@ -265,12 +339,21 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
 
 void vtkKWCornerAnnotation::CornerChanged(int i) 
 {
+  if (this->CornerText[i]->GetValue() &&
+      this->CornerProp->GetText(i) && 
+      !strcmp(this->CornerText[i]->GetValue(), this->CornerProp->GetText(i)))
+    {
+    return;
+    }
   this->CornerProp->SetText(i,this->CornerText[i]->GetValue());
   if (this->CornerButton->GetState())
     {
     this->View->Render();
     }
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
+
+  this->AddTraceEntry("$kw(%s) SetCornerText {%s} %d", 
+                      this->GetTclName(), this->CornerText[i]->GetValue(), i);
 }
 
 // Description:
@@ -351,7 +434,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

@@ -43,58 +43,117 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVMinMax.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.10");
+
+vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
 //---------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
 {
-  this->LabelWidget = vtkKWLabel::New();
-  this->LabelWidget->SetParent(this);
-  this->EntryLabel = 0;
-  this->XMinEntry = vtkKWEntry::New();
-  this->XMaxEntry = vtkKWEntry::New();
-  this->YMinEntry = vtkKWEntry::New();
-  this->YMaxEntry = vtkKWEntry::New();
-  this->ZMinEntry = vtkKWEntry::New();
-  this->ZMaxEntry = vtkKWEntry::New();
+  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame->SetParent(this);
+
+  this->Label = 0;
+
+  for (int i=0; i<3; i++)
+    {
+    this->MinMax[i] = vtkPVMinMax::New();
+    }
+
+  this->InputMenu = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkPVExtentEntry::~vtkPVExtentEntry()
 {
-  this->XMinEntry->Delete();
-  this->XMinEntry = NULL;
-  this->XMaxEntry->Delete();
-  this->XMaxEntry = NULL;
-  this->YMinEntry->Delete();
-  this->YMinEntry = NULL;
-  this->YMaxEntry->Delete();
-  this->YMaxEntry = NULL;
-  this->ZMinEntry->Delete();
-  this->ZMinEntry = NULL;
-  this->ZMaxEntry->Delete();
-  this->ZMaxEntry = NULL;
+  this->LabeledFrame->Delete();
+  this->LabeledFrame = 0;
 
-  this->LabelWidget->Delete();
-  this->LabelWidget = NULL;
-  this->SetEntryLabel(0);
+  this->SetLabel(0);
+
+  if (this->InputMenu)
+    {
+    this->InputMenu->Delete();
+    }
+
+  for(int i=0; i<3; i++)
+    {
+    this->MinMax[i]->Delete();
+    this->MinMax[i] = 0;
+    }
 }
 
-void vtkPVExtentEntry::SetLabel(const char* label)
+//---------------------------------------------------------------------------
+void vtkPVExtentEntry::Update()
 {
-  this->SetEntryLabel(label);
-  this->LabelWidget->SetLabel(label);
+  this->Superclass::Update();
+
+  vtkPVData *input = this->InputMenu->GetCurrentValue()->GetPVOutput();
+  if (input == NULL)
+    {
+    this->Script("eval %s SetRange %d %d %d %d %d %d",
+                 this->GetTclName(), 0, 0, 0, 0, 0, 0);
+    }
+  else
+    {
+    this->Script("eval %s SetRange [%s GetWholeExtent]",
+                 this->GetTclName(),
+                 input->GetVTKDataTclName());
+    }
+
+}
+
+void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
+{
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->LabeledFrame->SetBalloonHelpString(this->BalloonHelpString);
+    for (int i=0; i<3; i++)
+      {
+      this->MinMax[i]->SetBalloonHelpString(this->BalloonHelpString);
+      }
+
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -109,9 +168,48 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     }
   
   // For getting the widget in a script.
-  this->SetTraceName(this->EntryLabel);
+  if (this->Label && this->Label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(this->Label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 
   this->SetApplication(pvApp);
+
+  // create the top level
+  wname = this->GetWidgetName();
+  this->Script("frame %s -borderwidth 0 -relief flat", wname);
+
+  this->LabeledFrame->Create(pvApp);
+  // Now a label
+  if (this->Label && this->Label[0] != '\0')
+    {
+    this->LabeledFrame->SetLabel(this->Label);
+    }
+  else
+    {
+    this->LabeledFrame->SetLabel("Extent");
+    }
+   
+  char labels[3][4] = { "I: ", "J: ", "K: "};
+  int i;
+  for(i=0; i<3; i++)
+    {
+    this->MinMax[i]->SetParent(this->LabeledFrame->GetFrame());
+    this->MinMax[i]->PackVerticallyOff();
+    this->MinMax[i]->ShowMaxLabelOff();
+    this->MinMax[i]->SetMinLabelWidth(2);
+    this->MinMax[i]->Create(pvApp);
+    this->MinMax[i]->SetMinimumLabel(labels[i]);
+    this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMinScale()->DisplayEntry();
+    this->MinMax[i]->GetMinScale()->DisplayLabel(" Min:");
+    this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMaxScale()->DisplayEntry();
+    this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max:");
+    }
 
   // Initialize the extent of the VTK source. Normally, it
   // is set to -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT...
@@ -121,62 +219,22 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
                  this->PVSource->GetVTKSourceTclName(), 
                  this->GetVariableName(),
                  this->PVSource->GetPVInput()->GetVTKDataTclName());
+
+    this->Script("eval %s SetRange [%s GetWholeExtent]",
+                 this->GetTclName(),
+                 this->PVSource->GetPVInput()->GetVTKDataTclName());
     }
 
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
-
-  // Now a label
-  if (this->EntryLabel && this->EntryLabel[0] != '\0')
+  for(i=0; i<3; i++)
     {
-    this->LabelWidget->Create(pvApp, "-width 18 -justify right");
-    this->LabelWidget->SetLabel(this->EntryLabel);
-    this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
+    this->Script("pack %s -side top -fill x -expand t -pady 5", 
+                 this->MinMax[i]->GetWidgetName());
     }
-    
-  // Now the entries
-  this->XMinEntry->SetParent(this);
-  this->XMinEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->XMinEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->XMinEntry->GetWidgetName());
 
-  this->XMaxEntry->SetParent(this);
-  this->XMaxEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->XMaxEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->XMaxEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", 
+               this->LabeledFrame->GetWidgetName());
 
-  this->YMinEntry->SetParent(this);
-  this->YMinEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->YMinEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->YMinEntry->GetWidgetName());
-
-  this->YMaxEntry->SetParent(this);
-  this->YMaxEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->YMaxEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->YMaxEntry->GetWidgetName());
-
-  this->ZMinEntry->SetParent(this);
-  this->ZMinEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->ZMinEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->ZMinEntry->GetWidgetName());
-
-  this->ZMaxEntry->SetParent(this);
-  this->ZMaxEntry->Create(pvApp, "-width 2");
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->ZMaxEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->ZMaxEntry->GetWidgetName());
+  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 
@@ -200,19 +258,23 @@ void vtkPVExtentEntry::Accept()
 
   if (traceFlag)
     {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetValue " 
-               << this->XMinEntry->GetValueAsInt() << " "
-               << this->XMaxEntry->GetValueAsInt() << " "
-               << this->YMinEntry->GetValueAsInt() << " "
-               << this->YMaxEntry->GetValueAsInt() << " "
-               << this->ZMinEntry->GetValueAsInt() << " "
-               << this->ZMaxEntry->GetValueAsInt() << endl;
+    *traceFile << "$kw(" << this->GetTclName() << ") SetValue ";
+    for(int i=0; i<3; i++)
+      {
+      *traceFile << this->MinMax[i]->GetMinValue() << " "
+                 << this->MinMax[i]->GetMaxValue() << " ";
+      }
+    *traceFile << endl;
     }
 
-  pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", this->ObjectTclName, this->VariableName,
-          this->XMinEntry->GetValueAsInt(), this->XMaxEntry->GetValueAsInt(),
-          this->YMinEntry->GetValueAsInt(), this->YMaxEntry->GetValueAsInt(),
-          this->ZMinEntry->GetValueAsInt(), this->ZMaxEntry->GetValueAsInt());
+  pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
+                         this->ObjectTclName, this->VariableName,
+                         static_cast<int>(this->MinMax[0]->GetMinValue()), 
+                         static_cast<int>(this->MinMax[0]->GetMaxValue()),
+                         static_cast<int>(this->MinMax[1]->GetMinValue()), 
+                         static_cast<int>(this->MinMax[1]->GetMaxValue()),
+                         static_cast<int>(this->MinMax[2]->GetMinValue()), 
+                         static_cast<int>(this->MinMax[2]->GetMaxValue()));
 
   this->ModifiedFlag = 0;  
 }
@@ -220,30 +282,41 @@ void vtkPVExtentEntry::Accept()
 //---------------------------------------------------------------------------
 void vtkPVExtentEntry::Reset()
 {
-  //int count = 0;
-
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
   this->Script("eval %s SetValue [%s Get%s]",
-               this->GetTclName(), this->ObjectTclName, this->VariableName);
+               this->GetTclName(), this->ObjectTclName,  this->VariableName);
 
   this->ModifiedFlag = 0;
 }
 
 
 //---------------------------------------------------------------------------
+void vtkPVExtentEntry::SetRange(int v0, int v1, int v2, 
+                                int v3, int v4, int v5)
+{
+  this->MinMax[0]->SetRange(v0, v1);
+  this->MinMax[1]->SetRange(v2, v3);
+  this->MinMax[2]->SetRange(v4, v5);
+
+  this->ModifiedCallback();
+}
+
+//---------------------------------------------------------------------------
 void vtkPVExtentEntry::SetValue(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
-  this->XMinEntry->SetValue(v0);
-  this->XMaxEntry->SetValue(v1);
-  this->YMinEntry->SetValue(v2);
-  this->YMaxEntry->SetValue(v3);
-  this->ZMinEntry->SetValue(v4);
-  this->ZMaxEntry->SetValue(v5);
+  this->MinMax[0]->SetMaxValue(v1);
+  this->MinMax[0]->SetMinValue(v0);
+
+  this->MinMax[1]->SetMaxValue(v3);
+  this->MinMax[1]->SetMinValue(v2);
+
+  this->MinMax[2]->SetMaxValue(v5);
+  this->MinMax[2]->SetMinValue(v4);
 
   this->ModifiedCallback();
 }
@@ -293,7 +366,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
 
   if (mode == 0)
     {
-    sprintf(script, "%s Set%s [expr int($pvTime)] [expr int($pvTime)] %d %d %d %d", 
+    sprintf(script, 
+            "%s Set%s [expr int($pvTime)] [expr int($pvTime)] %d %d %d %d", 
             this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
     ai->SetLabelAndScript("X Axis", script);
     ai->SetTimeStart(ext[0]);
@@ -303,7 +377,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     }
   else if (mode == 1)
     {
-    sprintf(script, "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
+    sprintf(script, 
+            "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
             this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
     ai->SetLabelAndScript("Y Axis", script);
     ai->SetTimeStart(ext[2]);
@@ -313,7 +388,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     }
   else if (mode == 2)
     {
-    sprintf(script, "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
+    sprintf(script, 
+            "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
             this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
     ai->SetLabelAndScript("Z Axis", script);
     ai->SetTimeStart(ext[4]);
@@ -343,7 +419,16 @@ void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone,
   vtkPVExtentEntry* pvee = vtkPVExtentEntry::SafeDownCast(clone);
   if (pvee)
     {
-    pvee->SetLabel(this->EntryLabel);
+    pvee->SetLabel(this->Label);
+
+    if (this->InputMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
+      pvee->SetInputMenu(im);
+      im->Delete();
+      }
     }
   else 
     {
@@ -368,6 +453,27 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetLabel(this->VariableName);
     }
   
+  // Setup the InputMenu.
+  const char* input_menu = element->GetAttribute("input_menu");
+  if(!input_menu)
+    {
+    vtkErrorMacro("No input_menu attribute.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* ime = element->LookupElement(input_menu);
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
+  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+  if(!imw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+    return 0;
+    }
+  imw->AddDependent(this);
+  this->SetInputMenu(imw);
+  imw->Delete();
+
   return 1;
 }
 
@@ -375,4 +481,6 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << "InputMenu: " << this->InputMenu << endl;
+  os << "Label: " << (this->Label ? this->Label : "(none)") << endl;
 }

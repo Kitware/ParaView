@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.22");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.23");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -405,6 +405,11 @@ void vtkCornerAnnotation::SetText(int i, const char *text)
   this->CornerText[i] = new char [strlen(text)+1];
   strcpy(this->CornerText[i],text);
   this->Modified();
+}
+
+char* vtkCornerAnnotation::GetText(int i)
+{
+  return this->CornerText[i];
 }
 
 //----------------------------------------------------------------------------
