@@ -49,11 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.18");
+vtkCxxRevisionMacro(vtkPVScale, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -272,13 +273,17 @@ void vtkPVScale::ResetInternal(const char* sourceTclName)
 {
   if (sourceTclName && this->VariableName)
     {
-    this->Script("%s SetValue [%s Get%s]", this->Scale->GetTclName(),
+    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
                   this->ObjectTclName, this->VariableName);
+    this->Script("%s SetValue %s", this->Scale->GetTclName(),
+                  this->GetPVApplication()->GetProcessModule()->GetRootResult());
     }
   if ( sourceTclName && this->RangeSourceVariable )
     {
-    this->Script("eval %s SetRange [%s Get%s]", this->Scale->GetTclName(),
+    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
                   this->ObjectTclName, this->RangeSourceVariable);
+    this->Script("eval %s SetRange %s", this->Scale->GetTclName(),
+                  this->GetPVApplication()->GetProcessModule()->GetRootResult());                  
     }
 
   this->ModifiedFlag = 0;
