@@ -1,4 +1,16 @@
-PROJECT(MPEG2ENC)
+PROJECT(vtkMPEG2Encode)
+
+#############################################################################
+# to use this library in your code you will need to SUBDIR into this
+# directory so that it gets built and then you will use the following variables
+# in your CMakeLists files to get the proper include paths and libraries
+SET (vtkMPEG2Encode_INCLUDE_PATH 
+  "${vtkMPEG2Encode_SOURCE_DIR}"
+  CACHE INTERNAL "include paths for vtkMPEG2Encode"
+  )
+SET (vtkMPEG2Encode_LIBRARIES vtkMPEG2Encode 
+  CACHE INTERNAL "libraries for vtkMPEG2Encode")
+#############################################################################
 
 # We need ansi c-flags, especially on HP
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
