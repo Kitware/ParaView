@@ -1,17 +1,14 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkExtractCTHPart2.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -42,7 +39,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart2, "1.1");
+vtkCxxRevisionMacro(vtkExtractCTHPart2, "1.2");
 vtkStandardNewMacro(vtkExtractCTHPart2);
 vtkCxxSetObjectMacro(vtkExtractCTHPart2,ClipPlane,vtkPlane);
 

@@ -1,31 +1,21 @@
-// -*- c++ -*-
-
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:  vtkKdTree.cxx
-  Language:  C++
-  Date:    $Date$
-  Version:   $Revision$
+  Program:   ParaView
+  Module:    vtkKdTree.cxx
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-  Copyright (C) 2003 Sandia Corporation
-  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
-  license for use of this work by or on behalf of the U.S. Government.
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that this Notice and any statement
-  of authorship are reproduced on all copies.
-
-  Contact: Lee Ann Fisk, lafisk@sandia.gov
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/*----------------------------------------------------------------------------
+ Copyright (c) Sandia Corporation
+ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+----------------------------------------------------------------------------*/
 
 #include "vtkKdTree.h"
 #include "vtkBox.h"
@@ -46,7 +36,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.13");
+vtkCxxRevisionMacro(vtkKdTree, "1.14");
 
 // methods for vtkKdNode -------------------------------------------
 

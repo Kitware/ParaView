@@ -1,17 +1,14 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkCompositeProp.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -22,7 +19,7 @@
 
 vtkStandardNewMacro(vtkCompositeProp);
 
-vtkCxxRevisionMacro(vtkCompositeProp, "1.2");
+vtkCxxRevisionMacro(vtkCompositeProp, "1.3");
 
 // Creates an Prop with the following defaults: visibility on.
 vtkCompositeProp::vtkCompositeProp()
@@ -56,17 +53,17 @@ float *vtkCompositeProp::GetBounds()
     if ( tb )
       {
       for ( cc = 0; cc < 3; cc ++ )
-	{	
-	this->Bounds[cc*2] = vtkMIN(this->Bounds[cc*2], tb[cc*2]);
-	this->Bounds[cc*2+1] = vtkMAX(this->Bounds[cc*2+1], tb[cc*2+1]);
-	}
+        {       
+        this->Bounds[cc*2] = vtkMIN(this->Bounds[cc*2], tb[cc*2]);
+        this->Bounds[cc*2+1] = vtkMAX(this->Bounds[cc*2+1], tb[cc*2+1]);
+        }
       }
     }
 
   for ( cc = 0; cc < 6; cc ++ )
     {
     if ( this->Bounds[cc] >= VTK_FLOAT_MAX-1 ||
-	 this->Bounds[cc] <= VTK_FLOAT_MIN+1 )
+         this->Bounds[cc] <= VTK_FLOAT_MIN+1 )
       {
       return 0;
       }

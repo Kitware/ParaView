@@ -1,12 +1,15 @@
-// -*- c++ -*-
-
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkDesktopDeliveryServer.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -40,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.4");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.5");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()

@@ -1,12 +1,15 @@
-// -*- c++ -*-
-
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkDesktopDeliveryClient.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -30,7 +33,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.9");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.10");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
