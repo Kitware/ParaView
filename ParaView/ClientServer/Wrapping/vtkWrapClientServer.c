@@ -116,19 +116,11 @@ void return_result(FILE *fp)
       break;
     case 1: case 3: case 4: case 5: case 6: case 7:
     case 13: case 14: case 15: case 16:
+    case 303:
       fprintf(fp,
               "      resultStream.Reset();\n"
               "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
               MAX_ARGS);
-      break;
-    case 303:
-      fprintf(fp,
-              "      resultStream.Reset();\n"
-              "      if (temp%i)\n"
-              "        {\n"
-              "        resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n"
-              "        }\n",
-              MAX_ARGS,MAX_ARGS);
       break;
     case 109:
     case 309:
