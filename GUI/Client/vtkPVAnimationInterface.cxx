@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.142");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.143");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1343,15 +1343,15 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         }
       else if (!strcmp(aspect, "4:3"))
         {
-        height = width / 4.0 * 3;
+        height = static_cast<int>(width / 4.0 * 3);
         }
       else if (!strcmp(aspect, "16:9"))
         {
-        height = width / 16.0 * 9;
+        height = static_cast<int>(width / 16.0 * 9);
         }
       else if (!strcmp(aspect, "2.21:1"))
         {
-        height = width / 2.21;
+        height = static_cast<int>(width / 2.21);
         }
       }
     else
