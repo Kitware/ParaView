@@ -89,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.152");
+vtkCxxRevisionMacro(vtkKWApplication, "1.153");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -2071,7 +2071,10 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetApplicationVersionName() << endl;
   os << indent << "ApplicationPrettyName: " 
      << this->GetApplicationPrettyName() << endl;
-  os << indent << "EmailFeedbackAddress: " << this->GetEmailFeedbackAddress() << endl;
+  os << indent << "EmailFeedbackAddress: "
+     << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
+         "(none)")
+     << endl;
   os << indent << "ShowBalloonHelp: " << (this->ShowBalloonHelp ? "on":"off") << endl;
   os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
