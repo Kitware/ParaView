@@ -41,6 +41,7 @@
         number_of_elements="3"
         default_values="1 1 1"
         update_self="1">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
      </DoubleVectorProperty>
 
      <SubProxy>
@@ -140,6 +141,7 @@
              command="SetPointSize"
              number_of_elements="1"
              default_values="1">
+            <DoubleRangeDomain name="range" min="1" />
           </DoubleVectorProperty>
 
           <DoubleVectorProperty
@@ -147,6 +149,7 @@
              command="SetLineWidth"
              number_of_elements="1"
              default_values="1">
+            <DoubleRangeDomain name="range" min="1" />
           </DoubleVectorProperty>
 
           <DoubleVectorProperty
@@ -154,6 +157,7 @@
              command="SetOpacity"
              number_of_elements="1"
              default_values="1">
+            <DoubleRangeDomain name="range" min="0" max="1" />
           </DoubleVectorProperty>
        </Proxy>
      </SubProxy>
@@ -180,6 +184,7 @@
         command="SetSize" 
         number_of_elements="2"
         default_values="400 400" > 
+       <DoubleRangeDomain name="range" min="1 1" />
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -206,12 +211,14 @@
              command="SetBackground"
              number_of_elements="3"
              default_values="0 0 0">
+            <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
           </DoubleVectorProperty>
           <DoubleVectorProperty
              name="Viewport"
              command="SetViewport"
              number_of_elements="4"
              default_values="0 0 1 1">
+            <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
           </DoubleVectorProperty>
        </Proxy>
      </SubProxy>

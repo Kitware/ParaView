@@ -54,6 +54,12 @@ public:
   // Set the value of an element of a property from the animation editor.
   virtual void SetAnimationValue(vtkSMProperty*, int, double) {}
 
+  // Description:
+  // Assigned by the XML parser. The name assigned in the XML
+  // configuration. Can be used to figure out the origin of the
+  // domain.
+  vtkGetStringMacro(XMLName);
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
