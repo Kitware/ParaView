@@ -1,3 +1,5 @@
+/* -*- c++ -*- *******************************************************/
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -6,13 +8,12 @@
   Date:      $Date$
   Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
+  Copyright 2003 Sandia Coporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
 
 =========================================================================*/
 
@@ -26,13 +27,23 @@
 #include <vtkFloatArray.h>
 #include <vtkUnsignedCharArray.h>
 #include <GL/ice-t_mpi.h>
+#include "vtkCamera.h"
 
+//******************************************************************
+// Hidden structures.
+//******************************************************************
+struct IceTInformation {
+  int TilesDirty;
+  int Strategy;
+  int ComposeOperation;
+};
+const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 
 //******************************************************************
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.2");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
@@ -47,7 +58,13 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->Strategy = DEFAULT;
   this->StrategyDirty = 1;
 
+  this->ComposeOperation = CLOSEST;
+  this->ComposeOperationDirty = 1;
+
   this->LastKnownImageReductionFactor = 0;
+
+  this->FullImageSharesData = 0;
+  this->ReducedImageSharesData = 0;
 }
 
 vtkIceTRenderManager::~vtkIceTRenderManager()
@@ -128,12 +145,12 @@ void vtkIceTRenderManager::UpdateIceTContext()
     for (x = 0; x < this->NumTilesX; x++)
       {
       for (y = 0; y < this->NumTilesY; y++)
-  {
-  icetAddTile(x*this->ReducedImageSize[0],
-        (this->NumTilesY-y-1)*this->ReducedImageSize[1],
-        this->ReducedImageSize[0], this->ReducedImageSize[1],
-        this->TileRanks[x][y]);
-  }
+    {
+    icetAddTile(x*this->ReducedImageSize[0],
+            (this->NumTilesY-y-1)*this->ReducedImageSize[1],
+            this->ReducedImageSize[0], this->ReducedImageSize[1],
+            this->TileRanks[x][y]);
+    }
       }
     this->TilesDirty = 0;
     this->CleanScreenWidth = this->FullImageSize[0];
@@ -150,8 +167,27 @@ void vtkIceTRenderManager::UpdateIceTContext()
       case SPLIT:   icetStrategy(ICET_STRATEGY_SPLIT);   break;
       case SERIAL:  icetStrategy(ICET_STRATEGY_SERIAL);  break;
       case DIRECT:  icetStrategy(ICET_STRATEGY_DIRECT);  break;
+      default: vtkErrorMacro("Invalid strategy set"); break;
       }
     this->StrategyDirty = 0;
+    }
+
+  if (this->ContextDirty || this->ComposeOperationDirty)
+    {
+    switch (this->ComposeOperation)
+      {
+      case CLOSEST:
+    icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT,
+                   ICET_COLOR_BUFFER_BIT);
+    break;
+      case OVER:
+    icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT, ICET_COLOR_BUFFER_BIT);
+    break;
+      default:
+    vtkErrorMacro("Invalid compose operation set");
+    break;
+      }
+    this->ComposeOperationDirty = 0;
     }
 
   if (this->ContextDirty || (this->MTime > this->ContextUpdateTime))
@@ -181,6 +217,10 @@ void vtkIceTRenderManager::UpdateIceTContext()
       {
       icetDisable(ICET_DISPLAY_INFLATE);
       }
+    // This stuff is just hacks to check things.
+//     icetEnable(ICET_ORDERED_COMPOSITE);
+//     const int rank_orders[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+//     icetCompositeOrder(rank_orders);
     }
 
   this->ContextUpdateTime.Modified();
@@ -204,6 +244,11 @@ void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
 {
   vtkDebugMacro("ChangeTileDims " << tilesX << " " << tilesY);
 
+  if ((this->NumTilesX == tilesX) && (this->NumTilesY == tilesY))
+    {
+    return;
+    }
+
   int x, y;
   int **NewTileRanks;
 
@@ -214,13 +259,13 @@ void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
     for (y = 0; y < tilesY; y++)
       {
       if ( (y < this->NumTilesY) && (x < this->NumTilesX))
-  {
-  NewTileRanks[x][y] = this->TileRanks[x][y];
-  }
+    {
+    NewTileRanks[x][y] = this->TileRanks[x][y];
+    }
       else
-  {
-  NewTileRanks[x][y] = y*tilesX + x;
-  }
+    {
+    NewTileRanks[x][y] = y*tilesX + x;
+    }
       }
     if (x < this->NumTilesX)
       {
@@ -307,11 +352,29 @@ void vtkIceTRenderManager::SetStrategy(const char *strategy)
     }
 }
 
+void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
+{
+  vtkDebugMacro("SetComposeOperation to " << operation);
+
+  if (this->ComposeOperation == operation) return;
+
+  this->ComposeOperation = operation;
+  this->ComposeOperationDirty = 1;
+}
+
 double vtkIceTRenderManager::GetRenderTime()
 {
-  double t;
-  icetGetDoublev(ICET_RENDER_TIME, &t);
-  return t;
+  if (this->Controller)
+    {
+    double t;
+    icetSetContext(this->Context);
+    icetGetDoublev(ICET_RENDER_TIME, &t);
+    return t;
+    }
+  else
+    {
+    return 0.0;
+    }
 }
 double vtkIceTRenderManager::GetImageProcessingTime()
 {
@@ -320,21 +383,79 @@ double vtkIceTRenderManager::GetImageProcessingTime()
 }
 double vtkIceTRenderManager::GetBufferReadTime()
 {
-  double t;
-  icetGetDoublev(ICET_BUFFER_READ_TIME, &t);
-  return t;
+  if (this->Controller)
+    {
+    double t;
+    icetSetContext(this->Context);
+    icetGetDoublev(ICET_BUFFER_READ_TIME, &t);
+    return t;
+    }
+  else
+    {
+    return 0.0;
+    }
 }
 double vtkIceTRenderManager::GetBufferWriteTime()
 {
-  double t;
-  icetGetDoublev(ICET_BUFFER_WRITE_TIME, &t);
-  return t;
+  if (this->Controller)
+    {
+    double t;
+    icetSetContext(this->Context);
+    icetGetDoublev(ICET_BUFFER_WRITE_TIME, &t);
+    return t;
+    }
+  else
+    {
+    return 0.0;
+    }
 }
 double vtkIceTRenderManager::GetCompositeTime()
 {
-  double t;
-  icetGetDoublev(ICET_COMPOSITE_TIME, &t);
-  return t;
+  if (this->Controller)
+    {
+    double t;
+    icetSetContext(this->Context);
+    icetGetDoublev(ICET_COMPOSITE_TIME, &t);
+    return t;
+    }
+  else
+    {
+    return 0.0;
+    }
+}
+
+void vtkIceTRenderManager::StartRender()
+{
+  if (this->FullImageSharesData)
+    {
+    this->FullImage->Initialize();
+    this->FullImageSharesData = 0;
+    }
+
+  if (this->ReducedImageSharesData)
+    {
+    this->ReducedImage->Initialize();
+    this->ReducedImageSharesData = 0;
+    }
+
+  this->Superclass::StartRender();
+}
+
+void vtkIceTRenderManager::SatelliteStartRender()
+{
+  if (this->FullImageSharesData)
+    {
+    this->FullImage->Initialize();
+    this->FullImageSharesData = 0;
+    }
+
+  if (this->ReducedImageSharesData)
+    {
+    this->ReducedImage->Initialize();
+    this->ReducedImageSharesData = 0;
+    }
+
+  this->Superclass::SatelliteStartRender();
 }
 
 void vtkIceTRenderManager::SendWindowInformation()
@@ -343,25 +464,30 @@ void vtkIceTRenderManager::SendWindowInformation()
 
   this->Superclass::SendWindowInformation();
 
+  struct IceTInformation info;
+  info.TilesDirty = this->TilesDirty;
+  info.Strategy = this->Strategy;
+  info.ComposeOperation = this->ComposeOperation;
+
   int numProcs = this->Controller->GetNumberOfProcesses();
-  for (int id = 1; id < numProcs; id++)
+  for (int id = 0; id < numProcs; id++)
     {
-    this->Controller->Send(&this->TilesDirty, 1, id,
-         vtkIceTRenderManager::TILES_DIRTY_TAG);
+    if (id == this->RootProcessId) continue;
+
+    this->Controller->Send((int *)&info, ICET_INFO_SIZE, id,
+               vtkIceTRenderManager::ICET_INFO_TAG);
     if (this->TilesDirty)
       {
       this->Controller->Send(&this->NumTilesX, 1, id,
-           vtkIceTRenderManager::NUM_TILES_X_TAG);
+                 vtkIceTRenderManager::NUM_TILES_X_TAG);
       this->Controller->Send(&this->NumTilesY, 1, id,
-           vtkIceTRenderManager::NUM_TILES_Y_TAG);
+                 vtkIceTRenderManager::NUM_TILES_Y_TAG);
       for (int x = 0; x < this->NumTilesX; x++)
-  {
-  this->Controller->Send(this->TileRanks[x], this->NumTilesY, id,
-             vtkIceTRenderManager::TILE_RANKS_TAG);
-  }
+    {
+    this->Controller->Send(this->TileRanks[x], this->NumTilesY, id,
+                   vtkIceTRenderManager::TILE_RANKS_TAG);
+    }
       }
-    this->Controller->Send((int *)&this->Strategy, 1, id,
-         vtkIceTRenderManager::STRATEGY_TAG);
     }
 }
 
@@ -371,49 +497,78 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 
   this->Superclass::ReceiveWindowInformation();
 
-  int NewTilesDirty;
-  this->Controller->Receive(&NewTilesDirty, 1, 0,
-          vtkIceTRenderManager::TILES_DIRTY_TAG);
-  if (NewTilesDirty)
+  struct IceTInformation info;
+  this->Controller->Receive((int *)&info, ICET_INFO_SIZE, this->RootProcessId,
+                vtkIceTRenderManager::ICET_INFO_TAG);
+  if (info.TilesDirty)
     {
     int NewNumTilesX, NewNumTilesY;
     this->Controller->Receive(&NewNumTilesX, 1, 0,
-            vtkIceTRenderManager::NUM_TILES_X_TAG);
+                  vtkIceTRenderManager::NUM_TILES_X_TAG);
     this->Controller->Receive(&NewNumTilesY, 1, 0,
-            vtkIceTRenderManager::NUM_TILES_Y_TAG);
+                  vtkIceTRenderManager::NUM_TILES_Y_TAG);
     this->ChangeTileDims(NewNumTilesX, NewNumTilesY);
     for (int x = 0; x < this->NumTilesX; x++)
       {
       this->Controller->Receive(this->TileRanks[x], this->NumTilesY, 0,
-        vtkIceTRenderManager::TILE_RANKS_TAG);
+                vtkIceTRenderManager::TILE_RANKS_TAG);
       }
     }
 
-  int NewStrategy;
-  this->Controller->Receive(&NewStrategy, 1, 0,
-          vtkIceTRenderManager::STRATEGY_TAG);
-  this->SetStrategy((StrategyType)NewStrategy);
+  this->SetStrategy((StrategyType)info.Strategy);
+  this->SetComposeOperation((ComposeOperationType)info.ComposeOperation);
 }
 
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
 
+  // Code taken from my tile display module.
+  if (!this->UseCompositing)
+    {
+    vtkCamera* cam;
+    vtkRenderWindow* renWin = this->RenderWindow;
+    vtkRendererCollection *rens;
+    vtkRenderer* ren;
+
+    rens = renWin->GetRenderers();
+    rens->InitTraversal();
+    ren = rens->GetNextItem();
+    if (ren)
+      {
+      cam = ren->GetActiveCamera();
+      }
+
+    int x, y;
+    int tileIdx = this->Controller->GetLocalProcessId();
+    y = tileIdx/this->NumTilesX;
+    x = tileIdx - y*this->NumTilesX;
+    // Flip the y axis to match IceT
+    y = this->NumTilesY-1-y;
+    // Setup the camera for this tile.
+    cam->SetWindowCenter(1.0-(double)(this->NumTilesX) + 2.0*(double)x,
+                         1.0-(double)(this->NumTilesY) + 2.0*(double)y);
+
+
+    return;
+    }
+
+
   this->UpdateIceTContext();
 
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
   vtkRenderer *ren;
   int i;
-  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+  for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
     {
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
     if (icetRen == NULL)
       {
       vtkWarningMacro("vtkIceTRenderManager used with renderer that is not "
-          "vtkIceTRenderer.\n"
-          "Remember to use\n\n"
-          "    vtkParallelRenderManager::MakeRenderer()\n\n"
-          "in place of vtkRenderer::New()");
+              "vtkIceTRenderer.\n"
+              "Remember to use\n\n"
+              "    vtkParallelRenderManager::MakeRenderer()\n\n"
+              "in place of vtkRenderer::New()");
       }
     else
       {
@@ -425,9 +580,9 @@ void vtkIceTRenderManager::PreRenderProcessing()
       // Restore viewports.  ICE-T will handle reduced images better on its own.
       float *viewport = ren->GetViewport();
       ren->SetViewport(viewport[0]*this->ImageReductionFactor,
-           viewport[1]*this->ImageReductionFactor,
-           viewport[2]*this->ImageReductionFactor,
-           viewport[3]*this->ImageReductionFactor);
+               viewport[1]*this->ImageReductionFactor,
+               viewport[2]*this->ImageReductionFactor,
+               viewport[3]*this->ImageReductionFactor);
       }
     }
 
@@ -458,6 +613,14 @@ void vtkIceTRenderManager::ReadReducedImage()
     return;
     }
 
+  GLboolean icet_color_buffer_valid;
+  icetGetBooleanv(ICET_COLOR_BUFFER_VALID, &icet_color_buffer_valid);
+  if (!icet_color_buffer_valid)
+    {
+    this->Superclass::ReadReducedImage();
+    return;
+    }
+
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
   rens->InitTraversal();
   vtkRenderer *ren = rens->GetNextItem();
@@ -468,100 +631,61 @@ void vtkIceTRenderManager::ReadReducedImage()
     return;
     }
 
-  this->ReducedImage->SetNumberOfComponents(3);
-  if (this->ImageReductionFactor == 1)
+#ifndef GL_BGRA
+#define GL_BGRA GL_BGRA_EXT
+#endif
+  GLint color_format;
+  icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
+  if (color_format == GL_RGBA)
     {
-    this->FullImage->SetNumberOfComponents(3);
-    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
-               * this->FullImageSize[1]);
-    this->ReducedImage->SetArray(this->FullImage->GetPointer(0),
-         this->FullImage->GetSize(), 1);
+    this->ReducedImage->SetArray(icetGetColorBuffer(),
+                 this->ReducedImageSize[0]
+                 *this->ReducedImageSize[1]*4,
+                 1);
+    this->ReducedImage->SetNumberOfComponents(4);
+    this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
+                      * this->ReducedImageSize[1]);
+    this->ReducedImageSharesData = 1;
     }
-  this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
-          * this->ReducedImageSize[1]);
-
-  unsigned char *dest
-    = this->ReducedImage->WritePointer(0,
-               3*this->ReducedImageSize[0]
-                *this->ReducedImageSize[1]);
-  unsigned char *src;
-
-  GLboolean icet_color_buffer_valid;
-  icetGetBooleanv(ICET_COLOR_BUFFER_VALID, &icet_color_buffer_valid);
-  if (icet_color_buffer_valid)
+  else if (color_format == GL_BGRA)
     {
-    src = icetGetColorBuffer();;
+    this->ReducedImage->SetNumberOfComponents(4);
+    this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
+                      * this->ReducedImageSize[1]);
+    unsigned char *dest
+      = this->ReducedImage->WritePointer(0,
+                     4*this->ReducedImageSize[0]
+                     *this->ReducedImageSize[1]);
+    unsigned char *src = icetGetColorBuffer();
+    int image_size = this->ReducedImageSize[0]*this->ReducedImageSize[1];
+    for (int i = 0; i < image_size; i++, dest += 4, src += 4)
+      {
+      dest[0] = src[2];
+      dest[1] = src[1];
+      dest[2] = src[0];
+      dest[3] = src[3];
+      }
     }
   else
     {
+    vtkErrorMacro("ICE-T using unknown image format.");
     this->Superclass::ReadReducedImage();
     return;
     }
 
-  GLint color_format;
-  icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-
-  int i;
-  int image_size = this->ReducedImageSize[0]*this->ReducedImageSize[1];
-
-#if 0
-  float *fbackground = ren->GetBackground();
-  unsigned char background[3];
-  background[0] = (unsigned char)(fbackground[0]*255);
-  background[1] = (unsigned char)(fbackground[1]*255);
-  background[2] = (unsigned char)(fbackground[2]*255);
-
-#define CONVERT_IMAGE(redi, greeni, bluei, alphai)  \
-  for (i = 0; i < image_size; i++)      \
-    {              \
-    if (src[alphai] == 0)        \
-      {              \
-      dest[0] = background[0];        \
-      dest[1] = background[1];        \
-      dest[2] = background[2];        \
-      }              \
-    else            \
-      {              \
-      dest[0] = src[redi];        \
-      dest[1] = src[greeni];        \
-      dest[2] = src[bluei];        \
-      }              \
-    src += 4;            \
-    dest += 3;            \
-    }
-#else
-#define CONVERT_IMAGE(redi, greeni, bluei, alphai)  \
-  for (i = 0; i < image_size; i++)      \
-    {              \
-    dest[0] = src[redi];        \
-    dest[1] = src[greeni];        \
-    dest[2] = src[bluei];        \
-    src += 4;            \
-    dest += 3;            \
-    }
-#endif
-
-  switch (color_format)
-    {
-    case GL_RGBA:
-      CONVERT_IMAGE(0, 1, 2, 3);
-      break;
-#ifdef GL_BGRA
-    case GL_BGRA:
-#elif defined(GL_BGRA_EXT)
-    case GL_BGRA_EXT:
-#endif
-      CONVERT_IMAGE(2, 1, 0, 3);
-      break;
-    default:
-      vtkErrorMacro("ICE-T using unknown image format.");
-      this->Superclass::ReadReducedImage();
-      break;
-    }
-
-#undef CONVERT_IMAGE
-
   this->ReducedImageUpToDate = true;
+
+  if (this->ImageReductionFactor == 1)
+    {
+    this->FullImage->SetArray(this->ReducedImage->GetPointer(0),
+                  this->FullImageSize[0]*this->FullImageSize[1]*4,
+                  1);
+    this->FullImage->SetNumberOfComponents(4);
+    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
+                       * this->FullImageSize[1]);
+    this->FullImageSharesData = 1;
+    this->FullImageUpToDate = true;
+    }
 }
 
 void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
@@ -597,14 +721,16 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     case DIRECT:  os << "DIRECT";  break;
     }
   os << endl;
+
+  os << indent << "Compose Operation: ";
+  switch (this->ComposeOperation)
+    {
+    case CLOSEST: os << "closest to camera"; break;
+    case OVER:    os << "Porter and Duff OVER operator"; break;
+    }
+  os << endl;
 }
 
-void vtkIceTRenderManager::SetTileDimensions(int x, int y)
-{
-  cout << "SetTileDimensions: " << x <<", " << y << endl;
-  this->SetNumTilesX(x);
-  this->SetNumTilesY(y);
-}
 
 //******************************************************************
 //Local function/method implementation.

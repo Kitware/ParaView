@@ -1,20 +1,4 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkParallelRenderManager.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// -*- c++ -*-
 
 #include "vtkParallelRenderManager.h"
 
@@ -35,23 +19,23 @@
 #include <vtkTimerLog.h>
 
 static void AbortRenderCheck(vtkObject *caller, unsigned long vtkNotUsed(event),
-           void *clientData, void *);
+                 void *clientData, void *);
 static void StartRender(vtkObject *caller, unsigned long vtkNotUsed(event),
-      void *clientData, void *);
+            void *clientData, void *);
 static void EndRender(vtkObject *caller, unsigned long vtkNotUsed(event),
-      void *clientData, void *);
+            void *clientData, void *);
 static void SatelliteStartRender(vtkObject *caller,
-        unsigned long vtkNotUsed(event),
-        void *clientData, void *);
+                unsigned long vtkNotUsed(event),
+                void *clientData, void *);
 static void SatelliteEndRender(vtkObject *caller,
-            unsigned long vtkNotUsed(event),
-            void *clientData, void *);
+                  unsigned long vtkNotUsed(event),
+                  void *clientData, void *);
 static void ResetCamera(vtkObject *caller,
-            unsigned long vtkNotUsed(event),
-            void *clientData, void *);
+                  unsigned long vtkNotUsed(event),
+                  void *clientData, void *);
 static void ResetCameraClippingRange(vtkObject *caller,
-             unsigned long vtkNotUsed(event),
-             void *clientData, void *);
+                     unsigned long vtkNotUsed(event),
+                     void *clientData, void *);
 static void RenderRMI(void *arg, void *, int, int);
 static void ComputeVisiblePropBoundsRMI(void *arg, void *, int, int);
 
@@ -60,6 +44,7 @@ struct RenderWindowInfoInt {
   int ReducedSize[2];
   int NumberOfRenderers;
   int ImageReductionFactor;
+  int UseCompositing;
 };
 struct RenderWindowInfoFloat {
   float DesiredUpdateRate;
@@ -88,7 +73,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.3");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -102,14 +87,19 @@ vtkParallelRenderManager::vtkParallelRenderManager()
   this->Lock = 0;
 
   this->ImageReductionFactor = 1;
-  this->MaxImageReductionFactor = 6;
+  this->MaxImageReductionFactor = 16;
   this->AutoImageReductionFactor = 0;
   this->AverageTimePerPixel = 0.0;
+
+  this->RenderTime = 0.0;
+  this->ImageProcessingTime = 0.0;
 
   this->ParallelRendering = 1;
   this->WriteBackImages = 1;
   this->MagnifyImages = 1;
+  this->MagnifyImageMethod = NEAREST;
   this->RenderEventPropagation = 1;
+  this->UseCompositing = 1;
 
   this->FullImage = vtkUnsignedCharArray::New();
   this->ReducedImage = vtkUnsignedCharArray::New();
@@ -141,6 +131,8 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
      << (this->ParallelRendering ? "on" : "off") << endl;
   os << indent << "RenderEventPropagation: "
      << (this->RenderEventPropagation ? "on" : "off") << endl;
+  os << indent << "UseCompositing: "
+     << (this->UseCompositing ? "on" : "off") << endl;
 
   os << indent << "ObservingRendererWindow: "
      << (this->ObservingRenderWindow ? "yes" : "no") << endl;
@@ -154,6 +146,15 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
      << this->MaxImageReductionFactor << endl;
   os << indent << "AutoImageReductionFactor: "
      << (this->AutoImageReductionFactor ? "on" : "off") << endl;
+
+  if (this->MagnifyImageMethod == LINEAR)
+    {
+    os << indent << "MagnifyImageMethod: LINEAR\n";
+    }
+  else if (this->MagnifyImageMethod == NEAREST)
+    {
+    os << indent << "MagnifyImageMethod: NEAREST\n";
+    }
 
   os << indent << "WriteBackImages: "
      << (this->WriteBackImages ? "on" : "off") << endl;
@@ -170,9 +171,10 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "RootProcessId: " << this->RootProcessId << endl;
 
-  //os << indent << "Last render time: " << this->GetRenderTime() << endl;
-  //os << indent << "Last image processing time: "
-  //   << this->GetImageProcessingTime() << endl;
+  os << indent << "Last render time: " << this->GetRenderTime() << endl;
+  //os << indent << "ImageProcessingTime:\n ";
+  os << indent << "Last image processing time: "
+     << this->GetImageProcessingTime() << endl;
 }
 
 vtkRenderWindow *vtkParallelRenderManager::MakeRenderWindow()
@@ -212,17 +214,17 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
       
       // Will make do with first renderer. (Assumes renderer does not change.)
       if (this->ObservingRenderer)
-  {
-  rens = this->RenderWindow->GetRenderers();
-  rens->InitTraversal();
-  ren = rens->GetNextItem();
-  if (ren)
     {
-    ren->RemoveObserver(this->ResetCameraTag);
-    ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+    rens = this->RenderWindow->GetRenderers();
+    rens->InitTraversal();
+    ren = rens->GetNextItem();
+    if (ren)
+      {
+      //ren->RemoveObserver(this->ResetCameraTag);
+      //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+      }
+    this->ObservingRenderer = false;
     }
-  this->ObservingRenderer = false;
-  }
 
       this->ObservingRenderWindow = false;
       }
@@ -246,14 +248,14 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
     cbc->SetClientData((void*)this);
     // renWin will delete the cbc when the observer is removed.
     this->AbortRenderCheckTag = renWin->AddObserver(vtkCommand::AbortCheckEvent,
-                cbc);
+                            cbc);
     cbc->Delete();
 
     if (this->Controller)
       {
       if (this->Controller->GetLocalProcessId() == this->RootProcessId)
         {
-  this->ObservingRenderWindow = true;
+    this->ObservingRenderWindow = true;
         
         cbc = vtkCallbackCommand::New();
         cbc->SetCallback(::StartRender);
@@ -276,30 +278,30 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
         ren = rens->GetNextItem();
         if (ren)
           {
-    this->ObservingRenderer = true;
+      this->ObservingRenderer = true;
 
-          cbc = vtkCallbackCommand::New();
-          cbc->SetCallback(::ResetCameraClippingRange);
-          cbc->SetClientData((void*)this);
+          //cbc = vtkCallbackCommand::New();
+          //cbc->SetCallback(::ResetCameraClippingRange);
+          //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
-          this->ResetCameraClippingRangeTag = 
-      ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
-          cbc->Delete();
+          //this->ResetCameraClippingRangeTag = 
+            //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+          //cbc->Delete();
 
-          cbc = vtkCallbackCommand::New();
-          cbc->SetCallback(::ResetCamera);
-          cbc->SetClientData((void*)this);
+          //cbc = vtkCallbackCommand::New();
+          //cbc->SetCallback(::ResetCamera);
+          //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
-          this->ResetCameraTag =
-      ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
-          cbc->Delete();
+          //this->ResetCameraTag =
+            //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
+          //cbc->Delete();
           }
         }
       else // LocalProcessId != RootProcessId
         {
         vtkCallbackCommand *cbc;
         
-  this->ObservingRenderWindow = true;
+    this->ObservingRenderWindow = true;
         
         cbc= vtkCallbackCommand::New();
         cbc->SetCallback(::SatelliteStartRender);
@@ -426,7 +428,7 @@ void vtkParallelRenderManager::StartInteractor()
       inter->Start();
       }
     //By the time we reach here, the interaction is finished.
-    this->StopService();
+    this->StopServices();
     }
   else
     {
@@ -452,9 +454,9 @@ void vtkParallelRenderManager::StartService()
   this->Controller->ProcessRMIs();
 }
 
-void vtkParallelRenderManager::StopService()
+void vtkParallelRenderManager::StopServices()
 {
-  vtkDebugMacro("StopService");
+  vtkDebugMacro("StopServices");
 
   if (!this->Controller)
     {
@@ -534,8 +536,11 @@ void vtkParallelRenderManager::StartRender()
     }
   this->FullImageSize[0] = size[0];
   this->FullImageSize[1] = size[1];
-  this->ReducedImageSize[0] = size[0]/this->ImageReductionFactor;
-  this->ReducedImageSize[1] = size[1]/this->ImageReductionFactor;
+  //Round up.
+  this->ReducedImageSize[0]
+    = (size[0]+this->ImageReductionFactor-1)/this->ImageReductionFactor;
+  this->ReducedImageSize[1]
+    = (size[1]+this->ImageReductionFactor-1)/this->ImageReductionFactor;
 
   // Collect and distribute information about current state of RenderWindow
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
@@ -545,6 +550,7 @@ void vtkParallelRenderManager::StartRender()
   winInfoInt.ReducedSize[1] = this->ReducedImageSize[1];
   winInfoInt.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.ImageReductionFactor = this->ImageReductionFactor;
+  winInfoInt.UseCompositing = this->UseCompositing;
   winInfoFloat.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
 
   for (id = 0; id < numProcs; id++)
@@ -553,12 +559,12 @@ void vtkParallelRenderManager::StartRender()
     if (this->RenderEventPropagation)
       {
       this->Controller->TriggerRMI(id, NULL, 0,
-           vtkParallelRenderManager::RENDER_RMI_TAG);
+                   vtkParallelRenderManager::RENDER_RMI_TAG);
       }
     this->Controller->Send((int *)(&winInfoInt), WIN_INFO_INT_SIZE, id,
-         vtkParallelRenderManager::WIN_INFO_INT_TAG);
+               vtkParallelRenderManager::WIN_INFO_INT_TAG);
     this->Controller->Send((float *)(&winInfoFloat), WIN_INFO_FLOAT_SIZE, id,
-         vtkParallelRenderManager::WIN_INFO_FLOAT_TAG);
+               vtkParallelRenderManager::WIN_INFO_FLOAT_TAG);
     this->SendWindowInformation();
     }
 
@@ -567,7 +573,7 @@ void vtkParallelRenderManager::StartRender()
     this->Viewports->SetNumberOfTuples(rens->GetNumberOfItems());
     }
   vtkRenderer *ren;
-  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+  for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
     {
     ren->GetViewport(renInfoFloat.Viewport);
 
@@ -596,24 +602,24 @@ void vtkParallelRenderManager::StartRender()
       {
       if (id == this->RootProcessId) continue;
       this->Controller->Send((int *)(&renInfoInt), REN_INFO_INT_SIZE, id,
-           vtkParallelRenderManager::REN_INFO_INT_TAG);
+                 vtkParallelRenderManager::REN_INFO_INT_TAG);
       this->Controller->Send((float *)(&renInfoFloat), REN_INFO_FLOAT_SIZE, id,
-           vtkParallelRenderManager::REN_INFO_FLOAT_TAG);
+                 vtkParallelRenderManager::REN_INFO_FLOAT_TAG);
       }
 
     vtkLight *light;
-    for (lc->InitTraversal(); (light = lc->GetNextItem()); )
+    for (lc->InitTraversal(); light = lc->GetNextItem(); )
       {
       light->GetPosition(lightInfoFloat.Position);
       light->GetFocalPoint(lightInfoFloat.FocalPoint);
 
       for (id = 0; id < numProcs; id++)
-  {
-  if (id == this->RootProcessId) continue;
-  this->Controller->Send((float *)(&lightInfoFloat),
-             LIGHT_INFO_FLOAT_SIZE, id,
-             vtkParallelRenderManager::LIGHT_INFO_FLOAT_TAG);
-  }
+    {
+    if (id == this->RootProcessId) continue;
+    this->Controller->Send((float *)(&lightInfoFloat),
+                   LIGHT_INFO_FLOAT_SIZE, id,
+                   vtkParallelRenderManager::LIGHT_INFO_FLOAT_TAG);
+    }
       }
 
     this->SendRendererInformation(ren);
@@ -633,6 +639,12 @@ void vtkParallelRenderManager::EndRender()
   this->RenderTime = this->Timer->GetElapsedTime();
   this->ImageProcessingTime = 0;
 
+  if (!this->UseCompositing)
+    {
+    this->Lock = 0;
+    return;
+    }
+
   this->PostRenderProcessing();
 
   // Restore renderer viewports, if necessary.
@@ -641,7 +653,7 @@ void vtkParallelRenderManager::EndRender()
     vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
     vtkRenderer *ren;
     int i;
-    for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+    for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
       {
       ren->SetViewport(this->Viewports->GetPointer(i*4));
       }
@@ -684,14 +696,15 @@ void vtkParallelRenderManager::SatelliteStartRender()
   this->InvokeEvent(vtkCommand::StartEvent, NULL);
 
   this->Controller->Receive((int *)(&winInfoInt), WIN_INFO_INT_SIZE,
-          this->RootProcessId,
-          vtkParallelRenderManager::WIN_INFO_INT_TAG);
+                this->RootProcessId,
+                vtkParallelRenderManager::WIN_INFO_INT_TAG);
   this->Controller->Receive((float *)(&winInfoFloat), WIN_INFO_FLOAT_SIZE,
-          this->RootProcessId,
-          vtkParallelRenderManager::WIN_INFO_FLOAT_TAG);
+                this->RootProcessId,
+                vtkParallelRenderManager::WIN_INFO_FLOAT_TAG);
   this->ReceiveWindowInformation();
 
   this->RenderWindow->SetDesiredUpdateRate(winInfoFloat.DesiredUpdateRate);
+  this->UseCompositing = winInfoInt.UseCompositing;
   this->ImageReductionFactor = winInfoInt.ImageReductionFactor;
   this->FullImageSize[0] = winInfoInt.FullSize[0];
   this->FullImageSize[1] = winInfoInt.FullSize[1];
@@ -704,11 +717,11 @@ void vtkParallelRenderManager::SatelliteStartRender()
   for (i = 0; i < winInfoInt.NumberOfRenderers; i++)
     {
     this->Controller->Receive((int *)(&renInfoInt), REN_INFO_INT_SIZE,
-            this->RootProcessId,
-            vtkParallelRenderManager::REN_INFO_INT_TAG);
+                  this->RootProcessId,
+                  vtkParallelRenderManager::REN_INFO_INT_TAG);
     this->Controller->Receive((float *)(&renInfoFloat), REN_INFO_FLOAT_SIZE,
-            this->RootProcessId,
-            vtkParallelRenderManager::REN_INFO_FLOAT_TAG);
+                  this->RootProcessId,
+                  vtkParallelRenderManager::REN_INFO_FLOAT_TAG);
 
     vtkLightCollection *lc;
     vtkRenderer *ren = rens->GetNextItem();
@@ -732,34 +745,34 @@ void vtkParallelRenderManager::SatelliteStartRender()
     for (j = 0; j < renInfoInt.NumberOfLights; j++)
       {
       if (ren != NULL)
-  {
-  vtkLight *light = lc->GetNextItem();
-  if (light == NULL)
     {
-    // Not enough lights?  Just create them.
-    vtkDebugMacro("Adding light");
-    light = vtkLight::New();
-    ren->AddLight(light);
-    light->Delete();
-    }
+    vtkLight *light = lc->GetNextItem();
+    if (light == NULL)
+      {
+      // Not enough lights?  Just create them.
+      vtkDebugMacro("Adding light");
+      light = vtkLight::New();
+      ren->AddLight(light);
+      light->Delete();
+      }
 
-  this->Controller->Receive((float *)(&lightInfoFloat),
-          LIGHT_INFO_FLOAT_SIZE, this->RootProcessId,
-          vtkParallelRenderManager
-          ::LIGHT_INFO_FLOAT_TAG);
-  light->SetPosition(lightInfoFloat.Position);
-  light->SetFocalPoint(lightInfoFloat.FocalPoint);
-  }
+    this->Controller->Receive((float *)(&lightInfoFloat),
+                  LIGHT_INFO_FLOAT_SIZE, this->RootProcessId,
+                  vtkParallelRenderManager
+                  ::LIGHT_INFO_FLOAT_TAG);
+    light->SetPosition(lightInfoFloat.Position);
+    light->SetFocalPoint(lightInfoFloat.FocalPoint);
+    }
       }
 
     if (ren != NULL)
       {
       vtkLight *light;
-      while ((light = lc->GetNextItem()))
-  {
-  // To many lights?  Just remove the extras.
-  ren->RemoveLight(light);
-  }
+      while (light = lc->GetNextItem())
+    {
+    // To many lights?  Just remove the extras.
+    ren->RemoveLight(light);
+    }
       }
 
     this->ReceiveRendererInformation(ren);
@@ -771,6 +784,10 @@ void vtkParallelRenderManager::SatelliteStartRender()
 void vtkParallelRenderManager::SatelliteEndRender()
 {
   if (!this->ParallelRendering)
+    {
+    return;
+    }
+  if (!this->UseCompositing)
     {
     return;
     }
@@ -789,10 +806,12 @@ void vtkParallelRenderManager::RenderRMI()
 
 void vtkParallelRenderManager::ResetCamera(vtkRenderer *ren)
 {
-  return;
   vtkDebugMacro("ResetCamera");
 
   float bounds[6];
+
+  // ParaView resets the camera its self. 
+  return;
 
   if (this->Lock)
     {
@@ -824,10 +843,12 @@ void vtkParallelRenderManager::ResetCamera(vtkRenderer *ren)
 
 void vtkParallelRenderManager::ResetCameraClippingRange(vtkRenderer *ren)
 {
-  return;
   vtkDebugMacro("ResetCameraClippingRange");
 
   float bounds[6];
+
+  // ParaView resets the cliping range itself
+  return;
 
   if (this->Lock)
     {
@@ -854,7 +875,7 @@ void vtkParallelRenderManager::ComputeVisiblePropBoundsRMI()
   // Get proper renderer.
   int renderId;
   this->Controller->Receive(&renderId, 1, this->RootProcessId,
-          vtkParallelRenderManager::REN_ID_TAG);
+                vtkParallelRenderManager::REN_ID_TAG);
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
   vtkRenderer *ren;
   rens->InitTraversal();
@@ -866,8 +887,8 @@ void vtkParallelRenderManager::ComputeVisiblePropBoundsRMI()
   if (ren == NULL)
     {
     vtkWarningMacro("Client requested invalid renderer in "
-        "ComputeVisiblePropBoundsRMI\n"
-        "Defaulting to first renderer");
+            "ComputeVisiblePropBoundsRMI\n"
+            "Defaulting to first renderer");
     rens->InitTraversal();
     ren = rens->GetNextItem();
     }
@@ -876,25 +897,24 @@ void vtkParallelRenderManager::ComputeVisiblePropBoundsRMI()
   this->LocalComputeVisiblePropBounds(ren, bounds);
 
   this->Controller->Send(bounds, 6, this->RootProcessId,
-       vtkParallelRenderManager::BOUNDS_TAG);
+             vtkParallelRenderManager::BOUNDS_TAG);
 }
 
 void vtkParallelRenderManager::LocalComputeVisiblePropBounds(vtkRenderer *ren,
-                   float bounds[6])
+                                 float bounds[6])
 {
   ren->ComputeVisiblePropBounds(bounds);
 }
 
 
 void vtkParallelRenderManager::ComputeVisiblePropBounds(vtkRenderer *ren,
-              float bounds[6])
+                            float bounds[6])
 {
   vtkDebugMacro("ComputeVisiblePropBounds");
 
-  ren->ComputeVisiblePropBounds(bounds);
-
   if (!this->ParallelRendering)
     {
+    ren->ComputeVisiblePropBounds(bounds);
     return;
     }
 
@@ -913,28 +933,44 @@ void vtkParallelRenderManager::ComputeVisiblePropBounds(vtkRenderer *ren,
       {
       vtkRenderer *myren = rens->GetNextItem();
       if (myren == NULL)
-  {
-  vtkWarningMacro("ComputeVisiblePropBounds called with unregistered renderer " << ren << "\nDefaulting to first renderer.");
-  renderId = 0;
-  break;
-  }
+    {
+    vtkWarningMacro("ComputeVisiblePropBounds called with unregistered renderer " << ren << "\nDefaulting to first renderer.");
+    renderId = 0;
+    break;
+    }
       if (myren == ren)
-  {
-  //Found right renderer.
-  break;
-  }
+    {
+    //Found correct renderer.
+    break;
+    }
       renderId++;
       }
 
+    //Invoke RMI's on servers to perform their own ComputeVisiblePropBounds.
     int numProcs = this->Controller->GetNumberOfProcesses();
-    for (int id = 0; id < numProcs; id++)
+    int id;
+    for (id = 0; id < numProcs; id++)
       {
-      float tmp[6];
       if (id == this->RootProcessId) continue;
       this->Controller->TriggerRMI
-  (id, vtkParallelRenderManager::COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
+    (id, vtkParallelRenderManager::COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
       this->Controller->Send(&renderId, 1, id,
-           vtkParallelRenderManager::REN_ID_TAG);
+                 vtkParallelRenderManager::REN_ID_TAG);
+      }
+    
+    //Now that all the RMI's have been invoked, we can safely query our
+    //local bounds even if an Update requires a parallel operation.
+
+    this->LocalComputeVisiblePropBounds(ren, bounds);
+  
+    //Collect all the bounds.
+    for (id = 0; id < numProcs; id++)
+      {
+      
+      float tmp[6];
+
+      if (id == this->RootProcessId) continue;
+
       this->Controller->Receive(tmp, 6, id, vtkParallelRenderManager::BOUNDS_TAG);
       
       if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
@@ -948,6 +984,8 @@ void vtkParallelRenderManager::ComputeVisiblePropBounds(vtkRenderer *ren,
   else
     {
     vtkWarningMacro("ComputeVisiblePropBounds/ResetCamera called before Controller set");
+
+    ren->ComputeVisiblePropBounds(bounds);
     }
 }
 
@@ -963,10 +1001,10 @@ void vtkParallelRenderManager::InitializeRMIs()
     }
 
   this->Controller->AddRMI(::RenderRMI, this,
-         vtkParallelRenderManager::RENDER_RMI_TAG);
+               vtkParallelRenderManager::RENDER_RMI_TAG);
   this->Controller->AddRMI(::ComputeVisiblePropBoundsRMI, this,
-         vtkParallelRenderManager::
-         COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
+               vtkParallelRenderManager::
+               COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
 }
 
 void vtkParallelRenderManager::ResetAllCameras()
@@ -983,17 +1021,53 @@ void vtkParallelRenderManager::ResetAllCameras()
   vtkRenderer *ren;
 
   rens = this->RenderWindow->GetRenderers();
-  for (rens->InitTraversal(); (ren = rens->GetNextItem()); )
+  for (rens->InitTraversal(); ren = rens->GetNextItem(); )
     {
     this->ResetCamera(ren);
     }
+}
+
+void vtkParallelRenderManager::SetImageReductionFactor(int factor)
+{
+  // Clamp factor.
+  factor = (factor < 1) ? 1 : factor;
+  factor = (factor > this->MaxImageReductionFactor)
+    ? this->MaxImageReductionFactor : factor;
+
+  if (this->MagnifyImageMethod == LINEAR)
+    {
+    // Make factor be a power of 2.
+    int pow_of_2 = 1;
+    while (pow_of_2 <= factor) pow_of_2 <<= 1;
+    factor = pow_of_2 >> 1;
+    }
+
+  if (factor == this->ImageReductionFactor)
+    {
+    return;
+    }
+
+  this->ImageReductionFactor = factor;
+  this->Modified();
+}
+
+void vtkParallelRenderManager::SetMagnifyImageMethod(int method)
+{
+  if (this->MagnifyImageMethod == method)
+    {
+    return;
+    }
+
+  this->MagnifyImageMethod = method;
+  // May need to modify image reduction factor.
+  this->SetImageReductionFactor(this->ImageReductionFactor);
 }
 
 void vtkParallelRenderManager
     ::SetImageReductionFactorForUpdateRate(float DesiredUpdateRate)
 {
   vtkDebugMacro("Setting reduction factor for update rate of "
-    << DesiredUpdateRate);
+        << DesiredUpdateRate);
 
   if (DesiredUpdateRate == 0.0)
     {
@@ -1031,8 +1105,8 @@ void vtkParallelRenderManager
     }
 
   vtkDebugMacro("TimePerPixel: " << TimePerPixel
-    << ", AverageTimePerPixel: " << this->AverageTimePerPixel
-    << ", AllottedPixelTime: " << AllottedPixelTime);
+        << ", AverageTimePerPixel: " << this->AverageTimePerPixel
+        << ", AllottedPixelTime: " << AllottedPixelTime);
 
   double PixelsToUse = AllottedPixelTime/this->AverageTimePerPixel;
 
@@ -1061,6 +1135,143 @@ int vtkParallelRenderManager::LastRenderInFrontBuffer()
   return this->RenderWindow->GetSwapBuffers();
 }
 
+static void MagnifyImageNearest(vtkUnsignedCharArray *FullImage,
+                int FullImageSize[2],
+                vtkUnsignedCharArray *ReducedImage,
+                int ReducedImageSize[2],
+                vtkTimerLog *Timer)
+{
+  int num_comp = ReducedImage->GetNumberOfComponents();;
+
+  FullImage->SetNumberOfComponents(num_comp);
+  FullImage->SetNumberOfTuples(FullImageSize[0]*FullImageSize[1]);
+
+  Timer->StartTimer();
+
+  // Inflate image.
+  float xstep = (float)ReducedImageSize[0]/FullImageSize[0];
+  float ystep = (float)ReducedImageSize[1]/FullImageSize[1];
+  unsigned char *lastsrcline = NULL;
+  for (int y = 0; y < FullImageSize[1]; y++)
+    {
+    unsigned char *destline
+      = FullImage->GetPointer(num_comp*FullImageSize[0]*y);
+    unsigned char *srcline
+      = ReducedImage->GetPointer(num_comp*ReducedImageSize[0]*(int)(ystep*y));
+    if (srcline == lastsrcline)
+      {
+      // This line same as last one.
+      memcpy(destline,
+         (const unsigned char *)(destline - num_comp*FullImageSize[0]),
+         num_comp*FullImageSize[0]);
+      }
+    else
+      {
+      for (int x = 0; x < FullImageSize[0]; x++)
+    {
+    int srcloc = num_comp*(int)(x*xstep);
+    int destloc = num_comp*x;
+    for (int i = 0; i < num_comp; i++)
+      {
+      destline[destloc + i] = srcline[srcloc + i];
+      }
+    }
+      lastsrcline = srcline;
+      }
+    }
+
+  Timer->StopTimer();
+}
+
+// A neat trick to quickly divide all 4 of the bytes in an integer by 2.
+#define VEC_DIV_2(intvector)    (((intvector) >> 1) & 0x7F7F7F7F)
+
+static void MagnifyImageLinear(vtkUnsignedCharArray *FullImage,
+                int FullImageSize[2],
+                vtkUnsignedCharArray *ReducedImage,
+                int ReducedImageSize[2],
+                vtkTimerLog *Timer)
+{
+  int xmag, ymag;
+  int x, y;
+  int src_comp = ReducedImage->GetNumberOfComponents();;
+
+  //Allocate full image so all pixels are on 4-byte integer boundaries.
+  FullImage->SetNumberOfComponents(4);
+  FullImage->SetNumberOfTuples(FullImageSize[0]*FullImageSize[1]);
+
+  Timer->StartTimer();
+
+  // Guess x and y magnification.  Round up to ensure we do not try to
+  // read data from the image data that does not exist.
+  xmag = (FullImageSize[0]+ReducedImageSize[0]-1)/ReducedImageSize[0];
+  ymag = (FullImageSize[1]+ReducedImageSize[1]-1)/ReducedImageSize[1];
+
+  // For speed, we only magnify by powers of 2.  Round up to the nearest
+  // power of 2 to ensure that the reduced image is large enough.
+  int pow_of_2;
+  for (pow_of_2 = 1; pow_of_2 < xmag; pow_of_2 <<= 1);
+  xmag = pow_of_2;
+  for (pow_of_2 = 1; pow_of_2 < ymag; pow_of_2 <<= 1);
+  ymag = pow_of_2;
+
+  unsigned char *srcline = ReducedImage->GetPointer(0);
+  unsigned char *destline = FullImage->GetPointer(0);
+  for (y = 0; y < FullImageSize[1]; y += ymag)
+    {
+    unsigned char *srcval = srcline;
+    unsigned char *destval = destline;
+    for (x = 0; x < FullImageSize[0]; x += xmag)
+      {
+      destval[0] = srcval[0];
+      destval[1] = srcval[1];
+      destval[2] = srcval[2];
+      destval[3] = 0xFF;    //Hope we don't need the alpha value.
+      srcval += src_comp;
+      destval += 4*xmag;
+      }
+    srcline += src_comp*ReducedImageSize[0];
+    destline += 4*FullImageSize[0]*ymag;
+    }
+
+  // Now that we have everything on 4-byte boundaries, we will treat
+  // everything as integers for much faster computation.
+  unsigned int *image = (unsigned int *)FullImage->GetPointer(0);
+
+  // Fill in scanlines.
+  for (; xmag > 1; xmag >>= 1)
+    {
+    int half_xmag = xmag/2;
+    for (y = 0; y < FullImageSize[1]; y += ymag)
+      {
+      unsigned int *scanline = image + y*FullImageSize[0];
+      int max_x = FullImageSize[0] - half_xmag;    //Don't access bad memory.
+      for (x = half_xmag; x < max_x; x += xmag)
+    {
+    scanline[x] =
+      VEC_DIV_2(scanline[x-half_xmag]) + VEC_DIV_2(scanline[x+half_xmag]);
+    }
+      }
+    }
+
+  // Add blank scanlines.
+  for (; ymag > 1; ymag >>= 1)
+    {
+    int half_ymag = ymag/2;
+    int max_y = FullImageSize[1] - half_ymag;    //Don't access bad memory.
+    for (y = half_ymag; y < max_y; y += ymag)
+      {
+      unsigned int *destline = image + y*FullImageSize[0];
+      unsigned int *srcline1 = image + (y-half_ymag)*FullImageSize[0];
+      unsigned int *srcline2 = image + (y+half_ymag)*FullImageSize[0];
+      for (x = 0; x < FullImageSize[0]; x++)
+    {
+    destline[x] = VEC_DIV_2(srcline1[x]) + VEC_DIV_2(srcline2[x]);
+    }
+      }
+    }
+}
+
 void vtkParallelRenderManager::MagnifyReducedImage()
 {
   if ((this->FullImageUpToDate))
@@ -1072,45 +1283,19 @@ void vtkParallelRenderManager::MagnifyReducedImage()
 
   if (this->FullImage->GetPointer(0) != this->ReducedImage->GetPointer(0))
     {
-    this->FullImage->SetNumberOfComponents(3);
-    this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
-               * this->FullImageSize[1]);
-
-    this->Timer->StartTimer();
-
-    // Inflate image.
-    float xstep = (float)this->ReducedImageSize[0]/this->FullImageSize[0];
-    float ystep = (float)this->ReducedImageSize[1]/this->FullImageSize[1];
-    unsigned char *lastsrcline = NULL;
-    for (int y = 0; y < this->FullImageSize[1]; y++)
+    switch (this->MagnifyImageMethod)
       {
-      unsigned char *destline
-  = this->FullImage->GetPointer(3*this->FullImageSize[0]*y);
-      unsigned char *srcline
-  = this->ReducedImage->GetPointer(  3*this->ReducedImageSize[0]
-           * (int)(ystep*y));
-      if (srcline == lastsrcline)
-  {
-  // This line same as last one.
-  memcpy(destline,
-         (const unsigned char *)(destline - 3*this->FullImageSize[0]),
-         3*this->FullImageSize[0]);
-  }
-      else
-  {
-  for (int x = 0; x < this->FullImageSize[0]; x++)
-    {
-    int srcloc = 3*(int)(x*xstep);
-    int destloc = 3*x;
-    destline[destloc + 0] = srcline[srcloc + 0];
-    destline[destloc + 1] = srcline[srcloc + 1];
-    destline[destloc + 2] = srcline[srcloc + 2];
-    }
-  lastsrcline = srcline;
-  }
+      case NEAREST:
+    MagnifyImageNearest(this->FullImage, this->FullImageSize,
+                this->ReducedImage, this->ReducedImageSize,
+                this->Timer);
+    break;
+      case LINEAR:
+    MagnifyImageLinear(this->FullImage, this->FullImageSize,
+               this->ReducedImage, this->ReducedImageSize,
+               this->Timer);
+    break;
       }
-
-    this->Timer->StopTimer();
     // We log the image inflation under render time because it is inversely
     // proportional to the image size.  This makes the auto image reduction
     // calculation work better.
@@ -1130,11 +1315,7 @@ void vtkParallelRenderManager::WriteFullImage()
   if (this->MagnifyImages && (this->ImageReductionFactor > 1))
     {
     this->MagnifyReducedImage();
-    this->RenderWindow->SetPixelData(0, 0,
-             this->FullImageSize[0]-1,
-             this->FullImageSize[1]-1,
-             this->FullImage,
-             this->LastRenderInFrontBuffer());
+    this->SetRenderWindowPixelData(this->FullImage, this->FullImageSize);
     }
   else
     {
@@ -1142,15 +1323,34 @@ void vtkParallelRenderManager::WriteFullImage()
     // changed.
     if (this->ReducedImageUpToDate)
       {
-      this->RenderWindow->SetPixelData(0, 0,
-               this->ReducedImageSize[0]-1,
-               this->ReducedImageSize[1]-1,
-               this->ReducedImage,
-               this->LastRenderInFrontBuffer());
+      this->SetRenderWindowPixelData(this->ReducedImage,
+                     this->ReducedImageSize);
       }
     }
 
   this->RenderWindowImageUpToDate = true;
+}
+
+void vtkParallelRenderManager
+    ::SetRenderWindowPixelData(vtkUnsignedCharArray *pixels,
+                   const int pixel_dimensions[2])
+{
+  if (pixels->GetNumberOfComponents() == 4)
+    {
+    this->RenderWindow->SetRGBACharPixelData(0, 0,
+                         pixel_dimensions[0]-1,
+                         pixel_dimensions[1]-1,
+                         pixels,
+                         this->LastRenderInFrontBuffer());
+    }
+  else
+    {
+    this->RenderWindow->SetPixelData(0, 0,
+                     pixel_dimensions[0]-1,
+                     pixel_dimensions[1]-1,
+                     pixels,
+                     this->LastRenderInFrontBuffer());
+    }
 }
 
 void vtkParallelRenderManager::ReadReducedImage()
@@ -1164,22 +1364,22 @@ void vtkParallelRenderManager::ReadReducedImage()
 
   if (this->ImageReductionFactor > 1)
     {
-    this->RenderWindow->GetPixelData(0, 0, this->ReducedImageSize[0]-1,
-             this->ReducedImageSize[1]-1,
-             this->LastRenderInFrontBuffer(),
-             this->ReducedImage);
+    this->RenderWindow->GetRGBACharPixelData(0, 0, this->ReducedImageSize[0]-1,
+                         this->ReducedImageSize[1]-1,
+                         this->LastRenderInFrontBuffer(),
+                         this->ReducedImage);
     }
   else
     {
-    this->RenderWindow->GetPixelData(0, 0, this->FullImageSize[0]-1,
-             this->FullImageSize[1]-1,
-             this->LastRenderInFrontBuffer(),
-             this->FullImage);
+    this->RenderWindow->GetRGBACharPixelData(0, 0, this->FullImageSize[0]-1,
+                         this->FullImageSize[1]-1,
+                         this->LastRenderInFrontBuffer(),
+                         this->FullImage);
     this->FullImageUpToDate = true;
     this->ReducedImage
       ->SetNumberOfComponents(this->FullImage->GetNumberOfComponents());
     this->ReducedImage->SetArray(this->FullImage->GetPointer(0),
-         this->FullImage->GetSize(), 1);
+                 this->FullImage->GetSize(), 1);
     this->ReducedImage->SetNumberOfTuples(this->FullImage->GetNumberOfTuples());
     }
 
@@ -1202,12 +1402,12 @@ void vtkParallelRenderManager::GetPixelData(vtkUnsignedCharArray *data)
 
   data->SetNumberOfComponents(this->FullImage->GetNumberOfComponents());
   data->SetArray(this->FullImage->GetPointer(0),
-     this->FullImage->GetSize(), 1);
+         this->FullImage->GetSize(), 1);
   data->SetNumberOfTuples(this->FullImage->GetNumberOfTuples());
 }
 
 void vtkParallelRenderManager::GetPixelData(int x1, int y1, int x2, int y2,
-              vtkUnsignedCharArray *data)
+                        vtkUnsignedCharArray *data)
 {
   if (!this->RenderWindow)
     {
@@ -1240,16 +1440,19 @@ void vtkParallelRenderManager::GetPixelData(int x1, int y1, int x2, int y2,
   vtkIdType width = x2 - x1 + 1;
   vtkIdType height = y2 - y1 + 1;
 
-  data->SetNumberOfComponents(3);
+  int num_comp = this->FullImage->GetNumberOfComponents();
+
+  data->SetNumberOfComponents(num_comp);
   data->SetNumberOfTuples(width*height);
 
   const unsigned char *src = this->FullImage->GetPointer(0);
-  unsigned char *dest = data->WritePointer(0, width*height*3);
+  unsigned char *dest = data->WritePointer(0, width*height*num_comp);
 
   for (int row = 0; row < height; row++)
     {
-    memcpy(dest + row*width*3,
-     src + (row+y1)*this->FullImageSize[0]*3 + x1*3, width*3);
+    memcpy(dest + row*width*num_comp,
+       src + (row+y1)*this->FullImageSize[0]*num_comp + x1*num_comp,
+       width*num_comp);
     }
 }
 
@@ -1266,13 +1469,13 @@ void vtkParallelRenderManager::GetReducedPixelData(vtkUnsignedCharArray *data)
 
   data->SetNumberOfComponents(this->ReducedImage->GetNumberOfComponents());
   data->SetArray(this->ReducedImage->GetPointer(0),
-     this->ReducedImage->GetSize(), 1);
+         this->ReducedImage->GetSize(), 1);
   data->SetNumberOfTuples(this->ReducedImage->GetNumberOfTuples());
 }
 
 void vtkParallelRenderManager::GetReducedPixelData(int x1, int y1,
-               int x2, int y2,
-               vtkUnsignedCharArray *data)
+                           int x2, int y2,
+                           vtkUnsignedCharArray *data)
 {
   if (!this->RenderWindow)
     {
@@ -1305,23 +1508,26 @@ void vtkParallelRenderManager::GetReducedPixelData(int x1, int y1,
   vtkIdType width = x2 - x1 + 1;
   vtkIdType height = y2 - y1 + 1;
 
-  data->SetNumberOfComponents(3);
+  int num_comp = this->ReducedImage->GetNumberOfComponents();
+
+  data->SetNumberOfComponents(num_comp);
   data->SetNumberOfTuples(width*height);
 
   const unsigned char *src = this->ReducedImage->GetPointer(0);
-  unsigned char *dest = data->WritePointer(0, width*height*3);
+  unsigned char *dest = data->WritePointer(0, width*height*num_comp);
 
   for (int row = 0; row < height; row++)
     {
-    memcpy(dest + row*width*3,
-     src + (row+y1)*this->ReducedImageSize[0]*3 + x1*3, width*3);
+    memcpy(dest + row*width*num_comp,
+       src + (row+y1)*this->ReducedImageSize[0]*num_comp + x1*num_comp,
+       width*num_comp);
     }
 }
 
 // Static function prototypes --------------------------------------------
 
 static void AbortRenderCheck(vtkObject *caller, unsigned long vtkNotUsed(event),
-           void *clientData, void *)
+                 void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   if (caller != self->GetRenderWindow())
@@ -1333,7 +1539,7 @@ static void AbortRenderCheck(vtkObject *caller, unsigned long vtkNotUsed(event),
 }
 
 static void StartRender(vtkObject *caller, unsigned long vtkNotUsed(event),
-      void *clientData, void *)
+            void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   if (caller != self->GetRenderWindow())
@@ -1345,7 +1551,7 @@ static void StartRender(vtkObject *caller, unsigned long vtkNotUsed(event),
 }
 
 static void EndRender(vtkObject *caller, unsigned long vtkNotUsed(event),
-      void *clientData, void *)
+            void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   if (caller != self->GetRenderWindow())
@@ -1357,8 +1563,8 @@ static void EndRender(vtkObject *caller, unsigned long vtkNotUsed(event),
 }
 
 static void SatelliteStartRender(vtkObject *caller,
-        unsigned long vtkNotUsed(event),
-        void *clientData, void *)
+                unsigned long vtkNotUsed(event),
+                void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   if (caller != self->GetRenderWindow())
@@ -1370,8 +1576,8 @@ static void SatelliteStartRender(vtkObject *caller,
 }
 
 static void SatelliteEndRender(vtkObject *caller,
-            unsigned long vtkNotUsed(event),
-            void *clientData, void *)
+                  unsigned long vtkNotUsed(event),
+                  void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   if (caller != self->GetRenderWindow())
@@ -1383,8 +1589,8 @@ static void SatelliteEndRender(vtkObject *caller,
 }
 
 static void ResetCamera(vtkObject *caller,
-      unsigned long vtkNotUsed(event),
-      void *clientData, void *)
+            unsigned long vtkNotUsed(event),
+            void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   vtkRenderer *ren = (vtkRenderer *)caller;
@@ -1392,8 +1598,8 @@ static void ResetCamera(vtkObject *caller,
 }
 
 static void ResetCameraClippingRange(vtkObject *caller,
-             unsigned long vtkNotUsed(event),
-             void *clientData, void *)
+                     unsigned long vtkNotUsed(event),
+                     void *clientData, void *)
 {
   vtkParallelRenderManager *self = (vtkParallelRenderManager *)clientData;
   vtkRenderer *ren = (vtkRenderer *)caller;

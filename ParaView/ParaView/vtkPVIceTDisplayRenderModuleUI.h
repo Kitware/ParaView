@@ -51,21 +51,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVIceTDisplayRenderModuleUI_h
 #define __vtkPVIceTDisplayRenderModuleUI_h
 
-#include "vtkPVRenderModuleUI.h"
+#include "vtkPVLODRenderModuleUI.h"
 
 class vtkPVIceTDisplayRenderModule;
 
-class VTK_EXPORT vtkPVIceTDisplayRenderModuleUI : public vtkPVRenderModuleUI
+class VTK_EXPORT vtkPVIceTDisplayRenderModuleUI : public vtkPVLODRenderModuleUI
 {
 public:
   static vtkPVIceTDisplayRenderModuleUI* New();
-  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModuleUI,vtkPVRenderModuleUI);
+  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModuleUI,vtkPVLODRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Tracing uses the method with the argument.
+  // A reduction value of 1 is equivalent to having the feature
+  // disabled.
+  void ReductionCheckCallback();
+  void ReductionFactorScaleCallback();
+  void SetReductionFactor(int val);
+
+  // Description:
+  // Downcasts rm pointer to vtkPVIceTDisplayRenderModule for internal use.
+  virtual void SetRenderModule(vtkPVRenderModule* rm);
+
+  // Description:
+  // Creates the UI.
+  virtual void Create(vtkKWApplication *app, const char *);
+
 
 protected:
   vtkPVIceTDisplayRenderModuleUI();
   ~vtkPVIceTDisplayRenderModuleUI();
  
+  vtkKWLabel*       ReductionLabel;
+  vtkKWCheckButton* ReductionCheck;
+  vtkKWScale*       ReductionFactorScale;
+  vtkKWLabel*       ReductionFactorLabel;
+  int               ReductionFactor;
+
+  vtkPVIceTDisplayRenderModule* IceTRenderModule;
+
   vtkPVIceTDisplayRenderModuleUI(const vtkPVIceTDisplayRenderModuleUI&); // Not implemented
   void operator=(const vtkPVIceTDisplayRenderModuleUI&); // Not implemented
 };

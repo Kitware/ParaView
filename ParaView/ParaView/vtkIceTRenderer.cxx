@@ -1,29 +1,12 @@
-/*=========================================================================
+/* -*- c++ -*- *******************************************************/
 
-  Program:   Visualization Toolkit
-  Module:    vtkIceTRenderer.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+/* Id */
 
 #include "vtkIceTRenderer.h"
 
-#include <vtkObjectFactory.h>
-#include <vtkLightCollection.h>
-
-#include <GL/ice-t.h>
-
-#define VTK41 1
+#include "vtkObjectFactory.h"
+#include "vtkLightCollection.h"
+#include "vtkCommand.h"
 
 //******************************************************************
 // Prototypes
@@ -39,12 +22,13 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.2");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.3");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
 {
   this->ComposeNextFrame = 0;
+  this->InIceTRender = 0;
 }
 
 vtkIceTRenderer::~vtkIceTRenderer()
@@ -53,8 +37,14 @@ vtkIceTRenderer::~vtkIceTRenderer()
 
 void vtkIceTRenderer::ComputeAspect()
 {
-  float aspect[2];
   this->Superclass::ComputeAspect();
+
+  if (!this->ComposeNextFrame)
+    {
+    return;
+    }
+
+  float aspect[2];
   this->GetAspect(aspect);
 
   int global_viewport[4];
@@ -97,6 +87,25 @@ void vtkIceTRenderer::DeviceRender()
     this->CreateLight();
     }
 
+  //Make sure we tell ICE-T what the background color is.  Make sure
+  //the background is transparent if blending colors.
+  GLint in_buffers;
+  icetGetIntegerv(ICET_INPUT_BUFFERS, &in_buffers);
+  if (in_buffers == ICET_COLOR_BUFFER_BIT)
+    {
+    glClearColor((GLclampf)(this->Background[0]),
+         (GLclampf)(this->Background[1]),
+         (GLclampf)(this->Background[2]),
+         (GLclampf)(0.0));
+    }
+  else
+    {
+    glClearColor((GLclampf)(this->Background[0]),
+         (GLclampf)(this->Background[1]),
+         (GLclampf)(this->Background[2]),
+         (GLclampf)(1.0));
+    }
+
   //ICE-T works much better if it knows the bounds of the geometry.
   float allBounds[6];
   this->ComputeVisiblePropBounds(allBounds);
@@ -104,13 +113,13 @@ void vtkIceTRenderer::DeviceRender()
   //nothing is in bounds.
   if (allBounds[0] > allBounds[1])
     {
-    float tmp = 1e38;
+    float tmp = VTK_LARGE_FLOAT;
     icetBoundingVertices(1, ICET_FLOAT, 0, 1, &tmp);
     }
   else
     {
     icetBoundingBoxf(allBounds[0], allBounds[1], allBounds[2], allBounds[3],
-         allBounds[4], allBounds[5]);
+             allBounds[4], allBounds[5]);
     }
 
   //Setup ICE-T callback function.  Note that this is not thread safe.
@@ -118,7 +127,9 @@ void vtkIceTRenderer::DeviceRender()
   icetDrawFunc(draw);
 
   //Now tell ICE-T to render the frame.
+  this->InIceTRender = 1;
   icetDrawFrame();
+  this->InIceTRender = 0;
 
   //Pop the modelview matrix (because the camera pushed it).
   glMatrixMode(GL_MODELVIEW);
@@ -126,6 +137,32 @@ void vtkIceTRenderer::DeviceRender()
 
   //Don't compose the next frame unless we are told to.
   this->ComposeNextFrame = 0;
+
+  //I think this is necessary because UpdateGeometry() no longer calls
+  //EndEvent.  That seems like a weird place to invoke EndEvent when
+  //StartEvent is invoked in Render().
+  this->InvokeEvent(vtkCommand::EndEvent, NULL);
+
+  //This is also traditionally done in UpdateGeometry().
+  this->RenderTime.Modified();
+}
+
+void vtkIceTRenderer::Clear()
+{
+  if (!this->InIceTRender)
+    {
+    this->Superclass::Clear();
+    return;
+    }
+
+  // Set clear color so that it is transparent if color blending.
+  float bgcolor[4];
+  icetGetFloatv(ICET_BACKGROUND_COLOR, bgcolor);
+  vtkDebugMacro("Clear Color: " << bgcolor[0] << ", " << bgcolor[1]
+        << ", " << bgcolor[2] << ", " << bgcolor[3]);
+  glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);
+  glClearDepth(1.0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void vtkIceTRenderer::RenderWithoutCamera()
@@ -133,7 +170,7 @@ void vtkIceTRenderer::RenderWithoutCamera()
   vtkDebugMacro("In vtkIceTRenderer::RenderWithoutCamera()");
 
   //Won't actually set camera view because we overrode UpdateCamera
-  this->vtkOpenGLRenderer::DeviceRender();
+  this->Superclass::DeviceRender();
 }
 
 //Fake a camera update without actually changing any matrix.
@@ -153,10 +190,10 @@ int vtkIceTRenderer::UpdateCamera()
   return 1;
 }
 
-#define MI(r,c)  (c*4+r)
+#define MI(r,c)    (c*4+r)
 static inline void UpdateViewParams(GLdouble vert[3], GLdouble transform[16],
-            bool &left, bool &right, bool &bottom,
-            bool &top, bool &znear, bool &zfar)
+                    bool &left, bool &right, bool &bottom,
+                    bool &top, bool &znear, bool &zfar)
 {
   GLdouble x, y, z, w;
 
@@ -195,9 +232,9 @@ int vtkIceTRenderer::UpdateGeometry()
     for (int r = 0; r < 4; r++)
       {
       transform[c*4+r] = (  projection[MI(r,0)]*modelview[MI(0,c)]
-        + projection[MI(r,1)]*modelview[MI(1,c)]
-        + projection[MI(r,2)]*modelview[MI(2,c)]
-        + projection[MI(r,3)]*modelview[MI(3,c)]);
+              + projection[MI(r,1)]*modelview[MI(1,c)]
+              + projection[MI(r,2)]*modelview[MI(2,c)]
+              + projection[MI(r,3)]*modelview[MI(3,c)]);
       }
     }
 
@@ -233,57 +270,35 @@ int vtkIceTRenderer::UpdateGeometry()
     }
 
   //Now render the props that are really visible.
-#if VTK41
   this->NumberOfPropsRendered = 0;
-#else
-  this->NumberOfPropsRenderedAsGeometry = 0;
-#endif
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
       {
-#if VTK41
       this->NumberOfPropsRendered +=
-  this->PropArray[i]->RenderOpaqueGeometry(this);
-#else
-      this->NumberOfPropsRenderedAsGeometry +=
-  this->PropArray[i]->RenderOpaqueGeometry(this);
-#endif
+    this->PropArray[i]->RenderOpaqueGeometry(this);
       }
     }
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
       {
-#if VTK41
       this->NumberOfPropsRendered +=
-  this->PropArray[i]->RenderTranslucentGeometry(this);
-#else
-      this->NumberOfPropsRenderedAsGeometry +=
-  this->PropArray[i]->RenderTranslucentGeometry(this);
-#endif
+    this->PropArray[i]->RenderTranslucentGeometry(this);
       }
     }
 
-#if VTK41
   vtkDebugMacro("Rendered " << this->NumberOfPropsRendered
-    << " actors");
-#else
-  vtkDebugMacro("Rendered " << this->NumberOfPropsRenderedAsGeometry
-    << " actors");
-#endif
+        << " actors");
 
   delete[] visible;
-#if VTK41
   return this->NumberOfPropsRendered;
-#else
-  return this->NumberOfPropsRenderedAsGeometry;
-#endif
 }
 
 void vtkIceTRenderer::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->vtkOpenGLRenderer::PrintSelf(os, indent);
+
   os << indent << "ComposeNextFrame: " << this->ComposeNextFrame << endl;
 }
 

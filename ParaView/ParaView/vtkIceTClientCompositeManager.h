@@ -39,6 +39,7 @@ class vtkRenderer;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
+class vtkIceTRenderManager;
 
 class VTK_EXPORT vtkIceTClientCompositeManager : public vtkObject
 {
@@ -87,37 +88,20 @@ public:
   vtkGetMacro(ClientFlag, int);
 
   // Description:
-  // This flag tells the compositer to use char values for pixel data rather than float.
-  // Default is float.  I have seen some artifacts on some systems with char.
-  void SetUseChar(int useChar);
-  vtkGetMacro(UseChar, int);
-  vtkBooleanMacro(UseChar, int);
-
-  // Description:
-  // This flag tells the compositier to get the color buffer as RGB 
-  // instead of RGBA. We do not use the alpha value so it is not 
-  // important to get.  ATI Radeon cards / drivers do not properly get 
-  // the color buffer as RGBA.  This flag turns the UseChar flag on 
-  // because VTK does not have methods to get the pixel data as RGB float.
-  void SetUseRGB(int useRGB);
-  vtkGetMacro(UseRGB, int);
-  vtkBooleanMacro(UseRGB, int);
-
-  // Description:
   // For values larger than 1, render a smaller image and display the
   // result using pixel replication.
-  vtkSetMacro(ReductionFactor, int);
-  vtkGetMacro(ReductionFactor, int);
+  vtkSetMacro(ImageReductionFactor, int);
+  vtkGetMacro(ImageReductionFactor, int);
 
   // Description:
   // Methods that are not used at the moment.
   virtual void SetRenderView(vtkObject*) {};
 
   // Description:
-  // When the server has more than one process, this object
-  // composites the buffers into one.  Defaults to vtkCompressCompositer.
-  void SetCompositer(vtkCompositer *c);
-  vtkGetObjectMacro(Compositer,vtkCompositer);
+  // This is the server (IceT) manager.
+  // This is the way we propagate the parameters client->server.
+  void SetIceTManager(vtkIceTRenderManager *c);
+  vtkGetObjectMacro(IceTManager,vtkIceTRenderManager);
 
   // Description:
   // These parameters allow this object to manage a tiled display.
@@ -153,10 +137,11 @@ public:
   void GatherZBufferValueRMI(int x, int y);
 
   // Description:
-  // Turn on and off Squirt compression
-  vtkBooleanMacro(UseSquirt, int);
-  vtkSetClampMacro(UseSquirt, int, 0, 1);
-  vtkGetMacro(UseSquirt, int);
+  // This is not used.  It is here until we can clean up
+  // the render module superclasses.
+  vtkSetMacro(UseCompositeCompression,int);
+  vtkGetMacro(UseCompositeCompression,int);
+  vtkBooleanMacro(UseCompositeCompression,int);
 
 protected:
   vtkIceTClientCompositeManager();
@@ -165,7 +150,7 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* CompositeController;
   vtkSocketController* ClientController;
-  vtkCompositer *Compositer;
+  vtkIceTRenderManager *IceTManager;
 
   int Tiled;
   int TiledDimensions[2];
@@ -174,62 +159,14 @@ protected:
   unsigned long StartTag;
   //unsigned long EndTag;
   
-  void SetPDataSize(int x, int y);
-  void ReallocPDataArrays();
-
   virtual void SatelliteStartRender();
   virtual void SatelliteEndRender();
 
-
-
-  // Same method that is in vtkComposite manager.
-  // We should find a way to shar this method. !!!!
-  void MagnifyBuffer(vtkDataArray* localP, 
-                     vtkDataArray* magP,
-                     int windowSize[2]);
-
-  void DoubleBuffer(vtkDataArray* localP, 
-                    vtkDataArray* magP,
-                    int windowSize[2]);
-
-
-  // Our simple alternative to compositing.
-  void ReceiveAndSetColorBuffer();
-
   vtkObject *RenderView;
-  int ReductionFactor;
-
-  vtkDataArray *PData;
-  vtkFloatArray *ZData;
-  // Temporary arrays used for compositing.
-  vtkDataArray *PData2;
-  vtkFloatArray *ZData2;
-
-  int SquirtCompression;
-  vtkUnsignedCharArray *SquirtArray;
-  void SquirtCompress(vtkUnsignedCharArray *in,
-                      vtkUnsignedCharArray *out,
-                      int compress_level);
-  void SquirtDecompress(vtkUnsignedCharArray *in,
-                        vtkUnsignedCharArray *out);
-
-  vtkUnsignedCharArray *BaseArray;
-  void DeltaEncode(vtkUnsignedCharArray *buf);
-  void DeltaDecode(vtkUnsignedCharArray *buf);
-
-  int PDataSize[2];
-
-  // This is used to hold the result from pixel replication.
-  // It is only allocated on the client.
-  vtkDataArray *MagnifiedPData;
-  int MagnifiedPDataSize[2];
-
-  int UseChar;
-  int UseRGB;
+  int ImageReductionFactor;
 
   int UseCompositing;
-
-  int UseSquirt;
+  int UseCompositeCompression;
 
 //BTX
   enum {
