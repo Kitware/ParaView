@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.24");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.25");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1144,26 +1144,6 @@ void vtkKWTextProperty::UpdateEnableState()
     {
     this->OpacityScale->SetEnabled(this->Enabled);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTextProperty::SetObjectMethodCommand(
-  char **command, vtkKWObject *object, const char *method)
-{
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command_str;
-  command_str << object->GetTclName() << " " << method << ends;
-  *command = command_str.str();
 }
 
 //----------------------------------------------------------------------------

@@ -118,9 +118,6 @@ protected:
 
   char  *SelectedComponentChangedCommand;
 
-  virtual void SetObjectMethodCommand(
-    char **command, vtkKWObject *object, const char *method);
-  
   // GUI
 
   vtkKWLabeledOptionMenu *SelectedComponentOptionMenu;

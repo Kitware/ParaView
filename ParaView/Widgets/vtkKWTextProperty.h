@@ -224,9 +224,6 @@ protected:
   int ShowOpacity;
   vtkKWScale *OpacityScale;
 
-  virtual void SetObjectMethodCommand(
-    char **command, vtkKWObject *object, const char *method);
-
   char *ChangedCommand;
   char *ColorChangedCommand;
 
