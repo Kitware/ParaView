@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.25");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.26");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -278,7 +278,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     ia = vtkImageActor::SafeDownCast(pc->GetItemAsObject(i));
     if (ia)
       {
-      if (!wl)
+      if (ia->GetInput() && !wl)
         {
         wl = vtkImageMapToWindowLevelColors::SafeDownCast(
           ia->GetInput()->GetSource());
@@ -476,7 +476,8 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
 //----------------------------------------------------------------------------
 void vtkCornerAnnotation::SetText(int i, const char *text)
 {
-  if ( this->CornerText[i] && text && (!strcmp(this->CornerText[i],text))) 
+  if (!text || 
+      (this->CornerText[i] && text && (!strcmp(this->CornerText[i],text))))
     { 
     return;
     } 
