@@ -677,13 +677,20 @@ public:
   // Description:
   // Set commands.
   // Point... commands are passed the index of the point that is/was modified.
-  // PointRemovedCommand take an additional arg which is the value of 
-  // the parameter of the point that was removed.
-  // SelectionChanged is called on selection/deselection.
+  // PointAddedCommand is called when a point was added.
+  // PointMovingCommand/PointMovedCommand is called when a point is moving or
+  // was moved (at the end of the interaction).
+  // PointRemovedCommand is called when a point was removed, it takes an
+  // additional arg which is the value of the parameter of the point that
+  // was removed.
+  // SelectionChanged is called when the selection was changed or deselection.
   // FunctionChanged is called when the function was changed (as the
   // result of an interaction which is now over, like point added/(re)moved). 
   // FunctionChanging is called when the function is changing (as the
   // result of an interaction in progress, like moving a point). 
+  // VisibleRangeChangedCommand/VisibleRangeChangingCommand is called
+  // when the visible range (parameter or value) is changing, or was changed
+  // (at the end of the interaction).
   virtual void SetPointAddedCommand(
     vtkKWObject* object,const char *method);
   virtual void SetPointMovingCommand(
@@ -702,20 +709,33 @@ public:
     vtkKWObject* object, const char *method);
   virtual void SetVisibleRangeChangingCommand(
     vtkKWObject* object, const char *method);
-  virtual void InvokePointAddedCommand(int id);
-  virtual void InvokePointMovingCommand(int id);
-  virtual void InvokePointMovedCommand(int id);
-  virtual void InvokePointRemovedCommand(int id, double parameter);
-  virtual void InvokeSelectionChangedCommand();
-  virtual void InvokeFunctionChangedCommand();
-  virtual void InvokeFunctionChangingCommand();
-  virtual void InvokeVisibleRangeChangedCommand();
-  virtual void InvokeVisibleRangeChangingCommand();
+
+  // Description:
+  // Events. Even though it is highly recommended to use the commands
+  // framework defined above to specify the callback methods you want to be 
+  // invoked when specific event occur, you can also use the observer
+  // framework and listen to the corresponding events:
+  //BTX
+  enum
+  {
+    FunctionChangedEvent = 10000,
+    FunctionChangingEvent,
+    PointAddedEvent,
+    PointMovedEvent,
+    PointMovingEvent,
+    PointRemovedEvent,
+    SelectionChangedEvent,
+    VisibleParameterRangeChangedEvent,
+    VisibleParameterRangeChangingEvent,
+    VisibleRangeChangedEvent,
+    VisibleRangeChangingEvent
+  };
+  //ETX
 
   // Description:
   // Set/get whether the above commands should be called or not.
   // This allow you to disable the commands while you are setting the range
-  // value for example.
+  // value for example. Events are still invoked.
   vtkSetMacro(DisableCommands, int);
   vtkGetMacro(DisableCommands, int);
   vtkBooleanMacro(DisableCommands, int);
@@ -915,6 +935,16 @@ protected:
   virtual void InvokePointCommand(
     const char *command, int id, const char *extra = 0);
 
+  virtual void InvokePointAddedCommand(int id);
+  virtual void InvokePointMovingCommand(int id);
+  virtual void InvokePointMovedCommand(int id);
+  virtual void InvokePointRemovedCommand(int id, double parameter);
+  virtual void InvokeSelectionChangedCommand();
+  virtual void InvokeFunctionChangedCommand();
+  virtual void InvokeFunctionChangingCommand();
+  virtual void InvokeVisibleRangeChangedCommand();
+  virtual void InvokeVisibleRangeChangingCommand();
+
   // GUI
 
   vtkKWCanvas       *Canvas;
@@ -1088,23 +1118,6 @@ protected:
   virtual int CanvasCheckTagType(const char *prefix, int id, const char *type);
 
   // Synchronization callbacks
-
-  //BTX
-  enum
-  {
-    FunctionChangedEvent = 10000,
-    FunctionChangingEvent,
-    PointAddedEvent,
-    PointMovedEvent,
-    PointMovingEvent,
-    PointRemovedEvent,
-    SelectionChangedEvent,
-    VisibleParameterRangeChangedEvent,
-    VisibleParameterRangeChangingEvent,
-    VisibleRangeChangedEvent,
-    VisibleRangeChangingEvent
-  };
-  //ETX
 
   vtkCallbackCommand *SynchronizeCallbackCommand;
   vtkCallbackCommand *SynchronizeCallbackCommand2;
