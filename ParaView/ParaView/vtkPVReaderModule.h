@@ -144,6 +144,8 @@ protected:
   // cloning was successful.
   int ClonePrototype(int makeCurrent, vtkPVReaderModule*& clone);
 
+  int PackFileEntry;
+
 private:
   vtkPVReaderModule(const vtkPVReaderModule&); // Not implemented
   void operator=(const vtkPVReaderModule&); // Not implemented

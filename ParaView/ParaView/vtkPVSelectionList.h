@@ -107,6 +107,10 @@ public:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to the widgets (label and selection) it contains.
   virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
+  // Disables the widget.
+  void Disable();
   
 //BTX
   // Description:

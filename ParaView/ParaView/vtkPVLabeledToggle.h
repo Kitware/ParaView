@@ -87,6 +87,10 @@ public:
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
 
+  // Description:
+  // Disables the checkbutton.
+  void Disable();
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create

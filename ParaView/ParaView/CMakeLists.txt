@@ -55,6 +55,7 @@ vtkPVLineSourceWidget.cxx
 vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
+vtkPVPLOT3DReaderModule.cxx
 vtkPVPivotManipulator.cxx
 vtkPVPlaneWidget.cxx
 vtkPVPointSourceWidget.cxx

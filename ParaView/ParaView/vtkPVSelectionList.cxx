@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.28");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.29");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -117,6 +117,13 @@ void vtkPVSelectionList::SetBalloonHelpString(const char *str)
     this->Menu->SetBalloonHelpString(this->BalloonHelpString);
     this->BalloonHelpInitialized = 1;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::Disable()
+{
+  this->Script("%s configure -state disabled", this->Label->GetWidgetName());
+  this->Script("%s configure -state disabled", this->Menu->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

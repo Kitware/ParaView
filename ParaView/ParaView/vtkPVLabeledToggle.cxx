@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.12");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -148,6 +148,15 @@ void vtkPVLabeledToggle::SetState(int val)
 
   this->CheckButton->SetState(val); 
   this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::Disable()
+{
+  this->Script("%s configure -state disabled", 
+               this->CheckButton->GetWidgetName());
+  this->Script("%s configure -state disabled", 
+               this->Label->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

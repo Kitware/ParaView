@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.11");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -63,6 +63,7 @@ vtkPVReaderModule::vtkPVReaderModule()
   this->AcceptAfterRead = 1;
   this->Extensions = vtkVector<const char*>::New();
   this->Iterator = this->Extensions->NewIterator();
+  this->PackFileEntry = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +91,11 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetObjectVariable(this->VTKSourceTclName, "FileName");
   this->FileEntry->Create(this->GetPVApplication());
   this->AddPVWidget(this->FileEntry);
-  this->Script("pack %s", this->FileEntry->GetWidgetName());
+  
+  if (this->PackFileEntry)
+    {
+    this->Script("pack %s", this->FileEntry->GetWidgetName());
+    }
 
 }
 
@@ -202,4 +207,5 @@ void vtkPVReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << "AcceptAfterRead: " << this->AcceptAfterRead << endl;
+  os << "PackFileEntry: " << this->PackFileEntry << endl;
 }
