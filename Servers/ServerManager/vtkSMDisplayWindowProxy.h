@@ -81,7 +81,6 @@ protected:
 
   vtkSMProxy* WindowToImage;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
 private:
 
   vtkSMDisplayWindowProxyInternals* DWInternals;
