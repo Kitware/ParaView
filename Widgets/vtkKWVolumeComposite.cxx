@@ -140,13 +140,6 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   ctf->AddRGBPoint(255.0,   1.0, 1.0, 1.0);
   this->VolumeProperty->SetColor(ctf);
   
-  vtkPiecewiseFunction *gof = vtkPiecewiseFunction::New();
-  gof->AddPoint(0,0.0);
-  gof->AddPoint(1,0.0);
-  gof->AddPoint(2,0.0);
-  gof->AddPoint(3,0.0);
-  this->VolumeProperty->SetGradientOpacity(gof);
-
   this->CommandFunction = vtkKWVolumeCompositeCommand;
 
   if ( this->VolumeProMapper->GetNumberOfBoards() > 0 )
@@ -165,7 +158,6 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
 
   pwf->Delete();
   ctf->Delete();
-  gof->Delete();
 }
 
 vtkKWVolumeComposite::~vtkKWVolumeComposite()
@@ -218,8 +210,8 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   float scale = 255.0 / max;
   
   this->RayCastMapper->GetGradientEstimator()->SetInput(input);
-  this->RayCastMapper->GetGradientEstimator()->SetGradientMagnitudeScale(scale);
-  this->RayCastMapper->GetGradientEstimator()->Update();
+  this->RayCastMapper->GetGradientEstimator()->
+    SetGradientMagnitudeScale(scale);
   
   if ( this->GetView() )
     {
@@ -333,7 +325,6 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
         SetInput( this->LowResResampler->GetOutput() );
       this->LowResTextureMapper->GetGradientEstimator()->
         SetGradientMagnitudeScale(scale);
-      this->LowResTextureMapper->GetGradientEstimator()->Update();
       
       if ( this->GetView() )
         {
@@ -411,7 +402,6 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
         SetInput( this->MedResResampler->GetOutput() );
       this->MedResTextureMapper->GetGradientEstimator()->
         SetGradientMagnitudeScale(scale);
-      this->MedResTextureMapper->GetGradientEstimator()->Update();
       
       if ( this->GetView() )
         {
@@ -433,13 +423,8 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   pwf->AddPoint(  0, 0.0);
   pwf->AddPoint(max, 1.0);
   
-  pwf = this->VolumeProperty->GetGradientOpacity();
-  pwf->AddPoint(         0.0, 0.0);
-  pwf->AddPoint(         1.0, 0.0);
-  pwf->AddPoint( (max/ 50.0), 1.0);
-  pwf->AddPoint(         max, 1.0);
-  this->VolumeProMapper->GradientOpacityModulationOn();
-  this->LowResVolumeProMapper->GradientOpacityModulationOn();
+  this->VolumeProMapper->GradientOpacityModulationOff();
+  this->LowResVolumeProMapper->GradientOpacityModulationOff();
 
   if ( this->GetView() )
     {
@@ -458,5 +443,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.19 $");
+  this->ExtractRevision(os,"$Revision: 1.20 $");
 }

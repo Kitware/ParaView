@@ -94,7 +94,7 @@ void vtkKWScale::SetValue(float s)
   this->Script("%s set %f", this->ScaleWidget->GetWidgetName(),s);
   if (this->Entry)
     {
-    this->Entry->SetValue(s,0);
+    this->Entry->SetValue(s,2);
     }
   this->Value = s;
 
@@ -212,7 +212,7 @@ void vtkKWScale::ScaleValueChanged(float num)
   this->Value = num;
   if (this->Entry)
     {
-    this->Entry->SetValue(this->Value,0);
+    this->Entry->SetValue(this->Value,2);
     }
   if (this->Command)
     {
