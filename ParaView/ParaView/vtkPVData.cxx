@@ -958,7 +958,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
-    if (0 && getenv("PV_LOCK_SAFE") != NULL)
+    if (getenv("PV_LOCK_SAFE") != NULL)
       {
       pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
       }
@@ -971,7 +971,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
-    if (0 && getenv("PV_LOCK_SAFE") != NULL)
+    if (getenv("PV_LOCK_SAFE") != NULL)
       {
       pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
       }
@@ -2617,7 +2617,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.124 $");
+  this->ExtractRevision(os,"$Revision: 1.125 $");
 }
 
 //----------------------------------------------------------------------------
