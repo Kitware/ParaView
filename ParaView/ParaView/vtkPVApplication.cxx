@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.1");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1634,6 +1634,13 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
 {
   this->BroadcastScript("%s %s", className, tclName);
   return this->TclToVTKObject(tclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::MakeServerTclObject(const char *className,
+                                           const char *tclName)
+{
+  this->GetProcessModule()->ServerScript("%s %s", className, tclName);
 }
 
 //----------------------------------------------------------------------------

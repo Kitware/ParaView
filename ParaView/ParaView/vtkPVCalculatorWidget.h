@@ -169,6 +169,15 @@ protected:
 
   char *LastAcceptedFunction;
   vtkSetStringMacro(LastAcceptedFunction);
+
+  char **ScalarArrayNames;
+  char **ScalarVariableNames;
+  int *ScalarComponents;
+  int NumberOfScalarVariables;
+  char **VectorArrayNames;
+  char **VectorVariableNames;
+  int NumberOfVectorVariables;
+  void ClearAllVariables();
   
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented

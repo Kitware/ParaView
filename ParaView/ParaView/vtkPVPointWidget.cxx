@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.2");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.3");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -224,8 +224,8 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 
   ++instanceCount;
   sprintf(tclName, "pvPointWidget%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkPointWidget %s", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s AllOff", tclName);
+  pvApp->BroadcastScript("vtkPointWidget %s", tclName);
+  pvApp->BroadcastScript("%s AllOff", tclName);
   this->SetWidget3DTclName(tclName);
 
   this->SetFrameLabel("Point Widget");
@@ -347,7 +347,7 @@ void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
   this->PositionEntry[2]->SetValue(z, 5);  
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s SetPosition %f %f %f", this->Widget3DTclName, x, y, z);
     }
   this->Render();
@@ -382,7 +382,7 @@ void vtkPVPointWidget::SetPosition()
     {
     val[cc] = atof(this->PositionEntry[cc]->GetValue());
     }
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetPosition %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
   this->ModifiedCallback();
   this->ValueChanged = 0;

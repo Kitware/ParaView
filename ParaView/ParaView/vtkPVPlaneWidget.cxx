@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -60,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.1");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.2");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -118,14 +117,14 @@ void vtkPVPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 
   if ( this->Widget3DTclName )
     {
-    pvApp->GetProcessModule()->ServerScript("%s Delete");
+    pvApp->BroadcastScript("%s Delete", this->Widget3DTclName);
     this->SetWidget3DTclName(NULL);
     }
 
   ++instanceCount;
   sprintf(tclName, "pvPlaneWidget%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkPlaneWidget %s", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s SetPlaceFactor 1.0", tclName);
+  pvApp->BroadcastScript("vtkPlaneWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", tclName);
   this->SetWidget3DTclName(tclName);
 }
 
@@ -168,7 +167,7 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
   this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s SetCenter %f %f %f", this->Widget3DTclName, x, y, z);
     }
 }
@@ -182,7 +181,7 @@ void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
   this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s SetNormal %f %f %f", this->Widget3DTclName, x, y, z);
     }
 }

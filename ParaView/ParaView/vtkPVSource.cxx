@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.2");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -614,19 +614,19 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
     return;
     }
   
-  if (tclName == NULL || source == NULL)
+  if (tclName == NULL)
     {
-    vtkErrorMacro("Missing Tcl name or source.");
+    vtkErrorMacro("Missing source  Tcl name.");
     return;
     }
 
   // I hate having two collections: one for the vtk object, and one for its
   // Tcl name.  I should probably create an object to contain both.
-  this->VTKSources->AddItem(source);
+//  this->VTKSources->AddItem(source);
   this->VTKSourceTclNames->AddString(tclName);
     
-  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
-                tclName, this->GetTclName());
+//  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
+//                tclName, this->GetTclName());
     
   pvApp->GetProcessModule()->ServerScript(
     "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
@@ -663,7 +663,7 @@ int vtkPVSource::GetNumberOfVTKSources()
     {
     return 0;
     }
-  return this->VTKSources->GetNumberOfItems();
+  return this->VTKSourceTclNames->GetNumberOfStrings();
 }
 
 //----------------------------------------------------------------------------
@@ -894,10 +894,11 @@ void vtkPVSource::UpdateDescriptionFrame()
 
   if (this->TypeLabel && this->TypeLabel->IsCreated())
     {
-    if (this->GetVTKSource()) 
+    if (this->GetSourceClassName()) 
       {
       this->TypeLabel->GetLabel2()->SetLabel(
-        this->GetVTKSource()->GetClassName());
+        this->GetSourceClassName());
+//        this->GetVTKSource()->GetClassName());
       if (this->DescriptionFrame->IsPacked())
         {
         this->Script("grid %s", this->TypeLabel->GetWidgetName());
@@ -1823,7 +1824,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.
-  if (this->GetVTKSource() == NULL)
+  if (this->GetSourceClassName() == NULL)
     {
     return;
     }
@@ -1851,7 +1852,8 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   numSources = this->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    *file << this->GetVTKSource(sourceIdx)->GetClassName()
+//    *file << this->GetVTKSource(sourceIdx)->GetClassName()
+    *file << this->GetSourceClassName()
           << " " << this->GetVTKSourceTclName(sourceIdx) << "\n";
     }
 
@@ -1900,10 +1902,10 @@ void vtkPVSource::SaveState(ofstream *file)
     }
 
   // Detect special sources we do not handle yet.
-  if (this->GetVTKSource() == NULL)
-    {
-    return;
-    }
+//  if (this->GetVTKSource() == NULL)
+//    {
+//    return;
+//    }
 
   // This should not be needed, but We can check anyway.
   if (this->VisitedFlag)
@@ -2331,17 +2333,9 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       }
 
     // Create a vtkSource
-    vtkSource* vtksource = 
-      static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
-                                                    tclName));
-    if (vtksource == NULL)
-      {
-      vtkErrorMacro("Could not get pointer from object.");
-      pvs->Delete();
-      return VTK_ERROR;
-      }
-
-    pvs->AddVTKSource(vtksource, tclName);
+    pvApp->MakeServerTclObject(this->SourceClassName, tclName);
+    
+    pvs->AddVTKSource(NULL, tclName);
     }
 
   pvs->SetView(this->GetPVWindow()->GetMainView());

@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -69,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.2");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.3");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -124,19 +123,19 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     }
   if (this->BoxTclName)
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s Delete", this->BoxTclName);
     this->SetBoxTclName(NULL);
     }
   if ( this->BoxTransformTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s Delete", this->BoxTransformTclName);
     this->SetBoxTransformTclName(0);
     }
   if ( this->BoxMatrixTclName)
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s Delete", this->BoxMatrixTclName);
     this->SetBoxMatrixTclName(0);
     }
@@ -176,7 +175,7 @@ void vtkPVBoxWidget::ActualPlaceWidget()
   this->Superclass::ActualPlaceWidget();
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
     this->Application);
-  pvApp->GetProcessModule()->ServerScript(
+  pvApp->BroadcastScript(
     "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
 }
 
@@ -192,7 +191,7 @@ void vtkPVBoxWidget::AcceptInternal(const char* sourceTclName)
     {
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
       this->Application);
-    pvApp->GetProcessModule()->ServerScript(
+    pvApp->BroadcastScript(
       "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
 
     this->SetStoredPosition(this->PositionGUI);
@@ -380,20 +379,20 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   ++instanceCount;
   sprintf(tclName, "pvBoxWidget%d", instanceCount);
   this->SetWidget3DTclName(tclName);
-  pvApp->GetProcessModule()->ServerScript("vtkBoxWidget %s", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s SetPlaceFactor 1.0", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
+  pvApp->BroadcastScript("vtkBoxWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", tclName);
+  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
 
   sprintf(tclName, "pvBox%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkPlanes %s", tclName);
+  pvApp->BroadcastScript("vtkPlanes %s", tclName);
   this->SetBoxTclName(tclName);
 
   sprintf(tclName, "pvBoxTransform%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkTransform %s", tclName);
+  pvApp->BroadcastScript("vtkTransform %s", tclName);
   this->SetBoxTransformTclName(tclName);
 
   sprintf(tclName, "pvBoxMatrix%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkMatrix4x4 %s", tclName);
+  pvApp->BroadcastScript("vtkMatrix4x4 %s", tclName);
   this->SetBoxMatrixTclName(tclName);
 
   this->BoxTransform = vtkTransform::SafeDownCast(pvApp->TclToVTKObject(this->BoxTransformTclName));
@@ -519,7 +518,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     if (input)
       {
       this->Reset();
-      pvApp->GetProcessModule()->ServerScript(
+      pvApp->BroadcastScript(
         "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
       }
     }
@@ -700,7 +699,7 @@ void vtkPVBoxWidget::UpdateBox(int update)
     this->BoxTransformTclName
     );
     */
-  pvApp->GetProcessModule()->ServerScript(
+  pvApp->BroadcastScript(
     "%s Identity\n"
     "eval %s DeepCopy { "
     "%f %f %f %f "
@@ -723,7 +722,7 @@ void vtkPVBoxWidget::UpdateBox(int update)
     );
   /*
   mat->Print(cout);
-  pvApp->GetProcessModule()->ServerScript("set normals [ %s GetNormals ]\n"
+  pvApp->BroadcastScript("set normals [ %s GetNormals ]\n"
   "puts \"Normal:\" \n"
   "for { set c 0 } { $c < 6 } { incr c } {\n"
   "  puts [ $normals GetTuple3 $c ]\n"

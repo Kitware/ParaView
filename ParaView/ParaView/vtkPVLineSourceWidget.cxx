@@ -44,14 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVLineWidget.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 
 int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.7.4.2");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.7.4.3");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -96,12 +95,12 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   if (pvApp)
     {
     this->SetSourceTclName(name);
-    pvApp->GetProcessModule()->ServerScript("vtkLineSource %s;"
-                                            "vtkPolyData %s;"
-                                            "%s SetOutput %s;", 
-                                            name,
-                                            outputName,
-                                            name, outputName);
+    pvApp->BroadcastScript("vtkLineSource %s;"
+                           "vtkPolyData %s;"
+                           "%s SetOutput %s;", 
+                           name,
+                           outputName,
+                           name, outputName);
 
     //special for saving in tcl scripts.
     sprintf(outputName, "[%s GetOutput]", name);

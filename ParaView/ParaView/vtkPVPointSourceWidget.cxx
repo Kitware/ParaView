@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPointWidget.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 
@@ -52,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.3");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.4");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -142,16 +141,16 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     {
     this->SetSourceTclName(name);
 
-    pvApp->GetProcessModule()->ServerScript("vtkPointSource %s;"
-                                            "%s SetNumberOfPoints 1;"
-                                            "%s SetRadius 0.0;"
-                                            "vtkPolyData %s;"
-                                            "%s SetOutput %s;", 
-                                            name,
-                                            name,
-                                            name,
-                                            outputName,
-                                            name, outputName);
+    pvApp->BroadcastScript("vtkPointSource %s;"
+                           "%s SetNumberOfPoints 1;"
+                           "%s SetRadius 0.0;"
+                           "vtkPolyData %s;"
+                           "%s SetOutput %s;", 
+                           name,
+                           name,
+                           name,
+                           outputName,
+                           name, outputName);
     //special for saving in tcl scripts.
     sprintf(outputName, "[%s GetOutput]", name);
     this->SetOutputTclName(outputName);
@@ -182,6 +181,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToRed");
   
   this->NumberOfPointsWidget->Create(this->Application);
+  this->NumberOfPointsWidget->SetValue("1"); // match value set in point source
   this->Script("pack %s -side top -fill both -expand true",
                this->NumberOfPointsWidget->GetWidgetName());
 

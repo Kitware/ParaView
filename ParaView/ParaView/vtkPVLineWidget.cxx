@@ -50,15 +50,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.2");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -168,7 +168,7 @@ void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
     pos[i] = this->Point1[i]->GetValueAsFloat();
     }
 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetPoint1 %f %f %f; %s SetAlignToNone",
     this->Widget3DTclName, 
     pos[0], pos[1], pos[2],
@@ -210,7 +210,7 @@ void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
     pos[i] = this->Point2[i]->GetValueAsFloat();
     }
 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetPoint2 %f %f %f; %s SetAlignToNone",
     this->Widget3DTclName, 
     pos[0], pos[1], pos[2],
@@ -285,7 +285,7 @@ void vtkPVLineWidget::SetResolution(int i)
     {
     return;
     }
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetResolution %d", this->Widget3DTclName, res);
   this->Render();
 }
@@ -414,9 +414,9 @@ void vtkPVLineWidget::ActualPlaceWidget()
     bds[1] = bds[3] = bds[5] = 1.0;
     }
 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
-    "%s PlaceWidget %f %f %f %f %f %f",
-    this->Widget3DTclName, bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
+  this->GetPVApplication()->BroadcastScript(
+    "%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
+    bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
 
   this->UpdateVTKObject(this->ObjectTclName);
 }
@@ -646,8 +646,8 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   ++instanceCount;
   sprintf(tclName, "pvLineWidget%d", instanceCount);
   this->SetWidget3DTclName(tclName);
-  pvApp->GetProcessModule()->ServerScript("vtkLineWidget %s", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s SetAlignToNone", tclName);
+  pvApp->BroadcastScript("vtkLineWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetAlignToNone", tclName);
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());

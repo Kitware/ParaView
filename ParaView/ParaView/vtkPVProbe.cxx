@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.99");
+vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.1");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -142,7 +142,8 @@ void vtkPVProbe::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  pvApp->BroadcastScript("%s SetSpatialMatch 2", this->GetVTKSourceTclName());
+  pvApp->GetProcessModule()->ServerScript(
+    "%s SetSpatialMatch 2", this->GetVTKSourceTclName());
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -184,14 +185,15 @@ void vtkPVProbe::CreateProperties()
     xyp->SetNumberOfXLabels(5);
     xyp->SetXTitle("Line Divisions");
     
-    pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
-                           this->GetVTKSourceTclName());
+    pvApp->GetProcessModule()->ServerScript(
+      "%s SetController [ $Application GetController ] ", 
+      this->GetVTKSourceTclName());
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
-    if (pvApp->GetClientMode())
-      {
-      this->Script("%s SetController {}", this->GetVTKSourceTclName());
-      }
+//    if (pvApp->GetClientMode())
+//      {
+//      this->Script("%s SetController {}", this->GetVTKSourceTclName());
+//      }
     
     vtkPVGenericRenderWindowInteractor* iren = 
       this->GetPVWindow()->GetInteractor();
@@ -232,7 +234,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
     return;
     }
-  
+
   vtkPointData *pd = probeOutput->GetPointData();
   
   int arrayCount;
@@ -408,7 +410,8 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     *file << "\tline" << this->InstanceCount << " SetResolution " << interp->result << "\n\n";
     }
   
-  *file << this->GetVTKSource()->GetClassName() << " "
+//  *file << this->GetVTKSource()->GetClassName() << " "
+  *file << this->GetSourceClassName() << " "
         << this->GetVTKSourceTclName() << "\n";
   if (this->GetDimensionality() == 0)
     {
