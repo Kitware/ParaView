@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.66");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.67");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -921,23 +921,31 @@ void vtkKWNotebook::RemovePagesMatchingTag(int tag)
 {
   if (this->Internals)
     {
-    vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
-      this->Internals->Pages.rbegin();
-    vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
-      this->Internals->Pages.rend();
-    while (rit != rend)
+    // This is not too efficient, but we are talking at most two dozens
+    // element anyway. We could save the iterator value, then go to the next
+    // position, and remove at the old iterator value, but too many
+    // STL related operations take place in ::RemovePage, invalidating the
+    // list iterators. Let's keep it simple.
+
+    int keep_going;
+    do
       {
-      if (*rit && (*rit)->Tag == tag)
+      keep_going = 0;
+      vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
+        this->Internals->Pages.rbegin();
+      vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
+        this->Internals->Pages.rend();
+      while (rit != rend)
         {
-        vtkKWNotebook::Page *page = *rit;
+        if (*rit && (*rit)->Tag == tag)
+          {
+          this->RemovePage(*rit);
+          keep_going = 1;
+          break;
+          }
         ++rit;
-        this->RemovePage(page);
         }
-      else
-        {
-        ++rit;
-        }
-      }
+      } while (keep_going);
     }
 }
 
@@ -1603,7 +1611,7 @@ int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
     return 0;
     }
 
-  this->Internals->MostRecentPages.push_front(*pos);
+  this->Internals->MostRecentPages.push_front(page);
   return 1;
 }
 
@@ -2580,7 +2588,6 @@ void vtkKWNotebook::ConstrainVisiblePages()
 
     vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
       this->Internals->MostRecentPages.rbegin();
-    vtkKWNotebookInternals::PagesContainerReverseIterator rit2;
     vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
       this->Internals->MostRecentPages.rend();
     while (diff && rit != rend)
