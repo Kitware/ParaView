@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.55");
+vtkCxxRevisionMacro(vtkKWEntry, "1.56");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -150,7 +150,7 @@ void vtkKWEntry::SetValue(const char *s)
     this->SetEnabled(1);
     }
 
-  if (this->IsCreated())
+  if (this->Entry && this->Entry->IsAlive())
     {
     this->Script("%s delete 0 end", this->Entry->GetWidgetName());
     if (s)
