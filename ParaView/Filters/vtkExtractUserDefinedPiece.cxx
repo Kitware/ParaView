@@ -30,7 +30,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.2");
+vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.3");
 vtkStandardNewMacro(vtkExtractUserDefinedPiece);
 
 vtkExtractUserDefinedPiece::vtkExtractUserDefinedPiece()
@@ -113,7 +113,7 @@ void vtkExtractUserDefinedPiece::Execute()
   // Cell tags end up being 0 for cells in piece and -1 for all others.
   // Point ownership is the cell that owns the point.
 
-  this->ComputeCellTagsWithFunction(cellTags, pointOwnership, piece, numPieces);
+  this->ComputeCellTagsWithFunction(cellTags, pointOwnership);
 
   // Find the layers of ghost cells.
   if (this->CreateGhostCells)
@@ -206,9 +206,7 @@ void vtkExtractUserDefinedPiece::Execute()
 }
 void vtkExtractUserDefinedPiece::
 ComputeCellTagsWithFunction(vtkIntArray *tags,
-                            vtkIdList *pointOwnership,
-                            int vtkNotUsed(piece), 
-                            int vtkNotUsed(numPieces))
+                            vtkIdList *pointOwnership)
 {
   vtkUnstructuredGrid *input;
   int j;

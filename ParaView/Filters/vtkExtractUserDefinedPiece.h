@@ -69,9 +69,7 @@ protected:
 
   void Execute();
 
-  void ComputeCellTagsWithFunction(vtkIntArray *tags,
-                                   vtkIdList *pointOwnership,
-                                   int piece, int numPieces);
+  void ComputeCellTagsWithFunction(vtkIntArray *tags, vtkIdList *pointOwnership);
 
 private:
 
