@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -526,6 +526,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     {
     port = this->GetRenderServerPort();
     }
+  int sock = comm->OpenSocket(port);
   if ( this->ClientMode )
     {
     cout << "Waiting for server..." << endl;
@@ -540,7 +541,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     }
 
   // Establish connection
-  if (!comm->WaitForConnection(port))
+  if (!comm->WaitForConnectionOnSocket(sock))
     {
     vtkErrorMacro("Wait timed out or could not initialize socket.");
     comm->Delete();
