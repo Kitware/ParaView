@@ -44,19 +44,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWHashTableIterator_h
 #define __vtkKWHashTableIterator_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 
 class vtkKWHashTable;
 class vtkKWHashTableItem;
 
-class VTK_EXPORT vtkKWHashTableIterator : public vtkKWObject
+class VTK_EXPORT vtkKWHashTableIterator : public vtkObject
 {
 public: 
   static vtkKWHashTableIterator *New();
   vtkTypeMacro(vtkKWHashTableIterator,vtkObject);
 
   void SetHashTable(vtkKWHashTable *table);
-  
+ 
+
   unsigned long GetKey();
   void *GetPointerKey();
   void *GetData();

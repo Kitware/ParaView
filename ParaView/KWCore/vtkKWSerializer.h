@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWSerializer_h
 #define __vtkKWSerializer_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 
 // var args
 #ifndef _WIN32

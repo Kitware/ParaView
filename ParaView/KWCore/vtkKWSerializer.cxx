@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSerializer.h"
 #include <ctype.h>
 #include "vtkObjectFactory.h"
-#include "vtkKWApplication.h"
+//#include "vtkKWApplication.h"
 
 
 //------------------------------------------------------------------------------

@@ -49,15 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWIcon_h
 #define __vtkKWIcon_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 class vtkKWApplication;
 class vtkKWIcon;
 
-class VTK_EXPORT vtkKWIcon : public vtkKWObject
+class VTK_EXPORT vtkKWIcon : public vtkObject
 {
 public:
   static vtkKWIcon* New();
-  vtkTypeMacro(vtkKWIcon,vtkKWObject);
+  vtkTypeMacro(vtkKWIcon,vtkObject);
 
   // Description:
   // Set image data.

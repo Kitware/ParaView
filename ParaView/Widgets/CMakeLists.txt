@@ -15,9 +15,6 @@ vtkKWEvent
 vtkKWExtent 
 vtkKWFrame
 vtkKWGenericComposite 
-vtkKWHashTable
-vtkKWHashTableIterator
-vtkKWIcon
 vtkKWImageLabel
 vtkKWLabel 
 vtkKWLabeledEntry 
@@ -31,15 +28,12 @@ vtkKWNotebook
 vtkKWOKCancelDialog 
 vtkKWObject 
 vtkKWOptionMenu 
-vtkKWProcessStatistics
 vtkKWProgressGauge 
 vtkKWPushButton 
 vtkKWRadioButton 
-vtkKWRegisteryUtilities
 vtkKWSaveImageDialog 
 vtkKWScale 
 vtkKWScrollableFrame
-vtkKWSerializer 
 vtkKWSplitFrame
 vtkKWTclInteractor
 vtkKWText 
@@ -57,36 +51,15 @@ ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl
 
 ABSTRACT_FILES(
 vtkKWComposite 
-vtkContainer
 vtkKWView 
 vtkKWFileDialog
 )
 
 
-IF (WIN32)
-  SOURCE_FILES( KWWidgets_SRCS 
-    vtkKWWin32RegisteryUtilities
-  )
-  WRAP_EXCLUDE_FILES(
-    vtkKWWin32RegisteryUtilities
-  )
-ELSE (WIN32)
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-  SOURCE_FILES( KWWidgets_SRCS 
-    vtkKWUNIXRegisteryUtilities
-  )
-  WRAP_EXCLUDE_FILES(
-    vtkKWUNIXRegisteryUtilities
-  )
-ENDIF (WIN32)
-  
 WRAP_EXCLUDE_FILES(
   kwinit 
   vtktcl 
   vtkKWEvent
-  vtkKWHashTable 
-  vtkContainer
-  vtkKWRegisteryUtilities
 )
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
@@ -116,6 +89,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 LINK_LIBRARIES (
+vtkKWCoreTCL
 vtkRenderingTCL 
 vtkImagingTCL 
 vtkGraphicsTCL 

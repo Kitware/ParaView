@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWRegisteryUtilities_h
 #define __vtkKWRegisteryUtilities_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 
-class VTK_EXPORT vtkKWRegisteryUtilities : public vtkKWObject
+class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
 {
   public:
   static vtkKWRegisteryUtilities* New();
-  vtkTypeMacro(vtkKWRegisteryUtilities, vtkKWObject);
+  vtkTypeMacro(vtkKWRegisteryUtilities, vtkObject);
 
   // Description:
   // Read a value from the registry.

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWHashTable_h
 #define __vtkKWHashTable_h
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 
 // This is the initial number of buckets
 #define KW_HASHTABLE_INITIAL_NUMBER_OF_BUCKETS 101
@@ -71,7 +71,7 @@ public:
   static int Count;
 };
 
-class VTK_EXPORT vtkKWHashTable : public vtkKWObject
+class VTK_EXPORT vtkKWHashTable : public vtkObject
 {
   friend class vtkKWHashTableIterator;
 public: 

@@ -108,7 +108,8 @@ IF (WIN32)
   ENDIF (TK_XLIB_PATH) 
 ENDIF (WIN32)
 
-LINK_LIBRARIES (vtkKWWidgetsTCL 
+LINK_LIBRARIES (vtkKWCoreTCL
+	        vtkKWWidgetsTCL 
                 vtkCommonTCL 
                 vtkFilteringTCL   
                 vtkGraphicsTCL 
