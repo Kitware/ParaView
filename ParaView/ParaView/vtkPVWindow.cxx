@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
-#include "vtkPVInteractorStyleFly.h"
+//#include "vtkPVInteractorStyleFly.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -116,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.371");
+vtkCxxRevisionMacro(vtkPVWindow, "1.372");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -149,7 +149,7 @@ vtkPVWindow::vtkPVWindow()
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
 
-  this->FlyButton = vtkKWRadioButton::New();
+  //this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
   
@@ -165,7 +165,7 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
-  this->FlyStyle = vtkPVInteractorStyleFly::New();
+//  this->FlyStyle = vtkPVInteractorStyleFly::New();
   
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterButton = vtkKWPushButton::New();
@@ -180,9 +180,9 @@ vtkPVWindow::vtkPVWindow()
   this->CenterZLabel = vtkKWLabel::New();
   this->CenterZEntry = vtkKWEntry::New();
 
-  this->FlySpeedToolbar = vtkKWToolbar::New();
-  this->FlySpeedLabel = vtkKWLabel::New();
-  this->FlySpeedScale = vtkKWScale::New();
+  //this->FlySpeedToolbar = vtkKWToolbar::New();
+  //this->FlySpeedLabel = vtkKWLabel::New();
+  //this->FlySpeedScale = vtkKWScale::New();
   
   this->CenterSource = vtkAxes::New();
   this->CenterSource->SymmetricOn();
@@ -288,8 +288,8 @@ vtkPVWindow::~vtkPVWindow()
 
   this->PrepareForDelete();
 
-  this->FlyButton->Delete();
-  this->FlyButton = NULL;
+  //this->FlyButton->Delete();
+  //this->FlyButton = NULL;
   this->RotateCameraButton->Delete();
   this->RotateCameraButton = NULL;
   this->TranslateCameraButton->Delete();
@@ -422,11 +422,11 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar = NULL;
     }
 
-  if (this->FlyStyle)
-    {
-    this->FlyStyle->Delete();
-    this->FlyStyle = NULL;
-    }
+  //if (this->FlyStyle)
+  //  {
+  //  this->FlyStyle->Delete();
+  //  this->FlyStyle = NULL;
+  //  }
 
   if (this->CameraStyle3D)
     {
@@ -528,23 +528,23 @@ void vtkPVWindow::PrepareForDelete()
     this->PickCenterToolbar = NULL;
     }
 
-  if (this->FlySpeedLabel)
-    {
-    this->FlySpeedLabel->Delete();
-    this->FlySpeedLabel = NULL;
-    }
+//   if (this->FlySpeedLabel)
+//     {
+//     this->FlySpeedLabel->Delete();
+//     this->FlySpeedLabel = NULL;
+//     }
   
-  if (this->FlySpeedScale)
-    {
-    this->FlySpeedScale->Delete();
-    this->FlySpeedScale = NULL;
-    }
+//   if (this->FlySpeedScale)
+//     {
+//     this->FlySpeedScale->Delete();
+//     this->FlySpeedScale = NULL;
+//     }
   
-  if (this->FlySpeedToolbar)
-    {
-    this->FlySpeedToolbar->Delete();
-    this->FlySpeedToolbar = NULL;
-    }
+//   if (this->FlySpeedToolbar)
+//     {
+//     this->FlySpeedToolbar->Delete();
+//     this->FlySpeedToolbar = NULL;
+//     }
 
   if (this->MainView)
     {
@@ -774,14 +774,14 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   
   // Fly interactor style
 
-  this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
-  this->FlyButton->Create(
-    app, "-indicatoron 0 -highlightthickness 0 -image PVFlyButton -selectimage PVFlyButtonActive");
-  this->FlyButton->SetBalloonHelpString(
-    "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
-  this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
-               this->FlyButton->GetWidgetName(), this->GetTclName());
-  this->InteractorToolbar->AddWidget(this->FlyButton);
+//   this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
+//   this->FlyButton->Create(
+//     app, "-indicatoron 0 -highlightthickness 0 -image PVFlyButton -selectimage PVFlyButtonActive");
+//   this->FlyButton->SetBalloonHelpString(
+//     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
+//   this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
+//                this->FlyButton->GetWidgetName(), this->GetTclName());
+//   this->InteractorToolbar->AddWidget(this->FlyButton);
 
   // Rotate camera interactor style
 
@@ -997,20 +997,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     }
   this->MainView->GetRenderer()->AddActor(this->CenterActor);
   
-  this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
-  this->FlySpeedToolbar->Create(app);
+//   this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
+//   this->FlySpeedToolbar->Create(app);
   
-  this->FlySpeedLabel->SetParent(this->FlySpeedToolbar->GetFrame());
-  this->FlySpeedLabel->Create(app, "");
-  this->FlySpeedLabel->SetLabel("Fly Speed");
-  this->FlySpeedToolbar->AddWidget(this->FlySpeedLabel);
+//   this->FlySpeedLabel->SetParent(this->FlySpeedToolbar->GetFrame());
+//   this->FlySpeedLabel->Create(app, "");
+//   this->FlySpeedLabel->SetLabel("Fly Speed");
+//   this->FlySpeedToolbar->AddWidget(this->FlySpeedLabel);
   
-  this->FlySpeedScale->SetParent(this->FlySpeedToolbar->GetFrame());
-  this->FlySpeedScale->Create(app, "");
-  this->FlySpeedScale->SetRange(0.0, 50.0);
-  this->FlySpeedScale->SetValue(20.0);
-  this->FlySpeedScale->SetCommand(this, "FlySpeedScaleCallback");
-  this->FlySpeedToolbar->AddWidget(this->FlySpeedScale);
+//   this->FlySpeedScale->SetParent(this->FlySpeedToolbar->GetFrame());
+//   this->FlySpeedScale->Create(app, "");
+//   this->FlySpeedScale->SetRange(0.0, 50.0);
+//   this->FlySpeedScale->SetValue(20.0);
+//   this->FlySpeedScale->SetCommand(this, "FlySpeedScaleCallback");
+//   this->FlySpeedToolbar->AddWidget(this->FlySpeedScale);
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1312,10 +1312,10 @@ void vtkPVWindow::ResetCenterCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::FlySpeedScaleCallback()
-{
-  this->FlyStyle->SetSpeed(this->FlySpeedScale->GetValue());
-}
+// void vtkPVWindow::FlySpeedScaleCallback()
+// {
+//   this->FlyStyle->SetSpeed(this->FlySpeedScale->GetValue());
+// }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
@@ -1348,19 +1348,19 @@ void vtkPVWindow::ResizeCenterActor()
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
   this->PickCenterToolbar->Unpack();
-  this->FlySpeedToolbar->Unpack();;
+  //this->FlySpeedToolbar->Unpack();;
   
   switch (index)
     {
-    case 0:
-      this->RotateCameraButton->SetState(0);
-      this->TranslateCameraButton->SetState(0);
-      this->HideCenterActor();
-      this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
-      this->FlySpeedToolbar->Pack("-side left");
-      break;
+//     case 0:
+//       this->RotateCameraButton->SetState(0);
+//       this->TranslateCameraButton->SetState(0);
+//       this->HideCenterActor();
+//       this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
+//       this->FlySpeedToolbar->Pack("-side left");
+//       break;
     case 1:
-      this->FlyButton->SetState(0);
+      //this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle3D);
       this->PickCenterToolbar->Pack("-side left");
@@ -1368,7 +1368,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->ShowCenterActor();
       break;
     case 2:
-      this->FlyButton->SetState(0);
+      //this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
@@ -1824,8 +1824,8 @@ void vtkPVWindow::UpdateToolbarAspect()
   this->PickCenterToolbar->SetFlatAspect(flat_frame);
   this->PickCenterToolbar->SetWidgetsFlatAspect(flat_buttons);
 
-  this->FlySpeedToolbar->SetFlatAspect(flat_frame);
-  this->FlySpeedToolbar->SetWidgetsFlatAspect(flat_buttons);
+//   this->FlySpeedToolbar->SetFlatAspect(flat_frame);
+//   this->FlySpeedToolbar->SetWidgetsFlatAspect(flat_buttons);
 }
 
 //----------------------------------------------------------------------------
@@ -1868,7 +1868,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
     if (retVal == VTK_OK && rm->CanReadFile(openFileName) &&
-        this->OpenWithReader(openFileName, rm) == VTK_OK )
+        this->OpenWithReader(openFileName, rm, 0) == VTK_OK )
       {
       if ( store )
         {
@@ -1884,7 +1884,8 @@ int vtkPVWindow::Open(char *openFileName, int store)
   
   ostrstream error;
   error << "Could not find an appropriate reader for file "
-        << openFileName << ends;
+        << openFileName << ". Would you like to manually select "
+        << "the reader for this file?" << ends;
   if (this->UseMessageDialog)
     {
     if ( vtkKWMessageDialog::PopupOkCancel(this->Application, this,
@@ -1984,7 +1985,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         if ( this->ReaderList->GetItem(listbox->GetSelectionIndex(),
                                        reader) == VTK_OK && reader )
           {
-          if ( this->OpenWithReader(openFileName, reader) != VTK_OK )
+          if ( this->OpenWithReader(openFileName, reader, 1) != VTK_OK )
             {
             ostrstream error;
             error << "Can not open file " << openFileName << " for reading." << ends;
@@ -2023,7 +2024,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::OpenWithReader(char *fileName, vtkPVReaderModule* reader)
+int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader, int custom)
 {
   vtkPVReaderModule* clone = 0;
   // Read the file. On success this will return a new source.
@@ -2036,8 +2037,45 @@ int vtkPVWindow::OpenWithReader(char *fileName, vtkPVReaderModule* reader)
       clone->Accept(0);
       }
     clone->Delete();
+    if ( custom )
+      {
+      ostrstream str;
+      str << "OpenCustom \"" << reader->GetDescription() << "\"" <<ends;
+      this->AddRecentFile(NULL, fileName, this, str.str());
+      str.rdbuf()->freeze(0);
+      }
+    else
+      {
+      this->AddRecentFile(NULL, fileName, this, "Open");
+      }
     }
   return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
+{
+  if ( !reader || vtkString::Length(reader) == 0 || 
+       !filename || vtkString::Length(filename) == 0 )
+    {
+    return VTK_ERROR;
+    }
+  vtkLinkedListIterator<vtkPVReaderModule*>* it = 
+    this->ReaderList->NewIterator();
+  while(!it->IsDoneWithTraversal())
+    {
+    vtkPVReaderModule* rm = 0;
+    int retVal = it->GetData(rm);
+    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetDescription(), reader) &&
+        this->OpenWithReader(filename, rm, 1) == VTK_OK )
+      {
+      it->Delete();
+      return VTK_OK;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+  return VTK_ERROR;
 }
 
 //----------------------------------------------------------------------------
@@ -3740,7 +3778,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.371 $");
+  this->ExtractRevision(os,"$Revision: 1.372 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4116,7 +4154,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterZEntry: " << this->GetCenterZEntry() << endl;
   os << indent << "CurrentPVData: " << this->GetCurrentPVData() << endl;
   os << indent << "FilterMenu: " << this->GetFilterMenu() << endl;
-  os << indent << "FlyStyle: " << this->GetFlyStyle() << endl;
+//  os << indent << "FlyStyle: " << this->GetFlyStyle() << endl;
   os << indent << "InteractorStyleToolbar: " << this->GetInteractorToolbar() 
      << endl;
   os << indent << "MainView: " << this->GetMainView() << endl;
@@ -4126,7 +4164,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
   os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
-  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
+//  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
   os << indent << "GenericInteractor: " << this->GenericInteractor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 

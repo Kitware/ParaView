@@ -104,7 +104,7 @@ class vtkPVErrorLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
-class vtkPVInteractorStyleFly;
+//class vtkPVInteractorStyleFly;
 class vtkPVReaderModule;
 class vtkPVRenderView;
 class vtkPVSource;
@@ -214,7 +214,7 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
-  vtkGetObjectMacro(FlySpeedToolbar, vtkKWToolbar);
+//  vtkGetObjectMacro(FlySpeedToolbar, vtkKWToolbar);
   
   // Description:
   // Access from script for regression test.
@@ -244,7 +244,8 @@ public:
   // recently used files list.
   int Open(char *fileName, int store);
   int Open(char *fileName) { return this->Open(fileName, 0); }
-  int OpenWithReader(char *fileName, vtkPVReaderModule* reader);
+  int OpenWithReader(const char *fileName, vtkPVReaderModule* reader, int custom);
+  int OpenCustom(const char* reader, const char* filename);
 
   // Description:
   // Play the demo.
@@ -284,7 +285,7 @@ public:
   // Access to the interactor styles from tcl.
   vtkGetObjectMacro(CameraStyle3D, vtkPVInteractorStyle);
   vtkGetObjectMacro(CameraStyle2D, vtkPVInteractorStyle);
-  vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
+//  vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
   
   // Description:
   // Get the source list called "listname". The default source
@@ -406,7 +407,7 @@ public:
 
   // Description:
   // Callback for fly speed widget
-  void FlySpeedScaleCallback();
+//  void FlySpeedScaleCallback();
 
   // Description:
   // Return the main render window interactor.
@@ -488,12 +489,12 @@ protected:
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
 
   // Fly should also be made into a manipulator.
-  vtkPVInteractorStyleFly *FlyStyle;
+//  vtkPVInteractorStyleFly *FlyStyle;
 
     
   // Interactor stuff
   vtkKWToolbar *InteractorToolbar;
-  vtkKWRadioButton *FlyButton;
+//  vtkKWRadioButton *FlyButton;
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
   vtkKWRadioButton *TrackballCameraButton;
@@ -518,9 +519,9 @@ protected:
   vtkKWEntry *CenterZEntry;
   
   // widgets for setting fly speed for fly interactor style
-  vtkKWToolbar *FlySpeedToolbar;
-  vtkKWLabel *FlySpeedLabel;
-  vtkKWScale *FlySpeedScale;
+//  vtkKWToolbar *FlySpeedToolbar;
+//  vtkKWLabel *FlySpeedLabel;
+//  vtkKWScale *FlySpeedScale;
   
   vtkAxes *CenterSource;
   vtkPolyDataMapper *CenterMapper;
