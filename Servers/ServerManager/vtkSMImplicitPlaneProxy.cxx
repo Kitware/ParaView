@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneProxy::vtkSMImplicitPlaneProxy()
@@ -79,7 +79,9 @@ void vtkSMImplicitPlaneProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Offset: " << this->Offset << endl;
-  os << indent << "Origin: " << this->Origin << endl;
+  os << indent << "Origin: " << this->Origin[0] << "," 
+                             << this->Origin[1] << ","
+                             << this->Origin[2] << endl;
 }
 
 
