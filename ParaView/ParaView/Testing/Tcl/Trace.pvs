@@ -68,7 +68,7 @@ set pv(vtkTemp286) [$pv(vtkTemp1) CreatePVSource Calculator]
 $pv(vtkTemp286) AddScalarVariable Momentum_0 Momentum 0
 $pv(vtkTemp286) AddScalarVariable Momentum_1 Momentum 1
 $pv(vtkTemp286) SetFunctionLabel {Momentum_0+Momentum_1}
-set pv(vtkTemp298) [$pv(vtkTemp286) GetPVWidget {Result Array Name:}]
+set pv(vtkTemp298) [$pv(vtkTemp286) GetPVWidget {ResultArray}]
 $pv(vtkTemp298) SetValue {sum}
 $pv(vtkTemp286) AcceptCallback
 

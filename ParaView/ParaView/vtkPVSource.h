@@ -174,7 +174,7 @@ public:
 
   // Description:
   // Internal method; called by AcceptCallbackInternal.
-  // Hide flag is used for hidding creation of 
+  // Hide flag is used for hiding creation of 
   // the glyph sources from the user.
   virtual void Accept() { this->Accept(0); }
   virtual void Accept(int hideFlag) { this->Accept(hideFlag, 1); }
@@ -281,12 +281,27 @@ public:
   // This adds the PVWidget and sets up the callbacks to initialize its trace.
   void AddPVWidget(vtkPVWidget *pvw);
 
-  // Description: Creates and returns (by reference) a copy of this
+  // Description: 
+  // Convenience methid which calls ClonePrototype() and InitializeClone()
+  int CloneAndInitialize(int makeCurrent, vtkPVSource*& clone);
+
+  // Description: 
+  // Creates and returns (by reference) a copy of this
   // source. It will create a new instance of the same type as the current
   // object using NewInstance() and then call ClonePrototype() on all
   // widgets and add these clones to it's widget list. The return
   // value is VTK_OK is the cloning was successful.
-  int ClonePrototype(int makeCurrent, vtkPVSource*& clone);
+  int ClonePrototype(vtkPVSource*& clone);
+
+  // Description: 
+  // This method is usually called on a clone created using ClonePrototype().
+  // It: 1. sets the input, 2. calls CreateProperties(), 3. make the source
+  // current (if makeCurrent is true), 4. creates output (vtkPVData) which
+  // contains a vtk data object of type outputDataType, 5. assigns or
+  // creates an extent translator to the output.
+  int InitializeClone(vtkPVData* input, 
+                      const char* outputDataType, 
+                      int makeCurrent);
 
   // Description:
   // This method can be used by subclasses of PVSource to do
@@ -510,15 +525,7 @@ protected:
   // Flag to tell whether the source is grabbed or not.
   int SourceGrabbed;
 
-  // Not used any more, should be deleted
-  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
-
-  // For generality, clone prototype internal is split in two
-  // steps. The first step does the actual cloning, while the second
-  // step sets the pvData. The vtkPVSource::ClonePrototype(...)
-  // actually calls both of them.
-  virtual int ClonePrototypeInternal1(int makeCurrent, vtkPVSource*& clone);
-  virtual int ClonePrototypeInternal2(int makeCurrent, vtkPVSource* clone);
+  virtual int ClonePrototypeInternal(vtkPVSource*& clone);
 
   int ToolbarModule;
 

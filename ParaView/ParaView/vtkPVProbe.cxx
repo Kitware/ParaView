@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.82");
+vtkCxxRevisionMacro(vtkPVProbe, "1.83");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -520,13 +520,6 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
   
   this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProbe::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
-{
-  int retVal = this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
-  return retVal;
 }
 
 //----------------------------------------------------------------------------

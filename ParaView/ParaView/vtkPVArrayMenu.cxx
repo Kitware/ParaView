@@ -57,9 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.31");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.32");
 
-vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
+vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu::vtkPVArrayMenu()
@@ -384,7 +384,8 @@ void vtkPVArrayMenu::Accept()
   vtkPVApplication *pvApp = this->GetPVApplication();
   const char* attributeName;
 
-  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
+    this->AttributeType);
   if (attributeName == NULL)
     {
     //vtkErrorMacro("Could not find attribute name.");
@@ -409,12 +410,9 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    if (this->ModifiedFlag)
-      {
-      this->AddTraceEntry("$kw(%s) SetValue {%s}", 
-                           this->GetTclName(), 
-                           this->ArrayName);
-      }
+    this->AddTraceEntry("$kw(%s) SetValue {%s}", 
+                        this->GetTclName(), 
+                        this->ArrayName);
     }
   else
     {
@@ -422,10 +420,7 @@ void vtkPVArrayMenu::Accept()
                            this->ObjectTclName,
                            this->InputName,
                            attributeName);
-    if (this->ModifiedFlag)
-      {
-      this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
-      }
+    this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
     }
 
   if (this->ShowComponentMenu)
@@ -435,12 +430,9 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
-    if (this->ModifiedFlag)
-      {
-      this->AddTraceEntry("$kw(%s) SetSelectedComponent {%s}", 
-                           this->GetTclName(), 
-                           this->ArrayName);
-      }
+    this->AddTraceEntry("$kw(%s) SetSelectedComponent {%s}", 
+                        this->GetTclName(), 
+                        this->ArrayName);
     }
 
   this->ModifiedFlag = 0;
@@ -452,7 +444,8 @@ void vtkPVArrayMenu::Reset()
 {
   const char* attributeName;
 
-  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
+    this->AttributeType);
   if (attributeName == NULL)
     {
     vtkErrorMacro("Could not find attribute name.");
@@ -471,6 +464,7 @@ void vtkPVArrayMenu::Reset()
                this->ObjectTclName,
                this->InputName,
                attributeName);
+  
 
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
@@ -491,7 +485,8 @@ void vtkPVArrayMenu::SaveInTclScript(ofstream *file)
 {
   const char* attributeName;
 
-  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
+    this->AttributeType);
 
   if (this->ObjectTclName == NULL)
     {
@@ -539,7 +534,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   vtkDataSetAttributes *field;
   vtkDataSet *ds;
 
-  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+  attributeName = 
+    vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
   if (attributeName == NULL)
     {
     vtkErrorMacro("Could not find attribute name.");
@@ -608,7 +604,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       }
     }
 
-  // If the filter has not specified a valid array, then use the default attribute.
+  // If the filter has not specified a valid array, then use the default
+  // attribute.
   if (arrayFound == 0)
     { // If the current value is not in the menu, then look for another to use.
     // First look for a default attribute.

@@ -50,15 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVContourEntry.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.56");
+vtkCxxRevisionMacro(vtkPVContour, "1.57");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -69,155 +65,52 @@ vtkPVContour::vtkPVContour()
 {
   this->CommandFunction = vtkPVContourCommand;
   
-  this->ArrayMenu = NULL;
-
   this->ReplaceInputOff();
 }
 
 //----------------------------------------------------------------------------
 vtkPVContour::~vtkPVContour()
 {
-  if (this->ArrayMenu)
-    {
-    this->ArrayMenu->UnRegister(this);
-    this->ArrayMenu = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVContour::CreateProperties()
 {
-  this->Superclass::CreateProperties();
-
   vtkContourFilter* contour = vtkContourFilter::SafeDownCast(this->VTKSource);
   if (contour)
     {
     contour->SetNumberOfContours(0);
     }
 
-  vtkPVApplication*      pvApp = this->GetPVApplication();
-  vtkPVContourEntry*     entry;
-  vtkPVLabeledToggle*    computeScalarsCheck;
-  vtkPVLabeledToggle*    computeNormalsCheck;
-  vtkPVLabeledToggle*    computeGradientsCheck;
+  this->Superclass::CreateProperties();
 
-  vtkPVInputMenu* im = this->AddInputMenu(
-    "Input", "PVInput", "vtkDataSet","Set the input to this filter.",
-    this->GetPVWindow()->GetSourceList("Sources")); 
-  im->SetModifiedCommand(this->GetTclName(), 
-                         "SetAcceptButtonColorToRed");
-  this->Script("pack %s -side top -fill x -expand t", im->GetWidgetName());
-
-  this->ArrayMenu = vtkPVArrayMenu::New();
-  this->ArrayMenu->SetNumberOfComponents(1);
-  this->ArrayMenu->SetInputName("Input");
-  this->ArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
-  this->ArrayMenu->SetLabel("Scalars");
-  this->ArrayMenu->SetObjectTclName(this->GetVTKSourceTclName());
-  this->ArrayMenu->SetParent(this->ParameterFrame->GetFrame());
-  this->ArrayMenu->Create(this->Application);
-  this->ArrayMenu->SetBalloonHelpString("Choose which scalar array you want"
-                                        " to contour.");
-  this->ArrayMenu->SetInputMenu(im);
-  im->AddDependent(this->ArrayMenu);
-  this->AddPVWidget(this->ArrayMenu);
-  this->ArrayMenu->SetModifiedCommand(this->GetTclName(), 
-                                      "SetAcceptButtonColorToRed");
-  this->Script("pack %s -side top -fill x -expand t", this->ArrayMenu->GetWidgetName());
-
-  vtkPVScalarRangeLabel* scalarRange = vtkPVScalarRangeLabel::New();
-  scalarRange->SetArrayMenu(this->ArrayMenu);
-  scalarRange->SetTraceName("ScalarRangeLabel");
-  scalarRange->SetTraceNameState(vtkPVWidget::UserInitialized);
-  scalarRange->SetParent(this->ParameterFrame->GetFrame());
-  scalarRange->Create(this->Application);
-  this->ArrayMenu->AddDependent(scalarRange);  
-  this->AddPVWidget(scalarRange);
-  scalarRange->SetModifiedCommand(this->GetTclName(), 
-                                  "SetAcceptButtonColorToRed");
-  this->Script("pack %s", scalarRange->GetWidgetName());
-  scalarRange->Delete();
-
-  entry = vtkPVContourEntry::New();
-  entry->SetPVSource(this);
-  entry->SetParent(this->GetParameterFrame()->GetFrame());
-  entry->SetLabel("Contour Values");
-  entry->Create(pvApp);
-  entry->SetBalloonHelpString("List of the current contour values");
-  this->AddPVWidget(entry);
-  this->Script("pack %s", entry->GetWidgetName());
-  entry->SetModifiedCommand(this->GetTclName(), 
-                            "SetAcceptButtonColorToRed");
-  entry->Delete();
-  entry = NULL;
-  
-  computeNormalsCheck = vtkPVLabeledToggle::New();
-  computeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeNormalsCheck->SetLabel("Compute Normals");
-  computeNormalsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
-                                         "ComputeNormals");
-  computeNormalsCheck->SetBalloonHelpString(
-    "Select whether to compute normals");
-  computeNormalsCheck->Create(pvApp);
-  computeNormalsCheck->SetState(1);
-  this->AddPVWidget(computeNormalsCheck);
-  computeNormalsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "SetAcceptButtonColorToRed");
-
-  computeGradientsCheck = vtkPVLabeledToggle::New();
-  computeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeGradientsCheck->SetLabel("Compute Gradients");
-  computeGradientsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
-                                           "ComputeGradients");
-  computeGradientsCheck->SetBalloonHelpString(
-    "Select whether to compute gradients");
-  computeGradientsCheck->Create(pvApp);
-  computeGradientsCheck->SetState(0);
-  this->AddPVWidget(computeGradientsCheck);
-  computeGradientsCheck->SetModifiedCommand(this->GetTclName(), 
-                                            "SetAcceptButtonColorToRed");
-  
-  computeScalarsCheck = vtkPVLabeledToggle::New();
-  computeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeScalarsCheck->SetLabel("Compute Scalars");
-  computeScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
-                                         "ComputeScalars");
-  computeScalarsCheck->SetBalloonHelpString(
-    "Select whether to compute scalars");
-  computeScalarsCheck->Create(pvApp);
-  computeScalarsCheck->SetState(1);
-  this->AddPVWidget(computeScalarsCheck);
-  computeScalarsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "SetAcceptButtonColorToRed");
-
-  this->Script("pack %s %s %s -anchor w -padx 10",
-               computeNormalsCheck->GetWidgetName(),
-               computeGradientsCheck->GetWidgetName(),
-               computeScalarsCheck->GetWidgetName());
-
-  computeNormalsCheck->Delete();
-  computeNormalsCheck= NULL;
-  computeGradientsCheck->Delete();
-  computeGradientsCheck= NULL;
-  computeScalarsCheck->Delete();
-  computeScalarsCheck= NULL;
+  // We update the input menu to make sure it has a valid value.
+  // This value is used by the array menu when checking for arrays
+  // (in VerifyInput())
+  vtkPVWidget* input = this->GetPVWidget("Input");
+  if (input)
+    {
+    input->Reset();
+    }
+  this->VerifyInput();
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVContour::SetPVInput(vtkPVData *input)
+// Print a warning if input has no scalars
+void vtkPVContour::VerifyInput()
 {
-  if (input == this->GetPVInput())
+  vtkPVData* input = this->GetPVInput();
+  if (!input)
     {
     return;
     }
 
-  this->vtkPVSource::SetPVInput(input);
-
-  if (this->ArrayMenu)
+  vtkPVArrayMenu* arrayMenu = vtkPVArrayMenu::SafeDownCast(
+    this->GetPVWidget("Scalars"));
+  if (arrayMenu && arrayMenu->GetApplication())
     {
-    this->ArrayMenu->Reset();
-    if (this->ArrayMenu->GetValue() == NULL)
+    arrayMenu->Reset();
+    if (arrayMenu->GetValue() == NULL)
       {
       vtkKWMessageDialog::PopupMessage(
         this->Application, this->GetPVApplication()->GetMainWindow(), 
@@ -229,14 +122,15 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContour::InitializePrototype()
+void vtkPVContour::SetPVInput(vtkPVData *input)
 {
-}
+  if (input == this->GetPVInput())
+    {
+    return;
+    }
 
-//----------------------------------------------------------------------------
-int vtkPVContour::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
-{
-  return this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
+  this->vtkPVSource::SetPVInput(input);
+  this->VerifyInput();
 }
 
 //----------------------------------------------------------------------------

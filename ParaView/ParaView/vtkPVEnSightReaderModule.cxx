@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.31");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.32");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -552,7 +552,7 @@ int vtkPVEnSightReaderModule::Initialize(const char* fname,
   this->SetOutputClassName("vtkPolyData");
 
   clone = 0;
-  if (this->ClonePrototype(0, clone) != VTK_OK)
+  if (this->CloneAndInitialize(0, clone) != VTK_OK)
     {
     vtkErrorMacro("Error creating reader " << this->GetClassName()
                   << endl);

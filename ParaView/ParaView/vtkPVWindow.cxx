@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.402");
+vtkCxxRevisionMacro(vtkPVWindow, "1.403");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -224,7 +224,7 @@ vtkPVWindow::vtkPVWindow()
   this->FileDescriptions = NULL;
 
   // The prototypes for source and filter modules. Instances are 
-  // created by calling ClonePrototype() on these.
+  // created by calling CloneAndInitialize() on these.
   this->Prototypes = vtkArrayMap<const char*, vtkPVSource*>::New();
   // The prototypes for reader modules. Instances are 
   // created by calling ReadFile() on these.
@@ -1207,7 +1207,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
 //----------------------------------------------------------------------------
 // The prototypes for source and filter modules. Instances are 
-// created by calling ClonePrototype() on these.
+// created by calling CloneAndInitialize() on these.
 void vtkPVWindow::AddPrototype(const char* name, vtkPVSource* proto)
 {
   this->Prototypes->SetItem(name, proto);
@@ -3344,11 +3344,11 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
       {
-      success = pvs->ClonePrototype(0, clone);
+      success = pvs->CloneAndInitialize(0, clone);
       }
     else
       {
-      success = pvs->ClonePrototype(1, clone);
+      success = pvs->CloneAndInitialize(1, clone);
       }
 
     if (success != VTK_OK)
@@ -3830,7 +3830,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.402 $");
+  this->ExtractRevision(os,"$Revision: 1.403 $");
 }
 
 //----------------------------------------------------------------------------

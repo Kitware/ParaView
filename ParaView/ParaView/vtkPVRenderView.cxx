@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
@@ -106,7 +107,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.222");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.223");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -474,7 +475,7 @@ vtkPVRenderView::~vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
-void PVRenderViewAbortCheck(void *arg)
+void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 {
   vtkPVRenderView *me = (vtkPVRenderView*)arg;
   int abort;
@@ -2299,6 +2300,7 @@ void vtkPVRenderView::InterruptRenderCallback()
   if (this->Composite)
     {
     vtkPVApplication* pvApp = this->GetPVApplication();
+
     // Interrupts will have to work with client server process modules. !!!!!!
     if (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1 )
       {
@@ -2308,14 +2310,14 @@ void vtkPVRenderView::InterruptRenderCallback()
       }
     else
       {
+      this->RenderWindow->RemoveObservers(vtkCommand::AbortCheckEvent);
       if (this->InterruptRenderCheck->GetState())
         {
-        this->RenderWindow->SetAbortCheckMethod(
-          PVRenderViewAbortCheck, (void*)this);
-        }
-      else
-        {
-        this->RenderWindow->SetAbortCheckMethod(0, 0);
+        vtkCallbackCommand* abc = vtkCallbackCommand::New();
+        abc->SetCallback(PVRenderViewAbortCheck);
+        abc->SetClientData(this);
+        this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
+        abc->Delete();
         }
       }
     }
@@ -2596,7 +2598,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.222 $");
+  this->ExtractRevision(os,"$Revision: 1.223 $");
 }
 
 //------------------------------------------------------------------------------

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.19");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -107,13 +107,13 @@ void vtkPVReaderModule::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVReaderModule::ClonePrototype(int makeCurrent, 
-                                      vtkPVReaderModule*& clone )
+int vtkPVReaderModule::CloneAndInitialize(int makeCurrent, 
+                                          vtkPVReaderModule*& clone )
 {
   clone = 0;
 
   vtkPVSource* pvs = 0;
-  int retVal = this->ClonePrototypeInternal(makeCurrent, pvs);
+  int retVal = this->Superclass::CloneAndInitialize(makeCurrent, pvs);
   if (retVal == VTK_OK)
     {
     clone = vtkPVReaderModule::SafeDownCast(pvs);
@@ -183,7 +183,7 @@ const char* vtkPVReaderModule::ExtractExtension(const char* fname)
 int vtkPVReaderModule::Initialize(const char*, vtkPVReaderModule*& clone)
 {
   clone = 0;
-  if (this->ClonePrototype(1, clone) != VTK_OK)
+  if (this->CloneAndInitialize(1, clone) != VTK_OK)
     {
     vtkErrorMacro("Error creating reader " << this->GetClassName()
                   << endl);

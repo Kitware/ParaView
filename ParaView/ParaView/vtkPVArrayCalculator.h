@@ -54,7 +54,6 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWWidget;
-class vtkPVStringEntry;
 
 class VTK_EXPORT vtkPVArrayCalculator : public vtkPVSource
 {
@@ -112,8 +111,6 @@ protected:
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;
-  
-  vtkPVStringEntry* ArrayNameEntry;
   
   vtkKWLabeledFrame* CalculatorFrame;
   vtkKWLabel* FunctionLabel;

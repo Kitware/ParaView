@@ -56,8 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkPVStringEntry.h"
-#include "vtkPVStringEntry.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
@@ -65,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.49");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.50");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -78,7 +76,6 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();
-  this->ArrayNameEntry = vtkPVStringEntry::New();
   
   this->CalculatorFrame = vtkKWLabeledFrame::New();
   this->FunctionLabel = vtkKWLabel::New();
@@ -135,8 +132,6 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
   this->AttributeModeMenu = NULL;
   this->AttributeModeFrame->Delete();
   this->AttributeModeFrame = NULL;
-  this->ArrayNameEntry->Delete();
-  this->ArrayNameEntry = NULL;
   
   this->FunctionLabel->Delete();
   this->FunctionLabel = NULL;
@@ -230,11 +225,6 @@ void vtkPVArrayCalculator::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  vtkPVInputMenu* im = this->AddInputMenu(
-    "Input", "PVInput", "vtkDataSet", "Set the input to this filter.",
-    this->GetPVWindow()->GetSourceList("Sources"));
-  this->Script("pack %s -side top -fill x -expand t", im->GetWidgetName());
-  
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
@@ -243,7 +233,8 @@ void vtkPVArrayCalculator::CreateProperties()
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
   this->AttributeModeLabel->Create(pvApp, "");
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
-  this->AttributeModeLabel->SetBalloonHelpString("Select whether to operate on point or cell data");
+  this->AttributeModeLabel->SetBalloonHelpString(
+    "Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp, "");
   this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
@@ -251,22 +242,11 @@ void vtkPVArrayCalculator::CreateProperties()
   this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
                                                "ChangeAttributeMode cell");
   this->AttributeModeMenu->SetCurrentEntry("Point Data");
-  this->AttributeModeMenu->SetBalloonHelpString("Select whether to operate on point or cell data");
+  this->AttributeModeMenu->SetBalloonHelpString(
+    "Select whether to operate on point or cell data");
   this->Script("pack %s %s -side left",
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
-  
-  this->ArrayNameEntry->SetParent(this->ParameterFrame->GetFrame());
-  this->ArrayNameEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                          "ResultArrayName");
-  this->ArrayNameEntry->SetModifiedCommand(this->GetTclName(), 
-                                            "SetAcceptButtonColorToRed");
-  this->ArrayNameEntry->SetLabel("Result Array Name:");
-  this->ArrayNameEntry->SetBalloonHelpString("Set the name of the array to hold the results of this computation");
-  this->ArrayNameEntry->Create(pvApp);
-  this->AddPVWidget(this->ArrayNameEntry);
-  this->Script("pack %s -side top -fill x",
-               this->ArrayNameEntry->GetWidgetName());
   
   this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->CalculatorFrame->ShowHideFrameOn();
@@ -278,7 +258,8 @@ void vtkPVArrayCalculator::CreateProperties()
   this->FunctionLabel->SetParent(this->CalculatorFrame->GetFrame());
   this->FunctionLabel->Create(pvApp, "-background white");
   this->FunctionLabel->SetLabel("");
-  this->Script("grid %s -columnspan 8 -sticky ew", this->FunctionLabel->GetWidgetName());
+  this->Script("grid %s -columnspan 8 -sticky ew", 
+               this->FunctionLabel->GetWidgetName());
   
   this->ButtonClear->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonClear->Create(pvApp, "");
@@ -473,8 +454,10 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ButtonNorm->Create(pvApp, "");
   this->ButtonNorm->SetLabel("norm");
   this->ButtonNorm->SetCommand(this, "UpdateFunction norm");
-  this->Script("grid %s %s %s -sticky ew", this->ButtonDot->GetWidgetName(),
-               this->ButtonMag->GetWidgetName(), this->ButtonNorm->GetWidgetName());
+  this->Script("grid %s %s %s -sticky ew", 
+               this->ButtonDot->GetWidgetName(),
+               this->ButtonMag->GetWidgetName(), 
+               this->ButtonNorm->GetWidgetName());
   
   this->ScalarsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->ScalarsMenu->Create(pvApp, "");
@@ -632,8 +615,9 @@ void vtkPVArrayCalculator::UpdateVTKSourceParameters()
     pvApp->AddTraceEntry("$kw(%s) SetFunctionLabel {%s}",
                          this->GetTclName(), this->FunctionLabel->GetLabel());
 
-    // Format a command to move value from widget to vtkObjects (on all processes).
-    // The VTK objects do not yet have to have the same Tcl name!
+    // Format a command to move value from widget to vtkObjects (on all
+    // processes).  The VTK objects do not yet have to have the same Tcl
+    // name!
     pvApp->BroadcastScript("%s SetFunction {%s}",
                            this->GetVTKSourceTclName(),
                            this->FunctionLabel->GetLabel());

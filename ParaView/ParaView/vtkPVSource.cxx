@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.254");
+vtkCxxRevisionMacro(vtkPVSource, "1.255");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -574,6 +574,19 @@ void vtkPVSource::CreateProperties()
   frame->Delete();  
  
   this->UpdateProperties();
+
+  vtkPVWidget *pvWidget;
+  this->Widgets->InitTraversal();
+  int i;
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+    {
+    pvWidget = this->Widgets->GetNextPVWidget();
+    pvWidget->SetParent(this->ParameterFrame->GetFrame());
+    pvWidget->Create(this->Application);
+    this->Script("pack %s -side top -fill x -expand t", 
+                 pvWidget->GetWidgetName());
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1238,7 +1251,11 @@ void vtkPVSource::UpdateParameterWidgets()
   while( !it->IsDoneWithTraversal() )
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    pvw->ForceReset();
+    // Do not try to reset the widget if it is not initialized
+    if (pvw->GetApplication())
+      {
+      pvw->ForceReset();
+      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -1761,13 +1778,39 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName,
   return inputMenu;
 }
 
-int vtkPVSource::ClonePrototype(int makeCurrent, vtkPVSource*& clone )
+int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
 {
-  return this->ClonePrototypeInternal1(makeCurrent, clone) &&
-    this->ClonePrototypeInternal2(makeCurrent, clone);
+
+  int retVal = this->ClonePrototypeInternal(clone);
+  if (retVal != VTK_OK)
+    {
+    return retVal;
+    }
+
+  vtkPVData *current = this->GetPVWindow()->GetCurrentPVData();
+  retVal = clone->InitializeClone(current, 
+                                  this->GetOutputClassName(),
+                                  makeCurrent);
+
+  if (retVal != VTK_OK)
+    {
+    clone->Delete();
+    clone = 0;
+    return retVal;
+    }
+
+  // Accept button is always red when a source is first created.
+  clone->SetAcceptButtonColorToRed();
+
+  return VTK_OK;
 }
 
-int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
+int vtkPVSource::ClonePrototype(vtkPVSource*& clone)
+{
+  return this->ClonePrototypeInternal(clone);
+}
+
+int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 {
   clone = 0;
 
@@ -1804,8 +1847,6 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     return VTK_ERROR;
     }
 
-  vtkPVData *current = this->GetPVWindow()->GetCurrentPVData();
-
   // Create a (unique) name for the source.
   // Beware: If two prototypes have the same name, the name 
   // will not be unique.
@@ -1835,91 +1876,13 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 
   pvs->SetVTKSource(vtksource, tclName);
   pvs->SetView(this->GetPVWindow()->GetMainView());
-  // Set the input if necessary.
-  if (pvs->InputClassNames->GetNumberOfItems() > 0)
-    {
-    pvs->SetPVInput(current);
-    }
-  // Create the properties frame etc.
-  pvs->CreateProperties();
-
-  // let's see if we can determine the output type.
-  const char* outputDataType = this->GetOutputClassName();
-  if (strcmp(outputDataType, "vtkDataSet") == 0)
-    { // Output will be the same as the input.
-    if (current == NULL)
-      {
-      pvs->Delete();
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = current->GetVTKData()->GetClassName();
-    }
-  if (strcmp(outputDataType, "vtkPointSet") == 0)
-    { // Output will be the same as the input.
-    if (current == NULL)
-      {
-      pvs->Delete();
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = current->GetVTKData()->GetClassName();
-    }
-
-  if (makeCurrent)
-    {
-    // This has to be here because if it is called
-    // after the PVData is set we get errors. This 
-    // should probably be fixed.
-    this->GetPVWindow()->SetCurrentPVSourceCallback(pvs);
-    this->GetPVWindow()->ShowCurrentSourceProperties();
-    }
-
-  // Create the output.
-  char otherTclName[1024];
-  vtkPVData* pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
-  sprintf(otherTclName, "%sOutput", tclName);
-  // Create the object through tcl on all processes.
-  vtkDataSet* vtkdata = static_cast<vtkDataSet *>(pvApp->MakeTclObject(
-    outputDataType, otherTclName));
-  pvd->SetVTKData(vtkdata, otherTclName);
-
-  // Connect the source and data.
-  pvs->SetPVOutput(pvd);  
-  
-  // Relay the connection to the VTK objects.  
-  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-                         pvd->GetVTKDataTclName());   
-
-  // Create the extent translator
-  if (pvs->InputClassNames->GetNumberOfItems())
-    {
-    pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
-                           pvd->GetVTKDataTclName(), 
-                           current->GetVTKDataTclName());
-    }
-  else
-    {
-    sprintf(otherTclName, "%sTranslator", tclName);
-    pvApp->BroadcastScript("vtkPVExtentTranslator %s", otherTclName);
-    pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
-                           otherTclName, 
-                           pvs->GetVTKSourceTclName());
-    pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                           pvd->GetVTKDataTclName(), 
-                           otherTclName);
-    // Hold onto name so it can be deleted.
-    pvs->SetExtentTranslatorTclName(otherTclName);
-    }
-
-  pvd->Delete();
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
   this->PrototypeInstanceCount++;
 
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* widgetMap =
     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>::New();
+
 
   // Copy all widgets
   vtkPVWidget *pvWidget, *clonedWidget;
@@ -1929,213 +1892,110 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     {
     pvWidget = this->Widgets->GetNextPVWidget();
     clonedWidget = pvWidget->ClonePrototype(pvs, widgetMap);
-    clonedWidget->SetParent(pvs->ParameterFrame->GetFrame());
-    clonedWidget->Create(pvApp);
-    pvApp->Script("pack %s -side top -fill x -expand t", 
-                  clonedWidget->GetWidgetName());
     pvs->AddPVWidget(clonedWidget);
     clonedWidget->Delete();
     }
   widgetMap->Delete();
-  
-  // Accept button is always red when a source is first created.
-  pvs->SetAcceptButtonColorToRed();
-  
+
   clone = pvs;
   return VTK_OK;
 }
 
-int vtkPVSource::ClonePrototypeInternal1(int makeCurrent, vtkPVSource*& clone)
+int vtkPVSource::InitializeClone(vtkPVData* input,
+                                 const char* outputDataType,
+                                 int makeCurrent)
+
 {
-  clone = 0;
 
-  // Create instance
-  vtkPVSource* pvs = this->NewInstance();
-  // Copy properties
-  pvs->SetApplication(this->Application);
-  pvs->SetReplaceInput(this->ReplaceInput);
-  pvs->SetParametersParent(this->ParametersParent);
-
-  pvs->SetShortHelp(this->GetShortHelp());
-  pvs->SetLongHelp(this->GetLongHelp());
-
-  vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
-  vtkIdType id;
-  for(id=0; id<numItems; id++)
+  // Set the input if necessary.
+  if (this->InputClassNames->GetNumberOfItems() > 0)
     {
-    const char* item;
-    if ( this->InputClassNames->GetItem(id, item) == VTK_OK )
-      {
-      pvs->AddInputClassName(item);
-      }
-    }
-  pvs->SetOutputClassName(this->OutputClassName);
-  pvs->SetSourceClassName(this->SourceClassName);
-
-  pvs->SetModuleName(this->ModuleName);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->Application);
-  if (!pvApp)
-    {
-    vtkErrorMacro("vtkPVApplication is not set properly. Aborting clone.");
-    pvs->Delete();
-    return VTK_ERROR;
-    }
-
-  // Create a (unique) name for the source.
-  // Beware: If two prototypes have the same name, the name 
-  // will not be unique.
-  char tclName[1024];
-  if (this->Name && this->Name[0] != '\0')
-    { 
-    sprintf(tclName, "%s%d", this->Name, this->PrototypeInstanceCount);
+    this->SetPVInput(input);
     }
   else
     {
-    vtkErrorMacro("The prototype must have a name. Cloning aborted.");
-    pvs->Delete();
-    return VTK_ERROR;
-    }
-  pvs->SetName(tclName);
-
-  // Create a vtkSource with the same name as the PVSource
-  vtkSource* vtksource = 
-    static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
-                                                  tclName));
-  if (vtksource == NULL)
-    {
-    vtkErrorMacro("Could not get pointer from object.");
-    pvs->Delete();
-    return VTK_ERROR;
+    input = 0;
     }
 
-  pvs->SetVTKSource(vtksource, tclName);
-  pvs->SetView(this->GetPVWindow()->GetMainView());
-  
-  clone = pvs;
-  clone->Prototype = this;
-  return VTK_OK;
-}
-
-int vtkPVSource::ClonePrototypeInternal2(int makeCurrent, vtkPVSource* pvs)
-{
-  vtkPVSource* prototype = pvs->Prototype;
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->Application);
-  if (!pvApp)
-    {
-    vtkErrorMacro("vtkPVApplication is not set properly. Aborting clone.");
-    pvs->Delete();
-    return VTK_ERROR;
-    }
-  vtkPVData *current = prototype->GetPVWindow()->GetCurrentPVData();
-  // Set the input if necessary.
-  if (pvs->InputClassNames->GetNumberOfItems() > 0)
-    {
-    pvs->SetPVInput(current);
-    }
   // Create the properties frame etc.
-  pvs->CreateProperties();
-
-  // let's see if we can determine the output type.
-  const char* outputDataType = prototype->GetOutputClassName();
-  if (strcmp(outputDataType, "vtkDataSet") == 0)
-    { // Output will be the same as the input.
-    if (current == NULL)
-      {
-      pvs->Delete();
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = current->GetVTKData()->GetClassName();
-    }
-  if (strcmp(outputDataType, "vtkPointSet") == 0)
-    { // Output will be the same as the input.
-    if (current == NULL)
-      {
-      pvs->Delete();
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = current->GetVTKData()->GetClassName();
-    }
+  this->CreateProperties();
 
   if (makeCurrent)
     {
-    // This has to be here because if it is called
-    // after the PVData is set we get errors. This 
-    // should probably be fixed.
-    prototype->GetPVWindow()->SetCurrentPVSourceCallback(pvs);
-    prototype->GetPVWindow()->ShowCurrentSourceProperties();
+    this->GetPVWindow()->SetCurrentPVSourceCallback(this);
     }
+  
+  const char* inputDataType=0;
+  if ( input )
+    {
+    inputDataType = input->GetVTKData()->GetClassName();
+    }
+
+  // let's see if we can determine the output type.
+  if (strcmp(outputDataType, "vtkDataSet") == 0)
+    { // Output will be the same as the input.
+    if (!inputDataType)
+      {
+      vtkErrorMacro("Cannot determine output type.");
+      return VTK_ERROR;
+      }
+    outputDataType = inputDataType;
+    }
+  if (strcmp(outputDataType, "vtkPointSet") == 0)
+    { // Output will be the same as the input.
+    if (!inputDataType)
+      {
+      vtkErrorMacro("Cannot determine output type.");
+      return VTK_ERROR;
+      }
+    outputDataType = inputDataType;
+    }
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->Application);
 
   // Create the output.
   char otherTclName[1024];
   vtkPVData* pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
-  sprintf(otherTclName, "%sOutput", pvs->GetName());
+  sprintf(otherTclName, "%sOutput", this->GetName());
   // Create the object through tcl on all processes.
   vtkDataSet* vtkdata = static_cast<vtkDataSet *>(pvApp->MakeTclObject(
     outputDataType, otherTclName));
   pvd->SetVTKData(vtkdata, otherTclName);
 
   // Connect the source and data.
-  pvs->SetPVOutput(pvd);  
+  this->SetPVOutput(pvd);  
   
   // Relay the connection to the VTK objects.  
-  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+  pvApp->BroadcastScript("%s SetOutput %s", this->GetVTKSourceTclName(),
                          pvd->GetVTKDataTclName());   
 
   // Create the extent translator
-  if (pvs->InputClassNames->GetNumberOfItems())
+  if (input)
     {
     pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
                            pvd->GetVTKDataTclName(), 
-                           current->GetVTKDataTclName());
+                           input->GetVTKDataTclName());
     }
   else
     {
-    sprintf(otherTclName, "%sTranslator", pvs->GetName());
+    sprintf(otherTclName, "%sTranslator", this->GetName());
     pvApp->BroadcastScript("vtkPVExtentTranslator %s", otherTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
                            otherTclName, 
-                           pvs->GetVTKSourceTclName());
+                           this->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
                            pvd->GetVTKDataTclName(), 
                            otherTclName);
     // Hold onto name so it can be deleted.
-    pvs->SetExtentTranslatorTclName(otherTclName);
+    this->SetExtentTranslatorTclName(otherTclName);
     }
 
   pvd->Delete();
-
-  pvs->PrototypeInstanceCount = prototype->PrototypeInstanceCount;
-  prototype->PrototypeInstanceCount++;
-
-  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* widgetMap =
-    vtkArrayMap<vtkPVWidget*, vtkPVWidget*>::New();
-
-  // Copy all widgets
-  vtkPVWidget *pvWidget, *clonedWidget;
-  prototype->Widgets->InitTraversal();
-  int i;
-  for (i = 0; i < prototype->Widgets->GetNumberOfItems(); i++)
-    {
-    pvWidget = prototype->Widgets->GetNextPVWidget();
-    clonedWidget = pvWidget->ClonePrototype(pvs, widgetMap);
-    clonedWidget->SetParent(pvs->ParameterFrame->GetFrame());
-    clonedWidget->Create(pvApp);
-    pvApp->Script("pack %s -side top -fill x -expand t", 
-                  clonedWidget->GetWidgetName());
-    pvs->AddPVWidget(clonedWidget);
-    clonedWidget->Delete();
-    }
-  widgetMap->Delete();
-  
-  // Accept button is always red when a source is first created.
-  pvs->SetAcceptButtonColorToRed();
-  
   return VTK_OK;
+
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
@@ -2326,7 +2186,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.254 $");
+  this->ExtractRevision(os,"$Revision: 1.255 $");
 }
 
 //----------------------------------------------------------------------------

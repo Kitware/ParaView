@@ -157,7 +157,7 @@ protected:
   // NewInstance() and then call ClonePrototype() on all widgets and add
   // these clones to it's widget list. The return value is VTK_OK is the
   // cloning was successful.
-  int ClonePrototype(int makeCurrent, vtkPVReaderModule*& clone);
+  int CloneAndInitialize(int makeCurrent, vtkPVReaderModule*& clone);
 
   int PackFileEntry;
   int AddFileEntry;

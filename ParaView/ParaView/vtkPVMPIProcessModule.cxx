@@ -85,7 +85,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.3");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.4");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -244,6 +244,7 @@ void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
     this->RemoteSimpleScript(id, str);
     }
   
+//  cout << str << endl;
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
 }
@@ -534,7 +535,9 @@ void vtkPVMPIProcessModule::CompleteArrays(vtkMapper *mapper, char *mapperTclNam
    numProcs = this->Controller->GetNumberOfProcesses();
   for (i = 1; i < numProcs; ++i)
     {
-    this->RemoteScript(i, "[$Application GetProcessModule] SendCompleteArrays %s", mapperTclName);
+    this->RemoteScript(i, 
+                       "[$Application GetProcessModule] SendCompleteArrays %s", 
+                       mapperTclName);
     this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
     if (nonEmptyFlag)
       { // This process has data.  Receive all the arrays, type and component.
@@ -595,11 +598,16 @@ void vtkPVMPIProcessModule::CompleteArrays(vtkMapper *mapper, char *mapperTclNam
         } // end of loop over point arrays.
       // Which scalars, ... are active?
       this->Controller->Receive(activeAttributes, 5, i, 987258);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(
+        activeAttributes[0],0);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(
+        activeAttributes[1],1);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(
+        activeAttributes[2],2);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(
+        activeAttributes[3],3);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(
+        activeAttributes[4],4);
  
       // Next Cell data.
       this->Controller->Receive(&num, 1, i, 987244);
@@ -651,11 +659,16 @@ void vtkPVMPIProcessModule::CompleteArrays(vtkMapper *mapper, char *mapperTclNam
         } // end of loop over cell arrays.
       // Which scalars, ... are active?
       this->Controller->Receive(activeAttributes, 5, i, 987258);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(
+        activeAttributes[0],0);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(
+        activeAttributes[1],1);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(
+        activeAttributes[2],2);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(
+        activeAttributes[3],3);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(
+        activeAttributes[4],4);
       
       // We only need information from one.
       return;

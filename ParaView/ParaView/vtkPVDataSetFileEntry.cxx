@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.6");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -76,7 +76,8 @@ void vtkPVDataSetFileEntry::Accept()
 
   if (newType == -1)
     {
-    this->GetPVApplication()->GetMainWindow()->WarningMessage("Could not read file.");
+    this->GetPVApplication()->GetMainWindow()->WarningMessage(
+      "Could not read file.");
     this->Reset();
     return;
     }
@@ -86,7 +87,8 @@ void vtkPVDataSetFileEntry::Accept()
     }
   if (this->Type != newType)
     {
-    this->GetPVApplication()->GetMainWindow()->WarningMessage("Output type does not match previous file.");
+    this->GetPVApplication()->GetMainWindow()->WarningMessage(
+      "Output type does not match previous file.");
     this->Reset();
     return;
     }

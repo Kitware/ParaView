@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.12");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -116,7 +116,7 @@ int vtkPVDataSetReaderModule::Initialize(const char* fname,
     return VTK_ERROR;
     }
   
-  pvs = vtkPVReaderModule::New();
+  pvs = vtkPVDataSetReaderModule::New();
   pvs->SetParametersParent(
     this->GetPVWindow()->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
@@ -146,20 +146,25 @@ int vtkPVDataSetReaderModule::Initialize(const char* fname,
   switch (s->GetDataType())
     {
     case VTK_POLY_DATA:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", outputTclName));
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", 
+                                              outputTclName));
       break;
     case VTK_UNSTRUCTURED_GRID:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkUnstructuredGrid", outputTclName));
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkUnstructuredGrid", 
+                                              outputTclName));
       break;
     case VTK_STRUCTURED_GRID:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkStructuredGrid", outputTclName));
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkStructuredGrid", 
+                                              outputTclName));
       break;
     case VTK_RECTILINEAR_GRID:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", 
+                                              outputTclName));
       break;
     case VTK_STRUCTURED_POINTS:
     case VTK_IMAGE_DATA:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkImageData", outputTclName));
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkImageData", 
+                                              outputTclName));
       break;
     default:
       vtkErrorMacro("Could not determine output type.");

@@ -62,23 +62,18 @@ public:
   
   // Description:
   // This does the same thing as the superclass, but also
-  // checks fopr scalars.
+  // checks for scalars.
   virtual void SetPVInput(vtkPVData* input);
   
-  // Description:
-  // Create the widgets in the prototype.
-  virtual void InitializePrototype();
-
 protected:
   vtkPVContour();
   ~vtkPVContour();
   
-  vtkPVArrayMenu* ArrayMenu;
+  void VerifyInput();
 
   vtkPVContour(const vtkPVContour&); // Not implemented
   void operator=(const vtkPVContour&); // Not implemented
 
-  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 };
 
 #endif

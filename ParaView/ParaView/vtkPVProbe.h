@@ -136,8 +136,6 @@ protected:
 
   void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
 
-  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
-
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
 };
