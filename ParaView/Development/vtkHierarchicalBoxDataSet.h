@@ -23,13 +23,12 @@
 
 #include "vtkHierarchicalDataSet.h"
 
-#include "vtkAMRBox.h"
-
 //BTX
 struct vtkHierarchicalBoxDataSetInternal;
 //ETX
 class vtkDataObject;
 class vtkUniformGrid;
+class vtkAMRBox;
 
 class VTK_EXPORT vtkHierarchicalBoxDataSet : public vtkHierarchicalDataSet
 {

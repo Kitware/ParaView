@@ -55,6 +55,11 @@ protected:
 
   vtkMultiBlockApplyFilterCommand();
   ~vtkMultiBlockApplyFilterCommand();
+
+private:
+  vtkMultiBlockApplyFilterCommand(
+    const vtkMultiBlockApplyFilterCommand&); // Not implemented
+  void operator=(const vtkMultiBlockApplyFilterCommand&); // Not implemented
 };
 
 

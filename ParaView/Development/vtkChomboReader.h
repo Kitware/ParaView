@@ -22,11 +22,12 @@
 #define __vtkChomboReader_h
 
 #include "vtkSource.h"
-#include "vtkAMRBox.h"
 
-#include <hdf5.h>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include "vtkAMRBox.h" // Needed for vector of vtkAMRBox
+
+#include <hdf5.h> // Needed for hid_t
+#include <vtkstd/vector> // Needed for vector ivar
+#include <vtkstd/string> // Needed for vector ivar
 
 class vtkHierarchicalBoxDataSet;
 

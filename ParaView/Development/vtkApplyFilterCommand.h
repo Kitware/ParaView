@@ -49,6 +49,11 @@ protected:
   
   vtkApplyFilterCommand();
   ~vtkApplyFilterCommand();
+
+private:
+  vtkApplyFilterCommand(
+    const vtkApplyFilterCommand&); // Not implemented
+  void operator=(const vtkApplyFilterCommand&); // Not implemented
 };
 
 

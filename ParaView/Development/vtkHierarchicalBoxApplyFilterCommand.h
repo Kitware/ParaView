@@ -22,7 +22,7 @@
 #define __vtkHierarchicalBoxApplyFilterCommand_h
 
 #include "vtkApplyFilterCommand.h"
-#include "vtkAMRBox.h"
+#include "vtkAMRBox.h" // Needed for LevelInformation
 
 class vtkHierarchicalBoxDataSet;
 
@@ -66,9 +66,11 @@ protected:
 
   vtkHierarchicalBoxApplyFilterCommand();
   ~vtkHierarchicalBoxApplyFilterCommand();
+
+  vtkHierarchicalBoxApplyFilterCommand(
+    const vtkHierarchicalBoxApplyFilterCommand&); // Not implemented
+  void operator=(const vtkHierarchicalBoxApplyFilterCommand&); // Not implemented
 };
-
-
 
 #endif /* __vtkHierarchicalBoxApplyFilterCommand_h */
  
