@@ -44,10 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.5");
+vtkCxxRevisionMacro(vtkPVWriter, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -111,36 +112,36 @@ void vtkPVWriter::Write(const char* fileName, const char* dataTclName,
   
   if(!this->Parallel)
     {
-    pvApp->BroadcastScript("%s writer", this->WriterClassName);
-    pvApp->BroadcastScript("writer SetFileName %s", fileName);
-    pvApp->BroadcastScript("writer SetInput %s", dataTclName);
-    if(this->DataModeMethod)
+    pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);
+    pvApp->GetProcessModule()->ServerScript("writer SetFileName %s", fileName);
+    pvApp->GetProcessModule()->ServerScript("writer SetInput %s", dataTclName);
+    if (this->DataModeMethod)
       {
-      pvApp->BroadcastScript("writer %s", this->DataModeMethod);
+      pvApp->GetProcessModule()->ServerScript("writer %s", this->DataModeMethod);
       }
-    pvApp->BroadcastScript("writer Write");
-    pvApp->BroadcastScript("writer Delete");
+    pvApp->GetProcessModule()->ServerScript("writer Write");
+    pvApp->GetProcessModule()->ServerScript("writer Delete");
     }
   else
     {
-    pvApp->BroadcastScript("%s writer", this->WriterClassName);
-    pvApp->BroadcastScript("writer SetFileName %s", fileName);
-    pvApp->BroadcastScript("writer SetInput %s", dataTclName);
+    pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);
+    pvApp->GetProcessModule()->ServerScript("writer SetFileName %s", fileName);
+    pvApp->GetProcessModule()->ServerScript("writer SetInput %s", dataTclName);
     if(this->DataModeMethod)
       {
-      pvApp->BroadcastScript("writer %s", this->DataModeMethod);
+      pvApp->GetProcessModule()->ServerScript("writer %s", this->DataModeMethod);
       }
-    pvApp->BroadcastScript("writer SetNumberOfPieces %d", numProcs);
-    pvApp->BroadcastScript("writer SetGhostLevel %d", ghostLevel);
-    this->Script("writer SetStartPiece 0");
-    this->Script("writer SetEndPiece 0");
+    pvApp->GetProcessModule()->ServerScript("writer SetNumberOfPieces %d", numProcs);
+    pvApp->GetProcessModule()->ServerScript("writer SetGhostLevel %d", ghostLevel);
+    pvApp->GetProcessModule()->RootScript("writer SetStartPiece 0");
+    pvApp->GetProcessModule()->RootScript("writer SetEndPiece 0");
     int i;
     for (i=1; i < numProcs; ++i)
       {
       pvApp->RemoteScript(i, "writer SetStartPiece %d", i);
       pvApp->RemoteScript(i, "writer SetEndPiece %d", i);
       }
-    pvApp->BroadcastScript("writer Write");
-    pvApp->BroadcastScript("writer Delete");
+    pvApp->GetProcessModule()->ServerScript("writer Write");
+    pvApp->GetProcessModule()->ServerScript("writer Delete");
     }
 }

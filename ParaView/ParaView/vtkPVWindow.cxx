@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.441");
+vtkCxxRevisionMacro(vtkPVWindow, "1.442");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2378,6 +2378,9 @@ void vtkPVWindow::WriteData()
   typesStr.rdbuf()->freeze(0);
   
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  // Dialog does not support saving yet.
+  // vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
+
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
   saveDialog->SetParent(this);
   saveDialog->Create(this->Application, 0);
@@ -4203,7 +4206,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.441 $");
+  this->ExtractRevision(os,"$Revision: 1.442 $");
 }
 
 //-----------------------------------------------------------------------------
