@@ -60,11 +60,16 @@ public:
 
   // Description:
   // Set/Get the value of the entry in a few different formats.
-  // In the SetValue method with float, the second argument is the
-  // number of decimal places to display.
+  // In the SetValue method with double, values are printed in printf's f or e
+  // format, whichever is more compact for the given value and precision. 
+  // The e format is used only when the exponent of the value is less than
+  // -4 or greater than or equal to the precision argument (which can be
+  // controlled using the the second parameter of SetValue). Trailing zeros
+  // are truncated, and the decimal point appears only if one or more digits
+  // follow it.
   void SetValue(const char *);
   void SetValue(int a);
-  void SetValue(double f,int size);
+  void SetValue(double f, int size);
   void SetValue(double f);
   char *GetValue();
   int GetValueAsInt();

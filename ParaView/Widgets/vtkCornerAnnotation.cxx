@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.38");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.39");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -188,7 +188,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
         *rpos = '\0';
         if (wl)
           {
-          sprintf(text2,"%sWindow: %.2f%s",text,window,rpos+8);
+          sprintf(text2,"%sWindow: %g%s",text,window,rpos+8);
           }
         else
           {
@@ -205,7 +205,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
         *rpos = '\0';
         if (wl)
           {
-          sprintf(text2,"%sLevel: %.2f%s",text,level,rpos+7);
+          sprintf(text2,"%sLevel: %g%s",text,level,rpos+7);
           }
         else
           {
