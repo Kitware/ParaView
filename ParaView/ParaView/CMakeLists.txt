@@ -69,7 +69,6 @@ SET( ParaView_SRCS
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSetFileEntry.cxx
-  vtkPVDataSetReaderModule.cxx
   vtkPVDummyWidget.cxx
   vtkPVDuplicatePolyData.cxx
   vtkPVEnSightReaderModule.cxx
