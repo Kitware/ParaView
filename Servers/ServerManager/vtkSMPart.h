@@ -22,6 +22,7 @@
 
 #include "vtkSMProxy.h"
 
+class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 
 class VTK_EXPORT vtkSMPart : public vtkSMProxy
@@ -42,6 +43,12 @@ public:
   // Description:
   void InvalidateDataInformation();
 
+  // Description:
+  void InsertExtractPiecesIfNecessary();
+
+  // Description:
+  void CreateTranslatorIfNecessary();
+
 protected:
   vtkSMPart();
   ~vtkSMPart();
@@ -49,7 +56,8 @@ protected:
   vtkSMPart(const vtkSMPart&); // Not implemented
   void operator=(const vtkSMPart&); // Not implemented
 
-  vtkPVDataInformation *DataInformation;
+  vtkPVDataInformation* DataInformation;
+  vtkPVClassNameInformation* ClassNameInformation;
   int DataInformationValid;
 };
 
