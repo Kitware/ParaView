@@ -21,7 +21,7 @@
 #include "vtkFieldData.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkSelectInputs, "1.4");
+vtkCxxRevisionMacro(vtkSelectInputs, "1.5");
 vtkStandardNewMacro(vtkSelectInputs);
 
 //----------------------------------------------------------------------------
@@ -47,6 +47,9 @@ void vtkSelectInputs::SetInputMask(int idx, int flag)
     this->InputMask->InsertValue(i2, 1);
     }
   this->InputMask->SetValue(idx, flag);
+
+  // Wipe out all outputs when the mask is changed
+  this->SetNumberOfOutputs(0);
 }
 
 //----------------------------------------------------------------------------
