@@ -103,7 +103,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.251");
+vtkCxxRevisionMacro(vtkPVApplication, "1.252");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1688,62 +1688,13 @@ int vtkPVApplication::GetGlobalLODFlag()
 
 void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 {
-#ifdef _WIN32
-  ostrstream temp;
-  if (this->ApplicationInstallationDirectory)
-    {
-    temp << this->ApplicationInstallationDirectory << "/";
-    }
-  temp << this->ApplicationName << ".chm" << ends;
-
-  struct stat fs;
-  if (stat(temp.str(), &fs) == 0) 
-    {
-    HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0);
-    temp.rdbuf()->freeze(0);
-    return;
-    }
-  temp.rdbuf()->freeze(0);
-
-  const char** dir;
-  for(dir=VTK_PV_HELP_PATHS; *dir; ++dir)
-    {
-    ostrstream temp2;
-    temp2 << *dir << "/" << this->ApplicationName << ".chm";
-    if (stat(temp2.str(), &fs) == 0) 
-      {
-      HtmlHelp(NULL, temp2.str(), HH_DISPLAY_TOPIC, 0);
-      temp2.rdbuf()->freeze(0);
-      return;
-      }
-    temp2.rdbuf()->freeze(0);
-    }
-
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
   dlg->Create(this,"");
-  dlg->SetText(
-    "The help file could not be found. Please make sure that ParaView "
-    "is installed properly.");
+  dlg->SetText("ParaView documentation is available from the Download section of the ParaView web site: www.paraview.org/HTML/Download.html.");
   dlg->Invoke();  
   dlg->Delete();
-  return;
-    
-#else
-
-  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-  dlg->SetTitle("ParaView Help");
-  dlg->SetMasterWindow(master);
-  dlg->Create(this,"");
-  dlg->SetText(
-    "HTML help is included in the Documentation/HTML subdirectory of"
-    "this application. You can view this help using a standard web browser.");
-  dlg->Invoke();  
-  dlg->Delete();
-
-
-#endif
 }
 
 //----------------------------------------------------------------------------
