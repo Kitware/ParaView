@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.4");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -549,7 +549,7 @@ void vtkPVServerFileDialog::DownDirectoryCallback()
   idx = static_cast<int>(strlen(this->LastPath));
   newdir = new char[idx + 1];
   strcpy(newdir, this->LastPath);
-  while (newdir[idx] != '/' && newdir[idx] != '\')
+  while (newdir[idx] != '/' && newdir[idx] != '\\')
     {
     if ( idx <= 0)
       { // Already at lowest directory.
