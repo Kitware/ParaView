@@ -82,6 +82,12 @@ IF(CMAKE_HAS_X)
    ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
 ENDIF(CMAKE_HAS_X)
 
+IF (WIN32)
+  IF (TK_XLIB_PATH)
+    INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
+  ENDIF (TK_XLIB_PATH) 
+ENDIF (WIN32)
+
 LINK_LIBRARIES (vtkKWWidgetsTCL 
                 vtkCommonTCL 
                 vtkFilteringTCL   
