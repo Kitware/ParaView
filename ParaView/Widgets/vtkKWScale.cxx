@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.67");
+vtkCxxRevisionMacro(vtkKWScale, "1.68");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1083,5 +1083,7 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DisplayRange ? "On" : "Off") << endl;
   os << indent << "DisableCommands: "
      << (this->DisableCommands ? "On" : "Off") << endl;
+  os << indent << "DisableScaleValueCallback: "
+     << (this->DisableScaleValueCallback ? "On" : "Off") << endl;
 }
 
