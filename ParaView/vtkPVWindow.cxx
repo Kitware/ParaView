@@ -907,6 +907,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetDataScalarType");
   mInt->AddIntegerArgument();
   mInt->SetBalloonHelp("Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)");
+  sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Method
