@@ -191,6 +191,7 @@ public:
   // the string is successfully parsed and 0 otherwise.
   virtual int SendStringToClient(const char*);
   virtual int SendStringToClientAndServer(const char*);
+  virtual int SendStringToClientAndServerRoot(const char*);
   virtual int SendStringToServer(const char*);
   virtual int SendStringToServerRoot(const char*);
 

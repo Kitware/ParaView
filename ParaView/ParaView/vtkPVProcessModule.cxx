@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.30");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.31");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -525,6 +525,17 @@ int vtkPVProcessModule::SendStringToClient(const char* str)
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::SendStringToClientAndServer(const char* str)
+{
+  if(!this->ClientServerStream->StreamFromString(str))
+    {
+    return 0;
+    }
+  this->SendStreamToClientAndServer();
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::SendStringToClientAndServerRoot(const char* str)
 {
   if(!this->ClientServerStream->StreamFromString(str))
     {
