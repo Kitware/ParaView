@@ -384,10 +384,11 @@ void vtkPVAnimationInterface::EntryUpdate()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::CurrentTimeCallback()
 {
-  if (this->Application)
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (pvApp)
     {
-    this->Script("set pvTime %f", this->GetCurrentTime());
-    this->Script("catch {%s}", this->ScriptEditor->GetValue());
+    pvApp->BroadcastScript("set pvTime %f", this->GetCurrentTime());
+    pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
     if (this->View)
       {
       this->View->Render();
@@ -461,6 +462,9 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
 void vtkPVAnimationInterface::Play()
 {  
   float t, sgn;
+
+  // Make sue we have the up to date entries for end and step.
+  this->EntryCallback();
 
   // We need a different end test if the step is negative.
   sgn = 1.0;
@@ -683,3 +687,6 @@ void vtkPVAnimationInterface::SetMethodInterfaceIndex(int idx)
       }
     }
 }
+
+
+

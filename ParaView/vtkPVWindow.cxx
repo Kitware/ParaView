@@ -1814,7 +1814,7 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "</Source>\n"
 "\n"
 "<Source class=\"vtkParticleReader\" root=\"Particle\" output=\"vtkPolyData\">\n"
-"  <String name=\"FileName\" help=\"Set the file to read.\"/>\n"
+"  <File name=\"FileName\" extension=\"*\" help=\"Set the file to read.\"/>\n"
 "</Source>  \n"
 "\n"
 "<Source class=\"vtkPOPReader\" root=\"POPReader\" output=\"vtkStructuredGrid\">\n"

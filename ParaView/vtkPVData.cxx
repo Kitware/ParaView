@@ -365,15 +365,37 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     }
   else
     {
-    vtkWarningMacro("We do not extract pieces from structured data.");
     return;
     }
 
-  pvApp->BroadcastSimpleScript("pvTemp SetInput [pvTemp GetOutput]");
+  if (this->PVSource->GetVTKSourceTclName())
+    {
+    pvApp->BroadcastSimpleScript("pvTemp SetInput [pvTemp GetOutput]");
+    pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
+    pvApp->BroadcastScript("%s SetOutput [pvTemp GetInput]",
+                           this->PVSource->GetVTKSourceTclName());
+    // Now delete Tcl's reference to the piece filter.
+    pvApp->BroadcastSimpleScript("pvTemp Delete");
+    return;
+    }
+
+  // No source, just create new static data.
+  // This happens with data set reader.
+  if (this->VTKData->IsA("vtkPolyData"))
+    {
+    pvApp->BroadcastSimpleScript("vtkPolyData pvTempOut");
+    }
+  else if (this->VTKData->IsA("vtkUnstructuredGrid"))
+    {
+    pvApp->BroadcastSimpleScript("vtkUnstructuredGrid pvTempOut");
+    }
+
+  pvApp->BroadcastScript("pvTempOut ShallowCopy %s", this->VTKDataTclName);
+  pvApp->BroadcastSimpleScript("pvTemp SetInput pvTempOut");
   pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
-  pvApp->BroadcastScript("%s SetOutput [pvTemp GetInput]",
-                         this->PVSource->GetVTKSourceTclName());
+
 
   // Now delete Tcl's reference to the piece filter.
   pvApp->BroadcastSimpleScript("pvTemp Delete");
+  pvApp->BroadcastSimpleScript("pvTempOut Delete");
 }
