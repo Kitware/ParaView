@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.7");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -515,6 +515,15 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
     this->Dirty = 0;
     }
   return this->GetTimeEquation();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::RemoveBinds()
+{
+  this->StartTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->StartTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->EndTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->EndTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
 }
 
 //-----------------------------------------------------------------------------

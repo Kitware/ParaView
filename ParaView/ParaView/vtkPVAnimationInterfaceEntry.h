@@ -102,6 +102,7 @@ public:
   const char* GetTimeEquation(float vtkNotUsed(tmax));
 
   void SetupBinds();
+  void RemoveBinds();
 
   void SetTypeToFloat();
 
