@@ -3,7 +3,6 @@ vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
 vtkClientCompositeManager.cxx
 vtkCompositeProp.cxx
-vtkDuplicatePolyData.cxx
 vtkExtractCTHPart.cxx
 vtkGroup.cxx
 vtkKWBoundsDisplay.cxx
@@ -47,6 +46,7 @@ vtkPVExtentEntry.cxx
 vtkPVExtentTranslator.cxx 
 vtkPVExtractGeometryByScalar.cxx
 vtkPVExtractPartsWidget.cxx
+vtkPVFieldMenu.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGhostLevelDialog.cxx
