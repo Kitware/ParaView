@@ -89,7 +89,7 @@ ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 SUBDIRS(Wrapping)
 
 # Build vtkClientServer wrappers for VTK kits.
-SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel)
+SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering)
 IF(VTK_USE_PATENTED)
   SUBDIRS(Patented)
 ENDIF(VTK_USE_PATENTED)
