@@ -245,6 +245,18 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
+void vtkPV3DWidget::ActualPlaceWidget()
+{
+  vtkDataSet* data = 0;
+  if ( this->PVSource->GetPVInput() )
+    {
+    data = this->PVSource->GetPVInput()->GetVTKData();
+    }
+  this->Widget3D->SetInput(data);
+  this->Widget3D->PlaceWidget();  
+}
+
+//----------------------------------------------------------------------------
 void vtkPV3DWidget::PlaceWidget()
 {
   vtkDataSet* data = 0;
@@ -254,8 +266,7 @@ void vtkPV3DWidget::PlaceWidget()
     }
   if (!this->Placed || data != this->Widget3D->GetInput())
     {
-    this->Widget3D->SetInput(data);
-    this->Widget3D->PlaceWidget();
+    this->ActualPlaceWidget();
     this->Placed = 1;
     this->ModifiedFlag = 1;
     }

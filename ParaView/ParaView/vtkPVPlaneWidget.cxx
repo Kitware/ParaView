@@ -217,6 +217,24 @@ void vtkPVPlaneWidget::Reset()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPlaneWidget::ActualPlaceWidget()
+{
+  vtkPlaneWidget *widget = static_cast<vtkPlaneWidget*>( this->Widget3D );
+  float center[3];
+  float normal[3];
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    center[cc] = atof(this->CenterEntry[cc]->GetValue());
+    normal[cc] = atof(this->NormalEntry[cc]->GetValue());
+    }
+ 
+  this->Superclass::ActualPlaceWidget();
+  this->SetCenter(center[0], center[1], center[2]);
+  this->SetNormal(normal[0], normal[1], normal[2]);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Accept()
 {
   this->PlaceWidget();

@@ -102,6 +102,11 @@ public:
   // This method sets the input to the 3D widget and places the widget.
   virtual void PlaceWidget();
 
+  // Description:
+  // This method does the actual placing. If the subclass is doing
+  // something fancy, it should overwrite it.
+  virtual void ActualPlaceWidget();
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();

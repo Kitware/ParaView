@@ -93,6 +93,10 @@ public:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
 
+  // Description:
+  // This method sets the input to the 3D widget and places the widget.
+  virtual void ActualPlaceWidget();
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
