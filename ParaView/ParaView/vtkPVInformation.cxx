@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVInformation, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkPVInformation::CopyFromObject(vtkObject*)
@@ -60,7 +60,7 @@ void vtkPVInformation::CopyFromMessage(unsigned char*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInformation::AddInformation(vtkPVInformation* info)
+void vtkPVInformation::AddInformation(vtkPVInformation* vtkNotUsed(info))
 {
   vtkErrorMacro("AddInformation not implemented.");
 }

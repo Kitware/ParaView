@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.2");
 
 
 
@@ -537,7 +537,6 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
 {
   vtkObject* object;
   vtkPVCompositePartDisplay* pDisp;
-  vtkPVApplication* pvApp = this->GetPVApplication();
   int decision = 1;
 
   // Do I really need to store the TotalVisibleMemorySIze in the application???
@@ -580,7 +579,6 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
 {
   vtkObject* object;
   vtkPVCompositePartDisplay* pDisp;
-  vtkPVApplication* pvApp = this->GetPVApplication();
   int decision = 1;
 
   if (this->GetTotalVisibleMemorySizeValid())

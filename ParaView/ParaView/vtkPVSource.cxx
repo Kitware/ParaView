@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.303");
+vtkCxxRevisionMacro(vtkPVSource, "1.304");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -493,7 +493,7 @@ void vtkPVSource::GatherDataInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::ForceUpdate(vtkPVApplication* pvApp)
+void vtkPVSource::ForceUpdate(vtkPVApplication* vtkNotUsed(pvApp))
 {
   vtkPVPart *part;
 

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.206");
+vtkCxxRevisionMacro(vtkPVData, "1.207");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1260,7 +1260,6 @@ void vtkPVData::UpdatePropertiesInternal()
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorColor(float r, float g, float b)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
   int idx, num;
 
@@ -1343,7 +1342,6 @@ void vtkPVData::ColorByProperty()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPropertyInternal()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
   int idx, num;
 

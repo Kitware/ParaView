@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -182,8 +182,6 @@ void vtkPVLODRenderModule::ComputeTotalVisibleMemorySize()
 //-----------------------------------------------------------------------------
 unsigned long vtkPVLODRenderModule::GetTotalVisibleGeometryMemorySize()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->GetTotalVisibleMemorySizeValid())
     {
     return this->TotalVisibleGeometryMemorySize;

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -190,9 +190,6 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->PropertyTclName);
   pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 
                          this->MapperTclName);
-
-  int numPartitions = pvApp->GetProcessModule()->GetNumberOfPartitions();
-  int partition =  pvApp->GetProcessModule()->GetPartitionId();
 
   // Broadcast for subclasses.  
   pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
