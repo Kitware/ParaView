@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -87,6 +87,7 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os,indent);
 }
 
 

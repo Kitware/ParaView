@@ -142,7 +142,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.56");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -188,7 +188,8 @@ public:
   const void CreateLabel(int idx)
     {
     char index[100];
-    sprintf(index, "%d_", idx);
+    sprintf(index, "Action %d", idx);
+    /*
     vtkstd::string label;
     label = index;
     if ( this->SourceMenuButton->GetButtonText() && 
@@ -207,6 +208,8 @@ public:
       label += this->MethodMenuButton->GetButtonText();
       }
     this->SetLabel(label.c_str());
+    */
+    this->SetLabel(index);
     }
 
   void Create(vtkPVApplication* pvApp, const char*)
@@ -843,7 +846,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeSpanEntry->SetParent(this->TimeFrame);
   this->TimeSpanEntry->Create(this->Application);
   this->TimeSpanEntry->GetEntry()->SetWidth(6);
-  this->TimeSpanEntry->SetLabel("Span:");
+  this->TimeSpanEntry->SetLabel("Number Of Iterations:");
   this->TimeSpanEntry->SetValue(this->TimeSpan);
 
   this->Script("bind %s <KeyPress-Return> {%s TimeSpanEntryCallback}",
@@ -861,8 +864,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeRange->ShowEntriesOn();
   this->TimeRange->Create(this->Application, 0);
 
-  this->Script("pack %s -side top -expand t -fill x", 
-               this->TimeRange->GetWidgetName());
+  //this->Script("pack %s -side top -expand t -fill x", 
+  //             this->TimeRange->GetWidgetName());
 
   // New Interface ----------------------------------------------------
   this->AnimationEntriesFrame->SetParent(this);
@@ -878,17 +881,25 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   frame->Create(this->Application, 0);
   this->AddItemButton->SetParent(frame->GetFrame());
   this->AddItemButton->Create(this->Application, 0);
-  this->AddItemButton->SetLabel("Add Item");
+  this->AddItemButton->SetLabel("Add Action");
   this->DeleteItemButton->SetParent(frame->GetFrame());
   this->DeleteItemButton->Create(this->Application, 0);
-  this->DeleteItemButton->SetLabel("Delete Item");
+  this->DeleteItemButton->SetLabel("Delete Action");
   this->Script("pack %s %s %s -side top -fill both -expand 1", 
     this->AnimationEntriesMenu->GetWidgetName(),
     this->AnimationEntryInformation->GetWidgetName(),
     frame->GetWidgetName());
-  this->Script("pack %s %s -side left -fill both -expand 1", 
-    this->AddItemButton->GetWidgetName(),
+
+  vtkKWFrame* fr = vtkKWFrame::New();
+  fr->SetParent(frame->GetFrame());
+  fr->Create(this->Application, 0);
+  this->Script("pack %s -side left -fill both -expand 0", 
+    this->AddItemButton->GetWidgetName());
+  this->Script("pack %s -side left -fill both -expand 1", 
+    fr->GetWidgetName());
+  this->Script("pack %s -side left -fill both -expand 0", 
     this->DeleteItemButton->GetWidgetName());
+  fr->Delete();
   //this->Script("%s configure -bg red", this->AnimationEntryInformation->GetWidgetName());
   frame->Delete();
   this->AddItemButton->SetCommand(this, "AddEmptySourceItem");
@@ -1140,7 +1151,7 @@ void vtkPVAnimationInterface::TimeSpanEntryCallback()
 {
   cout << "TimeSpanEntryCallback" << endl;
   this->LastEntryIndex = -1;
-  this->SetTimeSpan(this->TimeSpanEntry->GetValueAsFloat());
+  this->SetTimeSpan(static_cast<int>(this->TimeSpanEntry->GetValueAsFloat()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1339,7 +1350,7 @@ void vtkPVAnimationInterface::SetTypeToInt()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeScaleCallback()
 {
-  this->SetCurrentTime(this->TimeScale->GetValue());
+  this->SetCurrentTime(static_cast<int>(this->TimeScale->GetValue()));
 }
 
 //-----------------------------------------------------------------------------
