@@ -43,6 +43,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkCollection;
 class vtkPVPartDisplay;
+class vtkPVDisplay;
 class vtkPVRenderModuleObserver;
 
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
@@ -66,6 +67,16 @@ public:
   // This method is executed in all processes.
   void AddPVSource(vtkPVSource *pvs);
   void RemovePVSource(vtkPVSource *pvs);
+
+  // Description:
+  // This is used for special plot displays.
+  // It is a way to have the render module update displays
+  // that are not part displays created by AddPVSource.
+  // I do not expect that this will be a permenant method.
+  // As we create more types of displays, I will have to
+  // find a different way of managing them.
+  void AddDisplay(vtkPVDisplay* disp);
+  void RemoveDisplay(vtkPVDisplay* disp);
   
   // Description:
   // Renders using Still/FullRes or interactive/LODs
@@ -148,11 +159,11 @@ protected:
 
   // This collection keeps a reference to all PartDisplays created
   // by this module.
-  vtkCollection* PartDisplays;
+  vtkCollection* Displays;
 
   // This is used before a render to make sure all visible sources
   // have been updated.
-  virtual void UpdateAllPVData();
+  virtual void UpdateAllDisplays();
  
   vtkPVApplication* PVApplication;
   vtkRenderWindow*  RenderWindow;
