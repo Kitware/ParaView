@@ -33,7 +33,7 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWWidget;
-class vtkPVStringAndScalarListWidgetProperty;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkPVCalculatorWidget : public vtkPVWidget
 {
@@ -75,7 +75,7 @@ public:
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK calculator filter.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -90,15 +90,6 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -178,12 +169,46 @@ protected:
   int NumberOfVectorVariables;
   void ClearAllVariables();
   void AddAllVariables(int populateMenus);
+
+  char *SMFunctionPropertyName;
+  char *SMScalarVariablePropertyName;
+  char *SMVectorVariablePropertyName;
+  char *SMAttributeModePropertyName;
+
+  void SetSMFunctionProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMFunctionProperty();
+  void SetSMScalarVariableProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMScalarVariableProperty();
+  void SetSMVectorVariableProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMVectorVariableProperty();
+  void SetSMAttributeModeProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMAttributeModeProperty();
+
+  vtkSetStringMacro(SMFunctionPropertyName);
+  vtkGetStringMacro(SMFunctionPropertyName);
+  vtkSetStringMacro(SMScalarVariablePropertyName);
+  vtkGetStringMacro(SMScalarVariablePropertyName);
+  vtkSetStringMacro(SMVectorVariablePropertyName);
+  vtkGetStringMacro(SMVectorVariablePropertyName);
+  vtkSetStringMacro(SMAttributeModePropertyName);
+  vtkGetStringMacro(SMAttributeModePropertyName);
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
   
-  vtkPVStringAndScalarListWidgetProperty *Property;
-  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
+
 private:
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
+
+  vtkSMProperty *SMFunctionProperty;
+  vtkSMProperty *SMScalarVariableProperty;
+  vtkSMProperty *SMVectorVariableProperty;
+  vtkSMProperty *SMAttributeModeProperty;
 };
 
 #endif

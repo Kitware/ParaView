@@ -522,6 +522,10 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
                  label="Result Array Name"
                  help="Set the name of the array to hold the results of this computation"/>
     <CalculatorWidget trace_name="Equation"
+                      function_property="Function"
+                      scalar_property="AddScalarVariable"
+                      vector_property="AddVectorVariable"
+                      attribute_mode_property="AttributeMode"
                       help="Enter the equation for the new array."/>
     <Documentation>
 The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are point-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.

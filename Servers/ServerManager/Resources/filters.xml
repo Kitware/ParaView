@@ -608,9 +608,8 @@
         number_of_elements="1"
         default_values="0" >
        <EnumerationDomain>
-         <Entry value="0" text="default"/>
-         <Entry value="1" text="point_data"/>
-         <Entry value="2" text="cell_data"/>
+         <Entry value="0" text="point_data"/>
+         <Entry value="1" text="cell_data"/>
        </EnumerationDomain>
      </IntVectorProperty>
    <!-- End Calculator -->
