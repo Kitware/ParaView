@@ -643,6 +643,40 @@ The Elevation filter generates point scalar values for an input data set along a
 The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
     </Documentation>
   </Module>
+<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
+  <Module name="CTHPartAMR"
+          menu_name="Extract AMR CTH Parts"
+          root_name="CTHPartAMR"
+          module_type="Filter"
+          long_help="Create a surface from a AMR CTH volume fraction."
+          short_help="Extract a part from a CTH dataset.">
+    <Filter class="vtkCTHExtractAMRPart">
+      <Input name="Input"
+             class="vtkCTHData">
+        <ArrayRequirement attribute="Cell" components="1"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im" label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <SelectCTHArrays input_menu="im"
+                     trace_name="ArraySelection"
+                     property="AddVolumeArrayName"
+                     help="Select the volume fraction arrays for generating parts."/>
+    <SelectWidget property="ClipPlane" label="Clip Plane"
+                  trace_name="Clipping">
+      <Item label="On" value="On">
+        <ImplicitPlaneWidget use_label="0" trace_name="Plane"
+                             input_menu="im"
+                             help="Adjusts the parameters of the plane to clip with."/>
+      </Item>
+      <Item label="Off" value="Off">
+        <DummyWidget trace_name="Dummy"/>
+      </Item>
+    </SelectWidget>
+  </Module>
+<!-- #endif -->
   <Module name="CTHPart"
           menu_name="Extract CTH Parts"
           root_name="CTHPart"
