@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.3");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -287,7 +287,13 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   this->Controller = vtkMPIController::New();
 #else
   this->Controller = vtkDummyController::New();
+  // This would be simpler if vtkDummyController::SingleMethodExecute
+  // did its job correctly.
+  vtkMultiProcessController::SetGlobalController(this->Controller);
+  vtkPVClientServerInit(this->Controller, (void*)this);
+  return this->ReturnValue;
 #endif
+
   vtkMultiProcessController::SetGlobalController(this->Controller);
 
   this->Controller->Initialize(&argc, &argv, 1);
