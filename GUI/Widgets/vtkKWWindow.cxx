@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.192");
+vtkCxxRevisionMacro(vtkKWWindow, "1.193");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1119,7 +1119,7 @@ void vtkKWWindow::StoreRecentFilesToRegistery()
 
 //----------------------------------------------------------------------------
 void vtkKWWindow::AddRecentFilesMenu(
-  const char *menuEntry, vtkKWObject *target, const char *label)
+  const char *menuEntry, vtkKWObject *target, const char *label, int underline)
 {
   if (!this->IsCreated() || !label || !this->MenuFile)
     {
@@ -1160,7 +1160,8 @@ void vtkKWWindow::AddRecentFilesMenu(
     insert_idx = this->MenuFile->GetIndex(menuEntry) - 1;
     }
   
-  this->MenuFile->InsertCascade(insert_idx, label, this->MenuRecentFiles, 0);
+  this->MenuFile->InsertCascade(
+    insert_idx, label, this->MenuRecentFiles, underline);
 
   // Fill the recent files vector with recent files stored in registery
 

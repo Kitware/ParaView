@@ -163,7 +163,8 @@ public:
   virtual void AddRecentFilesMenu(
     const char *menuEntry, 
     vtkKWObject *target, 
-    const char *label = VTK_KW_RECENT_FILES_MENU_LABEL);
+    const char *label = VTK_KW_RECENT_FILES_MENU_LABEL,
+    int underline = 6);
 
   // Description::
   // Add a file to the Recent File list.
