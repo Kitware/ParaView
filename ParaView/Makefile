@@ -16,7 +16,6 @@ vtkInteractorStyleExtent
 CONCRETE = \
 vtkCameraInteractor \
 vtkClipPlane \
-vtkCutMaterial \
 vtkCutPlane \
 vtkDummyRenderWindowInteractor \
 vtkFastGeometryFilter \
