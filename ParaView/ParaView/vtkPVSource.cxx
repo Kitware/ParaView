@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.310");
+vtkCxxRevisionMacro(vtkPVSource, "1.311");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -437,12 +437,20 @@ int vtkPVSource::GetNumberOfParts()
 //----------------------------------------------------------------------------
 void vtkPVSource::SetPart(vtkPVPart* part)
 {
+  if ( !part )
+    {
+    return;
+    }
   this->Parts->AddItem(part);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPart(vtkPVPart* part)
 {
+  if ( !part )
+    {
+    return;
+    }
   this->Parts->AddItem(part);
 }
 
@@ -1080,6 +1088,10 @@ void vtkPVSource::SetLabel(const char* arg)
 { 
   this->SetLabelNoTrace(arg);
 
+  if ( !this->Application )
+    {
+    return;
+    }
   // Update the nav window (that usually might display name + description)
   vtkPVSource* current = this->GetPVWindow()->GetCurrentPVSource();
   if (this->GetPVRenderView() && current)

@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.22");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.23");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -373,6 +373,10 @@ void vtkPVProcessModule::RootSimpleScript(const char *script)
 //----------------------------------------------------------------------------
 const char* vtkPVProcessModule::GetRootResult()
 {
+  if ( !this->Application || ! this->Application->GetMainInterp() )
+    {
+    return 0;
+    }
   return this->Application->GetMainInterp()->result;
 }
 
@@ -435,6 +439,10 @@ vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::InitializeTclMethodImplementations()
 {
+  if ( !this->Application )
+    {
+    return;
+    }
   this->Application->Script(
     "namespace eval ::paraview::vtkPVProcessModule {\n"
     "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"

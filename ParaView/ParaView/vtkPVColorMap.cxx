@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.61");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.62");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1443,8 +1443,6 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetVectorComponent(int component)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->AddTraceEntry("$kw(%s) SetVectorComponent %d", 
                       this->GetTclName(), component);
 
@@ -1466,6 +1464,12 @@ void vtkPVColorMap::SetVectorComponent(int component)
 
   // Change the title of the scalar bar.
   this->UpdateScalarBarTitle();
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( !pvApp )
+    {
+    return;
+    }
 
   pvApp->BroadcastScript("%s SetVectorComponent %d", 
                          this->LookupTableTclName, component);

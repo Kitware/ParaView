@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.3");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -340,6 +340,10 @@ void vtkPVCompositeRenderModuleUI::SetCollectThresholdInternal(float threshold)
   this->CollectThreshold = threshold;
 
   // This will cause collection to be re evaluated.
+  if ( !this->CompositeRenderModule )
+    {
+    return;
+    }
   this->CompositeRenderModule->SetTotalVisibleMemorySizeValid(0);
   this->CompositeRenderModule->SetCollectThreshold(threshold);
 

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.39");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -285,6 +285,10 @@ vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
   if (this->ArrayMenu)
     {
     vtkPVSource *input;
+    if ( !this->InputMenu )
+      {
+      return NULL;
+      }
     input = this->InputMenu->GetCurrentValue();
     if (input == NULL)
       {

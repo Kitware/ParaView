@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -454,10 +454,10 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     pvw->AddAnimationScriptsToMenu(menu, this);
     }
   char methodAndArgs[1024];
-  sprintf(methodAndArgs, "NoMethodCallback");
-  menu->AddCommand("None", this, methodAndArgs, 0,"");
   sprintf(methodAndArgs, "ScriptMethodCallback");
   menu->AddCommand("Script", this, methodAndArgs, 0,"");
+  sprintf(methodAndArgs, "NoMethodCallback");
+  menu->AddCommand("None", this, methodAndArgs, 0,"");
 
   if ( samesource && this->GetCurrentMethod() )
     {
@@ -478,6 +478,11 @@ void vtkPVAnimationInterfaceEntry::SetTimeStart(float f)
     }
   this->TimeStart = f;
   this->UpdateStartEndValueToEntry();
+  if ( !this->StartTimeEntry->IsCreated() ||
+    !this->EndTimeEntry->IsCreated() )
+    {
+    return;
+    } 
   this->AddTraceEntry("$kw(%s) SetTimeStart %f", 
     this->GetTclName(), f);
   //cout << __LINE__ << " Dirty" << endl;
@@ -495,6 +500,11 @@ void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
     }
   this->TimeEnd = f;
   this->UpdateStartEndValueToEntry();
+  if ( !this->StartTimeEntry->IsCreated() ||
+    !this->EndTimeEntry->IsCreated() )
+    {
+    return;
+    } 
   this->AddTraceEntry("$kw(%s) SetTimeEnd %f", 
     this->GetTclName(), f);
   //cout << __LINE__ << " Dirty" << endl;
@@ -511,6 +521,11 @@ void vtkPVAnimationInterfaceEntry::UpdateStartEndValueFromEntry()
     return;
     }
   this->UpdatingEntries = 1;
+  if ( !this->StartTimeEntry->IsCreated() ||
+    !this->EndTimeEntry->IsCreated() )
+    {
+    return;
+    }
   if ( this->TimeStart != this->StartTimeEntry->GetEntry()->GetValueAsFloat() )
     {
     this->SetTimeStart(this->StartTimeEntry->GetEntry()->GetValueAsFloat());

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.209");
+vtkCxxRevisionMacro(vtkPVData, "1.210");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1853,6 +1853,10 @@ void vtkPVData::VisibilityCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetVisibility(int v)
 {
+  if ( !this->GetPVSource() )
+    {
+    return;
+    }
   this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->GetPVSource()->SetVisibilityInternal(v);
   this->Script("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
@@ -1861,6 +1865,10 @@ void vtkPVData::SetVisibility(int v)
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVData::GetPVRenderView()
 {
+  if ( !this->GetPVSource() )
+    {
+    return 0;
+    }
   return this->GetPVSource()->GetPVRenderView();
 }
 

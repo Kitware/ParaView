@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.26");
+vtkCxxRevisionMacro(vtkPVPart, "1.27");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -133,7 +133,10 @@ vtkPVPart::~vtkPVPart()
 //----------------------------------------------------------------------------
 void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
 {
-  this->CreateParallelTclObjects(pvApp);
+  if ( pvApp )
+    {
+    this->CreateParallelTclObjects(pvApp);
+    }
   this->vtkKWObject::SetApplication(pvApp);
 }
 
@@ -141,6 +144,10 @@ void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
+  if ( !pvApp )
+    {
+    return;
+    }
   char tclName[100];
   
   this->vtkKWObject::SetApplication(pvApp);
@@ -200,6 +207,10 @@ void vtkPVPart::InvalidateDataInformation()
 void vtkPVPart::GatherDataInformation()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( !pvApp )
+    {
+    return;
+    }
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
   pm->GatherInformation(this->DataInformation, 
@@ -258,6 +269,10 @@ void vtkPVPart::GatherDataInformation()
 void vtkPVPart::SetVTKDataTclName(const char* tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( !pvApp )
+    {
+    return;
+    }
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   if (pvApp == NULL)

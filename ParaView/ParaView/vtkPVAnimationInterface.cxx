@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.76");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.77");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -772,7 +772,6 @@ void vtkPVAnimationInterface::UpdateInterface()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 {
-  this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
   this->NumberOfFramesEntry->SetValue(t);
@@ -782,6 +781,11 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
   this->TimeRange->SetRange(range[0], t);
   this->TimeScale->GetRange(range);
   this->TimeScale->SetRange(0, t-1);
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
+  this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
 }
 
 //-----------------------------------------------------------------------------

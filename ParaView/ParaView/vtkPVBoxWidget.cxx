@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.8");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -76,9 +76,12 @@ int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVBoxWidget::vtkPVBoxWidget()
 {
+  this->CommandFunction = vtkPVBoxWidgetCommand;
   this->BoxTclName = 0;
   this->BoxMatrixTclName = 0;
   this->BoxTransformTclName = 0;
+
+  this->BoxTransform = 0;
 
   this->ControlFrame = vtkKWFrame::New();
   this->TranslateLabel = vtkKWLabel::New();

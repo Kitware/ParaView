@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -171,9 +171,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
     }
 
   old = this->Entry->GetValue();
-  if (strcmp(old, fileName) == 0)
+  if ( old && fileName )
     {
-    return;
+    if (strcmp(old, fileName) == 0)
+      {
+      return;
+      }
     }
 
   this->Entry->SetValue(fileName); 

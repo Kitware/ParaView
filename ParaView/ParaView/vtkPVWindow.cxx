@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.465");
+vtkCxxRevisionMacro(vtkPVWindow, "1.466");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4236,6 +4236,10 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
 {
   this->InteractiveRenderEnabled = s;
   vtkPVGenericRenderWindowInteractor* rwi = this->Interactor;
+  if ( !rwi )
+    {
+    return;
+    }
   rwi->SetInteractiveRenderEnabled(s);
 }
 

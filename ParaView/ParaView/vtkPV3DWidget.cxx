@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.38");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39");
 
 //===========================================================================
 //***************************************************************************
@@ -100,6 +100,7 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
+  this->Widget3D = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -226,6 +226,10 @@ void vtkPVPartDisplay::SetVisibility(int v)
     }
   this->Visibility = v;
 
+  if ( !pvApp || !pvApp->GetRenderModule() )
+    {
+    return;
+    }
   // Recompute total visibile memory size.
   pvApp->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
 }

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -276,6 +276,10 @@ void vtkPVLineWidget::SetResolution(int i)
   int res = this->ResolutionEntry->GetValueAsInt();
 
 
+  if ( !this->GetPVApplication() )
+    {
+    return;
+    }
   this->GetPVApplication()->BroadcastScript("%s SetResolution %d",
                                             this->Widget3DTclName, res);
   this->Render();

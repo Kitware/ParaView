@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.6");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -376,9 +376,14 @@ void vtkPVLODRenderModuleUI::SetLODThresholdInternal(float threshold)
 
   sprintf(str, "%.1f MBytes", threshold);
   this->LODThresholdValue->SetLabel(str);
-  this->LODRenderModule->SetLODThreshold(threshold);
+
+  if ( !this->LODRenderModule )
+    {
+    return;
+    }
 
   this->LODThreshold = threshold;
+  this->LODRenderModule->SetLODThreshold(threshold);
 }
 
 
@@ -426,7 +431,6 @@ void vtkPVLODRenderModuleUI::SetLODResolution(int value)
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
 {
-  vtkPVApplication *pvApp;
   char str[256];
 
   sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
@@ -434,7 +438,11 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
 
   this->LODResolution = resolution;
  
-  pvApp = this->GetPVApplication();
+  if ( !this->LODRenderModule )
+    {
+    return;
+    }
+
   this->LODRenderModule->SetLODResolution(resolution);
 }
 
