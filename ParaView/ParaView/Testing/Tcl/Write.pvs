@@ -33,10 +33,10 @@ if { [catch {
   
   # Barrier after write.  We don't want to delete files before they
   # are written.
-  puts [[$Application GetProcessModule] SendStringToClientAndServer {
+  [$Application GetProcessModule] SendStringToClientAndServer {
     Invoke id(1) GetController
     Invoke result() Barrier
-  }]
+  }
 
   file delete -force vtkParaViewWriteTest.$ext
   file delete -force vtkParaViewWriteTestGhost.$ext
