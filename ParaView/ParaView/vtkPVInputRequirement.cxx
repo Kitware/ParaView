@@ -50,11 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputRequirement);
-vtkCxxRevisionMacro(vtkPVInputRequirement, "1.3");
+vtkCxxRevisionMacro(vtkPVInputRequirement, "1.4");
 
 
 //----------------------------------------------------------------------------
-int vtkPVInputRequirement::GetIsValidInput(vtkPVData*, vtkPVSource*)
+int vtkPVInputRequirement::GetIsValidInput(vtkPVSource*, vtkPVSource*)
 {
   vtkErrorMacro("Requirment class did not supply a 'GetIsValidInput' method.");
 

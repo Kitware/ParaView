@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
+class vtkDataSet;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabeledEntry;
@@ -73,6 +74,8 @@ class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
 class vtkCollection;
+class vtkPVPart;
+class vtkPVDataInformation;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -89,7 +92,13 @@ public:
   // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
-  
+
+  // Description:
+  // This methiod updates the piece that has been assinged to this process.
+  // It update all parts and gathers data information.
+  void Update();
+  void ForceUpdate(vtkPVApplication* pvApp);
+
   // Description:
   // Methods to indicate when this source is selected in the window..
   // The second version of Deselect allows to user to specify whether
@@ -107,14 +116,26 @@ public:
   // processes.
   void SetVisibility(int v);
   int GetVisibility();
+  void SetVisibilityInternal(int v);
 
   // Description:
   // Although not all sources will need or use this input, I want to 
   // avoid duplicating VTK's source class structure.
-  virtual void SetPVInput(int idx, vtkPVData *input);
-  virtual vtkPVData* GetPVInput(int idx) {return this->GetNthPVInput(idx);}
+  virtual void SetPVInput(int idx, vtkPVSource *input);
+  virtual vtkPVSource* GetPVInput(int idx) {return this->GetNthPVInput(idx);}
   vtkGetMacro(NumberOfPVInputs, int);
   void RemoveAllPVInputs();
+
+  // Description:
+  // Get the number of consumers
+  vtkGetMacro(NumberOfPVConsumers, int);
+
+  // Description:
+  // Add, remove, get, or check a consumer.
+  void AddPVConsumer(vtkPVSource *c);
+  void RemovePVConsumer(vtkPVSource *c);
+  vtkPVSource *GetPVConsumer(int i);
+  int IsPVConsumer(vtkPVSource *c);
 
   // Description:
   // Set/get the first output of this source. Most source are setup
@@ -180,6 +201,10 @@ public:
   virtual void UpdateParameterWidgets();
   
   // Description:
+  // Updates delete button and description frame.
+  void UpdateProperties();  
+
+  // Description:
   // The SetVTKSource method registers a ModifiedEvent observer with
   // the vtkSource to call this method.  This is used to keep the GUI
   // up to date as the vtkSource changes.
@@ -241,7 +266,7 @@ public:
 
   // Description:
   // These are used for drawing the navigation window.
-  vtkPVData **GetPVInputs() { return this->PVInputs; };
+  vtkPVSource **GetPVInputs() { return this->PVInputs; };
 
   // Description:
   // The notebook that is displayed when the source is selected.
@@ -288,7 +313,7 @@ public:
   // current (if makeCurrent is true), 4. creates output (vtkPVData) which
   // contains a vtk data object of type outputDataType, 5. assigns or
   // creates an extent translator to the output.
-  int InitializeClone(vtkPVData* input, int makeCurrent);
+  int InitializeClone(vtkPVSource* input, int makeCurrent);
 
   // Description:
   // This sets up the PVData.  This method is called when
@@ -305,6 +330,16 @@ public:
   // Description of the VTK filter.
   vtkSetStringMacro(SourceClassName);
   vtkGetStringMacro(SourceClassName);
+
+  // Description:
+  // Access to individual parts.
+  void AddPVPart(vtkPVPart *part);
+  void SetPVPart(vtkPVPart *part);
+  vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
+  vtkPVPart *GetPVPart(int idx); 
+  int GetNumberOfPVParts();
+  // This will create and set the part.
+  void SetVTKData(vtkDataSet *data, const char *name);
 
   // Descriptions:
   // Properties that describe the inputs to the filter of type
@@ -333,16 +368,6 @@ public:
   vtkSetMacro(IsPermanent, int);
   vtkGetMacro(IsPermanent, int);
   vtkBooleanMacro(IsPermanent, int);
-
-  // Description:
-  // Returns the number of consumers of either:
-  // 1. the first output if there is only one output,
-  // 2. the outputs of the consumers of
-  //    each output if there are more than one outputs.
-  // Method (2) is used for multiple outputs because,
-  // in this situation, there is always a dummy pvsource
-  // attached to each of the outputs.
-  int GetNumberOfPVConsumers();
 
   // Description:
   // If this is on, no Display page (from vtkPVData) is display
@@ -391,10 +416,6 @@ public:
   vtkGetStringMacro(LongHelp);
 
   // Description:
-  // This method returns the input source as a Tcl string.
-  vtkPVSource* GetInputPVSource(int idx);
-
-  // Description:
   // Check whether the source has been initialized 
   // (Accept has been called at least one)
   vtkGetMacro(Initialized, int);
@@ -417,12 +438,34 @@ public:
   void UnGrabFocus();
 
   // Description:
-  // Update the properties page.
-  void UpdateProperties();
+  // Moving away from direct access to VTK data objects.
+  vtkPVDataInformation* GetDataInformation();
+  
+  // Description:
+  // Called by source EndEvent to schedule another Gather.
+  void InvalidateDataInformation();
+
+  // Description:
+  // Set the resolution of the decimation LOD.
+  // Resulting decimation uses dim^3 volume.
+  void SetLODResolution(int dim);
+  vtkGetMacro(LODResolution, int);
+
+  // Description:
+  // Convenience method for rendering.
+  vtkPVRenderView *GetPVRenderView();
 
 protected:
   vtkPVSource();
   ~vtkPVSource();
+
+  vtkCollection *PVParts;
+
+  // Description:
+  // This method collects data information from all processes.
+  void GatherDataInformation();
+  vtkPVDataInformation *DataInformation;
+  int DataInformationValid;
 
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
@@ -433,8 +476,6 @@ protected:
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
                                        char* help, 
                                        vtkPVSourceCollection* sources);
-
-  vtkPVRenderView* GetPVRenderView();
 
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
@@ -459,10 +500,14 @@ protected:
   
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
-  vtkPVData **PVInputs;
+  vtkPVSource **PVInputs;
   int NumberOfPVInputs; 
-  vtkPVData *GetNthPVInput(int idx);
-  void SetNthPVInput(int idx, vtkPVData *input);
+  vtkPVSource *GetNthPVInput(int idx);
+  void SetNthPVInput(int idx, vtkPVSource *input);
+
+  // Keep a list of sources that are using this data.
+  vtkPVSource **PVConsumers;
+  int NumberOfPVConsumers;
    
   void UpdateDescriptionFrame();
   
@@ -535,6 +580,8 @@ protected:
 
   // Taking responsibility of saving inputs away from input menu.
   void SetInputsInBatchScript(ofstream *file);
+
+  int LODResolution;
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented

@@ -102,17 +102,6 @@ public:
   vtkPVSource* GetCurrentValue() { return this->CurrentValue;}
   
   // Description:
-  // It is sort of weird that the value of the menu is a vtkPVSource.
-  // This method returns the output of the source, 
-  // so the menu can be used more naturally.
-  vtkPVData* GetPVData();
-
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!
-  // Description:
-  // Get the vtk data set of the current value.
-  //vtkDataSet* GetVTKData();
-
-  // Description:
   // Menu callback when an item is selected.
   void MenuEntryCallback(vtkPVSource *pvs);
 

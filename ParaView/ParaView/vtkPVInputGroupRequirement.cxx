@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputGroupRequirement.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputGroupRequirement);
-vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.2");
+vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVInputGroupRequirement::vtkPVInputGroupRequirement()
@@ -89,9 +90,9 @@ int vtkPVInputGroupRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
 
 
 //----------------------------------------------------------------------------
-int vtkPVInputGroupRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*)
+int vtkPVInputGroupRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource*)
 {
-  int num = pvd->GetNumberOfPVParts();
+  int num = input->GetNumberOfPVParts();
   if (this->Quantity == -1 && num > 1)
     {
     return 1;

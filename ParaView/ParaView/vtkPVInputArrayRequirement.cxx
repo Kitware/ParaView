@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputArrayRequirement.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputArrayRequirement);
-vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.4");
+vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVInputArrayRequirement::vtkPVInputArrayRequirement()
@@ -134,9 +135,9 @@ int vtkPVInputArrayRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
 
 
 //----------------------------------------------------------------------------
-int vtkPVInputArrayRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*)
+int vtkPVInputArrayRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource*)
 {
-  vtkPVDataInformation *info = pvd->GetDataInformation();
+  vtkPVDataInformation *info = input->GetDataInformation();
   
   if (this->Attribute == vtkDataSet::POINT_DATA_FIELD)
     {
@@ -161,6 +162,7 @@ int vtkPVInputArrayRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*)
     {
     return 1;
     }
+
   return 0;
 }
 

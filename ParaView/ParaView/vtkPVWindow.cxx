@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.422");
+vtkCxxRevisionMacro(vtkPVWindow, "1.423");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -202,7 +202,6 @@ vtkPVWindow::vtkPVWindow()
   this->CenterMapperTclName = NULL;
   this->CenterActorTclName = NULL;
     
-  this->CurrentPVData = NULL;
   this->CurrentPVSource = NULL;
 
   // Frame used for animations.
@@ -387,7 +386,7 @@ void vtkPVWindow::ComputeTotalVisibleMemorySize()
     if (pvs->GetVisibility())
       {
       pvd = pvs->GetPVOutput();
-      pvdi = pvd->GetDataInformation();
+      pvdi = pvs->GetDataInformation();
       this->TotalVisibleGeometryMemorySize += pvdi->GetGeometryMemorySize();
       this->TotalVisibleLODMemorySize += pvdi->GetLODMemorySize();
       }
@@ -446,10 +445,10 @@ int vtkPVWindow::MakeCollectionDecision()
   while ( (pvs=col->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    numParts = pvd->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfPVParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvp = pvd->GetPVPart(partIdx);
+      pvp = pvs->GetPVPart(partIdx);
       pvp->SetCollectionDecision(this->CollectionDecision);
       }
     }
@@ -493,10 +492,10 @@ int vtkPVWindow::MakeLODCollectionDecision()
   while ( (pvs=col->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    numParts = pvd->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfPVParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvp = pvd->GetPVPart(partIdx);
+      pvp = pvs->GetPVPart(partIdx);
       pvp->SetLODCollectionDecision(this->LODCollectionDecision);
       }
     }
@@ -568,11 +567,6 @@ void vtkPVWindow::PrepareForDelete()
     this->PVColorMaps = NULL;
     }
 
-  if (this->CurrentPVData)
-    {
-    this->CurrentPVData->UnRegister(this);
-    this->CurrentPVData = NULL;
-    }
   if (this->CurrentPVSource)
     {
     this->CurrentPVSource->UnRegister(this);
@@ -1499,13 +1493,13 @@ void vtkPVWindow::ToggleCenterActorCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ResetCenterCallback()
 {
-  if ( ! this->CurrentPVData)
+  if ( ! this->CurrentPVSource)
     {
     return;
     }
   
   double bounds[6];
-  this->CurrentPVData->GetDataInformation()->GetBounds(bounds);
+  this->CurrentPVSource->GetDataInformation()->GetBounds(bounds);
 
   float center[3];
   center[0] = (bounds[0]+bounds[1])/2.0;
@@ -1550,12 +1544,12 @@ void vtkPVWindow::ResizeCenterActor()
       {
       if (first)
         {
-        pvs->GetPVOutput()->GetDataInformation()->GetBounds(bounds);
+        pvs->GetDataInformation()->GetBounds(bounds);
         first = 0;
         }
       else
         {
-        pvs->GetPVOutput()->GetDataInformation()->GetBounds(tmp);
+        pvs->GetDataInformation()->GetBounds(tmp);
         if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];} 
         if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];} 
         if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];} 
@@ -2236,7 +2230,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
 //-----------------------------------------------------------------------------
 void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
 {
-  if(!this->CurrentPVData)
+  if(!this->CurrentPVSource)
     {
     return;
     }
@@ -2264,7 +2258,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
       msg << " serial writing of ";
       }
     
-    msg << this->GetCurrentPVData()->GetDataInformation()->GetDataSetTypeAsString()
+    msg << this->GetCurrentPVSource()->GetDataInformation()->GetDataSetTypeAsString()
         << " to file with name \"" << filename << "\"" << ends;
     
     if (this->UseMessageDialog)
@@ -2287,7 +2281,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                        filename, ghostLevel);
   
   // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVData()->GetPVPart()->GetVTKDataTclName(),
+  writer->Write(filename, this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName(),
                 numParts, ghostLevel);
 }
 
@@ -2295,7 +2289,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
 void vtkPVWindow::WriteData()
 {
   // Make sure there are data to write.
-  if(!this->GetCurrentPVData())
+  if(!this->GetCurrentPVSource())
     {
     vtkKWMessageDialog::PopupMessage(
       this->Application, this, "Error Saving File", 
@@ -2303,7 +2297,7 @@ void vtkPVWindow::WriteData()
       vtkKWMessageDialog::ErrorIcon);
     return;
     }
-  vtkDataSet* data = this->GetCurrentPVData()->GetPVPart()->GetVTKData();  
+  vtkDataSet* data = this->GetCurrentPVSource()->GetPVPart()->GetVTKData();  
 
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -2349,7 +2343,7 @@ void vtkPVWindow::WriteData()
       msg << " serial writing of ";
       }
     
-    msg << this->GetCurrentPVData()->GetDataInformation()->GetDataSetTypeAsString()
+    msg << this->GetCurrentPVSource()->GetDataInformation()->GetDataSetTypeAsString()
         << "." << ends;
 
     vtkKWMessageDialog::PopupMessage(
@@ -2419,7 +2413,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
   
-  vtkDataSet* data = this->GetCurrentPVData()->GetPVPart()->GetVTKData();  
+  vtkDataSet* data = this->GetCurrentPVSource()->GetPVPart()->GetVTKData();  
   vtkLinkedListIterator<vtkPVWriter*>* it =
     this->FileWriterList->NewIterator();
   while(!it->IsDoneWithTraversal())
@@ -2877,7 +2871,7 @@ void vtkPVWindow::UpdateFilterMenu()
   this->FilterMenu->DeleteAllMenuItems();
   this->DisableToolbarButtons();
 
-  if (this->CurrentPVData && this->CurrentPVSource &&
+  if (this->CurrentPVSource &&
       !this->CurrentPVSource->GetIsPermanent() && 
       !this->CurrentPVSource->GetHideDisplayPage() )
     {
@@ -2895,7 +2889,7 @@ void vtkPVWindow::UpdateFilterMenu()
         // Check if this is an appropriate filter by comparing
         // it's input type with the current data object's type.
         if (proto && proto->GetInputProperty(0) &&
-            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVData, proto))
+            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto))
           {
           it->GetKey(key);
 
@@ -2954,23 +2948,6 @@ void vtkPVWindow::UpdateFilterMenu()
                          vtkKWMenu::Disabled);
     }
   
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
-{
-  if (this->CurrentPVData)
-    {
-    this->CurrentPVData->UnRegister(this);
-    this->CurrentPVData = NULL;
-    }
-  if (pvd)
-    {
-    pvd->Register(this);
-    }
-  this->CurrentPVData = pvd;
-
-  this->UpdateFilterMenu();
 }
 
 //-----------------------------------------------------------------------------
@@ -3046,14 +3023,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
   this->CurrentPVSource = pvs;
 
   // Other stuff
-  if (pvs)
-    {
-    this->SetCurrentPVData(pvs->GetPVOutput());
-    }
-  else
-    {
-    this->SetCurrentPVData(NULL);
-    }
+  this->UpdateFilterMenu();
 
   // This will update the parameters.  
   // I doubt the conditional is still necessary.
@@ -3313,7 +3283,7 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
-  if (this->CurrentPVData == NULL)
+  if (this->CurrentPVSource == NULL)
     {
     return;
     }
@@ -3330,7 +3300,7 @@ void vtkPVWindow::EnableToolbarButtons()
       if ( this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
         {
         if (proto->GetInputProperty(0) &&
-            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVData, proto) )
+            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto) )
           {
           button->EnabledOn();
           }
@@ -3348,12 +3318,12 @@ void vtkPVWindow::EnableToolbarButtons()
 //-----------------------------------------------------------------------------
 vtkPVSource *vtkPVWindow::ExtractGridCallback()
 {
-  if (this->CurrentPVData == NULL)
+  if (this->CurrentPVSource == NULL)
     { // This should not be able to happen but ...
     return NULL;
     }
 
-  int type = this->CurrentPVData->GetDataInformation()->GetDataSetType();
+  int type = this->CurrentPVSource->GetDataInformation()->GetDataSetType();
   if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS)
     {
     return this->CreatePVSource("ExtractVOI"); 
@@ -4046,7 +4016,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.422 $");
+  this->ExtractRevision(os,"$Revision: 1.423 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4114,14 +4084,14 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
         int cc;
         for ( cc = 0; cc < source->GetNumberOfPVInputs(); cc ++ )
           {
-          vtkPVData* data = source->GetPVInput(cc);
-          if ( data && data->GetPVSource() )
+          vtkPVSource* pvs = source->GetPVInput(cc);
+          if ( pvs )
             {
-            this->SerializeSource(os, indent, data->GetPVSource(), writtenMap);
+            this->SerializeSource(os, indent, pvs, writtenMap);
             }
           }
         }
-      vtkPVSource* inputsource = source->GetInputPVSource(0);
+      vtkPVSource* inputsource = source->GetPVInput(0);
       os << indent << "Module " << source->GetName() << " " 
          << source->GetModuleName() << " " 
          << (inputsource?inputsource->GetName():"None") << " ";
@@ -4424,7 +4394,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterXEntry: " << this->GetCenterXEntry() << endl;
   os << indent << "CenterYEntry: " << this->GetCenterYEntry() << endl;
   os << indent << "CenterZEntry: " << this->GetCenterZEntry() << endl;
-  os << indent << "CurrentPVData: " << this->GetCurrentPVData() << endl;
   os << indent << "FilterMenu: " << this->GetFilterMenu() << endl;
 //  os << indent << "FlyStyle: " << this->GetFlyStyle() << endl;
   os << indent << "InteractorStyleToolbar: " << this->GetInteractorToolbar() 

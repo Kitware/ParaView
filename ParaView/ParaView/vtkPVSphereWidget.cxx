@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.23");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -106,7 +106,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::CenterResetCallback()
 {
-  vtkPVData *input;
+  vtkPVSource *input;
   double bds[6];
 
   if (this->PVSource == NULL)
@@ -399,7 +399,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
     {
-    vtkPVData *input = this->PVSource->GetPVInput(0);
+    vtkPVSource *input = this->PVSource->GetPVInput(0);
     if (input)
       {
       double bds[6];

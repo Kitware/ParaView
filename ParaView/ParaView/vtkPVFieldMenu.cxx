@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.2");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -172,14 +172,14 @@ void vtkPVFieldMenu::SetValue(int field)
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
 {
-  vtkPVData *pvd;
+  vtkPVSource *input;
 
   if (this->InputMenu == NULL)
     {
     return NULL;
     }
-  pvd = this->InputMenu->GetPVData();
-  if (pvd == NULL)
+  input = this->InputMenu->GetCurrentValue();
+  if (input == NULL)
     {
     return NULL;
     }
@@ -190,10 +190,10 @@ vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
       vtkErrorMacro("We do not handle data object fields yet.");
       return NULL;
     case vtkDataSet::POINT_DATA_FIELD:
-      return pvd->GetDataInformation()->GetPointDataInformation();
+      return input->GetDataInformation()->GetPointDataInformation();
       break;
     case vtkDataSet::CELL_DATA_FIELD:
-      return pvd->GetDataInformation()->GetCellDataInformation();
+      return input->GetDataInformation()->GetCellDataInformation();
       break;
     }
 
@@ -289,7 +289,7 @@ void vtkPVFieldMenu::Update()
     {
     return;
     }
-  vtkPVDataInformation* dataInfo = pvs->GetPVOutput()->GetDataInformation();
+  vtkPVDataInformation* dataInfo = pvs->GetDataInformation();
   if (dataInfo == NULL)
     {
     return;

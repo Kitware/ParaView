@@ -45,13 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVWindow.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.4");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.5");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -97,8 +98,8 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     return;
     }
   vtkPVWindow *window = app->GetMainWindow();
-  vtkPVData* data = window->GetCurrentPVData();
-  if (data )
+  vtkPVSource* pvs = window->GetCurrentPVSource();
+  if ( pvs )
     {
     double bounds[6];
     float center[3];
@@ -108,7 +109,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     int cc;
 
     // Get bounds
-    data->GetDataInformation()->GetBounds(bounds);
+    pvs->GetDataInformation()->GetBounds(bounds);
 
     // Calculate center of bounds.
     for ( cc = 0; cc < 3; cc ++ )
@@ -138,14 +139,14 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
       }
 
     float move[3];
-    data->GetActorTranslate(move);
+    pvs->GetPVOutput()->GetActorTranslate(move);
     
     for ( cc = 0; cc < 3; cc ++ )
       {
       move[cc] += endpoint[cc] - startpoint[cc];
       }
     
-    data->SetActorTranslate(move);
+    pvs->GetPVOutput()->SetActorTranslate(move);
 
     ren->ResetCameraClippingRange();
     rwi->Render();

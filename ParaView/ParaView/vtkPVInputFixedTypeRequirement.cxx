@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.2");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
@@ -71,19 +71,13 @@ int vtkPVInputFixedTypeRequirement::ReadXMLAttributes(vtkPVXMLElement*,
 
 
 //----------------------------------------------------------------------------
-int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource* pvs)
+int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource* pvs)
 {
-  if (pvd == NULL)
+  if (input == NULL)
     {
     return 0;
     }
   if (pvs == NULL)
-    {
-    return 1;
-    }
-
-  vtkPVData *currentData = pvs->GetPVOutput();
-  if (currentData == NULL)
     {
     return 1;
     }
@@ -94,8 +88,8 @@ int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*
   // Better would have been to passed the input property as an argument.
   // I already spent too long on this, so it will have to wait.
   int partIdx, numParts;
-  numParts = currentData->GetNumberOfPVParts(); 
-  if (pvd->GetNumberOfPVParts() != numParts)
+  numParts = pvs->GetNumberOfPVParts(); 
+  if (input->GetNumberOfPVParts() != numParts)
     {
     return 0;
     }
@@ -103,8 +97,8 @@ int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*
     {
     vtkPVDataInformation *info1;
     vtkPVDataInformation *info2;
-    info1 = pvd->GetPVPart(partIdx)->GetDataInformation();
-    info2 = currentData->GetPVPart(partIdx)->GetDataInformation();
+    info1 = input->GetPVPart(partIdx)->GetDataInformation();
+    info2 = pvs->GetPVPart(partIdx)->GetDataInformation();
     if (info1->GetDataSetType() != info2->GetDataSetType())
       {
       return 0;

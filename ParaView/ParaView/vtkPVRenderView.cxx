@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.241");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.242");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1649,7 +1649,7 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bds[6])
     {
     if (pvs->GetVisibility())
       {
-      tmp = pvs->GetPVOutput()->GetDataInformation()->GetBounds();
+      tmp = pvs->GetDataInformation()->GetBounds();
       if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
       if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
       if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
@@ -1741,25 +1741,22 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddPVData(vtkPVData *pvd)
+void vtkPVRenderView::AddPVSource(vtkPVSource *pvs)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
   int num, idx;
   
-  if (pvd == NULL)
+  if (pvs == NULL)
     {
     return;
     }  
-
-  // This has no side effects.  It just sets the pointer.
-  pvd->SetPVRenderView(this);
   
   // I would like to move the addition of the prop into vtkPVPart sometime.
-  num = pvd->GetNumberOfPVParts();
+  num = pvs->GetNumberOfPVParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = pvd->GetPVPart(idx);
+    part = pvs->GetPVPart(idx);
     if (part && part->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
@@ -1769,22 +1766,21 @@ void vtkPVRenderView::AddPVData(vtkPVData *pvd)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
+void vtkPVRenderView::RemovePVSource(vtkPVSource *pvs)
 {
   int idx, num;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
 
-  if (pvc == NULL)
+  if (pvs == NULL)
     {
     return;
     }
 
-  pvc->SetPVRenderView(NULL);
-  num = pvc->GetNumberOfPVParts();
+  num = pvs->GetNumberOfPVParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = pvc->GetPVPart(idx);
+    part = pvs->GetPVPart(idx);
     if (part->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
@@ -1876,7 +1872,7 @@ int vtkPVRenderView::UpdateAllPVData(int interactive)
       vtkPVData* data = source->GetPVOutput();
       if ( source->GetInitialized() && source->GetVisibility() )
         {
-        data->ForceUpdate(pvApp);
+        source->ForceUpdate(pvApp);
         }
       it->GoToNextItem();
       }
@@ -2054,7 +2050,6 @@ void vtkPVRenderView::TriangleStripsCallback()
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVData *pvd;
   vtkPVApplication *pvApp;
   int numParts, partIdx;
 
@@ -2070,12 +2065,11 @@ void vtkPVRenderView::TriangleStripsCallback()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvd = pvs->GetPVOutput();
-    numParts = pvd->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfPVParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetUseStrips %d",
-                             pvd->GetPVPart(partIdx)->GetGeometryTclName(),
+                             pvs->GetPVPart(partIdx)->GetGeometryTclName(),
                              this->TriangleStripsCheck->GetState());
       }
     }
@@ -2115,7 +2109,6 @@ void vtkPVRenderView::ImmediateModeCallback()
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVData *pvd;
   vtkPVApplication *pvApp;
   int partIdx, numParts;
 
@@ -2131,15 +2124,14 @@ void vtkPVRenderView::ImmediateModeCallback()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvd = pvs->GetPVOutput();
-    numParts = pvd->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfPVParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvd->GetPVPart(partIdx)->GetMapperTclName(),
+                             pvs->GetPVPart(partIdx)->GetMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvd->GetPVPart(partIdx)->GetLODMapperTclName(),
+                             pvs->GetPVPart(partIdx)->GetLODMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       }
     }
@@ -2259,7 +2251,6 @@ void vtkPVRenderView::SetLODResolutionInternal(int resolution)
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVData *pvd;
   vtkPVApplication *pvApp;
   char str[256];
 
@@ -2279,8 +2270,7 @@ void vtkPVRenderView::SetLODResolutionInternal(int resolution)
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvd = pvs->GetPVOutput();
-    pvd->SetLODResolution(resolution);
+    pvs->SetLODResolution(resolution);
     }
 }
 
@@ -2653,7 +2643,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.241 $");
+  this->ExtractRevision(os,"$Revision: 1.242 $");
 }
 
 //------------------------------------------------------------------------------

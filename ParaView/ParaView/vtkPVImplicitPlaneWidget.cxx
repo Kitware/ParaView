@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -130,7 +130,7 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::CenterResetCallback()
 {
-  vtkPVData *input;
+  vtkPVSource *input;
   float bds[6];
 
   if (this->PVSource == NULL)
@@ -579,7 +579,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   // Initialize the center of the plane based on the input bounds.
   if (this->PVSource)
     {
-    vtkPVData *input = this->PVSource->GetPVInput(0);
+    vtkPVSource *input = this->PVSource->GetPVInput(0);
     if (input)
       {
       float bds[6];
@@ -732,7 +732,7 @@ void vtkPVImplicitPlaneWidget::SetNormal()
 void vtkPVImplicitPlaneWidget::Update()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVData *input;
+  vtkPVSource *input;
   float bds[6];
 
   this->Superclass::Update();
@@ -742,7 +742,7 @@ void vtkPVImplicitPlaneWidget::Update()
     return;
     }
 
-  input = this->InputMenu->GetPVData();
+  input = this->InputMenu->GetCurrentValue();
   if (input)
     {
     input->GetDataInformation()->GetBounds(bds);

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.8");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -142,7 +142,6 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVData *pvd;
 
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");
@@ -171,11 +170,10 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
       vtkErrorMacro("Source mismatch.");
       return;
       }
-    pvd = pvs->GetPVOutput();
     state = this->PartSelectionList->GetSelectState(idx);
     if (state)
       {
-      this->PVSource->SetPVInput(count++, pvd);
+      this->PVSource->SetPVInput(count++, pvs);
       // SetPVinput does all this for us.
       // Special replace input feature.
       // Visibility of ALL selected input turned off.

@@ -69,7 +69,7 @@ public:
   // This method return 1 if the PVData matches the requirement.
   // The pvSource pointer is only used by one requirement so far.
   // vtkDataToDataSetFilters cannot change input types.
-  virtual int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+  virtual int GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs);
 
   // Description:
   // This are used by the field menu to determine is a field

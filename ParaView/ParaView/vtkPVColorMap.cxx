@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.49");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.50");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -908,7 +908,7 @@ void vtkPVColorMap::BackButtonCallback()
     }
 
   // This has a side effect of gathering and display information.
-  this->PVRenderView->GetPVWindow()->GetCurrentPVData()->UpdateProperties();
+  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetPVOutput()->UpdateProperties();
   this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
 }
 
@@ -1383,7 +1383,6 @@ void vtkPVColorMap::ResetScalarRangeInternal()
   float tmp[2];
   vtkPVSourceCollection *sourceList;
   vtkPVSource *pvs;
-  vtkPVData *pvd;
   int component = this->VectorComponent;
   if (this->VectorMode == vtkPVColorMap::MAGNITUDE)
     {
@@ -1404,10 +1403,9 @@ void vtkPVColorMap::ResetScalarRangeInternal()
   sourceList->InitTraversal();
   while ( (pvs = sourceList->GetNextPVSource()) )
     {
-    pvd = pvs->GetPVOutput();
     // For point data ...
     vtkPVArrayInformation *ai;
-    ai = pvd->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(this->ArrayName);
+    ai = pvs->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(this->ArrayName);
     if (ai)
       {
       ai->GetComponentRange(component, tmp);
@@ -1421,7 +1419,7 @@ void vtkPVColorMap::ResetScalarRangeInternal()
         }
       }
     // For cell data ...
-    ai = pvd->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(this->ArrayName);
+    ai = pvs->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(this->ArrayName);
     if (ai)
       {  
       ai->GetComponentRange(component, tmp);

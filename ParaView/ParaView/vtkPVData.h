@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
+class vtkCollection;
 class vtkCubeAxesActor2D;
 class vtkKWBoundsDisplay;
 class vtkKWChangeColorButton;
@@ -69,13 +70,8 @@ class vtkKWThumbWheel;
 class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVColorMap;
-class vtkPVRenderView;
 class vtkPVSource;
-
-class vtkCollection;
-class vtkDataSet;
-class vtkPVPart;
-class vtkPVDataInformation;
+class vtkPVRenderView;
 
 // Try to eliminate this !!!!
 class vtkData;
@@ -108,33 +104,7 @@ public:
   // The composite sets this so this data widget will know who owns it.
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource, vtkPVSource);
-
-  // Description:
-  // Access to individual parts.
-  void AddPVPart(vtkPVPart *part);
-  void SetPVPart(vtkPVPart *part);
-  vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
-  vtkPVPart *GetPVPart(int idx); 
-  int GetNumberOfPVParts();
-  // This will create and set the part.
-  void SetVTKData(vtkDataSet *data, const char *name);
-
-  // Description:
-  // Get the number of consumers
-  vtkGetMacro(NumberOfPVConsumers, int);
-  
-  // Description:
-  // Add, remove, get, or check a consumer.
-  void AddPVConsumer(vtkPVSource *c);
-  void RemovePVConsumer(vtkPVSource *c);
-  vtkPVSource *GetPVConsumer(int i);
-  int IsPVConsumer(vtkPVSource *c);
-  
-  // Description:
-  // This methiod updates the piece that has been assinged to this process.
-  // It update all parts and gathers data information.
-  void Update();
-  
+      
   //===================
 
   // Description:
@@ -207,7 +177,6 @@ public:
   // This flag turns the visibility of the prop on and off.  These methods transmit
   // the state change to all of the satellite processes.
   void SetVisibility(int v);
-  void SetVisibilityInternal(int v);
   vtkGetMacro(Visibility, int);
   vtkBooleanMacro(Visibility, int);
   void VisibilityCheckCallback();
@@ -279,13 +248,7 @@ public:
   // Description:
   // Callback for the change color button.
   void ChangeActorColor(float r, float g, float b);
-  
-  // Description:
-  // I would like to get rid of this reference if possible.
-  // Needed to render. Also needed to get the default values for deci lod
-  void SetPVRenderView(vtkPVRenderView *view);
-  vtkPVRenderView *GetPVRenderView();
-  
+    
   // Description:
   // Get the name of the cube axes actor.
   vtkGetStringMacro(CubeAxesTclName);
@@ -312,8 +275,6 @@ public:
   void ColorByPointField(const char *name, int numComps);
   void ColorByCellField(const char *name, int numComps);
   
-  vtkPVRenderView *PVRenderView;
-
   // Description:
   // This allows you to set the propertiesParent to any widget you like.  
   // If you do not specify a parent, then the views->PropertyParent is used.  
@@ -326,25 +287,18 @@ public:
   // Returns true if CreateProperties() has been called.
   vtkGetMacro(PropertiesCreated, int);
 
-  void ForceUpdate(vtkPVApplication* pvApp);
-
   // Description:
   // Called by vtkPVSource::DeleteCallback().
   void DeleteCallback();
   
   // Description:
-  // Set the resolution of the decimation LOD.
-  // Resulting decimation uses dim^3 volume.
-  void SetLODResolution(int dim);
-  vtkGetMacro(LODResolution, int);
+  // Convenience method for rendering.
+  vtkPVRenderView* GetPVRenderView(); 
 
   // Description:
-  // Moving away from direct access to VTK data objects.
-  vtkPVDataInformation* GetDataInformation();
-  
-  // Description:
-  // Called by source EndEvent to schedule another Gather.
-  void InvalidateDataInformation();
+  // The source calls this to update the visibility check button,
+  // and to determine whether the scalar bar should be visible.
+  void SetVisibilityCheckState(int v);
 
 protected:
   vtkPVData();
@@ -355,21 +309,9 @@ protected:
   virtual void SerializeToken(istream& is, const char token[1024]);
   
   int InstanceCount;
-  vtkCollection *PVParts;
-
-  // Description:
-  // This method collects data information from all processes.
-  void GatherDataInformation();
-  void UpdatePropertiesInternal();
-  vtkPVDataInformation *DataInformation;
-  int DataInformationValid;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
-
-  // Keep a list of sources that are using this data.
-  vtkPVSource **PVConsumers;
-  int NumberOfPVConsumers;
 
   // If we are the last source to unregister a color map,
   // this method will turn its scalar bar visibility off.
@@ -457,8 +399,7 @@ protected:
 
   vtkPVColorMap *PVColorMap;
 
-  int LODResolution;
-
+  void UpdatePropertiesInternal();
   void UpdateActorControlResolutions();
 
   vtkPVData(const vtkPVData&); // Not implemented

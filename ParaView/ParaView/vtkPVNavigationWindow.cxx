@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkString.h"
@@ -55,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.19");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -72,11 +71,9 @@ vtkPVNavigationWindow::~vtkPVNavigationWindow()
 void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
 {
   vtkPVSource *source;
-  vtkPVData **inputs = currentSource->GetPVInputs();
-  vtkPVData *output;
+  vtkPVSource **inputs = currentSource->GetPVInputs();
   int numInputs, xMid, yMid=0, y, i;
   int bboxIn[4], bboxOut[4], bboxSource[4];
-  vtkPVData *moreOut;
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
 
   // Draw the name of the assembly.
@@ -108,7 +105,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
     xMid = bboxSource[0] - 25;
     for (i = 0; i < numInputs; i++)
       {
-      if (inputs[i] && (source = inputs[i]->GetPVSource()) )
+      if ( (source = inputs[i]) )
         {
         // Draw the name of the assembly.
         
@@ -169,7 +166,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
         
         if (source->GetPVInputs())
           {
-          if (source->GetPVInput(0)->GetPVSource())
+          if (source->GetPVInput(0))
             {
             // Draw ellipsis indicating that this source has a source.
             this->Script("%s create line %d %d %d %d",
@@ -188,103 +185,85 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
       }
     }
 
-  // Put the outputs in the canvas.
-  output = currentSource->GetPVOutput();
-  if (output)
+  y = 10;
+  // only want to set xMid  once
+  xMid = bboxSource[2] + 25;
+  int num;
+  num = currentSource->GetNumberOfPVConsumers();
+  for (i = 0; i < num; i++)
     {
-    y = 10;
-    if (output)
+    source = currentSource->GetPVConsumer(i);
+    
+    // Draw the name of the assembly .
+    char *otext = this->GetTextRepresentation(source);
+    const char* res = this->CreateCanvasItem(
+      "%s create text %d %d -text {%s} -font %s -anchor w "
+      "-tags x -fill blue",
+      this->Canvas->GetWidgetName(), bboxSource[2]+50, y, otext, font);
+    delete [] otext;
+    tmp = vtkString::Duplicate(res);
+    
+    // Get the bounding box for the name.
+    this->CalculateBBox(this->Canvas, tmp, bboxOut);
+    if (this->CreateSelectionBindings)
       {
-      // only want to set xMid  once
-      xMid = bboxSource[2] + 25;
-      // We have two display modes:
-      // 1. If the number of outputs is > 1, we display the first
-      // consumer of each output (with the current implementation,
-      // there is no way of assigning more than one consumer to
-      // an output from the user interface if there are more than
-      // 1 outputs)
-      // 2. If there is only one output, we display all the consumers
-      // of that output
-      int num;
-      num = output->GetNumberOfPVConsumers();
-      for (i = 0; i < num; i++)
-        {
-        source = output->GetPVConsumer(i);
-        
-        // Draw the name of the assembly .
-        char *otext = this->GetTextRepresentation(source);
-        const char* res = this->CreateCanvasItem(
-          "%s create text %d %d -text {%s} -font %s -anchor w "
-          "-tags x -fill blue",
-          this->Canvas->GetWidgetName(), bboxSource[2]+50, y, otext, font);
-        delete [] otext;
-        tmp = vtkString::Duplicate(res);
-        
-        // Get the bounding box for the name.
-        this->CalculateBBox(this->Canvas, tmp, bboxOut);
-        if (this->CreateSelectionBindings)
-          {
-          this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
-                       this->Canvas->GetWidgetName(), tmp,
-                       currentSource->GetPVWindow()->GetTclName(), 
-                       source->GetTclName());
-          this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
-                       this->Canvas->GetWidgetName(), tmp,
-                       this->GetTclName(), tmp);
-          this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
-                       this->Canvas->GetWidgetName(), tmp,
-                       this->GetTclName(), tmp); 
-          this->Script("%s bind %s <ButtonPress-3> "
-                       "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-                       this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-                       source->GetTclName());
-          }
-        delete [] tmp;
-        tmp = NULL;
-        
-        // only want to set yMid once
-        if ( i == 0 )
-          {
-          yMid = static_cast<int>(0.5 * (bboxOut[1]+bboxOut[3]));
-          }
-
-        // Draw to output.
-        if (y == 10)
-          { // first is a special case (single line).
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->Canvas->GetWidgetName(), bboxSource[2],
-                       yMid, bboxOut[0], yMid);
-          }
-        else
-          {
-          xMid = (int)(0.5 * (bboxSource[2] + bboxOut[0]));
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->Canvas->GetWidgetName(), xMid, yMid,
-                       xMid, yMid+15);
-          yMid += 15;
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->Canvas->GetWidgetName(), xMid, yMid,
-                       bboxOut[0], yMid);
-          }
-        if ((moreOut = source->GetPVOutput()))
-          {
-          if (moreOut->GetNumberOfPVConsumers() > 0)
-            {
-            this->Script("%s create line %d %d %d %d",
-                         this->Canvas->GetWidgetName(),
-                         bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->Canvas->GetWidgetName(),
-                         bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->Canvas->GetWidgetName(),
-                         bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
-            }
-          }
-        y += 15;
-        }
+      this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
+                   this->Canvas->GetWidgetName(), tmp,
+                   currentSource->GetPVWindow()->GetTclName(), 
+                   source->GetTclName());
+      this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+                   this->Canvas->GetWidgetName(), tmp,
+                   this->GetTclName(), tmp);
+      this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+                   this->Canvas->GetWidgetName(), tmp,
+                   this->GetTclName(), tmp); 
+      this->Script("%s bind %s <ButtonPress-3> "
+                   "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                   this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                   source->GetTclName());
       }
+    delete [] tmp;
+    tmp = NULL;
+    
+    // only want to set yMid once
+    if ( i == 0 )
+      {
+      yMid = static_cast<int>(0.5 * (bboxOut[1]+bboxOut[3]));
+      }
+    // Draw to output.
+    if (y == 10)
+      { // first is a special case (single line).
+      this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                   this->Canvas->GetWidgetName(), bboxSource[2],
+                   yMid, bboxOut[0], yMid);
+      }
+    else
+      {
+      xMid = (int)(0.5 * (bboxSource[2] + bboxOut[0]));
+      this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                   this->Canvas->GetWidgetName(), xMid, yMid,
+                   xMid, yMid+15);
+      yMid += 15;
+      this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                   this->Canvas->GetWidgetName(), xMid, yMid,
+                   bboxOut[0], yMid);
+      }
+    if (source->GetNumberOfPVConsumers() > 0)
+      {
+      this->Script("%s create line %d %d %d %d",
+                   this->Canvas->GetWidgetName(),
+                   bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
+      this->Script("%s create line %d %d %d %d",
+                   this->Canvas->GetWidgetName(),
+                   bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
+      this->Script("%s create line %d %d %d %d",
+                   this->Canvas->GetWidgetName(),
+                   bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
+      }
+      
+    y += 15;
     }
+
 }
 
 //-----------------------------------------------------------------------------

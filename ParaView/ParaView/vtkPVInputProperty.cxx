@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputProperty.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -51,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -77,16 +78,23 @@ void vtkPVInputProperty::AddRequirement(vtkPVInputRequirement *ir)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputProperty::GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs)
+int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 {
-  vtkPVDataInformation *info = pvd->GetDataInformation();
+  vtkPVDataInformation *info;
   vtkPVInputRequirement *ir;
+
+  if (input->GetPVOutput() == NULL)
+    {
+    return 0;
+    }
+
+  info = input->GetDataInformation();
 
   // First check the data has the correct arrays.
   this->Requirements->InitTraversal();
   while ( (ir = (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
     {
-    if ( ! ir->GetIsValidInput(pvd, pvs) )
+    if ( ! ir->GetIsValidInput(input, pvs) )
       {
       return 0;
       }

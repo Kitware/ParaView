@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.20");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.21");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -109,7 +109,7 @@ void vtkPVExtentEntry::Update()
 {
   this->Superclass::Update();
 
-  vtkPVData *input = this->InputMenu->GetCurrentValue()->GetPVOutput();
+  vtkPVSource *input = this->InputMenu->GetCurrentValue();
   if (input == NULL)
     {
     this->SetRange(0, 0, 0, 0, 0, 0);

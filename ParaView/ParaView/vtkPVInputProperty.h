@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkObject.h"
-class vtkPVData;
 class vtkCollection;
 class vtkPVInputRequirement;
 class vtkPVDataSetAttributesInformation;
@@ -73,7 +72,7 @@ public:
   // This method return 1 if the PVData matches the property.
   // The pvSource pointer is only used by one requirement so far.
   // vtkDataToDataSetFilters cannot change input types.
-  int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+  int GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs);
 
   // Description:
   // This are used by the field menu to determine is a field

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.4");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -222,7 +222,7 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVExtractPartsWidget::ResetInternal(const char* vtkSourceTclName)
 {
-  vtkPVData *input;
+  vtkPVSource *input;
   vtkPVPart *part;
   int num, idx;
 

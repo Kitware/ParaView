@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.89");
+vtkCxxRevisionMacro(vtkPVProbe, "1.90");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -216,10 +216,10 @@ void vtkPVProbe::AcceptCallbackInternal()
   if (this->GetPVOutput())
     {
     // Update the VTK data.
-    this->GetPVOutput()->Update();
+    this->Update();
     }
 
-  vtkPolyData *probeOutput = (vtkPolyData *)(this->GetPVOutput()->GetPVPart(0)->GetVTKData());
+  vtkPolyData *probeOutput = (vtkPolyData *)(this->GetPVPart(0)->GetVTKData());
   vtkPointData *pd = probeOutput->GetPointData();
     
   int arrayCount;
@@ -303,7 +303,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       arrayName = array->GetName();
       if (array->GetNumberOfComponents() == 1)
         {
-        xyp->AddInput(this->GetPVOutput()->GetPVPart()->GetVTKData(), arrayName, 0);
+        xyp->AddInput(this->GetPVPart()->GetVTKData(), arrayName, 0);
         xyp->SetPlotLabel(i, arrayName);
         float r, g, b;
         this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
@@ -391,7 +391,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     }
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
-  *file << this->GetPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+  *file << this->GetPVInput(0)->GetVTKSourceTclName()
         << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.13");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -129,7 +129,7 @@ void vtkPVBoundsDisplay::Update()
 {
   this->Superclass::Update();
 
-  vtkPVData *input;
+  vtkPVSource *input;
   float bds[6];
 
   if (this->InputMenu == NULL)
@@ -138,7 +138,7 @@ void vtkPVBoundsDisplay::Update()
     return;
     }
 
-  input = this->InputMenu->GetPVData();
+  input = this->InputMenu->GetCurrentValue();
   if (input == NULL)
     {
     bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;

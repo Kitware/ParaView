@@ -122,8 +122,8 @@ public:
 
   // Description:
   // This method is executed in all processes.
-  void AddPVData(vtkPVData *pvc);
-  void RemovePVData(vtkPVData *pvc);
+  void AddPVSource(vtkPVSource *pvs);
+  void RemovePVSource(vtkPVSource *pvs);
 
   // Description:
   // Make snapshot of the render window.

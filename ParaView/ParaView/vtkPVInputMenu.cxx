@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.45");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.46");
 
 
 //----------------------------------------------------------------------------
@@ -167,33 +167,22 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
 //----------------------------------------------------------------------------
 int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
 {
-  vtkPVData *pvd;
   if (pvs == this->PVSource || pvs == NULL)
     {
     return 0;
     }
 
   // Have to have the same number of parts as last input.
-  pvd = pvs->GetPVOutput();
-  if (pvd == NULL)
-    {
-    return 0;
-    }
   if (this->CurrentValue)
     {
-    vtkPVData *currentData = this->CurrentValue->GetPVOutput();
-    if (currentData != NULL)
+    if (pvs->GetNumberOfPVParts() != this->CurrentValue->GetNumberOfPVParts())
       {
-      if (pvd->GetNumberOfPVParts() != currentData->GetNumberOfPVParts())
-        {
-        return 0;
-        }
+      return 0;
       }
     }
 
   // Has to meet all requirments from XML filter description.
-  if ( ! this->GetInputProperty()->GetIsValidInput(pvs->GetPVOutput(), 
-                                                   this->PVSource))
+  if ( ! this->GetInputProperty()->GetIsValidInput(pvs,this->PVSource))
     {
     return 0;
     }
@@ -279,24 +268,13 @@ int vtkPVInputMenu::CheckForLoop(vtkPVSource *pvs)
   int res = 0;
   for ( cc = 0; cc < pvs->GetNumberOfPVInputs(); cc ++ )
     {
-    vtkPVData* data = pvs->GetPVInput(cc);
-    if ( data && data->GetPVSource() )
+    vtkPVSource* input = pvs->GetPVInput(cc);
+    if ( input )
       {
-      res += this->CheckForLoop(data->GetPVSource());
+      res += this->CheckForLoop(input);
       }
     }
   return res;
-}
-//----------------------------------------------------------------------------
-vtkPVData *vtkPVInputMenu::GetPVData()
-{
-  vtkPVSource *pvs = this->GetCurrentValue();
-
-  if (pvs == NULL)
-    {
-    return NULL;
-    }
-  return pvs->GetPVOutput();
 }
 
 //----------------------------------------------------------------------------
@@ -362,7 +340,7 @@ void vtkPVInputMenu::AcceptInternal(const char*)
     {
     this->Script("%s SetPVInput %d %s", this->PVSource->GetTclName(), 
                  this->GetPVInputIndex(),
-                 this->CurrentValue->GetPVOutput()->GetTclName());
+                 this->CurrentValue->GetTclName());
     // Turn visibility of ne input off.
     // We cannot put this in vtkPVSource::SetPVInput because
     // it is too early.
@@ -418,22 +396,17 @@ void vtkPVInputMenu::ResetInternal(const char*)
 
   // Set the current value.  The catch is here because GlyphSource is
   // initially NULL which causes an error.
-  this->Script("catch {%s SetCurrentValue [[%s GetPVInput %d] GetPVSource]}", 
-               this->GetTclName(), this->PVSource->GetTclName(), 
-               this->GetPVInputIndex());    
-
-  // Only turn modified off if the SetCurrentValue was successful.
-  if (this->GetIntegerResult(this->Application) == 0)
-    {
+  vtkPVSource* input = this->PVSource->GetPVInput(this->GetPVInputIndex());
+  if (input)
+    { // Use our default if there in no input set (glyph source).
+    this->Script("%s SetCurrentValue %s", 
+               this->GetTclName(), input->GetTclName());
+    // Only turn off modified if we successfully set input.
     this->ModifiedFlag = 0;
-    }
-  else
-    {
-    this->ModifiedFlag = 1;
-    }
 
-  // Update any widgets that depend on this input menu.
-  this->Update();
+    // Update any widgets that depend on this input menu.
+    this->Update();
+    }
 }
 
 //----------------------------------------------------------------------------

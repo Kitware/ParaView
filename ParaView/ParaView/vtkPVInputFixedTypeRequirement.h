@@ -69,7 +69,7 @@ public:
   
   // Description:
   // This method return 1 if the PVData matches the requirement.
-  virtual int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+  virtual int GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs);
 
   // Description:
   // Called by vtkPVXMLPackageParser to configure the widget from XML

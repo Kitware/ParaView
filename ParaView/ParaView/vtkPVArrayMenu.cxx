@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.36");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -284,9 +284,9 @@ vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
     }
   if (this->ArrayMenu)
     {
-    vtkPVData *pvd;
-    pvd = this->InputMenu->GetPVData();
-    if (pvd == NULL)
+    vtkPVSource *input;
+    input = this->InputMenu->GetCurrentValue();
+    if (input == NULL)
       {
       return NULL;
       }
@@ -296,10 +296,10 @@ vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
         vtkErrorMacro("We do not handle data object fields yet.");
         return NULL;
       case vtkDataSet::POINT_DATA_FIELD:
-        return pvd->GetDataInformation()->GetPointDataInformation();
+        return input->GetDataInformation()->GetPointDataInformation();
         break;
       case vtkDataSet::CELL_DATA_FIELD:
-        return pvd->GetDataInformation()->GetCellDataInformation();
+        return input->GetDataInformation()->GetCellDataInformation();
         break;
       }
     vtkErrorMacro("Unknown field.");

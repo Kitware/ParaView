@@ -63,7 +63,7 @@ public:
   
   // Description:
   // This method return 1 if the PVData matches the property.
-  virtual int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+  virtual int GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs);
 
 
   // Description:

@@ -177,15 +177,7 @@ public:
   void DeleteAllSourcesCallback();
   void DeleteAllSources();
   void DeleteSourceAndOutputs(vtkPVSource*);
-  
-  // Description: 
-  // The current data is the data object that will be used as
-  // input to the next filter.  It is usually the last output of the
-  // current source. The current data determines which filters are 
-  // displayed in the filter menu.
-  void SetCurrentPVData(vtkPVData *data);
-  vtkGetObjectMacro(CurrentPVData, vtkPVData);
-  
+    
   // Description:
   // Find a data source with name "sourcename" in the source list called
   // "listname"
