@@ -13,10 +13,13 @@ IF (BUILD_DOCUMENTATION)
 
   SET(VTK_DOXYGEN_HOME "${ParaView_SOURCE_DIR}/VTK/Utilities/Doxygen")
 
-
   #
   # Configure the script and the doxyfile, then add target
   #
+  IF(NOT DOT_PATH)
+    GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH)
+  ENDIF(NOT DOT_PATH)
+
   CONFIGURE_FILE(
     ${ParaView_SOURCE_DIR}/Utilities/Doxygen/doxyfile.in
     ${ParaView_BINARY_DIR}/Utilities/Doxygen/doxyfile)
