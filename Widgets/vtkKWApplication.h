@@ -118,8 +118,8 @@ public:
   // This variable can be used to hide the user interface.  
   // When WidgetVisibility is off, The cherat methods of vtkKWWidgets 
   // should not create the TK widgets.
-  static void SetWidgetVisibility(int v) {vtkKWApplication::WidgetVisibility = v;}
-  static int GetWidgetVisibility() {return vtkKWApplication::WidgetVisibility;}
+  static void SetWidgetVisibility(int v);
+  static int GetWidgetVisibility();
   vtkBooleanMacro(WidgetVisibility, int);
   
   // Description:

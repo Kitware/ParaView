@@ -443,3 +443,14 @@ void vtkKWApplication::BalloonHelpCancel()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetWidgetVisibility(int v)
+{
+  vtkKWApplication::WidgetVisibility = v;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetWidgetVisibility() 
+{
+  return vtkKWApplication::WidgetVisibility;
+}
