@@ -154,6 +154,7 @@ protected:
 
   void UpdateExtensionsMenu();
   vtkStringList*    FileTypeStrings;
+  vtkStringList*    FileTypeDescriptions;
   vtkStringList*    ExtensionStrings;
   int               CheckExtension(const char* name);
 

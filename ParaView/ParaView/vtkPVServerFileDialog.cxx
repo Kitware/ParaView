@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.7");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -170,6 +170,7 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->SelectedDirectory = NULL;
 
   this->FileTypeStrings = vtkStringList::New();
+  this->FileTypeDescriptions = vtkStringList::New();
   this->ExtensionStrings = vtkStringList::New();
 
   this->DirectoryToolTclName = NULL;
@@ -233,6 +234,9 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
 
   this->FileTypeStrings->Delete();
   this->FileTypeStrings = NULL;
+
+  this->FileTypeDescriptions->Delete();
+  this->FileTypeDescriptions = NULL;
 
   this->ExtensionStrings->Delete();
   this->ExtensionStrings = NULL;
@@ -493,6 +497,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 int vtkPVServerFileDialog::Invoke()
 {   
+  this->Application->SetDialogUp(1);
   this->UpdateExtensionsMenu();
   // Side effect of UpdateExtensionsMenu is to Update.
   //this->Update();
@@ -508,6 +513,7 @@ int vtkPVServerFileDialog::Invoke()
     {
     this->Script("after 100; update");
     }
+  this->Application->SetDialogUp(0);
   return this->ReturnValue;
 }
 
@@ -542,13 +548,15 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     newdir << this->DirectoryDisplay->GetLabel() << "/" << this->SelectedDirectory << ends;
     this->SetLastPath(newdir.str());
     this->Update();
+    newdir.rdbuf()->freeze(0);
     return;
     } 
 
   ostrstream fullpath;
   fullpath << this->DirectoryDisplay->GetLabel() << "/" << this->FileNameEntry->GetValue() << ends;
   this->SetFileName(fullpath.str());
- 
+  fullpath.rdbuf()->freeze(0);
+   
   this->Done = 1;
   this->Script("grab release %s", this->GetWidgetName());
   this->Script("wm withdraw %s", this->GetWidgetName());
@@ -596,7 +604,6 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
   char *extensionStart;
   
   extensions = this->FileTypeStrings->GetString(typeIdx);
-  this->ExtensionsDisplay->SetLabel(extensions);
 
   // Make a copy of the extensions string 
   // so we can change characters while we parse.
@@ -657,6 +664,18 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
     }
 
   delete [] extensionsCopy;
+
+  ostrstream label;
+  label << this->FileTypeDescriptions->GetString(typeIdx) << " ";
+  if (this->ExtensionStrings->GetNumberOfStrings() <= 1)
+    {
+    label << extensions;
+    }
+  label << ends;
+
+  this->ExtensionsDisplay->SetLabel(label.str());
+  label.rdbuf()->freeze(0);
+  
   this->Update();
 }
 
@@ -686,6 +705,13 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
 
   ptr1 = fileTypesCopy;
 
+  char separator;
+#ifdef _WIN32
+  separator = ';';
+#else
+  separator = ' ';
+#endif
+  
   typesFinished = 0;
   typeIdx = 0;
   while ( ! typesFinished)
@@ -735,7 +761,7 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
         }
       fileExtension = ptr1;
       // Now find the end of the extension
-      while ( ! extensionsFinished && *ptr1!='}' && *ptr1!=';' )
+      while ( ! extensionsFinished && *ptr1!='}' && *ptr1!= separator )
         {
         if (*ptr1 == '\0')
           {
@@ -804,8 +830,11 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
       this->ExtensionsMenuButton->GetMenu()->AddCommand(label.str(), this,
                                                         methodAndArgString);
       this->FileTypeStrings->AddString(extensions.str());
+      this->FileTypeDescriptions->AddString(fileTypeDescription);
       ++typeIdx;
       }
+    label.rdbuf()->freeze(0);
+    extensions.rdbuf()->freeze(0);
     }
 
   // Default file type is the first in the list.
