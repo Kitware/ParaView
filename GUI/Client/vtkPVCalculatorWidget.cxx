@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.34");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -1037,6 +1037,8 @@ void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
   char menuEntry[256];
   char* name;
   const char* mode = this->AttributeModeMenu->GetValue();
+
+  this->ClearAllVariables();
 
   // Populate the scalar and array menu using collected data information.
   if (strcmp(mode, "Point Data") == 0)
