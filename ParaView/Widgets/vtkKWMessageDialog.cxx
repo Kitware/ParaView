@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.38");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.38.2.1");
 
 
 
@@ -85,6 +85,10 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->DialogName = 0;
   this->Options    = 0;
   this->DialogText = 0;
+  this->OKButtonText = 0;
+  this->SetOKButtonText("OK");
+  this->CancelButtonText = 0;
+  this->SetCancelButtonText("Cancel");
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
@@ -134,25 +138,20 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                    this->OKFrame->GetWidgetName());
       break;
     case vtkKWMessageDialog::YesNo: 
-      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->OKButton->Create(app,"button","-text Yes -width 16");
-      this->OKButton->SetCommand(this, "OK");
-      this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->CancelButton->Create(app,"button","-text No -width 16");
-      this->CancelButton->SetCommand(this, "Cancel");
-      this->Script("pack %s %s -side left -expand yes",
-                   this->OKButton->GetWidgetName(),
-                   this->CancelButton->GetWidgetName());
-      this->Script("pack %s %s -side left -padx 4 -expand yes",
-                   this->OKFrame->GetWidgetName(),
-                   this->CancelFrame->GetWidgetName());
-      break;
+      this->SetOKButtonText("Yes");
+      this->SetCancelButtonText("No");
     case vtkKWMessageDialog::OkCancel:
       this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->OKButton->Create(app,"button","-text OK -width 16");
+      ostrstream oktext;
+      oktext << "-text " << this->OKButtonText << " -width 16" << ends;
+      this->OKButton->Create(app, "button", oktext.str());
+      oktext.rdbuf()->freeze(0);
       this->OKButton->SetCommand(this, "OK");
       this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->CancelButton->Create(app,"button","-text Cancel -width 16");
+      ostrstream canceltext;
+      canceltext << "-text " << this->CancelButtonText << " -width 16" << ends;
+      this->CancelButton->Create(app,"button", canceltext.str());
+      canceltext.rdbuf()->freeze(0);
       this->CancelButton->SetCommand(this, "Cancel");
       this->Script("pack %s %s -side left -expand yes",
                    this->OKButton->GetWidgetName(),
@@ -395,4 +394,10 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Options: " << this->GetOptions() << endl;
   os << indent << "Style: " << this->GetStyle() << endl;
   os << indent << "MessageDialogFrame: " << this->MessageDialogFrame << endl;
+  os << indent << "OKButtonText: " << (this->OKButtonText?
+                                       this->OKButtonText:"none") << endl;
+  os << indent << "CancelButtonText: " << (this->CancelButtonText?
+                                       this->CancelButtonText:"none") << endl;
+  os << indent << "DialogName: " << (this->DialogName?this->DialogName:"none")
+     << endl;
 }
