@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -125,6 +125,7 @@ int vtkPVContainerWidget::GetModifiedFlag()
     it->GetData(widget);
     if (widget && widget->GetModifiedFlag())
       {
+      it->Delete();
       return 1;
       }
     it->GoToNextItem();
