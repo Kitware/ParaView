@@ -625,11 +625,6 @@ This filter operates on polygonal data and produces polygonal output.
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu property="SelectInputScalars"
-               label="Scalars"
-               trace_name="ArrayMenu"
-               input_menu="im"
-               help="Select the input scalars to process."/>
     <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
                    label="Dimensionality"
@@ -657,11 +652,6 @@ The Gradient filter computes the gradient vector at each point in an image or vo
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu property="SelectInputScalars"
-               label="Scalars"
-               trace_name="ArrayMenu"
-               input_menu="im"
-               help="Select the input scalars to process."/>
     <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
                    label="Dimensionality"
@@ -810,11 +800,6 @@ The Input menu allows the user to select the data set to which this filter will 
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu property="SelectInputScalars"
-               label="Scalars"
-               trace_name="Scalars"
-               input_menu="im"
-               help="Select the input scalars to process."/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Kernel Size"
                  trace_name="KernelSize"
