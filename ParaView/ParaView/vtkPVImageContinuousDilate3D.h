@@ -29,7 +29,7 @@ public:
 
   // Description:
   static vtkPVImageContinuousDilate3D *New();
-  vtkTypeRevisionMacro(vtkPVImageContinuousDilate3D,vtkImageSpatialFilter);
+  vtkTypeRevisionMacro(vtkPVImageContinuousDilate3D,vtkImageContinuousDilate3D);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

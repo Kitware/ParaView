@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVImageGradientMagnitude : public vtkImageGradientMagnitude
 {
 public:
   static vtkPVImageGradientMagnitude *New();
-  vtkTypeRevisionMacro(vtkPVImageGradientMagnitude,vtkImageToImageFilter);
+  vtkTypeRevisionMacro(vtkPVImageGradientMagnitude,vtkImageGradientMagnitude);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
