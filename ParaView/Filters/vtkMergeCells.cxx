@@ -50,7 +50,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.3");
+vtkCxxRevisionMacro(vtkMergeCells, "1.4");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
@@ -123,8 +123,8 @@ int vtkMergeCells::MergeDataSet(vtkDataSet *set)
       (this->TotalNumberOfDataSets <= 0))
     {
     vtkErrorMacro(<<
-     "Must SetTotalCells, SetTotalPoints and SetTotalNumberOfDataSets "
-     "before starting to MergeDataSets");
+     "Must SetTotalCells, SetTotalPoints and SetTotalNumberOfDataSets (upper bounds at least)"
+     " before starting to MergeDataSets");
 
     return -1;
     }
@@ -461,74 +461,6 @@ vtkIdType *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
     vtkErrorMacro("global id array is not available");
     return NULL;
     }
-  int dataTypeSize = globalIds->GetDataTypeSize();
-
-  if (dataTypeSize != sizeof(vtkIdType))
-    {
-    vtkErrorMacro("global id array has element of wrong size");
-    return NULL;
-    }
-
-  vtkIdType *idArray = NULL;
-
-  vtkShortArray *s_ids;
-  vtkUnsignedShortArray *us_ids;
-  vtkIntArray *i_ids;
-  vtkUnsignedIntArray *ui_ids;
-  vtkLongArray *l_ids;
-  vtkUnsignedLongArray *ul_ids;
-  vtkIdTypeArray *it_ids;
-
-  switch (globalIds->GetDataType())
-    {
-    case VTK_SHORT:
-
-      s_ids = vtkShortArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)s_ids->GetPointer(0);
-      break;
-
-    case VTK_UNSIGNED_SHORT:
-
-      us_ids = vtkUnsignedShortArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)us_ids->GetPointer(0);
-      break;
-
-    case VTK_INT:
-
-      i_ids = vtkIntArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)i_ids->GetPointer(0);
-      break;
-
-    case VTK_UNSIGNED_INT:
-
-      ui_ids = vtkUnsignedIntArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)ui_ids->GetPointer(0);
-      break;
-
-    case VTK_LONG:
-
-      l_ids = vtkLongArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)l_ids->GetPointer(0);
-      break;
-
-    case VTK_UNSIGNED_LONG:
-
-      ul_ids = vtkUnsignedLongArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)ul_ids->GetPointer(0);
-      break;
-
-    case VTK_ID_TYPE:
-
-      it_ids = vtkIdTypeArray::SafeDownCast(globalIds);
-      idArray = (vtkIdType *)it_ids->GetPointer(0);
-      break;
-    }
-
-  if (idArray == NULL)
-    {
-    vtkErrorMacro("global id array is of wrong type");
-    return NULL;
-    }
 
   vtkIdType npoints = set->GetNumberOfPoints();
 
@@ -540,7 +472,8 @@ vtkIdType *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
 
   for (vtkIdType oldId=0; oldId<npoints; oldId++)
     {
-    vtkIdType globalId = idArray[oldId];
+    float *id = globalIds->GetTuple(oldId);
+    vtkIdType globalId = (vtkIdType)*id;
 
     vtkstd::pair<vtkstd::map<vtkIdType, vtkIdType>::iterator, bool> inserted =
 
@@ -562,6 +495,7 @@ vtkIdType *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
       idMap[oldId] = inserted.first->second;
       }
     }
+
   return idMap;
 }
 
