@@ -67,7 +67,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.6");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.7");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -316,8 +316,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->Script("grid %s %s -sticky ew",
     this->FrameRateLabel->GetWidgetName(),
     this->FrameRateThumbWheel->GetWidgetName());
+  this->SetFrameRate(1.0);
 
-  
   // Animation Control: Play Mode
   this->PlayModeLabel->SetParent(this);
   this->PlayModeLabel->Create(app, 0);
