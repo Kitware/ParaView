@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.4");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.5");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -324,7 +324,7 @@ void vtkXDMFReaderModule::UpdateGrids()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "GetNumberOfGrids"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer();  // was a rootscript
   int numGrids = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numGrids))
     {
@@ -376,7 +376,7 @@ void vtkXDMFReaderModule::UpdateDomains()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "GetNumberOfDomains"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer();  // was a rootscript
   int numDomains = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numDomains))
     {

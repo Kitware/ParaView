@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.21");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.22");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1654,7 +1654,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
   pm->GetStream() << vtkClientServerStream::Invoke
                   << pm->GetApplicationID() << "GetDemoPath"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer();  // was a rootscript
   if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;
@@ -1705,7 +1705,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
                   << this->ServerFileListingID << "FileIsReadable"
                   << fileName
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer(); // was a rootscript
   int readable = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &readable))
     {
@@ -2115,7 +2115,7 @@ void vtkPVWindow::WriteData()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetVTKDataID());
+  pm->GatherInformation(info, part->GetVTKDataID());  // was a rootscript
 
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
@@ -2284,7 +2284,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetVTKDataID());
+  pm->GatherInformation(info, part->GetVTKDataID()); // was a rootscript
   if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
     {
     data = vtkImageData::New();

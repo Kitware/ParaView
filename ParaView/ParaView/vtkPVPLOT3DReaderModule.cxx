@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.15.4.2");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.15.4.3");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -93,7 +93,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
                   << "CanReadBinaryFile" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer(); // was a RootScript
   int canread = 0;
   if(!pm->GetLastServerResult().GetArgument(0,0,&canread))
     {

@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.18");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.19");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2441,7 +2441,14 @@ int vtkPVSource::InitializeData()
       // Needs to be before "ExtractPieces" because translator propagates.
       vtkClientServerID translatorID = {0};
       if ( ! input)
-        {
+        {  
+// Was a rootscript, this stuff needs fixing:        
+//         // Do not overwrite custom extent translators.
+//         // PVExtent translator should really be the default,
+//         // Then we would not need to do this.
+//         pm->RootScript("[${%s} GetExtentTranslator] GetClassName",
+//                        dataName); 
+//         if (strcmp(pm->GetRootResult(),"vtkExtentTranslator") == 0)
         vtkClientServerID translatorID = pm->NewStreamObject("vtkPVExtentTranslator");
         stream << vtkClientServerStream::Invoke << dataID 
                << "SetExtentTranslator" << translatorID 

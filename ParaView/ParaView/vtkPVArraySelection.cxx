@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.4");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.5");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -241,7 +241,7 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
                     << this->ServerSideID << "GetArraySettings"
                     << this->VTKReaderID << point
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServer(); // This was a RootScript
     vtkClientServerStream arrays;
     if(pm->GetLastServerResult().GetArgument(0, 0, &arrays))
       {

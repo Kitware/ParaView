@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.2");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -93,7 +93,6 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
 {
   // Make sure the reader's file name is set.
   this->SetReaderFileName(fname);
-  int fixme;
 
   // Check whether the input file has a "timestep" attribute.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
@@ -105,6 +104,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     << vtkClientServerStream::Invoke
     << this->GetVTKSourceID() << "GetAttributeIndex" << "timestep"
     << vtkClientServerStream::End;
+  int fixme; // This was a rootscript
   pm->SendStreamToServer();
   int index = -1;
   this->HaveTime = (pm->GetLastServerResult().GetArgument(0, 0, &index) &&

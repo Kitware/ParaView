@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2.4.2");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2.4.3");
 
 
 
@@ -179,7 +179,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
   // **********************************************************
   this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer(); // was a rootscript
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?

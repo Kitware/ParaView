@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.5");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.6");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -463,7 +463,7 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
                   << this->ServerSideID << "GetTimeSets"
                   << this->PVSource->GetVTKSourceID()
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer();  // was a rootscript
   vtkClientServerStream timeSets;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &timeSets))
     {

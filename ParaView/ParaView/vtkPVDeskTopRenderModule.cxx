@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.2.4.2");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.2.4.3");
 
 
 
@@ -173,7 +173,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // the same id
   pm->GetStream() << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
                   <<  this->CompositeID <<  vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServer(); // Was a RootScript
 
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
