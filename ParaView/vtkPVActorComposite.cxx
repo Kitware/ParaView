@@ -141,16 +141,11 @@ void vtkPVActorComposite::GetInputScalarRange(float range[2])
 void vtkPVActorComposite::TransmitInputScalarRange() 
 { 
   float tmp[2];
-  cerr << "TransmitInputScalarRange: " << this << "\n";
   vtkPVApplication *pvApp = this->GetPVApplication();
-  cerr << "pvApp: " << pvApp << endl;
   vtkMultiProcessController *controller = pvApp->GetController();
-  cerr << "controller: " << controller << endl;
   
   this->Mapper->Update();
-  cerr << "Updated\n";
   this->Mapper->GetInput()->GetScalarRange(tmp);
-  cerr << " range: " << tmp[0] << ", " << tmp[1] << endl;
   
   controller->Send(tmp, 2, 0, 99399);
 }
@@ -299,14 +294,11 @@ void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
   cerr << "ActorComp: " << this << ", mapper: " << this->Mapper 
        << ", assignment: " << a << ", piece: " << a->GetPiece()
        << ", numPieces: " << a->GetNumberOfPieces() << endl;
-  
-
 }
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 {
-  cerr << this << "Returning application : " << this->Application << endl;
   if (this->Application == NULL)
     {
     return NULL;

@@ -62,6 +62,27 @@ vtkPVImage* vtkPVImage::New()
   return new vtkPVImage();
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVImage::SetOutlineFlag(int f)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->OutlineFlag == f)
+    {
+    return;
+    }
+  this->Modified();
+  this->OutlineFlag = f;
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutlineFlag %d", this->GetTclName(), f);
+    }  
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVImage::Clip()
 {

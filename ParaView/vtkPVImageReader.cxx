@@ -55,7 +55,6 @@ vtkPVImageReader::vtkPVImageReader()
   this->ZDimension->SetParent(this->Properties);
   
   this->ImageReader = vtkImageReader::New();
-  this->ImageReader->SetFilePrefix("../../vtkdata/headsq/quarter");
 }
 
 //----------------------------------------------------------------------------
@@ -122,6 +121,63 @@ void vtkPVImageReader::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImageReader::SetFilePrefix(char *prefix)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->ImageReader->SetFilePrefix(prefix);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetFilePrefix %s", 
+			   this->GetTclName(), prefix);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageReader::SetDataByteOrder(int o)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->ImageReader->SetDataByteOrder(o);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetDataByteOrder %d", this->GetTclName(), o);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageReader::SetDataExtent(int xmin,int xmax, int ymin,int ymax, 
+				     int zmin,int zmax)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->ImageReader->SetDataExtent(xmin, xmax, ymin, ymax, zmin, zmax);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetDataExtent %d %d %d %d %d %d",
+		   this->GetTclName(), xmin,xmax, ymin,ymax, zmin,zmax);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageReader::SetDataSpacing(float sx, float sy, float sz)
+{
+ vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->ImageReader->SetDataSpacing(sx, sy, sz);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetDataSpacing %f %f %f", 
+			   this->GetTclName(), sx, sy, sz);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVImageReader::SetOutput(vtkPVImage *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -143,16 +199,6 @@ vtkPVImage *vtkPVImageReader::GetOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageReader::ReadImage()
-{
-  this->ImageReader->SetDataByteOrderToLittleEndian();
-  this->ImageReader->SetDataExtent(0, this->XDimension->GetValueAsInt(),
-				   0, this->YDimension->GetValueAsInt(),
-				   1, this->ZDimension->GetValueAsInt());
-  this->ImageReader->SetDataSpacing(4, 4, 1.8);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVImageReader::ImageAccepted()
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
@@ -161,9 +207,16 @@ void vtkPVImageReader::ImageAccepted()
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
   
-  // Does not actually read.  Just sets the file name ...
-  this->ReadImage();
-  
+  // Setup the image reader from the UI.
+  this->SetDataByteOrder(VTK_FILE_BYTE_ORDER_LITTLE_ENDIAN);
+  this->SetDataExtent(0, this->XDimension->GetValueAsInt(),
+		      0, this->YDimension->GetValueAsInt(),
+		      1, this->ZDimension->GetValueAsInt());
+  this->SetDataSpacing(4, 4, 1.8);
+  // This will have to be changed when general files are used.
+  // There should be a label/entry/button that has the prefix.
+  this->SetFilePrefix("../../vtkdata/headsq/quarter");
+
   if (this->GetPVData() == NULL)
     {
     pvImage = vtkPVImage::New();

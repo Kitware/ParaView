@@ -213,6 +213,20 @@ void vtkPVImageSlice::SetSliceAxis(int axis)
   this->UpdateProperties();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SetOutputWholeExtent(int xmin, int xmax, int ymin, 
+					   int ymax, int zmin, int zmax)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->Slice->SetOutputWholeExtent(xmin, xmax, ymin, ymax, zmin, zmax);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutputWholeExtent %d %d %d %d %d %d",
+		   this->GetTclName(), xmin,xmax, ymin,ymax, zmin,zmax);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SliceChanged()
@@ -253,8 +267,8 @@ void vtkPVImageSlice::SliceChanged()
       {
       this->SetSliceNumber(ext[1]);
       }
-    this->Slice->SetOutputWholeExtent(this->SliceNumber, this->SliceNumber,
-				      ext[2], ext[3], ext[4], ext[5]);
+    this->SetOutputWholeExtent(this->SliceNumber, this->SliceNumber,
+			       ext[2], ext[3], ext[4], ext[5]);
     }
   if (this->SliceAxis == 1)
     {
@@ -266,8 +280,8 @@ void vtkPVImageSlice::SliceChanged()
       {
       this->SetSliceNumber(ext[3]);
       }
-    this->Slice->SetOutputWholeExtent(ext[0], ext[1], this->SliceNumber, 
-				      this->SliceNumber, ext[4], ext[5]);
+    this->SetOutputWholeExtent(ext[0], ext[1], this->SliceNumber, 
+			       this->SliceNumber, ext[4], ext[5]);
     }
   if (this->SliceAxis == 2)
     {
@@ -279,8 +293,8 @@ void vtkPVImageSlice::SliceChanged()
       {
       this->SetSliceNumber(ext[5]);
       }
-    this->Slice->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
-				      this->SliceNumber, this->SliceNumber);
+    this->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
+			       this->SliceNumber, this->SliceNumber);
     }  
   
   // Create the data if this is the first accept.

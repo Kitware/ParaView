@@ -26,7 +26,6 @@ vtkKWRenderView \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVAssignment \
-vtkPVAssignmentClip \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
@@ -37,7 +36,6 @@ vtkPVImage \
 vtkPVImageClip \
 vtkPVImageReader \
 vtkPVImageSlice \
-vtkPVImageTextureFilter \
 vtkPVMenuButton \
 vtkPVPolyData \
 vtkPVRenderView \

@@ -35,9 +35,6 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVAssignmentNewCommand();
-int vtkPVAssignmentClipCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVAssignmentClipNewCommand();
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVConeSourceNewCommand();
@@ -68,9 +65,6 @@ ClientData vtkPVImageReaderNewCommand();
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSliceNewCommand();
-int vtkPVImageTextureFilterCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVImageTextureFilterNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
@@ -144,8 +138,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
-  vtkTclCreateNew(interp,"vtkPVAssignmentClip", vtkPVAssignmentClipNewCommand,
-                  vtkPVAssignmentClipCommand);
   vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
@@ -166,8 +158,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageReaderCommand);
   vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
-  vtkTclCreateNew(interp,"vtkPVImageTextureFilter", vtkPVImageTextureFilterNewCommand,
-                  vtkPVImageTextureFilterCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,

@@ -218,7 +218,6 @@ void vtkInteractorStyleCamera::DollyXY(int dx, int dy)
 void vtkInteractorStyleCamera::OnLeftButtonDown(int ctrl, int shift, 
 						int x, int y) 
 {
-  cerr << "**** Left Button Down\n";
   this->FindPokedRenderer(x, y);
   if (this->CurrentRenderer == NULL)
     {
@@ -239,7 +238,6 @@ void vtkInteractorStyleCamera::OnLeftButtonUp(int ctrl, int shift,
 void vtkInteractorStyleCamera::OnMiddleButtonDown(int ctrl, int shift, 
 						 int x, int y) 
 {
-  cerr << "**** Middle Button Down\n";
   this->FindPokedRenderer(x, y);
   if (this->CurrentRenderer == NULL)
     {
@@ -259,7 +257,6 @@ void vtkInteractorStyleCamera::OnMiddleButtonUp(int ctrl, int shift,
 void vtkInteractorStyleCamera::OnRightButtonDown(int ctrl, int shift, 
 						int x, int y) 
 {
-  cerr << "**** Right Button Down\n";
   this->FindPokedRenderer(x, y);
   if (this->CurrentRenderer == NULL)
     {

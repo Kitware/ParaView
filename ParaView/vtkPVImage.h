@@ -57,8 +57,10 @@ public:
   int Create(char *args);
   
   // Description:
-  // When this ivar is tru, then an outline is used to represent the image.
-  vtkSetMacro(OutlineFlag,int);
+  // When this ivar is true, then an outline is used to represent the image.
+  // The Set method is parallel and all clones 
+  // outline flags are set the same way.
+  void SetOutlineFlag(int f);
   vtkGetMacro(OutlineFlag,int);
   vtkBooleanMacro(OutlineFlag,int);
 

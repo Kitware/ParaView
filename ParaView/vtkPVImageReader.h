@@ -56,9 +56,16 @@ public:
   
   vtkGetObjectMacro(ImageReader, vtkImageReader);
   
-  void ReadImage();
   void ImageAccepted();
   void OpenFile();
+
+  // Description:
+  // Parallel methods to set the parameters of the reader.
+  // All clones should have the same parameters.
+  void SetDataByteOrder(int o);
+  void SetDataExtent(int xmin,int xmax, int ymin,int ymax, int zmin,int zmax);
+  void SetDataSpacing(float sx, float sy, float sz);
+  void SetFilePrefix(char *prefix);
   
 protected:
   vtkPVImageReader();
