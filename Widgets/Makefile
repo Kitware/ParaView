@@ -23,6 +23,7 @@ vtkKWEntry \
 vtkKWExtent \
 vtkKWGenericComposite \
 vtkKWLabeledFrame \
+vtkKWMenu \
 vtkKWMessageDialog \
 vtkKWNotebook \
 vtkKWObject \
@@ -55,7 +56,7 @@ include ${VTKBIN}/user.make
 include targets.make
 
 # add in any extra libraies here
-KIT_LIBS =
+KIT_LIBS = 
 
 # standard stuff here
 KIT_OBJ = ${SRC_OBJ} 
@@ -65,7 +66,7 @@ KIT_FLAGS =
 
 
 VTK_LIB_FILE  = libVTK${ME}${VTK_LIB_EXT}
-TCL_LIB_FILE  = libVTK${ME}Tcl${VTK_LIB_EXT}
+TCL_LIB_FILE  = vtk${ME}Tcl
 
 
 #------------------------------------------------------------------------------
