@@ -206,6 +206,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
     ${ParaView_SOURCE_DIR}/Utilities/hdf5
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
 
+  SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/Utilities/hdf5/HDF5Config.cmake)
   SUBDIRS(Utilities/hdf5)
 
 ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
