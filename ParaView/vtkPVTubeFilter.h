@@ -29,9 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVTubeFilter_h
 #define __vtkPVTubeFilter_h
 
-#include "vtkTubeFilter.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
 class vtkPVPolyData;
@@ -47,29 +44,11 @@ public:
   // You have to clone this object before you create its UI.
   void CreateProperties();
   
-  // Description:
-  // This method is called when the accpt button is pressed.
-  void TubeFilterChanged();
-
-  // Description:
-  // This is used internally to cast the source to a vtkTubeFilter
-  vtkTubeFilter *GetTubeFilter();
-
-  // Description:
-  // The methods execute on all processes.
-  void SetRadius(float radius);
-  void SetNumberOfSides(int sides);
-
 protected:
   vtkPVTubeFilter();
-  ~vtkPVTubeFilter();
+  ~vtkPVTubeFilter() {};
   vtkPVTubeFilter(const vtkPVTubeFilter&) {};
   void operator=(const vtkPVTubeFilter&) {};
-  
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-  vtkKWLabeledEntry *RadiusEntry;
-  vtkKWLabeledEntry *SidesEntry;
 };
 
 #endif

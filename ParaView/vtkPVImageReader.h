@@ -29,13 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageReader_h
 #define __vtkPVImageReader_h
 
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
-#include "vtkImageReader.h"
 #include "vtkPVImageSource.h"
-
-class vtkPVImageData;
-
 
 class VTK_EXPORT vtkPVImageReader : public vtkPVImageSource
 {
@@ -47,32 +41,12 @@ public:
   // You will need to clone this object before you create it.
   void CreateProperties();
   
-  // Description:
-  // This method is used internally to cast the source to a vtkImageReader.
-  vtkImageReader *GetImageReader();
-  
-  void ImageAccepted();
-  void OpenFile();
-
-  // Description:
-  // Parallel methods to set the parameters of the reader.
-  // All clones should have the same parameters.
-  void SetDataByteOrder(int o);
-  void SetDataExtent(int xmin,int xmax, int ymin,int ymax, int zmin,int zmax);
-  void SetDataSpacing(float sx, float sy, float sz);
-  void SetFilePrefix(char *prefix);
-  
 protected:
   vtkPVImageReader();
-  ~vtkPVImageReader();
+  ~vtkPVImageReader() {};
   vtkPVImageReader(const vtkPVImageReader&) {};
   void operator=(const vtkPVImageReader&) {};
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *Open;
-  vtkKWLabeledEntry *XDimension;
-  vtkKWLabeledEntry *YDimension;
-  vtkKWLabeledEntry *ZDimension;
 };
 
 #endif

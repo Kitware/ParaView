@@ -77,6 +77,7 @@ public:
   void Contour();
   void ColorByProcess();
   void Elevation();
+  void ExtractEdges();
   void Cutter();
 
   // Description:

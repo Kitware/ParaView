@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImage.cxx
+  Module:    vtkPVImageData.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVImageClip.h"
 #include "vtkPVImageSlice.h"
 #include "vtkPVWindow.h"
@@ -35,19 +35,19 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMenuButton.h"
 #include "vtkPVActorComposite.h"
 
-int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVImageDataCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVImage::vtkPVImage()
+vtkPVImageData::vtkPVImageData()
 {
   this->OutlineFlag = 1;
-  this->CommandFunction = vtkPVImageCommand;
+  this->CommandFunction = vtkPVImageDataCommand;
   this->GeometryFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage::~vtkPVImage()
+vtkPVImageData::~vtkPVImageData()
 {
   if (this->GeometryFilter)
     {
@@ -57,15 +57,15 @@ vtkPVImage::~vtkPVImage()
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage* vtkPVImage::New()
+vtkPVImageData* vtkPVImageData::New()
 {
-  return new vtkPVImage();
+  return new vtkPVImageData();
 }
 
 
 
 //----------------------------------------------------------------------------
-void vtkPVImage::SetOutlineFlag(int f)
+void vtkPVImageData::SetOutlineFlag(int f)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -84,7 +84,7 @@ void vtkPVImage::SetOutlineFlag(int f)
 
 
 //----------------------------------------------------------------------------
-void vtkPVImage::Clip()
+void vtkPVImageData::Clip()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageClip *clip;
@@ -111,7 +111,7 @@ void vtkPVImage::Clip()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImage::Slice()
+void vtkPVImageData::Slice()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageSlice *slice;
@@ -150,7 +150,7 @@ void vtkPVImage::Slice()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVImage::Create(char *args)
+int vtkPVImageData::Create(char *args)
 {
   if (this->vtkPVData::Create(args) == 0)
     {
@@ -164,7 +164,7 @@ int vtkPVImage::Create(char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImage::SetData(vtkDataSet *data)
+void vtkPVImageData::SetData(vtkDataSet *data)
 {
   vtkImageOutlineFilter *outline;
   vtkImageData *image = vtkImageData::SafeDownCast(data);
@@ -206,13 +206,13 @@ void vtkPVImage::SetData(vtkDataSet *data)
 
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkPVImage::GetImageData()
+vtkImageData* vtkPVImageData::GetImageData()
 {
   return (vtkImageData*)this->Data;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImage::SetAssignment(vtkPVAssignment *a)
+void vtkPVImageData::SetAssignment(vtkPVAssignment *a)
 {
   // This will take care of broadcasting the method
   this->vtkPVData::SetAssignment(a);
@@ -226,7 +226,7 @@ void vtkPVImage::SetAssignment(vtkPVAssignment *a)
 
 
 //----------------------------------------------------------------------------
-void vtkPVImage::Update()
+void vtkPVImageData::Update()
 {
   vtkImageData *image;
 
@@ -245,3 +245,7 @@ void vtkPVImage::Update()
 
   image->Update();
 }
+
+
+
+

@@ -329,8 +329,6 @@ void vtkPVWindow::NewVolume()
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
   
-  reader->GetImageReader()->UpdateInformation();
-  
   reader->SetName("volume");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);

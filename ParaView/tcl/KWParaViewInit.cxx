@@ -62,12 +62,18 @@ ClientData vtkPVDataNewCommand();
 int vtkPVDataSetToDataSetFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataSetToDataSetFilterNewCommand();
+int vtkPVDataSetToPolyDataFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVDataSetToPolyDataFilterNewCommand();
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVElevationFilterNewCommand();
 int vtkPVExtentTranslatorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVExtentTranslatorNewCommand();
+int vtkPVExtractEdgesCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVExtractEdgesNewCommand();
 int vtkPVGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGetRemoteGhostCellsNewCommand();
@@ -201,10 +207,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVDataCommand);
   vtkTclCreateNew(interp,"vtkPVDataSetToDataSetFilter", vtkPVDataSetToDataSetFilterNewCommand,
                   vtkPVDataSetToDataSetFilterCommand);
+  vtkTclCreateNew(interp,"vtkPVDataSetToPolyDataFilter", vtkPVDataSetToPolyDataFilterNewCommand,
+                  vtkPVDataSetToPolyDataFilterCommand);
   vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
                   vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
                   vtkPVExtentTranslatorCommand);
+  vtkTclCreateNew(interp,"vtkPVExtractEdges", vtkPVExtractEdgesNewCommand,
+                  vtkPVExtractEdgesCommand);
   vtkTclCreateNew(interp,"vtkPVGetRemoteGhostCells", vtkPVGetRemoteGhostCellsNewCommand,
                   vtkPVGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,

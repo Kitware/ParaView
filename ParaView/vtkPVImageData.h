@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImage.h
+  Module:    vtkPVImageData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,14 +25,14 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVImage - ImageData interface.
+// .NAME vtkPVImageData - ImageData interface.
 // .SECTION Description
 // This is a parallel object.  It needs to be cloned to work correctly.  
 // After cloning, the parallel nature of the object is transparent.
 
 
-#ifndef __vtkPVImage_h
-#define __vtkPVImage_h
+#ifndef __vtkPVImageData_h
+#define __vtkPVImageData_h
 
 #include "vtkKWWidget.h"
 #include "vtkProp.h"
@@ -46,17 +46,17 @@ class vtkPVImageTextureFilter;
 class vtkGeometryFilter;
 
 
-class VTK_EXPORT vtkPVImage : public vtkPVData
+class VTK_EXPORT vtkPVImageData : public vtkPVData
 {
 public:
-  static vtkPVImage* New();
-  vtkTypeMacro(vtkPVImage,vtkKWWidget);
+  static vtkPVImageData* New();
+  vtkTypeMacro(vtkPVImageData,vtkKWWidget);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object
   // that is of the same type as the original.  It is used for creating
   // the output pvData in pvDataSetToDataSetFilters.
-  vtkPVData *MakeObject() {return vtkPVImage::New();}
+  vtkPVData *MakeObject() {return vtkPVImageData::New();}
 
   // Description:
   // You have to clone this object before you create it.
@@ -88,10 +88,10 @@ public:
   void SetAssignment(vtkPVAssignment *a);
   
 protected:
-  vtkPVImage();
-  ~vtkPVImage();
-  vtkPVImage(const vtkPVImage&) {};
-  void operator=(const vtkPVImage&) {};
+  vtkPVImageData();
+  ~vtkPVImageData();
+  vtkPVImageData(const vtkPVImageData&) {};
+  void operator=(const vtkPVImageData&) {};
   
   int OutlineFlag;
   

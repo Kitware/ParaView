@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
+#include "vtkPVAssignment.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
 #include "vtkKWRenderView.h"
@@ -205,7 +206,34 @@ void vtkPVSource::SetPVData(vtkPVData *data)
     data->SetPVSource(this);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSource::InitializeAssignment()
+{
+  vtkPVData *input;
+  vtkPVData *output;
+  vtkPVAssignment *assignment;
   
+  input = this->Input;
+  output = this->PVOutput;
+  if (output == NULL)
+    {
+    vtkErrorMacro("No output for filter.");
+    return;
+    }
+  
+  if (input != NULL)
+    {
+    assignment = input->GetAssignment();
+    }
+  else
+    {
+    assignment = vtkPVAssignment::New();
+    assignment->Clone(this->GetPVApplication());
+    }
+  
+  output->SetAssignment(assignment);
+}
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVSource::GetWindow()
@@ -518,7 +546,7 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 4");
+  xEntry->Create(this->Application, "-width 5");
   this->Script("pack %s -side left", xEntry->GetWidgetName());
 
   // Y
@@ -534,7 +562,7 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 4");
+  yEntry->Create(this->Application, "-width 5");
   this->Script("pack %s -side left", yEntry->GetWidgetName());
 
   // Z
@@ -550,7 +578,7 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 4");
+  zEntry->Create(this->Application, "-width 5");
   this->Script("pack %s -side left", zEntry->GetWidgetName());
 
   // Get initial value from the vtk source.
@@ -571,6 +599,79 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
   xEntry->Delete();
   yEntry->Delete();
   zEntry->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *minEntry, *maxEntry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  // Min
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel("Min");
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  minEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(minEntry);
+  minEntry->SetParent(frame);
+  minEntry->Create(this->Application, "-width 6");
+  this->Script("pack %s -side left", minEntry->GetWidgetName());
+
+  // Max
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel("Max");
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  maxEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(maxEntry);
+  maxEntry->SetParent(frame);
+  maxEntry->Create(this->Application, "-width 6");
+  this->Script("pack %s -side left", maxEntry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
+               minEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
+               maxEntry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), setCmd, minEntry->GetTclName(),
+                          maxEntry->GetTclName());
+
+  frame->Delete();
+  minEntry->Delete();
+  maxEntry->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -629,6 +730,7 @@ void vtkPVSource::AcceptCallback()
     this->Script(this->AcceptCommands[i]);
     }  
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptHelper(char *method, char *args)

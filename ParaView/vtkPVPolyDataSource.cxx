@@ -27,11 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVPolyDataSource.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
-#include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPolyData.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
@@ -72,7 +69,6 @@ vtkPVPolyData *vtkPVPolyDataSource::GetPVOutput()
   return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVPolyDataSource::AcceptCallback()
 {
@@ -82,18 +78,13 @@ void vtkPVPolyDataSource::AcceptCallback()
   
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
-    vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVPolyData *pvd;
-    vtkPVAssignment *a;
     vtkPVActorComposite *ac;
 
     pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    a = vtkPVAssignment::New();
-    a->Clone(pvApp);
-    
-    pvd->SetAssignment(a);
+    pvd->Clone(this->GetPVApplication());
     this->SetPVOutput(pvd);
+    this->InitializeAssignment();
     
     this->CreateDataPage();
   

@@ -125,13 +125,13 @@ void vtkPVPolyDataNormals::SetInput(vtkPVData *pvData)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::SetOutput(vtkPVPolyData *pvd)
+void vtkPVPolyDataNormals::SetPVOutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
 			   pvd->GetTclName());
     }  
   
@@ -140,9 +140,9 @@ void vtkPVPolyDataNormals::SetOutput(vtkPVPolyData *pvd)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVPolyDataNormals::GetOutput()
+vtkPVPolyData *vtkPVPolyDataNormals::GetPVOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->Output);
+  return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ void vtkPVPolyDataNormals::NormalsParameterChanged()
     this->GetPolyDataNormals()->SetEndMethod(EndNormalsProgress, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
-    this->SetOutput(pvd);
+    this->SetPVOutput(pvd);
     a = this->GetInput()->GetAssignment();
     pvd->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();

@@ -215,7 +215,7 @@ void vtkPVCutter::SetInput(vtkPVData *pvData)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCutter::SetPVutput(vtkPVPolyData *pvd)
+void vtkPVCutter::SetPVOutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   

@@ -1,12 +1,12 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVTubeFilter.cxx
+  Module:    vtkPVDataSetToPolyDataFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
 
-Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 
 All rights reserved. No part of this software may be reproduced, distributed,
@@ -26,34 +26,33 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVTubeFilter.h"
-#include "vtkTubeFilter.h"
+#ifndef __vtkPVDataSetToPolyDataFilter_h
+#define __vtkPVDataSetToPolyDataFilter_h
 
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+#include "vtkKWLabel.h"
+#include "vtkShrinkPolyData.h"
+#include "vtkKWScale.h"
+#include "vtkKWPushButton.h"
+#include "vtkPVPolyDataSource.h"
 
-//----------------------------------------------------------------------------
-vtkPVTubeFilter::vtkPVTubeFilter()
+class vtkPVPolyData;
+
+
+class VTK_EXPORT vtkPVDataSetToPolyDataFilter : public vtkPVPolyDataSource
 {
-  this->CommandFunction = vtkPVTubeFilterCommand;
+public:
+  static vtkPVDataSetToPolyDataFilter* New();
+  vtkTypeMacro(vtkPVDataSetToPolyDataFilter,vtkPVPolyDataSource);
+
+  // Description:
+  // The methods execute on all processes.
+  void SetInput(vtkPVData *pvData);
   
-  vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetVTKSource(tube);
-  tube->Delete();
-}
+protected:
+  vtkPVDataSetToPolyDataFilter();
+  ~vtkPVDataSetToPolyDataFilter() {};
+  vtkPVDataSetToPolyDataFilter(const vtkPVDataSetToPolyDataFilter&) {};
+  void operator=(const vtkPVDataSetToPolyDataFilter&) {};
+};
 
-//----------------------------------------------------------------------------
-vtkPVTubeFilter* vtkPVTubeFilter::New()
-{
-  return new vtkPVTubeFilter();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVTubeFilter::CreateProperties()
-{  
-  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
-  
-  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
-}
-
+#endif

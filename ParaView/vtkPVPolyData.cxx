@@ -259,7 +259,7 @@ void vtkPVPolyData::Decimate()
   decimate->Clone(pvApp);
   
   decimate->SetInput(this);
-  decimate->SetOutput(output);
+  decimate->SetPVOutput(output);
     
   this->SetLocalRepresentation(output);
 

@@ -1,12 +1,12 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVTubeFilter.cxx
+  Module:    vtkPVExtractEdges.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
 
-Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 
 All rights reserved. No part of this software may be reproduced, distributed,
@@ -26,34 +26,27 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVTubeFilter.h"
-#include "vtkTubeFilter.h"
+#ifndef __vtkPVExtractEdges_h
+#define __vtkPVExtractEdges_h
 
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+#include "vtkPVDataSetToPolyDataFilter.h"
 
-//----------------------------------------------------------------------------
-vtkPVTubeFilter::vtkPVTubeFilter()
+
+class VTK_EXPORT vtkPVExtractEdges : public vtkPVDataSetToPolyDataFilter
 {
-  this->CommandFunction = vtkPVTubeFilterCommand;
-  
-  vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetVTKSource(tube);
-  tube->Delete();
-}
+public:
+  static vtkPVExtractEdges* New();
+  vtkTypeMacro(vtkPVExtractEdges, vtkPVDataSetToPolyDataFilter);
 
-//----------------------------------------------------------------------------
-vtkPVTubeFilter* vtkPVTubeFilter::New()
-{
-  return new vtkPVTubeFilter();
-}
+  // Description:
+  // You have to clone this object before you create its UI.
+  void CreateProperties();
 
-//----------------------------------------------------------------------------
-void vtkPVTubeFilter::CreateProperties()
-{  
-  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
-  
-  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
-}
+protected:
+  vtkPVExtractEdges();
+  ~vtkPVExtractEdges() {};
+  vtkPVExtractEdges(const vtkPVExtractEdges&) {};
+  void operator=(const vtkPVExtractEdges&) {};
+};
 
+#endif

@@ -49,8 +49,59 @@ vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
   return new vtkPVDataSetToDataSetFilter();
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVPolyData *pvd)
+void vtkPVDataSetToDataSetFilter::AcceptCallback()
+{
+  vtkPVWindow *window = this->GetWindow();
+ 
+  this->vtkPVSource::AcceptCallback();
+  
+  if (this->GetPVData() == NULL)
+    { // This is the first time, initialize data.  
+    vtkPVData *pvd;
+    vtkPVData *input;
+    vtkPVActorComposite *ac;
+
+    input = this->GetInput();
+    if (input == NULL)
+      {
+      vtkErrorMacro("Input not set.");
+      return;
+      }
+    if (input->IsA("vtkPVPolyData"))
+      {
+      pvd = vtkPVPolyData::New();
+      }
+    else if (input->IsA("vtkPVImageData"))
+      {
+      pvd = vtkPVImageData::New();
+      }
+    else
+      {
+      vtkErrorMacro("Cannot determine type of input: " << input->GetClassName());
+      return;
+      }
+    pvd->Clone(this->GetPVApplication());
+    this->SetPVOutput(pvd);
+    this->InitializeAssignment();
+    
+    this->CreateDataPage();
+  
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    // Make the last data invisible.
+    this->GetInput()->GetActorComposite()->SetVisibility(0);
+    window->GetMainView()->ResetCamera();
+    }
+
+  window->GetMainView()->SetSelectedComposite(this);  
+  this->GetView()->Render();
+  window->GetSourceList()->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkDataSetToDataSetFilter *f = this->GetVTKDataSetToDataSetFilter();
@@ -62,22 +113,7 @@ void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVPolyData *pvd)
     }
   // This calls just does reference counting.
   this->SetPVData(pvd);  
-  pvd->SetData(f->GetPolyDataOutput());
-}
-//----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVImageData *pvi)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkDataSetToDataSetFilter *f = this->GetVTKDataSetToDataSetFilter();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
-			   pvi->GetTclName());
-    }
-  // This calls just does reference counting.
-  this->SetPVData(pvi);  
-  pvi->SetData(f->GetStructuredPointsOutput());
+  pvd->SetData(f->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +135,6 @@ vtkPVImageData *vtkPVDataSetToDataSetFilter::GetPVImageDataOutput()
 }
 
 
-
 //----------------------------------------------------------------------------
 void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
 {
@@ -107,7 +142,13 @@ void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
   vtkDataSetToDataSetFilter *f;
   
   f = vtkDataSetToDataSetFilter::SafeDownCast(this->GetVTKSource());
-
+  if (f == NULL)
+    {
+    vtkErrorMacro("Could not get source as vtkDataSetToDataSetFilter. "
+		  << "Did you choose the correct supperclass?");
+    return;
+    }
+  
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
@@ -115,6 +156,7 @@ void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
     }  
   
   f->SetInput(pvData->GetData());
+  // What about reference counting ?????
   this->Input = pvData;
 }
 
@@ -136,13 +178,3 @@ vtkPVDataSetToDataSetFilter::GetVTKDataSetToDataSetFilter()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SelectInputSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}

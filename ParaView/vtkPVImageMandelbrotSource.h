@@ -29,10 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageMandelbrotSource_h
 #define __vtkPVImageMandelbrotSource_h
 
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
-#include "vtkImageMandelbrotSource.h"
 #include "vtkPVImageSource.h"
 
 class vtkPVImageData;
@@ -48,42 +44,11 @@ public:
   // You will need to clone this object before you create it.
   void CreateProperties();
   
-  // Description:
-  // This method is used internally to cast the source to a vtkImageMandelbrotSource.
-  vtkImageMandelbrotSource *GetImageMandelbrotSource();
-  
-  void AcceptParameters();
-
-  // Description:
-  // Parallel methods to set the parameters of the source.
-  // All clones will get the same parameters.
-  void SetDimensions(int dx, int dy, int dz);
-  void SetSpacing(float sc, float sx);
-  void SetCenter(float cReal, float cImage, float xReal, float xImag);
-
 protected:
   vtkPVImageMandelbrotSource();
-  ~vtkPVImageMandelbrotSource();
+  ~vtkPVImageMandelbrotSource() {};
   vtkPVImageMandelbrotSource(const vtkPVImageMandelbrotSource&) {};
   void operator=(const vtkPVImageMandelbrotSource&) {};
-  
-  vtkKWPushButton *Accept;
-
-  vtkKWLabeledFrame *DimensionsFrame;
-  vtkKWLabeledEntry *XDimension;
-  vtkKWLabeledEntry *YDimension;
-  vtkKWLabeledEntry *ZDimension;
-
-  vtkKWLabeledFrame *CenterFrame;
-  vtkKWLabeledEntry *CRealEntry;
-  vtkKWLabeledEntry *CImaginaryEntry;
-  vtkKWLabeledEntry *XRealEntry;
-  vtkKWLabeledEntry *XImaginaryEntry;
-  
-  vtkKWLabeledEntry *CSpacingEntry;
-  
-  vtkKWLabeledEntry *XSpacingEntry;
-  
   
 };
 

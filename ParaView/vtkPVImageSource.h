@@ -42,27 +42,30 @@ public:
   vtkTypeMacro(vtkPVImageSource, vtkPVSource);
 
   // Description:
+  // This method gets called when the accept button is pressed
+  // for the first time.  It creates a pvData and an actor composite
+  // to display the data.
+  void AcceptCallback();
+
+  // Description:
+  // We need to set the original image.
+  void InitializeAssignment();
+  
+  // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
   void SetPVOutput(vtkPVImageData *pvi);
   vtkPVImageData *GetPVOutput();
 
-  // Description:
-  // This method is called the first time the accept button is pressed.
-  // It creates a PVData and actor composite.
-  void InitializeData();
-  
 protected:
   vtkPVImageSource();
-  ~vtkPVImageSource();
+  ~vtkPVImageSource() {};
   vtkPVImageSource(const vtkPVImageSource&) {};
   void operator=(const vtkPVImageSource&) {};
   
   // Description:
-  // For reference counting.
-  vtkSetObjectMacro(ImageSource, vtkImageSource);
-  
-  vtkImageSource *ImageSource;
+  // Cast to the correct type.
+  vtkImageSource *GetVTKImageSource();
 };
 
 #endif

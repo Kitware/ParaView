@@ -30,13 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVElevationFilter_h
 
 #include "vtkPVDataSetToDataSetFilter.h"
-#include "vtkElevationFilter.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkPVSource.h"
-
-class vtkPVPolyData;
-class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVElevationFilter : public vtkPVDataSetToDataSetFilter
@@ -49,46 +42,11 @@ public:
   // You have to clone this object before you create its UI.
   void CreateProperties();
 
-  // Description:
-  // this method casts the fitler to an elevation filter.
-  vtkElevationFilter *GetElevation();
-  
-  // Description:
-  // A callback that gets called when the Accept button is pressed.
-  void ElevationParameterChanged();
-  
-  // Description:
-  // Filter parameters that get broadcast to all processes.
-  void SetLowPoint(float x, float y, float z);
-  void SetHighPoint(float x, float y, float z);
-  void SetScalarRange(float min, float max);
-
-  void GetSource();
-  
 protected:
   vtkPVElevationFilter();
-  ~vtkPVElevationFilter();
+  ~vtkPVElevationFilter() {};
   vtkPVElevationFilter(const vtkPVElevationFilter&) {};
   void operator=(const vtkPVElevationFilter&) {};
-  
-  vtkKWLabel *LowPointLabel;
-  vtkKWLabel *HighPointLabel;
-  vtkKWLabel *RangeLabel;
-  vtkKWWidget *LowPointFrame;
-  vtkKWWidget *HighPointFrame;
-  vtkKWWidget *RangeFrame;
-  
-  vtkKWLabeledEntry *LowPointXEntry;
-  vtkKWLabeledEntry *LowPointYEntry;
-  vtkKWLabeledEntry *LowPointZEntry;
-  vtkKWLabeledEntry *HighPointXEntry;
-  vtkKWLabeledEntry *HighPointYEntry;
-  vtkKWLabeledEntry *HighPointZEntry;
-  vtkKWLabeledEntry *RangeMinEntry;
-  vtkKWLabeledEntry *RangeMaxEntry;
-  
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
 };
 
 #endif

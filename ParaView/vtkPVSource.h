@@ -97,7 +97,13 @@ public:
 
   // Description:
   // Sources have no props.
-  vtkProp *GetProp() {return NULL;}
+  vtkProp *GetProp() {return NULL;}  
+
+  // Description:
+  // Sets the assignement for the output.  
+  // If there is an input, it uses its assignement. 
+  // Otherwise, it creates a new one.
+  virtual void InitializeAssignment();
   
   // Description:
   // Called when the accept button is pressed.
@@ -109,6 +115,7 @@ public:
   void AddLabeledEntry(char *label, char *setCmd, char *getCmd);
   void AddLabeledToggle(char *label, char *setCmd, char *getCmd);
   void AddXYZEntry(char *label, char *setCmd, char *getCmd);
+  void AddRangeEntry(char *label, char *setCmd, char *getCmd);
   void AddSlider(char *label, char *setCmd, char *getCmd, 
 		 float min, float max, float resolution);
 

@@ -27,22 +27,20 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVImageSource.h"
+#include "vtkImageSource.h"
 #include "vtkPVApplication.h"
 #include "vtkPVImageData.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVAssignment.h"
 
+int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
+			   int argc, char *argv[]);
+
 //----------------------------------------------------------------------------
 vtkPVImageSource::vtkPVImageSource()
 {
-  this->ImageSource = NULL;  
-}
-
-//----------------------------------------------------------------------------
-vtkPVImageSource::~vtkPVImageSource()
-{
-  this->SetImageSource(NULL);
+  this->CommandFunction = vtkPVPolyDataSourceCommand;
 }
 
 //----------------------------------------------------------------------------
@@ -51,21 +49,19 @@ vtkPVImageSource* vtkPVImageSource::New()
   return new vtkPVImageSource();
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVImageSource::SetPVOutput(vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->SetPVData(pvi);
-  pvi->SetData(this->ImageSource->GetOutput());
-  
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
 			   pvi->GetTclName());
     }
+
+  this->SetPVData(pvi);
+  pvi->SetData(this->GetVTKImageSource()->GetOutput());  
 }
 
 //----------------------------------------------------------------------------
@@ -75,31 +71,80 @@ vtkPVImageData *vtkPVImageSource::GetPVOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::InitializeData()
+void vtkPVImageSource::InitializeAssignment()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVImageData *pvImage;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
-
-  pvImage = vtkPVImageData::New();
-  pvImage->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
+  vtkPVData *input;
+  vtkPVData *output;
+  vtkPVAssignment *assignment;
   
-  this->SetPVOutput(pvImage);
-  // It is important that the pvImage have its image data befor this call.
-  // The assignments vtk object is vtkPVExtentTranslator which needs the image.
-  // This may get resolved as more functionality of Assignement gets into ExtentTranslator.
-  // Maybe the pvImage should create the vtkIamgeData, and the source will set it as its output.
-  a->SetOriginalImage(pvImage);
+  input = this->Input;
+  output = this->PVOutput;
+  if (output == NULL)
+    {
+    vtkErrorMacro("No output for filter.");
+    return;
+    }
   
-  pvImage->SetAssignment(a);
+  if (input != NULL)
+    {
+    assignment = input->GetAssignment();
+    }
+  else
+    {
+    assignment = vtkPVAssignment::New();
+    assignment->Clone(this->GetPVApplication());
+    assignment->SetOriginalImage(this->GetPVOutput());
+    }
   
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
+  output->SetAssignment(assignment);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVImageSource::AcceptCallback()
+{
+  vtkPVWindow *window = this->GetWindow();
+ 
+  this->vtkPVSource::AcceptCallback();
+  
+  if (this->GetPVData() == NULL)
+    { // This is the first time, initialize data.  
+    vtkPVImageData *pvi;
+    vtkPVActorComposite *ac;
+
+    pvi = vtkPVImageData::New();
+    pvi->Clone(this->GetPVApplication());
+    this->SetPVOutput(pvi);
+    this->InitializeAssignment();
+    
+    this->CreateDataPage();
+  
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    // Make the last data invisible.
+    if (this->GetInput())
+      {
+      this->GetInput()->GetActorComposite()->SetVisibility(0);
+      }
+    window->GetMainView()->ResetCamera();
+    }
+
+  window->GetMainView()->SetSelectedComposite(this);  
+  this->GetView()->Render();
+  window->GetSourceList()->Update();
+}
+
+//----------------------------------------------------------------------------
+vtkImageSource *vtkPVImageSource::GetVTKImageSource()
+{
+  vtkImageSource *imageSource = NULL;
+
+  if (this->VTKSource)
+    {
+    imageSource = vtkImageSource::SafeDownCast(this->VTKSource);
+    }
+  if (imageSource == NULL)
+    {
+    vtkWarningMacro("Could not get the vtkImageSource.");
+    }
+  return imageSource;
+}

@@ -35,11 +35,13 @@ vtkPVContourFilter \
 vtkPVCutter \
 vtkPVData \
 vtkPVDataSetToDataSetFilter \
+vtkPVDataSetToPolyDataFilter \
 vtkPVElevationFilter \
 vtkPVExtentTranslator \
+vtkPVExtractEdges \
 vtkPVGetRemoteGhostCells \
 vtkPVGlyph3D \
-vtkPVImage \
+vtkPVImageData \
 vtkPVImageClip \
 vtkPVImageMandelbrotSource \
 vtkPVImageReader \

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVTubeFilter.cxx
+  Module:    vtkPVDataSetToPolyDataFilter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,34 +26,45 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVTubeFilter.h"
-#include "vtkTubeFilter.h"
+#include "vtkPVDataSetToPolyDataFilter.h"
+#include "vtkDataSetToPolyDataFilter.h"
+#include "vtkPVApplication.h"
+#include "vtkPVPolyData.h"
 
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
+
+int vtkPVDataSetToPolyDataFilterCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter::vtkPVTubeFilter()
+vtkPVDataSetToPolyDataFilter::vtkPVDataSetToPolyDataFilter()
 {
-  this->CommandFunction = vtkPVTubeFilterCommand;
-  
-  vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetVTKSource(tube);
-  tube->Delete();
+  this->CommandFunction = vtkPVDataSetToPolyDataFilterCommand;
 }
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter* vtkPVTubeFilter::New()
+vtkPVDataSetToPolyDataFilter* vtkPVDataSetToPolyDataFilter::New()
 {
-  return new vtkPVTubeFilter();
+  return new vtkPVDataSetToPolyDataFilter();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTubeFilter::CreateProperties()
-{  
-  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
+void vtkPVDataSetToPolyDataFilter::SetInput(vtkPVData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkDataSetToPolyDataFilter *f;
   
-  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
+  f = vtkDataSetToPolyDataFilter::SafeDownCast(this->GetVTKSource());
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  f->SetInput(pvData->GetData());
+  // What about reference counting???
+  this->Input = pvData;
 }
+
+
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVTubeFilter.cxx
+  Module:    vtkPVExtractEdges.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,34 +26,31 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVTubeFilter.h"
-#include "vtkTubeFilter.h"
+#include "vtkPVExtractEdges.h"
+#include "vtkExtractEdges.h"
 
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+int vtkPVExtractEdgesCommand(ClientData cd, Tcl_Interp *interp,
+				int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter::vtkPVTubeFilter()
+vtkPVExtractEdges::vtkPVExtractEdges()
 {
-  this->CommandFunction = vtkPVTubeFilterCommand;
-  
-  vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetVTKSource(tube);
-  tube->Delete();
+  this->CommandFunction = vtkPVExtractEdgesCommand;
+
+  vtkExtractEdges *e = vtkExtractEdges::New();
+  this->SetVTKSource(e);
+  e->Delete();
 }
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter* vtkPVTubeFilter::New()
+vtkPVExtractEdges* vtkPVExtractEdges::New()
 {
-  return new vtkPVTubeFilter();
+  return new vtkPVExtractEdges();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTubeFilter::CreateProperties()
-{  
-  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
-  
-  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
+void vtkPVExtractEdges::CreateProperties()
+{ 
+  this->vtkPVDataSetToPolyDataFilter::CreateProperties();
 }
 

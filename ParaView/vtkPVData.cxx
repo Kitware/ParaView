@@ -33,6 +33,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
 #include "vtkPVElevationFilter.h"
+#include "vtkElevationFilter.h"
+#include "vtkPVExtractEdges.h"
 #include "vtkPVColorByProcess.h"
 #include "vtkPVCutter.h"
 #include "vtkPVAssignment.h"
@@ -147,6 +149,8 @@ int vtkPVData::Create(char *args)
   
   this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
 				      "Elevation");
+  this->FiltersMenuButton->AddCommand("vtkExtractEdges", this,
+				      "ExtractEdges");
   this->FiltersMenuButton->AddCommand("vtkColorByProcess", this,
 				      "ColorByProcess");
   this->FiltersMenuButton->AddCommand("vtkCutter", this, "Cutter");
@@ -222,6 +226,7 @@ void vtkPVData::Elevation()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVElevationFilter *elevation;
+  vtkElevationFilter *elevVTK;
   float bounds[6];
 
   // This should go through the PVData who will collect the info.
@@ -229,6 +234,7 @@ void vtkPVData::Elevation()
   
   elevation = vtkPVElevationFilter::New();
   elevation->Clone(pvApp);
+  elevVTK = vtkElevationFilter::SafeDownCast(elevation->GetVTKSource());
   
   elevation->SetInput(this);
   
@@ -237,12 +243,33 @@ void vtkPVData::Elevation()
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
-  elevation->SetLowPoint(bounds[0], 0.0, 0.0);
-  elevation->SetHighPoint(bounds[1], 0.0, 0.0);
+  elevVTK->SetLowPoint(bounds[0], 0.0, 0.0);
+  elevVTK->SetHighPoint(bounds[1], 0.0, 0.0);
 
   window->SetCurrentSource(elevation);
   
   elevation->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ExtractEdges()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVWindow *window;
+  vtkPVExtractEdges *e;
+
+  e = vtkPVExtractEdges::New();
+  e->Clone(pvApp);
+  
+  e->SetInput(this);
+  
+  this->GetPVSource()->GetView()->AddComposite(e);
+  e->SetName("edges");
+  
+  window = this->GetPVSource()->GetWindow();
+  window->SetCurrentSource(e);
+  
+  e->Delete();
 }
 
 //----------------------------------------------------------------------------

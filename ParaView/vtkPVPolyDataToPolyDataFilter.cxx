@@ -29,8 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyDataToPolyDataFilter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVActorComposite.h"
-#include "vtkPVWindow.h"
 
 
 int vtkPVPolyDataToPolyDataFilterCommand(ClientData cd, Tcl_Interp *interp,
@@ -65,4 +63,5 @@ void vtkPVPolyDataToPolyDataFilter::SetInput(vtkPVPolyData *pvData)
   f->SetInput(pvData->GetPolyData());
   this->Input = pvData;
 }
+
 
