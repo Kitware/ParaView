@@ -27,7 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPVSlave.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
 
@@ -58,7 +57,7 @@ struct vtkPVArgs
 void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 		      int remoteProcessId)
 {
-  vtkPVSlave *self = (vtkPVSlave *)(localArg);
+  vtkPVApplication *self = (vtkPVApplication *)(localArg);
 
   self->SimpleScript((char*)remoteArg);
 }
@@ -68,7 +67,6 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 // We will start the rmi loop, and let an RMI initialize the slave.
 void vtkPVSlaveStart(vtkMultiProcessController *controller)
 {
-
   Tcl_Interp *interp = Tcl_CreateInterp();
 
   if (Tcl_Init(interp) == TCL_ERROR) 
@@ -110,28 +108,22 @@ void vtkPVSlaveStart(vtkMultiProcessController *controller)
 
   // Set up the slave object.
   
-  if (Tcl_Eval(interp, "vtkPVSlave Slave") != TCL_OK)
+  // We should use the application tcl name in the future.
+  if (Tcl_Eval(interp, "vtkPVApplication Slave") != TCL_OK)
     {
     cerr << "Error returned from tcl script.\n" << interp->result << endl;
     }
   int    error;
-  vtkPVSlave *slave = (vtkPVSlave *)(vtkTclGetPointerFromObject("Slave","vtkPVSlave",interp,error));
+  vtkPVApplication *slave = (vtkPVApplication *)(vtkTclGetPointerFromObject("Slave","vtkPVApplication",interp,error));
   //cerr << "Interp: " << interp << " has slave " << slave << endl;
   
   if (slave == NULL)
     {
     vtkGenericWarningMacro("Could not get slave pointer.");
     return;
-    }
-  
+    }  
   slave->SetController(controller);
-  slave->SetInterp(interp);
-  // This may not be needed.  I do not like that the slave numbering scheme is divided
-  // Betwee this object and ParaView.cxx
-  slave->SetNumberOfSlaves(controller->GetNumberOfProcesses()-1);
-  slave->SetSlaveId(controller->GetLocalProcessId());
-
-  
+   
   controller->AddRMI(vtkPVSlaveScript, (void *)(slave), VTK_PV_SLAVE_SCRIPT_RMI_TAG);  
   
   controller->ProcessRMIs();
@@ -153,10 +145,9 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   if (myId == 0)
     { // The last process is for UI.
     // We need to pass the local controller to the UI process.
-    //putenv("DISPLAY=:6.0");
-    //putenv("DISPLAY=:0.0");
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     vtkPVApplication *app = vtkPVApplication::New();
+    cerr << "app: " << app << ", controller: " << controller << endl;
     app->SetController(controller);
     app->Script("wm withdraw .");
     

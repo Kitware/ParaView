@@ -23,11 +23,14 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
+vtkPVAssignment \
 vtkPVComposite \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
+vtkPVDataList \
 vtkPVElevationFilter \
+vtkPVGlyph3D \
 vtkPVImage \
 vtkPVImageClip \
 vtkPVImageReader \
@@ -37,10 +40,9 @@ vtkPVPolyData \
 vtkPVRenderSlave \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
-vtkPVSlave \
 vtkPVSource \
 vtkPVWindow \
-vtkPVMesaRenderWindow
+vtkPVMesaRenderWindow 
 
 
 #------------------------------------------------------------------------------

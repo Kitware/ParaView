@@ -111,3 +111,15 @@ vtkPVData *vtkPVSource::GetDataWidget()
 {
   return this->DataWidget;
 }
+
+
+// Data must be set first.  This is OK, because Source will merge with PVComposite ...
+void vtkPVSource::SetAssignment(vtkPVAssignment *a)
+{
+  if (this->GetDataWidget() == NULL)
+    {
+    vtkErrorMacro("Cannot make assignment.  Output has not been created.");
+    return;
+    }
+  this->GetDataWidget()->SetAssignment(a);
+}

@@ -46,6 +46,7 @@ class VTK_EXPORT vtkPVComposite : public vtkKWComposite
 {
 public:
   static vtkPVComposite* New();
+  vtkTypeMacro(vtkPVComposite,vtkKWComposite);
   
   // Description:
   // Get the Prop for this class.

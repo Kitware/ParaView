@@ -26,15 +26,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVData.h"
-#include "vtkPVPolyData.h" //because contour produces poly data as output
+#include "vtkPVPolyData.h" 
 #include "vtkPVComposite.h"
 #include "vtkPVSource.h"
 #include "vtkKWView.h"
-
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
-
+#include "vtkPVAssignment.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -51,11 +50,12 @@ vtkPVData::vtkPVData()
   
   this->Mapper = vtkDataSetMapper::New();
   this->Actor = vtkActor::New();
-  
+  this->Assignment = NULL;
 }
 
 vtkPVData::~vtkPVData()
 {
+  this->SetAssignment(NULL);
   this->SetData(NULL);
   this->SetSourceWidget(NULL);
 
@@ -180,3 +180,31 @@ vtkPVComposite *vtkPVData::GetComposite()
 
   return this->SourceWidget->GetComposite();
 }
+
+void vtkPVData::SetAssignment(vtkPVAssignment *a)
+{
+  if (this->Assignment == a)
+    {
+    return;
+    }
+  
+  if (this->Assignment)
+    {
+    this->Assignment->UnRegister(NULL);
+    this->Assignment = NULL;
+    }
+
+  if (a)
+    {
+    if (this->Data == NULL)
+      {
+      vtkErrorMacro("I do not have a data set to make an assignment.");
+      return;
+      }
+    this->Assignment = a;
+    a->Register(this);
+  
+    this->Data->SetUpdateExtent(a->GetPiece(), a->GetNumberOfPieces());
+    }
+}
+

@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkSource.h"
 
 class vtkPVComposite;
+class vtkPVAssignment;
 
 class VTK_EXPORT vtkPVSource : public vtkKWWidget
 {
@@ -58,6 +59,10 @@ public:
   // Description:
   // Gets the composite that owns this source widget.
   vtkGetObjectMacro(Composite, vtkPVComposite);
+
+  // Description:
+  // Tells the filter wich piece of data to generate.
+  virtual void SetAssignment(vtkPVAssignment *a);
   
 protected:
   vtkPVSource();
@@ -75,3 +80,5 @@ protected:
 };
 
 #endif
+
+

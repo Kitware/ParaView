@@ -111,7 +111,7 @@ void vtkPVRenderSlave::Render()
   int myId, numProcs;
   vtkPVRenderSlaveInfo info;
   vtkMultiProcessController *controller;
-
+  
   controller = this->PVSlave->GetController();
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
@@ -135,12 +135,7 @@ void vtkPVRenderSlave::Render()
   
   this->RenderWindow->SetSize(info.WindowSize);
  
-  vtkTimerLog *timer = vtkTimerLog::New();
-  cerr << "    -Start Render\n";
-  timer->StartTimer();
   this->RenderWindow->Render();
-  timer->StopTimer();
-  cerr << "    -Stop Render: " << timer->GetElapsedTime() << endl;
   
   window_size = this->RenderWindow->GetSize();
   
@@ -158,15 +153,9 @@ void vtkPVRenderSlave::Render()
   else
     {
     length = 3*numPixels;  
-    cerr << "    -Start GetData\n";  
-    timer->StartTimer();
     pdata = this->RenderWindow->GetPixelData(0,0,window_size[0]-1, window_size[1]-1,1);
-    timer->StopTimer();
-    cerr << "    -Stop GetData: " << timer->GetElapsedTime() << endl;
     controller->Send((char*)pdata, length, 0, 99);
     }
-  
-  timer->Delete();  
 }
 
 
@@ -297,18 +286,18 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
       { // Find participants
       if ((myId % (int)pow2(i+1)) < pow2(i)) 
         {
-	      // receivers
-	      id = myId+pow2(i);
-
-	      // only send or receive if sender or receiver id is valid
-	      // (handles non-power of 2 cases)
-	      if (id < numProcs) 
+	// receivers
+	id = myId+pow2(i);
+	
+	// only send or receive if sender or receiver id is valid
+	// (handles non-power of 2 cases)
+	if (id < numProcs) 
           {
-	        //cerr << "phase " << i << " receiver: " << myId 
-	        //     << " receives data from " << id << endl;
-	        controller->Receive(remoteZdata, zdata_size, id, 99);
-	        controller->Receive(remotePdata, pdata_size, id, 99);
-
+	  //cerr << "phase " << i << " receiver: " << myId 
+	  //     << " receives data from " << id << endl;
+	  controller->Receive(remoteZdata, zdata_size, id, 99);
+	  controller->Receive(remotePdata, pdata_size, id, 99);
+	  
 	  // notice the result is stored as the local data
 	  vtkCompositeImagePair(localZdata, localPdata, remoteZdata, remotePdata, 
 				total_pixels, flag);

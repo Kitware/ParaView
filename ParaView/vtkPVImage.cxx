@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkOutlineFilter.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
@@ -171,3 +172,33 @@ vtkImageData* vtkPVImage::GetImageData()
 {
   return (vtkImageData*)this->Data;
 }
+
+void vtkPVImage::SetAssignment(vtkPVAssignment *a)
+{
+  if (this->Assignment == a)
+    {
+    return;
+    }
+  
+  if (this->Assignment)
+    {
+    this->Assignment->UnRegister(NULL);
+    this->Assignment = NULL;
+    }
+
+  if (a)
+    {
+    vtkImageData *image = this->GetImageData();
+    
+    if (image == NULL)
+      {
+      vtkErrorMacro("I do not have an image to make an assignment.");
+      return;
+      }
+    this->Assignment = a;
+    a->Register(this);
+  
+    image->SetUpdateExtent(a->GetExtent());
+    }
+}
+

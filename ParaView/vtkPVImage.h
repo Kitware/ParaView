@@ -51,6 +51,10 @@ public:
   void Clip();
   void Slice();
   
+  // Description:
+  // Like update extent, but an object tells which piece to assign this process.
+  void SetAssignment(vtkPVAssignment *a);
+
 protected:
   vtkPVImage();
   ~vtkPVImage();

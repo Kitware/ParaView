@@ -85,6 +85,10 @@ public:
   void PreviousComposite();
   
   vtkGetObjectMacro(DataList, vtkPVDataList);
+
+  // Description:
+  // Callback from the reset camera button.
+  void ResetCameraCallback();
   
 protected:
   vtkPVWindow();

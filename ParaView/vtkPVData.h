@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkPVComposite;
 class vtkPVSource;
+class vtkPVAssignment;
 
 class VTK_EXPORT vtkPVData : public vtkKWWidget
 {
@@ -61,6 +62,12 @@ public:
   // The composite sets this so this data widget will know who owns it.
   void SetSourceWidget(vtkPVSource *source);
 
+  // Description:
+  // Like update extent, but an object tells which piece to assign this process.
+  virtual void SetAssignment(vtkPVAssignment *a);
+  vtkPVAssignment *GetAssignment() {return this->Assignment;}
+  
+  
 protected:
   vtkPVData();
   ~vtkPVData();
@@ -80,6 +87,8 @@ protected:
   // A convenience method to get the cpmposite that owns the source widget
   // that owns this data widget.
   vtkPVComposite *GetComposite();
+
+  vtkPVAssignment *Assignment;
 };
 
 #endif

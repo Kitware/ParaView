@@ -37,9 +37,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkPVSlave.h"
-
-
 
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -53,8 +50,6 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   
   return interp;
 }
-
-
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVApplication::New()

@@ -1,7 +1,16 @@
 #include "vtkTclUtil.h"
+int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkDummyRenderWindowInteractorNewCommand();
+int vtkInteractorStyleCameraCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkInteractorStyleCameraNewCommand();
 int vtkInteractorStyleGridExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleGridExtentNewCommand();
+int vtkInteractorStyleImageExtentCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkInteractorStyleImageExtentNewCommand();
 int vtkInteractorStylePlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStylePlaneNewCommand();
@@ -17,18 +26,66 @@ ClientData vtkKWRenderViewNewCommand();
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVApplicationNewCommand();
+int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVAssignmentNewCommand();
+int vtkPVCompositeCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVCompositeNewCommand();
+int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVConeSourceNewCommand();
+int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVContourFilterNewCommand();
+int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVDataNewCommand();
+int vtkPVDataListCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVDataListNewCommand();
+int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVElevationFilterNewCommand();
+int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVGlyph3DNewCommand();
+int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageNewCommand();
+int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageClipNewCommand();
+int vtkPVImageReaderCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageReaderNewCommand();
+int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageSliceNewCommand();
+int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVMenuButtonNewCommand();
+int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVPolyDataNewCommand();
 int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderSlaveNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
-int vtkPVSlaveCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
-ClientData vtkPVSlaveNewCommand();
+ClientData vtkPVShrinkPolyDataNewCommand();
+int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSourceNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
+int vtkPVMesaRenderWindowCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVMesaRenderWindowNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -57,8 +114,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
+                  vtkDummyRenderWindowInteractorCommand);
+  vtkTclCreateNew(interp,"vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
+                  vtkInteractorStyleCameraCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
                   vtkInteractorStyleGridExtentCommand);
+  vtkTclCreateNew(interp,"vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,
+                  vtkInteractorStyleImageExtentCommand);
   vtkTclCreateNew(interp,"vtkInteractorStylePlane", vtkInteractorStylePlaneNewCommand,
                   vtkInteractorStylePlaneCommand);
   vtkTclCreateNew(interp,"vtkInteractorStylePlaneSource", vtkInteractorStylePlaneSourceNewCommand,
@@ -69,13 +132,45 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkKWRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
+  vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
+                  vtkPVAssignmentCommand);
+  vtkTclCreateNew(interp,"vtkPVComposite", vtkPVCompositeNewCommand,
+                  vtkPVCompositeCommand);
+  vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
+                  vtkPVConeSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
+                  vtkPVContourFilterCommand);
+  vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
+                  vtkPVDataCommand);
+  vtkTclCreateNew(interp,"vtkPVDataList", vtkPVDataListNewCommand,
+                  vtkPVDataListCommand);
+  vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
+                  vtkPVElevationFilterCommand);
+  vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
+                  vtkPVGlyph3DCommand);
+  vtkTclCreateNew(interp,"vtkPVImage", vtkPVImageNewCommand,
+                  vtkPVImageCommand);
+  vtkTclCreateNew(interp,"vtkPVImageClip", vtkPVImageClipNewCommand,
+                  vtkPVImageClipCommand);
+  vtkTclCreateNew(interp,"vtkPVImageReader", vtkPVImageReaderNewCommand,
+                  vtkPVImageReaderCommand);
+  vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
+                  vtkPVImageSliceCommand);
+  vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
+                  vtkPVMenuButtonCommand);
+  vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
+                  vtkPVPolyDataCommand);
   vtkTclCreateNew(interp,"vtkPVRenderSlave", vtkPVRenderSlaveNewCommand,
                   vtkPVRenderSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
-  vtkTclCreateNew(interp,"vtkPVSlave", vtkPVSlaveNewCommand,
-                  vtkPVSlaveCommand);
+  vtkTclCreateNew(interp,"vtkPVShrinkPolyData", vtkPVShrinkPolyDataNewCommand,
+                  vtkPVShrinkPolyDataCommand);
+  vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,
+                  vtkPVSourceCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
+  vtkTclCreateNew(interp,"vtkPVMesaRenderWindow", vtkPVMesaRenderWindowNewCommand,
+                  vtkPVMesaRenderWindowCommand);
   return TCL_OK;
 }

@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVRenderSlave_h
 
 #include "vtkKWObject.h"
-#include "vtkPVSlave.h"
+#include "vtkPVApplication.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 
@@ -72,8 +72,8 @@ public:
   // Description:
   // The PVSlave is like a controller but is used by the slaves.
   // It may be the start of a communicator.
-  vtkSetObjectMacro(PVSlave, vtkPVSlave);
-  vtkGetObjectMacro(PVSlave, vtkPVSlave);
+  vtkSetObjectMacro(PVSlave, vtkPVApplication);
+  vtkGetObjectMacro(PVSlave, vtkPVApplication);
 
   // Description:
   // Access to renderer for adding actors ...
@@ -92,7 +92,7 @@ protected:
 
   vtkRenderWindow *RenderWindow;
   vtkRenderer *Renderer;
-  vtkPVSlave *PVSlave;
+  vtkPVApplication *PVSlave;
 };
 
 

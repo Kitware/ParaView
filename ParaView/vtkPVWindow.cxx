@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMath.h"
 #include "vtkSynchronizedTemplates3D.h"
 
+#include "vtkPVAssignment.h"
 #include "vtkPVComposite.h"
 #include "vtkPVConeSource.h"
 #include "vtkPVPolyData.h"
@@ -179,7 +180,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   
   this->ResetCameraButton->SetParent(this->Toolbar);
   this->ResetCameraButton->Create(app, "button", "-text ResetCamera");
-  this->ResetCameraButton->SetCommand(this->MainView, "ResetCamera");
+  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName());
   
@@ -333,6 +334,7 @@ void vtkPVWindow::SetupCone()
 
 void vtkPVWindow::NewCone()
 {
+  int id, num;
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   vtkPVConeSource *cone;
@@ -344,6 +346,12 @@ void vtkPVWindow::NewCone()
   comp->SetSource(cone);
   comp->SetCompositeName("cone");
 
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  vtkPVAssignment *a = vtkPVAssignment::New();
+  a->SetApplication(pvApp);
+  a->SetPiece(0, num);
+  cone->SetAssignment(a);
+  
   // Create the properties (interface).
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
   comp->CreateProperties(pvApp, "");
@@ -353,10 +361,28 @@ void vtkPVWindow::NewCone()
   comp->SetWindow(this);
   this->SetCurrentDataComposite(comp);
 
+  // Lets show a cone as a test.
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteScript(id, "%s %s", cone->GetClassName(), cone->GetTclName());
+    pvApp->RemoteScript(id, "%s %s", comp->GetClassName(), comp->GetTclName());
+    pvApp->RemoteScript(id, "%s %s", a->GetClassName(), a->GetTclName());
+    pvApp->RemoteScript(id, "%s SetPiece %d %d", a->GetTclName(), id, num);
+    pvApp->RemoteScript(id, "%s SetSource %s", comp->GetTclName(), cone->GetTclName());
+    //pvApp->RemoteScript(id, "[%s GetConeSource] DebugOn", cone->GetTclName());
+    pvApp->RemoteScript(id, "%s SetAssignment %s", cone->GetTclName(), a->GetTclName());
+    // We sould probably use a view in the satellite processes (then delete the comp/source).
+    pvApp->RemoteScript(id, "[RenderSlave GetRenderer] AddProp [%s GetProp]",comp->GetTclName());
+    }
+  
   // Clean up.
   comp->Delete();
+  comp = NULL;
   this->DataList->Update();
   cone->Delete();
+  cone = NULL;
+  a->Delete();
+  a = NULL;
   
   this->MainView->ResetCamera();
   this->MainView->Render();
@@ -480,4 +506,11 @@ vtkPVComposite* vtkPVWindow::GetPreviousComposite()
 vtkKWCompositeCollection* vtkPVWindow::GetCompositeList()
 {
   return this->CompositeList;
+}
+
+void vtkPVWindow::ResetCameraCallback()
+{
+  
+  this->MainView->ResetCamera();
+  this->MainView->Render();
 }
