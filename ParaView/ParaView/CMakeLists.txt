@@ -3,8 +3,6 @@ SET( ParaView_SRCS
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
-  vtkDesktopDeliveryClient.cxx
-  vtkDesktopDeliveryServer.cxx
   vtkExtractCTHPart.cxx
   vtkGroup.cxx
   vtkKWBoundsDisplay.cxx
@@ -200,6 +198,8 @@ ENDIF(VTK_USE_MPI)
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
+    vtkDesktopDeliveryClient.cxx
+    vtkDesktopDeliveryServer.cxx
     #vtkIceTComposite.cxx
     vtkIceTRenderer.cxx
     vtkIceTRenderManager.cxx
