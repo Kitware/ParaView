@@ -22,6 +22,11 @@
 /*# define ET_HAVE_MAIN 0*/
 /*#endif*/
 #define ET_HAVE_CUSTOM_MAINLOOP 0
+
+/* The following constants define internal paths (not on disk)   */
+/* for Tcl/Tk to use when looking for initialization scripts     */
+/* which are in this file. They do not represent any hardwired   */
+/* paths                                                         */
 #ifdef HAVE_TCL8_3
 #define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.3"
 #define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.3"
