@@ -127,7 +127,7 @@ INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}/Servers/ServerManager
 )
 
-SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid)
+SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
 IF(VTK_USE_PATENTED)
   SET(kits ${kits} Patented)
 ENDIF(VTK_USE_PATENTED)

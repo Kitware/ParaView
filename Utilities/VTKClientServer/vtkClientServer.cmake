@@ -15,7 +15,7 @@ ENDMACRO(CS_INITIALIZE_WRAP)
 
 MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
   SET(vtk${kit}CS_HEADERS)
-  INCLUDE(${VTK_KITS_DIR}/vtk${kit}Kit.cmake)
+  INCLUDE("${VTK_KITS_DIR}/vtk${kit}Kit.cmake")
   FOREACH(class ${VTK_${ukit}_CLASSES})
     SET(full_name "${VTK_${ukit}_HEADER_DIR}/${class}.h")
     IF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")

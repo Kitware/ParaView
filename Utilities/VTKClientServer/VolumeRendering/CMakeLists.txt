@@ -1,2 +1,2 @@
 SET(KIT_WRAP_DEPS Rendering)
-PV_WRAP_VTK_CS(VolumeRendering VolumeRendering "${KIT_WRAP_DEPS}")
+PV_WRAP_VTK_CS(VolumeRendering VOLUMERENDERING "${KIT_WRAP_DEPS}")

@@ -215,7 +215,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS KWCommon ${PARAVIEW_ADDITIONAL_LIBRARIES})
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS vtkVolumeRenderingCS KWCommon ${PARAVIEW_ADDITIONAL_LIBRARIES})
 IF(KWSYS_NAMESPACE)
   TARGET_LINK_LIBRARIES (vtkPVFilters ${KWSYS_NAMESPACE})
 ENDIF(KWSYS_NAMESPACE)
@@ -240,7 +240,7 @@ CS_INITIALIZE_WRAP()
 INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 
 # Wrap PVFilters
-SET(KIT_WRAP_DEPS Parallel Hybrid Rendering)
+SET(KIT_WRAP_DEPS Parallel Hybrid Rendering VolumeRendering)
 IF(VTK_USE_PATENTED)
   SET(KIT_WRAP_DEPS Patented)
 ENDIF(VTK_USE_PATENTED)
