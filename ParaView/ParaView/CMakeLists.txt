@@ -1,0 +1,196 @@
+SOURCE_FILES( ParaView_SRCS
+vtkAllToNRedistributePolyData.cxx
+vtkBalancedRedistributePolyData.cxx
+vtkCompositeProp.cxx
+vtkRedistributePolyData.cxx
+vtkWeightedRedistributePolyData.cxx
+vtkKWBoundsDisplay.cxx
+vtkKWExtractGeometryByScalar.cxx
+vtkPickDataSetFilter.cxx
+vtkPV3DWidget.cxx
+vtkPVAdvancedReaderModule.cxx
+vtkPVAnimationInterface.cxx
+vtkPVApplication.cxx 
+vtkPVApplicationResources.cxx 
+vtkPVArrayCalculator.cxx 
+vtkPVArrayMenu.cxx 
+vtkPVArraySelection.cxx
+vtkPVBoundsDisplay.cxx
+vtkPVCameraIcon.cxx
+vtkPVCameraManipulator.cxx
+vtkPVColorMap.cxx
+vtkPVComponentSelection.cxx
+vtkPVConnectivityFilter.cxx
+vtkPVContainerWidget.cxx
+vtkPVContour.cxx 
+vtkPVContourEntry.cxx 
+vtkPVData.cxx 
+vtkPVDataSetFileEntry.cxx
+vtkPVDataSetReaderModule.cxx
+vtkPVDummyWidget.cxx
+vtkPVEnSightArraySelection.cxx
+vtkPVEnSightReaderModule.cxx
+vtkPVErrorLogDisplay.cxx
+vtkPVExtentEntry.cxx
+vtkPVExtentTranslator.cxx 
+vtkPVExtractGeometryByScalar.cxx
+vtkPVFileEntry.cxx
+vtkPVGenericRenderWindowInteractor.cxx
+vtkPVGlyph3D.cxx 
+vtkPVImplicitPlaneWidget.cxx
+vtkPVInitialize.cxx
+vtkPVInputMenu.cxx 
+vtkPVInteractorStyle.cxx
+vtkPVInteractorStyleCenterOfRotation.cxx
+vtkPVInteractorStyleControl.cxx
+vtkPVInteractorStyleFly.cxx
+vtkPVJoystickFly.cxx
+vtkPVJoystickFlyIn.cxx
+vtkPVJoystickFlyOut.cxx
+vtkPVLODActor.cxx
+vtkPVLabel.cxx
+vtkPVLabeledToggle.cxx
+vtkPVLineWidget.cxx
+vtkPVLineSourceWidget.cxx
+vtkPVMinMax.cxx
+vtkPVNavigationWindow.cxx
+vtkPVObjectWidget.cxx
+vtkPVPassThrough.cxx
+vtkPVPLOT3DReaderModule.cxx
+vtkPVPivotManipulator.cxx
+vtkPVPlaneWidget.cxx
+vtkPVPointSourceWidget.cxx
+vtkPVPointWidget.cxx
+vtkPVProbe.cxx
+vtkPVPushButton.cxx
+vtkPVReaderModule.cxx
+vtkPVRenderGroupDialog.cxx
+vtkPVRenderView.cxx 
+vtkPVScalarRangeLabel.cxx 
+vtkPVScale.cxx 
+vtkPVSelectCustomReader.cxx
+vtkPVSelectWidget.cxx 
+vtkPVSelectionList.cxx
+vtkPVSelectTimeSet.cxx
+vtkPVSource.cxx 
+vtkPVSourceCollection.cxx
+vtkPVSourceList.cxx
+vtkPVSourcesNavigationWindow.cxx
+vtkPVSourceWidget.cxx
+vtkPVSphereWidget.cxx
+vtkPVStringEntry.cxx
+vtkPVThreshold.cxx 
+vtkPVTimerLogDisplay.cxx
+vtkPVTrackballMoveActor.cxx
+vtkPVTrackballPan.cxx
+vtkPVTrackballRoll.cxx
+vtkPVTrackballRotate.cxx
+vtkPVTrackballZoom.cxx
+vtkPVTreeComposite.cxx 
+vtkPVUpdateSuppressor.cxx
+vtkPVVectorEntry.cxx
+vtkPVWidget.cxx
+vtkPVWidgetCollection.cxx
+vtkPVWindow.cxx 
+vtkPVWindowResources.cxx 
+#vtkPVWizard.cxx
+vtkPVWorldPointPicker.cxx 
+vtkPVWriter.cxx
+vtkPVXMLElement.cxx
+vtkPVXMLPackageParser.cxx
+vtkPVXMLParser.cxx
+vtkStringList.cxx 
+)
+
+WRAP_EXCLUDE_FILES(
+  vtkPVApplicationResources
+  vtkPVWindowResources
+)
+
+IF (VTK_USE_MPI)
+  SOURCE_FILES( ParaView_SRCS vtkPVEnSightVerifier.cxx )
+ENDIF (VTK_USE_MPI)
+
+ABSTRACT_FILES(
+vtkPVObjectWidget
+vtkPVWidget
+vtkPV3DWidget
+vtkPVJoystickFly
+vtkPVSourceWidget
+)
+
+# Setup vtkInstantiator registration for this library's classes.
+VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
+                      ParaView_SRCS
+                      EXPORT_MACRO VTK_EXPORT
+                      HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
+
+VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
+ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
+
+TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
+                       vtkKWWidgetsTCL 
+                       vtkKWCommonTCL
+                       vtkParallelTCL
+		       vtkHybridTCL
+                       vtkRenderingTCL)
+
+
+IF (VTK_USE_PATENTED)
+ TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPatentedTCL)
+ENDIF (VTK_USE_PATENTED)
+
+CONFIGURE_FILE(
+     ${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
+     ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
+     ESCAPE_QUOTES)
+
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVDemoPaths.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVDemoPaths.h
+               ESCAPE_QUOTES)
+
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVConfig.h
+               ESCAPE_QUOTES)
+
+INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
+
+SOURCE_FILES(ParaViewBinary_SRCS
+	     ParaView.cxx)
+
+IF(WIN32)
+  SOURCE_FILES(ParaViewBinary_SRCS
+               ParaView.rc)
+ENDIF(WIN32)
+
+ADD_EXECUTABLE(ParaView WIN32 ParaViewBinary_SRCS) 
+
+IF (VTK_MANGLE_MESA)
+  IF (MESA_INCLUDE_PATH)
+    INCLUDE_DIRECTORIES(${MESA_INCLUDE_PATH})
+  ENDIF(MESA_INCLUDE_PATH)     
+  LINK_LIBRARIES (${MESA_LIBRARY})
+ENDIF(VTK_MANGLE_MESA)
+
+IF(CMAKE_HAS_X)
+   LINK_LIBRARIES(-lXt)
+   LINK_LIBRARIES(${CMAKE_X_LIBS})
+   ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
+ENDIF(CMAKE_HAS_X)
+
+IF (WIN32)
+  IF (TK_XLIB_PATH)
+    INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
+  ENDIF (TK_XLIB_PATH) 
+ENDIF (WIN32)
+
+TARGET_LINK_LIBRARIES (ParaView
+                       vtkKWParaViewTCL)
+
+INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
+INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
+
+
+INSTALL_TARGETS(/lib vtkKWParaViewTCL)
+INSTALL_TARGETS(/bin ParaView)
+
