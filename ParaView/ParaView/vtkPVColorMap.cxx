@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.4");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.5");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -474,8 +474,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
 
   this->SetColorSchemeToRedBlue();
-
-  this->ColorMapFrame->AdjustMargin();
 }
 
 
