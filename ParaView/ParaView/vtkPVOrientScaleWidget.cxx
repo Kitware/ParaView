@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -298,6 +298,7 @@ void vtkPVOrientScaleWidget::Trace(ofstream *file)
 void vtkPVOrientScaleWidget::Update()
 {
   this->UpdateArrayMenus();
+  this->UpdateModeMenus();
   this->UpdateScaleFactor();
   this->Superclass::Update();
 }
@@ -435,6 +436,80 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
     this->Property->SetString(0, this->ScalarArrayName);
     this->Property->SetString(1, this->VectorArrayName);
     }
+}
+
+void vtkPVOrientScaleWidget::UpdateModeMenus()
+{
+  vtkKWMenu *scaleMenu = this->ScaleModeMenu->GetMenu();
+  vtkKWMenu *orientMenu = this->OrientModeMenu->GetMenu();
+  
+  int numScalars = this->ScalarsMenu->GetNumberOfEntries();
+  int numVectors = this->VectorsMenu->GetNumberOfEntries();
+
+  const char *scaleMode = this->ScaleModeMenu->GetValue();
+  
+  if (numScalars == 0)
+    {
+    // disabled
+    scaleMenu->SetState("Scalar", 2);
+    if (!strcmp(scaleMode, "Scalar"))
+      {
+      if (numVectors == 0)
+        {
+        this->ScaleModeMenu->SetValue("Data Scaling Off");
+        }
+      else
+        {
+        this->ScaleModeMenu->SetValue("Vector Magnitude");
+        }
+      }
+    }
+  else
+    {
+    // normal
+    scaleMenu->SetState("Scalar", 0);
+    }
+  
+  if (numVectors == 0)
+    {
+    // disabled
+    orientMenu->SetState("Vector", 2);
+    scaleMenu->SetState("Vector Magnitude", 2);
+    scaleMenu->SetState("Vector Components", 2);
+    if (!strcmp(this->OrientModeMenu->GetValue(), "Vector"))
+      {
+      this->OrientModeMenu->SetValue("Off");
+      }
+    if (!strcmp(scaleMode, "Vector Magnitude") ||
+        !strcmp(scaleMode, "Vector Components"))
+      {
+      if (numScalars == 0)
+        {
+        this->ScaleModeMenu->SetValue("Data Scaling Off");
+        }
+      else
+        {
+        this->ScaleModeMenu->SetValue("Scalar");
+        }
+      }
+    }
+  else
+    {
+    // normal
+    orientMenu->SetState("Vector", 0);
+    scaleMenu->SetState("Vector Magnitude", 0);
+    scaleMenu->SetState("Vector Components", 0);
+    }
+  
+  if (!this->AcceptCalled)
+    {
+    this->DefaultOrientMode = this->OrientModeMenu->GetMenu()->GetIndex(
+      this->OrientModeMenu->GetValue());
+    this->DefaultScaleMode = this->ScaleModeMenu->GetMenu()->GetIndex(
+      this->ScaleModeMenu->GetValue());
+    }
+  
+  this->UpdateScaleFactor();
 }
 
 void vtkPVOrientScaleWidget::UpdateScaleFactor()
@@ -676,7 +751,7 @@ void vtkPVOrientScaleWidget::ResetInternal()
   this->ScaleModeMenu->SetValue(
     this->ScaleModeMenu->GetEntryLabel((int)scalars[1]));
   this->ScaleFactorEntry->SetValue(scalars[2]);
- 
+  
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;

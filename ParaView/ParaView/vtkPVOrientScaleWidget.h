@@ -177,6 +177,7 @@ protected:
   
   vtkPVDataSetAttributesInformation* GetPointDataInformation();
   void UpdateArrayMenus();
+  void UpdateModeMenus();
   void UpdateScaleFactor();
   
 private:
