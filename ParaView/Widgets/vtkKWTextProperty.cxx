@@ -118,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.4");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.5");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -524,9 +524,19 @@ void vtkKWTextProperty::SetShowColor(int _arg)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::SetColor(float r, float g, float b) 
 {
+  float *rgb = this->GetColor();
+  if (rgb[0] == r && rgb[1] == g && rgb[2] == b)
+    {
+    return;
+    }
+
   if (this->TextProperty)
     {
     this->TextProperty->SetColor(r, g, b);
+    }
+  else if (this->Actor2D && this->Actor2D->GetProperty())
+    {
+    this->Actor2D->GetProperty()->SetColor(r, g, b);
     }
 
   this->UpdateColorButton();
@@ -579,7 +589,7 @@ float* vtkKWTextProperty::GetColor()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateColorButton()
 {
-  if (this->ChangeColorButton->IsCreated() && this->TextProperty)
+  if (this->ChangeColorButton->IsCreated())
     {
     this->ChangeColorButton->SetColor(this->GetColor());
 
@@ -613,6 +623,10 @@ void vtkKWTextProperty::SetFontFamily(int v)
 {
   if (this->TextProperty)
     {
+    if (this->TextProperty->GetFontFamily() == v)
+      {
+      return;
+      }
     this->TextProperty->SetFontFamily(v);
     }
 
@@ -703,6 +717,10 @@ void vtkKWTextProperty::SetBold(int v)
 {
   if (this->TextProperty)
     {
+    if (this->TextProperty->GetBold() == v)
+      {
+      return;
+      }
     this->TextProperty->SetBold(v);
     }
 
@@ -739,6 +757,10 @@ void vtkKWTextProperty::SetItalic(int v)
 {
   if (this->TextProperty)
     {
+    if (this->TextProperty->GetItalic() == v)
+      {
+      return;
+      }
     this->TextProperty->SetItalic(v);
     }
 
@@ -775,6 +797,10 @@ void vtkKWTextProperty::SetShadow(int v)
 {
   if (this->TextProperty)
     {
+    if (this->TextProperty->GetShadow() == v)
+      {
+      return;
+      }
     this->TextProperty->SetShadow(v);
     }
 
@@ -822,9 +848,18 @@ void vtkKWTextProperty::SetShowOpacity(int _arg)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::SetOpacityNoTrace(float v) 
 {
+  if (this->GetOpacity() == v)
+    {
+    return;
+    }
+
   if (this->TextProperty)
     {
     this->TextProperty->SetOpacity(v);
+    }
+  else if (this->Actor2D && this->Actor2D->GetProperty())
+    {
+    this->Actor2D->GetProperty()->SetOpacity(v);
     }
 
   this->UpdateOpacityScale();
