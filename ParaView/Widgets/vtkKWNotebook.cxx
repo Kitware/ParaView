@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.45");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.46");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -508,6 +508,8 @@ int vtkKWNotebook::GetVisiblePageId(int idx)
     return this->GetMostRecentPageId(idx);
     }
 
+  // If not, consider the unpinned page first
+
   vtkIdType found = -1;
   vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
@@ -515,13 +517,32 @@ int vtkKWNotebook::GetVisiblePageId(int idx)
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(page) == VTK_OK && page->Visibility && !idx--)
+    if (it->GetData(page) == VTK_OK && 
+        page->Visibility && !page->Pinned && !idx--)
       {
       found = page->Id;
       break;
       }
     it->GoToNextItem();
     }
+
+  // Not found ? Now consider the pinned page
+
+  if (found < 0)
+    {
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(page) == VTK_OK && 
+          page->Visibility && page->Pinned && !idx--)
+        {
+        found = page->Id;
+        break;
+        }
+      it->GoToNextItem();
+      }
+    }
+
   it->Delete();
 
   return found;
