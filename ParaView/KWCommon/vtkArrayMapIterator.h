@@ -39,7 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkArrayMapIterator - a templated linked list
+// .NAME vtkArrayMapIterator - an array map iterator
 
 #ifndef __vtkArrayMapIterator_h
 #define __vtkArrayMapIterator_h
@@ -77,6 +77,20 @@ public:
   // Return VTK_OK if everything is ok.
   int GoToNextItem();
 
+  // Description:
+  // Decrement the iterator to the next location.
+  // Return VTK_OK if everything is ok.
+  int GoToPreviousItem();
+
+  // Description:
+  // Go to the "first" item of the map.
+  // Return VTK_OK if everything is ok.
+  int GoToFirstItem();
+
+  // Description:
+  // Go to the "last" item of the map.
+  // Return VTK_OK if everything is ok.
+  int GoToLastItem();
 
 protected:
   static vtkArrayMapIterator<KeyType,DataType> *New() 

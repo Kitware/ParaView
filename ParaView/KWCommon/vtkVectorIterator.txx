@@ -99,4 +99,44 @@ int vtkVectorIterator<DType>::GoToNextItem()
   return VTK_OK;
 }
 
+// Description:
+// Decrement the iterator to the next location.
+// Return VTK_OK if everything is ok.
+template<class DType>
+int vtkVectorIterator<DType>::GoToPreviousItem()
+{
+  vtkVector<DType> *llist 
+    = static_cast<vtkVector<DType>*>(this->Container);
+  if ( this->Index < 0 || this->Index >= llist->GetNumberOfItems() )
+    {
+    return VTK_ERROR;
+    }
+  if ( this->Index == 0 )
+    {
+    this->Index = llist->GetNumberOfItems();
+    return VTK_OK;
+    }
+  this->Index--;
+  return VTK_OK;
+}
+
+template<class DType>
+int vtkVectorIterator<DType>::GoToLastItem()
+{
+  if ( !this->Container )
+    {
+    //cout << "No container" << endl;
+    return VTK_ERROR;
+    }
+  vtkVector<DType> *llist 
+    = static_cast<vtkVector<DType>*>(this->Container);
+  if ( llist->GetNumberOfItems() <= 0 )
+    {
+    return VTK_ERROR;
+    }
+  
+  this->Index = llist->GetNumberOfItems()-1;  
+  return VTK_OK;
+}
+
 #endif

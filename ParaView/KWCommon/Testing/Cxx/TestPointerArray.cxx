@@ -235,6 +235,7 @@ int TestList(DType*)
   // Try the iterator
   typename DType::IteratorType *it = strings->NewIterator();
   //cout << "Try iterator" << endl;
+  it->GoToFirstItem();
   while ( it->IsDoneWithTraversal() != VTK_OK )
     {
     const char* str = 0;
@@ -252,6 +253,25 @@ int TestList(DType*)
     //cout << "Item: " << idx << " = " << str << endl;
     it->GoToNextItem();
     }
+  it->GoToLastItem();
+  while( it->IsDoneWithTraversal() != VTK_OK )
+    {
+    const char* str = 0;
+    vtkIdType idx = 0;
+    if ( it->GetData(str) != VTK_OK )
+      {
+      C_ERROR(strings) << "Problem accessing data from iterator" << endl;
+      error =1;
+      }
+    if ( it->GetKey(idx) != VTK_OK )
+      {
+      C_ERROR(strings) << "Problem accessing data from iterator" << endl;
+      error =1;     
+      }
+    //cout << "Item: " << idx << " = " << str << endl;    
+    it->GoToPreviousItem();
+    }
+  it->GoToFirstItem();
   it->Delete();
 
   for ( ; strings->GetNumberOfItems(); )

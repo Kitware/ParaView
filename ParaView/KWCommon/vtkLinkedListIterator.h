@@ -39,7 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkLinkedListIterator - a templated linked list
+// .NAME vtkLinkedListIterator - a templated linked list iterator
 
 #ifndef __vtkLinkedListIterator_h
 #define __vtkLinkedListIterator_h
@@ -80,6 +80,22 @@ public:
   // Return VTK_OK if everything is ok.
   int GoToNextItem();
 
+  // Description:
+  // Decrement the iterator to the next location.
+  // On singly Linked list this operations is extremely expensive, because
+  // it has to traverse through potentially whole list.
+  // Return VTK_OK if everything is ok.
+  int GoToPreviousItem();
+
+  // Description:
+  // Go to the first item of the list.
+  // Return VTK_OK if everything is ok.
+  int GoToFirstItem() { this->InitTraversal(); return VTK_OK; }
+
+  // Description:
+  // Go to the last item of the list.
+  // Return VTK_OK if everything is ok.
+  int GoToLastItem();
 
 protected:
   static vtkLinkedListIterator<DType> *New() 

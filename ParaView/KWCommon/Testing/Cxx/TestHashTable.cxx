@@ -52,6 +52,7 @@ int main()
   // Try the iterator
   vtkArrayMap<int,char*>::IteratorType *nit = am->NewIterator();
   //cout << "Try iterator" << endl;
+  nit->GoToFirstItem();
   while ( nit->IsDoneWithTraversal() != VTK_OK )
     {
     char* str = 0;
@@ -68,6 +69,24 @@ int main()
       }
     cout << "Item: " << idx << " = " << str << endl;
     nit->GoToNextItem();
+    }
+  nit->GoToLastItem();
+  while ( nit->IsDoneWithTraversal() != VTK_OK )
+    {
+    char* str = 0;
+    int idx = 0;
+    if ( nit->GetData(str) != VTK_OK )
+      {
+      cout << "Problem accessing data from iterator" << endl;
+      error =1;
+      }
+    if ( nit->GetKey(idx) != VTK_OK )
+      {
+      cout << "Problem accessing key from iterator" << endl;
+      error =1;     
+      }
+    cout << "Item: " << idx << " = " << str << endl;
+    nit->GoToPreviousItem();
     }
   nit->Delete();
  
