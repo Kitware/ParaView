@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.150");
+vtkCxxRevisionMacro(vtkPVData, "1.151");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2578,6 +2578,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ColorMap: " << this->PVColorMap << endl;
+  os << indent << "ColorMenu: " << this->ColorMenu << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
@@ -2762,7 +2763,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.150 $");
+  this->ExtractRevision(os,"$Revision: 1.151 $");
 }
 
 //----------------------------------------------------------------------------
