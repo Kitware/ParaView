@@ -182,9 +182,21 @@ public:
   vtkGetMacro(NumberOfGhostLevels, int);
   virtual void Initialize();
 
+  // Description:
+  // Extra methods for dealing with sets of blocks with different dimensions.
+  vtkIdType GetBlockStartPointId(int blockId);
+  vtkIdType GetBlockStartCellId(int blockId);
+
 protected:
   vtkCTHData();
   ~vtkCTHData();
+
+  void DeleteInternalArrays();
+  void CreateInternalArrays();
+  vtkIdType *BlockStartPointIds;
+  vtkIdType *BlockStartCellIds;
+  int *BlockNumberOfPoints;
+  int *BlockNumberOfCells;
 
   // for the GetCell method
   vtkVertex *Vertex;

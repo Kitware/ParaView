@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.20");
+vtkCxxRevisionMacro(vtkCTHData, "1.21");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -76,6 +76,11 @@ vtkCTHData::vtkCTHData()
   this->Information->Set(vtkDataObject::DATA_PIECE_NUMBER(), -1);
   this->Information->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 1);
   this->Information->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 0);
+  
+  this->BlockStartPointIds = 0;
+  this->BlockStartCellIds = 0;  
+  this->BlockNumberOfPoints = 0;
+  this->BlockNumberOfCells = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -94,11 +99,14 @@ vtkCTHData::~vtkCTHData()
   this->BlockLevels = NULL;
   this->BlockCellExtents->Delete();
   this->BlockCellExtents = NULL;
+  
+  this->DeleteInternalArrays();
 }
 
 //----------------------------------------------------------------------------
 void vtkCTHData::Initialize()
 {
+  this->DeleteInternalArrays();
   this->Superclass::Initialize();
   this->BlockOrigins->Initialize();
   this->BlockSpacings->Initialize();
@@ -154,7 +162,7 @@ void vtkCTHData::GetBlock(int blockId, vtkImageData* block)
     tupleSize = array->GetDataTypeSize() * array->GetNumberOfComponents();
     ptr1 = (unsigned char*)(array->GetVoidPointer(0));
     ptr2 = (unsigned char*)(newArray->GetVoidPointer(0));
-    ptr1 += blockId * tupleSize * GetNumberOfPointsForBlock(blockId);
+    ptr1 += tupleSize * this->GetBlockStartPointId(blockId);
     memcpy(ptr2, ptr1, tupleSize * GetNumberOfPointsForBlock(blockId));
     block->GetPointData()->AddArray(newArray);
     newArray->Delete();
@@ -167,14 +175,14 @@ void vtkCTHData::GetBlock(int blockId, vtkImageData* block)
     array = this->CellData->GetArray(idx);
     newArray = array->NewInstance();
     newArray->SetNumberOfComponents(array->GetNumberOfComponents());
-    newArray->SetNumberOfTuples(GetNumberOfCellsForBlock(blockId));
+    newArray->SetNumberOfTuples(this->GetNumberOfCellsForBlock(blockId));
     newArray->SetName(array->GetName());
     // Copy memory segment.
     tupleSize = array->GetDataTypeSize() * array->GetNumberOfComponents();
     ptr1 = (unsigned char*)(array->GetVoidPointer(0));
     ptr2 = (unsigned char*)(newArray->GetVoidPointer(0));
-    ptr1 += blockId * tupleSize * GetNumberOfCellsForBlock(blockId);
-    memcpy(ptr2, ptr1, tupleSize * GetNumberOfCellsForBlock(blockId));
+    ptr1 += tupleSize * this->GetBlockStartCellId(blockId);
+    memcpy(ptr2, ptr1, tupleSize * this->GetNumberOfCellsForBlock(blockId));
     block->GetCellData()->AddArray(newArray);
     newArray->Delete();
     newArray = NULL;
@@ -190,6 +198,7 @@ void vtkCTHData::SetNumberOfBlocks(int num)
     }
   
   this->Modified();
+  this->DeleteInternalArrays();
   this->BlockOrigins->SetNumberOfTuples(num);
   this->BlockSpacings->SetNumberOfTuples(num);
   this->BlockLevels->SetNumberOfTuples(num);
@@ -218,6 +227,7 @@ int vtkCTHData::InsertNextBlock()
   this->BlockLevels->InsertNextValue(0);
   e[0] = e[1] = e[2] = e[3] = e[4] = e[5] = 0;
   this->BlockCellExtents->InsertNextTuple(e);
+  this->DeleteInternalArrays();
   return this->GetNumberOfBlocks()-1;
 }
 
@@ -249,6 +259,7 @@ void vtkCTHData::SetBlockCellExtent(int blockId, int level, int *extent)
     return;
     }
 
+  this->DeleteInternalArrays();
   int newDescription = VTK_XYZ_GRID;
   // We could do this with a case statement, but the index would be cryptic.
   int xtest = (extent[0] == extent[1]);
@@ -467,16 +478,41 @@ int vtkCTHData::GetBlockLevel(int blockId)
 //----------------------------------------------------------------------------
 void vtkCTHData::GetCellPoints(vtkIdType cellId, vtkIdList *ptIds)
 {
-  // Charles next three lines are obviously going to be wrong... but punting again
-  int blockId = cellId / GetNumberOfCellsForBlock(0);
-  int blockCellId = cellId - (blockId*GetNumberOfCellsForBlock(0));
-  int offset = GetNumberOfPointsForBlock(0) * blockId;
+  int blockId, numBlocks, numBlockPts, numBlockCells;
+  int blockCellId;
+  vtkIdType blockFirstPtId;
   int num, idx;
   vtkIdType id;
 
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    ptIds->Initialize();
+    return;
+    } 
+
+  // Scan through blocks to find block that contains the cell id.
+  blockId = 0;
+  blockFirstPtId = 0;
+  blockCellId = cellId;
+  numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+  while (blockCellId >= numBlockCells)
+    {
+    numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain cell " << cellId);
+      ptIds->Initialize();
+      return;
+      }
+    blockCellId -= numBlockCells;
+    blockFirstPtId += numBlockPts;
+    numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+    }    
+      
   int dims[3];
   this->GetBlockPointDimensions(blockId, dims);
-
   vtkStructuredData::GetCellPoints(blockCellId,ptIds,this->DataDescription,
                                    dims);
 
@@ -485,33 +521,61 @@ void vtkCTHData::GetCellPoints(vtkIdType cellId, vtkIdList *ptIds)
   for (idx = 0; idx < num; ++idx)
     {
     id = ptIds->GetId(idx);
-    id += offset;
+    id += blockFirstPtId;
     ptIds->SetId(idx, id);
     }
 }
 
 //----------------------------------------------------------------------------
+// TODO We should also include cells from neighbor blocks.
 void vtkCTHData::GetPointCells(vtkIdType ptId, vtkIdList *cellIds)
 {
-  // Charles next two lines are obviously going to be wrong... but punting again
-  // Which block is this point in?
-  vtkIdType blockId = ptId / GetNumberOfPointsForBlock(0);
-  vtkIdType numCellsPerBlock = GetNumberOfCellsForBlock(0);
+  int blockId, numBlocks, numBlockPts, numBlockCells;
+  int blockPtId;
+  vtkIdType blockFirstCellId;
+  int num;
   vtkIdType* ptr;
-  vtkIdType num, id;
+  vtkIdType id;
+
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    cellIds->Initialize();
+    return;
+    } 
+
+  // Scan through blocks to find block that contains the point id.
+  blockId = 0;
+  blockFirstCellId = 0;
+  blockPtId = ptId;
+  numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+  while (blockPtId >= numBlockPts)
+    {
+    numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain point " << ptId);
+      cellIds->Initialize();
+      return;
+      }
+    blockPtId -= numBlockPts;
+    blockFirstCellId += numBlockCells;
+    numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+    }    
+
   int dims[3];
   this->GetBlockPointDimensions(blockId, dims);
   
-  vtkStructuredData::GetPointCells(ptId,cellIds,dims);
+  vtkStructuredData::GetPointCells(blockPtId,cellIds,dims);
   ptr = cellIds->GetPointer(0);
   num = cellIds->GetNumberOfIds();
   for (id = 0; id < num; ++id)
     {
-    *ptr += numCellsPerBlock * blockId;
+    *ptr += blockFirstCellId;
     ++ptr;
     }
 }
-
 
 
 //----------------------------------------------------------------------------
@@ -525,16 +589,13 @@ void vtkCTHData::GetPoint(vtkIdType id, double x[3])
 //----------------------------------------------------------------------------
 vtkIdType vtkCTHData::GetNumberOfPoints()
 {
-  int i;
-  vtkIdType nPoints=0;
-  
-  // Loop through all the blocks and add up cells
-  for(i=0;i<this->GetNumberOfBlocks(); ++i)
+  int last = this->GetNumberOfBlocks() - 1;
+  if (last < 0)
     {
-    nPoints += this->GetNumberOfPointsForBlock(i);
+    return 0;
     }
-  
-  return nPoints;
+  return this->GetBlockStartPointId(last) 
+            + this->GetNumberOfPointsForBlock(last);
 }
 
 
@@ -555,6 +616,7 @@ void vtkCTHData::CopyStructure(vtkDataSet *ds)
   vtkCTHData *src=vtkCTHData::SafeDownCast(ds);
   this->Initialize();
 
+  this->DeleteInternalArrays();
   for (i = 0; i < 3; ++i)
     {
     this->TopLevelSpacing[i] = src->TopLevelSpacing[i];
@@ -577,6 +639,8 @@ void vtkCTHData::CopyTypeSpecificInformation( vtkDataObject *data )
 {
   vtkCTHData *cth = vtkCTHData::SafeDownCast(data);
   int i;
+
+  this->DeleteInternalArrays();
 
   // Copy the generic stuff
   this->CopyInformation( data );
@@ -602,23 +666,47 @@ void vtkCTHData::CopyTypeSpecificInformation( vtkDataObject *data )
 
 
 //----------------------------------------------------------------------------
-
 vtkCell *vtkCTHData::GetCell(vtkIdType cellId)
 {
+  int blockId, numBlocks, numBlockPts, numBlockCells;
+  int blockCellId;
+  vtkIdType blockFirstPtId;
+  int idx;
+
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    return 0;
+    } 
+
+  // Scan through blocks to find block that contains the cell id.
+  blockId = 0;
+  blockFirstPtId = 0;
+  blockCellId = cellId;
+  numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+  while (blockCellId >= numBlockCells)
+    {
+    numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain cell " << cellId);
+      return 0;
+      }
+    blockCellId -= numBlockCells;
+    blockFirstPtId += numBlockPts;
+    numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+    }    
+      
+  int dims[3];
+  this->GetBlockPointDimensions(blockId, dims);
+  
   vtkCell *cell = NULL;
   int loc[3];
-  vtkIdType idx, npts;
+  vtkIdType npts;
   int iMin, iMax, jMin, jMax, kMin, kMax;
-  // hack
-  int dims[3];
-  this->GetBlockPointDimensions(0, dims);
   int d01 = dims[0]*dims[1];
   double x[3];
-  
-  // Charles all the logic for this entire method will be wrong... but punting again
-  int cellsPerBlock = this->GetNumberOfCellsForBlock(0);
-  int blockId = cellId / cellsPerBlock;
-  int blockCellId = cellId - (blockId*cellsPerBlock);
   double *origin = this->GetBlockOrigin(blockId);
   double *spacing = this->GetBlockSpacing(blockId);
 
@@ -694,7 +782,6 @@ vtkCell *vtkCTHData::GetCell(vtkIdType cellId)
     }
 
   // Extract point coordinates and point ids
-  vtkIdType blockPointOffset = this->GetNumberOfPointsForBlock(0) * blockId;
   npts = 0;
   for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
     {
@@ -706,7 +793,7 @@ vtkCell *vtkCTHData::GetCell(vtkIdType cellId)
         {
         x[0] = origin[0] + (loc[0] * spacing[0]); 
 
-        idx = blockPointOffset + loc[0] + loc[1]*dims[0] + loc[2]*d01;
+        idx = blockFirstPtId + loc[0] + loc[1]*dims[0] + loc[2]*d01;
         cell->PointIds->SetId(npts,idx);
         cell->Points->SetPoint(npts++,x);
         }
@@ -716,22 +803,48 @@ vtkCell *vtkCTHData::GetCell(vtkIdType cellId)
   return cell;
 }
 
+
 //----------------------------------------------------------------------------
 void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
 {
-  vtkIdType npts, idx;
+  int blockId, numBlocks, numBlockPts, numBlockCells;
+  int blockCellId;
+  vtkIdType blockFirstPtId;
+  int idx;
+
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    return;
+    } 
+
+  // Scan through blocks to find block that contains the cell id.
+  blockId = 0;
+  blockFirstPtId = 0;
+  blockCellId = cellId;
+  numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+  while (blockCellId >= numBlockCells)
+    {
+    numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain cell " << cellId);
+      return;
+      }
+    blockCellId -= numBlockCells;
+    blockFirstPtId += numBlockPts;
+    numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+    }    
+      
+  int dims[3];
+  this->GetBlockPointDimensions(blockId, dims);
+
+
+  vtkIdType npts;
   int loc[3];
   int iMin, iMax, jMin, jMax, kMin, kMax;
-  // hack
-  int dims[3];
-  this->GetBlockPointDimensions(0, dims);
   int d01 = dims[0]*dims[1];
-  
-  // Charles all the logic for this entire method will be wrong... but punting again
-  int cellsPerBlock = this->GetNumberOfCellsForBlock(0);
-  int blockPointOffset;
-  int blockId = cellId / cellsPerBlock;
-  int blockCellId = cellId - (blockId*cellsPerBlock);
   double *origin = this->GetBlockOrigin(blockId);
   double *spacing = this->GetBlockSpacing(blockId);
   double x[3];
@@ -809,9 +922,6 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
     }
 
   // Extract point coordinates and point ids
-  
-  // Charles all the logic for this entire method will be wrong... but punting again
-  blockPointOffset = this->GetNumberOfPointsForBlock(0) * blockId;
   for (npts=0,loc[2]=kMin; loc[2]<=kMax; loc[2]++)
     {
     x[2] = origin[2] + (loc[2] * spacing[2]); 
@@ -822,7 +932,7 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
         {
         x[0] = origin[0] + (loc[0] * spacing[0]); 
 
-        idx = blockPointOffset + loc[0] + loc[1]*dims[0] + loc[2]*d01;
+        idx = blockFirstPtId + loc[0] + loc[1]*dims[0] + loc[2]*d01;
         cell->PointIds->SetId(npts,idx);
         cell->Points->SetPoint(npts++,x);
         }
@@ -830,27 +940,44 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
     }
 }
 
-
 //----------------------------------------------------------------------------
 // Fast implementation of GetCellBounds().  Bounds are calculated without
 // constructing a cell.
 void vtkCTHData::GetCellBounds(vtkIdType cellId, double bounds[6])
 {
+  int blockId, numBlocks, numBlockCells;
+  int blockCellId;
+
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    return;
+    } 
+
+  // Scan through blocks to find block that contains the cell id.
+  blockId = 0;
+  blockCellId = cellId;
+  numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+  while (blockCellId >= numBlockCells)
+    {
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain cell " << cellId);
+      return;
+      }
+    blockCellId -= numBlockCells;
+    numBlockCells = this->GetNumberOfCellsForBlock(blockId);
+    }    
+      
+  int dims[3];
+  this->GetBlockPointDimensions(blockId, dims);
+
   int loc[3], iMin, iMax, jMin, jMax, kMin, kMax;
   double x[3];
-  
-  // Charles all the logic for this entire method will be wrong... but punting again
-  int cellsPerBlock = this->GetNumberOfCellsForBlock(0);
-  int blockId = cellId / cellsPerBlock;
-  int blockCellId = cellId - (blockId*cellsPerBlock);
   double *origin = this->GetBlockOrigin(blockId);
   double *spacing = this->GetBlockSpacing(blockId);
-  // hack
-  int dims[3];
-  this->GetBlockPointDimensions(0, dims);
-
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
-  
   if (dims[0] == 0 || dims[1] == 0 || dims[2] == 0)
     {
     vtkErrorMacro("Requesting cell bounds from an empty image.");
@@ -943,14 +1070,39 @@ void vtkCTHData::GetCellBounds(vtkIdType cellId, double bounds[6])
 double *vtkCTHData::GetPoint(vtkIdType ptId)
 {
   static double x[3];
+  int blockId, numBlocks, numBlockPts;
+  int blockPtId;
+
+  numBlocks = this->GetNumberOfBlocks();
+  if (numBlocks == 0)
+    {
+    vtkErrorMacro("Bad ID " << ptId);
+    return x;
+    } 
+
+  // Scan through blocks to find block that contains the point id.
+  blockId = 0;
+  blockPtId = ptId;
+  numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+  while (blockPtId >= numBlockPts)
+    {
+    ++blockId;
+    if (blockId >= numBlocks)
+      {
+      vtkErrorMacro("Data set does not contain point " << ptId);
+      return x;
+      }
+    blockPtId -= numBlockPts;
+    numBlockPts = this->GetNumberOfPointsForBlock(blockId);
+    }    
+
+  int dims[3];
+  this->GetBlockPointDimensions(blockId, dims);
+
   int i, loc[3];
-  
-  // Charles all the logic for this entire method will be wrong... but punting again
-  int pointsPerBlock = this->GetNumberOfPointsForBlock(0);
-  int blockId = ptId / pointsPerBlock;
-  ptId = ptId - (blockId*pointsPerBlock);
   double *origin = this->GetBlockOrigin(blockId);
   double *spacing = this->GetBlockSpacing(blockId);
+  ptId = blockPtId;
 
   if (spacing == 0)
     { // block out of range
@@ -958,10 +1110,6 @@ double *vtkCTHData::GetPoint(vtkIdType ptId)
     return x;
     }
    
-  // hack
-  int dims[3];
-  this->GetBlockPointDimensions(0, dims);
-
   x[0] = x[1] = x[2] = 0.0;
   if (dims[0] == 0 || dims[1] == 0 || dims[2] == 0)
     {
@@ -1030,8 +1178,7 @@ double *vtkCTHData::GetPoint(vtkIdType ptId)
 // Find the closest point.
 vtkIdType vtkCTHData::FindPoint(double x[3])
 {
-  // Charles all the logic for this entire method will be wrong... but punting again
-  int numPointsPerBlock = this->GetNumberOfPointsForBlock(0);
+  int blockFirstPtId = 0;
   int blockId, numBlocks, bestBlock = 0, bestBlockPtId = 0;
   int i, loc[3];
   double d;
@@ -1039,10 +1186,8 @@ vtkIdType vtkCTHData::FindPoint(double x[3])
   double *origin;
   double *spacing;
   int dims[3];
-  int extent[6];
-  this->GetExtent(extent);
 
-  // But force.
+  // Brut force.
   // Loop through all blocks.
   bestDist = VTK_LARGE_FLOAT;
   numBlocks = this->GetNumberOfBlocks();
@@ -1059,7 +1204,7 @@ vtkIdType vtkCTHData::FindPoint(double x[3])
       {
       d = x[i] - origin[i];
       loc[i] = (int) ((d / spacing[i]) + 0.5);
-      if ( loc[i] < extent[i*2])
+      if ( loc[i] < 0)
         {
         loc[i] = 0;
         }
@@ -1069,17 +1214,16 @@ vtkIdType vtkCTHData::FindPoint(double x[3])
         }
       d = d - (spacing[i]*loc[i]);
       dist += d*d;
-      // since point id is relative to the first point actually stored
-      loc[i] -= 0;
       }
     if (dist < bestDist)
       {
       bestBlock = blockId;
-      bestBlockPtId = loc[2]*dims[0]*dims[1] + loc[1]*dims[0] + loc[0];
+      bestBlockPtId = blockFirstPtId + loc[2]*dims[0]*dims[1] + loc[1]*dims[0] + loc[0];
       bestDist = dist;
       }
+    blockFirstPtId += this->GetNumberOfPointsForBlock(blockId);
     }
-  return bestBlock*numPointsPerBlock + bestBlockPtId;
+  return bestBlockPtId;
 }
 
 //----------------------------------------------------------------------------
@@ -1101,14 +1245,14 @@ vtkIdType vtkCTHData::FindCell(double x[3], vtkCell *vtkNotUsed(cell),
                                  int& subId, double pcoords[3], double *weights)
 {
   int loc[3];
-  //hack
   int dims[3];
-  this->GetBlockPointDimensions(0, dims);
   int blockId, numBlocks;
+  vtkIdType blockFirstCellId = 0;
 
   numBlocks = this->GetNumberOfBlocks();
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
+    this->GetBlockPointDimensions(blockId, dims);
     if ( this->ComputeStructuredCoordinates(blockId, x, loc, pcoords) != 0 )
       {
       vtkVoxel::InterpolationFunctions(pcoords,weights);
@@ -1117,11 +1261,11 @@ vtkIdType vtkCTHData::FindCell(double x[3], vtkCell *vtkNotUsed(cell),
       //
       subId = 0;
       
-      // Charles this logic is wrong... but punting again
-      return (this->GetNumberOfCellsForBlock(0) * blockId) +
+      return blockFirstCellId +
              loc[2] * (dims[0]-1)*(dims[1]-1) +
              loc[1] * (dims[0]-1) + loc[0];
       }
+    blockFirstCellId += this->GetNumberOfCellsForBlock(blockId);
     }
   return -1;
 }
@@ -1135,10 +1279,9 @@ vtkCell *vtkCTHData::FindAndGetCell(double x[3],
 {
   int i, j, k, loc[3];
   vtkIdType npts, idx;
-  // hack
   int dims[3];
-  this->GetBlockPointDimensions(0, dims);
-  vtkIdType d01 = dims[0]*dims[1];
+  vtkIdType blockFirstPtId = 0;
+  vtkIdType d01;
   double xOut[3];
   int iMax = 0;
   int jMax = 0;
@@ -1151,6 +1294,8 @@ vtkCell *vtkCTHData::FindAndGetCell(double x[3],
   numBlocks = this->GetNumberOfBlocks();
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
+    this->GetBlockPointDimensions(blockId, dims);
+    d01 = dims[0]*dims[1];
     origin = this->GetBlockOrigin(blockId);
     spacing = this->GetBlockSpacing(blockId);
 
@@ -1233,7 +1378,7 @@ vtkCell *vtkCTHData::FindAndGetCell(double x[3],
             {
             xOut[0] = origin[0] + i * spacing[0]; 
 
-            cell->PointIds->SetId(npts,idx);
+            cell->PointIds->SetId(npts, blockFirstPtId+idx);
             cell->Points->SetPoint(npts++,xOut);
             }
           }
@@ -1242,6 +1387,7 @@ vtkCell *vtkCTHData::FindAndGetCell(double x[3],
 
       return cell;
       }
+    blockFirstPtId += this->GetNumberOfPointsForBlock(blockId);
     }
   return NULL;
 }
@@ -1377,8 +1523,6 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   vtkIndent i2 = indent.GetNextIndent();
   int idx;
-  // hack
-  //int *dims = this->GetBlockPointDimensions(0);
   int numBlocks = this->GetNumberOfBlocks();
   double* origin;
   double* spacing;
@@ -1422,6 +1566,7 @@ void vtkCTHData::ShallowCopy(vtkDataObject *dataObject)
 {
   vtkCTHData *cthData = vtkCTHData::SafeDownCast(dataObject);
 
+  this->DeleteInternalArrays();
   if ( cthData != NULL )
     {
     this->InternalCTHDataCopy(cthData);
@@ -1436,6 +1581,7 @@ void vtkCTHData::DeepCopy(vtkDataObject *dataObject)
 {
   vtkCTHData *cthData = vtkCTHData::SafeDownCast(dataObject);
 
+  this->DeleteInternalArrays();
   if ( cthData != NULL )
     {
     this->InternalCTHDataCopy(cthData);
@@ -1473,64 +1619,34 @@ void vtkCTHData::InternalCTHDataCopy(vtkCTHData *src)
 //----------------------------------------------------------------------------
 vtkIdType vtkCTHData::GetNumberOfCellsForBlock(int blockId) 
 {
-  vtkIdType nCells=1;
-  int i;
-
-  int dims[3]; 
-  this->GetBlockCellDimensions(blockId, dims);
-
-  for (i=0; i<3; i++)
+  if (this->BlockNumberOfCells == 0)
     {
-    if (dims[i] == 0)
-      {
-      return 0;
-      }
-    if (dims[i] > 1)
-      {
-      nCells *= dims[i];
-      }
+    this->CreateInternalArrays();
     }
-  return nCells;
+  return this->BlockNumberOfCells[blockId];
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkCTHData::GetNumberOfPointsForBlock(int blockId) 
 {
-  vtkIdType nCells=1;
-  int i;
-  int dims[3];
-  this->GetBlockPointDimensions(blockId, dims);
-
-  for (i=0; i<3; i++)
+  if (this->BlockNumberOfPoints == 0)
     {
-    if (dims[i] == 0)
-      {
-      return 0;
-      }
-    if (dims[i] > 1)
-      {
-      nCells *= dims[i];
-      }
+    this->CreateInternalArrays();
     }
-  return nCells;
+  return this->BlockNumberOfPoints[blockId];
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkCTHData::GetNumberOfCells() 
 {
-  int i;
-  vtkIdType nCells=0;
-  
-  // Loop through all the blocks and add up cells
-  for(i=0;i<this->GetNumberOfBlocks(); ++i)
+  int last = this->GetNumberOfBlocks() - 1;
+  if (last < 0)
     {
-    nCells += this->GetNumberOfCellsForBlock(i);
+    return 0;
     }
-  
-  return nCells;
+  return this->GetBlockStartCellId(last) 
+            + this->GetNumberOfCellsForBlock(last);
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkCTHData::SetUpdateExtent(int piece, int numPieces,
@@ -1550,3 +1666,87 @@ void vtkCTHData::GetUpdateExtent(int &piece, int &numPieces,
   ghostLevel = this->GetUpdateGhostLevel();
 }
 
+//----------------------------------------------------------------------------
+vtkIdType vtkCTHData::GetBlockStartPointId(int blockId)
+{
+  if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
+    {
+    vtkErrorMacro("Block id " << blockId << " out of range.");
+    return 0;
+    }
+  if (this->BlockStartPointIds == 0)
+    {
+    this->CreateInternalArrays();
+    }
+  return this->BlockStartPointIds[blockId];
+}  
+
+      
+//----------------------------------------------------------------------------
+vtkIdType vtkCTHData::GetBlockStartCellId(int blockId)
+{
+  if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
+    {
+    vtkErrorMacro("Block id " << blockId << " out of range.");
+    return 0;
+    }
+  if (this->BlockStartCellIds == 0)
+    {
+    this->CreateInternalArrays();
+    }
+  return this->BlockStartCellIds[blockId];
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHData::DeleteInternalArrays()
+{
+  if (this->BlockStartCellIds)
+    {
+    delete [] this->BlockStartCellIds;
+    this->BlockStartCellIds = 0;
+    }
+  if (this->BlockStartPointIds)
+    {
+    delete [] this->BlockStartPointIds;
+    this->BlockStartPointIds = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHData::CreateInternalArrays()
+{
+  int numBlocks = this->GetNumberOfBlocks();
+  int id, tmp;
+  vtkIdType ptCount = 0;
+  vtkIdType cellCount = 0;
+  int dims[3];
+
+  if (this->BlockStartCellIds)
+    {
+    return;
+    }
+  if (numBlocks <= 0)
+    {
+    return;
+    }
+  
+  this->BlockStartCellIds = new vtkIdType[numBlocks];
+  this->BlockStartPointIds = new vtkIdType[numBlocks];
+  this->BlockNumberOfPoints = new int[numBlocks];
+  this->BlockNumberOfCells = new int[numBlocks];
+  for (id = 0; id < numBlocks; ++id)
+    {
+    this->BlockStartCellIds[id] = cellCount;
+    this->BlockStartPointIds[id] = ptCount;
+
+    this->GetBlockCellDimensions(id, dims);
+    tmp = dims[0] * dims[1] * dims[2];
+    this->BlockNumberOfCells[id] = tmp;
+    cellCount += (vtkIdType)(tmp);
+    // This call handles collapsed dimensions.
+    this->GetBlockPointDimensions(id, dims);
+    tmp = dims[0] * dims[1] * dims[2];
+    this->BlockNumberOfPoints[id] = tmp;
+    ptCount += (vtkIdType)(tmp);
+    }
+}
