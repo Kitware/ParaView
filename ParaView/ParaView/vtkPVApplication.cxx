@@ -39,6 +39,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVApplication.h"
+
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
@@ -48,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
-#include "vtkPVApplication.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
@@ -1354,9 +1355,6 @@ int vtkPVApplication::GetGlobalLODFlag()
 vtkObject *vtkPVApplication::MakeTclObject(const char *className,
                                            const char *tclName)
 {
-  vtkObject *o;
-  int error;
-
   this->BroadcastScript("%s %s", className, tclName);
   return this->TclToVTKObject(tclName);
 }
