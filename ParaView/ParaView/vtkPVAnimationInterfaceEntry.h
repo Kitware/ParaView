@@ -96,7 +96,9 @@ public:
 
   void SetCurrentIndex(int idx);
 
-  void SetLabelAndScript(const char* label, const char* script);
+  void SetLabelAndScript(const char* label, 
+                         const char* script, 
+                         const char* traceName);
 
   // Description:
   // This method has to be called in PV widget after all modifications of this
@@ -203,8 +205,12 @@ protected:
   char*              SaveStateScript;
   char*              Script;
   char*              CurrentMethod;
+  char*              TraceName;
   char*              TimeEquation;
   char*              Label;
+
+  vtkSetStringMacro(TraceName);
+  vtkGetStringMacro(TraceName);
 
   vtkPVWidgetProperty *CurrentProperty;
   

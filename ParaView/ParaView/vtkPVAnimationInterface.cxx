@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.119");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.120");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1551,7 +1551,7 @@ int vtkPVAnimationInterface::IsAnimationValid()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* imageFileName,
-                                                const char* geometryFileName)
+                                                const char* /*geometryFileName*/)
 {
   char *root;
   char *ext;
@@ -1560,22 +1560,43 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
   int timeIdx;
   char countStr[10];
 
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
   timeIdx = 0;
-  while (t < this->GetGlobalEnd())
+  while (t <= this->GetGlobalEnd())
     {
     float ctime = static_cast<float>(t) / 
       static_cast<float>(this->NumberOfFrames-1);
 
-    *file << "set globalPVTime " << ctime << "\n";
-    *file << this->GetScript() << endl;
-    sprintf(countStr, "%05d", (int)(timeIdx));
+    this->Script("set globalPVTime %g", ctime);
+
+    vtkCollectionIterator* it = this->AnimationEntriesIterator;
+    for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+      {
+      vtkPVAnimationInterfaceEntry* entry
+        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      if ( entry->GetCustomScript() )
+        {
+        }
+      else
+        {
+        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        if (prop)
+          {
+          this->Script(entry->GetTimeEquation());
+          prop->SetAnimationTimeInBatch(
+            file, vtkKWObject::GetFloatResult(pvApp));
+          }
+        }
+      }
+
+    *file << "$Ren1 UpdateVTKObjects; $Ren1 StillRender" << endl;
+    
     if (imageFileName)
       {
-      *file << "RenWin1 Render\n";
-      *file << "compManager Composite\n";
-      *file << "if {$myProcId == 0} {\n";  
+      sprintf(countStr, "%05d", (int)(timeIdx));
       root = new char[strlen(imageFileName)+1];
       strcpy(root, imageFileName);
       ext = NULL;
@@ -1592,23 +1613,29 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         {
         *ext = '\0';
         ++ext;
-        *file << "\t" << "ImageWriter SetFileName {" << root << countStr
-              << "." << ext << "}\n";
-        }
-      else
-        {
-        *file << "\t" << "ImageWriter SetFileName {" << root << countStr << "}\n";
-        }
-      *file << "\t" << "ImageWriter Write\n";
-      *file << "}\n";
-      delete [] root;
+        *file << "$Ren1 WriteImage {" << root << countStr
+               << "." << ext << "}\n";
+         }
+       else
+         {
+         *file << "$Ren1 WriteImage {" << root << countStr << "}\n";
+         }
       }
-    if (geometryFileName)
-      {
-      this->GetWindow()->SaveGeometryInBatchFile(file, 
-                                                 geometryFileName,
-                                                 timeIdx);
-      }
+
+// TODO implement this
+//      *file << "set globalPVTime " << ctime << "\n";
+//      *file << this->GetScript() << endl;
+//      sprintf(countStr, "%05d", (int)(timeIdx));
+//        *file << "\t" << "ImageWriter Write\n";
+//        *file << "}\n";
+//        delete [] root;
+//        }
+//      if (geometryFileName)
+//        {
+//        this->GetWindow()->SaveGeometryInBatchFile(file, 
+//                                                   geometryFileName,
+//                                                   timeIdx);
+//        }
     *file << endl;
     ++timeIdx;
     ++t;
