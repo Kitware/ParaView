@@ -107,11 +107,13 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     }
 #endif
 
+  Tcl_Interp *interp;
+
   if (myId ==  0)
     { // The last process is for UI.
 
     // We need to pass the local controller to the UI process.
-    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
     // To bypass vtkKWApplicaion assigning vtkKWApplicationCommand
     // to the tcl command, create the application from tcl.
@@ -149,7 +151,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     //putenv("DISPLAY=:0.0");
 
     vtkKWApplication::SetWidgetVisibility(0);
-    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
@@ -171,6 +173,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     controller->AddRMI(vtkPVSlaveScript, (void *)(app), VTK_PV_SLAVE_SCRIPT_RMI_TAG);
     controller->ProcessRMIs();
     }
+
+  Tcl_DeleteInterp(interp);
 }
 
 #ifdef _WIN32
@@ -293,6 +297,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
   free(argv);
 
+  
   Tcl_Finalize();
   return retVal;;
 }
