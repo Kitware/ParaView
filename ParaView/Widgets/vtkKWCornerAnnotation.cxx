@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWScale.h"
@@ -55,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.4");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.5");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -218,12 +219,15 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
   this->MaximumLineHeightScale->SetParent(this->GetFrame());
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
+  this->MaximumLineHeightScale->PopupScaleOn();
   this->MaximumLineHeightScale->Create(this->Application, "");
   this->MaximumLineHeightScale->SetValue(
     this->CornerProp->GetMaximumLineHeight());
   this->MaximumLineHeightScale->DisplayEntry();
   this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
   this->MaximumLineHeightScale->DisplayLabel("Max line height:");
+  this->Script("%s configure -width 5", 
+               this->MaximumLineHeightScale->GetEntry()->GetWidgetName());
   this->MaximumLineHeightScale->SetBalloonHelpString("Set the maximum height of a line of text as a percentage of the vertical area allocated to this scaled text actor.");
   this->MaximumLineHeightScale->SetCommand(
     this, "MaximumLineHeightCallback");
@@ -430,7 +434,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.29.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.29.2.5 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
