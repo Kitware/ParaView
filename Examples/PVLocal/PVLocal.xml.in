@@ -1,5 +1,6 @@
 <ModuleInterfaces>
  <Library name="@PROJECT_NAME@" directory="@LIBRARY_OUTPUT_PATH@"/>
+ <ServerManagerFile name="@PROJECT_NAME@.pvsm"/>
 
  <!-- Start of ParaView plugin interface specification. -->
  <Module name="LocalConeSource" menu_name="LocalCone" root_name="LocalCone"
