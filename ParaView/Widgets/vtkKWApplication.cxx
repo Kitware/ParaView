@@ -65,6 +65,7 @@ static Tcl_Interp *Et_Interp = 0;
 
 #ifdef _WIN32
 #include <htmlhelp.h>
+#include "kwappicon.h"
 #endif
 
 int vtkKWApplication::WidgetVisibility = 1;
@@ -72,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.95");
+vtkCxxRevisionMacro(vtkKWApplication, "1.96");
 
 
 
@@ -512,6 +513,11 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Et_DoInit(interp);
 #endif
   
+  // create the SetApplicationIcon command
+#ifdef _WIN32
+  ApplicationIcon_DoInit(interp);
+#endif
+
   // initialize VTK
   Vtktcl_Init(interp);
 
