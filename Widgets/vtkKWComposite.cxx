@@ -42,6 +42,8 @@ vtkKWComposite::vtkKWComposite()
   this->Application = NULL;
   this->View = NULL;
   this->LastSelectedProperty = -1;
+  
+  this->PropertiesParent = NULL;
 }
 
 vtkKWComposite::~vtkKWComposite()
@@ -64,6 +66,12 @@ vtkKWComposite::~vtkKWComposite()
     {
     this->View->UnRegister(this);
     this->View = NULL;
+    }
+  
+  if (this->PropertiesParent)
+    {
+    this->PropertiesParent->Delete();
+    this->PropertiesParent = NULL;
     }
 }
 
@@ -110,31 +118,54 @@ void vtkKWComposite::InitializeProperties()
     }
 }
 
+
+void vtkKWComposite::SetPropertiesParent(vtkKWWidget *parent)
+{
+  if (this->PropertiesParent == parent)
+    {
+    return;
+    }
+  if (this->PropertiesParent)
+    {
+    vtkErrorMacro("Cannot reparent properties.");
+    return;
+    }
+  this->PropertiesParent = parent;
+  parent->Register(this);
+}
+
+
 void vtkKWComposite::CreateProperties()
 {
   vtkKWApplication *app = this->Application;
 
-  // if we have a view then use its attachment point
-  if (this->View && this->View->GetPropertiesParent())
+  // If the user has not set the properties parent.
+  if (this->PropertiesParent == NULL)
     {
-    this->Notebook->SetParent(this->View->GetPropertiesParent());
-    this->Notebook2->SetParent(this->View->GetPropertiesParent());
-    }
-  else
-    {
-    // create and use a toplevel shell
-    this->TopLevel = vtkKWWidget::New();
-    this->TopLevel->Create(app,"toplevel","");
-    this->Script("wm title %s \"Properties\"",
+    if (this->View && this->View->GetPropertiesParent())
+      { // if we have a view then use its attachment point
+      this->SetPropertiesParent(this->View->GetPropertiesParent());
+      this->Notebook2->SetParent(this->View->GetPropertiesParent());
+      }
+    else
+      {
+      // create and use a toplevel shell
+      this->TopLevel = vtkKWWidget::New();
+      this->TopLevel->Create(app,"toplevel","");
+      this->Script("wm title %s \"Properties\"",
+		   this->TopLevel->GetWidgetName());
+      this->Script("wm iconname %s \"Properties\"",
                  this->TopLevel->GetWidgetName());
-    this->Script("wm iconname %s \"Properties\"",
-                 this->TopLevel->GetWidgetName());
-    this->Notebook->SetParent(this->TopLevel);
-    this->Notebook2->SetParent(this->TopLevel);
+      this->SetPropertiesParent(this->TopLevel);
+      }
     }
+  
+  this->Notebook->SetParent(this->PropertiesParent);
+  this->Notebook2->SetParent(this->PropertiesParent);
   this->Notebook->Create(this->Application,"");
   this->Notebook2->Create(this->Application,"");
 
+  // I do not think this should be here, but removing it will probably break VolView.
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
 }
@@ -166,5 +197,5 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }

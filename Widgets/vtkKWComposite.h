@@ -97,6 +97,13 @@ public:
   // A chance for the composite to reset itself
   virtual void Reset() {};
   
+  // Description:
+  // This allows you to set the propertiesParent to any widget you like.  
+  // If you do not specify a parent, then the views->PropertyParent is used.  
+  // If the composite does not have a view, then a top level window is created.
+  void SetPropertiesParent(vtkKWWidget *parent);
+  vtkGetObjectMacro(PropertiesParent, vtkKWWidget);
+  
 protected:
   vtkKWComposite();
   ~vtkKWComposite();
@@ -109,6 +116,8 @@ protected:
   int PropertiesCreated;
   vtkKWWidget *TopLevel;
   vtkKWView *View;
+
+  vtkKWWidget *PropertiesParent;
 };
 
 
