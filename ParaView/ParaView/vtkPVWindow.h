@@ -158,12 +158,12 @@ public:
 
   // Description:
   // Copy the trace file to a file with the specified file name.
-  void SaveTrace();  
+  void SaveTrace();
   
   // Description:
   // Save the pipeline ParaView Tcl script
   void SaveWorkspace();
-
+  
   // Description:
   // Open a data file.
   void OpenCallback();
@@ -207,6 +207,10 @@ public:
   vtkPVSource *ProbeCallback();
   
   // Description:
+  // Callback from the extract voids button.
+  vtkPVSource *ExtractVoidsCallback();
+  
+  // Description:
   // Callback from the frame rate scale.
   void FrameRateScaleCallback();
 
@@ -239,6 +243,7 @@ public:
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
   vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
+  vtkGetObjectMacro(ExtractVoidsButton, vtkKWPushButton);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
 
   // Description:
@@ -326,6 +331,7 @@ protected:
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;
   vtkKWPushButton *ProbeButton;
+  vtkKWPushButton *ExtractVoidsButton;
   
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;

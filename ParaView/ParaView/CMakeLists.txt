@@ -5,6 +5,7 @@ vtkDummyRenderWindow
 vtkInteractor 
 vtkKWBoundsDisplay
 vtkKWCenterOfRotation 
+vtkKWExtractGeometryByScalar
 vtkKWFlyInteractor 
 vtkKWInteractor 
 vtkKWRotateCameraInteractor 
@@ -17,15 +18,19 @@ vtkPVArrayMenu
 vtkPVArraySelection
 vtkPVBoundsDisplay
 vtkPVClip
+vtkPVComponentSelection
+vtkPVConnectivityFilter
 vtkPVCut
 vtkPVContour 
 vtkPVContourEntry 
+vtkPVCutPlane
 vtkPVData 
 vtkPVDataSetFileEntry
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentEntry
 vtkPVExtentTranslator 
+vtkPVExtractGeometryByScalar
 vtkPVFileEntry
 vtkPVGlyph3D 
 vtkPVInputMenu 

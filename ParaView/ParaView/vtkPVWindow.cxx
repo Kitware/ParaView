@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContour.h"
 #include "vtkPVGlyph3D.h"
 #include "vtkPVProbe.h"
+#include "vtkPVExtractGeometryByScalar.h"
 
 #include "vtkKWInteractor.h"
 #include "vtkKWFlyInteractor.h"
@@ -150,6 +151,7 @@ vtkPVWindow::vtkPVWindow()
   this->ContourButton = vtkKWPushButton::New();
   this->GlyphButton = vtkKWPushButton::New();
   this->ProbeButton = vtkKWPushButton::New();
+  this->ExtractVoidsButton = vtkKWPushButton::New();
 
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
@@ -339,6 +341,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->ProbeButton->Delete();
     this->ProbeButton = NULL;
+    }
+  
+  if (this->ExtractVoidsButton)
+    {
+    this->ExtractVoidsButton->Delete();
+    this->ExtractVoidsButton = NULL;
     }
   
   if (this->FrameRateLabel)
@@ -617,7 +625,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->ProbeButton->SetCommand(this, "ProbeCallback");
   this->ProbeButton->SetBalloonHelpString("Probe");
   
-  this->Script("pack %s %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+  this->ExtractVoidsButton->SetParent(this->Toolbar);
+  this->ExtractVoidsButton->Create(app, "-text \"Extract Voids\"");
+  this->ExtractVoidsButton->SetCommand(this, "ExtractVoidsCallback");
+  this->ExtractVoidsButton->SetBalloonHelpString("Extract Voids");
+  
+  this->Script("pack %s %s %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),
                this->CutButton->GetWidgetName(),
                this->ClipButton->GetWidgetName(),
@@ -625,7 +638,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
                this->GlyphButton->GetWidgetName(),
-               this->ProbeButton->GetWidgetName());
+               this->ProbeButton->GetWidgetName(),
+               this->ExtractVoidsButton->GetWidgetName());
   
   // No trace
   this->FrameRateScale->SetParent(this->GetToolbarFrame());
@@ -810,6 +824,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
 	       this->GetWidgetName(), this->GetTclName());
+
 
   // Try to load modules we know about.
   if (this->LoadModule("vtkARLTCL.pvm"))
@@ -2583,6 +2598,88 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
 }
 
 //----------------------------------------------------------------------------
+vtkPVSource *vtkPVWindow::ExtractVoidsCallback()
+{
+  static int instanceCount = 1;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVExtractGeometryByScalar *extract;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  const char* outputDataType;
+  vtkPVData *current;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot extract voids; no input");
+    return NULL;
+    }
+  outputDataType = "vtkUnstructuredGrid";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "ExtractVoids", instanceCount);
+  // Create the object through tcl on all processes.
+  s =
+    (vtkSource *)(pvApp->MakeTclObject("vtkKWExtractGeometryByScalar",
+                                       tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return NULL;
+    }
+  
+  extract = vtkPVExtractGeometryByScalar::New();
+  extract->SetView(this->GetMainView());
+  extract->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  extract->SetApplication(pvApp);
+  extract->SetVTKSource(s, tclName);
+  extract->SetName(tclName);
+
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ExtractVoidsCallback]", 
+                       extract->GetTclName(), this->GetTclName());
+  extract->SetTraceInitialized(1);
+
+  extract->SetPVInput(current);
+  extract->CreateProperties();
+
+  this->AddPVSource(extract);
+  this->SetCurrentPVSource(extract);
+  this->ShowCurrentSourceProperties();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetPVApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "ExtractVoids", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  extract->SetPVOutput(pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", extract->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  // Push along the extent translator (for consistent pieces).
+  pvApp->BroadcastScript(
+    "%s SetExtentTranslator [%s GetExtentTranslator]",
+    pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
+
+  extract->Delete();
+  pvd->Delete();
+  
+  ++instanceCount;
+
+  this->DisableMenus();
+  this->DisableFilterButtons();
+
+  return extract;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::ShowWindowProperties()
 {
   this->ShowProperties();
@@ -3275,6 +3372,8 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Boolean name=\"NonManifold\" set=\"SetNonManifoldTraversal\" get=\"GetNonManifoldTraversal\" help=\"Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops.\"/>\n"
 "  <Boolean name=\"PieceInvariant\" help=\"Turn this off if you do not want to process ghost levels and do not mind seams.\"/>\n"
 "</Filter>\n"
+"\n"
+"<Filter class=\"vtkPVConnectivityFilter\" root=\"Connect\" input=\"vtkDataSet\" output=\"vtkUnstructuredGrid\"/>\n"
 "\n"
 "<Filter class=\"vtkQuadricClustering\" root=\"QC\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
 "  <Vector name=\"Spacing\" set=\"SetDivisionSpacing\" get=\"GetDivisionSpacing\" type=\"float\" length=\"3\" help=\"Set the spacing of the bins in each dimension\"/>\n"
