@@ -8,10 +8,10 @@ IF (VTK_USE_MPI)
   ENDIF (UNIX)
 ENDIF (VTK_USE_MPI)
 
+#                  TestStructuredGridIO
 SET(PROJECT_TESTS SimplePackage
                   TestPolyDataIO
                   TestUnstructuredGridIO
-                  TestStructuredGridIO
                   TestRectilinearGridIO
                   TestImageDataIO    )
 
