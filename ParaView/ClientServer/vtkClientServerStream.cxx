@@ -190,6 +190,18 @@ void vtkClientServerStream::Copy(const vtkClientServerStream* source)
 vtkClientServerStream&
 vtkClientServerStream::Write(const void* data, size_t length)
 {
+  // Make sure we have data.
+  if(length == 0)
+    {
+    return *this;
+    }
+  else if(!data)
+    {
+    vtkGenericWarningMacro(
+      "vtkClientServerStream::Write given NULL pointer and non-zero length.");
+    return *this;
+    }
+
   // Copy the value into the data.
   this->Internal->Data.resize(this->Internal->Data.size() + length);
   memcpy(&*this->Internal->Data.end() - length, data, length);
@@ -344,7 +356,7 @@ vtkClientServerStream&
 vtkClientServerStreamOperatorSL(vtkClientServerStream* self,
                                 vtkClientServerStreamInternals* internal, T x)
 {
-  /* Store the type first, then the value. */
+  // Store the type first, then the value.
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
   *self << vtkClientServerTypeTraits<Type>::Value();
   return internal->Write(*self, &x, sizeof(x));
@@ -375,8 +387,9 @@ VTK_CLIENT_SERVER_OPERATOR(double)
 //----------------------------------------------------------------------------
 vtkClientServerStream& vtkClientServerStream::operator << (const char* x)
 {
-  // String length will include null terminator.
-  vtkTypeUInt32 length = static_cast<vtkTypeUInt32>(strlen(x)+1);
+  // String length will include null terminator.  NULL string will be
+  // length 0.
+  vtkTypeUInt32 length = static_cast<vtkTypeUInt32>(x?(strlen(x)+1):0);
   *this << vtkClientServerStream::string_value;
   this->Write(&length, sizeof(length));
   return this->Write(x, static_cast<size_t>(length));
@@ -388,7 +401,7 @@ template <class T>
 vtkClientServerStream::Array
 vtkClientServerStreamInsertArray(const T* data, int length)
 {
-  /* Construct and return the array information structure. */
+  // Construct and return the array information structure.
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
   vtkClientServerStream::Array a =
     {
@@ -429,10 +442,10 @@ template <class SourceType, class T>
 void vtkClientServerStreamGetArgumentCase(SourceType*,
                                           const unsigned char* src, T* dest)
 {
-  /* Copy the value out of the stream and convert it. */
+  // Copy the value out of the stream and convert it.
   SourceType value;
   memcpy(&value, src, sizeof(value));
-  *dest = value;
+  *dest = static_cast<T>(value);
   memcpy(dest, src, sizeof(*dest));
 }
 
@@ -450,7 +463,11 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeInt8.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     default: return 0;
     };
   return 1;
@@ -463,9 +480,13 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeInt16.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     default: return 0;
     };
   return 1;
@@ -478,11 +499,15 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeInt32.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
     default: return 0;
     };
   return 1;
@@ -495,6 +520,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeInt64.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
@@ -502,6 +528,9 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     default: return 0;
     };
   return 1;
@@ -514,7 +543,11 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeUInt8.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     default: return 0;
     };
   return 1;
@@ -527,8 +560,13 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeUInt16.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     default: return 0;
     };
   return 1;
@@ -541,9 +579,15 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeUInt32.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
     default: return 0;
     };
   return 1;
@@ -556,10 +600,17 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeUInt64.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
+    VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
+    VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
     default: return 0;
     };
   return 1;
@@ -572,11 +623,17 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeFloat32.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
+
+    // Unsafe conversions:
+    VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
     default: return 0;
     };
   return 1;
@@ -589,6 +646,7 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
   // Lookup what types can be converted safely to a vtkTypeFloat64.
   switch(type)
     {
+    // Safe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
@@ -615,12 +673,12 @@ vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
   if(const unsigned char* data = internal->GetValue(*self, midx, 1+argument))
     {
-    /* Get the type of the value in the stream. */
+    // Get the type of the value in the stream.
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
 
-    /* Call the type conversion function for this type. */
+    // Call the type conversion function for this type.
     return vtkClientServerStreamGetArgument(
       static_cast<vtkClientServerStream::Types>(tp), data,
       reinterpret_cast<Type*>(value));
@@ -664,23 +722,26 @@ vtkClientServerStreamGetArgumentArray(const vtkClientServerStream* self,
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
   if(const unsigned char* data = internal->GetValue(*self, midx, 1+argument))
     {
-    /* Get the type of the value in the stream. */
+    // Get the type of the value in the stream.
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
 
-    /* Get the length of the value in the stream. */
-    vtkTypeUInt32 len;
-    memcpy(&len, data, sizeof(len));
-    data += sizeof(len);
-
-    /* If the type and length of the array match, use it. */
+    // If the type and length of the array match, use it.
     if(static_cast<vtkClientServerStream::Types>(tp) ==
-       vtkClientServerTypeTraits<Type>::Array() && len == length)
+       vtkClientServerTypeTraits<Type>::Array())
       {
-      /* Copy the value out of the stream. */
-      memcpy(value, data, len*sizeof(Type));
-      return 1;
+      // Get the length of the value in the stream.
+      vtkTypeUInt32 len;
+      memcpy(&len, data, sizeof(len));
+      data += sizeof(len);
+
+      if(len == length)
+        {
+        // Copy the value out of the stream.
+        memcpy(value, data, len*sizeof(Type));
+        return 1;
+        }
       }
     }
   return 0;
@@ -724,15 +785,25 @@ int vtkClientServerStream::GetArgument(int message, int argument,
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
 
-    // Skip the length value.
-    data += sizeof(vtkTypeUInt32);
-
     // Make sure the type is a string.
     if(static_cast<vtkClientServerStream::Types>(tp) ==
        vtkClientServerStream::string_value)
       {
-      // Give back a pointer directly to the string in the stream.
-      *value = reinterpret_cast<const char*>(data);
+      // Get the length of the string.
+      vtkTypeUInt32 len;
+      memcpy(&len, data, sizeof(len));
+      data += sizeof(len);
+
+      if(len > 0)
+        {
+        // Give back a pointer directly to the string in the stream.
+        *value = reinterpret_cast<const char*>(data);
+        }
+      else
+        {
+        // String pointer value was NULL.
+        *value = 0;
+        }
       return 1;
       }
     }
@@ -777,10 +848,30 @@ int vtkClientServerStream::GetArgument(int message, int argument,
 }
 
 //----------------------------------------------------------------------------
+// Template to implement GetArgument zero-to-null-pointer conversions.
+template <class SourceType>
+int vtkClientServerStreamGetArgumentPointer(SourceType*,
+                                            const unsigned char* src,
+                                            vtkObjectBase** dest)
+{
+  // Copy the value out of the stream.
+  SourceType value;
+  memcpy(&value, src, sizeof(value));
+
+  // Values of 0 can be converted to a NULL pointer.
+  if(value == static_cast<SourceType>(0))
+    {
+    *dest = 0;
+    return 1;
+    }
+  return 0;
+}
+
 int vtkClientServerStream::GetArgument(int message, int argument,
                                        vtkObjectBase** value) const
 {
   // Get a pointer to the type/value pair in the stream.
+  int result = 0;
   if(const unsigned char* data = this->GetValue(message, 1+argument))
     {
     // Get the type of the value in the stream.
@@ -788,16 +879,23 @@ int vtkClientServerStream::GetArgument(int message, int argument,
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
 
-    // Make sure the type is a vtk_object_pointer.
-    if(static_cast<vtkClientServerStream::Types>(tp) ==
-       vtkClientServerStream::vtk_object_pointer)
+    // Make sure the type is a vtk_object_pointer or is 0.
+    switch(static_cast<vtkClientServerStream::Types>(tp))
       {
-      // Copy the value out of the stream.
-      memcpy(value, data, sizeof(*value));
-      return 1;
+      VTK_CSS_TEMPLATE_MACRO(value, result =
+                             vtkClientServerStreamGetArgumentPointer
+                             (T, data, value));
+      case vtkClientServerStream::vtk_object_pointer:
+        {
+        // Copy the value out of the stream.
+        memcpy(value, data, sizeof(*value));
+        result = 1;
+        } break;
+      default:
+        break;
       }
     }
-  return 0;
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -1219,7 +1317,7 @@ template <class T> size_t vtkClientServerStreamValueSize(T*){return sizeof(T);}
 template <class T>
 size_t vtkClientServerStreamArraySize(const unsigned char* data, T*)
 {
-  /* Get the length of the value in the stream. */
+  // Get the length of the value in the stream.
   vtkTypeUInt32 len;
   memcpy(&len, data, sizeof(len));
   return sizeof(len) + len*sizeof(T);
@@ -1483,7 +1581,15 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
         {
         const char* arg;
         this->GetArgument(message, a, &arg);
-        os << "  Argument " << a << " = string_value {" << arg << "}\n";
+        os << "  Argument " << a << " = string_value ";
+        if(arg)
+          {
+          os << "{" << arg << "}\n";
+          }
+        else
+          {
+          os << "(null)\n";
+          }
         } break;
       case vtkClientServerStream::id_value:
         {
