@@ -26,7 +26,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkToolkits.h"
-#include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #else
@@ -90,10 +89,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     
     vtkPVApplication *app = vtkPVApplication::New();
 
-#ifdef PV_USE_SGI_PIPES
-    int numPipes = 1;
-    app->SetNumberOfPipes(numPipes);
-#endif
+    app->SetNumberOfPipes(numProcs);
     
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
     app->SetupTrapsForSignals(myId);   
