@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.121");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.122");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -191,6 +191,8 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->StopFlag = 0;
   this->InPlay = 0;
   this->Loop = 0;
+
+  this->SavingData = 0;
 
   this->PVSource = NULL;
 
@@ -1248,6 +1250,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext) 
 {
+  this->SavingData = 1;
+  this->GetWindow()->UpdateEnableState();
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer;
   char *fileName;
@@ -1273,6 +1277,8 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   else
     {
     vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
+    this->SavingData = 0;
+    this->GetWindow()->UpdateEnableState();
     return;
     }
   writer->SetInput(winToImage->GetOutput());
@@ -1315,6 +1321,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   delete [] fileName;
   fileName = NULL;
   
+  this->SavingData = 0;
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -1322,6 +1329,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
       "There is insufficient disk space to save the images for this "
       "animation. The file(s) already written will be deleted.");
     }
+  this->GetWindow()->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -1352,6 +1360,8 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 void vtkPVAnimationInterface::SaveGeometry(const char* fileName, 
                                            int numPartitions) 
 {
+  this->SavingData = 1;
+  this->GetWindow()->UpdateEnableState();
   this->AddTraceEntry("$kw(%s) SaveGeometry {%s} {%d}",
                       this->GetTclName(), fileName, numPartitions);
   
@@ -1529,6 +1539,8 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       }
     pm->SendStreamToServer();
     }  
+  this->SavingData = 0;
+  this->GetWindow()->UpdateEnableState();
 }
 
 

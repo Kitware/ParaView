@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.539");
+vtkCxxRevisionMacro(vtkPVWindow, "1.540");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1497,7 +1497,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
-  if ( !this->Enabled  )
+  if ( !this->MainView->GetEnabled()  )
     {
     return;
     }
@@ -4268,7 +4268,8 @@ void vtkPVWindow::UpdateEnableState()
     }
 
   int enabled = this->Enabled;
-  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+  if ( this->AnimationInterface && 
+    (this->AnimationInterface->GetInPlay() || this->AnimationInterface->GetSavingData()))
     {
     this->Enabled = 0;
     }

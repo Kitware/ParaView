@@ -226,6 +226,10 @@ public:
   // Description:
   // Get whether animation is playing.
   vtkGetMacro(InPlay, int);
+
+  // Description:
+  // Is it in the process of saving data?
+  vtkGetMacro(SavingData, int);
  
 protected:
   vtkPVAnimationInterface();
@@ -307,6 +311,7 @@ protected:
   void EmptyEntryFrame();
 
   int UpdatingScript;
+  int SavingData;
 
   unsigned long ErrorEventTag;
   vtkPVAnimationInterfaceObserver* Observer;
