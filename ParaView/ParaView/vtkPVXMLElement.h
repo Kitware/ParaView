@@ -137,7 +137,7 @@ protected:
   void SetParent(vtkPVXMLElement* parent);
   
   //BTX
-  friend vtkPVXMLParser;
+  friend class vtkPVXMLParser;
   //ETX
   
 private:
