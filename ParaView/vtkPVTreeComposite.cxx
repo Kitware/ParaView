@@ -565,7 +565,7 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 }
 
 //-------------------------------------------------------------------------
-int vtkPVTreeComposite::RootWaitForSateliteToFinish(int satelliteId)
+int vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
 {
   satelliteId = satelliteId;
 }
