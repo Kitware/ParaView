@@ -21,7 +21,7 @@
 #include "vtkHierarchicalDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.2");
+vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.3");
 vtkStandardNewMacro(vtkHierarchicalDataIterator);
 
 class vtkHierarchicalDataIteratorInternal
@@ -146,5 +146,16 @@ vtkDataObject* vtkHierarchicalDataIterator::GetCurrentDataObject()
 void vtkHierarchicalDataIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "DataSet: ";
+  if (this->DataSet)
+    {
+    os << endl;
+    this->DataSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 

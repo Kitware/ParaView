@@ -21,7 +21,7 @@
 #include "vtkMultiBlockDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.3");
+vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.4");
 vtkStandardNewMacro(vtkMultiBlockDataIterator);
 
 // Note that this class is dependent on the implementation
@@ -125,5 +125,16 @@ vtkDataObject* vtkMultiBlockDataIterator::GetCurrentDataObject()
 void vtkMultiBlockDataIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "DataSet: ";
+  if (this->DataSet)
+    {
+    os << endl;
+    this->DataSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 

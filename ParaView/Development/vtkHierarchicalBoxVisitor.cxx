@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxVisitor, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxVisitor, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxVisitor);
 
 vtkCxxSetObjectMacro(vtkHierarchicalBoxVisitor, 
@@ -82,5 +82,17 @@ void vtkHierarchicalBoxVisitor::Execute()
 void vtkHierarchicalBoxVisitor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "DataSet: ";
+  if (this->DataSet)
+    {
+    os << endl;
+    this->DataSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
+
 

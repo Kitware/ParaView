@@ -15,16 +15,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxSource - abstract class whose subclasses generate polygonal data
+// .NAME vtkHierarchicalBoxSource - abstract class whose subclasses generate hierarchical box data
 // .SECTION Description
-// vtkHierarchicalBoxSource is an abstract class whose subclasses generate polygonal
-// data.
-
-// .SECTION See Also
-// vtkPolyDataReader vtkAxes vtkBYUReader vtkConeSource vtkCubeSource
-// vtkCursor3D vtkCyberReader vtkCylinderSource vtkDiskSource vtkLineSource
-// vtkMCubesReader vtkOutlineSource vtkPlaneSource vtkPointSource vtkSTLReader
-// vtkSphereSource vtkTextSource vtkUGFacetReader vtkVectorText
+// vtkHierarchicalBoxSource is an abstract class whose subclasses generate 
+// hierarchical box data.
 
 #ifndef __vtkHierarchicalBoxSource_h
 #define __vtkHierarchicalBoxSource_h

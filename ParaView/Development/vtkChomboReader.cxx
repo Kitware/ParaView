@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkChomboReader, "1.2");
+vtkCxxRevisionMacro(vtkChomboReader, "1.3");
 vtkStandardNewMacro(vtkChomboReader);
 
 //----------------------------------------------------------------------------
@@ -555,4 +555,16 @@ void vtkChomboReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: "
      << (this->FileName? this->FileName:"(none)") << "\n";
+  os << indent << "Dimensionality: " << this->Dimensionality << endl;
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "RealType: ";
+  if (this->RealType == vtkChomboReader::FLOAT)
+    {
+    os << " float" << endl;
+    }
+  else
+    {
+    os << " double" << endl;
+    }
+  os << indent << "NumberOfLevels: " << this->NumberOfLevels << endl;
 }

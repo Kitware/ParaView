@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxCutter -
+// .NAME vtkHierarchicalBoxCutter - Cut vtkHierarchicalBoxDataSet with user-specified implicit function
 // .SECTION Description
+// This filter uses vtkCutter to cut vtkHierarchicalBoxDataSet with 
+// user-specified implicit function.
+
+// .SECTION See Also
+// vtkCutter
 
 #ifndef __vtkHierarchicalBoxCutter_h
 #define __vtkHierarchicalBoxCutter_h

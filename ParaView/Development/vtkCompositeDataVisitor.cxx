@@ -19,7 +19,7 @@
 
 #include "vtkCompositeDataVisitorCommand.h"
 
-vtkCxxRevisionMacro(vtkCompositeDataVisitor, "1.1");
+vtkCxxRevisionMacro(vtkCompositeDataVisitor, "1.2");
 
 vtkCxxSetObjectMacro(vtkCompositeDataVisitor,
                      Command, 
@@ -42,5 +42,17 @@ vtkCompositeDataVisitor::~vtkCompositeDataVisitor()
 void vtkCompositeDataVisitor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Command: ";
+  if (this->Command)
+    {
+    os << endl;
+    this->Command->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "CreateTransitionElements: " << this->CreateTransitionElements
+     << endl;
 }
 

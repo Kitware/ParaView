@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkSource.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockApplyFilterCommand, "1.3");
+vtkCxxRevisionMacro(vtkMultiBlockApplyFilterCommand, "1.4");
 vtkStandardNewMacro(vtkMultiBlockApplyFilterCommand);
 
 vtkCxxSetObjectMacro(vtkMultiBlockApplyFilterCommand,
@@ -90,4 +90,14 @@ void vtkMultiBlockApplyFilterCommand::Execute(vtkCompositeDataVisitor *caller,
 void vtkMultiBlockApplyFilterCommand::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Output: ";
+  if (this->Output)
+    {
+    os << endl;
+    this->Output->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

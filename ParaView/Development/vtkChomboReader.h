@@ -15,8 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkChomboReader -
+// .NAME vtkChomboReader - Reads Chombo files (in development)
 // .SECTION Description
+// This is an experimental Chombo file reader. It is mainly used
+// for development and does not support all features of Chombo
+// format. Use at your own risk.
 
 #ifndef __vtkChomboReader_h
 #define __vtkChomboReader_h
@@ -49,15 +52,20 @@ public:
   vtkHierarchicalBoxDataSet *GetOutput(int idx);
 
   // Description:
+  // Get the number of components (similar to NumberOfComponents
+  // in data arrays)
   vtkGetMacro(NumberOfComponents, int);
 
   // Description:
+  // The number of levels
   vtkGetMacro(NumberOfLevels, int);
 
   // Description:
+  // 2D or 3D?
   vtkGetMacro(Dimensionality, int);
 
   // Description:
+  // FLOAT (0) or DOUBLE (1)
   vtkGetMacro(RealType, int);
 
 protected:

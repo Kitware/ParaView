@@ -23,7 +23,7 @@
 #include "vtkCompositeDataVisitorCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockDataVisitor, "1.2");
+vtkCxxRevisionMacro(vtkMultiBlockDataVisitor, "1.3");
 vtkStandardNewMacro(vtkMultiBlockDataVisitor);
 
 vtkCxxSetObjectMacro(vtkMultiBlockDataVisitor,
@@ -105,5 +105,16 @@ void vtkMultiBlockDataVisitor::Execute()
 void vtkMultiBlockDataVisitor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "DataIterator: ";
+  if (this->DataIterator)
+    {
+    os << endl;
+    this->DataIterator->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 

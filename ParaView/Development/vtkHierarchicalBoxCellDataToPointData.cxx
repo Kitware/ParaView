@@ -28,7 +28,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxCellDataToPointData, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxCellDataToPointData, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxCellDataToPointData);
 
 //----------------------------------------------------------------------------
@@ -74,5 +74,6 @@ void vtkHierarchicalBoxCellDataToPointData::PrintSelf(
   ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "PassCellData: " << this->PassCellData << endl;
 }
 

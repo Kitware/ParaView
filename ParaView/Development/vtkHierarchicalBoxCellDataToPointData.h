@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxCellDataToPointData -
+// .NAME vtkHierarchicalBoxCellDataToPointData - map cell data to point data
 // .SECTION Description
+// vtkHierarchicalBoxCellDataToPointData is a filter that transforms cell data 
+// (i.e., data specified per cell) into point data (i.e., data specified at cell
+// points). The method of transformation is based on averaging the data
+// values of all cells using a particular point. Optionally, the input cell
+// data can be passed through to the output as well. 
 
 #ifndef __vtkHierarchicalBoxCellDataToPointData_h
 #define __vtkHierarchicalBoxCellDataToPointData_h
@@ -51,10 +56,8 @@ protected:
 
   int PassCellData;
 private:
-  vtkHierarchicalBoxCellDataToPointData(
-    const vtkHierarchicalBoxCellDataToPointData&);  // Not implemented.
-  void operator=(
-    const vtkHierarchicalBoxCellDataToPointData&);  // Not implemented.
+  vtkHierarchicalBoxCellDataToPointData(const vtkHierarchicalBoxCellDataToPointData&);  // Not implemented.
+  void operator=(const vtkHierarchicalBoxCellDataToPointData&);  // Not implemented.
 };
 
 

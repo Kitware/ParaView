@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxOutlineFilter -
+// .NAME vtkHierarchicalBoxOutlineFilter - reate wireframe outline for hierarchical datasets
 // .SECTION Description
+// vtkHierarchicalBoxOutlineFilter creates an outline for each vtkUniformGrid
+// in a vtkHierarchicalBoxDataSet
+
+// .SECTION See Also
+// vtkOutlineFilter
 
 #ifndef __vtkHierarchicalBoxOutlineFilter_h
 #define __vtkHierarchicalBoxOutlineFilter_h
@@ -42,10 +47,8 @@ protected:
   virtual void ExecuteData(vtkDataObject*);
 
 private:
-  vtkHierarchicalBoxOutlineFilter(
-    const vtkHierarchicalBoxOutlineFilter&);  // Not implemented.
-  void operator=(
-    const vtkHierarchicalBoxOutlineFilter&);  // Not implemented.
+  vtkHierarchicalBoxOutlineFilter(const vtkHierarchicalBoxOutlineFilter&);  // Not implemented.
+  void operator=(const vtkHierarchicalBoxOutlineFilter&);  // Not implemented.
 };
 
 

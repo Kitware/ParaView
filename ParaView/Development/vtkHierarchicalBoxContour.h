@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxContour -
+// .NAME vtkHierarchicalBoxContour - generate isosurfaces/isolines from scalar values
 // .SECTION Description
+// This filter uses vtkContourFilter to generate isosurfaces/isolines from
+// scalar values
+
+// .SECTION See Also
+// vtkContourFilter
 
 #ifndef __vtkHierarchicalBoxContour_h
 #define __vtkHierarchicalBoxContour_h

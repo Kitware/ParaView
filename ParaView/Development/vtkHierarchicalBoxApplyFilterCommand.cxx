@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkApplyFilterCommandInternal.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.3");
+vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.4");
 vtkStandardNewMacro(vtkHierarchicalBoxApplyFilterCommand);
 
 vtkCxxSetObjectMacro(vtkHierarchicalBoxApplyFilterCommand,
@@ -107,4 +107,15 @@ void vtkHierarchicalBoxApplyFilterCommand::PrintSelf(ostream& os,
                                                      vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Output: ";
+  if (this->Output)
+    {
+    os << endl;
+    this->Output->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkApplyFilterCommandInternal.h"
 
-vtkCxxRevisionMacro(vtkApplyFilterCommand, "1.2");
+vtkCxxRevisionMacro(vtkApplyFilterCommand, "1.3");
 
 vtkCxxSetObjectMacro(vtkApplyFilterCommand,
                      Filter, 
@@ -143,4 +143,15 @@ int vtkApplyFilterCommand::CheckFilterInputMatch(vtkDataObject* inp)
 void vtkApplyFilterCommand::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Filter: ";
+  if (this->Filter)
+    {
+    os << endl;
+    this->Filter->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
