@@ -68,6 +68,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     SET (KWCommon_SRCS ${KWCommon_SRCS}
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetWriter.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLImagePlaneWidgetReader.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLImagePlaneWidgetWriter.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLPlaneWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLPlaneWidgetWriter.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLPolyDataSourceWidgetReader.cxx
