@@ -38,8 +38,9 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
+#include "vtkGarbageCollector.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.41");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.42");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -71,8 +72,14 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 {
-  this->DataSetSurfaceFilter->Delete();
-  this->HierarchicalBoxOutline->Delete();
+  if(this->DataSetSurfaceFilter)
+    {
+    this->DataSetSurfaceFilter->Delete();
+    }
+  if(this->HierarchicalBoxOutline)
+    {
+    this->HierarchicalBoxOutline->Delete();
+    }
   this->OutlineSource->Delete();
   this->InternalProgressObserver->Delete();
   this->SetController(0);
@@ -603,6 +610,30 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
     }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+  collector->ReportReference(this->DataSetSurfaceFilter, "DataSetSurfaceFilter");
+  collector->ReportReference(this->HierarchicalBoxOutline, "HierarchicalBoxOutline");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVGeometryFilter::RemoveReferences()
+{
+  if(this->DataSetSurfaceFilter)
+    {
+    this->DataSetSurfaceFilter->Delete();
+    this->DataSetSurfaceFilter = 0;
+    }
+  if(this->HierarchicalBoxOutline)
+    {
+    this->HierarchicalBoxOutline->Delete();
+    this->HierarchicalBoxOutline = 0;
+    }
+  this->Superclass::RemoveReferences();
 }
 
 //----------------------------------------------------------------------------

@@ -18,13 +18,14 @@
 #include "vtkExtractGrid.h"
 #include "vtkExtractVOI.h"
 #include "vtkExtractRectilinearGrid.h"
+#include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.2");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.3");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -46,9 +47,18 @@ vtkPVExtractVOI::vtkPVExtractVOI()
 //----------------------------------------------------------------------------
 vtkPVExtractVOI::~vtkPVExtractVOI()
 {
-  this->ExtractGrid->Delete();
-  this->ExtractVOI->Delete();
-  this->ExtractRG->Delete();
+  if(this->ExtractVOI)
+    {
+    this->ExtractVOI->Delete();
+    }
+  if(this->ExtractGrid)
+    {
+    this->ExtractGrid->Delete();
+    }
+  if(this->ExtractRG)
+    {
+    this->ExtractRG->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -273,6 +283,36 @@ void vtkPVExtractVOI::SetSampleRateK(int ratek)
   
   this->SampleRate[2] = ratek;
   this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVExtractVOI::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+  collector->ReportReference(this->ExtractVOI, "ExtractVOI");
+  collector->ReportReference(this->ExtractGrid, "ExtractGrid");
+  collector->ReportReference(this->ExtractRG, "ExtractRG");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVExtractVOI::RemoveReferences()
+{
+  if(this->ExtractVOI)
+    {
+    this->ExtractVOI->Delete();
+    this->ExtractVOI = 0;
+    }
+  if(this->ExtractGrid)
+    {
+    this->ExtractGrid->Delete();
+    this->ExtractGrid = 0;
+    }
+  if(this->ExtractRG)
+    {
+    this->ExtractRG->Delete();
+    this->ExtractRG = 0;
+    }
+  this->Superclass::RemoveReferences();
 }
 
 //----------------------------------------------------------------------------
