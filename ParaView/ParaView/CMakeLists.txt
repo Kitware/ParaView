@@ -10,7 +10,7 @@ SET( ParaViewShared_SRCS
   vtkPVProcessModule.cxx
   vtkPVTreeComposite.cxx
   vtkStringList.cxx
-)
+  )
 
 SET( ParaViewServer_SRCS
   vtkClientCompositeManager.cxx
@@ -71,6 +71,8 @@ SET( ParaViewClient_SRCS
   vtkPVArrayInformation.cxx
   vtkPVArrayMenu.cxx
   vtkPVArraySelection.cxx
+  vtkPVAxesActor.cxx
+  vtkPVAxesWidget.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
@@ -80,8 +82,6 @@ SET( ParaViewClient_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVClassNameInformation.cxx
   vtkPVColorMap.cxx
-  vtkPVAxesActor.cxx
-  vtkPVAxesWidget.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositePartDisplay.cxx
   vtkPVCompositeRenderModule.cxx
@@ -211,22 +211,22 @@ SET(ParaViewBinary_SRCS
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
-    vtkPVDeskTopRenderModule.cxx
-    vtkPVDeskTopRenderModuleUI.cxx
+    #vtkIceTComposite.cxx
     vtkDesktopDeliveryClient.cxx
     vtkDesktopDeliveryServer.cxx
-    #vtkIceTComposite.cxx
     vtkIceTFactory.cxx
-    vtkPVIceTDisplayRenderModuleUI.cxx
+    vtkPVDeskTopRenderModule.cxx
+    vtkPVDeskTopRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
-    vtkPVIceTRenderModuleUI.cxx
+    vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTRenderModule.cxx
+    vtkPVIceTRenderModuleUI.cxx
     )
   SET( ParaViewServer_SRCS
     ${ParaViewServer_SRCS}
     vtkIceTRenderManager.cxx
-    vtkIceTRenderer.cxx
     vtkIceTClientCompositeManager.cxx
+    vtkIceTRenderer.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     vtkIceTFactory.cxx
@@ -245,12 +245,12 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkPVObjectWidget
-  vtkPVWidget
   vtkPV3DWidget
-  vtkPVJoystickFly
-  vtkPVSourceWidget
   vtkPVInformation
+  vtkPVJoystickFly
+  vtkPVObjectWidget
+  vtkPVSourceWidget
+  vtkPVWidget
   ABSTRACT
   )
 
@@ -313,7 +313,7 @@ IF(PARAVIEW_USE_SAF)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     ${SAF_SOURCE_DIR}/vtkPVSAFReaderModule.cxx )
-                                                                                                                                             
+
 ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
