@@ -123,8 +123,8 @@ public:
 
   // Description:
   // Type or name of manipulator is used for storing in the registery.
-  vtkSetStringMacro(Type);
-  vtkGetStringMacro(Type);
+  vtkSetStringMacro(RegisteryName);
+  vtkGetStringMacro(RegisteryName);
 
 protected:
   vtkPVInteractorStyleControl();
@@ -135,7 +135,7 @@ protected:
   vtkKWOptionMenu *Menus[9];
   vtkCollection *ManipulatorCollection;
   char* DefaultManipulator;
-  char* Type;
+  char* RegisteryName;
 
 //BTX
   typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;

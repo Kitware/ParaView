@@ -142,9 +142,9 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateScale = vtkKWScale::New();
 
   this->ManipulatorControl2D = vtkPVInteractorStyleControl::New();
-  this->ManipulatorControl2D->SetType("2D");
+  this->ManipulatorControl2D->SetRegisteryName("2D");
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
-  this->ManipulatorControl3D->SetType("3D");
+  this->ManipulatorControl3D->SetRegisteryName("3D");
 
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;

@@ -77,7 +77,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
   this->Manipulators = vtkPVInteractorStyleControl::ManipulatorMap::New();
   this->ManipulatorCollection = 0;
   this->DefaultManipulator = 0;
-  this->Type = 0;
+  this->RegisteryName = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->Manipulators->Delete();
   this->SetManipulatorCollection(0);
   this->SetDefaultManipulator(0);
-  this->SetType(0);
+  this->SetRegisteryName(0);
 }
 
 //------------------------------------------------------------------------------
@@ -359,7 +359,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ReadRegistery()
 {
-  if ( !this->Application || !this->Type )
+  if ( !this->Application || !this->RegisteryName )
     {
     vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
     }
@@ -371,7 +371,8 @@ void vtkPVInteractorStyleControl::ReadRegistery()
     int mouse = cc % 3;
     int key = static_cast<int>(cc / 3);
     buffer[0] = 0;
-    sprintf(manipulator, "ManipulatorT%sM%dK%d", this->Type, mouse, key);
+    sprintf(manipulator, "ManipulatorT%sM%dK%d", 
+            this->RegisteryName, mouse, key);
     if ( this->Application->GetRegisteryValue(2, "RunTime", manipulator,
                                               buffer) &&
          *buffer > 0 &&
@@ -385,7 +386,7 @@ void vtkPVInteractorStyleControl::ReadRegistery()
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::StoreRegistery()
 {
-  if ( !this->Application || !this->Type )
+  if ( !this->Application || !this->RegisteryName )
     {
     vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
     }
@@ -396,7 +397,8 @@ void vtkPVInteractorStyleControl::StoreRegistery()
     int mouse = cc % 3;
     int key = static_cast<int>(cc / 3);
     
-    sprintf(manipulator, "ManipulatorT%sM%dK%d", this->Type, mouse, key);
+    sprintf(manipulator, "ManipulatorT%sM%dK%d", 
+            this->RegisteryName, mouse, key);
     this->Application->SetRegisteryValue(2, "RunTime", manipulator,
                                          this->Menus[cc]->GetValue());
     }
