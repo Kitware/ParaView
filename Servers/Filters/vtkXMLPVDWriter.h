@@ -62,6 +62,12 @@ public:
   // file.
   vtkGetMacro(WriteCollectionFile, int);
   virtual void SetWriteCollectionFile(int flag);
+
+  // See the vtkAlgorithm for a desciption of what these do
+  int ProcessRequest(vtkInformation*,
+                     vtkInformationVector**,
+                     vtkInformationVector*);
+
 protected:
   vtkXMLPVDWriter();
   ~vtkXMLPVDWriter();
@@ -70,7 +76,7 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   // Replace vtkXMLWriter's writing driver method.
-  virtual int WriteInternal();
+  int RequestData(vtkInformation*  , vtkInformationVector** , vtkInformationVector*);
   virtual int WriteData();
   virtual const char* GetDataSetName();
   
