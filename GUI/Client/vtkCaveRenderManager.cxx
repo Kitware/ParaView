@@ -39,7 +39,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.2");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 // Structures to communicate render info.
@@ -317,7 +317,7 @@ void vtkCaveRenderManager::ComputeCamera(vtkPVCaveClientInfo *info,
   cam->SetViewUp(oy[0], oy[1], oy[2]);
   
   // Compute view angle.
-  viewAngle = asin(height/(2.0*dist)) * 360.0 / 3.1415926;
+  viewAngle = atan(height/(2.0*dist)) * 360.0 / 3.1415926;
   cam->SetViewAngle(viewAngle);
 
   // Compute the shear/offset vector (focal point to window center).
