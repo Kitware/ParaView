@@ -146,6 +146,10 @@ vtkKWApplication::~vtkKWApplication()
     {
     this->BalloonHelpWindow->Delete();
     }
+  if ( this->BalloonHelpLabel )
+    {
+    this->BalloonHelpLabel->Delete();
+    }
   this->SetBalloonHelpWidget(0);
   if (this->Windows)
     {
