@@ -63,7 +63,7 @@
 #include "vtkKWEvent.h"
 #include "vtkPVConfig.h"
 
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
 # ifdef _WIN32
 #  include "vtkAVIWriter.h"
 # else
@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.152");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.153");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1212,7 +1212,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
 # ifdef _WIN32
   ostr << " {{AVI movie file} {.avi}}";
 # else
@@ -1413,7 +1413,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   this->StopButton->SetEnabled(1);
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer = 0;
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
   vtkKWGenericMovieWriter* awriter = 0;
 #endif
   char *fileName;
@@ -1450,7 +1450,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer = vtkPNGWriter::New();
     }
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
 # ifdef _WIN32
   else if (strcmp(ext,"avi") == 0 )
     {
@@ -1485,7 +1485,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer->SetInput(winToImage->GetOutput());
     }
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
     awriter->SetInput(winToImage->GetOutput());
@@ -1517,7 +1517,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
       writer->Write();
       errcode = writer->GetErrorCode();
       }
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
     else if ( awriter )
       {
       awriter->Write();
@@ -1554,7 +1554,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     writer->Delete();
     writer = NULL;
     }
-#ifdef PARAVIEW_PRO_BUILD
+#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
     awriter->Delete();
