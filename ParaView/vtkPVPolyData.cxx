@@ -100,7 +100,8 @@ void vtkPVPolyData::Shrink()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -130,7 +131,8 @@ void vtkPVPolyData::TubeFilter()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -165,7 +167,8 @@ void vtkPVPolyData::PolyDataNormals()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -215,7 +218,8 @@ void vtkPVPolyData::LoopSubdivision()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -244,7 +248,8 @@ void vtkPVPolyData::Clean()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -275,7 +280,8 @@ void vtkPVPolyData::Triangulate()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.  
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -318,7 +324,8 @@ void vtkPVPolyData::Decimate()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkPVPolyData::QuadricClustering()
@@ -350,7 +357,8 @@ void vtkPVPolyData::QuadricClustering()
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  f->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------

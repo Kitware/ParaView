@@ -271,7 +271,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
 
@@ -305,7 +306,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
@@ -334,7 +336,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
  
@@ -364,7 +367,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCube()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
@@ -394,7 +398,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
@@ -423,7 +428,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
@@ -451,7 +457,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateLine()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
@@ -480,7 +487,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
   pvs->AddVector3Entry("Point2:","X","Y","Z", "SetPoint2", "GetPoint2");
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
@@ -511,7 +519,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
@@ -542,7 +551,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
@@ -580,7 +590,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pvs->Delete();
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
 

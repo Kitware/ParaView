@@ -265,9 +265,10 @@ vtkPVSource *vtkPVApplication::MakePVSource(const char *pvsClassName,
   pvs->SetVTKSource(s);
   pvs->SetVTKSourceTclName(sName);
   pvs->SetName(sName);
-  this->BroadcastScript("%s SetVTKSource %s", pvsName, sName); 
-
-  s->Delete();
+  this->BroadcastScript("%s SetVTKSource %s", pvsName, sName);
+  
+  // We cannot create an object in tcl and delete it in C++.
+  //s->Delete();
   // How do we clean up on the other processes?
 
   return pvs;
