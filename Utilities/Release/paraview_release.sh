@@ -42,9 +42,6 @@ CVS_PASS="paraview"
 CMAKE="cmake"
 MAKE="make"
 
-TEST_SUBTREE=ParaView
-INSTALL_SUBTREE=ParaView
-
 # ParaView release root directory.
 RELEASE_ROOT_NAME="ParaViewReleaseRoot"
 RELEASE_ROOT="${HOME}/${RELEASE_ROOT_NAME}"
@@ -534,7 +531,7 @@ install()
     echo "Running make install ..." &&
     (
         rm -rf Install &&
-        cd "${PROJECT}-${VERSION}-${PLATFORM}/${INSTALL_SUBTREE}" &&
+        cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
         ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
     ) >Logs/install.log 2>&1 || error_log Logs/install.log
 }
