@@ -72,8 +72,17 @@ public:
   virtual void OnRightButtonDown();
   virtual void OnRightButtonUp();
   
+  // Description:
   // Access to adding or removing manipulators.
   void AddManipulator(vtkPVCameraManipulator *m);
+
+  // Description:
+  // Accessor for the collection of camera manipulators.
+  vtkGetObjectMacro(CameraManipulators, vtkCollection);
+
+  // Description:
+  // Propagates the center to the manipulators.
+  void SetCenterOfRotation(float x, float y, float z);
 
 protected:
   vtkPVInteractorStyle();

@@ -150,7 +150,6 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
 
-  this->RotationManipulators = vtkCollection::New();
   this->RotateCameraStyle = vtkPVInteractorStyle::New();
   this->TranslateCameraStyle = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
@@ -285,9 +284,6 @@ vtkPVWindow::~vtkPVWindow()
   this->TranslateCameraButton = NULL;
   //this->TrackballCameraButton->Delete();
   //this->TrackballCameraButton = NULL;
-
-  this->RotationManipulators->Delete();
-  this->RotationManipulators = NULL;
 
   this->CenterSource->Delete();
   this->CenterSource = NULL;
@@ -889,15 +885,21 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
   const char *tname = this->GetTclName();
   this->Script("bind %s <B1-Motion> {}", wname);
+  this->Script("bind %s <B2-Motion> {}", wname);
   this->Script("bind %s <B3-Motion> {}", wname);
   this->Script("bind %s <Shift-B1-Motion> {}", wname);
+  this->Script("bind %s <Shift-B2-Motion> {}", wname);
   this->Script("bind %s <Shift-B3-Motion> {}", wname);
   
   this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y}",
                wname, tname);
   this->Script("bind %s <Shift-Any-ButtonPress> {%s AShiftButtonPress %%b %%x %%y}",
                wname, tname);
+  this->Script("bind %s <Control-Any-ButtonPress> {%s AControlButtonPress %%b %%x %%y}",
+               wname, tname);
   this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Control-Any-ButtonRelease> {%s AControlButtonRelease %%b %%x %%y}",
                wname, tname);
   this->Script("bind %s <Shift-Any-ButtonRelease> {%s AShiftButtonRelease %%b %%x %%y}",
                wname, tname);
@@ -1026,7 +1028,7 @@ void vtkPVWindow::AddPackageName(const char* name)
 // disabled/enabled in certain situations.
 void vtkPVWindow::AddToolbarButton(const char* buttonName, 
                                    const char* imageName, 
-				   const char* fileName,
+                                   const char* fileName,
                                    const char* command,
                                    const char* balloonHelp)
 {
@@ -1068,20 +1070,6 @@ void vtkPVWindow::CenterEntryCloseCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
-{
-  vtkPVCenterOfRotationManipulator *m;
-
-  this->RotationManipulators->InitTraversal();
-  while ( (m = (vtkPVCenterOfRotationManipulator*)
-                 (this->RotationManipulators->GetNextItemAsObject()) ))
-    {
-    m->SetCenter(x, y, z);
-    }
-  this->CenterActor->SetPosition(x, y, z);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVWindow::CenterEntryCallback()
 {
   float x = this->CenterXEntry->GetValueAsFloat();
@@ -1089,6 +1077,13 @@ void vtkPVWindow::CenterEntryCallback()
   float z = this->CenterZEntry->GetValueAsFloat();
   this->SetCenterOfRotation(x, y, z);
   this->MainView->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
+{
+  this->RotateCameraStyle->SetCenterOfRotation(x, y, z);
+  this->CenterActor->SetPosition(x, y, z);
 }
 
 //----------------------------------------------------------------------------
@@ -1209,6 +1204,11 @@ void vtkPVWindow::AButtonPress(int button, int x, int y)
     this->GenericInteractor->SetEventInformationFlipY(x, y);
     this->GenericInteractor->LeftButtonPressEvent();
     }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->MiddleButtonPressEvent();
+    }
   else if (button == 3)
     {
     this->GenericInteractor->SetEventInformationFlipY(x, y);
@@ -1225,9 +1225,35 @@ void vtkPVWindow::AShiftButtonPress(int button, int x, int y)
     this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
     this->GenericInteractor->LeftButtonPressEvent();
     }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->MiddleButtonPressEvent();
+    }
   else if (button == 3)
     {
     this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->RightButtonPressEvent();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AControlButtonPress(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
+    this->GenericInteractor->LeftButtonPressEvent();
+    }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
+    this->GenericInteractor->MiddleButtonPressEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
     this->GenericInteractor->RightButtonPressEvent();
     }
 }
@@ -1240,6 +1266,11 @@ void vtkPVWindow::AButtonRelease(int button, int x, int y)
     {
     this->GenericInteractor->SetEventInformationFlipY(x, y);
     this->GenericInteractor->LeftButtonReleaseEvent();
+    }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->MiddleButtonReleaseEvent();
     }
   else if (button == 3)
     {
@@ -1257,9 +1288,35 @@ void vtkPVWindow::AShiftButtonRelease(int button, int x, int y)
     this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
     this->GenericInteractor->LeftButtonReleaseEvent();
     }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->MiddleButtonReleaseEvent();
+    }
   else if (button == 3)
     {
     this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->RightButtonReleaseEvent();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AControlButtonRelease(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
+    this->GenericInteractor->LeftButtonReleaseEvent();
+    }
+  else if (button == 2)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
+    this->GenericInteractor->MiddleButtonReleaseEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
     this->GenericInteractor->RightButtonReleaseEvent();
     }
 }
@@ -1315,66 +1372,55 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->AddBindings(); // additional bindings in PV not in KW
   
 
-  vtkPVInteractorStyleControl *iscontrol = view->GetInteractorStyleControl();
+  vtkPVInteractorStyleControl *iscontrol3D = view->GetManipulatorControl3D();
+  iscontrol3D->SetManipulatorCollection(
+    this->RotateCameraStyle->GetCameraManipulators());
+  vtkPVInteractorStyleControl *iscontrol2D = view->GetManipulatorControl2D();
+  iscontrol2D->SetManipulatorCollection(
+    this->TranslateCameraStyle->GetCameraManipulators());
   
   vtkPVCameraManipulator *manipulator;
-  vtkPVCenterOfRotationManipulator *rotationManipulator;
   // ----
-  rotationManipulator = vtkPVTrackballRotate::New();
-  rotationManipulator->SetButton(1);
-  this->RotateCameraStyle->AddManipulator(rotationManipulator);
-  this->RotationManipulators->AddItem(rotationManipulator);
-  iscontrol->AddManipulator("Rotate", rotationManipulator);
-  iscontrol->SetManipulator(0, 0, "Rotate");
-  rotationManipulator->Delete();
-  rotationManipulator = NULL;
+  manipulator = vtkPVTrackballRotate::New();
+  iscontrol3D->AddManipulator("Rotate", manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
   // ----
-  rotationManipulator = vtkPVTrackballRoll::New();
-  rotationManipulator->SetButton(1);
-  rotationManipulator->ShiftOn();
-  this->RotateCameraStyle->AddManipulator(rotationManipulator);
-  this->RotationManipulators->AddItem(rotationManipulator);
-  iscontrol->AddManipulator("Roll", rotationManipulator);
-  iscontrol->SetManipulator(0, 1, "Roll");
-  rotationManipulator->Delete();
-  rotationManipulator = NULL;
+  manipulator = vtkPVTrackballRoll::New();
+  iscontrol2D->AddManipulator("Roll", manipulator);
+  iscontrol3D->AddManipulator("Roll", manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
   // ----
   manipulator = vtkPVTrackballPan::New();
   manipulator->SetButton(2);
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  iscontrol->AddManipulator("Pan", manipulator);
-  iscontrol->SetManipulator(1, 0, "Pan");
-  iscontrol->SetManipulator(2, 1, "Pan");
+  iscontrol2D->AddManipulator("Pan", manipulator);
+  iscontrol3D->AddManipulator("Pan", manipulator);
   manipulator->Delete();
   manipulator = NULL;
   // ----
   manipulator = vtkPVTrackballZoom::New();
   manipulator->SetButton(3);
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  iscontrol->AddManipulator("Zoom", manipulator);
-  iscontrol->SetManipulator(2, 0, "Zoom");
+  iscontrol2D->AddManipulator("Zoom", manipulator);
+  iscontrol3D->AddManipulator("Zoom", manipulator);
   manipulator->Delete();
   manipulator = NULL;
   // ----
-  manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(3);
-  manipulator->ShiftOn();
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(1);
-  this->TranslateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballZoom::New();
-  manipulator->SetButton(3);
-  this->TranslateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  iscontrol->UpdateMenus();
+
+  iscontrol3D->SetCurrentManipulator(0, 0, "Rotate");
+  iscontrol3D->SetCurrentManipulator(0, 1, "Roll");
+  iscontrol3D->SetCurrentManipulator(1, 0, "Pan");
+  iscontrol3D->SetCurrentManipulator(2, 1, "Pan");
+  iscontrol3D->SetCurrentManipulator(2, 0, "Zoom");
+  iscontrol3D->SetDefaultManipulator("Rotate");
+  iscontrol3D->UpdateMenus();
+
+  iscontrol2D->SetCurrentManipulator(0, 1, "Roll");
+  iscontrol2D->SetCurrentManipulator(1, 0, "Pan");
+  iscontrol2D->SetCurrentManipulator(2, 1, "Pan");
+  iscontrol2D->SetCurrentManipulator(2, 0, "Zoom");
+  iscontrol2D->SetDefaultManipulator("Pan");
+  iscontrol2D->UpdateMenus();
   
   float rgb[3];
   this->RetrieveColor(2, "RenderViewBG", rgb); 
@@ -1613,8 +1659,8 @@ int vtkPVWindow::Open(char *openFileName)
       // Add that source to the list of sources.
       if (rm->ReadFile(openFileName, clone) == VTK_OK && clone)
         {
-	this->AddPVSource("Sources", clone);
-	this->AddPVSource("RenderingSources", clone);
+        this->AddPVSource("Sources", clone);
+        this->AddPVSource("RenderingSources", clone);
         if (clone->GetAcceptAfterRead())
           {
           clone->Accept(0);
@@ -2126,7 +2172,7 @@ void vtkPVWindow::UpdateFilterMenu()
           sprintf(methodAndArgs, "CreatePVSource %s", key);
           // Remove "vtk" from the class name to get the menu item name.
           this->FilterMenu->AddCommand(key, this, methodAndArgs);
-	  this->EnableToolbarButton(key);
+          this->EnableToolbarButton(key);
           }
         }
       it->GoToNextItem();
@@ -2759,15 +2805,15 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
       {
       col = this->GetSourceList(sourceList);
       if ( col )
-	{
-	col->AddItem(clone);
-	}
+        {
+        col->AddItem(clone);
+        }
       else
-	{
-	vtkWarningMacro("The specified source list (" 
-			<< (sourceList ? sourceList : "Sources") 
-			<< ") could not be found.");
-	}
+        {
+        vtkWarningMacro("The specified source list (" 
+                        << (sourceList ? sourceList : "Sources") 
+                        << ") could not be found.");
+        }
       }
     else
       {

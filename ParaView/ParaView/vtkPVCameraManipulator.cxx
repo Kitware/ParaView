@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.1");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.2");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 //-------------------------------------------------------------------------
@@ -61,6 +61,9 @@ vtkPVCameraManipulator::vtkPVCameraManipulator()
   this->Control = 0;
 
   this->LastX = this->LastY = 0;
+
+  this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
+  this->DisplayCenter[0] = this->DisplayCenter[1] = 0.0;
 }
 
 //-------------------------------------------------------------------------
@@ -88,6 +91,21 @@ void vtkPVCameraManipulator::OnMouseMove(int, int, vtkRenderer*,
 }
 
 //-------------------------------------------------------------------------
+void vtkPVCameraManipulator::ComputeDisplayCenter(vtkRenderer *ren)
+{
+  float *pt;
+
+  // save the center of rotation in screen coordinates
+  ren->SetWorldPoint(this->Center[0],
+                     this->Center[1],
+                     this->Center[2], 1.0);
+  ren->WorldToDisplay();
+  pt = ren->GetDisplayPoint();
+  this->DisplayCenter[0] = pt[0];
+  this->DisplayCenter[1] = pt[1];
+}
+
+//-------------------------------------------------------------------------
 void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -95,6 +113,9 @@ void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Button: " << this->Button << endl;
   os << indent << "Shift: " << this->Shift << endl;
   os << indent << "Control: " << this->Control << endl;
+  
+  os << indent << "Center: " << this->Center[0] << ", " 
+     << this->Center[1] << ", " << this->Center[2] << endl;
 }
 
 

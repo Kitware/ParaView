@@ -48,13 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVTrackballRoll_h
 #define __vtkPVTrackballRoll_h
 
-#include "vtkPVCenterOfRotationManipulator.h"
+#include "vtkPVCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballRoll : public vtkPVCenterOfRotationManipulator
+class VTK_EXPORT vtkPVTrackballRoll : public vtkPVCameraManipulator
 {
 public:
   static vtkPVTrackballRoll *New();
-  vtkTypeRevisionMacro(vtkPVTrackballRoll, vtkPVCenterOfRotationManipulator);
+  vtkTypeRevisionMacro(vtkPVTrackballRoll, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

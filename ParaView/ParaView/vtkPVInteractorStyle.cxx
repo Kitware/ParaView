@@ -41,17 +41,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVInteractorStyle.h"
 
-
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkPVCameraManipulator.h"
+#include "vtkCamera.h"
 #include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVCameraManipulator.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.1");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.2");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -79,27 +79,50 @@ void vtkPVInteractorStyle::AddManipulator(vtkPVCameraManipulator *m)
 void vtkPVInteractorStyle::OnLeftButtonDown()
 {
   this->OnButtonDown(1, this->Interactor->GetShiftKey(), 
-		     this->Interactor->GetControlKey());
+                     this->Interactor->GetControlKey());
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMiddleButtonDown()
 {
   this->OnButtonDown(2, this->Interactor->GetShiftKey(), 
-		     this->Interactor->GetControlKey());
+                     this->Interactor->GetControlKey());
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnRightButtonDown()
 {
   this->OnButtonDown(3, this->Interactor->GetShiftKey(), 
-		     this->Interactor->GetControlKey());
+                     this->Interactor->GetControlKey());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
+{
+  vtkPVCameraManipulator *m;
+
+  vtkCollectionIterator *it = this->CameraManipulators->NewIterator();
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
+    {
+    m = static_cast<vtkPVCameraManipulator*>(it->GetObject());
+    m->SetCenter(x, y, z);
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
+  if ( control || this->Interactor->GetControlKey() )
+    {
+    cout << "Control key" << endl;
+    }
+  else
+    {
+    cout << "No control key" << endl;
+    }
   vtkPVCameraManipulator *manipulator;
 
   // Must not be processing an interaction to start another.
@@ -124,7 +147,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     {
     if (manipulator->GetButton() == button && 
         manipulator->GetShift() == shift &&
-	manipulator->GetControl() == control)
+        manipulator->GetControl() == control)
       {
       this->Current = manipulator;
       this->Current->Register(this);

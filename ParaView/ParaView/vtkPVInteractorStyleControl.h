@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+class vtkCollection;
 class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
@@ -73,7 +74,7 @@ public:
 
   // Description:
   // Get the vtkKWWidget for the internal frame.
-  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(LabeledFrame, vtkKWLabeledFrame);
 
   // Description:
   // Add manipulator to the list of manipulators.
@@ -84,6 +85,10 @@ public:
   void UpdateMenus();
 
   // Description:
+  // Set label of the control widget.
+  void SetLabel(const char*);
+
+  // Description:
   // Set the specific manipulator for a mouse button and key
   // combination.
   int SetManipulator(int pos, const char*);
@@ -92,13 +97,34 @@ public:
   vtkPVCameraManipulator* GetManipulator(int mouse, int key);
   vtkPVCameraManipulator* GetManipulator(const char* name);
 
+  // Description:
+  // Set the current manipulator to the specified one for the
+  // mouse button and keypress combination.
+  void SetCurrentManipulator(int pos, const char*);
+  void SetCurrentManipulator(int mouse, int key, const char*);
+
+  // Description:
+  // In order for manipulators to work, you have to set them
+  // on the window. This method sets the window.
+  void SetManipulatorCollection(vtkCollection*);
+  vtkGetObjectMacro(ManipulatorCollection, vtkCollection);
+
+  // Description:
+  // Set or get the default manipulator. The default manipulator is
+  // the one that is present in menus (after UpdateMenus) which do not
+  // have any manipulator set.
+  vtkSetStringMacro(DefaultManipulator);
+  vtkGetStringMacro(DefaultManipulator);
+
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
 
-  vtkKWLabeledFrame *Frame;
+  vtkKWLabeledFrame *LabeledFrame;
   vtkKWLabel *Labels[6];
   vtkKWOptionMenu *Menus[9];
+  vtkCollection *ManipulatorCollection;
+  char* DefaultManipulator;
 
 //BTX
   typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;

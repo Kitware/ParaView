@@ -256,7 +256,7 @@ public:
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList)
     { return this->CreatePVSource(className, sourceList, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
-			      int addTraceEntry);
+                              int addTraceEntry);
   
   // Description:
   // Access to the interactor styles from tcl.
@@ -317,7 +317,7 @@ public:
   // Add a push button to the main toolbar.
   void AddToolbarButton(const char* buttonName, const char* imageName,
                         const char* fileName, 
-			const char* command, const char* balloonHelp);
+                        const char* command, const char* balloonHelp);
 
   // Description:
   // Determines whether message dialogs or error macros as used
@@ -352,7 +352,9 @@ public:
   // Callbacks for generic render window interactor
   void AButtonPress(int button, int x, int y);
   void AShiftButtonPress(int button, int x, int y);
+  void AControlButtonPress(int button, int x, int y);
   void AButtonRelease(int button, int x, int y);
+  void AControlButtonRelease(int button, int x, int y);
   void AShiftButtonRelease(int button, int x, int y);
   void MouseMotion(int x, int y);
   void Configure(int width, int height);
@@ -416,7 +418,6 @@ protected:
   
   vtkPVInteractorStyle *TranslateCameraStyle;
   vtkPVInteractorStyle *RotateCameraStyle;
-  vtkCollection *RotationManipulators;
 
   // This should be made into a 3D Widget.
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
@@ -503,7 +504,7 @@ protected:
   char *FileDescriptions;
   // Add a file type and the corresponding prototype
   void AddFileType(const char* description, const char* ext, 
-		   vtkPVReaderModule* prototype);
+                   vtkPVReaderModule* prototype);
 
   // Read interface description from XML.
   void ReadSourceInterfaces();

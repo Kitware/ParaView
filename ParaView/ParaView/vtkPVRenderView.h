@@ -258,7 +258,8 @@ public:
 
   // Description:
   // Get the widget that controls the interactor styles.
-  vtkGetObjectMacro(InteractorStyleControl, vtkPVInteractorStyleControl);
+  vtkGetObjectMacro(ManipulatorControl3D, vtkPVInteractorStyleControl);
+  vtkGetObjectMacro(ManipulatorControl2D, vtkPVInteractorStyleControl);
     
 protected:
 
@@ -323,7 +324,8 @@ protected:
   // For the renderer in a separate toplevel window.
   vtkKWWidget *TopLevelRenderWindow;
 
-  vtkPVInteractorStyleControl *InteractorStyleControl;
+  vtkPVInteractorStyleControl *ManipulatorControl2D;
+  vtkPVInteractorStyleControl *ManipulatorControl3D;
 
   int DisableRenderingFlag;
 

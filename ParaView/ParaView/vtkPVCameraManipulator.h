@@ -73,8 +73,9 @@ public:
                           vtkRenderWindowInteractor *iren);
   
   // Description:
-  // These settings determine which button and modifiers the manipulator
-  // responds to.
+  // These settings determine which button and modifiers the
+  // manipulator responds to. Button can be either 1 (left), 2
+  // (middle), and 3 right.
   vtkSetMacro(Button, int);
   vtkGetMacro(Button, int);
   vtkSetMacro(Shift, int);
@@ -83,6 +84,11 @@ public:
   vtkSetMacro(Control, int);
   vtkGetMacro(Control, int);
   vtkBooleanMacro(Control, int);
+
+  // Description:
+  // For setting the center of rotation.
+  vtkSetVector3Macro(Center, float);
+  vtkGetVector3Macro(Center, float);
 
 protected:
   vtkPVCameraManipulator();
@@ -96,7 +102,12 @@ protected:
 
   int LastX;
   int LastY;
-  
+
+  float Center[3];
+  float DisplayCenter[2];
+  void ComputeDisplayCenter(vtkRenderer *ren);
+
+private:
   vtkPVCameraManipulator(const vtkPVCameraManipulator&); // Not implemented
   void operator=(const vtkPVCameraManipulator&); // Not implemented
 };

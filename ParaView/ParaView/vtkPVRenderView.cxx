@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
@@ -139,7 +140,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
 
-  this->InteractorStyleControl = vtkPVInteractorStyleControl::New();
+  this->ManipulatorControl2D = vtkPVInteractorStyleControl::New();
+  this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
 
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;
@@ -263,7 +265,9 @@ vtkPVRenderView::~vtkPVRenderView()
   this->CompositeCompressionCheck->Delete();
   this->CompositeCompressionCheck = NULL;
 
-  this->InteractorStyleControl->Delete();
+
+  this->ManipulatorControl2D->Delete();
+  this->ManipulatorControl3D->Delete();
   
   this->ReductionCheck->Delete();
   this->ReductionCheck = NULL;
@@ -404,6 +408,14 @@ void vtkPVRenderView::PrepareForDelete()
   if (this->Composite)
     {
     this->Composite->SetRenderView(NULL);
+    }
+  if ( this->ManipulatorControl2D )
+    {
+    this->ManipulatorControl2D->SetManipulatorCollection(0);
+    }
+  if ( this->ManipulatorControl3D )
+    {
+    this->ManipulatorControl3D->SetManipulatorCollection(0);
     }
 }
 
@@ -560,8 +572,6 @@ void vtkPVRenderView::CreateViewProperties()
   this->StandardViewsFrame->SetParent( this->GeneralProperties );
   this->StandardViewsFrame->Create(this->Application);
   this->StandardViewsFrame->SetLabel("Standard Views");
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->StandardViewsFrame->GetWidgetName());
 
   this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMaxViewButton->SetLabel("+X");
@@ -602,6 +612,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
                this->ZMinViewButton->GetWidgetName());
 
+  this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -810,11 +821,18 @@ void vtkPVRenderView::CreateViewProperties()
 
 #endif
 
-  this->InteractorStyleControl->SetParent(this->GeneralProperties);
-  this->InteractorStyleControl->Create(pvapp, 0);
+  this->ManipulatorControl2D->SetParent(this->GeneralProperties);
+  this->ManipulatorControl2D->Create(pvapp, 0);
+  this->ManipulatorControl2D->SetLabel("2D Movements");
+  this->ManipulatorControl3D->SetParent(this->GeneralProperties);
+  this->ManipulatorControl3D->Create(pvapp, 0);
+  this->ManipulatorControl3D->SetLabel("3D Movements");
 
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->InteractorStyleControl->GetWidgetName());
+               this->StandardViewsFrame->GetWidgetName());
+  this->Script("pack %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->ManipulatorControl2D->GetWidgetName(),
+               this->ManipulatorControl3D->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1537,6 +1555,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseReductionFactor: " << this->GetUseReductionFactor() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
-  os << indent << "InteractorStyleControl: " << this->InteractorStyleControl << endl;
+  os << indent << "ManipulatorControl2D: " << this->ManipulatorControl2D << endl;
+  os << indent << "ManipulatorControl3D: " << this->ManipulatorControl3D << endl;
 }
 

@@ -18,7 +18,6 @@ vtkPVArrayMenu.cxx
 vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
 vtkPVCameraManipulator.cxx
-vtkPVCenterOfRotationManipulator.cxx
 vtkPVColorMap.cxx
 vtkPVComponentSelection.cxx
 vtkPVConnectivityFilter.cxx
