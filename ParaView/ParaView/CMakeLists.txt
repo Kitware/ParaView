@@ -1,9 +1,14 @@
 SOURCE_FILES( ParaView_SRCS
-vtkPVAdvancedReaderModule
-vtkDummyRenderer
+#vtkPVDataSetReaderInterface 
+#vtkPVEnSightReaderInterface 
+#vtkPVMethodInterface 
+#vtkPVSourceInterface 
+#vtkPVSourceInterfaceParser
 vtkDummyRenderWindow
+vtkDummyRenderer
 vtkKWBoundsDisplay
 vtkKWExtractGeometryByScalar
+vtkPVAdvancedReaderModule
 vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
@@ -19,8 +24,7 @@ vtkPVData
 vtkPVDataSetFileEntry
 vtkPVDataSetReaderModule
 vtkPVEnSightReaderModule
-#vtkPVDataSetReaderInterface 
-#vtkPVEnSightReaderInterface 
+vtkPVErrorLogDisplay
 vtkPVExtentEntry
 vtkPVExtentTranslator 
 vtkPVExtractGeometryByScalar
@@ -32,26 +36,23 @@ vtkPVInteractorStyleCenterOfRotation
 vtkPVInteractorStyleFly
 vtkPVInteractorStyleRotateCamera
 vtkPVInteractorStyleTranslateCamera
+vtkPVLODActor
 vtkPVLabel
 vtkPVLabeledToggle
-vtkPVLODActor
-#vtkPVMethodInterface 
+vtkPVMinMax
 vtkPVNavigationWindow
 vtkPVObjectWidget
 vtkPVPlaneWidget
-vtkPVMinMax
 vtkPVProbe
 vtkPVReaderModule
 vtkPVRenderView 
 vtkPVScalarRangeLabel 
 vtkPVScale 
-vtkPVSelectionList
 vtkPVSelectWidget 
-vtkPVSphereWidget
+vtkPVSelectionList
 vtkPVSource 
 vtkPVSourceCollection
-#vtkPVSourceInterface 
-#vtkPVSourceInterfaceParser
+vtkPVSphereWidget
 vtkPVStringEntry
 vtkPVThreshold 
 vtkPVTimerLogDisplay
@@ -63,8 +64,8 @@ vtkPVWindow
 vtkPVWizard
 vtkPVWorldPointPicker 
 vtkPVXMLElement
-vtkPVXMLParser
 vtkPVXMLPackageParser
+vtkPVXMLParser
 vtkStringList 
 )
 
