@@ -29,7 +29,7 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.10");
+vtkCxxRevisionMacro(vtkString, "1.11");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -278,4 +278,23 @@ unsigned int vtkString::CountChar(char* str, char c)
       }
     }
   return count;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkString::GetFilenamePath(const char *filename, char *path)
+{
+  const char *ptr = filename + strlen(filename) - 1;
+  while (ptr > filename && *ptr != '/' && *ptr != '\\')
+    {
+    ptr--;
+    }
+
+  size_t length = ptr - filename;
+  if (length)
+    {
+    strncpy(path, filename, length);
+    }
+  path[length] = '\0';
+  
+  return path;
 }

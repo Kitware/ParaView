@@ -88,20 +88,29 @@ public:
   
   // Description:
   // Transform the string to lowercase (inplace).
+  // Return a pointer to the string (i.e. 'str').
   static char* ToLower(char* str);
 
   // Description:
   // Transform the string to uppercase (inplace).
+  // Return a pointer to the string (i.e. 'str').
   static char* ToUpper(char* str);
 
   // Description:
   // Replace a character or some characters in the string (inplace).
+  // Return a pointer to the string (i.e. 'str').
   static char* ReplaceChar(char* str, char toreplace, char replacement);
   static char* ReplaceChars(char* str, char *toreplace, char replacement);
 
   // Description:
   // Return the number of occurence of a char.
   static unsigned int CountChar(char* str, char c);
+
+  // Description:
+  // Find the path to a given filename (i.e. its directory path) and 
+  // write it to 'path'.
+  // Return a pointer to the path (i.e. 'path').
+  static const char* GetFilenamePath(const char *filename, char *path);
 
 protected:
   vtkString() {};
