@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.13");
+vtkCxxRevisionMacro(vtkKWFrame, "1.14");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -99,6 +99,7 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
     this->Frame->SetParent(this->ScrollFrame);
     this->Script("%s getframe", this->ScrollFrame->GetWidgetName());
     this->Frame->SetWidgetName(this->Application->GetMainInterp()->result);
+    this->Frame->SetApplication(this->Application);
 
     this->Script("%s configure -constrainedwidth 1", 
                  this->ScrollFrame->GetWidgetName());
