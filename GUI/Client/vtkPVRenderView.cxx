@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.337");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.338");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2039,7 +2039,8 @@ void vtkPVRenderView::RestoreCurrentCamera(int position)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveAsImage(const char* filename) 
 {
-  this->EventuallyRender();
+  this->GetRenderWindow()->SwapBuffersOff();
+  this->ForceRender();
   this->Script("update");
 
   if ( !filename || !*filename )
@@ -2051,9 +2052,13 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
   // first get the file name
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetRenderWindow());
+  w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
   w2i->Update();
   
+  this->GetRenderWindow()->SwapBuffersOn();
+  this->GetRenderWindow()->Frame();
+
   int success = 1;
   
   if (!strcmp(filename + strlen(filename) - 4,".bmp"))
