@@ -21,7 +21,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.9");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.10");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -104,28 +104,6 @@ void vtkPVScalarListWidgetProperty::SetScalars(int num, float *scalars)
   
   this->NumberOfScalars = num;
   memcpy(this->Scalars, scalars, num*sizeof(float));
-}
-
-void vtkPVScalarListWidgetProperty::AddScalar(float scalar)
-{
-  float *scalars = new float[this->NumberOfScalars];
-  int i;
-  for (i = 0; i < this->NumberOfScalars; i++)
-    {
-    scalars[i] = this->Scalars[i];
-    }
-
-  delete [] this->Scalars;
-  this->Scalars = NULL;
-  
-  this->Scalars = new float[this->NumberOfScalars+1];
-  for (i = 0; i < this->NumberOfScalars; i++)
-    {
-    this->Scalars[i] = scalars[i];
-    }
-  delete [] scalars;
-  this->Scalars[i] = scalar;
-  this->NumberOfScalars++;
 }
 
 float vtkPVScalarListWidgetProperty::GetScalar(int idx)
