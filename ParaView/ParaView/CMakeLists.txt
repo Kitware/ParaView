@@ -277,3 +277,5 @@ INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 INSTALL_TARGETS(/lib vtkKWParaViewTCL)
 INSTALL_TARGETS(/bin ParaView)
 
+#OUTPUT_REQUIRED_FILES(${PARAVIEW_SOURCE_DIR}/ParaView/ParaView.cxx 
+#                      ${PARAVIEW_BINARY_DIR}/ReqList.txt)
