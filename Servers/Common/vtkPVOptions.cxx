@@ -30,8 +30,8 @@ public:
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkPVOptions );
-vtkCxxRevisionMacro(vtkPVOptions, "1.3");
+vtkStandardNewMacro(vtkPVOptions);
+vtkCxxRevisionMacro(vtkPVOptions, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -299,14 +299,14 @@ int vtkPVOptions::Parse(int argc, const char* const argv[])
   this->Initialize();
   int res1 = this->Internals->CMD.Parse();
   int res2 = this->PostProcess();
-  cout << "Res1: " << res1 << " Res2: " << res2 << endl;
+  //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
   return res1 && res2;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVOptions::UnknownArgumentHandler(const char* argument, void* call_data)
 {
-  cout << "UnknownArgumentHandler: " << argument << endl;
+  //cout << "UnknownArgumentHandler: " << argument << endl;
   vtkPVOptions* self = static_cast<vtkPVOptions*>(call_data);
   if ( self )
     {
