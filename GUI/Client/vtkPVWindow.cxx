@@ -97,6 +97,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkClientServerStream.h"
 #include "vtkTimerLog.h"
+#include "vtkPVPluginsDialog.h"
 
 #include <vtkstd/map>
 
@@ -125,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.562");
+vtkCxxRevisionMacro(vtkPVWindow, "1.563");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -157,6 +158,8 @@ vtkPVWindow::vtkPVWindow()
   this->FilterMenu = vtkKWMenu::New();
   this->SelectMenu = vtkKWMenu::New();
   this->GlyphMenu = vtkKWMenu::New();
+
+  this->PluginsDialog = vtkPVPluginsDialog::New();
 
   // This toolbar contains buttons for modifying user interaction
   // mode
@@ -698,11 +701,22 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "Import Package", this, 
                                 "OpenPackage", 3,
                                 "Import modules defined in a ParaView package ");
+  
+  this->PreferencesMenu = vtkKWMenu::New();
+  this->PreferencesMenu->SetParent(this->MenuFile);
+  this->PreferencesMenu->SetTearOff(0);
+  this->PreferencesMenu->Create(this->Application, "");  
+  this->PreferencesMenu->InsertCommand(0, "Plug-ins", this,
+                                       "DisplayPluginWindow", 7,
+                                       "Manage available plug-ins");
+  
+  this->PluginsDialog->Create(this->Application,0);
 
+  this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
   this->MenuFile->InsertSeparator(clidx++);
+
   this->AddRecentFilesMenu(NULL, this);
-
-
+  
   /*
   // Open XML package
   this->MenuFile->InsertCommand(clidx++, "Open Package", this, 
@@ -761,6 +775,8 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     5, "Error Log", this, 
     "ShowErrorLog", 2, 
     "Show log of all errors and warnings");
+
+  // Preferences sub-menu
 
   // Edit menu
 
@@ -2643,6 +2659,25 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
 
   delete file;
+}
+
+// Description:
+// Display the plug-in window.
+void vtkPVWindow::DisplayPluginWindow()
+{
+  int res=0;
+
+  std::cout<<"Something"<<std::endl;
+
+  res = this->PluginsDialog->Invoke();
+  if(res)
+    {
+       std::cout<<"Something OK"<<std::endl;
+    }
+  else
+    {
+      std::cout<<"Something not OK"<<std::endl;
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -88,6 +88,7 @@ class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
+class vtkPVPluginsDialog;
 
 //BTX
 template <class key, class data> 
@@ -184,6 +185,10 @@ public:
   // Access from script for regression test.
   void SaveBatchScript(const char *filename);
   void SaveBatchScript(const char *filename, int offScreenFlag, const char* imageFileName, const char* geometryFileName);
+  
+  // Description:
+  // Display the plug-in window.
+  void DisplayPluginWindow();
 
   // Description:
   // This should part of a render module !!!!!
@@ -531,7 +536,10 @@ protected:
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
-  
+  vtkKWMenu *PreferencesMenu;
+
+  vtkPVPluginsDialog *PluginsDialog;
+
   vtkPVInteractorStyle *CameraStyle2D;
   vtkPVInteractorStyle *CameraStyle3D;
 
