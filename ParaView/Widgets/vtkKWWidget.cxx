@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.77");
+vtkCxxRevisionMacro(vtkKWWidget, "1.78");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -373,7 +373,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.77 $");
+  this->ExtractRevision(os,"$Revision: 1.78 $");
 }
 
 //----------------------------------------------------------------------------
@@ -614,6 +614,30 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
     }
 
   return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetTextOption(const char *text, const char *option)
+{
+  if (!option || !this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("%s configure %s [encoding convertfrom utf-8 {%s}]", 
+               this->GetWidgetName(), option, (text ? text : ""));
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::GetTextOption(const char *option)
+{
+  if (!option || !this->IsCreated())
+    {
+    return "";
+    }
+
+  return this->Script("encoding convertfrom identity [%s cget %s]", 
+                      this->GetWidgetName(), option);
 }
 
 //----------------------------------------------------------------------------

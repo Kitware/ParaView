@@ -176,6 +176,14 @@ public:
   // Query if widget has Tk configuration option, and get the option as int
   int HasConfigurationOption(const char* option);
   int GetConfigurationOptionAsInt(const char* option);
+
+  // Description:
+  // Set/Get the textual value of a Tk option (defaut is -text option) given a
+  // pointer to a char (conversion from/to unicode will be done for you)
+  //BTX
+  void SetTextOption(const char *text, const char *option = "-text");
+  const char* GetTextOption(const char *option = "-text");
+  //ETX
   
   // Description:
   // Query if widget is "alive" (i.e. is created and 'winfo exists')
