@@ -156,6 +156,8 @@ protected:
   virtual int FinalizeInternal(const char* fname, 
                                int accept);
 
+  void SetReaderFileName(const char* fname);
+  
 //BTX
   vtkVector<const char*>* Extensions;
   vtkVectorIterator<const char*>* Iterator;
