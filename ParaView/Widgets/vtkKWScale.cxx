@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.1");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.2");
 
 
 
@@ -146,13 +146,8 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   this->Script("%s configure -from %f -to %f",
                this->ScaleWidget->GetWidgetName(),
                this->Range[0], this->Range[1]);
-  this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
 
-  this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
-               this->ScaleWidget->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
-               this->ScaleWidget->GetWidgetName(), this->GetTclName());
-
+  this->Bind();
   this->PackWidget();
 }
 
@@ -183,11 +178,8 @@ void vtkKWScale::DisplayEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application,"-width 10");
-  this->Script("bind %s <Return> {%s EntryValueChanged}",
-               this->Entry->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s EntryValueChanged}",
-               this->Entry->GetWidgetName(), this->GetTclName());
   this->Entry->SetValue(this->GetValue(), 2);
+  this->Bind();
   this->PackWidget();
 }
 
@@ -414,6 +406,76 @@ void vtkKWScale::SetBalloonHelpJustification( int j )
     this->Label->SetBalloonHelpJustification( j );
     }
   
+}
+
+void vtkKWScale::SetEnabled(int e)
+{
+  if ( this->Enabled == e )
+    {
+    return;
+    }
+  this->Enabled = e;
+  this->Modified();
+
+  if (this->Entry && this->Entry->IsCreated())
+    {
+    this->Entry->SetEnabled(e);
+    }
+  if (this->Label && this->Label->IsCreated())
+    {
+    this->Label->SetEnabled(e);
+    }
+  if (this->ScaleWidget->IsCreated())
+    {
+    this->ScaleWidget->SetEnabled(e);
+    }
+}
+
+void vtkKWScale::Bind()
+{
+  if (this->ScaleWidget->IsCreated())
+    {
+    this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
+                 this->ScaleWidget->GetWidgetName(), this->GetTclName());
+    this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
+                 this->ScaleWidget->GetWidgetName(), this->GetTclName());
+    this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
+    }
+  if (this->Entry && this->Entry->IsCreated())
+    {
+    this->Script("bind %s <Return> {%s EntryValueChanged}",
+                 this->Entry->GetWidgetName(), this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s EntryValueChanged}",
+                 this->Entry->GetWidgetName(), this->GetTclName());
+    this->Script("%s config -bg [lindex [%s config -bg] 3]",
+                 this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
+    // this->Script("%s config -fg [lindex [%s config -fg] 3]",
+    //             this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
+    }
+}
+
+void vtkKWScale::UnBind()
+{
+  if (this->ScaleWidget->IsCreated())
+    {
+    this->Script("bind %s <ButtonPress>", 
+                 this->ScaleWidget->GetWidgetName());
+    this->Script("bind %s <ButtonRelease>", 
+                 this->ScaleWidget->GetWidgetName());
+    this->Script("%s configure -command {}",
+                 this->ScaleWidget->GetWidgetName());
+    }
+  if (this->Entry && this->Entry->IsCreated())
+    {
+    this->Script("bind %s <Return>",
+                 this->Entry->GetWidgetName());
+    this->Script("bind %s <FocusOut>",
+                 this->Entry->GetWidgetName());
+    this->Script("%s config -bg [%s cget -disabledbackground]",
+                 this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
+    // this->Script("%s config -fg [%s cget -disabledforeground]",
+    //             this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------

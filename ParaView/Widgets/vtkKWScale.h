@@ -115,6 +115,16 @@ public:
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification( int j );
 
+  // Description:
+  // Set or get enabled state.
+  virtual void SetEnabled(int);
+
+  // Description:
+  // Bind/Unbind all components so that values can be changed, but
+  // no command will be called.
+  void Bind();
+  void UnBind();
+
 protected:
   vtkKWScale();
   ~vtkKWScale();
