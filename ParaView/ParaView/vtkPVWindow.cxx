@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.491");
+vtkCxxRevisionMacro(vtkPVWindow, "1.492");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3989,6 +3989,10 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->ErrorLogDisplay->AppendError(message);
   this->SetErrorIcon(2);
   cout << "ErrorMessage end" << endl;
+  if ( this->GetPVApplication()->GetCrashOnErrors() )
+    {
+    abort();
+    }
 }
 
 //-----------------------------------------------------------------------------

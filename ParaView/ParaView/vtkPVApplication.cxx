@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.231");
+vtkCxxRevisionMacro(vtkPVApplication, "1.232");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -345,6 +345,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->CrashOnErrors = 0;
   this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
@@ -596,6 +597,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--tile-dimensions-y", "-tdy",
   "-tdy=Y where Y is number of displays in each column of the display.",
 #endif
+  "--crash-on-errors", "",
+  "",
 #ifdef VTK_USE_MANGLED_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -1108,6 +1111,12 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
        getenv("PV_OFFSCREEN") )
     {
     this->UseOffscreenRendering = 1;
+    }
+  
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--crash-on-errors",
+      index) == VTK_OK )
+    {
+    this->CrashOnErrors = 1;
     }
 
   return 0;
