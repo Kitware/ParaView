@@ -95,6 +95,8 @@ class VTK_EXPORT vtkKWEvent
     PerspectiveViewAngleChangedEvent,
     LightboxResolutionChangedEvent,
     ChangePrinterDPIEvent,
+    ChangeMouseOperationsEvent,
+    ChangeStandardInteractivityEvent,
     // PV
     InitializeTraceEvent
   };

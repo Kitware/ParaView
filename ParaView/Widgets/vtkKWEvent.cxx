@@ -86,6 +86,8 @@ static const char *vtkKWEventStrings[] = {
   "PerspectiveViewAngleChangedEvent",
   "LightboxResolutionChangedEvent",
   "ChangePrinterDPIEvent",
+  "ChangeMouseOperationsEvent",
+  "ChangeStandardInteractivityEvent",
   "InitializeTraceEvent"
 };
 
