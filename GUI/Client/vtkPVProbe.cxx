@@ -49,7 +49,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.115");
+vtkCxxRevisionMacro(vtkPVProbe, "1.116");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -289,7 +289,18 @@ void vtkPVProbe::AcceptCallbackInternal()
 
   if (this->ShowXYPlotToggle->GetState() && numPts > 1)
     {
+    vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+    this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
     this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
+
+    // Enable XYPlotActor on server for tiled display.
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << rm->GetRenderer2DID()
+                    << "AddActor"
+                    << this->PlotDisplay->GetXYPlotActorID() 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
   else
     {
