@@ -713,7 +713,7 @@ void vtkPVRenderView::RenderHack()
   renWin->Render();
 
   renWin->SetFileName("/home/lawcc/Views/ParaView/partial0.ppm");
-  renWin->SaveImageAsPPM();
+  //renWin->SaveImageAsPPM();
   
   window_size = renWin->GetSize();
   
