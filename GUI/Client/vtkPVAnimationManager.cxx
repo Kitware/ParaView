@@ -57,7 +57,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.5");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -326,7 +326,9 @@ void vtkPVAnimationManager::AddNewSources()
       }
     else
       {
-      pvCue->SetLabelText(pvApp->GetTextRepresentation(pvSource));
+      char *label = pvApp->GetTextRepresentation(pvSource);
+      pvCue->SetLabelText(label);
+      delete []label;
       }
 
     // Determine the parent of this tree node.

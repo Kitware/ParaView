@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -52,6 +52,8 @@ vtkPVAnimationCueTree::vtkPVAnimationCueTree()
   this->SetVirtual(1);
 
   this->ForceBounds = 0;
+  this->LastParameterBounds[0] = 0.0;
+  this->LastParameterBounds[1] = 1.0;
 }
 
 //-----------------------------------------------------------------------------
