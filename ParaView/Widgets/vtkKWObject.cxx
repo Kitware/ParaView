@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.39");
+vtkCxxRevisionMacro(vtkKWObject, "1.40");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -113,7 +113,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.39 $");
+  this->ExtractRevision(os,"$Revision: 1.40 $");
 }
 
 //----------------------------------------------------------------------------
@@ -449,20 +449,6 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "Application: " << this->GetApplication() << endl;
-  os << indent << "TraceInitialized: " << this->GetTraceInitialized() << endl;
-  os << indent << "TraceReferenceCommand: " 
-     << (this->TraceReferenceCommand?this->TraceReferenceCommand:"none") 
-     << endl;
-  os << indent << "TraceReferenceObject: " 
-     << this->GetTraceReferenceObject() << endl;
-}
-
 //----------------------------------------------------------------------------
 int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
 {
@@ -525,4 +511,40 @@ int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
   return length;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWObject::SetObjectMethodCommand(
+  char **command, 
+  vtkKWObject *object, 
+  const char *method)
+{
+  if (*command)
+    {
+    delete [] *command;
+    *command = NULL;
+    }
 
+  ostrstream command_str;
+  if (object)
+    {
+    command_str << object->GetTclName() << " ";
+    }
+  if (method)
+    {
+    command_str << method;
+    }
+  command_str << ends;
+  *command = command_str.str();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Application: " << this->GetApplication() << endl;
+  os << indent << "TraceInitialized: " << this->GetTraceInitialized() << endl;
+  os << indent << "TraceReferenceCommand: " 
+     << (this->TraceReferenceCommand?this->TraceReferenceCommand:"none") 
+     << endl;
+  os << indent << "TraceReferenceObject: " 
+     << this->GetTraceReferenceObject() << endl;
+}

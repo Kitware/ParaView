@@ -166,6 +166,16 @@ protected:
 
 //ETX
 
+  // This method can be used to create
+  // A method to set a callback function on object.  The first argument is
+  // the command (string) to set, the second is the KWObject that will have
+  // the method called on it. The third is the name of the method to be
+  // called and any arguments in string form. 
+  // The calling is done via TCL wrappers for the KWObject.
+  // If the command (string) is not NULL, it is deallocated first.
+  virtual void SetObjectMethodCommand(
+    char **command, vtkKWObject *object, const char *method);
+
 private:
   vtkKWObject(const vtkKWObject&); // Not implemented
   void operator=(const vtkKWObject&); // Not implemented
