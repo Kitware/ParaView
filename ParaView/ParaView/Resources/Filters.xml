@@ -507,6 +507,11 @@
                    variable="NonManifoldEdges"
                    help="Turn this off if you do not want to extract non-manifold edges."
                    default_value="1"/>
+    <LabeledToggle label="Manifold edges"
+                   trace_name="ManifoldEdges"
+                   variable="ManifoldEdges"
+                   help="Turn this on if you want to extract manifold edges."
+                   default_value="0"/>
     <LabeledToggle variable="Coloring"
                    trace_name="Coloring"
                    help="Turn this off if you do not want to color the edges by type."
