@@ -154,6 +154,7 @@ protected:
   virtual int GetApplicationKey() {return -1;};
 
   static int WidgetVisibility;
+  int InExit;
   
   vtkKWEventNotifier *EventNotifier;
 };

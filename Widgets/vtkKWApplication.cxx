@@ -107,6 +107,8 @@ vtkKWApplication::vtkKWApplication()
   
   this->EventNotifier = vtkKWEventNotifier::New();
   this->EventNotifier->SetApplication( this );
+
+  this->InExit = 0;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -242,6 +244,14 @@ void vtkKWApplication::Exit()
 {
   vtkKWWindow* win = 0;
   this->Windows->InitTraversal();
+
+  // Avoid a recursive exit.
+  if (this->InExit)
+    {
+    return;
+    }
+  this->InExit = 1;
+  
   while (this->Windows && (win = this->Windows->GetNextKWWindow()))
     {
     win->Close();
@@ -269,6 +279,9 @@ void vtkKWApplication::Exit()
     this->BalloonHelpLabel = NULL;
     }
   this->SetBalloonHelpPending(NULL);
+
+  this->InExit = 0;
+
   return;
 }
     
