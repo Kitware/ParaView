@@ -62,7 +62,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.158");
+vtkCxxRevisionMacro(vtkKWApplication, "1.159");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -526,12 +526,13 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   interp = Tcl_CreateInterp();
   args = Tcl_Merge(argc - 1, argv + 1);
-  Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, (char *)"argv", args, TCL_GLOBAL_ONLY);
   ckfree(args);
   sprintf(buf, "%d", argc-1);
-  Tcl_SetVar(interp, "argc", buf, TCL_GLOBAL_ONLY);
-  Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
-  Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, (char *)"argc", buf, TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, (char *)"argv0", argv[0], TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, (char *)"tcl_interactive", 
+             (char *)"0", TCL_GLOBAL_ONLY);
 
   // Find the path to our internal Tcl/Tk support library/packages
   // if we are not using the installed Tcl/Tk (i.e., if the support
@@ -666,7 +667,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       return NULL;
       }
     
-    Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
+    Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
     }
     
   // create the SetApplicationIcon command

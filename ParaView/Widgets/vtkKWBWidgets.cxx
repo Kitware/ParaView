@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.17");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.18");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -245,13 +245,15 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  if ( CreatePhoto(interp, "bwminus", minus_bits,  minus_width, minus_height) 
+  if ( CreatePhoto(interp, (char *)"bwminus", minus_bits,  
+                   minus_width, minus_height) 
        != VTK_OK )
     {
     return;
     }
 
-  if ( CreatePhoto(interp, "bwplus", plus_bits,  plus_width, plus_height) 
+  if ( CreatePhoto(interp, (char *)"bwplus", plus_bits,  
+                   plus_width, plus_height) 
        != VTK_OK )
     {
     return;
