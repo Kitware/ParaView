@@ -645,7 +645,7 @@ void vtkPVActorComposite::UpdateProperties()
   char *currentColorBy;
   int currentColorByFound = 0;
   float time;
-
+  int validBounds = 1;
   
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
     {
@@ -697,14 +697,42 @@ void vtkPVActorComposite::UpdateProperties()
   sprintf(tmp, "number of points: %d",
           this->GetPVData()->GetNumberOfPoints());
   this->NumPointsLabel->SetLabel(tmp);
-  
-  sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
-  this->XRangeLabel->SetLabel(tmp);
-  sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
-  this->YRangeLabel->SetLabel(tmp);
-  sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
-  this->ZRangeLabel->SetLabel(tmp);
-  
+
+  if ((bounds[0] > VTK_FLOAT_MIN) && (bounds[1] < VTK_FLOAT_MAX) &&
+      (bounds[0] < bounds[1]))
+    {
+    sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
+    this->XRangeLabel->SetLabel(tmp);
+    }
+  else
+    {
+    validBounds = 0;
+    }
+  if ((bounds[2] > VTK_FLOAT_MIN) && (bounds[3] < VTK_FLOAT_MAX) &&
+      (bounds[0] < bounds[1]))
+    {
+    sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
+    this->YRangeLabel->SetLabel(tmp);
+    }
+  else
+    {
+    validBounds = 0;
+    }
+  if ((bounds[4] > VTK_FLOAT_MIN) && (bounds[5] < VTK_FLOAT_MAX) &&
+      (bounds[0] < bounds[1]))
+    {
+    sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
+    this->ZRangeLabel->SetLabel(tmp);
+    }
+  else
+    {
+    validBounds = 0;
+    }
+
+  if (!validBounds)
+    {
+    this->XRangeLabel->SetLabel("invalid bounds");
+    }
   
   // This doesn't need to be set currently because we're not packing
   // the AmbientScale.
