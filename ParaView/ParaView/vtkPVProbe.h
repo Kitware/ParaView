@@ -54,6 +54,7 @@ class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkPVArrayMenu;
+class vtkXYPlotWidget;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -90,6 +91,10 @@ public:
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
+
+  // Description:
+  // Get the XY Plot widget.
+  vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
   
 protected:
   vtkPVProbe();
@@ -122,6 +127,10 @@ protected:
   
   char* XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
+
+  vtkXYPlotWidget* XYPlotWidget;
+  char* XYPlotWidgetName;
+  vtkSetStringMacro(XYPlotWidgetName);
 
   int GetDimensionality();
 

@@ -50,18 +50,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
-#include "vtkSource.h"
+#include "vtkXYPlotWidget.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.76");
+vtkCxxRevisionMacro(vtkPVProbe, "1.77");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -87,6 +89,9 @@ vtkPVProbe::vtkPVProbe()
   this->ProbeFrame = vtkKWWidget::New();
   
   this->XYPlotTclName = NULL;
+
+  this->XYPlotWidget = 0;
+  this->XYPlotWidgetName = 0;
   
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -117,6 +122,13 @@ vtkPVProbe::~vtkPVProbe()
     this->Script("%s Delete", this->XYPlotTclName);
     this->SetXYPlotTclName(NULL);
     }
+
+  if ( this->XYPlotWidget )
+    {
+    this->XYPlotWidget->Delete();
+    this->XYPlotWidget = 0;
+    }
+  this->SetXYPlotWidgetName(0);
 
   this->ScalarArrayMenu->Delete();
   this->ScalarArrayMenu = NULL;
@@ -232,7 +244,21 @@ void vtkPVProbe::CreateProperties()
 
   pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
                         this->GetVTKSourceTclName());
-                        
+                
+  if ( !this->XYPlotWidget )
+    {
+    vtkPVGenericRenderWindowInteractor* iren = 
+      this->GetPVWindow()->GetGenericInteractor();
+    this->XYPlotWidget = vtkXYPlotWidget::New();
+    if ( iren )
+      {
+      this->XYPlotWidget->SetInteractor(iren);
+      }
+    this->SetXYPlotWidgetName(this->Script("%s GetXYPlotWidget", 
+                                           this->GetTclName()));
+    this->Script("%s SetXYPlotActor %s", this->XYPlotWidgetName,
+                 this->XYPlotTclName);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -373,12 +399,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       this->Script("%s SetYTitle {%s}", this->XYPlotTclName, arrayName);
       this->Script("%s SetPlotColor 0 1 1 1", this->XYPlotTclName);
      }
-    if (this->ShowXYPlotToggle->GetState())
-      {
-      this->Script("%s AddActor %s",
-                   window->GetMainView()->GetRendererTclName(),
-                   this->XYPlotTclName);
-      }
+    this->XYPlotWidget->SetEnabled(this->ShowXYPlotToggle->GetState());
     
     window->GetMainView()->Render();
     }
@@ -401,35 +422,12 @@ void vtkPVProbe::UpdateProbe()
     vtkErrorMacro("No vtkMultiProcessController");
     return;
     }  
-
-  this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
-               this->GetPVRenderView()->GetRendererTclName(),
-               this->XYPlotTclName);
-  
-  if (atoi(this->GetPVApplication()->GetMainInterp()->result) > 0)
-    {
-    this->Script("%s RemoveActor %s",
-                 this->GetPVRenderView()->GetRendererTclName(),
-                 this->XYPlotTclName);
-    this->GetPVRenderView()->Render();
-    }    
+  this->GetPVRenderView()->Render();
 }
 
 void vtkPVProbe::Deselect(int doPackForget)
 {
   this->ScalarArrayMenu->Update();
-  this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
-               this->GetPVRenderView()->GetRendererTclName(),
-               this->XYPlotTclName);
-  
-  if (atoi(this->GetPVApplication()->GetMainInterp()->result) > 0)
-    {
-    this->Script("%s RemoveActor %s",
-                 this->GetPVRenderView()->GetRendererTclName(),
-                 this->XYPlotTclName);
-    this->GetPVRenderView()->Render();
-    }
-  
   this->vtkPVSource::Deselect(doPackForget);
 }
 
@@ -517,6 +515,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
       *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
       *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
       }
+    this->XYPlotWidget->SetEnabled(this->ShowXYPlotToggle->GetState());
     }
   
   this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
