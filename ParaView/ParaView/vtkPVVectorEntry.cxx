@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.45");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -534,14 +534,14 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
                                                 vtkClientServerID sourceID)
 {
-  if (this->ScriptValue == NULL)
-    {
-    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceID);
-    return;
-    }
-
   *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
-  *file << " " << this->ScriptValue << "\n";
+  vtkPVScalarListWidgetProperty* prop = this->Property;
+  int cc;
+  for ( cc = 0; cc < prop->GetNumberOfScalars(); cc ++ )
+    {
+    *file << " " << prop->GetScalar(cc);
+    }
+  *file << endl;
 }
 
 //-----------------------------------------------------------------------------
