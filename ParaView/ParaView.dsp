@@ -305,15 +305,19 @@ SOURCE=.\vtkPVGlyph3DTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImage.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVImageClip.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkPVImageClipTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageData.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageDataTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -1034,15 +1038,15 @@ InputName=vtkPVGlyph3D
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImage.h
+SOURCE=.\vtkPVImageClip.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\vtkPVImage.h
-InputName=vtkPVImage
+InputPath=.\vtkPVImageClip.h
+InputName=vtkPVImageClip
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1054,15 +1058,15 @@ InputName=vtkPVImage
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageClip.h
+SOURCE=.\vtkPVImageData.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\vtkPVImageClip.h
-InputName=vtkPVImageClip
+InputPath=.\vtkPVImageData.h
+InputName=vtkPVImageData
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

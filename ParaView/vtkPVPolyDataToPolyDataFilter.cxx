@@ -43,11 +43,6 @@ vtkPVPolyDataToPolyDataFilter::vtkPVPolyDataToPolyDataFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyDataToPolyDataFilter::~vtkPVPolyDataToPolyDataFilter()
-{ 
-}
-
-//----------------------------------------------------------------------------
 vtkPVPolyDataToPolyDataFilter* vtkPVPolyDataToPolyDataFilter::New()
 {
   return new vtkPVPolyDataToPolyDataFilter();
@@ -59,7 +54,7 @@ void vtkPVPolyDataToPolyDataFilter::SetInput(vtkPVPolyData *pvData)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPolyDataToPolyDataFilter *f;
   
-  f = vtkPolyDataToPolyDataFilter::SafeDownCast(this->PolyDataSource);
+  f = vtkPolyDataToPolyDataFilter::SafeDownCast(this->GetVTKSource());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -69,29 +64,5 @@ void vtkPVPolyDataToPolyDataFilter::SetInput(vtkPVPolyData *pvData)
   
   f->SetInput(pvData->GetPolyData());
   this->Input = pvData;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyDataToPolyDataFilter::InitializeData()
-{
-  // Right now, this only deals with polydata.  This needs to be changed.
-
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVPolyData *newData;
-  vtkPVAssignment *a;
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVActorComposite *ac;
-
-  newData = vtkPVPolyData::New();
-  newData->Clone(pvApp);
-  this->SetOutput(newData);
-  a = this->GetInput()->GetAssignment();
-  newData->SetAssignment(a);
-  this->GetInput()->GetActorComposite()->VisibilityOff();
-  this->CreateDataPage();
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
-
-  newData->Delete();
 }
 

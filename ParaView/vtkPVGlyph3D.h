@@ -59,8 +59,8 @@ public:
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
-  void SetOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetOutput();  
+  void SetPVOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetPVOutput();  
   
   vtkGetObjectMacro(Glyph, vtkGlyph3D);
   

@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 

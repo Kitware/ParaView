@@ -46,14 +46,6 @@ public:
   vtkTypeMacro(vtkPVPolyDataSource, vtkPVSource);
 
   // Description:
-  // Access to the underlying vtk poly data source.
-  // This access should probably not exist.  Every thing should
-  // be done through the PV interface so that all
-  // clones can be syncronized.
-  vtkGetObjectMacro(PolyDataSource, vtkPolyDataSource);
-  vtkSetObjectMacro(PolyDataSource, vtkPolyDataSource);
-
-  // Description:
   // This method gets called when the accept button is pressed
   // for the first time.  It creates a pvData and an actor composite
   // to display the data.
@@ -67,12 +59,9 @@ public:
   // Description:
   // The user has to set the output explicitly.
   // This is executed in all processes.
-  void SetOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetOutput();
+  void SetPVOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetPVOutput();
   
-  // A method needed by the auto UI.  
-  // It should be moved to a superclass.
-  vtkSource *GetVTKSource () { return this->PolyDataSource;}
   
 protected:
   vtkPVPolyDataSource();
@@ -80,7 +69,9 @@ protected:
   vtkPVPolyDataSource(const vtkPVPolyDataSource&) {};
   void operator=(const vtkPVPolyDataSource&) {};
   
-  vtkPolyDataSource *PolyDataSource;  
+  // Description:
+  // Cast to the correct type.
+  vtkPolyDataSource *GetVTKPolyDataSource();
 };
 
 #endif

@@ -101,7 +101,7 @@ void vtkPVAssignment::SetPiece(int piece, int numPieces)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAssignment::SetOriginalImage(vtkPVImage *pvImage)
+void vtkPVAssignment::SetOriginalImage(vtkPVImageData *pvImage)
 {
   vtkPVApplication *pvApp;
   
@@ -121,7 +121,7 @@ void vtkPVAssignment::SetOriginalImage(vtkPVImage *pvImage)
   
   if (this->OriginalImage)
     {
-    vtkPVImage *tmp = this->OriginalImage;
+    vtkPVImageData *tmp = this->OriginalImage;
     this->OriginalImage = NULL;
     tmp->UnRegister(this);
     }

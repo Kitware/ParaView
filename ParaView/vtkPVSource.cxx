@@ -45,7 +45,9 @@ vtkPVSource::vtkPVSource()
   this->Name = NULL;
   
   this->Input = NULL;
-  this->Output = NULL;
+  this->PVOutput = NULL;
+  this->VTKSource = NULL;
+
   this->Properties = vtkKWWidget::New();
   
   this->DataCreated = 0;
@@ -64,10 +66,10 @@ vtkPVSource::vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
-  if (this->Output)
+  if (this->PVOutput)
     {
-    this->Output->UnRegister(this);
-    this->Output = NULL;
+    this->PVOutput->UnRegister(this);
+    this->PVOutput = NULL;
     }
   
   if (this->Input)
@@ -75,6 +77,9 @@ vtkPVSource::~vtkPVSource()
     this->Input->UnRegister(this);
     this->Input = NULL;
     }
+
+  this->SetVTKSource(NULL);
+
   this->SetName(NULL);
   this->Properties->Delete();
   this->Properties = NULL;
@@ -117,28 +122,84 @@ void vtkPVSource::Clone(vtkPVApplication *pvApp)
 			 pvApp->GetTclName());  
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVData(vtkPVData *data)
+// Functions to update the progress bar
+void vtkPVSourceStartProgress(void *arg)
 {
-  if (this->Output == data)
+  vtkPVSource *me = (vtkPVSource*)arg;
+  vtkSource *vtkSource = me->GetVTKSource();
+  static char str[200];
+  
+  if (vtkSource)
+    {
+    sprintf(str, "Processing %s", vtkSource->GetClassName());
+    me->GetWindow()->SetStatusText(str);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVSourceReportProgress(void *arg)
+{
+  vtkPVSource *me = (vtkPVSource*)arg;
+  vtkSource *vtkSource = me->GetVTKSource();
+
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
+}
+//----------------------------------------------------------------------------
+void vtkPVSourceEndProgress(void *arg)
+{
+  vtkPVSource *me = (vtkPVSource*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+//----------------------------------------------------------------------------
+void vtkPVSource::SetVTKSource(vtkSource *source)
+{
+  if (this->VTKSource == source)
     {
     return;
     }
   this->Modified();
 
-  if (this->Output)
+  if (this->VTKSource)
+    {
+    // Be extra careful of circular references. (not important here...)
+    vtkSource *tmp = this->VTKSource;
+    this->VTKSource = NULL;
+    // Should we unset the progress methods?
+    tmp->UnRegister(this);
+    }
+  if (source)
+    {
+    this->VTKSource = source;
+    source->Register(this);
+    // Set up the progress methods.
+    source->SetStartMethod(vtkPVSourceStartProgress, this);
+    source->SetProgressMethod(vtkPVSourceReportProgress, this);
+    source->SetEndMethod(vtkPVSourceEndProgress, this);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVData(vtkPVData *data)
+{
+  if (this->PVOutput == data)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->PVOutput)
     {
     // extra careful for circular references
-    vtkPVData *tmp = this->Output;
-    this->Output = NULL;
+    vtkPVData *tmp = this->PVOutput;
+    this->PVOutput = NULL;
     // Manage double pointer.
     tmp->SetPVSource(NULL);
     tmp->UnRegister(this);
     }
   if (data)
     {
-    this->Output = data;
+    this->PVOutput = data;
     data->Register(this);
     // Manage double pointer.
     data->SetPVSource(this);

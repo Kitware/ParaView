@@ -47,7 +47,7 @@ vtkPVParallelDecimate::vtkPVParallelDecimate()
   this->SourceButton->SetParent(this->Properties);
 
   vtkParallelDecimate *pd = vtkParallelDecimate::New();
-  this->SetPolyDataSource(pd);
+  this->SetVTKSource(pd);
   pd->Delete();
 }
 
@@ -89,7 +89,7 @@ void vtkPVParallelDecimate::ParallelDecimateChanged()
   
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
-    this->InitializeData();
+    //this->InitializeData();
     window->GetSourceList()->Update();
     }
   
@@ -110,5 +110,5 @@ void vtkPVParallelDecimate::SetApplication(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 vtkParallelDecimate *vtkPVParallelDecimate::GetParallelDecimate()
 {
-  return vtkParallelDecimate::SafeDownCast(this->PolyDataSource);
+  return vtkParallelDecimate::SafeDownCast(this->GetVTKSource());
 }

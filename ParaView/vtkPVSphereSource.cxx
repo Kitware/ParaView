@@ -38,7 +38,7 @@ vtkPVSphereSource::vtkPVSphereSource()
   this->CommandFunction = vtkPVSphereSourceCommand;
   
   vtkSphereSource *s = vtkSphereSource::New();  
-  this->SetPolyDataSource(s);
+  this->SetVTKSource(s);
   s->Delete();
 }
 

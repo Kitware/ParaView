@@ -51,7 +51,7 @@ vtkPVTubeFilter::vtkPVTubeFilter()
   this->SidesEntry->SetParent(this->Properties);
   
   vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetPolyDataSource(tube);
+  this->SetVTKSource(tube);
   tube->Delete();
 }
 
@@ -137,7 +137,7 @@ void vtkPVTubeFilter::TubeFilterChanged()
     this->GetTubeFilter()->SetProgressMethod(TubeFilterProgress, this);
     this->GetTubeFilter()->SetEndMethod(EndTubeFilterProgress, this);
 
-    this->InitializeData();
+    //this->InitializeData();
     window->GetSourceList()->Update();
     }
 
@@ -174,7 +174,7 @@ void vtkPVTubeFilter::SetNumberOfSides(int sides)
 //----------------------------------------------------------------------------
 vtkTubeFilter *vtkPVTubeFilter::GetTubeFilter()
 {
-  return vtkTubeFilter::SafeDownCast(this->PolyDataSource);
+  return vtkTubeFilter::SafeDownCast(this->GetVTKSource());
 }
 
 

@@ -74,9 +74,9 @@ ClientData vtkPVGetRemoteGhostCellsNewCommand();
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGlyph3DNewCommand();
-int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVImageDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
-ClientData vtkPVImageNewCommand();
+ClientData vtkPVImageDataNewCommand();
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageClipNewCommand();
@@ -209,8 +209,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
                   vtkPVGlyph3DCommand);
-  vtkTclCreateNew(interp,"vtkPVImage", vtkPVImageNewCommand,
-                  vtkPVImageCommand);
+  vtkTclCreateNew(interp,"vtkPVImageData", vtkPVImageDataNewCommand,
+                  vtkPVImageDataCommand);
   vtkTclCreateNew(interp,"vtkPVImageClip", vtkPVImageClipNewCommand,
                   vtkPVImageClipCommand);
   vtkTclCreateNew(interp,"vtkPVImageMandelbrotSource", vtkPVImageMandelbrotSourceNewCommand,

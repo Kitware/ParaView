@@ -38,7 +38,7 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
   vtkShrinkPolyData *shrink = vtkShrinkPolyData::New();
-  this->SetPolyDataSource(shrink);
+  this->SetVTKSource(shrink);
   shrink->Delete();
 }
 

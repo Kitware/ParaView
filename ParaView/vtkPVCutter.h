@@ -39,7 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStylePlane.h"
 
 class vtkPVPolyData;
-class vtkPVImage;
+class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVCutter : public vtkPVSource
@@ -60,8 +60,8 @@ public:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.  Do not try to
   // set the output before the input has been set.
-  void SetOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetOutput();
+  void SetPVOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetPVOutput();
   
   // Description:
   // This interface broadcasts the change to all the processes.

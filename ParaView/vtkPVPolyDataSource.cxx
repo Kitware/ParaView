@@ -43,8 +43,6 @@ int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPolyDataSource::vtkPVPolyDataSource()
 {
   this->CommandFunction = vtkPVPolyDataSourceCommand;
-  
-  this->PolyDataSource = NULL;  
 }
 
 //----------------------------------------------------------------------------
@@ -54,57 +52,26 @@ vtkPVPolyDataSource* vtkPVPolyDataSource::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::SetOutput(vtkPVPolyData *pd)
+void vtkPVPolyDataSource::SetPVOutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->SetPVData(pd);  
-  pd->SetData(this->PolyDataSource->GetOutput());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pd->GetTclName());
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
+			   pvd->GetTclName());
     }
+
+  this->SetPVData(pvd);  
+  pvd->SetData(this->GetVTKPolyDataSource()->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVPolyDataSource::GetOutput()
+vtkPVPolyData *vtkPVPolyDataSource::GetPVOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->Output);
+  return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void vtkPVSourceStartProgress(void *arg)
-{
-  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
-  vtkPolyDataSource *vtkSource = me->GetPolyDataSource();
-  static char str[200];
-  
-  if (vtkSource)
-    {
-    sprintf(str, "Processing %s", vtkSource->GetClassName());
-    me->GetWindow()->SetStatusText(str);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceReportProgress(void *arg)
-{
-  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
-  vtkPolyDataSource *vtkSource = me->GetPolyDataSource();
-
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceEndProgress(void *arg)
-{
-  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVPolyDataSource::AcceptCallback()
@@ -113,11 +80,6 @@ void vtkPVPolyDataSource::AcceptCallback()
  
   this->vtkPVSource::AcceptCallback();
   
-  if (this->PolyDataSource == NULL)
-    {
-    vtkErrorMacro("Source has not been set.");
-    }
-
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
     vtkPVApplication *pvApp = this->GetPVApplication();
@@ -125,22 +87,23 @@ void vtkPVPolyDataSource::AcceptCallback()
     vtkPVAssignment *a;
     vtkPVActorComposite *ac;
 
-    this->PolyDataSource->SetStartMethod(vtkPVSourceStartProgress, this);
-    this->PolyDataSource->SetProgressMethod(vtkPVSourceReportProgress, this);
-    this->PolyDataSource->SetEndMethod(vtkPVSourceEndProgress, this);
-  
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     a = vtkPVAssignment::New();
     a->Clone(pvApp);
     
     pvd->SetAssignment(a);
-    this->SetOutput(pvd);
+    this->SetPVOutput(pvd);
     
     this->CreateDataPage();
   
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+    // Make the last data invisible.
+    if (this->GetInput())
+      {
+      this->GetInput()->GetActorComposite()->SetVisibility(0);
+      }
     window->GetMainView()->ResetCamera();
     }
 
@@ -160,7 +123,21 @@ void vtkPVPolyDataSource::SelectInputSource()
   this->GetWindow()->GetMainView()->ResetCamera();
 }
 
+//----------------------------------------------------------------------------
+vtkPolyDataSource *vtkPVPolyDataSource::GetVTKPolyDataSource()
+{
+  vtkPolyDataSource *pds = NULL;
 
+  if (this->VTKSource)
+    {
+    pds = vtkPolyDataSource::SafeDownCast(this->VTKSource);
+    }
+  if (pds == NULL)
+    {
+    vtkWarningMacro("Could not get the vtkPolyDataSource.");
+    }
+  return pds;
+}
 
 
 

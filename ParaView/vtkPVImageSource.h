@@ -32,7 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageReader.h"
 #include "vtkPVSource.h"
 
-class vtkPVImage;
+class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVImageSource : public vtkPVSource
@@ -44,8 +44,8 @@ public:
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
-  void SetOutput(vtkPVImage *pvi);
-  vtkPVImage *GetOutput();
+  void SetPVOutput(vtkPVImageData *pvi);
+  vtkPVImageData *GetPVOutput();
 
   // Description:
   // This method is called the first time the accept button is pressed.

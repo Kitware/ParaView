@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageClip.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAssignment.h"
@@ -158,7 +158,7 @@ void vtkPVImageClip::CreateProperties()
 
 
 //----------------------------------------------------------------------------
-void vtkPVImageClip::SetInput(vtkPVImage *pvi)
+void vtkPVImageClip::SetInput(vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -173,7 +173,7 @@ void vtkPVImageClip::SetInput(vtkPVImage *pvi)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageClip::SetOutput(vtkPVImage *pvi)
+void vtkPVImageClip::SetPVOutput(vtkPVImageData *pvi)
 {
   this->SetPVData(pvi);
 
@@ -181,9 +181,9 @@ void vtkPVImageClip::SetOutput(vtkPVImage *pvi)
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage *vtkPVImageClip::GetOutput()
+vtkPVImageData *vtkPVImageClip::GetPVOutput()
 {
-  return vtkPVImage::SafeDownCast(this->Output);
+  return vtkPVImageData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void vtkPVImageClip::UseExtentStyle()
 void vtkPVImageClip::ExtentsChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImage *pvi;
+  vtkPVImageData *pvi;
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
   vtkPVAssignment *a;
@@ -272,10 +272,10 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetImageClip()->SetProgressMethod(ImageClipProgress, this);
     this->GetImageClip()->SetEndMethod(EndImageClipProgress, this);
     this->GetExtentStyle()->SetCallbackMethod(ExtentCallback, this);
-    pvi = vtkPVImage::New();
+    pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();
-    this->SetOutput(pvi);
+    this->SetPVOutput(pvi);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvi->SetAssignment(a);
     this->GetPVData()->GetData()->

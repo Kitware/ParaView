@@ -215,7 +215,7 @@ void vtkPVCutter::SetInput(vtkPVData *pvData)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCutter::SetOutput(vtkPVPolyData *pvd)
+void vtkPVCutter::SetPVutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -230,9 +230,9 @@ void vtkPVCutter::SetOutput(vtkPVPolyData *pvd)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVCutter::GetOutput()
+vtkPVPolyData *vtkPVCutter::GetPVOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->Output);
+  return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ void vtkPVCutter::CutterChanged()
     this->GetPlaneStyle()->SetCallbackMethod(PlaneCallback, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
-    this->SetOutput(pvd);
+    this->SetPVOutput(pvd);
     a = this->GetInput()->GetAssignment();
     pvd->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();

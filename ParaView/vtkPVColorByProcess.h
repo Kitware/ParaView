@@ -38,7 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
-class vtkPVImage;
+class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVColorByProcess : public vtkPVDataSetToDataSetFilter

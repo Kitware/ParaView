@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageSlice.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAssignment.h"
@@ -323,7 +323,7 @@ void vtkPVImageSlice::UseSliceStyle()
 void vtkPVImageSlice::SliceChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImage *pvi;
+  vtkPVImageData *pvi;
   vtkPVWindow *window = this->GetWindow();
   vtkPVActorComposite *ac;
   vtkPVAssignment *a;
@@ -395,10 +395,10 @@ void vtkPVImageSlice::SliceChanged()
     this->GetSlice()->SetProgressMethod(ImageSliceProgress, this);
     this->GetSlice()->SetEndMethod(EndImageSliceProgress, this);
     this->GetSliceStyle()->SetCallbackMethod(SliceCallback, this);
-    pvi = vtkPVImage::New();
+    pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();
-    this->SetOutput(pvi);
+    this->SetPVOutput(pvi);
     a = this->GetInput()->GetAssignment();
     pvi->SetAssignment(a);  
     this->GetInput()->GetActorComposite()->VisibilityOff();
@@ -430,7 +430,7 @@ void vtkPVImageSlice::SliceChanged()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSlice::SetInput(vtkPVImage *pvData)
+void vtkPVImageSlice::SetInput(vtkPVImageData *pvData)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -446,13 +446,13 @@ void vtkPVImageSlice::SetInput(vtkPVImage *pvData)
 
 
 //----------------------------------------------------------------------------
-void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
+void vtkPVImageSlice::SetPVOutput(vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
 			   pvi->GetTclName());
     }  
   
@@ -461,9 +461,9 @@ void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage *vtkPVImageSlice::GetOutput()
+vtkPVImageData *vtkPVImageSlice::GetPVOutput()
 {
-  return vtkPVImage::SafeDownCast(this->Output);
+  return vtkPVImageData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------

@@ -35,7 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWObject.h"
 #include "vtkPVExtentTranslator.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 
 class vtkPVApplication;
 
@@ -55,8 +55,8 @@ public:
   // Description:
   // The original source supplies this input so we will
   // always know the whole extent.  Set broadcasts executes on all processes.
-  void SetOriginalImage(vtkPVImage *pvImage);
-  vtkPVImage *GetOriginalImage() {return this->OriginalImage;}
+  void SetOriginalImage(vtkPVImageData *pvImage);
+  vtkPVImageData *GetOriginalImage() {return this->OriginalImage;}
   
   // Description:
   // Get the underlying extent translator.
@@ -88,7 +88,7 @@ protected:
   void operator=(const vtkPVAssignment&) {};
   
   vtkPVExtentTranslator *Translator;  
-  vtkPVImage *OriginalImage;
+  vtkPVImageData *OriginalImage;
 };
 
 #endif

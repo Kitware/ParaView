@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVImageSource.h"
 #include "vtkPVApplication.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVAssignment.h"
@@ -54,7 +54,7 @@ vtkPVImageSource* vtkPVImageSource::New()
 
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::SetOutput(vtkPVImage *pvi)
+void vtkPVImageSource::SetPVOutput(vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -63,15 +63,15 @@ void vtkPVImageSource::SetOutput(vtkPVImage *pvi)
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
 			   pvi->GetTclName());
     }
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage *vtkPVImageSource::GetOutput()
+vtkPVImageData *vtkPVImageSource::GetPVOutput()
 {
-  return vtkPVImage::SafeDownCast(this->Output);
+  return vtkPVImageData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
@@ -79,16 +79,16 @@ void vtkPVImageSource::InitializeData()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetWindow();
-  vtkPVImage *pvImage;
+  vtkPVImageData *pvImage;
   vtkPVAssignment *a;
   vtkPVActorComposite *ac;
 
-  pvImage = vtkPVImage::New();
+  pvImage = vtkPVImageData::New();
   pvImage->Clone(pvApp);
   a = vtkPVAssignment::New();
   a->Clone(pvApp);
   
-  this->SetOutput(pvImage);
+  this->SetPVOutput(pvImage);
   // It is important that the pvImage have its image data befor this call.
   // The assignments vtk object is vtkPVExtentTranslator which needs the image.
   // This may get resolved as more functionality of Assignement gets into ExtentTranslator.

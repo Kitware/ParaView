@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 
@@ -81,7 +81,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->SourceButton->SetParent(this->Properties);
   
   vtkElevationFilter *e = vtkElevationFilter::New();
-  this->SetFilter(e);
+  this->SetVTKSource(e);
   e->Delete();
 }
 
@@ -134,7 +134,7 @@ vtkPVElevationFilter* vtkPVElevationFilter::New()
 //----------------------------------------------------------------------------
 vtkElevationFilter* vtkPVElevationFilter::GetElevation()
 {
-  return vtkElevationFilter::SafeDownCast(this->Filter);
+  return vtkElevationFilter::SafeDownCast(this->GetVTKSource());
 }
 
 //----------------------------------------------------------------------------
@@ -282,7 +282,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
     this->GetElevation()->SetStartMethod(StartElevationFilterProgress, this);
     this->GetElevation()->SetProgressMethod(ElevationFilterProgress, this);
     this->GetElevation()->SetEndMethod(EndElevationFilterProgress, this);
-    this->InitializeData();
+    //this->InitializeData();
     window->GetSourceList()->Update();
     }
   

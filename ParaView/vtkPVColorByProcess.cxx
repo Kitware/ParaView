@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 
 int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
@@ -49,7 +49,7 @@ vtkPVColorByProcess::vtkPVColorByProcess()
   this->SourceButton->SetParent(this->Properties);
   
   vtkColorByProcess *f = vtkColorByProcess::New();
-  this->SetFilter(f);
+  this->SetVTKSource(f);
   f->Delete();
 }
 
@@ -72,7 +72,7 @@ vtkPVColorByProcess* vtkPVColorByProcess::New()
 //----------------------------------------------------------------------------
 vtkColorByProcess* vtkPVColorByProcess::GetFilter()
 {
-  return vtkColorByProcess::SafeDownCast(this->Filter);
+  return vtkColorByProcess::SafeDownCast(this->GetVTKSource());
 }
 
 //----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ void vtkPVColorByProcess::ParameterChanged()
     this->GetFilter()->SetStartMethod(StartColorByProcessProgress, this);
     this->GetFilter()->SetProgressMethod(ColorByProcessProgress, this);
     this->GetFilter()->SetEndMethod(EndColorByProcessProgress, this);
-    this->InitializeData();
+    //this->InitializeData();
     window->GetSourceList()->Update();
     }
   

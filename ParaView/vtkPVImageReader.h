@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageReader.h"
 #include "vtkPVImageSource.h"
 
-class vtkPVImage;
+class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVImageReader : public vtkPVImageSource

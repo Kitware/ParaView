@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVDataSetToDataSetFilter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVWindow.h"
 
@@ -40,19 +40,8 @@ int vtkPVDataSetToDataSetFilterCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVDataSetToDataSetFilter::vtkPVDataSetToDataSetFilter()
 {
   this->CommandFunction = vtkPVDataSetToDataSetFilterCommand;
-  
-  this->Filter = NULL;
 }
 
-//----------------------------------------------------------------------------
-vtkPVDataSetToDataSetFilter::~vtkPVDataSetToDataSetFilter()
-{
-  if (this->Filter)
-    {
-    this->Filter->UnRegister(this);
-    this->Filter = NULL;
-    }
-}
 
 //----------------------------------------------------------------------------
 vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
@@ -60,39 +49,53 @@ vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
   return new vtkPVDataSetToDataSetFilter();
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetOutput(vtkPVData *pvd)
+void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkDataSetToDataSetFilter *f = this->GetVTKDataSetToDataSetFilter();
+
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
 			   pvd->GetTclName());
     }
+  // This calls just does reference counting.
+  this->SetPVData(pvd);  
+  pvd->SetData(f->GetPolyDataOutput());
+}
+//----------------------------------------------------------------------------
+void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVImageData *pvi)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkDataSetToDataSetFilter *f = this->GetVTKDataSetToDataSetFilter();
   
-  // This is just for reference counting now.
-  this->SetPVData(pvd);
-  
-  pvd->SetData(this->Filter->GetOutput());
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
+			   pvi->GetTclName());
+    }
+  // This calls just does reference counting.
+  this->SetPVData(pvi);  
+  pvi->SetData(f->GetStructuredPointsOutput());
 }
 
 //----------------------------------------------------------------------------
-vtkPVData *vtkPVDataSetToDataSetFilter::GetOutput()
+vtkPVData *vtkPVDataSetToDataSetFilter::GetPVOutput()
 {
-  return this->Output;
+  return this->PVOutput;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPolyData *vtkPVDataSetToDataSetFilter::GetPVPolyDataOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->Output);
+  return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
-vtkPVImage *vtkPVDataSetToDataSetFilter::GetPVImageOutput()
+vtkPVImageData *vtkPVDataSetToDataSetFilter::GetPVImageDataOutput()
 {
-  return vtkPVImage::SafeDownCast(this->Output);
+  return vtkPVImageData::SafeDownCast(this->PVOutput);
 }
 
 
@@ -101,40 +104,37 @@ vtkPVImage *vtkPVDataSetToDataSetFilter::GetPVImageOutput()
 void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkDataSetToDataSetFilter *f;
   
+  f = vtkDataSetToDataSetFilter::SafeDownCast(this->GetVTKSource());
+
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
 			   pvData->GetTclName());
     }  
   
-  this->Filter->SetInput(pvData->GetData());
+  f->SetInput(pvData->GetData());
   this->Input = pvData;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::InitializeData()
+vtkDataSetToDataSetFilter*
+vtkPVDataSetToDataSetFilter::GetVTKDataSetToDataSetFilter()
 {
-  // Right now, this only deals with polydata.  This needs to be changed.
+  vtkDataSetToDataSetFilter *f = NULL;
 
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVData *newData;
-  vtkPVAssignment *a;
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVActorComposite *ac;
-
-  newData = this->GetInput()->MakeObject();
-  newData->Clone(pvApp);
-  this->SetOutput(newData);
-  a = this->GetInput()->GetAssignment();
-  newData->SetAssignment(a);
-  this->GetInput()->GetActorComposite()->VisibilityOff();
-  this->CreateDataPage();
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
-
-  newData->Delete();
+  if (this->VTKSource)
+    {
+    f = vtkDataSetToDataSetFilter::SafeDownCast(this->VTKSource);
+    }
+  if (f == NULL)
+    {
+    vtkWarningMacro("Could not get the vtkDataSetToDataSetFilter.");
+    }
+  return f;
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetToDataSetFilter::SelectInputSource()

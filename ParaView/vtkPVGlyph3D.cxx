@@ -141,13 +141,13 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pvd)
+void vtkPVGlyph3D::SetPVOutput(vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
 			   pvd->GetTclName());
     }  
   
@@ -156,9 +156,9 @@ void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pvd)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVGlyph3D::GetOutput()
+vtkPVPolyData *vtkPVGlyph3D::GetPVOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->Output);
+  return vtkPVPolyData::SafeDownCast(this->PVOutput);
 }
 
 //----------------------------------------------------------------------------
@@ -276,7 +276,7 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     coneAssignment = vtkPVAssignment::New();
     coneAssignment->Clone(pvApp);
     coneOut->SetAssignment(coneAssignment);
-    cone->SetOutput(coneOut);
+    cone->SetPVOutput(coneOut);
     cone->CreateDataPage();
     window->GetMainView()->AddComposite(coneOut->GetActorComposite());
     coneOut->GetActorComposite()->VisibilityOff();
@@ -291,7 +291,7 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     // Create our own output.
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
-    this->SetOutput(pvd);
+    this->SetPVOutput(pvd);
     a = this->GetInput()->GetAssignment();
     pvd->SetAssignment(a);
     this->GetInput()->GetActorComposite()->VisibilityOff();

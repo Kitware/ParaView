@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVImageReader.h"
 #include "vtkPVApplication.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVAssignment.h"

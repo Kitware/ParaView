@@ -35,7 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
-class vtkPVImage;
+class vtkPVImageData;
 
 
 class VTK_EXPORT vtkPVDataSetToDataSetFilter : public vtkPVSource
@@ -49,10 +49,11 @@ public:
   // the object creation/tcl-names in the other processes.  Do not try to
   // set the output before the input has been set.
   // This methods gets called in all processes.
-  void SetOutput(vtkPVData *pvd);
-  vtkPVData *GetOutput();
+  void SetPVOutput(vtkPVPolyData *pvd);
+  void SetPVOutput(vtkPVImageData *pvi);
+  vtkPVData *GetPVOutput();
   vtkPVPolyData *GetPVPolyDataOutput();
-  vtkPVImage *GetPVImageOutput();
+  vtkPVImageData *GetPVImageDataOutput();
   
   // Description:
   // Make the input source the current composite.
@@ -65,21 +66,13 @@ public:
 
 protected:
   vtkPVDataSetToDataSetFilter();
-  ~vtkPVDataSetToDataSetFilter();
+  ~vtkPVDataSetToDataSetFilter() {};
   vtkPVDataSetToDataSetFilter(const vtkPVDataSetToDataSetFilter&) {};
   void operator=(const vtkPVDataSetToDataSetFilter&) {};
 
   // Description:
-  // This method is called the first time the accept button is pressed.
-  // It creates the pvData object, and the actor composite for display.
-  void InitializeData();
-  
-  
-  // Description:
-  // A convenience method for setting the filter.
-  vtkSetObjectMacro(Filter, vtkDataSetToDataSetFilter);
-  
-  vtkDataSetToDataSetFilter *Filter;
+  // Cast to the correct type.
+  vtkDataSetToDataSetFilter *GetVTKDataSetToDataSetFilter();
 };
 
 #endif

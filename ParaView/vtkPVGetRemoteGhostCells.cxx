@@ -49,7 +49,7 @@ vtkPVGetRemoteGhostCells::vtkPVGetRemoteGhostCells()
   this->GhostLevelEntry->SetParent(this->Properties);
 
   vtkGetRemoteGhostCells *rgc = vtkGetRemoteGhostCells::New();
-  this->SetPolyDataSource(rgc);
+  this->SetVTKSource(rgc);
   rgc->Delete();
 }
 
@@ -99,7 +99,7 @@ void vtkPVGetRemoteGhostCells::GhostLevelChanged()
   
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
-    this->InitializeData();
+    //this->InitializeData();
     window->GetSourceList()->Update();
     }
   
@@ -123,7 +123,7 @@ void vtkPVGetRemoteGhostCells::SetGhostLevel(int level)
 			   level);
     }
   
-  this->GetOutput()->GetActorComposite()->GetMapper()->SetGhostLevel(level);
+  this->GetPVOutput()->GetActorComposite()->GetMapper()->SetGhostLevel(level);
 }
 
 //----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void vtkPVGetRemoteGhostCells::SetApplication(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 vtkGetRemoteGhostCells *vtkPVGetRemoteGhostCells::GetRemoteGhostCells()
 {
-  return vtkGetRemoteGhostCells::SafeDownCast(this->PolyDataSource);
+  return vtkGetRemoteGhostCells::SafeDownCast(this->GetVTKSource());
 }
 
 

@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkInteractorStyleImageExtent.h"
 
-class vtkPVImage;
+class vtkPVImageData;
 
 
 
@@ -56,13 +56,13 @@ public:
 
   // Description:
   // Used to connect pipelines.  Executes in all processes.
-  void SetInput(vtkPVImage *pvi);
+  void SetInput(vtkPVImageData *pvi);
 
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
-  void SetOutput(vtkPVImage *pvd);
-  vtkPVImage *GetOutput();
+  void SetPVOutput(vtkPVImageData *pvd);
+  vtkPVImageData *GetPVOutput();
 
   // Description:
   // Changes filters clip and clones in satellite processes.

@@ -45,7 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVImageReader.h"
 #include "vtkPVImageMandelbrotSource.h"
-#include "vtkPVImage.h"
+#include "vtkPVImageData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVSphereSource.h"

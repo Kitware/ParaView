@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkInteractorStyleImageExtent.h"
 
-class vtkPVImage;
+class vtkPVImageData;
 
 class VTK_EXPORT vtkPVImageSlice : public vtkPVSource
 {
@@ -50,13 +50,13 @@ public:
   
   // Description:
   // The methods executes on all processes.
-  void SetInput(vtkPVImage *pvData);
+  void SetInput(vtkPVImageData *pvData);
   
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
-  void SetOutput(vtkPVImage *pvd);
-  vtkPVImage *GetOutput();
+  void SetPVOutput(vtkPVImageData *pvd);
+  vtkPVImageData *GetPVOutput();
   
   // Description:
   // This is called when the accept button is pressed.

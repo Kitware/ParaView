@@ -50,11 +50,9 @@ public:
   
 protected:
   vtkPVPolyDataToPolyDataFilter();
-  ~vtkPVPolyDataToPolyDataFilter();
+  ~vtkPVPolyDataToPolyDataFilter() {};
   vtkPVPolyDataToPolyDataFilter(const vtkPVPolyDataToPolyDataFilter&) {};
   void operator=(const vtkPVPolyDataToPolyDataFilter&) {};
-  
-  void InitializeData();
 };
 
 #endif

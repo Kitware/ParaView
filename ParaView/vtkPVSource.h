@@ -60,7 +60,7 @@ public:
   
   // Description:
   // A way to get the output in the superclass.
-  vtkPVData *GetPVData() {return this->Output;}
+  vtkPVData *GetPVData() {return this->PVOutput;}
     
   // Description:
   // Create the properties object, called by InitializeProperties.
@@ -112,6 +112,11 @@ public:
   void AddSlider(char *label, char *setCmd, char *getCmd, 
 		 float min, float max, float resolution);
 
+  // Description:
+  // Set the vtk source that will be a part of the pipeline.
+  void SetVTKSource(vtkSource *source);
+  vtkGetObjectMacro(VTKSource, vtkSource);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -122,8 +127,9 @@ protected:
   // Mangages the double pointer and reference counting.
   void SetPVData(vtkPVData *data);
   
-  vtkPVData *Output;
-  
+  vtkPVData *PVOutput;
+  vtkSource *VTKSource;
+
   // Just one input for now.
   vtkPVData *Input;
   char *Name;

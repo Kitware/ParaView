@@ -38,7 +38,7 @@ vtkPVConeSource::vtkPVConeSource()
   this->CommandFunction = vtkPVConeSourceCommand;
   
   vtkConeSource *source = vtkConeSource::New();  
-  this->SetPolyDataSource(source);
+  this->SetVTKSource(source);
   source->Delete();
 }
 
