@@ -29,7 +29,7 @@
 
 class vtkPropCollection;
 
-class VTK_COMMON_EXPORT vtkCompositeProp : public vtkProp
+class VTK_EXPORT vtkCompositeProp : public vtkProp
 {
 public:
   vtkTypeRevisionMacro(vtkCompositeProp,vtkProp);
@@ -64,8 +64,8 @@ public:
   // second method is intended for rendering all translucent geometry. Most
   // volume rendering mappers draw their results during this second method.
   // The last method is to render any 2D annotation or overlays.
-  // Each of these methods return an integer value indicating
-  // whether or not this render method was applied to this data. 
+  // The value returned indicates how many props this render method was
+  // applied to.
   virtual int RenderOpaqueGeometry(      vtkViewport *);
   virtual int RenderTranslucentGeometry( vtkViewport *);
   virtual int RenderOverlay(             vtkViewport *);

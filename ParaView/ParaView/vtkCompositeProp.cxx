@@ -22,7 +22,7 @@
 
 vtkStandardNewMacro(vtkCompositeProp);
 
-vtkCxxRevisionMacro(vtkCompositeProp, "1.1");
+vtkCxxRevisionMacro(vtkCompositeProp, "1.2");
 
 // Creates an Prop with the following defaults: visibility on.
 vtkCompositeProp::vtkCompositeProp()
@@ -83,32 +83,38 @@ void vtkCompositeProp::Pick()
 
 int vtkCompositeProp::RenderOpaqueGeometry(vtkViewport *v)
 {
+  int renderCount = 0;
   vtkProp *p = 0;
   this->Props->InitTraversal();
   while( (p = this->Props->GetNextProp()) )
     {
-    p->RenderOpaqueGeometry(v);
+    renderCount += p->RenderOpaqueGeometry(v);
     }
+  return renderCount;
 }
 
 int vtkCompositeProp::RenderTranslucentGeometry(vtkViewport *v)
 {
+  int renderCount = 0;
   vtkProp *p = 0;
   this->Props->InitTraversal();
   while( (p = this->Props->GetNextProp()) )
     {
-    p->RenderTranslucentGeometry(v);
+    renderCount += p->RenderTranslucentGeometry(v);
     }
+  return renderCount;
 }
 
 int vtkCompositeProp::RenderOverlay(vtkViewport *v)
 {
+  int renderCount = 0;
   vtkProp *p = 0;
   this->Props->InitTraversal();
   while( (p = this->Props->GetNextProp()) )
     {
-    p->RenderOverlay(v);
+    renderCount += p->RenderOverlay(v);
     }
+  return renderCount;
 }
 
 void vtkCompositeProp::ReleaseGraphicsResources(vtkWindow *v)
