@@ -103,7 +103,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.114");
+vtkCxxRevisionMacro(vtkKWView, "1.115");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -490,8 +490,8 @@ void vtkKWView::CreateViewProperties()
                this->HeaderEntryFrame->GetWidgetName());
 
   this->HeaderButton->SetParent(this->HeaderDisplayFrame);
-  this->HeaderButton->Create(this->Application,
-                             "-text {Display Header Annotation}");
+  this->HeaderButton->Create(this->Application, "");
+  this->HeaderButton->SetText("Display Header Annotation");
   this->HeaderButton->SetBalloonHelpString("Toggle the visibility of the header text");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
   this->HeaderColor->SetParent(this->HeaderDisplayFrame);
@@ -505,7 +505,8 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->HeaderColor->GetWidgetName());
   this->HeaderLabel->SetParent(this->HeaderEntryFrame);
-  this->HeaderLabel->Create(app,"label","-text Header:");
+  this->HeaderLabel->Create(app,"label","");
+  this->HeaderLabel->SetTextOption("Header:");
   this->HeaderLabel->SetBalloonHelpString("Set the header text string");
   this->HeaderEntry->SetParent(this->HeaderEntryFrame);
   this->HeaderEntry->Create(app,"-width 20");
@@ -1414,8 +1415,7 @@ void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
 //----------------------------------------------------------------------------
 void vtkKWView::SetTitle(const char *title)
 {
-  this->Script("%s configure -text {%s}", 
-               this->Label->GetWidgetName(), title);
+  this->Label->SetTextOption(title);
   //  this->Script("update idletasks");
 }
 
@@ -1558,7 +1558,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.114 $");
+  this->ExtractRevision(os,"$Revision: 1.115 $");
 }
 
 //----------------------------------------------------------------------------

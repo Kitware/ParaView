@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
-vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.8");
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.9");
 
 
 
@@ -78,10 +78,12 @@ void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
   
   this->Message->Create(app,"label","");
   this->ButtonFrame->Create(app,"frame","");
-  this->OKButton->Create(app,"button","-text OK -width 16");
+  this->OKButton->Create(app, "button", "-width 16");
   this->OKButton->SetCommand(this, "OK");
-  this->CancelButton->Create(app,"button","-text Cancel -width 16");
+  this->OKButton->SetTextOption("OK");
+  this->CancelButton->Create(app,"button","-width 16");
   this->CancelButton->SetCommand(this, "Cancel");
+  this->CancelButton->SetTextOption("Cancel");
   this->Script("pack %s %s -side left -padx 4 -expand yes",
                this->OKButton->GetWidgetName(),
                this->CancelButton->GetWidgetName() );
@@ -93,8 +95,7 @@ void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
 
 void vtkKWOKCancelDialog::SetText(const char *txt)
 {
-  this->Script("%s configure -text {%s}",
-               this->Message->GetWidgetName(),txt);
+  this->Message->SetTextOption(txt);
 }
 
 //----------------------------------------------------------------------------

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.13");
+vtkCxxRevisionMacro(vtkKWText, "1.14");
 
 vtkKWText::vtkKWText()
 {
@@ -61,7 +61,8 @@ char *vtkKWText::GetValue()
     {
     return 0;
     }
-  this->Script("%s get 1.0 {end -1 chars}", this->GetWidgetName());
+  this->Script("encoding convertfrom identity [%s get 1.0 {end -1 chars}]", 
+               this->GetWidgetName());
   this->SetValueString( this->Application->GetMainInterp()->result );
   return this->GetValueString();
 }
@@ -75,7 +76,8 @@ void vtkKWText::SetValue(const char *s)
   this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)
     {
-    this->Script("%s insert 1.0 {%s}",this->GetWidgetName(),s);
+    this->Script("%s insert 1.0 [encoding convertfrom utf-8 {%s}]",
+                 this->GetWidgetName(), s);
     }
 }
 

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.51");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.52");
 
 
 
@@ -129,7 +129,8 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     {
     case vtkKWMessageDialog::Message :
       this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->OKButton->Create(app,"button","-text OK -width 16");
+      this->OKButton->Create(app,"button","-width 16");
+      this->OKButton->SetTextOption("OK");
       this->OKButton->SetCommand(this, "OK");
       this->Script("pack %s -side left -expand yes",
                    this->OKButton->GetWidgetName());
@@ -141,16 +142,12 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
       this->SetCancelButtonText("No");
     case vtkKWMessageDialog::OkCancel:
       this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      ostrstream oktext;
-      oktext << "-text " << this->OKButtonText << " -width 16" << ends;
-      this->OKButton->Create(app, "button", oktext.str());
-      oktext.rdbuf()->freeze(0);
+      this->OKButton->Create(app, "button", " -width 16");
+      this->OKButton->SetTextOption(this->OKButtonText);
       this->OKButton->SetCommand(this, "OK");
       this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      ostrstream canceltext;
-      canceltext << "-text " << this->CancelButtonText << " -width 16" << ends;
-      this->CancelButton->Create(app,"button", canceltext.str());
-      canceltext.rdbuf()->freeze(0);
+      this->CancelButton->Create(app,"button", "-width 16");
+      this->CancelButton->SetTextOption(this->CancelButtonText);
       this->CancelButton->SetCommand(this, "Cancel");
       this->Script("pack %s %s -side left -expand yes",
                    this->OKButton->GetWidgetName(),

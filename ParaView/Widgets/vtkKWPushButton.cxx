@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.13");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -72,10 +72,14 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 
   wname = this->GetWidgetName();
 
-  this->Script("button %s -text {%s} %s", 
-               wname, 
-               (this->ButtonLabel ? this->ButtonLabel : ""), 
-               (args ? args : ""));
+  this->Script("button %s", wname);
+
+  this->SetTextOption(this->ButtonLabel);
+
+  if (args && *args)
+    {
+    this->Script("%s config %s", wname, args);
+    }
 
   // Update enable state
 
@@ -86,11 +90,7 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 void vtkKWPushButton::SetLabel( const char *name )
 {
   this->SetButtonLabel(name);
-
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -text {%s}", this->GetWidgetName(), name);
-    }
+  this->SetTextOption(name);
 }
 
 //----------------------------------------------------------------------------

@@ -92,6 +92,7 @@ protected:
   ~vtkKWLabel();
 
   virtual void UpdateBindings();
+  virtual void UpdateText();
 
 private:
   char* Label;

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.23");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -123,15 +123,7 @@ void vtkKWCheckButton::SetIndicator(int ind)
 void vtkKWCheckButton::SetText(const char* txt)
 {
   this->SetMyText(txt);
-  
-  if (this->IsCreated())
-    {
-    if (this->MyText)
-      {
-      this->Script("%s configure -text {%s}", 
-                   this->GetWidgetName(), this->MyText);
-      }
-    }
+  this->SetTextOption(txt);
 }
 
 //----------------------------------------------------------------------------
@@ -201,10 +193,7 @@ void vtkKWCheckButton::Configure()
   this->Script("%s configure -indicatoron %d",
                wname, (this->IndicatorOn ? 1 : 0));
 
-  if (this->MyText)
-    {
-    this->Script("%s configure -text {%s}", wname, this->MyText);
-    }
+  this->SetTextOption(this->MyText);
 
   // Set the variable name if not set already
   if (!this->VariableName)

@@ -43,7 +43,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.25");
+vtkCxxRevisionMacro(vtkKWLabel, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -97,10 +97,15 @@ void vtkKWLabel::SetLabel(const char* _arg)
 
   this->Modified();
 
+  this->UpdateText();
+} 
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::UpdateText()
+{
   if (this->Label && this->IsCreated())
     {
-    this->Script("%s configure -text {%s}", 
-                 this->GetWidgetName(), this->Label);
+    this->SetTextOption(this->Label);
 
     // Whatever the label, -image always takes precedence, unless it's empty
     // so change it accordingly
@@ -110,13 +115,11 @@ void vtkKWLabel::SetLabel(const char* _arg)
       this->Script("%s configure -image {}", this->GetWidgetName());
       }
     }
-} 
+}
 
 //----------------------------------------------------------------------------
 void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
-
   // Set the application
 
   if (this->IsCreated())
@@ -127,17 +130,24 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 
   this->SetApplication(app);
 
-  // create the top level
-  wname = this->GetWidgetName();
-  if ( this->LineType == vtkKWLabel::MultiLine )
+  // Create the top level
+
+  const char *wname = this->GetWidgetName();
+
+  if (this->LineType == vtkKWLabel::MultiLine)
     {
-    this->Script("message %s -text {%s} -width %d %s", 
-                 wname, this->Label, this->Width, (args?args:""));
+    this->Script("message %s -width %d", wname, this->Width);
     }
   else
     {
-    this->Script("label %s -text {%s} -justify left -width %d %s", 
-                 wname, this->Label, this->Width, (args?args:""));
+    this->Script("label %s -justify left -width %d", wname, this->Width);
+    }
+
+  this->UpdateText();
+
+  if (args && *args)
+    {
+    this->Script("%s config %s", wname, args);
     }
 
   // Set bindings (if any)
@@ -154,22 +164,20 @@ void vtkKWLabel::SetLineType( int type )
 {
   if (this->IsCreated())
     {
-    if ( this->LineType != type )
+    if (this->LineType != type)
       {
-      this->Script("lindex [ %s configure -text ] 4", 
-                   this->GetWidgetName());
-      char *str = this->Application->GetMainInterp()->result;
-      this->Script("destroy %s", this->GetWidgetName());
-      if ( this->LineType == vtkKWLabel::MultiLine )
+      const char *wname = this->GetWidgetName();
+      this->SetLabel(this->GetTextOption());
+      this->Script("destroy %s", wname);
+      if (this->LineType == vtkKWLabel::MultiLine)
         {
-        this->Script("message %s -text {%s} -width %d", 
-                     this->GetWidgetName(), str, this->Width);
+        this->Script("message %s -width %d", wname, this->Width);
         }
       else
         {
-        this->Script("label %s -text {%s} -justify left -width %d", 
-                     this->GetWidgetName(), str, this->Width);
-        }                  
+        this->Script("label %s -justify left -width %d", wname, this->Width);
+        }
+      this->UpdateText();
       }
     }
   this->LineType = type;
