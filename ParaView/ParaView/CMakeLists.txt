@@ -1,6 +1,5 @@
 SOURCE_FILES( ParaView_SRCS
 vtkCameraInteractor 
-vtkImageOutlineFilter 
 vtkInteractor 
 vtkKWBoundsDisplay
 vtkKWCenterOfRotation 

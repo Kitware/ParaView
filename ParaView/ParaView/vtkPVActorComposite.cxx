@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
-#include "vtkImageOutlineFilter.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkTexture.h"
 #include "vtkScalarBarActor.h"
