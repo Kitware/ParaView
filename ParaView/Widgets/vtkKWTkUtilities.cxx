@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.3");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.4");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -151,8 +151,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       }
     else
       {
-      // Use a gray
-      r = g = b = 128;
+      vtkKWTkUtilities::GetBackgroundColor(interp, ".", &r, &g, &b);
       }
 
     // Create photo pixels
