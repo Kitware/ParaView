@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.260");
+vtkCxxRevisionMacro(vtkPVData, "1.261");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2656,6 +2656,38 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << " GetProperty PointSize] SetElements1 "  
           << part->GetPartDisplay()->GetProperty()->GetPointSize()
           << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Position] SetElements3 "  
+          << this->TranslateThumbWheel[0]->GetValue() << " "
+          << this->TranslateThumbWheel[1]->GetValue() << " "
+          << this->TranslateThumbWheel[2]->GetValue() << " "
+          << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Scale] SetElements3 "  
+          << this->ScaleThumbWheel[0]->GetValue() << " "
+          << this->ScaleThumbWheel[1]->GetValue() << " "
+          << this->ScaleThumbWheel[2]->GetValue() << " "
+          << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Orientation] SetElements3 "  
+          << this->OrientationScale[0]->GetValue() << " "
+          << this->OrientationScale[1]->GetValue() << " "
+          << this->OrientationScale[2]->GetValue() << " "
+          << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Origin] SetElements3 "  
+          << this->OriginThumbWheel[0]->GetValue() << " "
+          << this->OriginThumbWheel[1]->GetValue() << " "
+          << this->OriginThumbWheel[2]->GetValue() << " "
+          << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Opacity] SetElements1 "  
+          << this->OpacityScale->GetValue() << endl;
     
     double propColor[3];
     part->GetPartDisplay()->GetProperty()->GetColor(propColor);
