@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.4");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -416,7 +416,7 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
   char *ext = NULL;
 
   ptr = fileName;
-  while (*ptr != NULL)
+  while (*ptr != '\0')
     {
     if (*ptr == '.')
       {
