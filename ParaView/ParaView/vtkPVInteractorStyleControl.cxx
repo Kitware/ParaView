@@ -680,7 +680,6 @@ void vtkPVInteractorStyleControl::StoreRegistery()
 {
   if ( !this->Application || !this->RegisteryName )
     {
-    vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
     return;
     }
   int cc;
