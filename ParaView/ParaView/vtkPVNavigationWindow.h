@@ -39,8 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVNavigationWindow - 
+// .NAME vtkPVNavigationWindow - Widget for PV sources and their inputs and outputs
 // .SECTION Description
+// vtkPVNavigationWindow is a specialized ParaView widget used for
+// displaying a local presentation of the underlying pipeline. It
+// allows the user to navigate by clicking on the appropriate tags.
 
 #ifndef __vtkPVNavigationWindow_h
 #define __vtkPVNavigationWindow_h
@@ -62,13 +65,16 @@ public:
   void Create(vtkKWApplication *app, const char *args);
 
   // Description:
+  // Set the width and the height of the underlying canvas
   void SetWidth(int width);
   void SetHeight(int height);
 
   // Description:
+  // Return the underlying canvas
   vtkGetObjectMacro(Canvas, vtkKWWidget);
 
   // Description:
+  // Regenerate the display and re-assign bindings.
   void Update(vtkPVSource *currentSource);
   
 protected:
