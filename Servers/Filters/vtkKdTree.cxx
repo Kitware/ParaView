@@ -35,11 +35,15 @@
 #include "vtkPoints.h"
 #include "vtkIdTypeArray.h"
 #include "vtkIntArray.h"
+#include "vtkPointSet.h"
+#include "vtkImageData.h"
+#include "vtkUniformGrid.h"
+#include "vtkRectilinearGrid.h"
 
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.17");
+vtkCxxRevisionMacro(vtkKdTree, "1.18");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -850,17 +854,13 @@ static char * makeEntry(const char *s)
 
 vtkStandardNewMacro(vtkKdTree);
 
-const int vtkKdTree::xdim  = 0;  // don't change these values
-const int vtkKdTree::ydim  = 1;
-const int vtkKdTree::zdim  = 2;
-
 vtkKdTree::vtkKdTree()
 {
   this->MaxLevel = 20;
   this->Level    = 0;
 
   this->ValidDirections =
-  (1 << vtkKdTree::xdim) | (1 << vtkKdTree::ydim) | (1 << vtkKdTree::zdim);
+  (1 << vtkKdTree::XDIM) | (1 << vtkKdTree::YDIM) | (1 << vtkKdTree::ZDIM);
 
   this->MinCells = 100;
   this->NumRegions     = 0;
@@ -886,6 +886,9 @@ vtkKdTree::vtkKdTree()
   this->LocatorPoints = NULL;
   this->LocatorIds = NULL;
   this->LocatorRegionLocation = NULL;
+
+  this->LastDataCacheSize = 0;
+  this->ClearLastBuildCache();
 }
 void vtkKdTree::DeleteNodes(vtkKdNode *nd)
 {   
@@ -968,12 +971,16 @@ vtkKdTree::~vtkKdTree()
     {
     this->TimerLog->Delete();
     }
+
+  this->ClearLastBuildCache();
 }
 
-void vtkKdTree::Modified()
-{
-  vtkLocator::Modified();    // k-d tree must be re-built
-}
+// Add and remove data sets.  We don't update this->Modify() here, because
+// changing the data sets doesn't necessarily require rebuilding the
+// k-d tree.  We only need to build a new k-d tree in BuildLocator if
+// the geometry has changed, and we check for that with NewGeometry in
+// BuildLocator.  We Modify() for changes that definitely require a
+// rebuild of the tree, like changing the depth of the k-d tree.
 
 void vtkKdTree::SetDataSet(vtkDataSet *set)
 {
@@ -1013,8 +1020,6 @@ void vtkKdTree::SetDataSet(vtkDataSet *set)
 
     }
   this->DataSets[this->NumDataSets++] = set;
-
-  this->Modified();
 }
 void vtkKdTree::RemoveDataSet(vtkDataSet *set)
 {
@@ -1057,7 +1062,6 @@ void vtkKdTree::RemoveDataSet(int which)
     this->DataSets[i] = this->DataSets[i+1];
     }
   this->NumDataSets--;
-  this->Modified();
 }
 int vtkKdTree::GetDataSet(vtkDataSet *set)
 {
@@ -1339,17 +1343,11 @@ void vtkKdTree::ComputeCellCenter(vtkCell *cell, double *center, double *weights
 void vtkKdTree::BuildLocator()
 {
   int nCells=0;
-  unsigned int maxTime=0;
   int i;
 
-  for (i=0; i<this->NumDataSets; i++)
-    {
-    maxTime = (this->DataSets[i]->GetMTime() > maxTime) ?
-               this->DataSets[i]->GetMTime() : maxTime;
-    }
-
-  if ((this->Top != NULL) && (this->BuildTime > this->MTime) &&
-       (this->BuildTime > maxTime))
+  if ((this->Top != NULL) && 
+      (this->BuildTime > this->GetMTime()) &&
+      (this->NewGeometry() == 0))
     {
     return;
     }
@@ -1361,7 +1359,6 @@ void vtkKdTree::BuildLocator()
      vtkErrorMacro( << "vtkKdTree::BuildLocator - No cells to subdivide");
      return;
     }
-
 
   vtkDebugMacro( << "Creating Kdtree" );
 
@@ -1466,7 +1463,7 @@ void vtkKdTree::BuildLocator()
   this->SetActualLevel();
   this->BuildRegionList();
 
-  this->BuildTime.Modified();
+  this->UpdateBuildTime();
 
   return;
 }
@@ -1490,23 +1487,23 @@ int vtkKdTree::SelectCutDirection(vtkKdNode *kd)
 {
   int dim=0, i;
 
-  int xdir = 1 << vtkKdTree::xdim;
-  int ydir = 1 << vtkKdTree::ydim;
-  int zdir = 1 << vtkKdTree::zdim;
+  int xdir = 1 << vtkKdTree::XDIM;
+  int ydir = 1 << vtkKdTree::YDIM;
+  int zdir = 1 << vtkKdTree::ZDIM;
 
   // determine direction in which to divide this region
 
   if (this->ValidDirections == xdir)
     {
-    dim = vtkKdTree::xdim;
+    dim = vtkKdTree::XDIM;
     }
   else if (this->ValidDirections == ydir)
     {
-    dim = vtkKdTree::ydim;
+    dim = vtkKdTree::YDIM;
     }
   else if (this->ValidDirections == zdir)
     {
-    dim = vtkKdTree::zdim;
+    dim = vtkKdTree::ZDIM;
     }
   else
     {
@@ -1522,21 +1519,21 @@ int vtkKdTree::SelectCutDirection(vtkKdNode *kd)
 
     maxdiff = -1.0;
 
-    if ((this->ValidDirections & xdir) && (diff[vtkKdTree::xdim] > maxdiff))
+    if ((this->ValidDirections & xdir) && (diff[vtkKdTree::XDIM] > maxdiff))
       {
-      dim = vtkKdTree::xdim;
-      maxdiff = diff[vtkKdTree::xdim];
+      dim = vtkKdTree::XDIM;
+      maxdiff = diff[vtkKdTree::XDIM];
       }
 
-    if ((this->ValidDirections & ydir) && (diff[vtkKdTree::ydim] > maxdiff))
+    if ((this->ValidDirections & ydir) && (diff[vtkKdTree::YDIM] > maxdiff))
       {
-      dim = vtkKdTree::ydim;
-      maxdiff = diff[vtkKdTree::ydim];
+      dim = vtkKdTree::YDIM;
+      maxdiff = diff[vtkKdTree::YDIM];
       }
 
-    if ((this->ValidDirections & zdir) && (diff[vtkKdTree::zdim] > maxdiff))
+    if ((this->ValidDirections & zdir) && (diff[vtkKdTree::ZDIM] > maxdiff))
       {
-      dim = vtkKdTree::zdim;
+      dim = vtkKdTree::ZDIM;
       }
     }
   return dim;
@@ -1563,35 +1560,35 @@ int vtkKdTree::DivideRegion(vtkKdNode *kd, float *c1, int *ids, int nlevels)
 
   if (otherDirections)
     {
-    int x = otherDirections & (1 << vtkKdTree::xdim);
-    int y = otherDirections & (1 << vtkKdTree::ydim);
-    int z = otherDirections & (1 << vtkKdTree::zdim);
+    int x = otherDirections & (1 << vtkKdTree::XDIM);
+    int y = otherDirections & (1 << vtkKdTree::YDIM);
+    int z = otherDirections & (1 << vtkKdTree::ZDIM);
 
     if (x)
       {
-      dim2 = vtkKdTree::xdim;
+      dim2 = vtkKdTree::XDIM;
 
       if (y)
         {
-        dim3 = vtkKdTree::ydim;
+        dim3 = vtkKdTree::YDIM;
         }
       else if (z)
         {
-        dim3 = vtkKdTree::zdim;
+        dim3 = vtkKdTree::ZDIM;
         }
       }
     else if (y)
       {
-      dim2 = vtkKdTree::ydim;
+      dim2 = vtkKdTree::YDIM;
 
       if (z)
         {
-        dim3 = vtkKdTree::zdim;
+        dim3 = vtkKdTree::ZDIM;
         }
       }
     else if (z)
       {
-      dim2 = vtkKdTree::zdim;
+      dim2 = vtkKdTree::ZDIM;
       }
     }
 
@@ -1661,16 +1658,16 @@ void vtkKdTree::AddNewRegions(vtkKdNode *kd, float *c1, int midpt, int dim, doub
   kd->GetBounds(bounds);
 
   left->SetBounds(
-     bounds[0], ((dim == vtkKdTree::xdim) ? coord : bounds[1]),
-     bounds[2], ((dim == vtkKdTree::ydim) ? coord : bounds[3]),
-     bounds[4], ((dim == vtkKdTree::zdim) ? coord : bounds[5]));
+     bounds[0], ((dim == vtkKdTree::XDIM) ? coord : bounds[1]),
+     bounds[2], ((dim == vtkKdTree::YDIM) ? coord : bounds[3]),
+     bounds[4], ((dim == vtkKdTree::ZDIM) ? coord : bounds[5]));
   
   left->SetNumberOfCells(nleft);
   
   right->SetBounds(
-     ((dim == vtkKdTree::xdim) ? coord : bounds[0]), bounds[1],
-     ((dim == vtkKdTree::ydim) ? coord : bounds[2]), bounds[3],
-     ((dim == vtkKdTree::zdim) ? coord : bounds[4]), bounds[5]); 
+     ((dim == vtkKdTree::XDIM) ? coord : bounds[0]), bounds[1],
+     ((dim == vtkKdTree::YDIM) ? coord : bounds[2]), bounds[3],
+     ((dim == vtkKdTree::ZDIM) ? coord : bounds[4]), bounds[5]); 
   
   right->SetNumberOfCells(nright);
   
@@ -1955,6 +1952,7 @@ void vtkKdTree::BuildLocatorFromPoints(vtkPoints **ptArrays, int numPtArrays)
   TIMER("Set up to build k-d tree");
 
   this->FreeSearchStructure();
+  this->ClearLastBuildCache();
 
   // Fix bounds - (1) push out a little if flat 
   // (2) pull back the x, y and z lower bounds a little bit so that
@@ -2079,8 +2077,6 @@ void vtkKdTree::BuildLocatorFromPoints(vtkPoints **ptArrays, int numPtArrays)
   this->SetActualLevel();
   this->BuildRegionList();
 
-  this->BuildTime.Modified();
-
   // Create a location array for the points of each region
 
   this->LocatorRegionLocation = new int [this->NumRegions];
@@ -2098,6 +2094,10 @@ void vtkKdTree::BuildLocatorFromPoints(vtkPoints **ptArrays, int numPtArrays)
 
   TIMERDONE("Build tree");
 }
+//  --------------------------------------------------------------------
+//  Query functions subsequent to BuildLocatorFromPoints,
+//    relating to duplicate and nearby points
+//  --------------------------------------------------------------------
 vtkIdTypeArray *vtkKdTree::BuildMapForDuplicatePoints(float tolerance = 0.0)
 {
   int i;
@@ -2582,6 +2582,265 @@ vtkIdTypeArray *vtkKdTree::GetPointsInRegion(int regionId)
 
   return ptIds;
 }
+
+// ---------------------------------------------------------------
+// Code to save state/time of last k-d tree build, and to
+// determine if a data set's geometry has changed since the
+// last build. 
+// ---------------------------------------------------------------
+
+void vtkKdTree::ClearLastBuildCache()
+{
+  if (this->LastDataCacheSize > 0)
+    {
+    delete [] this->LastInputDataSets;
+    delete [] this->LastDataSetType;
+    delete [] this->LastInputDataInfo;
+    delete [] this->LastBounds;
+    delete [] this->LastNumCells;
+    delete [] this->LastNumPoints;
+    this->LastDataCacheSize = 0;
+    }
+  this->LastNumDataSets = 0;
+  this->LastInputDataSets = NULL;
+  this->LastDataSetType = NULL;
+  this->LastInputDataInfo = NULL;
+  this->LastBounds        = NULL;
+  this->LastNumPoints     = NULL;
+  this->LastNumCells      = NULL;
+}
+void vtkKdTree::UpdateBuildTime()
+{
+  this->BuildTime.Modified();
+
+  // Save enough information so that next time we execute,
+  // we can determine whether input geometry has changed.
+
+  if (this->NumDataSets > this->LastDataCacheSize)
+    {
+    this->ClearLastBuildCache();
+
+    this->LastInputDataSets = new vtkDataSet * [this->NumDataSets];
+    this->LastDataSetType = new int [this->NumDataSets];
+    this->LastInputDataInfo = new double [9 * this->NumDataSets];
+    this->LastBounds = new double [6 * this->NumDataSets];
+    this->LastNumPoints = new int [this->NumDataSets];
+    this->LastNumCells = new int [this->NumDataSets];
+    this->LastDataCacheSize = this->NumDataSets;
+    }
+
+  this->LastNumDataSets = this->NumDataSets;
+
+  for (int i=0; i<this->NumDataSets; i++)
+    {
+    vtkDataSet *in = this->DataSets[i];
+    this->LastInputDataSets[i] = in;
+
+    this->LastNumPoints[i] = static_cast<int>(in->GetNumberOfPoints());
+    this->LastNumCells[i] = static_cast<int>(in->GetNumberOfCells());
+
+    in->GetBounds(this->LastBounds + 6*i);
+  
+    int type = this->LastDataSetType[i] = in->GetDataObjectType();
+
+    if ((type == VTK_IMAGE_DATA) || (type == VTK_UNIFORM_GRID))
+      {
+      double origin[3], spacing[3];
+      int dims[3];
+  
+      if (type == VTK_IMAGE_DATA)
+        {
+        vtkImageData *id = vtkImageData::SafeDownCast(in);
+        id->GetDimensions(dims);
+        id->GetOrigin(origin);
+        id->GetSpacing(spacing);
+        }
+      else
+        {
+        vtkUniformGrid *ug = vtkUniformGrid::SafeDownCast(in);
+        ug->GetDimensions(dims);
+        ug->GetOrigin(origin);
+        ug->GetSpacing(spacing);
+        }
+  
+      this->SetInputDataInfo(i, dims, origin, spacing);
+      }
+    }
+}
+void vtkKdTree::SetInputDataInfo(int i, 
+         int dims[3], double origin[3], double spacing[3])
+{
+  int idx = 9*i;
+  this->LastInputDataInfo[idx++] = (double)dims[0];
+  this->LastInputDataInfo[idx++] = (double)dims[1];
+  this->LastInputDataInfo[idx++] = (double)dims[2];
+  this->LastInputDataInfo[idx++] = origin[0];
+  this->LastInputDataInfo[idx++] = origin[1];
+  this->LastInputDataInfo[idx++] = origin[2];
+  this->LastInputDataInfo[idx++] = spacing[0];
+  this->LastInputDataInfo[idx++] = spacing[1];
+  this->LastInputDataInfo[idx++] = spacing[2];
+}
+int vtkKdTree::CheckInputDataInfo(int i, 
+         int dims[3], double origin[3], double spacing[3])
+{
+  int sameValues = 1;
+  int idx = 9*i; 
+
+  if ((dims[0] != (int)this->LastInputDataInfo[idx]) ||
+      (dims[1] != (int)this->LastInputDataInfo[idx+1]) ||
+      (dims[2] != (int)this->LastInputDataInfo[idx+2]) ||
+      (origin[0] != this->LastInputDataInfo[idx+3]) ||
+      (origin[1] != this->LastInputDataInfo[idx+4]) ||
+      (origin[2] != this->LastInputDataInfo[idx+5]) ||
+      (spacing[0] != this->LastInputDataInfo[idx+6]) ||
+      (spacing[1] != this->LastInputDataInfo[idx+7]) ||
+      (spacing[2] != this->LastInputDataInfo[idx+8]) ) 
+    {
+    sameValues = 0;
+    }
+
+  return sameValues;
+}
+int vtkKdTree::NewGeometry()
+{
+  return this->NewGeometry(this->DataSets, this->NumDataSets);
+}
+int vtkKdTree::NewGeometry(vtkDataSet **sets, int numSets)
+{
+  int newGeometry = 0;
+#if 0
+  vtkPointSet *ps = NULL;
+#endif
+  vtkRectilinearGrid *rg = NULL;
+  vtkImageData *id = NULL;
+  vtkUniformGrid *ug = NULL;
+  int same=0;
+  int dims[3];
+  double origin[3], spacing[3];
+
+  if (numSets != this->LastNumDataSets)
+    {
+    newGeometry = 1;
+    }
+  else 
+    {
+    for (int i=0; i<numSets; i++)
+      {
+      vtkDataSet *in = this->LastInputDataSets[i];
+      int type = in->GetDataObjectType();
+
+      if (type != this->LastDataSetType[i])
+        {
+        newGeometry = 1;
+        break;
+        }
+
+      switch (type)
+        {
+        case VTK_POLY_DATA:
+        case VTK_UNSTRUCTURED_GRID:
+        case VTK_STRUCTURED_GRID:
+#if 0
+          // For now, vtkPExodusReader creates a whole new
+          // vtkUnstructuredGrid, even when just changing
+          // field arrays.  So we'll just check bounds.
+          ps = vtkPointSet::SafeDownCast(in);
+          if (ps->GetPoints()->GetMTime() > this->BuildTime)
+            {
+            newGeometry = 1;
+            }
+#else
+          if ((sets[i]->GetNumberOfPoints() != this->LastNumPoints[i]) || 
+              (sets[i]->GetNumberOfCells() != this->LastNumCells[i]) )
+            {
+            newGeometry = 1;
+            }
+          else
+            {
+            double b[6];
+            sets[i]->GetBounds(b);
+            double *lastb = this->LastBounds + 6*i;
+    
+            for (int dim=0; dim<6; dim++)
+              {
+              if (*lastb++ != b[dim])
+                {
+                newGeometry = 1;
+                break;
+                }
+              }
+            }
+#endif
+          break;
+        
+        case VTK_RECTILINEAR_GRID:
+  
+          rg = vtkRectilinearGrid::SafeDownCast(in);
+          if ((rg->GetXCoordinates()->GetMTime() > this->BuildTime) ||
+              (rg->GetYCoordinates()->GetMTime() > this->BuildTime) ||
+              (rg->GetZCoordinates()->GetMTime() > this->BuildTime) )
+            {
+            newGeometry = 1;
+            }
+          break;
+  
+        case VTK_IMAGE_DATA:
+        case VTK_STRUCTURED_POINTS:
+        
+          id = vtkImageData::SafeDownCast(in);
+  
+          id->GetDimensions(dims);
+          id->GetOrigin(origin);
+          id->GetSpacing(spacing);
+  
+          same = this->CheckInputDataInfo(i, dims, origin, spacing);
+  
+          if (!same)
+            {
+            newGeometry = 1;
+            }
+  
+          break;
+  
+        case VTK_UNIFORM_GRID:
+  
+          ug = vtkUniformGrid::SafeDownCast(in);
+  
+          ug->GetDimensions(dims);
+          ug->GetOrigin(origin);
+          ug->GetSpacing(spacing);
+  
+          same = this->CheckInputDataInfo(i, dims, origin, spacing);
+          
+          if (!same)
+            {
+            newGeometry = 1;
+            }
+          else if (ug->GetPointVisibilityArray()->GetMTime() > 
+                   this->BuildTime)
+            {
+            newGeometry = 1;
+            }
+          else if (ug->GetCellVisibilityArray()->GetMTime() > 
+                   this->BuildTime)
+            {
+            newGeometry = 1;
+            }
+          break;
+  
+        default:
+          vtkWarningMacro(<< 
+            "vtkKdTree::NewGeometry: unanticipated type");
+
+          newGeometry = 1;
+        }
+      if (newGeometry) break;
+      }
+    }
+
+  return newGeometry;
+}
 //----------------------------------------------------------------------
 void vtkKdTree::__printTree(vtkKdNode *kd, int depth, int v)
 {
@@ -2775,7 +3034,7 @@ void vtkKdTree::_generateRepresentationWholeSpace(vtkKdNode *kd,
   switch (kd->Dim)
     {
 
-    case xdim:
+    case XDIM:
 
       p[0][0] = leftmax[0]; p[0][1] = max[1]; p[0][2] = max[2];
       p[1][0] = leftmax[0]; p[1][1] = max[1]; p[1][2] = min[2];
@@ -2784,7 +3043,7 @@ void vtkKdTree::_generateRepresentationWholeSpace(vtkKdNode *kd,
 
       break;
 
-    case ydim:
+    case YDIM:
 
       p[0][0] = min[0]; p[0][1] = leftmax[1]; p[0][2] = max[2];
       p[1][0] = min[0]; p[1][1] = leftmax[1]; p[1][2] = min[2];
@@ -2793,7 +3052,7 @@ void vtkKdTree::_generateRepresentationWholeSpace(vtkKdNode *kd,
 
       break;
 
-    case zdim:
+    case ZDIM:
 
       p[0][0] = min[0]; p[0][1] = min[1]; p[0][2] = leftmax[2];
       p[1][0] = min[0]; p[1][1] = max[1]; p[1][2] = leftmax[2];
@@ -4178,7 +4437,8 @@ int vtkKdTree::IntersectsRegion(int regionId, vtkPlanes *planes,
 
   vtkKdNode *node = this->RegionList[regionId];
 
-  int intersects = node->IntersectsRegion(pi, this->ComputeIntersectionsUsingDataBounds);
+  int intersects = 
+    node->IntersectsRegion(pi, this->ComputeIntersectionsUsingDataBounds);
 
   pi->Delete();
 
@@ -4212,48 +4472,6 @@ int vtkKdTree::IntersectsRegion(int *ids, int len, vtkPlanes *planes,
   delete [] dv;
 
   return howmany; 
-}
-void vtkKdTree::OmitXPartitioning()
-{
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::ydim) | (1 << vtkKdTree::zdim);
-}
-
-void vtkKdTree::OmitYPartitioning()
-{
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::zdim) | (1 << vtkKdTree::xdim);
-}
-
-void vtkKdTree::OmitZPartitioning()
-{
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::xdim) | (1 << vtkKdTree::ydim);
-}
-
-void vtkKdTree::OmitXYPartitioning()
-{   
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::zdim);
-}      
-
-void vtkKdTree::OmitYZPartitioning()
-{         
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::xdim);
-}
-
-void vtkKdTree::OmitZXPartitioning()
-{
-  this->Modified();
-  this->ValidDirections = (1 << vtkKdTree::ydim);
-}
-
-void vtkKdTree::OmitNoPartitioning()
-{
-  this->Modified();
-  this->ValidDirections =
-    ((1 << vtkKdTree::xdim)|(1 << vtkKdTree::ydim)|(1 << vtkKdTree::zdim));
 }
 int vtkKdTree::IntersectsRegion(int *ids, int len, vtkPlanes *planes, 
                                 int nvertices, double *vertices)
@@ -4369,7 +4587,54 @@ int vtkKdTree::IntersectsFrustum(int *ids, int len, vtkRenderer *ren,
 
   return howmany;
 }
+//---------------------------------------------------------------------------
+// These requests change the boundaries of the k-d tree, so must
+// update the MTime.
+//---------------------------------------------------------------------------
 
+void vtkKdTree::NewPartitioningRequest(int req)
+{
+  if (req != this->ValidDirections)
+    {
+    this->Modified();
+    this->ValidDirections = req;
+    }
+}
+void vtkKdTree::OmitXPartitioning()
+{
+  this->NewPartitioningRequest((1 << vtkKdTree::YDIM) | (1 << vtkKdTree::ZDIM));
+}
+
+void vtkKdTree::OmitYPartitioning()
+{
+  this->NewPartitioningRequest((1 << vtkKdTree::ZDIM) | (1 << vtkKdTree::XDIM));
+}
+
+void vtkKdTree::OmitZPartitioning()
+{
+  this->NewPartitioningRequest((1 << vtkKdTree::XDIM) | (1 << vtkKdTree::YDIM));
+}
+
+void vtkKdTree::OmitXYPartitioning()
+{   
+  this->NewPartitioningRequest((1 << vtkKdTree::ZDIM));
+}      
+
+void vtkKdTree::OmitYZPartitioning()
+{         
+  this->NewPartitioningRequest((1 << vtkKdTree::XDIM));
+}
+
+void vtkKdTree::OmitZXPartitioning()
+{
+  this->NewPartitioningRequest((1 << vtkKdTree::YDIM));
+}
+
+void vtkKdTree::OmitNoPartitioning()
+{
+  int req = ((1 << vtkKdTree::XDIM)|(1 << vtkKdTree::YDIM)|(1 << vtkKdTree::ZDIM));
+  this->NewPartitioningRequest(req);
+}
 //---------------------------------------------------------------------------
 
 void vtkKdTree::PrintTiming(ostream& os, vtkIndent )

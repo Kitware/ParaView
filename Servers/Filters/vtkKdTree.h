@@ -168,7 +168,7 @@ public:
   vtkBooleanMacro(Timing, int);
   vtkSetMacro(Timing, int);
   vtkGetMacro(Timing, int);
-  
+
   // Description:
   //  Minimum number of cells per spatial region
   vtkSetMacro(MinCells, int);
@@ -181,6 +181,7 @@ public:
   //  width of the space multipled by 10e-6.
 
   vtkGetMacro(FudgeFactor, double);
+  vtkSetMacro(FudgeFactor, double);
 
   // Description:   
   //    Omit partitions along the X axis, yielding shafts in the X direction
@@ -209,7 +210,6 @@ public:
   // Description:
   //    Partition along all three axes - this is the default
   void OmitNoPartitioning();
-
 
   //   Add a data set to the list of those included in spatial paritioning
 
@@ -551,6 +551,7 @@ public:
 
   void BuildLocator();
 
+  // Description:
   // This is a special purpose locator that builds a k-d tree to 
   // find duplicate and near-by points.  It builds the tree from 
   // one or more vtkPoints objects instead of from the cells of
@@ -567,6 +568,7 @@ public:
 
   void BuildLocatorFromPoints(vtkPoints **ptArray, int numPtArrays);
   
+  // Description:
   // This call returns a mapping from the original point IDs supplied
   // to BuildLocatorFromPoints to a subset of those IDs that is unique 
   // within the specified tolerance.  
@@ -582,6 +584,7 @@ public:
 
   vtkIdTypeArray *BuildMapForDuplicatePoints(float tolerance);
 
+  // Description:
   // Find the Id of the point that was previously supplied
   // to BuildLocatorFromPoints().  Returns -1 if the point
   // was not in the original array.
@@ -591,6 +594,7 @@ public:
   vtkIdType FindPoint(float x, float y, float z);
   vtkIdType FindPoint(double x, double y, double z);
 
+  // Description:
   // Find the Id of the point that was previously supplied
   // to BuildLocatorFromPoints() which is closest to the given point.
   // Set the square of the distance between the two points.
@@ -600,6 +604,7 @@ public:
   vtkIdType FindClosestPoint(float x, float y, float z, float &dist2);
   vtkIdType FindClosestPoint(double x, double y, double z, double &dist2);
 
+  // Description:
   // Find the Id of the point in the given region which is
   // closest to the given point.  Return the ID of the point,
   // and set the square of the distance of between the points.
@@ -608,6 +613,7 @@ public:
   vtkIdType FindClosestPointInRegion(int regionId, float x, float y, float z, 
                                      float &dist2);
 
+  // Description:
   // Get a list of the original IDs of all points in a region.  You
   // must have called BuildLocatorFromPoints before calling this.
 
@@ -647,6 +653,19 @@ public:
   virtual void PrintTiming(ostream& os, vtkIndent indent);
 
   // Description:
+  //    Return 1 if the geometry of the input data sets
+  //    has changed since the last time the k-d tree was built.
+
+  int NewGeometry();
+
+  // Description:
+  //    Return 1 if the geometry of these data sets differs
+  //    for the geometry of the last data sets used to build
+  //    the k-d tree.
+ 
+  int NewGeometry(vtkDataSet **sets, int numDataSets);
+
+  // Description:
   //    Write six floats to the bounds array giving the bounds
   //    of the specified cell.
   
@@ -659,34 +678,28 @@ protected:
   vtkKdTree();
   ~vtkKdTree();
 
-  void Modified();
+  // Description:
+  //   Save enough state so NewGeometry() can work,
+  //   and update the BuildTime time stamp.
+
+  void UpdateBuildTime();
 
 //BTX
-  static const int xdim;
-  static const int ydim;
-  static const int zdim;
-
-  int ValidDirections;
+  enum {
+    XDIM = 0,  // don't change these values
+    YDIM = 1,
+    ZDIM = 2
+  };
 //ETX
 
-  int MinCells;
-  int NumRegions;              // number of leaf nodes
-
-  vtkDataSet **DataSets;
-  int NumDataSets;
+  int ValidDirections;
 
 //BTX
   vtkKdNode *Top;
   vtkKdNode **RegionList;      // indexed by region ID
 //ETX
 
-  int Timing;
   vtkTimerLog *TimerLog;
-
-  double FudgeFactor;   // a very small distance, relative to the dataset's size
-
-  void ResetDuplicatePointsLocatorFlags();
-  void SetDuplicatePointsLocatorFlags();
 
   static void DeleteNodes(vtkKdNode *nd);
 
@@ -801,6 +814,13 @@ private:
   int _FindClosestPointInRegion(int regionId, 
                           float x, float y, float z, float &dist2);
 
+  void NewParitioningRequest(int req);
+  void SetInputDataInfo(int i, 
+       int dims[3], double origin[3], double spacing[3]);
+  int CheckInputDataInfo(int i, 
+       int dims[3], double origin[3], double spacing[3]);
+  void ClearLastBuildCache();
+
 //BTX
   static void __printTree(vtkKdNode *kd, int depth, int verbose);
 //ETX
@@ -831,6 +851,8 @@ private:
   static void AddNewRegions(vtkKdNode *kd, float *c1, 
                             int midpt, int dim, double coord);
 
+  void NewPartitioningRequest(int req);
+
   int NumDataSetsAllocated;
 
   int IncludeRegionBoundaryCells;
@@ -848,6 +870,15 @@ private:
 
   int *CellRegionList;
 
+  int MinCells;
+  int NumRegions;              // number of leaf nodes
+
+  int Timing;
+  double FudgeFactor;   // a very small distance, relative to the dataset's size
+
+  vtkDataSet **DataSets;
+  int NumDataSets;
+
   // These instance variables are used by the special locator created
   // to find duplicate points. (BuildLocatorFromPoints)
 
@@ -857,6 +888,18 @@ private:
   int *LocatorRegionLocation;
 
   float MaxWidth;
+
+  // These Last* values are here to save state so we can
+  // determine later if k-d tree must be rebuilt.
+
+  int LastNumDataSets;
+  int LastDataCacheSize;
+  vtkDataSet **LastInputDataSets;
+  int *LastDataSetType;
+  double *LastInputDataInfo;
+  double *LastBounds;
+  int *LastNumPoints;
+  int *LastNumCells;
 
   vtkKdTree(const vtkKdTree&); // Not implemented
   void operator=(const vtkKdTree&); // Not implemented
