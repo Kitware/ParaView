@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVProgressHandler.h"
 
-#include "vtkMPIController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -22,8 +21,12 @@
 #include "vtkPVWindow.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
-#include "vtkMPICommunicator.h" // Needed for vtkMPICommunicator::Request
 #include "vtkClientServerInterpreter.h"
+
+#ifdef VTK_USE_MPI
+#include "vtkMPIController.h"
+#include "vtkMPICommunicator.h" // Needed for vtkMPICommunicator::Request
+#endif 
 
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
@@ -32,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.1");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.2");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -46,7 +49,9 @@ public:
   MapOfVectorsOfInts ProgressMap;
   MapOfObjectIds ObjectIdsMap;
 
+#ifdef VTK_USE_MPI
   vtkMPICommunicator::Request ProgressRequest;
+#endif
 };
 
 //****************************************************************************
@@ -95,6 +100,7 @@ void vtkPVProgressHandler::DetermineProgressType(vtkPVApplication* app)
   int server = app->GetServerMode();
   int local_process = 0;
   int num_processes = 1;
+#ifdef VTK_USE_MPI
   this->MPIController = vtkMPIController::SafeDownCast(
     app->GetProcessModule()->GetController());
   if ( this->MPIController )
@@ -102,6 +108,7 @@ void vtkPVProgressHandler::DetermineProgressType(vtkPVApplication* app)
     local_process = this->MPIController->GetLocalProcessId();
     num_processes = this->MPIController->GetNumberOfProcesses();
     }
+#endif
   this->SocketController = app->GetSocketController();
 
   if ( client )
@@ -280,10 +287,12 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
 void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
   vtkPVApplication*, vtkObject* o, int progress)
 {
+#ifdef VTK_USE_MPI
   if (this->ProgressPending && this->Internals->ProgressRequest.Test())
     {
     this->ProgressPending=0;
     }
+#endif
 
   this->ProgressTimer->StopTimer();
   double delT = this->ProgressTimer->GetElapsedTime();
@@ -297,6 +306,7 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
         = this->Internals->ObjectIdsMap.find(o);
       if ( it != this->Internals->ObjectIdsMap.end() )
         {
+#ifdef VTK_USE_MPI
         this->Progress[0] = this->MPIController->GetLocalProcessId();
         this->Progress[1] = it->second;
         this->Progress[2] = progress;
@@ -305,6 +315,7 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
           this->Progress, 
           3, 0, PVAPPLICATION_PROGRESS_TAG, 
           this->Internals->ProgressRequest);
+#endif
         this->ProgressPending=1;
         }
       else
@@ -320,6 +331,7 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
 int vtkPVProgressHandler::ReceiveProgressFromSatellite(int *id, int* progress)
 {
   int rec = 0;
+#ifdef VTK_USE_MPI
   if ( this->MPIController )
     {
     if (!this->ProgressPending)
@@ -342,6 +354,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellite(int *id, int* progress)
       }
     this->ProgressPending=1;
     }
+#endif
   int minprog = 101;
   int filter = -1;
   vtkPVProgressHandlerInternal::MapOfVectorsOfInts::iterator it;
@@ -371,7 +384,11 @@ void vtkPVProgressHandler::HandleProgress(int processid, int filterid, int progr
 {
   vtkPVProgressHandlerInternal::VectorOfInts* vect 
     = &this->Internals->ProgressMap[filterid];
+#ifdef VTK_USE_MPI
   vect->resize(this->MPIController->GetNumberOfProcesses());
+#else
+  vect->resize(processid < (int)vect->size()?vect->size():processid+1);
+#endif
   (*vect)[processid] = progress;
 }
 
