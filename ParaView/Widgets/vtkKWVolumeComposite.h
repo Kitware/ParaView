@@ -121,6 +121,10 @@ public:
   // overhead of setting up texture LODs if they are not going to be used.
   vtkGetMacro( SoftwareMapperAvailable, int );
   vtkSetMacro( SoftwareMapperAvailable, int );
+
+  // Description:
+  // True if the volume pro mapper can do intermix geometry.
+  vtkGetMacro(CanDoIntermixGeometry, int);
   
 protected:
   vtkKWVolumeComposite();
@@ -157,6 +161,7 @@ protected:
   int                                  HiResTextureID;
   int                                  VolumeProID;
   int                                  LowResVolumeProID;
+  int                                  CanDoIntermixGeometry;
 private:
   vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented
   void operator=(const vtkKWVolumeComposite&); // Not implemented
