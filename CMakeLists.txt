@@ -3,11 +3,16 @@ PROJECT(PARAVIEW)
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
 # load in the values from VTK if found
 IF ( VTK_BINARY_DIR )
-  LOAD_CACHE(${VTK_BINARY_DIR})
+  LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
+                               BUILD_SHARED_LIBS
+                               BUILD_TESTING
+                               EXECUTABLE_OUTPUT_PATH
+                               LIBRARY_OUTPUT_PATH)
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
   SUBDIRS(Widgets ParaView)
   SUBDIR_DEPENDS(ParaView Widgets)
 ENDIF (VTK_BINARY_DIR )
+
 
 INCLUDE (${CMAKE_ROOT}/Modules/FindMPI.cmake)
 IF (MPI_LIBRARY)
@@ -61,3 +66,5 @@ IF(BUILD_TESTING)
   ENDIF (DART_ROOT)
 ENDIF(BUILD_TESTING)
 
+SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
+SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
