@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.75");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.76");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -397,7 +397,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   char* prefix = 0;
   char* format = 0;
-  int range[2];
   already_set = this->Property->GetNumberOfFiles();
 
   char* path   = new char [ strlen(fileName) + 1];
@@ -418,8 +417,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     return;
     }
 
-  range[0] = range[1] = 0;
-
   this->IgnoreFileListEvents = 1;
 
   this->FileListSelect->RemoveItemsFromFinalList();
@@ -439,10 +436,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   int fnameLength = 0;
 
-  int h5Flag = 0;
   if (strcmp(ext, "h5") == 0)
     {
-    h5Flag = 1;
     file[strlen(file)-1] = 'f';
     }
 

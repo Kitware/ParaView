@@ -95,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.295");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.296");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -285,12 +285,6 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  vtkPVApplication *pvApp = 0;
-  if ( this->Application )
-    {
-    pvApp = this->GetPVApplication();
-    }
-
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
@@ -1634,7 +1628,6 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
-  vtkPVApplication *pvApp;
   int partIdx, numParts;
 
   this->AddTraceEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
@@ -1651,7 +1644,6 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
     this->SetUseTriangleStrips(1);
     }
 
-  pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
   if (pvWin == NULL)
     {

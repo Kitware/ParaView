@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.514");
+vtkCxxRevisionMacro(vtkPVWindow, "1.515");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3299,17 +3299,6 @@ void vtkPVWindow::EnableSelectMenu()
     numSources = 0;
     }
 
-  int numGlyphs;
-  sources = this->GetSourceList("GlyphSources");
-  if (sources)
-    {
-    numGlyphs =  sources->GetNumberOfItems();
-    }
-  else
-    {
-    numGlyphs = 0;
-    }
-  
   if (numSources == 0)
     {
     this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);

@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.247");
+vtkCxxRevisionMacro(vtkPVData, "1.248");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -319,9 +319,6 @@ vtkPVData::~vtkPVData()
 //----------------------------------------------------------------------------
 void vtkPVData::SetVisibilityCheckState(int v)
 {
-  vtkPVApplication *pvApp;
-  pvApp = (vtkPVApplication*)(this->Application);
-
   if (this->Visibility != v)
     {
     this->Visibility = v;
@@ -1058,7 +1055,6 @@ void vtkPVData::UpdatePropertiesInternal()
   vtkPVArrayInformation *arrayInfo;
   const char *currentColorBy, *inputColorBy = 0;
   int currentColorByFound = 0, inputColorByFound = 0;
-  vtkPVWindow *window;
   int defPoint = 0, inputPoint = 0;
   vtkPVArrayInformation *defArray, *inputArray;
   int inputColorSetByUser = 0, inputArraySetByUser = 0;
@@ -1085,8 +1081,6 @@ void vtkPVData::UpdatePropertiesInternal()
     {
     return;
     }
-
-  window = this->GetPVApplication()->GetMainWindow();
 
   // Update actor control resolutions
 
@@ -1206,11 +1200,10 @@ void vtkPVData::UpdatePropertiesInternal()
     arrayInfo = attrInfo->GetArrayInformation(i);
     numComps = arrayInfo->GetNumberOfComponents();
     sprintf(cmd, "ColorByPointField {%s} %d", 
-            arrayInfo->GetName(), arrayInfo->GetNumberOfComponents());
-    if (arrayInfo->GetNumberOfComponents() > 1)
+            arrayInfo->GetName(), numComps);
+    if (numComps > 1)
       {
-      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(),
-              arrayInfo->GetNumberOfComponents());
+      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
       }
     else
       {
@@ -1342,9 +1335,6 @@ void vtkPVData::SetActorColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVData::ChangeActorColor(double r, double g, double b)
 {
-  vtkPVPart *part;
-  part = this->GetPVSource()->GetPart();
-
   this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
                       this->GetTclName(), r, g, b);
 
