@@ -33,7 +33,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.14");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.15");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -123,10 +123,6 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
     }
 }
 
-#include "vtkImageData.h"
-#include "vtkDataSetWriter.h"
-#include "vtkPointData.h"
-
 void vtkDesktopDeliveryClient::PostRenderProcessing()
 {
   // Adjust render time for actual render on server.
@@ -137,91 +133,51 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
 
   vtkDesktopDeliveryServer::ImageParams ip;
   this->Controller->Receive((int *)(&ip),
-    vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
-    this->ServerProcessId,
-    vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+                            vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                            this->ServerProcessId,
+                            vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
 
   if (ip.RemoteDisplay)
     {
     // Receive image.
     this->Timer->StartTimer();
+    this->ReducedImageSize[0] = ip.ImageSize[0];
+    this->ReducedImageSize[1] = ip.ImageSize[1];
     this->ReducedImage->SetNumberOfComponents(ip.NumberOfComponents);
-    if (this->ImageReductionFactor == 1)
+    if (   (this->FullImageSize[0] == this->ReducedImageSize[0])
+        && (this->FullImageSize[1] == this->ReducedImageSize[1]) )
       {
       this->FullImage->SetNumberOfComponents(ip.NumberOfComponents);
       this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
-        * this->FullImageSize[1]);
+                                         * this->FullImageSize[1]);
       this->FullImageUpToDate = true;
       this->ReducedImage->SetArray(this->FullImage->GetPointer(0),
-        this->FullImage->GetSize(), 1);
+                                   this->FullImage->GetSize(), 1);
       }
     this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
-      * this->ReducedImageSize[1]);
+                                          * this->ReducedImageSize[1]);
 
     if (ip.SquirtCompressed)
       {
       this->SquirtBuffer->SetNumberOfComponents(ip.NumberOfComponents);
-      this->SquirtBuffer->SetNumberOfTuples(ip.Size/ip.NumberOfComponents);
-      this->Controller->Receive(this->SquirtBuffer->GetPointer(0), ip.Size,
-        this->ServerProcessId,
-        vtkDesktopDeliveryServer::IMAGE_TAG);
+      this->SquirtBuffer->SetNumberOfTuples(  ip.BufferSize
+                                            / ip.NumberOfComponents);
+      this->Controller->Receive(this->SquirtBuffer->GetPointer(0),
+                                ip.BufferSize, this->ServerProcessId,
+                                vtkDesktopDeliveryServer::IMAGE_TAG);
       this->SquirtDecompress(this->SquirtBuffer, this->ReducedImage);
       }
     else
       {
-      this->Controller->Receive(this->ReducedImage->GetPointer(0), ip.Size,
-        this->ServerProcessId,
-        vtkDesktopDeliveryServer::IMAGE_TAG);
+      this->Controller->Receive(this->ReducedImage->GetPointer(0),
+                                ip.BufferSize, this->ServerProcessId,
+                                vtkDesktopDeliveryServer::IMAGE_TAG);
       }
     this->ReducedImageUpToDate = true;
+    this->RenderWindowImageUpToDate = false;
 
     this->Timer->StopTimer();
     this->TransferTime = this->Timer->GetElapsedTime();
-
-    if (this->WriteBackImages)
-      {
-      if (this->MagnifyImages)
-        {
-        this->MagnifyReducedImage();
-        /*
-        if (this->ImageReductionFactor > 2)
-        {
-        vtkImageData* image = vtkImageData::New();
-        image->SetDimensions(this->FullImageSize[0], this->FullImageSize[1], 1);
-        image->SetNumberOfScalarComponents(4);
-        image->SetScalarType(VTK_UNSIGNED_CHAR);
-        image->GetPointData()->SetScalars(this->FullImage);
-        vtkDataSetWriter* writer= vtkDataSetWriter::New();
-        writer->SetFileTypeToBinary();
-        writer->SetFileName("junkBug.vtk");
-        writer->SetInput(image);
-        writer->Write();
-        writer->Delete();
-        image->Delete();
-        }
-        */
-        // Having problem with only small part of window set properly.
-        // Mabe the view port ....
-        //if (this->ImageReductionFactor > 1)
-        //  {
-        //  vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-        //  vtkRenderer *ren;
-        //  int i;
-        //  for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
-        //    { // hard coded to full window.
-        //   ren->SetViewport(0,0,1,1);
-        //   }
-        // }
-
-        this->SetRenderWindowPixelData(this->FullImage, this->FullImageSize);
-        }
-      else
-        {
-        this->ReadReducedImage();
-        this->SetRenderWindowPixelData(this->ReducedImage, this->ReducedImageSize);
-        }
-      this->RenderWindowImageUpToDate = true;
-      }
     }
   else
     {

@@ -43,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.9");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.10");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -262,31 +262,35 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
     this->ReadReducedImage();
     ip.NumberOfComponents = this->ReducedImage->GetNumberOfComponents();
     ip.SquirtCompressed = this->Squirt && (ip.NumberOfComponents == 4);
+    ip.ImageSize[0] = this->ReducedImageSize[0];
+    ip.ImageSize[1] = this->ReducedImageSize[1];
 
     if (ip.SquirtCompressed)
       {
       this->SquirtCompress(this->ReducedImage, this->SquirtBuffer);
       ip.NumberOfComponents = 4;
-      ip.Size = ip.NumberOfComponents*this->SquirtBuffer->GetNumberOfTuples();
+      ip.BufferSize
+        = ip.NumberOfComponents*this->SquirtBuffer->GetNumberOfTuples();
       this->Controller->Send((int *)(&ip),
-                 vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
-                 this->RootProcessId,
-                 vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
-      this->Controller->Send(this->SquirtBuffer->GetPointer(0), ip.Size,
-                 this->RootProcessId,
-                 vtkDesktopDeliveryServer::IMAGE_TAG);
+                             vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                             this->RootProcessId,
+                             vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+      this->Controller->Send(this->SquirtBuffer->GetPointer(0), ip.BufferSize,
+                             this->RootProcessId,
+                             vtkDesktopDeliveryServer::IMAGE_TAG);
 
       }
     else
       {
-      ip.Size = ip.NumberOfComponents*this->ReducedImage->GetNumberOfTuples();
+      ip.BufferSize
+        = ip.NumberOfComponents*this->ReducedImage->GetNumberOfTuples();
       this->Controller->Send((int *)(&ip),
-                 vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
-                 this->RootProcessId,
-                 vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
-      this->Controller->Send(this->ReducedImage->GetPointer(0), ip.Size,
-                 this->RootProcessId,
-                 vtkDesktopDeliveryServer::IMAGE_TAG);
+                             vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                             this->RootProcessId,
+                             vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+      this->Controller->Send(this->ReducedImage->GetPointer(0), ip.BufferSize,
+                             this->RootProcessId,
+                             vtkDesktopDeliveryServer::IMAGE_TAG);
       }
     }
   else
@@ -344,9 +348,11 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
     {
     int *size = this->ParallelRenderManager->GetReducedImageSize();
     if (   (this->ReducedImageSize[0] != size[0])
-    || (this->ReducedImageSize[1] != size[1]) )
+        || (this->ReducedImageSize[1] != size[1]) )
       {
       vtkWarningMacro("Coupled parallel render manager reports unexpected reduced image size");
+      this->ReducedImageSize[0] = size[0];
+      this->ReducedImageSize[1] = size[1];
       }
     this->ParallelRenderManager->GetReducedPixelData(this->ReducedImage);
     this->ReducedImageUpToDate = true;

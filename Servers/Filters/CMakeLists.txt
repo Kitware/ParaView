@@ -94,7 +94,6 @@ IF (PARAVIEW_USE_ICE_T)
     vtkIceTFactory.cxx
     vtkDesktopDeliveryServer.cxx
     vtkDesktopDeliveryClient.cxx
-    vtkDesktopDeliveryClient2.cxx
     )
   IF(VTK_USE_MPI)
     SET(Filters_SRCS 

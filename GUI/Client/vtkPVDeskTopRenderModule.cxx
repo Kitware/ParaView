@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.12");
 
 
 
@@ -159,7 +159,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // **********************************************************
 
   // create a vtkDesktopDeliveryClient on the client
-  this->CompositeID = pm->NewStreamObject("vtkDesktopDeliveryClient2");
+  this->CompositeID = pm->NewStreamObject("vtkDesktopDeliveryClient");
   pm->SendStream(vtkProcessModule::CLIENT);
   // create a vtkDesktopDeliveryServer on the server, but use
   // the same id

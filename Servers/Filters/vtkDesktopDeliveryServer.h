@@ -96,7 +96,8 @@ public:
     int RemoteDisplay;
     int SquirtCompressed;
     int NumberOfComponents;
-    int Size;
+    int BufferSize;
+    int ImageSize[2];
   };
 
   enum TimingMetricSize {
