@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.4");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.5");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -82,7 +82,7 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
   this->ProgressFrame->Create(app, "frame", "-bd 1 -relief sunken");
   
   this->ProgressCanvas->Create(app, "canvas", "");
-  this->Script("%s configure -borderwidth 0 -highlightthickness 0 -width %d -height %d",
+  this->Script("%s configure -borderwidth 0 -highlightthickness 0 -background #008 -width %d -height %d",
                this->ProgressCanvas->GetWidgetName(),
                this->Width, this->Height);
   
@@ -98,7 +98,7 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
                  (int)((i+1)*(this->Width/(float)this->NumberOfSegments)),
                  this->Height, i);
     }
-  
+
   switch (this->NumberOfSegments)
     {
     case 1:
@@ -162,7 +162,7 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
                    this->ProgressCanvas->GetWidgetName(), i,
                    (int)(i*this->Width/(float)this->NumberOfSegments),
                    (int)(this->Width/(float)this->NumberOfSegments *
-                   (i + 0.01*this->Value)),
+                         (i + 0.01*this->Value)),
                    this->Height);
       }
     else
