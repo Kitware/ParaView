@@ -28,6 +28,7 @@
 #include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkShortArray.h"
+#include "vtkPVConfig.h"
 
 // Include ordering of these four files is very sensitive on HP-UX.
 #include <vtkstd/vector>
@@ -36,7 +37,7 @@
 #include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.6");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.6.2.1");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
