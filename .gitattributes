@@ -1,7 +1,6 @@
 .git*            export-ignore
 
 *.bat           -crlf
-*.dsp           -crlf
 browse           crlf=input
 configure        crlf=input
 configure.in     crlf=input
