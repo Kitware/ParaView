@@ -65,6 +65,9 @@
 #include "Resources/vtkPVGroupButton.h"
 #include "Resources/vtkPVUngroupButton.h"
 #include "Resources/vtkPVLockButton.h"
+#include "Resources/vtkPVAMRPartButton.h"
+#include "Resources/vtkPVAMROutlineButton.h"
+#include "Resources/vtkPVAMRSurfaceButton.h"
 
 
 
@@ -361,6 +364,27 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVUngroupButton_height,
                     image_PVUngroupButton_pixel_size,
                     image_PVUngroupButton_buffer_length);
+
+  this->CreatePhoto("PVAMRPartButton", 
+                    image_PVAMRPartButton, 
+                    image_PVAMRPartButton_width, 
+                    image_PVAMRPartButton_height,
+                    image_PVAMRPartButton_pixel_size,
+                    image_PVAMRPartButton_buffer_length);
+
+  this->CreatePhoto("PVAMROutlineButton", 
+                    image_PVAMROutlineButton, 
+                    image_PVAMROutlineButton_width, 
+                    image_PVAMROutlineButton_height,
+                    image_PVAMROutlineButton_pixel_size,
+                    image_PVAMROutlineButton_buffer_length);
+
+  this->CreatePhoto("PVAMRSurfaceButton", 
+                    image_PVAMRSurfaceButton, 
+                    image_PVAMRSurfaceButton_width, 
+                    image_PVAMRSurfaceButton_height,
+                    image_PVAMRSurfaceButton_pixel_size,
+                    image_PVAMRSurfaceButton_buffer_length);
 
 }
 
