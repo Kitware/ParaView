@@ -607,7 +607,7 @@ private:
     vtkKdTree(const vtkKdTree&);
 
 //BTX
-    virtual int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
+    int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
     void SelfRegister(vtkKdNode *kd);
 
     struct _cellList{

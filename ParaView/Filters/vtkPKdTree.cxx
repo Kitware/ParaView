@@ -73,7 +73,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.4");
+vtkCxxRevisionMacro(vtkPKdTree, "1.5");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -2074,13 +2074,14 @@ void vtkPKdTree::InitializeProcessDataLists()
   this->CellDataMin = this->CellDataMax = NULL;
   this->PointDataMin = this->PointDataMax = NULL;
 }
+
 int vtkPKdTree::AllocateAndZeroProcessDataLists()
 {
   int nRegions = this->NumRegions;
   int nProcesses = this->NumProcesses;
 
-  int NumCellArrays = this->GetDataSet(0)->GetCellData()->GetNumberOfArrays();
-  int NumPointArrays = this->GetDataSet(0)->GetPointData()->GetNumberOfArrays();
+  int iNumCellArrays = this->GetDataSet(0)->GetCellData()->GetNumberOfArrays();
+  int iNumPointArrays = this->GetDataSet(0)->GetPointData()->GetNumberOfArrays();
 
   this->FreeProcessDataLists();
 
@@ -2108,27 +2109,27 @@ int vtkPKdTree::AllocateAndZeroProcessDataLists()
 
   if (this->CellCountList == NULL) goto doneError3;
 
-  if (NumCellArrays > 0)
+  if (iNumCellArrays > 0)
     {
-    MakeList(this->CellDataMin, float, NumCellArrays);
+    MakeList(this->CellDataMin, float, iNumCellArrays);
     if (this->CellDataMin == NULL) goto doneError3;
 
-    MakeList(this->CellDataMax, float, NumCellArrays);
+    MakeList(this->CellDataMax, float, iNumCellArrays);
     if (this->CellDataMax == NULL) goto doneError3;
     }
 
-  this->NumCellArrays = NumCellArrays;
+  this->NumCellArrays = iNumCellArrays;
 
-  if (NumPointArrays > 0)
+  if (iNumPointArrays > 0)
     {
-    MakeList(this->PointDataMin, float, NumPointArrays);
+    MakeList(this->PointDataMin, float, iNumPointArrays);
     if (this->PointDataMin == NULL) goto doneError3;
 
-    MakeList(this->PointDataMax, float, NumPointArrays);
+    MakeList(this->PointDataMax, float, iNumPointArrays);
     if (this->PointDataMax == NULL) goto doneError3;
     }
 
-  this->NumPointArrays = NumPointArrays;
+  this->NumPointArrays = iNumPointArrays;
 
   return 0;
 

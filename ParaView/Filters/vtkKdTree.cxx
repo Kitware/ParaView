@@ -44,7 +44,7 @@
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.6");
+vtkCxxRevisionMacro(vtkKdTree, "1.7");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -973,13 +973,13 @@ float *vtkKdTree::ComputeCellCenters(vtkDataSet *set)
     {
     for (i=0; i<this->NumDataSets; i++)
       {
-      vtkDataSet *set = this->DataSets[i];
+      vtkDataSet *iset = this->DataSets[i];
 
-      int nCells = set->GetNumberOfCells();
+      int nCells = iset->GetNumberOfCells();
 
       for (j=0; j<nCells; j++)
         {
-        this->ComputeCellCenter(set->GetCell(j), cptr, weights);
+        this->ComputeCellCenter(iset->GetCell(j), cptr, weights);
 
         cptr += 3;
         }
@@ -1869,14 +1869,14 @@ void vtkKdTree::SetCellBounds(vtkCell *cell, float *bounds)
 
 #define REMOVEDUPLICATES(l, lsize, newsize) \
 {                                  \
-int i,j;                           \
-for (i=0, j=0; i<lsize; i++)    \
+int ii,jj;                           \
+for (ii=0, jj=0; ii<lsize; ii++)    \
   {                               \
-  if ((i > 0) && (l[i] == l[j-1])) continue; \
-  if (j != i) l[j] = l[i];       \
-  j++;                           \
+  if ((ii > 0) && (l[ii] == l[jj-1])) continue; \
+  if (jj != ii) l[jj] = l[ii];       \
+  jj++;                           \
 }                                \
-newsize = j;                     \
+newsize = jj;                     \
 }
 int vtkKdTree::findRegion(vtkKdNode *node, float x, float y, float z)
 {
