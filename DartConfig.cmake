@@ -28,9 +28,6 @@ SET (DOXYGEN_URL "${PROJECT_URL}/doc" )
 SET (GNATS_WEB_URL "${PROJECT_URL}/Bug/query.php?projects=3&status%5B%5D=1&status%5B%5D=2&status%5B%5D=3&status%5B%5D=4&status%5B%5D=6&op=doquery")
 SET (USE_GNATS "On")
 
-# copy over the testing logo
-CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/Resources/ParaViewLogo.gif ${PARAVIEW_BINARY_DIR}/Testing/HTML/TestingResults/Icons/Logo.gif COPYONLY)
-
 # Continuous email delivery variables
 SET (CONTINUOUS_FROM "paraview-dashboard@public.kitware.com")
 SET (SMTP_MAILHOST "public.kitware.com")
