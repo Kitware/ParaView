@@ -2,7 +2,10 @@ PROJECT(WidgetsXML)
 
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
-INCLUDE_DIRECTORIES(${KWCommonXML_SOURCE_DIR})
+INCLUDE_DIRECTORIES(
+  ${KWCommonXML_SOURCE_DIR}
+  ${WidgetsXML_SOURCE_DIR}
+)
 
 SET(WidgetsXML_SRCS
   vtkXMLCornerAnnotationReader.cxx

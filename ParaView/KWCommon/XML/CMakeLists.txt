@@ -2,6 +2,10 @@ PROJECT(KWCommonXML)
 
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
+INCLUDE_DIRECTORIES(
+  ${KWCommonXML_SOURCE_DIR}
+)
+
 SET(KWCommonXML_SRCS
   vtkXMLCameraReader.cxx
   vtkXMLCameraWriter.cxx
