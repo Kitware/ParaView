@@ -26,7 +26,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.4");
 
 struct vtkSMSourceProxyInternals
 {
@@ -38,6 +38,17 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 {
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->PartsCreated = 0;
+
+  this->NumberOfConsumers = 0;
+  this->Consumers = 0;
+
+  this->NumberOfInputs = 0;
+  this->Inputs = 0;
+
+  this->HasMultipleInputs = 0;
+
+  vtkClientServerID nullID = { 0 };
+  this->ClientServerID = nullID;
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
   if (!cm)
@@ -59,14 +70,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   // on this object.
   //vtkSMProcessModule* pm = this->GetProcessModule();
   //pm->ClearLastResult();
-
-  this->NumberOfConsumers = 0;
-  this->Consumers = 0;
-
-  this->NumberOfInputs = 0;
-  this->Inputs = 0;
-
-  this->HasMultipleInputs = 0;
 }
 
 //---------------------------------------------------------------------------
