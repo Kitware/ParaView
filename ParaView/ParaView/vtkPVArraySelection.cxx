@@ -73,7 +73,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.26");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.27");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -321,8 +321,6 @@ void vtkPVArraySelection::Reset()
 //---------------------------------------------------------------------------
 void vtkPVArraySelection::Trace(ofstream *file)
 {
-  vtkKWCheckButton *check;
-
   if ( ! this->InitializeTrace(file))
     {
     return;
