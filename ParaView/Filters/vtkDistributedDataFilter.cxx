@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.17");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.18");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -1525,7 +1525,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
     }
 
   int *member = new int [nParticipants];
-  int myLocalRank;
+  int myLocalRank=0;
 
   member[0] = root;
 
@@ -1645,7 +1645,7 @@ void vtkDistributedDataFilter::ComputeFanIn(int *member,
   int nTo = 0;
   int nFrom = 0;
 
-  int fanInTo;
+  int fanInTo=0;
   int *fanInFrom = new int [20];
 
   for (int i = 1; i < nParticipants; i <<= 1)

@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.16");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.17");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -627,7 +627,7 @@ vtkPVCompositeBuffer* vtkMultiDisplayManager::GetTileBuffer(int tileIdx)
 //----------------------------------------------------------------------------
 void vtkMultiDisplayManager::SetupCamera(int tileIdx, int reduction)
 {
-  vtkCamera* cam;
+  vtkCamera* cam=0;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens;
   vtkRenderer* ren;

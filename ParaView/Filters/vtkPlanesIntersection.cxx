@@ -27,7 +27,7 @@
 #include "vtkCell.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.13");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.14");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the
@@ -131,7 +131,7 @@ int vtkPlanesIntersection::GetNumRegionVertices()
 int vtkPlanesIntersection::IntersectsRegion(vtkPoints *R)
 {
   int plane;
-  int allInside;
+  int allInside=0;
   int nplanes = this->GetNumberOfPlanes();
 
   if (nplanes < 4)

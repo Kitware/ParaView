@@ -67,7 +67,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.14");
+vtkCxxRevisionMacro(vtkPKdTree, "1.15");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -1203,7 +1203,7 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
 
   int need, have, take;
 
-  int FirstRightArrayElementLocation;
+  int FirstRightArrayElementLocation=0;
   int FirstRight = 1;
 
   if ( (myL > this->StartVal[me]) || (myR < this->EndVal[me]))
