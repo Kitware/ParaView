@@ -14,44 +14,37 @@
 =========================================================================*/
 #include "vtkPVProbe.h"
 
-#include "vtkIdTypeArray.h"
+#include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkObjectFactory.h"
-#include "vtkPProbeFilter.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkPVApplication.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkProperty2D.h"
-#include "vtkSocketController.h"
-#include "vtkSource.h"
-#include "vtkString.h"
-#include "vtkSystemIncludes.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkSMPlotDisplay.h"
 #include "vtkPVRenderModule.h"
 #include "vtkCommand.h"
+#include "vtkKWLoadSaveButton.h"
+#include "vtkKWLabeledLoadSaveButton.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkKWListBox.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVWidget.h"
+#include "vtkPVSelectWidget.h"
 
 #include <vtkstd/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.134");
+vtkCxxRevisionMacro(vtkPVProbe, "1.134.2.1");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -83,31 +76,22 @@ public:
   vtkPVProbe* PVProbe;
 };
 
-
-
-
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
 {
-  static int instanceCount = 0;
-  
   this->CommandFunction = vtkPVProbeCommand;
 
   this->SelectedPointFrame = vtkKWWidget::New();
-  this->SelectedPointLabel = vtkKWLabel::New();
   this->PointDataLabel = vtkKWLabel::New();
   
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
+  this->SaveButton = vtkKWLabeledLoadSaveButton::New(); 
 
-  
   this->ProbeFrame = vtkKWWidget::New();
+  this->FieldsSelection = vtkKWListBox::New();
   
   this->XYPlotWidget = 0;
   this->XYPlotObserver = NULL;
-  
-  // Create a unique id for creating tcl names.
-  ++instanceCount;
-  this->InstanceCount = instanceCount;
   
   this->ReplaceInputOff();
 
@@ -118,11 +102,14 @@ vtkPVProbe::vtkPVProbe()
   this->PlotDisplay = vtkSMPlotDisplay::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVProbe::~vtkPVProbe()
 {  
-  if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
+  if (this->GetPVApplication() 
+   && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
     {
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PlotDisplay);
+    this->GetPVApplication()->GetProcessModule()->
+      GetRenderModule()->RemoveDisplay(this->PlotDisplay);
     }
 
   this->PlotDisplay->Delete();
@@ -141,8 +128,6 @@ vtkPVProbe::~vtkPVProbe()
     this->XYPlotObserver = NULL;
     }
     
-  this->SelectedPointLabel->Delete();
-  this->SelectedPointLabel = NULL;
   this->SelectedPointFrame->Delete();
   this->SelectedPointFrame = NULL;
   this->PointDataLabel->Delete();
@@ -150,9 +135,13 @@ vtkPVProbe::~vtkPVProbe()
   
   this->ShowXYPlotToggle->Delete();
   this->ShowXYPlotToggle = NULL;
+  this->SaveButton->Delete();
+  this->SaveButton =  NULL;
   
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;  
+  this->FieldsSelection->Delete();
+  this->FieldsSelection = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -177,19 +166,6 @@ void vtkPVProbe::CreateProperties()
   this->Script("pack %s",
                this->ProbeFrame->GetWidgetName());
 
-  // widgets for points
-  this->SelectedPointFrame->SetParent(this->ProbeFrame);
-  this->SelectedPointFrame->Create(pvApp, "frame", "");
-  
-  
-  
-  this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
-  this->SelectedPointLabel->Create(pvApp, "");
-  this->SelectedPointLabel->SetLabel("Point");
-
-  this->Script("pack %s -side left",
-               this->SelectedPointLabel->GetWidgetName());
-  
   this->PointDataLabel->SetParent(this->ProbeFrame);
   this->PointDataLabel->Create(pvApp, "");
 
@@ -198,10 +174,36 @@ void vtkPVProbe::CreateProperties()
   this->ShowXYPlotToggle->SetState(1);
   this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
-
   this->Script("pack %s",
                this->ShowXYPlotToggle->GetWidgetName());
 
+
+  // // Display all the possible data arrays
+  // List box for selecting which fields to use for probing:
+  this->FieldsSelection->SetParent(this->ParameterFrame->GetFrame());
+  this->FieldsSelection->Create(pvApp, "");
+  this->FieldsSelection->SetSingleClickCallback(this, "FieldsSelectCallback");
+  //this->FieldsSelection->SetSelectState(0,1); //By default take first one
+  this->FieldsSelection->GetListbox()->ConfigureOptions("-selectmode extended -exportselection 0");
+  this->FieldsSelection->ScrollbarOff();
+
+  this->Script("pack %s -expand true -fill both",
+    this->FieldsSelection->GetWidgetName());
+
+  // Add a save button to save XYPloatActor as CSV file
+  this->SaveButton->SetParent(this->ParameterFrame->GetFrame());
+  this->SaveButton->Create(pvApp); //, "foo");
+  this->SaveButton->GetLoadSaveButton()->SetCommand(this, "SaveDialogCallback");
+  //this->SaveButton->ExpandWidgetOn ();
+  //this->SaveButton->SetLabelPositionToLeft ();
+  this->SaveButton->SetLabel ("Save as CSV");
+  vtkKWLoadSaveDialog *dlg = this->SaveButton->GetLoadSaveButton()->GetLoadSaveDialog();
+  dlg->SetDefaultExtension(".csv");
+  dlg->SetFileTypes("{{CSV Document} {.csv}}");
+  dlg->SaveDialogOn();
+
+  this->Script("pack %s",
+               this->SaveButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -260,11 +262,77 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
              << "SetValue" << pos2[0] << pos2[1]
              << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
-
       break;
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProbe::FieldsSelectCallback()
+{
+  int fastselec[100];
+  int n = this->FieldsSelection->GetNumberOfItems();
+  int *selec;
+  if( n > 100 )
+    {
+    selec = new int[n];
+    }
+  else
+    {
+    selec = fastselec;
+    }
+    
+  for(int i=0; i<n; i++)
+    {
+    selec[i] = this->FieldsSelection->GetSelectState(i);
+    }
+  this->PlotDisplay->UpdateInput(this->GetProxy(), selec);
+  if( n > 100 )
+    {
+    delete [] selec;
+    }
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::SaveDialogCallback()
+{
+  int numPts = this->GetDataInformation()->GetNumberOfPoints();
+
+  // We need to be in the case of a line
+  if (numPts != 1)
+    {
+    vtkXYPlotActor *xy = this->XYPlotWidget->GetXYPlotActor ();
+
+    ofstream f;
+    const char *filename = this->SaveButton->GetLoadSaveButton()->GetFileName();
+    f.open( filename );
+    xy->PrintAsCSV(f);
+    f.close();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::FillList(vtkKWListBox* list)
+{
+  vtkPVDataInformation *dataInfo = this->GetDataInformation();
+
+  vtkPVDataSetAttributesInformation* pdInfo = dataInfo->GetPointDataInformation();
+  int n = pdInfo->GetNumberOfArrays ();
+  for(int i=0; i<n; i++)
+    {
+    vtkPVArrayInformation *info = pdInfo->GetArrayInformation(i);
+    // Only append the array with only one component
+    if( info->GetNumberOfComponents () == 1)
+      {
+      list->AppendUnique( info->GetName());
+      this->FieldsSelection->SetSelectState(i,1);
+      }
+    else
+      {
+      this->FieldsSelection->SetSelectState(i,0);
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallbackInternal()
@@ -275,14 +343,35 @@ void vtkPVProbe::AcceptCallbackInternal()
   
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
-    
   if (this->PlotDisplay->GetNumberOfIDs() == 0)
     {
-    // Connect to the display.
-    // These should be merged.
-    this->PlotDisplay->SetInput(this->GetProxy());
-    //this->GetProxy()->AddDisplay(this->PlotDisplay);
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PlotDisplay);
+    vtkPVWidget *wdg = this->GetPVWidget( "Probe object" );
+    vtkPVSelectWidget *swdg = vtkPVSelectWidget::SafeDownCast( wdg );
+    if ( strcmp(swdg->GetCurrentValue(), "Point") == 0 )
+      {
+      this->FieldsSelection->SetEnabled(0);
+      this->SaveButton->SetEnabled(0);
+      }
+    else
+      {
+      this->FieldsSelection->SetEnabled(1);
+      this->SaveButton->SetEnabled(1);
+      }
+    static int initialized =0;
+    if( !initialized)
+      {
+      initialized++;
+      // Connect to the display. Do it only once
+      // These should be merged.
+      this->PlotDisplay->SetInput(this->GetProxy());
+      //this->GetProxy()->AddDisplay(this->PlotDisplay);
+      this->FieldsSelectCallback();
+      this->GetPVApplication()->GetProcessModule()->
+        GetRenderModule()->AddDisplay(this->PlotDisplay);
+
+      //Fill scalars fields:
+      this->FillList(this->FieldsSelection);
+      }
     }
 
   //law int fixme; // This should be in server.
@@ -291,7 +380,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->XYPlotWidget = vtkXYPlotWidget::New();
     this->PlotDisplay->ConnectWidgetAndActor(this->XYPlotWidget);
 
-  
     vtkPVGenericRenderWindowInteractor* iren = 
       this->GetPVWindow()->GetInteractor();
     if ( iren )
@@ -311,9 +399,6 @@ void vtkPVProbe::AcceptCallbackInternal()
                                     this->XYPlotObserver);
     }
 
-
-
-
   // We need to update manually for the case we are probing one point.
   this->PlotDisplay->Update();
   int numPts = this->GetDataInformation()->GetNumberOfPoints();
@@ -323,7 +408,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     // Get the collected data from the display.
     vtkPolyData* d = this->PlotDisplay->GetCollectedData();
     vtkPointData* pd = d->GetPointData();
-  
+ 
     // update the ui to see the point data for the probed point
     vtkIdType j, numComponents;
 
@@ -412,7 +497,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkPVRenderModule* rm = pvApp->GetProcessModule()->GetRenderModule();
     rm->RemoveDisplay(this->PlotDisplay);
     }
-    
+
 }
  
 //----------------------------------------------------------------------------
@@ -420,6 +505,6 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
+  os << indent << "ShowXYPlotToggle: " << this->ShowXYPlotToggle << endl;
   os << indent << "XYPlotWidget: " << this->XYPlotWidget << endl;
 }
