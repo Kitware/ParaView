@@ -136,7 +136,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.49");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -750,11 +750,11 @@ void vtkPVAnimationInterface::UpdateInterface()
     {
     if (this->InPlay)
       {
-      this->PlayButton->Disable();
+      this->PlayButton->SetEnabled(0);
       }
     else
       {
-      this->PlayButton->Enable();
+      this->PlayButton->SetEnabled(this->Enabled);
       }
     }
 
@@ -762,11 +762,11 @@ void vtkPVAnimationInterface::UpdateInterface()
     {
     if (this->InPlay)
       {
-      this->StopButton->Enable();
+      this->StopButton->SetEnabled(this->Enabled);
       }
     else
       {
-      this->StopButton->Disable();
+      this->StopButton->SetEnabled(0);
       }
     }
 
@@ -774,11 +774,11 @@ void vtkPVAnimationInterface::UpdateInterface()
     {
     if (this->InPlay)
       {
-      this->GoToBeginningButton->Disable();
+      this->GoToBeginningButton->SetEnabled(0);
       }
     else
       {
-      this->GoToBeginningButton->Enable();
+      this->GoToBeginningButton->SetEnabled(this->Enabled);
       }
     }
 
@@ -786,11 +786,11 @@ void vtkPVAnimationInterface::UpdateInterface()
     {
     if (this->InPlay)
       {
-      this->GoToEndButton->Disable();
+      this->GoToEndButton->SetEnabled(0);
       }
     else
       {
-      this->GoToEndButton->Enable();
+      this->GoToEndButton->SetEnabled(this->Enabled);
       }
     }
 
