@@ -22,16 +22,19 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
 
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.51");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.52");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -55,8 +58,6 @@ vtkPVVectorEntry::vtkPVVectorEntry()
     this->EntryValues[cc] = 0;
     this->DefaultValues[cc] = 0;
     }
-  
-  this->Property = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -262,26 +263,67 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVVectorEntry::Accept()
 {
+  int modFlag = this->GetModifiedFlag();
+  int i;
   vtkKWEntry *entry;
-  float scalars[6];
 
-  this->Superclass::AcceptInternal(sourceID);
-
-  // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
-  int count = 0;
-  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
-    {
-    scalars[count] = entry->GetValueAsFloat();
-    count++;
-    }
-  this->Property->SetScalars(count, scalars);
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->AcceptInternal();
   
-  this->ModifiedFlag = 0;  
+  switch (this->DataType)
+    {
+    case VTK_FLOAT:
+    case VTK_DOUBLE:
+      {
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->GetSMProperty());
+      if (dvp)
+        {
+        dvp->SetNumberOfElements(this->VectorLength);
+        for (i = 0; i < this->VectorLength; i++)
+          {
+          entry =
+            vtkKWEntry::SafeDownCast(this->Entries->GetNextItemAsObject());
+          dvp->SetElement(i, entry->GetValueAsFloat());
+          }
+        }
+      break;
+      }
+    case VTK_INT:
+      {
+      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+        this->GetSMProperty());
+      if (ivp)
+        {
+        ivp->SetNumberOfElements(this->VectorLength);
+        for (i = 0; i < this->VectorLength; i++)
+          {
+          entry =
+            vtkKWEntry::SafeDownCast(this->Entries->GetNextItemAsObject());
+          ivp->SetElement(i, entry->GetValueAsInt());
+          }
+        }
+      break;
+      }
+    }
+  
+  this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -310,35 +352,45 @@ void vtkPVVectorEntry::Trace(ofstream *file)
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::ResetInternal()
 {
-  int count = 0;
-
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
-  float *scalars = this->Property->GetScalars();
+  int i;
   
-  // Set each entry to the appropriate value.
-  for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
+  switch (this->DataType)
     {
-    ostrstream val;
-    val << scalars[count] << ends;
-    if (this->DataType == VTK_FLOAT || this->DataType == VTK_DOUBLE)
+    case VTK_DOUBLE:
+    case VTK_FLOAT:
       {
-      this->SetEntryValue(count, val.str());
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->GetSMProperty());
+      if (dvp)
+        {
+        for (i = 0; i < this->VectorLength; i++)
+          {
+          ostrstream val;
+          val << dvp->GetElement(i) << ends;
+          this->SetEntryValue(i, val.str());
+          val.rdbuf()->freeze(0);
+          }
+        }
+      break;
       }
-    else
+    case VTK_INT:
       {
-      int scalar = atoi(val.str());
-      char *newStr = new char[strlen(val.str())+1];
-      sprintf(newStr, "%d", scalar);
-      this->SetEntryValue(count, newStr);
-      delete [] newStr;
+      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+        this->GetSMProperty());
+      if (ivp)
+        {
+        for (i = 0; i < this->VectorLength; i++)
+          {
+          ostrstream val;
+          val << ivp->GetElement(i) << ends;
+          this->SetEntryValue(i, val.str());
+          val.rdbuf()->freeze(0);
+          }
+        }
+      break;
       }
-    val.rdbuf()->freeze(0);
     }
-
+  
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -406,11 +458,6 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     sscanf(values[idx], "%f", &scalars[idx]);
     }
   
-  if (!this->AcceptCalled)
-    {
-    this->Property->SetScalars(num, scalars);
-    }
-  
   this->ModifiedCallback();
 }
 
@@ -438,11 +485,6 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       }
     this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
     scalars[idx] = entry->GetValueAsFloat();
-    }
-  
-  if (!this->AcceptCalled)
-    {
-    this->Property->SetScalars(num, scalars);
     }
   
   this->ModifiedCallback();
@@ -534,18 +576,26 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 void vtkPVVectorEntry::SaveInBatchScript(ofstream *file)
 {
   int cc;
-  for ( cc = 0; cc < this->Property->GetNumberOfScalars(); cc ++ )
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
     {
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetElement "
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
+  for ( cc = 0; cc < this->VectorLength; cc ++ )
+    {
+    *file << "  [$pvTemp" << sourceID <<  " GetProperty "
+          << this->SMPropertyName << "] SetElement "
           << cc << " ";
     if (this->DataType == VTK_INT)
       {
-      *file << "[expr round(" << this->Property->GetScalar(cc) << ")]";
+      *file << "[expr round(" << this->EntryValues[cc] << ")]";
       }
     else
       {
-      *file << this->Property->GetScalar(cc);
+      *file << this->EntryValues[cc];
       }
     *file << endl;
     }
@@ -576,15 +626,43 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   if (this->Entries->GetNumberOfItems() == 1)
     {
     ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
-    ai->SetCurrentProperty(this->Property);
-    if (this->UseWidgetRange)
+    vtkSMProperty *prop = this->GetSMProperty();
+    vtkSMDomain *rangeDomain = prop->GetDomain("range");
+    
+    ai->SetCurrentSMProperty(prop);
+    ai->SetCurrentSMDomain(rangeDomain);
+
+    if (rangeDomain)
       {
-      ai->SetTimeStart(this->WidgetRange[0]);
-      ai->SetTimeEnd(this->WidgetRange[1]);
+      vtkSMIntRangeDomain *intRangeDomain =
+        vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
+      vtkSMDoubleRangeDomain *doubleRangeDomain =
+        vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
+      int minExists = 0, maxExists = 0;
+      if (intRangeDomain)
+        {
+        int min = intRangeDomain->GetMinimum(0, minExists);
+        int max = intRangeDomain->GetMaximum(0, maxExists);
+        if (minExists && maxExists)
+          {
+          ai->SetTimeStart(min);
+          ai->SetTimeEnd(max);
+          }
+        }
+      else if (doubleRangeDomain)
+        {
+        double min = doubleRangeDomain->GetMinimum(0, minExists);
+        double max = doubleRangeDomain->GetMaximum(0, maxExists);
+        if (minExists && maxExists)
+          {
+          ai->SetTimeStart(min);
+          ai->SetTimeEnd(max);
+          }
+        }
       }
     ai->Update();
     }
-  // What if there are more than one entry?
+    // What if there are more than one entry?
 }
 
 //-----------------------------------------------------------------------------
@@ -749,32 +827,6 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVVectorEntry::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    this->Property->SetScalars(this->VectorLength, this->DefaultValues);
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    this->Property->SetVTKCommands(1, &cmd, &this->VectorLength);
-    delete[] cmd;
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVVectorEntry::GetProperty()
-{
-  return this->Property;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVVectorEntry::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

@@ -173,8 +173,8 @@
           extensions=".h5"
           file_description="HDF5 Raw ImageData Files">
     <Source class="vtkHDF5RawImageReader"/>
-    <VectorEntry length="3"
-                 variable="Stride" trace_name="Stride" type="int"
+    <VectorEntry length="3" label="Stride"
+                 property="Stride" trace_name="Stride" type="int"
                  help="Read a subset of data spaced by the stride."
                  default_value="1 1 1"/>
     <ArraySelection attribute_name="Point"
@@ -207,7 +207,7 @@
           extensions=".xyz"
           file_description="XMol Molecule Files">
     <Source class="vtkXYZMolReader"/>
-    <VectorEntry variable="TimeStep"
+    <VectorEntry property="TimeStep" label="TimeStep"
                  trace_name="TimeStep" type="int"
                  help="Set the TimeStep"
                  default_value="0"/>
@@ -285,11 +285,11 @@
           extensions=".cube"
           file_description="Gaussian Cube Files">
     <Source class="vtkGaussianCubeReader"/>
-    <VectorEntry variable="HBScale"
+    <VectorEntry property="HBScale" label="HBScale"
                  trace_name="HBScale" type="float"
                  help="Set the HB scale"
                  default_value="1.0"/>
-    <VectorEntry variable="BScale"
+    <VectorEntry property="BScale" label="BScale"
                  trace_name="BScale" type="float"
                  help="Set the B scale"
                  default_value="1.0"/>
@@ -301,19 +301,19 @@
           extensions=".pop"
           file_description="POP Ocean Files">
     <Source class="vtkPOPReader"/>
-    <VectorEntry variable="Radius"
+    <VectorEntry property="Radius" label="Radius"
                  trace_name="Radius" type="float"
                  help="Set the radius of the data set"
                  default_value="60000"/>
     <VectorEntry label="Clip Extent"
-                 variable="ClipExtent" type="int"
+                 property="ClipExtent" type="int"
                  length="6"
                  trace_name="ClipExtent"
                  help="For reading a smaller extent."
                  default_value="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647"/>
     <VectorEntry label="Ghost Levels"
                  trace_name="NumberOfGhostLevels"
-                 variable="NumberOfGhostLevels"
+                 property="NumberOfGhostLevels"
                  type="int"
                  help="Set the number of ghost levels to read."
                  default_value="1"/>
@@ -383,23 +383,23 @@
             value="3"/>
     </SelectionList>
     <VectorEntry label="Origin"
-                 trace_name="Origin" variable="DataOrigin"
+                 trace_name="Origin" property="DataOrigin"
                  type="float" length="3"
                  help="Set the position of the point with index (0,0,0)"
                  default_value="0.0 0.0 0.0"/>
     <VectorEntry label="Spacing"
-                 trace_name="Spacing" variable="DataSpacing"
+                 trace_name="Spacing" property="DataSpacing"
                  type="float" length="3"
                  help="Set the size of a voxel in each dimension."
                  default_value="1.0 1.0 1.0"/>
     <VectorEntry label="Extent"
-                 trace_name="Extent" variable="DataExtent"
+                 trace_name="Extent" property="DataExtent"
                  type="int" length="6"
                  help="Set the min and max values of the data in each dimension"
                  default_value="0 0 0 0 0 0"/>
     <VectorEntry label="Num. components"
                  trace_name="NumberOfScalarComponents"
-                 variable="NumberOfScalarComponents" type="int"
+                 property="NumberOfScalarComponents" type="int"
                  help="How many componenets does each pixel have. (i.e. RGB would be 3.)"
                  default_value="1"/>
     <StringEntry label="Array name"
@@ -422,7 +422,7 @@
     <ArraySelection trace_name="cell_array_sel"
                     attribute_name="Point" />
     <VectorEntry label="Stride"
-                 trace_name="stride" variable="Stride" type="int"
+                 trace_name="stride" property="Stride" type="int"
                  length="3"
                  default_value="1 1 1"
                  help="Set the number of steps to skip between each point (structured data only)."/>
@@ -450,7 +450,7 @@
                  help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
 
     
-    <VectorEntry variable="FileRange"
+    <VectorEntry property="FileRange"
                  label="Range of files" type="int"
                  trace_name="file_range"
                  length="2"
@@ -500,7 +500,7 @@
                    help="Select whether the reader automatically applies displacements" default_value="1"/>
 	<VectorEntry label="Displacement Scale"
                  trace_name="DisplacementMagnitude"
-                 variable="DisplacementMagnitude"
+                 property="DisplacementMagnitude"
                  type="float"
                  help="The magnitude of the applied displacement."
                  default_value="1.0"/>

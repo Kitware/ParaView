@@ -29,7 +29,6 @@ class vtkKWEntry;
 class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWWidgetCollection;
-class vtkPVScalarListWidgetProperty;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -136,25 +135,14 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  //BTX
   // Description:
   // Move widget state to vtk object or back.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void ResetInternal();
-  //ETX
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
-
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -201,8 +189,6 @@ protected:
 
   float DefaultValues[6];
   vtkSetVector6Macro(DefaultValues, float);
-  
-  vtkPVScalarListWidgetProperty *Property;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

@@ -19,22 +19,19 @@
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMProperty.h"
+#include "vtkSMBoundsDomain.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.11");
-
-vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.12");
 
 vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
-  this->InputMenu = NULL;
-  this->Input = NULL;
   this->ScaleFactor = 0.1;
 }
 
 vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
 {
-  this->SetInputMenu(NULL);
 }
 
 void vtkPVScaleFactorEntry::ResetInternal()
@@ -55,21 +52,37 @@ void vtkPVScaleFactorEntry::Update()
 
 void vtkPVScaleFactorEntry::UpdateScaleFactor()
 {
-  if (!this->InputMenu)
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMBoundsDomain *dom = 0;
+  
+  if (prop)
     {
+    dom = vtkSMBoundsDomain::SafeDownCast(prop->GetDomain("bounds"));
+    }
+  
+  if (!prop || !dom)
+    {
+    this->Superclass::Update();
     return;
     }
   
-  vtkPVSource *input = this->InputMenu->GetCurrentValue();
-  if (!input || (input == this->Input && this->AcceptCalled))
-    {
-    return;
-    }
-  
-  this->Input = input;
+  int exists, i;
   
   double bnds[6];
-  input->GetDataInformation()->GetBounds(bnds);
+  
+  for (i = 0; i < 3; i++)
+    {
+    bnds[2*i] = dom->GetMinimum(i, exists);
+    if (!exists)
+      {
+      bnds[2*i] = 0;
+      }
+    bnds[2*i+1] = dom->GetMaximum(i, exists);
+    if (!exists)
+      {
+      bnds[2*i+1] = 1;
+      }
+    } 
   
   double maxBnds = bnds[1] - bnds[0];
   maxBnds = (bnds[3] - bnds[2] > maxBnds) ? (bnds[3] - bnds[2]) : maxBnds;
@@ -118,7 +131,6 @@ int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
       return 0;
       }
     imw->AddDependent(this);
-    this->SetInputMenu(imw);
     imw->Delete();
     }
   return 1;
@@ -133,42 +145,13 @@ void vtkPVScaleFactorEntry::CopyProperties(
   if (pvsfe)
     {
     pvsfe->ScaleFactor = this->ScaleFactor;
-    if (this->InputMenu)
-      {
-      vtkPVInputMenu *im = this->InputMenu->ClonePrototype(source, map);
-      pvsfe->SetInputMenu(im);
-      im->Delete();
-      }
-    pvsfe->SetInput(this->Input);
     }
 }                        
-
-void vtkPVScaleFactorEntry::SetInput(vtkPVSource *input)
-{
-  this->Input = input;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVScaleFactorEntry::UpdateEnableState()
-{
-  this->Superclass::UpdateEnableState();
-
-  this->PropagateEnableState(this->InputMenu);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   
-  os << indent << "InputMenu: ";
-  if (this->InputMenu)
-    {
-    os << this->InputMenu << endl;
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
   os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
 }

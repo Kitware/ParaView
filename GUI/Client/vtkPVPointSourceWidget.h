@@ -120,6 +120,8 @@ protected:
 //ETX
   virtual int ReadXMLAttributes(vtkPVXMLElement *element,
                                 vtkPVXMLPackageParser *parser);
+
+  void AcceptRadiusAndNumberOfPointsInternal();
   
   vtkPVPointWidget* PointWidget;
 

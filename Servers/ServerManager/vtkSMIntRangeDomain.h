@@ -93,6 +93,11 @@ public:
   // Clear all maximum values.
   void RemoveAllMaxima();
 
+  // Description:
+  // Set the value of an element of a property from the animation editor.
+  virtual void SetAnimationValue(vtkSMProperty *property, int idx,
+                                 double value);
+
 protected:
   vtkSMIntRangeDomain();
   ~vtkSMIntRangeDomain();

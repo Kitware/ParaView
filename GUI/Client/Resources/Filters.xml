@@ -28,7 +28,7 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
                help="Redistribute polydata to a subset of processes."
                input_name="Input"/>
     <VectorEntry label="Number of Processes" trace_name="NumberOfProcesses"
-                 variable="NumberOfProcesses"
+                 property="NumberOfProcesses"
                  type="int"
                  default_value="1"/>
     <Documentation>
@@ -375,7 +375,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
   <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Scalar range"
                  trace_name="ScalarRange"
-                 variable="ScalarRange"
+                 property="ScalarRange"
                  type="float" length="2"
                  default_value="0.0 1.0"
                  help="Set the range of scalar values to generate" />
@@ -730,12 +730,13 @@ The Group Parts filter causes different data sets to be grouped into a collectio
     <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Scale factor"
                  trace_name="ScaleFactor"
-                 variable="ScaleFactor" type="float"
+                 property="ScaleFactor" type="float"
                  help="Set the extrusion scale factor"
                  default_value="1.0"/>
     <!-- keeping vector entries with length > 1 -->
-    <VectorEntry variable="Vector"
+    <VectorEntry label="Vector"
                  trace_name="Vector"
+                 property="Vector"
                  type="float" length="3"
                  help="Set the direction for the extrusion"
                  default_value="0.0 0.0 1.0"/>
@@ -849,7 +850,7 @@ The Input menu allows the user to select the data set to which this filter will 
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Kernel Size"
                  trace_name="KernelSize"
-                 variable="KernelSize" type="int"
+                 property="KernelSize" type="int"
                  length="3"
                  help="Determines the smoothing neighborhood."
                  default_value="1 1 1"/>
@@ -1075,7 +1076,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Divisions"
                  trace_name="NumberOfDivisions"
-                 variable="NumberOfDivisions"
+                 property="NumberOfDivisions"
                  type="int"
                  length="3"
                  help="Set the number of bins in each dimension"
@@ -1179,7 +1180,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
     <!-- reasonable value dependent on bounds of the data -->
     <VectorEntry label="Center"
                  trace_name="Center"
-                 variable="Center"
+                 property="Center"
                  type="float"
                  help="The center of the mirror plane."
                  default_value="0.0"/>
@@ -1222,7 +1223,8 @@ The Reflection filter reflects the input data set across the specified plane. If
                input_menu="im"
                number_of_components="1"
                help="Select the input scalars to process."/>
-    <ScaleFactorEntry variable="Width"
+    <ScaleFactorEntry label="Width"
+                      property="Width"
                       input_menu="im"
                       trace_name="Width"
                       type="float"
@@ -1245,7 +1247,7 @@ The Reflection filter reflects the input data set across the specified plane. If
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Default normal"
                  trace_name="DefaultNormal"
-                 variable="DefaultNormal"
+                 property="DefaultNormal"
                  type="float"
                  length="3"
                  help="Specify the normal to use if Use default normal is on."
@@ -1282,21 +1284,23 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                 default_value="12"/>
     <LabeledToggle variable="Capping"
                    trace_name="Capping" default_value="1"/>
-    <VectorEntry variable="Angle"
+    <VectorEntry label="Angle"
                  trace_name="Angle"
+                 property="Angle"
                  help="Set the angle of rotation."
                  type="float"
                  default_value="360.0"/>
     <!-- Translation value chosen does not change processing speed of this filter or cause it to crash. -->
-    <VectorEntry variable="Translation"
+    <VectorEntry label="Translation"
                  trace_name="Translation"
+                 property="Translation"
                  type="float"
                  help="The total amount of translation along the z-axis."
                  default_value="0.0"/>
     <!-- DeltaRadius value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Delta radius"
                  trace_name="DeltaRadius"
-                 variable="DeltaRadius"
+                 property="DeltaRadius"
                  type="float"
                  help="The change in radius during sweep process."
                  default_value="0.0"/>
@@ -1349,7 +1353,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
                input_name="Input"/>
     <VectorEntry label="Shrink factor"
                  trace_name="ShrinkFactor"
-                 variable="ShrinkFactor"
+                 property="ShrinkFactor"
                  type="float"
                  help="Set the amount to shrink by"
                  default_value="0.5"/>
@@ -1459,7 +1463,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
            range="1 3"/>
     <VectorEntry label="Max Chord Error"
                  trace_name="ChordError"
-                 variable="ChordError" type="float"
+                 property="ChordError" type="float"
                  help="The maximum chord error allowed at any edge midpoint in the output tessellation."
                  default_value="0.0001" data_range=".0000000001 1"
                  />
@@ -1472,7 +1476,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
                       />
     <VectorEntry label="Max Num Of Subdivisions"
                  trace_name="MaximumNumberOfSubdivisions"
-                 variable="MaximumNumberOfSubdivisions" type="int"
+                 property="MaximumNumberOfSubdivisions" type="int"
                  default_value="1" data_range="0 8"/>
     <Documentation>
 The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
@@ -1573,7 +1577,8 @@ The Transform filter allows you to specify the position, size, and orientation o
                    trace_name="Capping"
                    help="Select whether to draw endcaps on the tube"
                    default_value="0"/>
-    <ScaleFactorEntry variable="Radius"
+    <ScaleFactorEntry label="Radius"
+                      property="Radius"
                       input_menu="im"
                       trace_name="Radius"
                       type="float"
@@ -1594,7 +1599,7 @@ The Transform filter allows you to specify the position, size, and orientation o
     <!-- RadiusFactor value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Radius factor"
                  trace_name="RadiusFactor"
-                 variable="RadiusFactor"
+                 property="RadiusFactor"
                  type="float"
                  help="Set the maximum tube radius in terms of a multiple of the minimum radius"
                  default_value="10"/>
@@ -1627,13 +1632,14 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
                help="Select the input scalars to process."/>
     <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Scale factor"
-                 variable="ScaleFactor"
+                 property="ScaleFactor"
                  trace_name="ScaleFactor"
                  type="float"
                  help="Displacement is vector times scale."
                  default_value="1.0"/>
     <!-- keeping vector entries with length > 1 -->
-    <VectorEntry variable="Normal"
+    <VectorEntry label="Normal"
+                 property="Normal"
                  trace_name="Normal"
                  type="float"
                  length="3"
@@ -1684,7 +1690,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
     <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Scale factor"
                  trace_name="ScaleFactor"
-                 variable="ScaleFactor"
+                 property="ScaleFactor"
                  type="float"
                  help="Displacement is vector times scale."
                  default_value="1.0"/>
@@ -1815,7 +1821,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
             <VectorEntry label="Clip value"
                          trace_name="Offset"
                          type="float"
-                         variable="Value"
+                         property="Value"
                          help="Choose the scalar value to clip with"/>
           </Item>
         </ContainerWidget>
@@ -2114,6 +2120,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
             value="Output">
         <PointSourceWidget trace_name="Point"
                            radius_scale_factor=".1"
+                           radius_property="Radius"
                            input_menu="im"
                            default_number_of_points="100"
                            show_entries="1"/>
@@ -2139,7 +2146,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </Item>
       <Item>
         <ScaleFactorEntry label=""
-                          variable="MaximumPropagation"
+                          property="MaximumPropagation"
                           type="float"
                           trace_name="MaxPropLen"
                           scale_factor="1.0"
@@ -2165,7 +2172,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </Item>
       <Item>
         <VectorEntry label=""
-                     variable="InitialIntegrationStep"
+                     property="InitialIntegrationStep"
                      type="float"
                      trace_name="InitLen"
                      help="Initial step length"
@@ -2214,7 +2221,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           </Item>
           <Item>
             <VectorEntry label=""
-                         variable="MinimumIntegrationStep"
+                         property="MinimumIntegrationStep"
                          type="float"
                          trace_name="MinLen"
                          help="Minimum step length  used in the integation"
@@ -2241,7 +2248,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
           </Item>
           <Item>
             <VectorEntry label=""
-                         variable="MaximumIntegrationStep"
+                         property="MaximumIntegrationStep"
                          type="float"
                          trace_name="MaxLen"
                          help="Maximum step length used in the integration"
@@ -2252,7 +2259,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Item>
       <VectorEntry label="Maximum Error"
                    trace_name="MaximumError"
-                   variable="MaximumError"
+                   property="MaximumError"
                    type="float"
                    help="Maximum error allowed in the integration"
                    default_value="0.000001"/>
@@ -2262,13 +2269,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     </SelectWidget>
     <VectorEntry label="Max. Steps"
                  trace_name="MaximumNumberOfSteps"
-                 variable="MaximumNumberOfSteps"
+                 property="MaximumNumberOfSteps"
                  type="int"
                  help="Maximum number of steps."
                  default_value="2000"/>
     <VectorEntry label="Term. Speed"
                  trace_name="TerminalSpeed"
-                 variable="TerminalSpeed"
+                 property="TerminalSpeed"
                  type="float"
                  help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"
                  default_value="0.000000000001"/>

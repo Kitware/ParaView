@@ -225,7 +225,13 @@ public:
   // Set/get the SM property to use with this widget..
   vtkSMProperty* GetSMProperty();
   void SetSMProperty(vtkSMProperty* prop);
-  
+
+  // Description:
+  // Need access to these so that container-type widgets can set the property
+  // name on the widgets they contain (e.g., vtkPVPointSourceWidget).
+  vtkSetStringMacro(SMPropertyName);
+  vtkGetStringMacro(SMPropertyName);
+
   // Description:
   // Create the right property for use with this widget.  Overridden in
   // subclasses.
@@ -266,9 +272,6 @@ protected:
   double WidgetRange[2];
 
   char* SMPropertyName;
-
-  vtkSetStringMacro(SMPropertyName);
-  vtkGetStringMacro(SMPropertyName);
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

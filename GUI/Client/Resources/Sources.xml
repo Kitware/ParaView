@@ -37,14 +37,14 @@ The output of the 2D Glyph source is polygonal data.
   <Source class="vtkCTHFractal"/>
 <!-- should use widget that keeps values non-negative -->
   <VectorEntry label="Dimension" trace_name="Dimension"
-               variable="Dimensions" type="int" default_value="10"
+               property="Dimensions" type="int" default_value="10"
                help="XYZ cell dimensions of a block"/>
   <VectorEntry label="FractalValue" trace_name="FractalValue"
-               variable="FractalValue" type="float" default_value="9.5"
+               property="FractalValue" type="float" default_value="9.5"
                help="Map this value to 0.5 for use as a volume fraction."/>
 <!-- should use widget that keeps value non-negative -->
   <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
-               variable="MaximumLevel" type="int" default_value="6"
+               property="MaximumLevel" type="int" default_value="6"
                help="Determines how deep to refine the grid."/>
   <LabeledToggle variable="GhostLevels" trace_name="GhostLevels" 
                  default_value="0"
@@ -134,11 +134,11 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
         long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z." 
         short_help="Create three lines representing X, Y and Z axes">
   <Source class="vtkAxes"/>
-  <VectorEntry label="Scale" trace_name="ScaleFactor" variable="ScaleFactor"
+  <VectorEntry label="Scale" trace_name="ScaleFactor" property="ScaleFactor"
                type="float" default_value="1.0"
                help="Set the size of the axes"/>
-  <VectorEntry variable="Origin" trace_name="Origin"  type="float" 
-               length="3" default_value="0.0 0.0 0.0"
+  <VectorEntry label="Origin" property="Origin" trace_name="Origin"
+               type="float" length="3" default_value="0.0 0.0 0.0"
                help="Set the x, y, z coordinates of the origin of the axes" />
   <LabeledToggle variable="Symmetric" trace_name="Symmetric"
                  default_value="0"
@@ -166,7 +166,7 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
   <ThumbWheel label="Z length" trace_name="ZLength" variable="ZLength"
                resolution="0.01" minimum_value="0" default_value="1"
                help="The length of the cube in the z direction." />
-  <VectorEntry variable="Center" trace_name="Center" length="3" 
+  <VectorEntry label="Center" property="Center" trace_name="Center" length="3" 
                type="float" default_value="0.0 0.0 0.0"
                help="Set the center of the cube." />
   <Documentation>
@@ -221,8 +221,8 @@ The output of the Cone source is polygonal data.
   <ThumbWheel variable="Radius" trace_name="Radius"
               resolution="0.01" minimum_value="0" default_value="0.5"
               help="The radius of the cylinder." />
-  <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
-               default_value="0.0 0.0 0.0" 
+  <VectorEntry  label="Center" property="Center" trace_name="Center"
+               type="float" length="3" default_value="0.0 0.0 0.0" 
                help="Set the center of the cylinder." />
   <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
                  help="Set whether to draw the ends of the cylinder" />
@@ -264,17 +264,17 @@ The output of the Line source is polygonal data.
         long_help="Representation (unsigned char ) of the Mandlebrot set in up to 3 dimensions." 
         short_help="Create a Mandelbrot representation">
   <Source class="vtkImageMandelbrotSource"/>
-  <VectorEntry label="Extent" trace_name="Extent" variable="WholeExtent" 
+  <VectorEntry label="Extent" trace_name="Extent" property="WholeExtent" 
                type="int" length="6" default_value="0 250 0 250 0 0"
                help="Set the min and max values of the data in each dimension" />
   <VectorEntry label="Sub-space" trace_name="SubSpace" 
-               variable="ProjectionAxes" type="int" 
+               property="ProjectionAxes" type="int" 
                length="3" default_value="0 1 2"
                help="Choose which axes of the data set to display" />
-  <VectorEntry label="Origin" trace_name="Origin" variable="OriginCX" 
+  <VectorEntry label="Origin" trace_name="Origin" property="OriginCX" 
                type="float" length="4" default_value="-1.75 -1.25 0.0 0.0"
                help="Set the imaginary and real values for C (constant) and X (initial value)" />
-  <VectorEntry label="Size" trace_name="Size" variable="SizeCX" type="float" 
+  <VectorEntry label="Size" trace_name="Size" property="SizeCX" type="float" 
                length="4" default_value="2.5 2.5 2.0 1.5"
                help="Set the inaginary and real values for the world size of the volume for C (constant) and X (initial value)" />
   <Scale label="Max. iterations" trace_name="MaxIterations" 
@@ -306,10 +306,12 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
   <ThumbWheel label="Run Factor" variable="RunFactor" trace_name="RunLength"
               resolution="1" minimum_value="1" default_value="20"
               help="A value that influences the run length and branching of the maze." />
-  <VectorEntry label="Magnet Factor" variable="MagnetFactor" trace_name="MagnetFactor" 
+  <VectorEntry label="Magnet Factor" property="MagnetFactor"
+               trace_name="MagnetFactor" 
                type="int" default_value="4" 
                help="When this value is larger than 1, new paths are preferentially formed adjacent to existing paths." />
-  <VectorEntry label="Random Seed" variable="RandomSeed" trace_name="RandomSeed" 
+  <VectorEntry label="Random Seed" property="RandomSeed"
+               trace_name="RandomSeed" 
                type="int" default_value="111" 
                help="Initializes the random number generator." />
   <LabeledToggle variable="ShowSolution" trace_name="ShowSolution" default_value="0"
@@ -330,13 +332,13 @@ The output of the Maze source is polygonal data.
         long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
         short_help="Create a parallelogram from an origin and two points">
   <Source class="vtkPlaneSource"/>
-  <VectorEntry variable="Origin" trace_name="Origin" type="float" length="3" 
-               default_value="-0.5 -0.5 0.0"
+  <VectorEntry label="Origin" property="Origin" trace_name="Origin"
+               type="float" length="3" default_value="-0.5 -0.5 0.0"
                help="Set the position of the origin of the plane."/>
-  <VectorEntry label="First point" variable="Point1" trace_name="Point1" 
+  <VectorEntry label="First point" property="Point1" trace_name="Point1" 
                type="float" length="3" default_value="0.5 -0.5 0.0"
                help="Set the position of the point defining the first axis."/>
-  <VectorEntry label="Second point" variable="Point2" trace_name="Point2" 
+  <VectorEntry label="Second point" property="Point2" trace_name="Point2" 
                type="float" length="3" default_value="-0.5 0.5 0.0"
                help="Set the position of the point defining the second axis."/>
   <ThumbWheel label="X resolution" trace_name="XResolution"
@@ -363,8 +365,8 @@ The output of the Plane source is polygonal data.
         long_help="3D sphere given a center and radius." 
         short_help="Create a 3D sphere">
   <Source class="vtkSphereSource"/>
-  <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
-               default_value="0.0 0.0 0.0" 
+  <VectorEntry label="Center" property="Center" trace_name="Center"
+               type="float" length="3" default_value="0.0 0.0 0.0" 
                help="Set the coordinates for the center of the sphere." />
   <ThumbWheel variable="Radius" trace_name="Radius"
               resolution="0.01" minimum_value="0" default_value="0.5"
@@ -415,11 +417,11 @@ The output of the Sphere source is polygonal data with point normals defined.
         long_help="Superquadric according to the theta and phi roundness parameters. This one function can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
         short_help="Create a superquadric according to the theta and phi roundness parameters">
   <Source class="vtkSuperquadricSource"/>
-  <VectorEntry variable="Center" trace_name="Center" type="float" length="3" 
-               default_value="0.0 0.0 0.0"
+  <VectorEntry label="Center" property="Center" trace_name="Center"
+               type="float" length="3" default_value="0.0 0.0 0.0"
                help="Set the center of the superquadric" />
-  <VectorEntry variable="Scale" trace_name="Scale" type="float" length="3" 
-               default_value="1.0 1.0 1.0" 
+  <VectorEntry label="Scale" property="Scale" trace_name="Scale" type="float"
+               length="3" default_value="1.0 1.0 1.0" 
                help="Set the scale of the superquadric" />
   <Scale label="Theta resolution" trace_name="ThetaResolution" 
                variable="ThetaResolution" default_value="16" resolution="1"
@@ -445,7 +447,7 @@ The output of the Sphere source is polygonal data with point normals defined.
                resolution="0.01" range="0.01 10" default_value="1"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
-  <VectorEntry variable="Size" trace_name="Size"
+  <VectorEntry label="Size" property="Size" trace_name="Size"
                type="float" default_value="0.5"
                help="Isotropic size" />
   <LabeledToggle variable="Toroidal" trace_name="Toroidal" default_value="0" 
@@ -469,28 +471,30 @@ The output of the Superquadric source is polygonal data with point normals and t
         module_type="Source" 
         long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function.">
   <Source class="vtkRTAnalyticSource"/>
-  <VectorEntry label="Extent" trace_name="WholeExtent" variable="WholeExtent" 
+  <VectorEntry label="Extent" trace_name="WholeExtent" property="WholeExtent" 
                 type="int" length="6" default_value="-10 10 -10 10 -10 10"
                 help="Extent (dimensions) of the function." />
-  <VectorEntry variable="Center" trace_name="Center" type="int" length="3" 
+  <VectorEntry label="Center" property="Center" trace_name="Center"
+               type="float" length="3" 
                default_value="0.0 0.0 0.0"
                help="Center of the function."/>
-  <VectorEntry variable="Maximum" trace_name="Maximum" type="float" 
+  <VectorEntry label="Maximum" property="Maximum" trace_name="Maximum"
+               type="float" 
                default_value="255.0" help="Maximum value of the function"/>
-  <VectorEntry label="X Freq." trace_name="XFreq" variable="XFreq" 
+  <VectorEntry label="X Freq." trace_name="XFreq" property="XFreq" 
                type="float" default_value="60" help="Frequency in X"/>
-  <VectorEntry label="Y Freq." trace_name="YFreq" variable="YFreq" 
+  <VectorEntry label="Y Freq." trace_name="YFreq" property="YFreq" 
                type="float" default_value="30" help="Frequency in Y"/>
-  <VectorEntry label="Z Freq." trace_name="ZFreq" variable="ZFreq" 
+  <VectorEntry label="Z Freq." trace_name="ZFreq" property="ZFreq" 
                type="float" default_value="40" help="Frequency in Z"/>
-  <VectorEntry label="X Mag." trace_name="XMag" variable="XMag" 
+  <VectorEntry label="X Mag." trace_name="XMag" property="XMag" 
                type="float" default_value="10" help="Wave amplitude in X"/>
-  <VectorEntry label="Y Mag." trace_name="YMag" variable="YMag" 
+  <VectorEntry label="Y Mag." trace_name="YMag" property="YMag" 
                type="float" default_value="18" help="Wave amplitude in Y"/>
-  <VectorEntry label="Z Mag." trace_name="ZMag" variable="ZMag" 
+  <VectorEntry label="Z Mag." trace_name="ZMag" property="ZMag" 
                type="float" default_value="5" help="Wave amplitude in Z"/>
   <VectorEntry label="Standard dev." trace_name="StandardDeviation" 
-               variable="StandardDeviation" type="float" default_value="0.5" 
+               property="StandardDeviation" type="float" default_value="0.5" 
                help="Standard deviation of the gaussian" />
   <Documentation>
 The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function.

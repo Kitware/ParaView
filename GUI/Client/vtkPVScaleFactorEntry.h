@@ -22,20 +22,13 @@
 
 #include "vtkPVVectorEntry.h"
 
-class vtkPVInputMenu;
-
 class VTK_EXPORT vtkPVScaleFactorEntry : public vtkPVVectorEntry
 {
 public:
   static vtkPVScaleFactorEntry* New();
   vtkTypeRevisionMacro(vtkPVScaleFactorEntry, vtkPVVectorEntry);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  // Description:
-  // This input menu supplies the data set.
-  virtual void SetInputMenu(vtkPVInputMenu*);
-  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
-  
+
   // Description:
   // This is called to update the menus if something (InputMenu) changes.
   virtual void Update();
@@ -46,15 +39,6 @@ public:
 
   vtkSetMacro(ScaleFactor, float);
   
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
- 
 protected:
   vtkPVScaleFactorEntry();
   ~vtkPVScaleFactorEntry();
@@ -68,10 +52,6 @@ protected:
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
                                 vtkPVXMLPackageParser* parser);  
   
-  vtkPVInputMenu *InputMenu;
-  vtkPVSource *Input;
-  void SetInput(vtkPVSource *input);
-
   float ScaleFactor;
 
 private:

@@ -227,6 +227,7 @@
         name="OutputWholeExtent" 
         command="SetOutputWholeExtent" 
         number_of_elements="6"> 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
    <!-- End ImageClip -->
    </SourceProxy>
@@ -740,6 +741,7 @@
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1175,6 +1177,7 @@
         command="SetCenter"
         number_of_elements="1"
         default_values="0.0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End ReflectionFilter -->
    </SourceProxy>
@@ -1221,6 +1224,12 @@
         command="SetWidth"
         number_of_elements="1"
         default_values="1" >
+       <DoubleRangeDomain name="range"/>
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1291,6 +1300,7 @@
         command="SetAngle"
         number_of_elements="1"
         default_values="360" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1298,6 +1308,7 @@
         command="SetTranslation"
         number_of_elements="1"
         default_values="0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1305,6 +1316,7 @@
         command="SetDeltaRadius"
         number_of_elements="1"
         default_values="0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End RotationalExtrusionFilter -->
    </SourceProxy>
@@ -1494,6 +1506,12 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+`       </BoundsDomain>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1513,6 +1531,7 @@
          command="SetRadiusFactor"
          number_of_elements="1"
          default_values="10" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End TubeFilter -->
    </SourceProxy>
@@ -1548,6 +1567,7 @@
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1606,6 +1626,7 @@
          command="SetScaleFactor"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End WarpVector -->
    </SourceProxy>
@@ -1907,6 +1928,7 @@
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1914,6 +1936,7 @@
         command="SetMaximumNumberOfPoints" 
         number_of_elements="1"
         default_values="5000" >
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -2038,6 +2061,18 @@
            </ArrayListDomain>
      </StringVectorProperty>
 
+     <DoubleVectorProperty
+        name="Radius"
+        number_of_elements="1"
+        default_values="0.1">
+        <DoubleRangeDomain name="range"/>
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+     </DoubleVectorProperty>
+
      <IntVectorProperty 
         name="MaximumPropagationUnit" 
         command="SetMaximumPropagationUnit" 
@@ -2054,6 +2089,12 @@
         command="SetMaximumPropagation"
         number_of_elements="1"
         default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2073,6 +2114,7 @@
         command="SetInitialIntegrationStep"
         number_of_elements="1"
         default_values="0.5" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2104,6 +2146,7 @@
         command="SetMaximumError"
         number_of_elements="1"
         default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2123,6 +2166,7 @@
         command="SetMinimumIntegrationStep"
         number_of_elements="1"
         default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2142,6 +2186,7 @@
         command="SetMaximumIntegrationStep"
         number_of_elements="1"
         default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -2149,6 +2194,7 @@
         command="SetMaximumNumberOfSteps" 
         number_of_elements="1"
         default_values="2000" >
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -2156,6 +2202,7 @@
         command="SetTerminalSpeed"
         number_of_elements="1"
         default_values="0.000000000001" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End StreamTracer -->
    </SourceProxy>

@@ -5,6 +5,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMBooleanDomain.cxx
+  vtkSMBoundsDomain.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx

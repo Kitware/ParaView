@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.6");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -288,6 +288,22 @@ int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
     }
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::SetAnimationValue(vtkSMProperty *property, int idx,
+                                            double value)
+{
+  if (!property)
+    {
+    return;
+    }
+  
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property);
+  if (ivp)
+    {
+    ivp->SetElement(idx, (int)(floor(value)));
+    }
 }
 
 //---------------------------------------------------------------------------

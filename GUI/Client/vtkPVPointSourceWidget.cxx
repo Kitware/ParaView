@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVPointSourceWidget.h"
 
+#include "vtkKWEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVInputMenu.h"
@@ -24,12 +25,14 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.29");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -151,20 +154,8 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                                        "SetAcceptButtonColorToModified");
   
   this->RadiusWidget->Create(app);
-  this->RadiusProperty = this->RadiusWidget->CreateAppropriateProperty();
-  this->RadiusProperty->SetWidget(this->RadiusWidget);
-  this->RadiusWidget->SetInputMenu(this->InputMenu);
-  if (this->InputMenu)
-    {
-    this->RadiusWidget->SetScaleFactor(this->RadiusScaleFactor);
-    }
-  else
-    {
-    this->RadiusWidget->SetValue(&this->DefaultRadius, 1);
-    }
-  
-  this->RadiusWidget->Update(); // so we can get the radius if we set the
-                                // scale factor
+  this->RadiusWidget->SetScaleFactor(this->RadiusScaleFactor);
+
   if (this->ShowEntries)
     {
     this->Script("pack %s -side top -fill both -expand true",
@@ -178,20 +169,12 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                     << this->SourceID << "SetNumberOfPoints"
                     << this->DefaultNumberOfPoints
                     << vtkClientServerStream::End;
-    if (this->InputMenu)
-      {
-      float radius;
-      this->RadiusWidget->GetValue(&radius, 1);
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << this->SourceID << "SetRadius" << radius
-                      << vtkClientServerStream::End;
-      }
-    else
-      {
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->SourceID << "SetRadius" << this->DefaultRadius
-                      << vtkClientServerStream::End;
-      }
+    float radius;
+    this->RadiusWidget->GetValue(&radius, 1);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->SourceID << "SetRadius" << radius
+                    << vtkClientServerStream::End;
+
     this->OutputID = pm->NewStreamObject("vtkPolyData");
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->SourceID << "SetOutput" << this->OutputID 
@@ -270,10 +253,29 @@ void vtkPVPointSourceWidget::AcceptInternal(vtkClientServerID)
   if (this->GetModifiedFlag())
     {
     this->PointWidget->AcceptInternal(this->SourceID);
-    this->RadiusWidget->AcceptInternal(this->SourceID);
-    this->NumberOfPointsWidget->AcceptInternal(this->SourceID);
+    this->AcceptRadiusAndNumberOfPointsInternal();
     }
   this->ModifiedFlag = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::AcceptRadiusAndNumberOfPointsInternal()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->SourceID.ID && pvApp)
+    {
+    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID
+                    << "SetNumberOfPoints"
+                    << this->NumberOfPointsWidget->GetEntry(0)->GetValueAsInt()
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID
+                    << "SetRadius"
+                    << this->RadiusWidget->GetEntry(0)->GetValueAsFloat()
+                    << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -357,6 +359,12 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     {
     this->ShowEntries = 1;
     }
+
+  const char *radius_property = element->GetAttribute("radius_property");
+  if (radius_property)
+    {
+    this->RadiusWidget->SetSMPropertyName(radius_property);
+    }
   
   return 1;
 }
@@ -380,6 +388,9 @@ void vtkPVPointSourceWidget::CopyProperties(
     psw->SetDefaultRadius(this->DefaultRadius);
     psw->SetDefaultNumberOfPoints(this->DefaultNumberOfPoints);
     psw->SetShowEntries(this->ShowEntries);
+    psw->GetRadiusWidget()->SetSMPropertyName(
+      this->RadiusWidget->GetSMPropertyName());
+    psw->GetNumberOfPointsWidget()->SetDataType(VTK_INT);
     }
 }
 

@@ -45,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVWidget, "1.50");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -489,4 +489,13 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseWidgetRange: " << this->UseWidgetRange << endl;
   os << indent << "WidgetRange: " << this->WidgetRange[0] << " "
      << this->WidgetRange[1] << endl;
+  os << indent << "SMPropertyName: ";
+  if (this->SMPropertyName)
+    {
+    os << this->SMPropertyName << endl;
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

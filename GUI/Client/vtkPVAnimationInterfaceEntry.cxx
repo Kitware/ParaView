@@ -38,7 +38,8 @@
 #include "vtkKWScale.h"
 #include "vtkKWLabeledRadioButtonSet.h"
 #include "vtkKWRadioButtonSet.h"
-
+#include "vtkSMProperty.h"
+#include "vtkSMDomain.h"
 
 #include <vtkstd/string>
 
@@ -75,10 +76,14 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.39");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
+vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMProperty,
+                     vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
+                     vtkSMDomain);
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -133,6 +138,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->ScriptEditorDirty = 0;
   
   this->CurrentProperty = NULL;
+  this->CurrentSMProperty = NULL;
+  this->CurrentSMDomain = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -431,6 +438,8 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->TimeScriptEntryFrame->Delete();
 
   this->SetCurrentProperty(NULL);
+  this->SetCurrentSMProperty(NULL);
+  this->SetCurrentSMDomain(NULL);
 }
  
 //-----------------------------------------------------------------------------
@@ -1133,10 +1142,24 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
       {
       *file << "$kw(" << this->GetTclName() << ") SetCurrentMethod {"
             << this->CurrentMethod << "}" << endl;
-      *file << "$kw(" << this->GetTclName() << ") SetCurrentProperty [["
-            << "$kw(" << this->GetPVSource()->GetTclName()
-            << ") GetPVWidget {" << this->GetTraceName() << "}] GetProperty]"
-            << endl;
+      if (this->CurrentProperty)
+        {
+        *file << "$kw(" << this->GetTclName() << ") SetCurrentProperty [["
+              << "$kw(" << this->GetPVSource()->GetTclName()
+              << ") GetPVWidget {" << this->GetTraceName() << "}] GetProperty]"
+              << endl;
+        }
+      else if (this->CurrentSMProperty && this->CurrentSMDomain)
+        {
+        *file << "$kw(" << this->GetTclName() << ") SetCurrentSMProperty [["
+              << "$kw(" << this->GetPVSource()->GetTclName()
+              << ") GetPVWidget {" << this->GetTraceName()
+              << "}] GetSMProperty]" << endl;
+        *file << "$kw(" << this->GetTclName() << ") SetCurrentSMDomain [["
+              << "$kw(" <<this->GetTclName()
+              << ") GetCurrentSMProperty] GetDomain {range}]" << endl;
+        }
+
       //*file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {"
       //<< this->CurrentMethod << "} \"\" " 
       //<< this->GetTraceName() << endl;
@@ -1261,6 +1284,8 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
   
   os << indent << "CurrentProperty: " << this->CurrentProperty << endl;
+  os << indent << "CurrentSMProperty: " << this->CurrentSMProperty << endl;
+  os << indent << "CurrentSMDomain: " << this->CurrentSMDomain << endl;
   
   os << indent << "CustomScript: " << this->CustomScript << endl;
 }

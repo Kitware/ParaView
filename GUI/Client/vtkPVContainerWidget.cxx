@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.26");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -132,7 +132,14 @@ void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)
     {
     prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
     widget = prop->GetWidget();
-    widget->AcceptInternal(sourceID);
+    if (widget->GetSMProperty())
+      {
+      widget->Accept();
+      }
+    else
+      {
+      widget->AcceptInternal(sourceID);
+      }
     it->GoToNextItem();
     }
   it->Delete();

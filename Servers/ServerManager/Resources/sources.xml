@@ -560,6 +560,7 @@
          command="SetSize"
          number_of_elements="1"
          default_values="0.5" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -592,6 +593,7 @@
          command="SetMaximum"
          number_of_elements="1"
          default_values="255.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -599,6 +601,7 @@
          command="SetXFreq"
          number_of_elements="1"
          default_values="60.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -606,6 +609,7 @@
          command="SetYFreq"
          number_of_elements="1"
          default_values="30.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -613,6 +617,7 @@
          command="SetZFreq"
          number_of_elements="1"
          default_values="40.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -620,6 +625,7 @@
          command="SetXMag"
          number_of_elements="1"
          default_values="10.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -627,6 +633,7 @@
          command="SetYMag"
          number_of_elements="1"
          default_values="18.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -634,6 +641,7 @@
          command="SetZMag"
          number_of_elements="1"
          default_values="5.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -641,6 +649,7 @@
          command="SetStandardDeviation"
          number_of_elements="1"
          default_values="0.5" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End Wavelet -->
    </SourceProxy>

@@ -35,6 +35,8 @@ class vtkPVWidgetProperty;
 class vtkKWLabeledOptionMenu;
 class vtkKWScale;
 class vtkKWThumbWheel;
+class vtkSMProperty;
+class vtkSMDomain;
 
 class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWWidget
 {
@@ -67,6 +69,12 @@ public:
   void SetCurrentProperty(vtkPVWidgetProperty *prop);
   vtkGetObjectMacro(CurrentProperty, vtkPVWidgetProperty);
   
+  void SetCurrentSMProperty(vtkSMProperty *prop);
+  vtkGetObjectMacro(CurrentSMProperty, vtkSMProperty);
+  
+  void SetCurrentSMDomain(vtkSMDomain *domain);
+  vtkGetObjectMacro(CurrentSMDomain, vtkSMDomain);
+
   void SetTimeStart(float f);
 
   void SetTimeEnd(float f);
@@ -235,6 +243,8 @@ protected:
   vtkGetStringMacro(TraceName);
 
   vtkPVWidgetProperty *CurrentProperty;
+  vtkSMProperty *CurrentSMProperty;
+  vtkSMDomain *CurrentSMDomain;
   
   float TimeStart;
   float TimeEnd;

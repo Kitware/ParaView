@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.7");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -289,6 +289,23 @@ int vtkSMDoubleRangeDomain::ReadXMLAttributes(
     }
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::SetAnimationValue(vtkSMProperty *property,
+                                               int idx, double value)
+{
+  if (!property)
+    {
+    return;
+    }
+  
+  vtkSMDoubleVectorProperty *dvp =
+    vtkSMDoubleVectorProperty::SafeDownCast(property);
+  if (dvp)
+    {
+    dvp->SetElement(idx, value);
+    }
 }
 
 //---------------------------------------------------------------------------

@@ -38,6 +38,9 @@
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWidgetProperty.h"
+#include "vtkSMDomain.h"
+#include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVWindow.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkJPEGWriter.h"
@@ -179,7 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.134");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -942,15 +945,28 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
       else
         {
         vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        vtkSMProperty *smProp = entry->GetCurrentSMProperty();
+        vtkSMDomain *smDomain = entry->GetCurrentSMDomain();
         if (prop)
           {
           this->Script(entry->GetTimeEquation());
           prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
           prop->GetWidget()->ModifiedCallback();
+          if ( entry->GetPVSource() )
+            {
+            entry->GetPVSource()->UpdateVTKSourceParameters();
+            }
           }
-        if ( entry->GetPVSource() )
+        else if (smProp && smDomain)
           {
-          entry->GetPVSource()->UpdateVTKSourceParameters();
+          this->Script(entry->GetTimeEquation());
+          smDomain->SetAnimationValue(smProp, 0,
+                                      vtkKWObject::GetFloatResult(pvApp));
+          if (entry->GetPVSource() && entry->GetPVSource()->GetProxy())
+            {
+            entry->GetPVSource()->GetProxy()->UpdateVTKObjects();
+            entry->GetPVSource()->ResetCallback();
+            }
           }
         }
       }
