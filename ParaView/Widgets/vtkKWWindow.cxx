@@ -187,7 +187,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, const char* menuEntry,
     file[0] = pos + '0';
     ostrstream str;
     str << this->Command << " \"" << this->FullFile << "\"" << ends;
-    menu->InsertCommand( menu->GetIndex(menuEntry) - 1, 
+    menu->InsertCommand( menu->GetIndex(menuEntry), 
 			 file, this->Target, str.str(), 0 );
     delete [] file;
     delete [] str.str();
@@ -913,9 +913,6 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
     {
     this->SetRecentFilesMenuTag("Close");
     }
-  this->GetMenuFile()->InsertSeparator(
-    this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);
-
   for (i = this->NumberOfRecentFiles-1; i >=0; i--)
     {
     sprintf(KeyNameP, "File%d", i);
@@ -937,11 +934,6 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
 void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
                                 const char *command)
 {
-  if ( this->RealNumberOfMRUFiles == 0 )
-    {
-    this->GetMenuFile()->InsertSeparator(
-      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);    
-    }
   this->InsertRecentFileToMenu(name, target, command);
   this->UpdateRecentMenu(key);
   this->StoreRecentMenuToRegistery(key);
@@ -971,7 +963,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.75 $");
+  this->ExtractRevision(os,"$Revision: 1.76 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1000,7 +992,12 @@ void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
   for ( cc = 0; cc < this->RealNumberOfMRUFiles; cc ++ )
     {
     this->GetMenuFile()->DeleteMenuItem(
-      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 2);
+      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);
+    }
+  if ( this->RealNumberOfMRUFiles )
+    {
+    this->GetMenuFile()->DeleteMenuItem(
+      this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);
     }
   this->RealNumberOfMRUFiles = 0;
   if ( this->RecentFiles )
@@ -1015,6 +1012,11 @@ void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
 			 this->GetMenuFile());
 	this->RealNumberOfMRUFiles ++;
 	}
+      }
+    if ( this->NumberOfRecentFiles )
+      {
+      this->GetMenuFile()->InsertSeparator(
+	this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()));    
       }
     }
   //this->PrintRecentFiles();
