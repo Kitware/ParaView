@@ -27,6 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkMultiProcessController.h"
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 
@@ -104,10 +106,17 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
   // Here we are going to create a single slave renderer in another process.
   // (As a test)
   vtkPVApplication *pvApp = (vtkPVApplication *)(app);
-  pvApp->RemoteScript(0, "vtkPVRenderSlave RenderSlave", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkPVRenderSlave RenderSlave", NULL, 0);
   // The global "Slave" was setup when the process was initiated.
-  pvApp->RemoteScript(0, "RenderSlave SetPVSlave Slave", NULL, 0);
-   
+  pvApp->RemoteSimpleScript(0, "RenderSlave SetPVSlave Slave", NULL, 0);
+  
+  // lets show something as a test.
+  pvApp->RemoteSimpleScript(0, "vtkSphereSource SphereSource", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper SphereMapper", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "SphereMapper SetInput [SphereSource GetOutput]", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkActor SphereActor", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "SphereActor SetMapper SphereMapper", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor SphereActor", NULL, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -215,5 +224,49 @@ void vtkPVRenderView::AKeyPress(char key, int x, int y)
     {
     this->InteractorStyle->OnChar(0, 0, key, 1);
     }
+}
+
+
+
+//----------------------------------------------------------------------------
+// A method for testing the remote rendering.
+void vtkPVRenderView::Render()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication*)(this->Application);
+  vtkRenderWindow *renWin;
+  float *zdata, *pdata;
+  int *window_size;
+  int total_pixels;
+  int pdata_size, zdata_size;
+  vtkMultiProcessController *controller;
+  
+  renWin = this->GetRenderWindow();
+  
+  this->vtkKWRenderView::Render();
+  
+  controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  
+  window_size = this->RenderWindow->GetSize();
+  total_pixels = window_size[0] * window_size[1];
+  zdata_size = total_pixels;
+  pdata_size = 4*total_pixels;
+
+  zdata = new float[zdata_size];
+  pdata = new float[pdata_size];
+  
+  // Make sure the render slave size matches our size
+  pvApp->RemoteScript(0, "[RenderSlave GetRenderWindow] SetSize %d %d", window_size[0], window_size[1]);
+  
+  // Render and get the data.
+  pvApp->RemoteSimpleScript(0, "RenderSlave Render", NULL, 0);
+  
+  controller->Receive(zdata, zdata_size, 0, 99);
+  controller->Receive(pdata, pdata_size, 0, 99);
+
+  renWin->SetRGBAPixelData(0,0,window_size[0]-1, \
+			   window_size[1]-1,pdata,1);
+  //((vtkMesaRenderWindow *)renWin)-> \ 
+  //  SetRGBACharPixelData(0,0, window_size[0]-1, \
+  //			 window_size[1]-1,pdata,1);
 }
 

@@ -78,8 +78,111 @@ vtkPVRenderSlave::~vtkPVRenderSlave()
 //----------------------------------------------------------------------------
 void vtkPVRenderSlave::Render()
 {
+  float *zdata, *pdata;
+  int *window_size;
+  int total_pixels;
+  int pdata_size, zdata_size;
+  int myId, numProcs, masterId;
+  vtkMultiProcessController *controller;
+
   this->RenderWindow->Render();
-  .....
+
+  controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  myId = controller->GetLocalProcessId();
+  numProcs = controller->GetNumberOfProcesses();
+  // Makes an assumption about how the tasks are setup.
+  masterId = numProcs - 1;
+  
+  window_size = renWin->GetSize();
+  total_pixels = window_size[0] * window_size[1];
+
+  zdata = renWin->GetZbufferData(0,0,window_size[0]-1, window_size[1]-1);
+  zdata_size = total_pixels;
+
+  pdata = renWin->GetRGBAPixelData(0,0,window_size[0]-1, \
+				   window_size[1]-1,1);
+  pdata_size = 4*total_pixels;
+  // pdata = ((vtkMesaRenderWindow *)renWin)->GetRGBACharPixelData(0,0,window_size[0]-1,window_size[1]-1,1);    
+  // pdata_size = total_pixels;
+
+  controller->Send(zdata, zdata_size, masterId, 99);
+  controller->Send(pdata, pdata_size, masterId, 99);
+
+  controller->UnRegister(NULL);
+}
+
+  window_size = renWin->GetSize();
+  total_pixels = window_size[0] * window_size[1];
+
+  zdata = this->RenderWindow->GetZbufferData(0,0,window_size[0]-1, window_size[1]-1);
+  zdata_size = total_pixels;
+
+  if (flag) { 
+    pdata = renWin->GetRGBAPixelData(0,0,window_size[0]-1, \
+				     window_size[1]-1,1);
+    pdata_size = 4*total_pixels;
+  } else {
+    pdata = ((vtkMesaRenderWindow *)renWin)-> \
+      GetRGBACharPixelData(0,0,window_size[0]-1,window_size[1]-1,1);    
+    pdata_size = total_pixels;
+  }
+
+  double double_log_npes = log((double)npes)/log((double)2);
+  int log_npes = (int)double_log_npes;
+
+  // not a power of 2 -- need an additional level
+  if (double_log_npes != (double)log_npes) {
+    log_npes++;
+  }
+
+  int i, id;
+
+  for (i = 0; i < log_npes; i++) {
+    if ((self % (int)pow2(i)) == 0) { // Find participants
+      
+      if ((self % (int)pow2(i+1)) < pow2(i)) {
+	// receivers
+	id = self+pow2(i);
+
+	// only send or receive if sender or receiver id is valid
+	// (handles non-power of 2 cases)
+
+	if (id < npes) {
+	  //cerr << "phase " << i << " receiver: " << self 
+	  //     << " receives data from " << id << endl;
+	  controller->Receive(g_zdata, zdata_size, id, 99);
+	  controller->Receive(g_pdata, pdata_size, id, 99);
+
+	  // notice the result is stored as the local data 
+	  vtkCompositeImagePair(zdata, pdata, g_zdata, g_pdata, \
+				total_pixels, flag);
+	}
+      } else {
+	id = self-pow2(i);
+	if (id < npes) {
+	  // cerr << i << " sender: " << self << " sends data to " 
+	  //      << id << endl;
+	  controller->Send(zdata, zdata_size, id, 99);
+	  controller->Send(pdata, pdata_size, id, 99);
+
+	}
+      }
+    }
+  }
+
+  
+  if (self ==0) {
+    if (flag) {
+      renWin->SetRGBAPixelData(0,0,window_size[0]-1, \
+				  window_size[1]-1,pdata,1);
+    } else {
+	  ((vtkMesaRenderWindow *)renWin)-> \
+	    SetRGBACharPixelData(0,0, window_size[0]-1, \
+				 window_size[1]-1,pdata,1);
+    }
+  }
+
+  controller->UnRegister(NULL);
 }
 
 //----------------------------------------------------------------------------

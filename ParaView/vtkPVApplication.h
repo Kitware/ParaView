@@ -44,10 +44,16 @@ public:
   // Start running the main application.
   virtual void Start(int argc, char *argv[]);
 
+  
+//BTX
   // Description:
   // Script which is executed in the remot processes.
   // If a result string is passed in, the results are place in it. 
-  void RemoteScript(int remoteId, char *str, char *result, int resultMax);
+  void RemoteScript(int remoteId, char *EventString, ...);
+  void RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax);
+//ETX
+  
+
   
   // Description:
   // Display the on-line help and about dialog for this application.

@@ -23,6 +23,7 @@ vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
 vtkPVRenderView \
+vtkPVRenderSlave \
 vtkPVSlave \
 vtkPVWindow 
 

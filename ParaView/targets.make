@@ -787,9 +787,12 @@ vtkPVApplication.o : ./vtkPVApplication.cxx  \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
   ../Widgets/vtkKWDialog.h \
   ../Widgets/vtkKWWindowCollection.h \
+  /home/lawcc/vtk/contrib/vtkMultiProcessController.h \
+  /home/lawcc/vtk/common/vtkMultiThreader.h \
   ../Widgets/vtkKWMessageDialog.h \
   /home/lawcc/vtk/common/vtkTimerLog.h \
-  /home/lawcc/vtk/common/vtkObjectFactory.h
+  /home/lawcc/vtk/common/vtkObjectFactory.h \
+  ./vtkPVSlave.h
 
 vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   ./vtkPVRenderView.h \
@@ -891,6 +894,90 @@ vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
   ./vtkDummyRenderWindowInteractor.h \
+  /home/lawcc/vtk/common/vtkObjectFactory.h
+
+vtkPVRenderSlave.o : ./vtkPVRenderSlave.cxx  \
+  ./vtkPVRenderSlave.h \
+  ../Widgets/vtkKWObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ./vtkPVSlave.h \
+  /home/lawcc/vtk/graphics/vtkRenderWindow.h \
+  /home/lawcc/vtk/common/vtkWindow.h \
+  /home/lawcc/vtk/graphics/vtkRendererCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/graphics/vtkRenderer.h \
+  /home/lawcc/vtk/common/vtkMatrix4x4.h \
+  /home/lawcc/vtk/graphics/vtkLightCollection.h \
+  /home/lawcc/vtk/graphics/vtkLight.h \
+  /home/lawcc/vtk/graphics/vtkVolumeCollection.h \
+  /home/lawcc/vtk/common/vtkPropCollection.h \
+  /home/lawcc/vtk/graphics/vtkCullerCollection.h \
+  /home/lawcc/vtk/graphics/vtkCamera.h \
+  /home/lawcc/vtk/common/vtkTransform.h \
+  /home/lawcc/vtk/common/vtkLinearTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
+  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkPoints.h \
+  /home/lawcc/vtk/common/vtkAttributeData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkNormals.h \
+  /home/lawcc/vtk/common/vtkVectors.h \
+  /home/lawcc/vtk/common/vtkMutexLock.h \
+  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/graphics/vtkActor.h \
+  /home/lawcc/vtk/graphics/vtkProp3D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/graphics/vtkProperty.h \
+  /home/lawcc/vtk/graphics/vtkRender.h \
+  /home/lawcc/vtk/common/vtkStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkImageData.h \
+  /home/lawcc/vtk/common/vtkDataSet.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkCellData.h \
+  /home/lawcc/vtk/common/vtkDataSetAttributes.h \
+  /home/lawcc/vtk/common/vtkScalars.h \
+  /home/lawcc/vtk/common/vtkTCoords.h \
+  /home/lawcc/vtk/common/vtkTensors.h \
+  /home/lawcc/vtk/common/vtkTensor.h \
+  /home/lawcc/vtk/common/vtkPointData.h \
+  /home/lawcc/vtk/common/vtkGenericCell.h \
+  /home/lawcc/vtk/common/vtkCell.h \
+  /home/lawcc/vtk/common/vtkCellType.h \
+  /home/lawcc/vtk/common/vtkCellTypes.h \
+  /home/lawcc/vtk/common/vtkStructuredData.h \
+  /home/lawcc/vtk/graphics/vtkTexture.h \
+  /home/lawcc/vtk/common/vtkLookupTable.h \
+  /home/lawcc/vtk/common/vtkScalarsToColors.h \
+  /home/lawcc/vtk/common/vtkUnsignedCharArray.h \
+  /home/lawcc/vtk/common/vtkImageToStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkSource.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/graphics/vtkMapper.h \
+  /home/lawcc/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkPlaneCollection.h \
+  /home/lawcc/vtk/common/vtkPlane.h \
+  /home/lawcc/vtk/common/vtkImplicitFunction.h \
+  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
+  /home/lawcc/vtk/common/vtkActor2D.h \
+  /home/lawcc/vtk/common/vtkCoordinate.h \
+  /home/lawcc/vtk/common/vtkProperty2D.h \
+  /home/lawcc/vtk/common/vtkViewport.h \
+  /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkMesaRenderWindow.h \
+  /home/lawcc/vtk/graphics/vtkXRenderWindow.h \
+  /home/lawcc/vtk/graphics/vtkMesaRenderer.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
 vtkPVSlave.o : ./vtkPVSlave.cxx  \
@@ -1026,6 +1113,7 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/lawcc/vtk/common/vtkCellLinks.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h \
   ../Widgets/vtkKWDialog.h \
+  ./vtkPVApplication.h \
   ./vtkInteractorStylePlaneSource.h \
   /home/lawcc/vtk/graphics/vtkPlaneSource.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
@@ -1853,6 +1941,85 @@ tcl/vtkPVRenderViewTcl.cxx : ./vtkPVRenderView.h /home/lawcc/vtk/common/vtkTclUt
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h
 
+tcl/vtkPVRenderSlaveTcl.cxx : ./vtkPVRenderSlave.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ./vtkPVSlave.h \
+  /home/lawcc/vtk/graphics/vtkRenderWindow.h \
+  /home/lawcc/vtk/common/vtkWindow.h \
+  /home/lawcc/vtk/graphics/vtkRendererCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/graphics/vtkRenderer.h \
+  /home/lawcc/vtk/common/vtkMatrix4x4.h \
+  /home/lawcc/vtk/graphics/vtkLightCollection.h \
+  /home/lawcc/vtk/graphics/vtkLight.h \
+  /home/lawcc/vtk/graphics/vtkVolumeCollection.h \
+  /home/lawcc/vtk/common/vtkPropCollection.h \
+  /home/lawcc/vtk/graphics/vtkCullerCollection.h \
+  /home/lawcc/vtk/graphics/vtkCamera.h \
+  /home/lawcc/vtk/common/vtkTransform.h \
+  /home/lawcc/vtk/common/vtkLinearTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
+  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkPoints.h \
+  /home/lawcc/vtk/common/vtkAttributeData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkNormals.h \
+  /home/lawcc/vtk/common/vtkVectors.h \
+  /home/lawcc/vtk/common/vtkMutexLock.h \
+  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/graphics/vtkActor.h \
+  /home/lawcc/vtk/graphics/vtkProp3D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/graphics/vtkProperty.h \
+  /home/lawcc/vtk/graphics/vtkRender.h \
+  /home/lawcc/vtk/common/vtkStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkImageData.h \
+  /home/lawcc/vtk/common/vtkDataSet.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkCellData.h \
+  /home/lawcc/vtk/common/vtkDataSetAttributes.h \
+  /home/lawcc/vtk/common/vtkScalars.h \
+  /home/lawcc/vtk/common/vtkTCoords.h \
+  /home/lawcc/vtk/common/vtkTensors.h \
+  /home/lawcc/vtk/common/vtkTensor.h \
+  /home/lawcc/vtk/common/vtkPointData.h \
+  /home/lawcc/vtk/common/vtkGenericCell.h \
+  /home/lawcc/vtk/common/vtkCell.h \
+  /home/lawcc/vtk/common/vtkCellType.h \
+  /home/lawcc/vtk/common/vtkCellTypes.h \
+  /home/lawcc/vtk/common/vtkStructuredData.h \
+  /home/lawcc/vtk/graphics/vtkTexture.h \
+  /home/lawcc/vtk/common/vtkLookupTable.h \
+  /home/lawcc/vtk/common/vtkScalarsToColors.h \
+  /home/lawcc/vtk/common/vtkUnsignedCharArray.h \
+  /home/lawcc/vtk/common/vtkImageToStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkSource.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/graphics/vtkMapper.h \
+  /home/lawcc/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkPlaneCollection.h \
+  /home/lawcc/vtk/common/vtkPlane.h \
+  /home/lawcc/vtk/common/vtkImplicitFunction.h \
+  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
+  /home/lawcc/vtk/common/vtkActor2D.h \
+  /home/lawcc/vtk/common/vtkCoordinate.h \
+  /home/lawcc/vtk/common/vtkProperty2D.h \
+  /home/lawcc/vtk/common/vtkViewport.h \
+  /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h
+
 tcl/vtkPVSlaveTcl.cxx : ./vtkPVSlave.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ../Widgets/vtkKWObject.h \
   /home/lawcc/vtk/common/vtkObject.h \
@@ -2065,6 +2232,7 @@ vtkInteractorStyleSphere.o \
 vtkKWRenderView.o \
 vtkPVApplication.o \
 vtkPVRenderView.o \
+vtkPVRenderSlave.o \
 vtkPVSlave.o \
 vtkPVWindow.o \
 vtkInteractorStyleExtent.o 
@@ -2079,6 +2247,7 @@ tcl/vtkInteractorStyleSphereTcl.o \
 tcl/vtkKWRenderViewTcl.o \
 tcl/vtkPVApplicationTcl.o \
 tcl/vtkPVRenderViewTcl.o \
+tcl/vtkPVRenderSlaveTcl.o \
 tcl/vtkPVSlaveTcl.o \
 tcl/vtkPVWindowTcl.o \
 tcl/vtkInteractorStyleExtentTcl.o 
@@ -2093,6 +2262,7 @@ vtkInteractorStyleSphere.h \
 vtkKWRenderView.h \
 vtkPVApplication.h \
 vtkPVRenderView.h \
+vtkPVRenderSlave.h \
 vtkPVSlave.h \
 vtkPVWindow.h 
 
@@ -2114,6 +2284,8 @@ tcl/vtkPVApplicationTcl.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wr
 	rm -f tcl/vtkPVApplicationTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVApplicationTcl.cxx
 tcl/vtkPVRenderViewTcl.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVRenderViewTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVRenderView.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVRenderViewTcl.cxx
+tcl/vtkPVRenderSlaveTcl.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVRenderSlaveTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVRenderSlaveTcl.cxx
 tcl/vtkPVSlaveTcl.cxx: vtkPVSlave.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVSlaveTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVSlave.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVSlaveTcl.cxx
 tcl/vtkPVWindowTcl.cxx: vtkPVWindow.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
@@ -2130,6 +2302,7 @@ JAVA_CLASSES = \
 ../java/vtk/vtkKWRenderView.java \
 ../java/vtk/vtkPVApplication.java \
 ../java/vtk/vtkPVRenderView.java \
+../java/vtk/vtkPVRenderSlave.java \
 ../java/vtk/vtkPVSlave.java \
 ../java/vtk/vtkPVWindow.java \
 ../java/vtk/vtkInteractorStyleExtent.java 
@@ -2144,6 +2317,7 @@ JAVA_CODE = \
 ../java/vtk/vtkKWRenderView.class \
 ../java/vtk/vtkPVApplication.class \
 ../java/vtk/vtkPVRenderView.class \
+../java/vtk/vtkPVRenderSlave.class \
 ../java/vtk/vtkPVSlave.class \
 ../java/vtk/vtkPVWindow.class \
 ../java/vtk/vtkInteractorStyleExtent.class 
@@ -2158,6 +2332,7 @@ java/vtkInteractorStyleSphereJava.o \
 java/vtkKWRenderViewJava.o \
 java/vtkPVApplicationJava.o \
 java/vtkPVRenderViewJava.o \
+java/vtkPVRenderSlaveJava.o \
 java/vtkPVSlaveJava.o \
 java/vtkPVWindowJava.o \
 java/vtkInteractorStyleExtentJava.o 
@@ -2198,6 +2373,10 @@ java/vtkPVApplicationJava.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapJava ..
 	rm -f ../java/vtk/vtkPVRenderView.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVRenderView.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVRenderView.java
 java/vtkPVRenderViewJava.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkPVRenderViewJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVRenderView.h ${srcdir}/../wrap/hints 1 > java/vtkPVRenderViewJava.cxx
+../java/vtk/vtkPVRenderSlave.java: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVRenderSlave.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVRenderSlave.java
+java/vtkPVRenderSlaveJava.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVRenderSlaveJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > java/vtkPVRenderSlaveJava.cxx
 ../java/vtk/vtkPVSlave.java: vtkPVSlave.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkPVSlave.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVSlave.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVSlave.java
 java/vtkPVSlaveJava.cxx: vtkPVSlave.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -2220,6 +2399,7 @@ python/vtkInteractorStyleSpherePython.o \
 python/vtkKWRenderViewPython.o \
 python/vtkPVApplicationPython.o \
 python/vtkPVRenderViewPython.o \
+python/vtkPVRenderSlavePython.o \
 python/vtkPVSlavePython.o \
 python/vtkPVWindowPython.o \
 python/vtkInteractorStyleExtentPython.o 
@@ -2242,6 +2422,8 @@ python/vtkPVApplicationPython.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapPyt
 	rm -f python/vtkPVApplicationPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 0 > python/vtkPVApplicationPython.cxx
 python/vtkPVRenderViewPython.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVRenderViewPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVRenderView.h ${srcdir}/../wrap/hints 0 > python/vtkPVRenderViewPython.cxx
+python/vtkPVRenderSlavePython.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVRenderSlavePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 0 > python/vtkPVRenderSlavePython.cxx
 python/vtkPVSlavePython.cxx: vtkPVSlave.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVSlavePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVSlave.h ${srcdir}/../wrap/hints 0 > python/vtkPVSlavePython.cxx
 python/vtkPVWindowPython.cxx: vtkPVWindow.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints

@@ -66,6 +66,9 @@ public:
   // Special binding added to this subclass.
   void MotionCallback(int x, int y);
 
+  // Description:
+  // Composites the remote renderers image into the renderwindow...
+  void Render();
 
 protected:
   vtkPVRenderView();

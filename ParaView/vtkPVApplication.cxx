@@ -58,8 +58,22 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationName("ParaView");
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVApplication::RemoteScript(int remoteId, char *str, char *result, int resultMax)
+void vtkPVApplication::RemoteScript(int id, char *format, ...)
+{
+  static char event[16000];
+  
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  this->RemoteSimpleScript(id, event, NULL, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax)
 {
   int length;
   vtkMultiProcessController *controller;
