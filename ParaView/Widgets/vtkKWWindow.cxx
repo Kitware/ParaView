@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.140");
+vtkCxxRevisionMacro(vtkKWWindow, "1.141");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1112,7 +1112,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.140 $");
+  this->ExtractRevision(os,"$Revision: 1.141 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1325,21 +1325,24 @@ void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
     level, "RunTime", key, "Color: %f %f %f", rgb[0], rgb[1], rgb[2]);
 }
 
-void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
+int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
 {
   char buffer[1024];
   rgb[0] = -1;
   rgb[1] = -1;
   rgb[2] = -1;
 
-  if ( this->GetApplication()->GetRegisteryValue(
-         level, "RunTime", key, buffer) )
+  int ok = 0;
+  if (this->GetApplication()->GetRegisteryValue(
+        level, "RunTime", key, buffer) )
     {
-    if ( *buffer )
+    if (*buffer)
       {      
       sscanf(buffer, "Color: %f %f %f", rgb, rgb+1, rgb+2);
+      ok = 1;
       }
     }
+  return ok;
 }
 
 int vtkKWWindow::BooleanRegisteryCheck(int level, 

@@ -284,9 +284,9 @@ public:
   
   // Description:
   // Save or retrieve color from registery. If color does not 
-  // exist, it will retrieve -1, -1 ,-1.
+  // exist, it will retrieve -1, -1 ,-1 and return 0 (1 if success).
   void SaveColor(int level, const char*, float rgb[3]);
-  void RetrieveColor(int level, const char*, float rgb[3]);
+  int RetrieveColor(int level, const char*, float rgb[3]);
 
   // Description:
   // Save or retrieve the last path of the dialog to the registery.
