@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.1");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -439,8 +439,7 @@ vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index,
     fn_with_warning_C4701 << path;
     }
   fn_with_warning_C4701
-    << this->FilePrefix.c_str() << "_" << index << "."
-    << this->Writers[index]->GetDefaultFileExtension() << ends;
+    << this->FilePrefix.c_str() << "_" << index << ".pva" << ends;
   fname = fn_with_warning_C4701.str();
   fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
