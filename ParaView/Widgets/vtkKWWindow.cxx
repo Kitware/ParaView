@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.7");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.8");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -983,7 +983,7 @@ void vtkKWWindow::CreatePreferencesProperties()
   this->InterfaceSettingsShowBalloonHelpCheck->SetParent(
     this->InterfaceSettingsFrame->GetFrame());
   this->InterfaceSettingsShowBalloonHelpCheck->Create(
-    this->Application, "-text {Show balloon help}");
+    this->Application, "-text {Show tooltips}");
 
   if (this->Application->HasRegisteryValue(
     2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
@@ -1302,7 +1302,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.7 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.8 $");
 }
 
 int vtkKWWindow::ExitDialog()
