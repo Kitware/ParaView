@@ -57,6 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 
+class vtkPVAnimationInterface;
+
+
 class VTK_EXPORT vtkPVWidget : public vtkKWWidget
 {
 public:
@@ -114,6 +117,13 @@ public:
   // Save this widget to a file.  
   virtual void SaveInTclScript(ofstream *file);
   
+  // Description:
+  // This mehtod is used by the animation editor to access all the animation 
+  // scripts available to modify the object.  The menu commands set the
+  // script of the editor.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu* menu, 
+                                 vtkPVAnimationInterface *object) {};
+
 protected:
   vtkPVWidget();
   ~vtkPVWidget();

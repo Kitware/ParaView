@@ -40,8 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVVectorEntry.h"
+#include "vtkPVAnimationInterface.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWEntry.h"
+#include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVVectorEntry::New()
@@ -65,6 +67,7 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   this->SubLabels = vtkKWWidgetCollection::New();
 
   this->ScriptValue = NULL;
+  this->DataType = VTK_FLOAT;
 }
 
 //---------------------------------------------------------------------------
@@ -332,3 +335,26 @@ void vtkPVVectorEntry::SaveInTclScript(ofstream *file)
   *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
   *file << " " << this->ScriptValue << "\n";
 }
+
+//----------------------------------------------------------------------------
+void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+                                                 vtkPVAnimationInterface *ai)
+{
+  if (this->Entries->GetNumberOfItems() == 1)
+    {
+    char methodAndArgs[500];
+    // I do not like setting the label like this but ...
+    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
+      {
+      sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s [expr int($pvTime)]}", 
+              this->Label->GetLabel(), this->ObjectTclName, this->VariableName);
+      }
+    else
+      {
+      sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s $pvTime}", 
+              this->Label->GetLabel(), this->ObjectTclName, this->VariableName);
+      }
+    menu->AddCommand(this->Label->GetLabel(), ai, methodAndArgs, 0, "");
+    }
+}
+

@@ -39,7 +39,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkPVWindow.h"
+#include "vtkPVWidget.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkKWWidgetCollection.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -615,6 +617,15 @@ void vtkPVAnimationInterface::SetScript(const char* script)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
+                                                const char* script)
+{
+  this->SetScript(script);
+  this->MethodMenuButton->SetButtonText(label);
+}
+
+
+//----------------------------------------------------------------------------
 const char* vtkPVAnimationInterface::GetScript()
 {
   return this->ScriptEditor->GetValue();
@@ -623,11 +634,8 @@ const char* vtkPVAnimationInterface::GetScript()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateMethodMenu()
 {
-  char methodAndArgStr[512];
-  int count;
-  vtkPVSourceInterface *sInt;
-  vtkCollection *mInts;
-  vtkPVMethodInterface *mInt;
+  vtkCollection *pvWidgets;
+  vtkPVWidget *pvw;
 
   // Remove all previous items form the menu.
   this->MethodMenuButton->GetMenu()->DeleteAllMenuItems();
@@ -637,66 +645,12 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
     this->MethodMenuButton->SetButtonText("None");
     return;
     }
-
-  // Lets try to do something for contour.
-  if (this->PVSource->IsA("vtkPVContour"))
+  
+  pvWidgets = this->PVSource->GetWidgets();
+  pvWidgets->InitTraversal();
+  while ( (pvw = (vtkPVWidget*)(pvWidgets->GetNextItemAsObject())) )
     {
-    if ( ! this->ScriptCheckButton->GetState())
-      {
-      char str[1024];
-      this->MethodMenuButton->SetButtonText("Value 0");
-
-      sprintf(str, "%s SetValue 0 $pvTime", this->PVSource->GetVTKSourceTclName());
-      this->ScriptEditor->SetValue(str);
-      }
-    }
-
-
-  sInt = this->PVSource->GetInterface();
-  if (sInt == NULL)
-    {
-    // Not all sources have interfaces yet.
-    this->MethodMenuButton->SetButtonText("None");
-    return;
-    }
-  mInts = sInt->GetMethodInterfaces();
-
-  // Loop through the methods.
-  count = 0;
-  mInts->InitTraversal();
-  while ( (mInt = ((vtkPVMethodInterface*)(mInts->GetNextItemAsObject()))) )
-    {
-    // We should really be able to iterate over files.
-    if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_FILE)
-      {
-      // do anything wil listing directories and finding pattern?
-      }
-    // Small chance that we want to animate a selection list.
-    //if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
-    // An extent could also be animated (clip).
-    //if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
-    if (mInt->GetNumberOfArguments() == 1)
-      {
-      sprintf(methodAndArgStr, "SetMethodInterfaceIndex %d", count);
-
-      this->MethodMenuButton->GetMenu()->AddCommand(mInt->GetVariableName(), 
-                                                    this, methodAndArgStr);
-      if (this->MethodInterfaceIndex < 0)
-        {
-        //this->MethodMenuButton->SetButtonText(mInt->GetVariableName());
-        //this->MethodInterfaceIndex = count;
-        // Call the callback method which also sets the script.
-        // Do we want to wait for the end to do this?
-        this->SetMethodInterfaceIndex(count);
-        }
-      }
-    // What should we do if there are more than one arguments?
-
-    ++count;
-    }
-  if (this->MethodInterfaceIndex < 0)
-    {
-    this->MethodMenuButton->SetButtonText("None");
+    pvw->AddAnimationScriptsToMenu(this->MethodMenuButton->GetMenu(), this);
     }
 }
 

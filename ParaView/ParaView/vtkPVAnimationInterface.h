@@ -136,6 +136,7 @@ public:
   // Access to the interface from scripts.
   void SetScriptCheckButtonState(int);
   void SetScript(const char* script);
+  void SetLabelAndScript(const char *label, const char* script);
   const char *GetScript();
 
   // Description:
@@ -187,6 +188,7 @@ protected:
 
   // The source selected.
   vtkPVSource *PVSource;
+
   // The method selected.
   int MethodInterfaceIndex;
   // The argument selected.

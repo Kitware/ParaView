@@ -203,7 +203,7 @@ public:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkPVVectorEntry *AddLabeledEntry(char* label, char* varName,
-                                    char* help);
+                                    char* help, int dataType);
   
   // Description:
   // Add label to vtkSource
@@ -215,14 +215,14 @@ public:
   // (l1,l2,l3, ...) are put in from of the individual entry boxes.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkPVVectorEntry* AddVector2Entry(char *label, char *l1, char *l2,
-                                    char *varName, char* help);
+                                    char *varName, char* help, int dataType);
   vtkPVVectorEntry* AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-                                    char *varName, char* help);
+                                    char *varName, char* help, int dataType);
   vtkPVVectorEntry* AddVector4Entry(char *label, char *l1, char *l2, char *l3,
-                                    char *l4, char *varName, char *help);
+                                    char *l4, char *varName, char *help, int dataType);
   vtkPVVectorEntry* AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
                                     char *l4, char *l5, char *l6,
-                                    char *varName, char* help);
+                                    char *varName, char* help, int dataType);
   
   // Description:
   // Special widget controls (not entries).

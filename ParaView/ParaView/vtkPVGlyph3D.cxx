@@ -147,7 +147,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->AddLabeledToggle("Orient", "Orient", "Select whether to orient the glyphs");
   this->AddLabeledToggle("Scaling", "Scaling", "Select whether to scale the glyphs");
 
-  this->AddLabeledEntry("Scale Factor", "ScaleFactor", "Select the amount to scale the glyphs by");
+  this->AddLabeledEntry("Scale Factor", "ScaleFactor", "Select the amount to scale the glyphs by", VTK_FLOAT);
 
   // Make sure the Input menus reflect the actual values.
   // This call is called too many times.  

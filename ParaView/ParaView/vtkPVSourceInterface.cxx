@@ -313,7 +313,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
 		   pvs->GetPVInput()->GetVTKDataTclName());
        pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
                             mInt->GetVariableName(),
-                            mInt->GetBalloonHelp());      
+                            mInt->GetBalloonHelp(),
+                            VTK_INT);      
       }
     else if (mInt->GetNumberOfArguments() == 1)
       {
@@ -327,32 +328,37 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
         {
         pvs->AddLabeledEntry(mInt->GetLabel(), 
                              mInt->GetVariableName(),
-                             mInt->GetBalloonHelp());
+                             mInt->GetBalloonHelp(),
+                             mInt->GetArgumentType(0));
         }
       }
     else if (mInt->GetNumberOfArguments() == 2)
       {
       pvs->AddVector2Entry(mInt->GetLabel(), "", "", 
-			   mInt->GetVariableName(),
-                           mInt->GetBalloonHelp());
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
       }
     else if (mInt->GetNumberOfArguments() == 3)
       {
       pvs->AddVector3Entry(mInt->GetLabel(), "", "", "",
-			   mInt->GetVariableName(),
-                           mInt->GetBalloonHelp());
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
       }
     else if (mInt->GetNumberOfArguments() == 4)
       {
       pvs->AddVector4Entry(mInt->GetLabel(), "", "", "", "",
-			   mInt->GetVariableName(),
-                           mInt->GetBalloonHelp());
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
       }
     else if (mInt->GetNumberOfArguments() == 6)
       {
       pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
-			   mInt->GetVariableName(),
-                           mInt->GetBalloonHelp());
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
       }
     else
       {

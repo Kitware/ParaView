@@ -101,6 +101,15 @@ public:
   // An interface for saving a widget into a script.
   virtual void SaveInTclScript(ofstream *file);
 
+  // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
+
+  // Description:
+  // This is the data type the vtk object is expecting.
+  vtkSetMacro(DataType, int); 
+  vtkGetMacro(DataType, int); 
+  
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
@@ -110,6 +119,8 @@ protected:
   vtkKWLabel *Label;
   vtkKWWidgetCollection *SubLabels;
   vtkKWWidgetCollection *Entries;
+
+  int DataType;
 
   char *ScriptValue;
 };

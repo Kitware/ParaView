@@ -1448,7 +1448,7 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName,
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName, 
-                                               char* help)
+                                               char* help, int dataType)
 {
   vtkPVVectorEntry *entry;
 
@@ -1458,6 +1458,7 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName,
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 1, NULL, help);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  entry->SetDataType(dataType);
 
   this->AddPVWidget(entry);
   entry->Delete();
@@ -1468,7 +1469,8 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName,
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-                                               char *varName, char *help)
+                                               char *varName, char *help,
+                                               int dataType)
 {
   vtkPVVectorEntry *entry;
   char* subLabels[2];
@@ -1483,6 +1485,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 2, subLabels, help);
+  entry->SetDataType(dataType);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   this->AddPVWidget(entry);
@@ -1499,7 +1502,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
                                                char *l3, char *varName, 
-                                               char* help)
+                                               char* help, int dataType)
 {
   vtkPVVectorEntry *entry;
   char* subLabels[3];
@@ -1516,6 +1519,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 3, subLabels, help);
+  entry->SetDataType(dataType);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   this->AddPVWidget(entry);
@@ -1532,8 +1536,8 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
-                                               char *l3, char *l4,
-                                               char *varName, char* help)
+                                               char *l3, char *l4, char *varName, 
+                                               char* help, int dataType)
 {
   vtkPVVectorEntry* entry;
   char* subLabels[4];
@@ -1553,6 +1557,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 4, subLabels, help);
+  entry->SetDataType(dataType);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   this->AddPVWidget(entry);
@@ -1572,7 +1577,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
 vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
                                                char *l3, char *l4, char *l5,
                                                char *l6, char *varName, 
-                                               char *help)
+                                               char *help, int dataType)
 
 {
   vtkPVVectorEntry *entry;
@@ -1597,6 +1602,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 6, subLabels, help);
+  entry->SetDataType(dataType);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   this->AddPVWidget(entry);
