@@ -31,11 +31,13 @@ The points are expected to be in a mostly planar distribution."
                    trace_name="ProjectionPlaneMode"
                    label="ProjectionPlaneMode"
                    help="Select ProjectionPlaneMode">
-      <Item name="VTK_XY_PLANE"
+      <Item name="Only XY coordinates"
             value="0"/>
+      <!--
       <Item name="VTK_SET_TRANSFORM_PLANE"
             value="1"/>
-      <Item name="VTK_BEST_FITTING_PLANE"
+      -->
+      <Item name="Project on best-fitting plane"
             value="2"/>
     </SelectionList>
     <Documentation>
