@@ -77,6 +77,8 @@ public:
 
   void SetKeyFrameIndex(int index);
 
+  // Update the display.
+  void Update();
 protected:
   vtkPVVerticalAnimationInterface();
   ~vtkPVVerticalAnimationInterface();
@@ -114,9 +116,6 @@ protected:
   void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
   void InitializeObservers(vtkPVAnimationCue* cue);
   void RemoveObservers(vtkPVAnimationCue* cue);
-
-  // Update the display.
-  void Update();
 
   void BuildTypeMenu();
   void UpdateTypeImage(vtkPVKeyFrame*);

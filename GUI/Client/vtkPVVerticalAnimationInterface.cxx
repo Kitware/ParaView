@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.9");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.10");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -247,7 +247,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
     "window to show its properties.");
 
   this->SelectKeyFrameLabel->Create(app, "-justify left");
-  this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
 
   this->Script("grid %s - - -row 0 -sticky ew", this->IndexScale->GetWidgetName());
   
@@ -303,7 +302,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("grid columnconfigure %s 1 -weight 2",
     this->KeyFramePropertiesFrame->GetFrame()->GetWidgetName());
 
-  this->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -461,6 +459,16 @@ void vtkPVVerticalAnimationInterface::RemoveObservers(vtkPVAnimationCue* cue)
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::Update()
 {
+  // This wierd stuff is needed as otherwise if the Animation Interaface hasn't been
+  // packed even once, Tcl would get stuck adjusting the wraplenth.
+  if (!this->IsPacked() && this->SelectKeyFrameLabel->GetAdjustWrapLengthToWidth())
+    {
+    this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOff();
+    }
+  else if (this->IsPacked() && !this->SelectKeyFrameLabel->GetAdjustWrapLengthToWidth())
+    {
+    this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
+    }
   int id;
   if (this->ActiveKeyFrame)
     {

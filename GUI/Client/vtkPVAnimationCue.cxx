@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.15");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.16");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -599,6 +599,7 @@ void vtkPVAnimationCue::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
     {
     return;
     }
+  keyframe->SetParent(NULL);
   this->KeyFrameManipulatorProxy->RemoveKeyFrame(keyframe->GetKeyFrameProxy());
   this->PVKeyFrames->RemoveItem(keyframe);
 }
@@ -1208,6 +1209,7 @@ void vtkPVAnimationCue::RecordState(double ntime, double offset,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::Detach()
 {
+  this->RemoveAllKeyFrames();
   this->RemoveFocus();
   this->UnpackWidget();
   this->SetParent(NULL);

@@ -60,7 +60,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.22");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.23");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -224,6 +224,7 @@ void vtkPVAnimationManager::ShowVAnimationInterface()
     this->VAnimationInterface->UnpackSiblings();
     this->Script("pack %s -anchor n -side top -expand t -fill both",
       this->VAnimationInterface->GetWidgetName());
+    this->VAnimationInterface->Update();
     }
 }
 
