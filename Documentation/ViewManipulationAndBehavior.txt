@@ -1,0 +1,17 @@
+There are several different ways to manipulate the view of you data in ParaView.  In the upper left corner of the application is the view toolbar.  The first button on this toolbar resets the view to all the visible data sets.  
+
+ResetViewButton.jpg
+
+If you would like to reset the view to show a single data set, you should press the "Set View To Data" button on the data's display page.
+
+SetViewToData.jpb
+
+The remaining buttons activate different interactors states.  The current interactor state is indicated by the highlighted button, and special cursors when the mouse is over the render window.
+
+FlyButton.jpg
+
+The "Fly" interactor  causes the view to move toward where the cursor is pointing.  When the cursor is in the middle of the view, the interactor zooms.  When the cursor is near the edge of the view, the fly interactor pans the view.  This interactor is most useful when trying to position the view internal to several elements.  The left mouse button flys forward, and the right mouse button flys backward.  None of the interactors use the middle mouse button.
+
+RotateButton.jpg
+
+The "Rotate" interactor is the default interactor.  Its behavior also depends on  where the cursor is position over the view.
