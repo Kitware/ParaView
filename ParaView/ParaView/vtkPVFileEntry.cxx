@@ -68,7 +68,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.72");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.73");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -593,10 +593,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   if ( !this->Initialized )
     {
     this->Property->RemoveAllFiles();
-    int cc;
-    for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
+    int kk;
+    for ( kk = 0; kk < this->FileListSelect->GetNumberOfElementsOnFinalList(); kk ++ )
       {
-      this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(cc));
+      this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(kk));
       }
     this->Initialized = 1;
     }
