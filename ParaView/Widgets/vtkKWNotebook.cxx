@@ -140,7 +140,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
                this->TabsFrame->GetWidgetName(), this->GetTclName());
   this->Body->Create(app,"frame","-borderwidth 2 -relief raised");
   this->Script("bind %s <Configure> {%s ScheduleResize}",
-               this->Body->GetWidgetName(), this->GetTclName());
+               this->Body->GetWidgetName(), this->GetTclName());  
   this->Mask->Create(app,"frame","-borderwidth 0 -relief flat");
   this->MaskLeft->Create(app,"frame","-borderwidth 0 -relief flat");
 #ifdef _WIN32
@@ -170,11 +170,9 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
                       this->MaskRight2->GetWidgetName(),
                       -this->BorderWidth, 2*this->BorderWidth, 
                       3*this->BorderWidth);
-#endif
-  
+#endif 
   this->Script("place %s -x 0 -y 0 -relwidth 1.0 -relheight 1.0",
                this->Body->GetWidgetName());
-  
 }
 
 void vtkKWNotebook::Raise(int num)
@@ -205,6 +203,7 @@ void vtkKWNotebook::Raise(int num)
     }
   
   int bw = this->BorderWidth;
+
   this->Script("winfo x %s",this->Buttons[num]->GetWidgetName());
   int xb = vtkKWObject::GetIntegerResult(app);
   this->Script("winfo y %s",this->Buttons[num]->GetWidgetName());
@@ -218,34 +217,38 @@ void vtkKWNotebook::Raise(int num)
   this->Script("winfo width %s", this->Buttons[num]->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(app);
   
-  int x0 = xb + x + bw;
-  int y0 = yb +  y  + height - bw;
-  int w0 = width - (bw * 2);
-#ifdef _WIN32
-  int h0 = 3;
+#ifdef _WIN32    
+  int h0 = bw * 2; // Should be 3
 #else
   int h0 = bw * 2;
 #endif
+
+  int x0 = xb + x + bw-1;
+  int y0 = yb +  y  + height - bw - h0;
+  int w0 = width - (bw * 2);
+
+
+
   this->Script("place %s -x %d -y %d -width %d -height %d",
-               this->Mask->GetWidgetName(),x0,y0,w0,h0);
+	       this->Mask->GetWidgetName(),x0,y0,w0,h0);
   
   int x1 = x0 - bw;
   int y1 = y0;
   int w1 = bw;
   int h1 = h0;
-  this->Script("place %s -x %d -y %d -width %d -height %d",
-               this->MaskLeft->GetWidgetName(),x1,y1,w1,h1);
+  //this->Script("place %s -x %d -y %d -width %d -height %d",
+  //	       this->MaskLeft->GetWidgetName(),x1,y1,w1,h1);
   
   int x2 = x0 + w0;
   int y2 = y0;
   int w2 = bw;
 #ifdef _WIN32
-  int h2 = 2;
+  int h2 = h0; // Should be 2
 #else
   int h2 = h0;
 #endif
-  this->Script("place %s -x %d -y %d -width %d -height %d",
-               this->MaskRight->GetWidgetName(),x2,y2,w2,h2);
+  //this->Script("place %s -x %d -y %d -width %d -height %d",
+  //	       this->MaskRight->GetWidgetName(),x2,y2,w2,h2);
 }
 
 
@@ -347,10 +350,18 @@ void vtkKWNotebook::AddPage(const char *title)
   
   if (this->NumberOfPages == 2)
     {
-    this->Script("place %s -x 0 -y 0 -relwidth 1.0 -height %d",
+#ifdef _WIN32    
+    int h0 = 3;
+#else
+    int h0 = this->BorderWidth * 2;
+#endif
+    
+    this->Script("place %s -x 10 -y 0 -relwidth 1.0 -height %d",
                  this->TabsFrame->GetWidgetName(), this->Height);
-    this->Script("place %s -x 0 -y %d -relwidth 1.0 -relheight 1.0 -height %d",
-                 this->Body->GetWidgetName(), this->Height, -this->Height);
+    this->Script("place %s -x 0 -y %d -relwidth 1.0 -relheight 1.0"
+		 " -height %d",
+                 this->Body->GetWidgetName(), this->Height-h0, 
+		 -this->Height-h0);
     }
   
   if (this->NumberOfPages == 1)
