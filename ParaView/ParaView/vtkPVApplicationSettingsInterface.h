@@ -71,23 +71,47 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the interface objects.
-  virtual void Create(vtkKWApplication *app);
-
-  // Description:
   // Set/Get the window (do not ref count it since the window will ref count
   // this widget).
   vtkGetObjectMacro(Window, vtkPVWindow);
   virtual void SetWindow(vtkPVWindow*);
 
   // Description:
-  // Access to the sub-widgets. Note that they might be NULL until the Create()
-  // function is called.
-  vtkGetObjectMacro(ShowSourcesDescriptionCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(ShowSourcesNameCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(ToolbarSettingsFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(FlatFrameCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(FlatButtonsCheckButton, vtkKWCheckButton);
+  // Create the interface objects.
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Enable/Disable this panel. This should propagate SetEnabled() calls to the
+  // internal widgets.
+  virtual void SetEnabled(int e);
+
+  // Description:
+  // Set ShowSourcesDescription UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Do not call vtkPVWindow::SetShowSourcesLongHelp(), since it
+  // is likely to call us to update the UI programmatically (note that the 
+  // callback will call it on user interaction though).
+  void SetShowSourcesDescription(int);
+
+  // Description:
+  // Set ShowSourcesName UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Do not call vtkPVRenderView::SetSourcesBrowserAlwaysShowName(), since it
+  // is likely to call us to update the UI programmatically (note that the 
+  // callback will call it on user interaction though).
+  void SetShowSourcesName(int);
+
+  // Description:
+  // Set FlatFrame UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Call vtkPVWindow::UpdateToolbarAspect() to update the toolbar aspect.
+  void SetFlatFrame(int);
+
+  // Description:
+  // Set FlatFrame UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Call vtkPVWindow::UpdateToolbarAspect() to update the toolbar aspect.
+  void SetFlatButtons(int);
 
   // Description:
   // Callback used when interaction has been performed.
@@ -97,9 +121,9 @@ public:
   void FlatButtonsCheckButtonCallback();
 
   // Description:
-  // Enable/Disable this panel. This should propagate SetEnabled() calls to the
-  // internal widgets.
-  virtual void SetEnabled(int e);
+  // Access to some sub-widgets. Note that they might be NULL until the Create()
+  // function is called.
+  vtkGetObjectMacro(ToolbarSettingsFrame, vtkKWLabeledFrame);
 
 protected:
   vtkPVApplicationSettingsInterface();

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.1");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.2");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -154,9 +154,11 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   vtkKWWidget *frame;
 
   // --------------------------------------------------------------
-  // Interface settings : show sources description
+  // Interface settings : continuing...
 
   frame = this->InterfaceSettingsFrame->GetFrame();
+
+  // Interface settings : show sources description
 
   if (!this->ShowSourcesDescriptionCheckButton)
     {
@@ -192,8 +194,6 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // Interface settings : show sources name
-
-  frame = this->InterfaceSettingsFrame->GetFrame();
 
   if (!this->ShowSourcesNameCheckButton)
     {
@@ -328,18 +328,42 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::SetShowSourcesDescription(int v)
+{
+  if (this->IsCreated())
+    {
+    int flag = v ? 1 : 0;
+    this->ShowSourcesDescriptionCheckButton->SetState(flag);
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCheckButtonCallback()
 {
  if (this->IsCreated())
    {
-   int val = this->ShowSourcesDescriptionCheckButton->GetState();
-   this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", val);
+   int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
+   this->SetShowSourcesDescription(flag);
+     
    if (this->Window)
      {
-     this->Window->SetShowSourcesLongHelp(val);
+     this->Window->SetShowSourcesLongHelp(flag);
      }
    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::SetShowSourcesName(int v)
+{
+  if (this->IsCreated())
+    {
+    int flag = v ? 1 : 0;
+    this->ShowSourcesNameCheckButton->SetState(flag);
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -347,14 +371,30 @@ void vtkPVApplicationSettingsInterface::ShowSourcesNameCheckButtonCallback()
 {
  if (this->IsCreated())
    {
-   int val = this->ShowSourcesNameCheckButton->GetState();
-   this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", val);
+   int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
+   this->SetShowSourcesName(flag);
+
    if (this->Window && this->Window->GetMainView())
      {
-     this->Window->GetMainView()->SetSourcesBrowserAlwaysShowName(val);
+     this->Window->GetMainView()->SetSourcesBrowserAlwaysShowName(flag);
      }
    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::SetFlatFrame(int v)
+{
+  if (this->IsCreated())
+    {
+    int flag = v ? 1 : 0;
+    this->FlatFrameCheckButton->SetState(flag);
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", flag);
+    if (this->Window)
+      {
+      this->Window->UpdateToolbarAspect();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -362,9 +402,19 @@ void vtkPVApplicationSettingsInterface::FlatFrameCheckButtonCallback()
 {
   if (this->IsCreated())
     {
+    this->SetFlatFrame(this->FlatFrameCheckButton->GetState() ? 1 : 0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::SetFlatButtons(int v)
+{
+  if (this->IsCreated())
+    {
+    int flag = v ? 1 : 0;
+    this->FlatButtonsCheckButton->SetState(flag);
     this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", 
-      this->FlatFrameCheckButton->GetState());
+      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", flag); 
     if (this->Window)
       {
       this->Window->UpdateToolbarAspect();
@@ -377,13 +427,7 @@ void vtkPVApplicationSettingsInterface::FlatButtonsCheckButtonCallback()
 {
   if (this->IsCreated())
     {
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", 
-      this->FlatButtonsCheckButton->GetState());
-    if (this->Window)
-      {
-      this->Window->UpdateToolbarAspect();
-      }
+    this->SetFlatButtons(this->FlatButtonsCheckButton->GetState() ? 1 : 0);
     }
 }
 
@@ -429,22 +473,8 @@ void vtkPVApplicationSettingsInterface::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Window: " << this->Window << endl;
 
-  // Interface settings
-
-  os << indent << "ShowSourcesDescriptionCheckButton: " 
-     << this->ShowSourcesDescriptionCheckButton << endl;
-
-  os << indent << "ShowSourcesNameCheckButton: " 
-     << this->ShowSourcesNameCheckButton << endl;
-
   // Toolbar settings
 
   os << indent << "ToolbarSettingsFrame: " 
      << this->ToolbarSettingsFrame << endl;
-
-  os << indent << "FlatFrameCheckButton: " 
-     << this->FlatFrameCheckButton << endl;
-
-  os << indent << "FlatButtonsCheckButton: " 
-     << this->FlatButtonsCheckButton << endl;
 }
