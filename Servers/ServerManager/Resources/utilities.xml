@@ -1229,4 +1229,12 @@
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
 
+  <ProxyGroup name="ComparativeVisHelpers">
+    <SourceProxy name="GeometryCache" class="vtkCVGeometryCache">
+      <ProxyProperty name="AddGeometry" command="AddGeometry" repeat_command="1">
+      </ProxyProperty>
+    </SourceProxy>
+  </ProxyGroup>
+
+
 </ServerManagerConfiguration>
