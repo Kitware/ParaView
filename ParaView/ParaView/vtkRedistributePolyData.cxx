@@ -90,6 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSetAttributes.h"
 
 #include "vtkTimerLog.h"
+#include "vtkString.h"
 
 #include "vtkMultiProcessController.h"
 
@@ -2981,7 +2982,7 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       {
       name = "";
       }
-    nameLength = strlen(name)+1;
+    nameLength = vtkString::Length(name)+1;
     this->Controller->Send(&nameLength, 1, sendTo, 997247);
     // I am pretty sure that Send does not modify the string.
     this->Controller->Send(const_cast<char*>(name), nameLength, 
@@ -3043,7 +3044,7 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       {
       name = "";
       }
-    nameLength = strlen(name+1);
+    nameLength = vtkString::Length(name+1);
     this->Controller->Send(&nameLength, 1, sendTo, 997247);
     this->Controller->Send(const_cast<char*>(name), nameLength, sendTo, 
                            997248);
