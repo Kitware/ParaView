@@ -1,8 +1,8 @@
 PLATFORM="x86-linux"
-CC="gcc332s"
-CXX="c++332s"
+CC="gcc"
+CXX="g++"
 CFLAGS=""
 CXXFLAGS="-Wno-deprecated"
-CMAKE="/home/kitware/Dashboards/CMake19/CMakeBin/bin/cmake"
+CMAKE="/usr/local/bin/cmake"
 MAKE="make -j 2"
 DISPLAY=:0.0
