@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.3");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.4");
 
 #define  VTK_XML_UTILITIES_FACTORED_POOL_NAME "FactoredPool"
 #define  VTK_XML_UTILITIES_FACTORED_NAME      "Factored"
@@ -397,9 +397,11 @@ int vtkXMLUtilities::FactorElementsInternal(vtkXMLDataElement *tree,
 
   // Otherwise replace those trees with factored refs
 
+  char buffer[5];
+  sprintf(buffer, "%02d_", pool->GetNumberOfNestedElements());
+
   ostrstream id;
-  id << setw(2) << setfill('0') << pool->GetNumberOfNestedElements() 
-     << "_" << tree->GetName() << ends;
+  id << buffer << tree->GetName() << ends;
     
   vtkXMLDataElement *factored = vtkXMLDataElement::New();
   factored->SetName(VTK_XML_UTILITIES_FACTORED_NAME);
