@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.298");
+vtkCxxRevisionMacro(vtkPVApplication, "1.299");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -511,6 +511,10 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  // Remove the ParaView output window so errors during exit will
+  // still be displayed.
+  vtkOutputWindow::SetInstance(0);
+
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
@@ -1863,9 +1867,6 @@ void vtkPVApplication::Exit()
       }
     }
   
-  // Remove the ParaView output window so errors during exit will
-  // still be displayed.
-  vtkOutputWindow::SetInstance(0);
 
   this->vtkKWApplication::Exit();
 
