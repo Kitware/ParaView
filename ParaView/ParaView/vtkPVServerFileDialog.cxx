@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.5");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.6");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -713,7 +713,7 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
   // Clear previous extensions.
   this->ExtensionStrings->RemoveAllItems();
 
-  std::string extensions = this->FileTypeStrings->GetString(typeIdx);
+  vtkstd::string extensions = this->FileTypeStrings->GetString(typeIdx);
   for(unsigned int i = 0; i < extensions.length(); ++i)
     {
     // Since we formated the string, we know that extensions always
