@@ -135,7 +135,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.45");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1432,19 +1432,30 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveGeometryCallback()
 {
+  int numPartitions;
+
+  numPartitions = this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions();
+
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
-  this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
+  this->GetWindow()->RetrieveLastPath(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
-  saveDialog->SetTitle("Save Animation Images");
-  saveDialog->SetDefaultExtension(".vtp");
-  saveDialog->SetFileTypes("{{PV Animation} {.vtp}}");
-
+  saveDialog->SetTitle("Save Animation Geometry");
+  if (numPartitions > 1)
+    {
+    saveDialog->SetDefaultExtension(".pvtp");
+    saveDialog->SetFileTypes("{{Parallel PolyData} {.pvtp}}");
+    }
+  else
+    {
+    saveDialog->SetDefaultExtension(".vtp");
+    saveDialog->SetFileTypes("{{VTK PolyData} {.vtp}}");
+    }
   if ( saveDialog->Invoke() &&
        strlen(saveDialog->GetFileName())>0 )
     {
-    this->GetWindow()->SaveLastPath(saveDialog, "SaveAnimationFile");
+    this->GetWindow()->SaveLastPath(saveDialog, "SaveGeometryFile");
     const char* filename = saveDialog->GetFileName();  
 
     // Split into root and extension.
@@ -1470,7 +1481,7 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
       ++ext;
       }
 
-    this->SaveGeometry(fileRoot);
+    this->SaveGeometry(fileRoot, numPartitions);
     delete [] fileRoot;
     fileRoot = NULL;
     ext = NULL;
@@ -1482,7 +1493,8 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot) 
+void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot, 
+                                           int numPartitions) 
 {
   vtkPVSource* source;
   const char* sourceName;
@@ -1497,12 +1509,24 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
 
   sources = this->GetWindow()->GetSourceList("Sources");
 
-  // Writer has to be in tcl to connect to geometry filter. 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
-          "vtkXMLPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
-          "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetWritePiece [[$Application GetProcessModule] GetPartitionId]", 
-          this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
+  if (numPartitions > 1)
+    {
+    // Writer has to be in tcl to connect to geometry filter. 
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "vtkXMLPPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetEndPiece [[$Application GetProcessModule] GetPartitionId]; pvAnimWriter SetStartPiece [[$Application GetProcessModule] GetPartitionId]", 
+            this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
+    }
+  else
+    {
+    // Writer has to be in tcl to connect to geometry filter. 
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "vtkXMLPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetWritePiece [[$Application GetProcessModule] GetPartitionId]", 
+            this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
+    }
 
   fileName = new char[strlen(fileRoot) + 30];      
   if (this->TimeStep < 0)
@@ -1532,14 +1556,30 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
           part = source->GetPVPart(partIdx);
           // Create a file name for this image.
           if (numParts == 1)
-            {
-            sprintf(fileName, "%s%sT%04d.vtp", 
-                    fileRoot, sourceName, timeCount);
+            { // Clean up these nested loops (stream). !!!!!!!!
+            if (numPartitions > 1)
+              {
+              sprintf(fileName, "%s%sT%04d.pvtp", 
+                      fileRoot, sourceName, timeCount);
+              }
+            else
+              {
+              sprintf(fileName, "%s%sT%04d.vtp", 
+                      fileRoot, sourceName, timeCount);
+              }
             }
           else
             {
-            sprintf(fileName, "%s%sP%dT%04d.vtp", 
-                    fileRoot, sourceName, partIdx, timeCount);
+            if (numPartitions > 1)
+              {
+              sprintf(fileName, "%s%sP%dT%04d.pvtp", 
+                      fileRoot, sourceName, partIdx, timeCount);
+              }
+            else
+              {
+              sprintf(fileName, "%s%sP%dT%04d.vtp", 
+                      fileRoot, sourceName, partIdx, timeCount);
+              }
             }
           this->GetPVApplication()->GetProcessModule()->ServerScript(
                   "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 

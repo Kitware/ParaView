@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.438");
+vtkCxxRevisionMacro(vtkPVWindow, "1.439");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2701,7 +2701,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
   *file << "if {[catch {set myProcId [[compManager GetController] "
       "GetLocalProcessId]}]} {set myProcId 0 } \n";
   *file << "if {[catch {set numberOfProcs [[compManager GetController] "
-      "GetNumberOfProcesses]}]} {set numberOfProcs 0 } \n\n";
+      "GetNumberOfProcesses]}]} {set numberOfProcs 1 } \n\n";
 
   // Create the image writer if necessary.
   if (imageFileName && vtkString::Length(imageFileName) > 0)
@@ -2715,11 +2715,16 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   if (geometryFileName)
     {
-    *file << "vtkXMLPolyDataWriter GeometryWriter\n";
-    *file << "GeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
+    *file << "if {$numberOfProcs > 1} {\n";
+    *file << "\tvtkXMLPPolyDataWriter GeometryWriter\n";
+    *file << "\tGeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
+    *file << "\tGeometryWriter SetStartPiece $myProcId\n";
+    *file << "\tGeometryWriter SetEndPiece $myProcId\n";
+    *file << "} else {\n";
+    *file << "\tvtkXMLPolyDataWriter GeometryWriter\n";
+    *file << "}\n";
     *file << "GeometryWriter SetDataModeToBinary" << endl;
     *file << "GeometryWriter EncodeAppendedDataOff" << endl;
-    *file << "GeometryWriter SetWritePiece $myProcId\n\n";
     }
 
   if (animationFlag)
@@ -2807,29 +2812,33 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
       for ( partIdx = 0; partIdx < numParts; ++partIdx)
         {
         part = source->GetPVPart(partIdx);
-        // Create a file name for the geometry.
+        // Create a file name for the geometry (without extension).
         if (numParts == 1 && timeIdx >= 0)
           {
-          sprintf(fileName, "%s/%s%sT%04d.vtp", 
+          sprintf(fileName, "%s/%s%sT%04d", 
                   filePath, fileRoot, sourceName, timeIdx);
           }
         else if (numParts != 1 && timeIdx >= 0)
           {
-          sprintf(fileName, "%s/%s%sP%dT%04d.vtp", 
+          sprintf(fileName, "%s/%s%sP%dT%04d", 
                   filePath, fileRoot, sourceName, partIdx, timeIdx);
           }
         else if (numParts == 1 && timeIdx < 0)
           {
-          sprintf(fileName, "%s/%s%s.vtp", 
+          sprintf(fileName, "%s/%s%s", 
                   filePath, fileRoot, sourceName);
           }
         else if (numParts != 1 && timeIdx < 0)
           {
-          sprintf(fileName, "%s/%s%sP%d.vtp", 
+          sprintf(fileName, "%s/%s%sP%d", 
                   filePath, fileRoot, sourceName, partIdx);
           }
         *file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
-        *file << "GeometryWriter SetFileName {" << fileName << "}\n";
+        *file << "if {$numberOfProcs > 1} {\n";
+        *file << "\tGeometryWriter SetFileName {" << fileName << ".Pvtp}\n";
+        *file << "} else {\n";
+        *file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
+        *file << "}\n";
         *file << "GeometryWriter Write\n";
         }
       }
@@ -4180,7 +4189,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.438 $");
+  this->ExtractRevision(os,"$Revision: 1.439 $");
 }
 
 //-----------------------------------------------------------------------------

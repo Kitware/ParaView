@@ -188,7 +188,7 @@ public:
   void SaveImagesCallback();
   void SaveImages(const char* fileRoot, const char* ext);
   void SaveGeometryCallback();
-  void SaveGeometry(const char* fileRoot);
+  void SaveGeometry(const char* fileRoot, int numParititons);
 
   // Description:
   // Convenience method.
