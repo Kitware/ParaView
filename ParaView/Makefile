@@ -36,7 +36,6 @@ vtkPVCutter \
 vtkPVData \
 vtkPVDataSetToDataSetFilter \
 vtkPVDataSetToPolyDataFilter \
-vtkPVElevationFilter \
 vtkPVExtentTranslator \
 vtkPVExtractEdges \
 vtkPVGetRemoteGhostCells \
@@ -104,9 +103,7 @@ ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS}
 	$(CXX) -o ParaView ParaView.o \
 	${TCL_LIB_FILE} ${KIT_LIBS} \
 	$(VIEWSDIR)/ParaView/vtkKWParaViewTcl$(VTK_LIB_EXT) \
-	$(VIEWSDIR)/ParaView/vtkKWParaView$(VTK_LIB_EXT) \
 	$(VIEWSDIR)/Widgets/vtkKWWidgetsTcl$(VTK_LIB_EXT) \
-	$(VIEWSDIR)/Widgets/vtkKWWidgets$(VTK_LIB_EXT) \
 	vtktcl.o \
 	${USE_PATENTED_LIBS}	\
 	${USE_IMAGING_LIBS}	\

@@ -1418,8 +1418,8 @@ void vtkPVSource::CancelCallback()
       {
       pvApp->BroadcastScript("%s Delete", this->GetTclName());
       }
-
     this->GetWindow()->GetMainView()->RemoveComposite(this);
+    pvApp->Script("%s Delete", this->GetTclName());
     }
   else
     {
@@ -1482,6 +1482,7 @@ void vtkPVSource::DeleteCallback()
     this->SetPVData(NULL);
     this->GetView()->Render();
     this->GetWindow()->GetMainView()->RemoveComposite(this);
+    pvApp->Script("%s Delete", this->GetTclName());
     }
   else
     {

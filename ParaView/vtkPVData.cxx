@@ -232,31 +232,36 @@ void vtkPVData::Cutter()
 //----------------------------------------------------------------------------
 void vtkPVData::Elevation()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVElevationFilter *elevation;
-  vtkElevationFilter *elevVTK;
-  float bounds[6];
-
-  // This should go through the PVData who will collect the info.
-  this->GetBounds(bounds);
-  
-  elevation = vtkPVElevationFilter::New();
-  elevation->Clone(pvApp);
-  elevVTK = vtkElevationFilter::SafeDownCast(elevation->GetVTKSource());
-  
-  elevation->SetInput(this);
-  
-  this->GetPVSource()->GetView()->AddComposite(elevation);
-  elevation->SetName("elevation");
-  
+  static instanceCount = 0;
+  vtkPVDataSetToDataSetFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
-  elevVTK->SetLowPoint(bounds[0], 0.0, 0.0);
-  elevVTK->SetHighPoint(bounds[1], 0.0, 0.0);
-
-  window->SetCurrentSource(elevation);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVDataSetToDataSetFilter::SafeDownCast(
+    pvApp->MakePVSource("vtkPVDataSetToDataSetFilter",
+			"vtkElevationFilter",
+			"Elevation", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
   
-  elevation->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+  
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddVector3Entry("LowPoint", "X", "Y", "Z", "SetLowPoint", "GetLowPoint");
+  f->AddVector3Entry("HighPoint", "X", "Y", "Z", "SetHighPoint",
+		     "GetHighPoint");
+  f->AddVector2Entry("ScalarRange", "Min", "Max", "SetScalarRange",
+		     "GetScalarRange");
+  f->UpdateParameterWidgets();
+  
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
