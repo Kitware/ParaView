@@ -76,9 +76,13 @@ $pv(vtkTemp366) AcceptCallback
 
 set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp395) AcceptCallback
+
+# Triangle filter to disabiguate quads.
+set pv(vtkTemp2244) [$pv(vtkTemp1) CreatePVSource TriangleFilter]
+$pv(vtkTemp2244) AcceptCallback
+
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp164)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
-
 
 set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
