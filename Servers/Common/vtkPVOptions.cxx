@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.16");
+vtkCxxRevisionMacro(vtkPVOptions, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -71,9 +71,6 @@ vtkPVOptions::vtkPVOptions()
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
-  this->ClientRenderServer = 0;
-  this->ConnectRenderToData = 0;
-  this->ConnectDataToRender = 0;
   this->HelpSelected = 0;
   this->ConnectID = 0;
 }
@@ -125,26 +122,14 @@ void vtkPVOptions::Initialize()
     "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix.");
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
     "Tell the application to enable stereo rendering (only when running on a single process).");
-  this->AddBooleanArgument("--client-render-server", "-crs", &this->ClientRenderServer,
-    "Run ParaView as a client to a data and render server. The render server will wait for the data server.");
-  this->AddBooleanArgument("--connect-render-to-data", "-r2d", &this->ConnectRenderToData,
-    "Run ParaView as a client to a data and render server. The data server will wait for the render server.");
-  this->AddBooleanArgument("--connect-data-to-render", "-d2r", &this->ConnectDataToRender,
-    "Run ParaView as a client to a data and render server. The render server will wait for the data server.");
-  this->AddArgument("--user", 0, &this->Username, 
-    "Tell the client what username to send to server when establishing SSH connection.");
   this->AddArgument("--host", "-h", &this->HostName, 
-    "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.");
-  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName, 
-    "Tell the client where to look for the render server (default: localhost). Used with --client option.");
+    "Tell the program where to look for the peer (default: localhost). Used with --client for client connecting to the server or with --server -rc for server connecting to the client.");
   this->AddArgument("--port", 0, &this->Port, 
     "Specify the port client and server will use (--port=11111).  Client and servers ports must match.");
   this->AddArgument("--machines", "-m", &this->MachinesFileName, 
     "Specify the network configurations file for the render server.");
   this->AddArgument("--render-node-port", 0, &this->RenderNodePort, 
     "Specify the port to be used by each render node (--render-node-port=22222).  Client and render servers ports must match.");
-  this->AddArgument("--render-port", 0, &this->RenderServerPort, 
-    "Specify the port client and render server will use (--port=22222).  Client and render servers ports must match.");
   this->AddBooleanArgument("--disable-composite", "-dc", &this->DisableComposite, 
     "Use this option when rendering resources are not available on the server.");
 
@@ -154,8 +139,6 @@ void vtkPVOptions::Initialize()
     "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.");
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection, 
     "Have the server connect to the client.");
-  this->AddBooleanArgument("--always-ssh", 0, &this->AlwaysSSH, 
-    "Always use SSH.");
   this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
     "Size of tile display in the number of displays in each row of the display.");
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
@@ -173,24 +156,17 @@ void vtkPVOptions::Initialize()
 //----------------------------------------------------------------------------
 int vtkPVOptions::PostProcess(int, const char* const*)
 {
+  if ( this->ServerMode && this->Port )
+    {
+    this->RenderNodePort = this->Port;
+    }
+  if ( this->ServerMode && this->HostName )
+    {
+    this->SetRenderServerHostName(this->HostName);
+    }
   if ( this->CaveConfigurationFileName )
     {
     this->SetRenderModuleName("CaveRenderModule");
-    }
-  if ( this->ClientRenderServer )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 1;
-    }
-  if ( this->ConnectDataToRender )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 1;
-    }
-  if ( this->ConnectRenderToData )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 2;
     }
   if ( this->UseSatelliteSoftwareRendering )
     {
@@ -336,28 +312,12 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Running as a server\n";
     }
 
-  if (this->ClientRenderServer)
-    {
-    os << indent << "Running as a client connected to a render server\n";
-    }
-
   if (this->RenderServerMode)
     {
     os << indent << "Running as a render server\n";
     }
 
-  if (this->ConnectDataToRender)
-    {
-    os << indent << "Running as a client to a data and render server\n";
-    }
-
-  if (this->ConnectDataToRender)
-    {
-    os << indent << "Running as a client to a data and render server\n";
-    }
-
-  if (this->ClientMode || this->ServerMode || this->RenderServerMode 
-   || this->RenderServerMode || this->ConnectDataToRender || this->ConnectDataToRender)
+  if (this->ClientMode || this->ServerMode || this->RenderServerMode )
     {
     os << indent << "ConnectID is: " << this->ConnectID << endl;
     os << indent << "Port: " << this->Port << endl;

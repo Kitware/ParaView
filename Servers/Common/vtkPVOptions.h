@@ -46,7 +46,6 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetMacro(ClientMode, int);
-  vtkGetMacro(ClientRenderServer, int);
   vtkGetMacro(Port, int);
   vtkGetMacro(RenderNodePort, int);
   vtkGetMacro(RenderServerPort, int);
@@ -132,18 +131,18 @@ protected:
 
   int ServerMode;
   int ClientMode;
+  int RenderServerMode;
+  int RenderServerPort;
+
+  vtkSetStringMacro(RenderServerHostName);
+  char* RenderServerHostName;
 
 private:
   // Options:
-  int RenderServerMode;
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
-  int ClientRenderServer;
-  int ConnectRenderToData;
-  int ConnectDataToRender;
   int RenderNodePort;
-  int RenderServerPort;
   int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
@@ -157,9 +156,6 @@ private:
 
   vtkSetStringMacro(CaveConfigurationFileName);
   char* CaveConfigurationFileName;
-
-  vtkSetStringMacro(RenderServerHostName);
-  char* RenderServerHostName;
 
   vtkSetStringMacro(MachinesFileName);
   char* MachinesFileName;

@@ -91,7 +91,7 @@ void pvTestDriver::CollectConfiguredOptions()
     this->ParaViewServer  += "/" CMAKE_INTDIR;
 #endif
     // To test pvserver, change the following to pvserver
-    this->ParaViewServer += "/paraview";
+    this->ParaViewServer += "/pvserver";
   // now find all the mpi information if mpi run is set
 #ifdef VTK_USE_MPI
 #ifdef VTK_MPIRUN_EXE
@@ -300,7 +300,7 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
   else
     {
     commandLine.push_back(paraView);
-    if(strlen(paraviewFlags) > 0)
+    if(strlen(paraviewFlags) > 0 && strcmp(paraviewFlags, "--server") != 0)
       {
       commandLine.push_back(paraviewFlags);
       }
