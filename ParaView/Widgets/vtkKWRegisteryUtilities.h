@@ -49,6 +49,9 @@ class VTK_EXPORT vtkKWRegisteryUtilities
 {
 public:
   static void ReadAValue(HKEY hKey,char *val,char *key, char *adefault);
+  static unsigned long DeleteKey(HKEY hKey, char *key);
+  static unsigned long DeleteValue(HKEY hKey, char *value);
+  static unsigned long SetValue(HKEY hKey,char *key,char *val);
 };
 
 #endif
