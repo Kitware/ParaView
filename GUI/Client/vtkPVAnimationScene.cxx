@@ -67,7 +67,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.5");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.6");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -249,6 +249,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRControl->SetGoToEndCommand(this,"GoToEnd");
   this->VCRControl->SetGoToPreviousCommand(this, "GoToPrevious");
   this->VCRControl->SetGoToNextCommand(this,"GoToNext");
+  this->VCRControl->SetLoopCheckCommand(this,"LoopCheckButtonCallback");
   this->Script("grid %s -columnspan 2 -sticky {}",
     this->VCRControl->GetWidgetName());
   
@@ -574,7 +575,6 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
   case vtkCommand::StartAnimationCueEvent:
     break;
   case vtkCommand::EndAnimationCueEvent:
-    break;
   case vtkCommand::AnimationCueTickEvent:
       {
       double etime = this->AnimationSceneProxy->GetEndTime();
