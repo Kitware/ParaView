@@ -27,6 +27,7 @@ vtkPVInputMenu
 vtkPVLabeledToggle
 vtkPVLODActor
 vtkPVMethodInterface 
+vtkPVMinMax
 vtkPVProbe
 vtkPVRenderView 
 vtkPVScale 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVThreshold.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVMinMax.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,61 +39,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVThreshold - A class to handle the UI for vtkThreshold
+// .NAME vtkPVMinMax -
 // .SECTION Description
 
+#ifndef __vtkPVMinMax_h
+#define __vtkPVMinMax_h
 
-#ifndef __vtkPVThreshold_h
-#define __vtkPVThreshold_h
+#include "vtkPVWidget.h"
+#include "vtkKWApplication.h"
+#include "vtkKWScale.h"
+#include "vtkKWLabel.h"
 
-#include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
-//#include "vtkKWScale.h"
-#include "vtkPVMinMax.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkThreshold.h"
-
-class VTK_EXPORT vtkPVThreshold : public vtkPVSource
+class VTK_EXPORT vtkPVMinMax : public vtkPVWidget
 {
 public:
-  static vtkPVThreshold* New();
-  vtkTypeMacro(vtkPVThreshold, vtkPVSource);
-    
+  static vtkPVMinMax* New();
+  vtkTypeMacro(vtkPVMinMax, vtkPVWidget);
+
+  void Create(vtkKWApplication *pvApp, char *minLabel, char *maxLabel,
+              float min, float max, float resolution,
+              char *setCmd, char *getMinCmd, char *getMaxCmd, char *minHelp,
+              char *maxHelp);
+  
   // Description:
-  // Set up the UI for this source
-  void CreateProperties();
+  // Called when accept button is pushed.  Just adds to trace
+  // file and calls supperclass accept.
+  virtual void Accept();
+  
+  // Description:
+  // This method allows scripts to modify the widgets value.
+  void SetMinValue(float val);
+  float GetMinValue() { return this->MinScale->GetValue(); }
+  void SetMaxValue(float val);
+  float GetMaxValue() { return this->MaxScale->GetValue(); }
+  void SetResolution(float res);
+  float GetResolution() { return this->MinScale->GetResolution(); }
+  void SetRange(float min, float max);
+  
+  // Description:
+  // Save this widget to a file
+  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
 
   // Description:
-  // Tcl callback for the attribute mode option menu
-  void ChangeAttributeMode(const char* newMode);
-
+  // Callback for min scale
+  void MinValueCallback();
+  
   // Description:
-  // Tcl callbacks for the upper value and lower value scales
-//  void UpperValueCallback();
-//  void LowerValueCallback();
-
-  // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
-
-  virtual void UpdateScalars();
+  // Callback for max scale
+  void MaxValueCallback();
   
 protected:
-  vtkPVThreshold();
-  ~vtkPVThreshold();
-  vtkPVThreshold(const vtkPVThreshold&) {};
-  void operator=(const vtkPVThreshold&) {};
+  vtkPVMinMax();
+  ~vtkPVMinMax();
+  vtkPVMinMax(const vtkPVMinMax&) {};
+  void operator=(const vtkPVMinMax&) {};
+  
+  vtkKWLabel *MinLabel;
+  vtkKWLabel *MaxLabel;
+  vtkKWScale *MinScale;
+  vtkKWScale *MaxScale;
+  vtkKWWidget *MinFrame;
+  vtkKWWidget *MaxFrame;
 
-  vtkKWWidget* AttributeModeFrame;
-  vtkKWLabel* AttributeModeLabel;
-  vtkKWOptionMenu* AttributeModeMenu;
-//  vtkKWScale* UpperValueScale;
-//  vtkKWScale* LowerValueScale;
-  vtkPVMinMax *MinMaxScale;
-  vtkPVLabeledToggle* AllScalarsCheck;
+  char *GetMinCommand;
+  char *GetMaxCommand;
+  
+  vtkSetStringMacro(GetMinCommand);
+  vtkSetStringMacro(GetMaxCommand);
 };
 
 #endif

@@ -62,8 +62,7 @@ vtkPVThreshold::vtkPVThreshold()
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();
-  this->UpperValueScale = vtkKWScale::New();
-  this->LowerValueScale = vtkKWScale::New();
+  this->MinMaxScale = vtkPVMinMax::New();
   this->AllScalarsCheck = vtkPVLabeledToggle::New();
 }
 
@@ -76,10 +75,8 @@ vtkPVThreshold::~vtkPVThreshold()
   this->AttributeModeMenu = NULL;
   this->AttributeModeFrame->Delete();
   this->AttributeModeFrame = NULL;
-  this->UpperValueScale->Delete();
-  this->UpperValueScale = NULL;
-  this->LowerValueScale->Delete();
-  this->LowerValueScale = NULL;
+  this->MinMaxScale->Delete();
+  this->MinMaxScale = NULL;
   this->AllScalarsCheck->Delete();
   this->AllScalarsCheck = NULL;
 }
@@ -139,45 +136,16 @@ void vtkPVThreshold::CreateProperties()
     range[1] = 1;
     }
   
-  this->UpperValueScale->SetParent(this->GetParameterFrame()->GetFrame());
-  this->UpperValueScale->Create(pvApp, "-showvalue 1");
-  this->UpperValueScale->DisplayLabel("Upper Threshold");
-  this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->UpperValueScale->SetRange(range[0], range[1]);
-  this->UpperValueScale->SetValue(range[1]);
-  this->UpperValueScale->SetCommand(this, "UpperValueCallback");
-  this->UpperValueScale->SetBalloonHelpString("Choose the upper value of the threshold");
+  this->MinMaxScale->SetParent(this->GetParameterFrame()->GetFrame());
+  this->MinMaxScale->SetPVSource(this);
+  this->MinMaxScale->Create(pvApp, "Lower Threshold", "Upper Threshold",
+                            range[0], range[1], (range[1] - range[0]) / 100.0,
+                            "ThresholdBetween", "GetLowerThreshold",
+                            "GetUpperThreshold",
+                            "Choose the lower value of the threshold",
+                            "Choose the upper value of the threshold");
+  this->Widgets->AddItem(this->MinMaxScale);
   
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->UpperValueScale->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetUpperThreshold");
-
-  this->LowerValueScale->SetParent(this->GetParameterFrame()->GetFrame());
-  this->LowerValueScale->Create(pvApp, "-showvalue 1");
-  this->LowerValueScale->DisplayLabel("Lower Threshold");
-  this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->LowerValueScale->SetRange(range[0], range[1]);
-  this->LowerValueScale->SetValue(range[0]);
-  this->LowerValueScale->SetCommand(this, "LowerValueCallback");
-  this->LowerValueScale->SetBalloonHelpString("Choose the lower value of the threshold");
-  
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->LowerValueScale->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetLowerThreshold");
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue]]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "ThresholdBetween",
-                                  this->LowerValueScale->GetTclName(),
-                                  this->UpperValueScale->GetTclName());
-
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->AllScalarsCheck->SetPVSource(this);
   this->AllScalarsCheck->Create(pvApp, "AllScalars", "SetAllScalars",
@@ -186,36 +154,11 @@ void vtkPVThreshold::CreateProperties()
   this->Widgets->AddItem(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
 
-  this->Script("pack %s %s %s",
-               this->UpperValueScale->GetWidgetName(),
-               this->LowerValueScale->GetWidgetName(),
+  this->Script("pack %s %s -fill x -expand t",
+               this->MinMaxScale->GetWidgetName(),
                this->AllScalarsCheck->GetWidgetName());
 
   this->UpdateParameterWidgets();
-}
-
-void vtkPVThreshold::UpperValueCallback()
-{
-  float lowerValue = this->LowerValueScale->GetValue();
-  
-  this->ChangeAcceptButtonColor();
-  
-  if (this->UpperValueScale->GetValue() < lowerValue)
-    {
-    this->UpperValueScale->SetValue(lowerValue);
-    }
-}
-
-void vtkPVThreshold::LowerValueCallback()
-{
-  float upperValue = this->UpperValueScale->GetValue();
-
-  this->ChangeAcceptButtonColor();
-  
-  if (this->LowerValueScale->GetValue() > upperValue)
-    {
-    this->LowerValueScale->SetValue(upperValue);
-    }
 }
 
 void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
@@ -260,13 +203,10 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
     this->ScalarOperationMenu->UsePointDataOff();
     }
 
-  this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->UpperValueScale->SetRange(range[0], range[1]);
-  this->UpperValueScale->SetValue(range[1]);
-
-  this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->LowerValueScale->SetRange(range[0], range[1]);
-  this->LowerValueScale->SetValue(range[0]);
+  this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->MinMaxScale->SetRange(range[0], range[1]);
+  this->MinMaxScale->SetMaxValue(range[1]);
+  this->MinMaxScale->SetMinValue(range[0]);
   
   this->ScalarOperationMenu->FillMenu();
 }
@@ -299,13 +239,10 @@ void vtkPVThreshold::UpdateScalars()
       }
     }
   
-  this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->UpperValueScale->SetRange(range[0], range[1]);
-  this->UpperValueScale->SetValue(range[1]);
-
-  this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->LowerValueScale->SetRange(range[0], range[1]);
-  this->LowerValueScale->SetValue(range[0]);  
+  this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->MinMaxScale->SetRange(range[0], range[1]);
+  this->MinMaxScale->SetMaxValue(range[1]);
+  this->MinMaxScale->SetMinValue(range[0]);
 }
 
 void vtkPVThreshold::SaveInTclScript(ofstream *file)
@@ -408,11 +345,11 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     *file << "CellData\n\t";
     }
   
-  *file << this->VTKSourceTclName << " ThresholdBetween "
-        << this->LowerValueScale->GetValue() << " "
-        << this->UpperValueScale->GetValue() << "\n\t";
-//        << this->VTKSourceTclName << " SetAllScalars "
-//        << this->AllScalarsCheck->GetState() << "\n\n";
+//  *file << this->VTKSourceTclName << " ThresholdBetween "
+//        << this->MinMaxScale->GetMinValue() << " "
+//        << this->MinMaxScale->GetMaxValue() << "\n\t";
+  
+  this->MinMaxScale->SaveInTclScript(file, this->VTKSourceTclName);
   this->AllScalarsCheck->SaveInTclScript(file, this->VTKSourceTclName);
   *file << "\n";
   
