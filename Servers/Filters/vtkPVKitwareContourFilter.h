@@ -12,7 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVKitwareContourFilter -
+// .NAME vtkPVKitwareContourFilter - generate isosurfaces/isolines from scalar values
+//
+// .SECTION Description
+// This is a subclass of vtkKitwareContourFilter that allows selection of input scalars
+
 #ifndef __vtkPVKitwareContourFilter_h
 #define __vtkPVKitwareContourFilter_h
 

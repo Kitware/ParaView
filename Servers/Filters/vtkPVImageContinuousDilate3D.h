@@ -12,7 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageContinuousDilate3D -
+// .NAME vtkPVImageContinuousDilate3D - Dilate implemented as a maximum.
+//
+// .SECTION Description
+// This is a subclass of vtkImageContinuousDilate3D that allows selection of input scalars
 
 #ifndef __vtkPVImageContinuousDilate3D_h
 #define __vtkPVImageContinuousDilate3D_h

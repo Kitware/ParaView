@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMazeSource - 
+// .NAME vtkMazeSource - Generate a maze
+//
 // .SECTION Description
+// Source object to generate a maze
 
 #ifndef __vtkMazeSource_h
 #define __vtkMazeSource_h

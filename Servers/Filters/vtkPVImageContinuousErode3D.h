@@ -12,7 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageContinuousErode3D - 
+// .NAME vtkPVImageContinuousErode3D - Erosion implemented as a minimum.
+//
+// .SECTION Description
+// This is a subclass of vtkImageContinuousErode3D that allows selection of input scalars
+
 
 #ifndef __vtkPVImageContinuousErode3D_h
 #define __vtkPVImageContinuousErode3D_h

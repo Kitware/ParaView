@@ -12,7 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageMedian3D -
+// .NAME vtkPVImageMedian3D - Median Filter.
+//
+// .SECTION Description
+// This is a subclass of vtkImageMedian3D that allows selection of input scalars
 
 #ifndef __vtkPVImageMedian3D_h
 #define __vtkPVImageMedian3D_h

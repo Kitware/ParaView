@@ -12,7 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageGradient -
+// .NAME vtkPVImageGradient - Computes the gradient vector.
+//
+// .SECTION Description
+// This is a subclass of vtkImageGradient that allows selection of input scalars
 
 #ifndef __vtkPVImageGradient_h
 #define __vtkPVImageGradient_h

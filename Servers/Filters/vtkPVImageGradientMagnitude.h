@@ -12,7 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageGradientMagnitude -
+// .NAME vtkPVImageGradientMagnitude - Computes magnitude of the gradient.
+//
+// .SECTION Description
+// This is a subclass of vtkImageGradientMagnitude that allows selection of input scalars
 
 #ifndef __vtkPVImageGradientMagnitude_h
 #define __vtkPVImageGradientMagnitude_h
