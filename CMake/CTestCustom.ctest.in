@@ -48,5 +48,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "jobserver unavailable"
   "warning: (Long double usage is reported only once for each file"
   "warning: To disable this warning use"
+  "ranlib: file: .+ has no symbols"
   )
 
