@@ -91,8 +91,6 @@ protected:
 
   int InstanceCount;
   
-  void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
-
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
 };
