@@ -117,7 +117,6 @@ protected:
   vtkPVApplication *GetPVApplication();
   vtkPVWindow *PVWindow;
   int InstanceCount;
-  int ExtentTranslatorInstanceCount;
 };
 
 #endif

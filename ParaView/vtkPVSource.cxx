@@ -91,6 +91,8 @@ vtkPVSource::vtkPVSource()
   this->ResetCommands = vtkStringList::New();
   
   this->Interface = NULL;
+
+  this->ExtentTranslatorTclName = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -199,6 +201,13 @@ vtkPVSource::~vtkPVSource()
   this->ResetCommands = NULL;
 
   this->SetInterface(NULL);
+
+  if (this->ExtentTranslatorTclName)
+    {
+    this->GetPVApplication()->BroadcastScript("%s Delete", 
+                                this->ExtentTranslatorTclName);
+    this->SetExtentTranslatorTclName(NULL);
+    }
 }
 
 //----------------------------------------------------------------------------

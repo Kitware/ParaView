@@ -40,7 +40,6 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   
   this->InstanceCount = 1;
   ++instanceCount;
-  this->ExtentTranslatorInstanceCount = instanceCount;
   
   this->SourceClassName = NULL;
   this->RootName = NULL;
@@ -107,6 +106,16 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       }
     outputDataType = current->GetVTKData()->GetClassName();
     }
+  if (strcmp(outputDataType, "vtkPointSet") == 0)
+    { // Output will be the same as the input.
+    vtkPVData *current = this->PVWindow->GetCurrentPVData();
+    if (current == NULL)
+      {
+      vtkErrorMacro("Cannot determine output type.");
+      return NULL;
+      }
+    outputDataType = current->GetVTKData()->GetClassName();
+    }
 
   // Create the vtkSource.
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
@@ -159,20 +168,19 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
 
-//  if (strcmp(this->SourceClassName, "vtkImageMandelbrotSource") == 0 ||
-//      strcmp(this->SourceClassName, "vtkImageReader") == 0)
   if (!this->InputClassName)
     {
-    sprintf(extentTclName, "Translator%d",
-	    this->ExtentTranslatorInstanceCount);
+    sprintf(extentTclName, "%s%dTranslator", this->RootName,
+	    this->InstanceCount);
     pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
 			   extentTclName, pvs->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
 			   pvd->GetVTKDataTclName(), extentTclName);
+    // Hold onto name so it can be deleted.
+    pvs->SetExtentTranslatorTclName(extentTclName);
     }
   else
-//  if (pvd->GetVTKData()->IsA("vtkImageData") && this->InputClassName)
     {
     pvApp->BroadcastScript(
       "%s SetExtentTranslator [[%s GetInput] GetExtentTranslator]",

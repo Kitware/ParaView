@@ -237,6 +237,10 @@ public:
   void ChangeAcceptButtonColor();
   void EntryChanged(float f1, float f2);
   
+  // Description:
+  // Needed to clean up properly.
+  vtkSetStringMacro(ExtentTranslatorTclName);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -250,6 +254,9 @@ protected:
   
   vtkSource *VTKSource;
   char *VTKSourceTclName;
+  
+  // To clean up properly.
+  char *ExtentTranslatorTclName;
 
   // Called to allocate the output array.  Copies old outputs.
   void SetNumberOfPVOutputs(int num);
