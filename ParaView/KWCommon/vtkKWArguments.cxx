@@ -76,7 +76,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.2");
+vtkCxxRevisionMacro(vtkKWArguments, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -194,7 +194,7 @@ int vtkKWArguments::Parse()
         }
       else
         {
-        cerr << "Got unknown argument: \"" << arg << "\"" << endl;
+        cerr << "Got unknown argument: \"" << arg.c_str() << "\"" << endl;
         return 0;
         }
       }
