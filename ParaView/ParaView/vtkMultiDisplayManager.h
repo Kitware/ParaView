@@ -137,6 +137,10 @@ public:
   vtkGetMacro(ZeroEmpty,int);
 
   // Description:
+  // Always uses the clients zbuffer value. (for picking).
+  float GetZBufferValue(int x, int y);
+  
+  // Description:
   // Internal, but public for RMI/Callbacks.
 //BTX
   void ClientStartRender();

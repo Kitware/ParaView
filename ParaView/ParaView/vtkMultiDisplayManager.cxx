@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.17");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.18");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -155,6 +155,28 @@ vtkMultiDisplayManager::~vtkMultiDisplayManager()
   // Deletes buffers and array.
   this->InitializeTileBuffers(0);
 }
+
+
+//-------------------------------------------------------------------------
+// Called by the render window start event. 
+float vtkMultiDisplayManager::GetZBufferValue(int x, int y)
+{
+  float z;
+  float *pz;
+
+  if (this->RenderWindow == NULL)
+    {
+    vtkErrorMacro("Missing render window.");
+    return 0.5;
+    }
+  
+  pz = this->RenderWindow->GetZbufferData(x, y, x, y);
+  z = *pz;
+  delete [] pz;
+  return z;  
+}
+
+
 
 //==================== CallbackCommand and RMI functions ====================
 
