@@ -78,6 +78,13 @@ public:
   virtual void ColorSpaceToRGBCallback();
   virtual void ColorSpaceToHSVCallback();
 
+  // Description:
+  // Proxy to the function. 
+  // Only those functions need to be implemented in the subclasses.
+  // See protected: section too.
+  virtual int HasFunction();
+  virtual int GetFunctionSize();
+
 protected:
   vtkKWColorTransferFunctionEditor();
   ~vtkKWColorTransferFunctionEditor();
@@ -94,8 +101,7 @@ protected:
 
   // Description:
   // Proxy to the function
-  virtual int  HasFunction();
-  virtual int  GetFunctionSize();
+  // See public: section too.
   virtual int  GetFunctionPointColor(int id, float rgb[3]);
   virtual int  GetFunctionPointParameter(int id, float &parameter);
   virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y);

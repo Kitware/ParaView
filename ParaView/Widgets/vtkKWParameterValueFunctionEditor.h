@@ -325,6 +325,13 @@ public:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
 
+  // Description:
+  // Proxy to the function. 
+  // Only those functions need to be implemented in the subclasses.
+  // See protected: section too.
+  virtual int HasFunction() = 0;
+  virtual int GetFunctionSize() = 0;
+
 protected:
   vtkKWParameterValueFunctionEditor();
   ~vtkKWParameterValueFunctionEditor();
@@ -441,8 +448,7 @@ protected:
   // Description:
   // Proxy to the function. 
   // Only those functions need to be implemented in the subclasses.
-  virtual int  HasFunction() = 0;
-  virtual int  GetFunctionSize() = 0;
+  // See public: section too.
   virtual int  GetFunctionPointColor(int id, float rgb[3]);
   virtual int  GetFunctionPointParameter(int id, float &parameter) = 0;
   virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y) = 0;
