@@ -204,9 +204,15 @@ void vtkPVImageReader::ImageAccepted()
     this->InitializeData();
     }
   
+  if (window->GetPreviousSource() != NULL)
+    {
+    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    }
+    
   window->GetMainView()->SetSelectedComposite(this);
   window->GetMainView()->ResetCamera();
   this->GetView()->Render();
+  window->GetSourceList()->Update();
 }
 
 //----------------------------------------------------------------------------

@@ -96,7 +96,6 @@ void vtkPVPolyData::Shrink()
 
   // The window here should probably be replaced with the view.
   window->SetCurrentSource(shrink);
-  window->GetSourceList()->Update();
   
   shrink->Delete();
 }
@@ -118,7 +117,6 @@ void vtkPVPolyData::TubeFilter()
   this->GetPVSource()->GetView()->AddComposite(tube);
   
   window->SetCurrentSource(tube);
-  window->GetSourceList()->Update();
   
   tube->Delete();
 }
@@ -140,7 +138,6 @@ void vtkPVPolyData::PolyDataNormals()
   this->GetPVSource()->GetView()->AddComposite(normal);
 
   window->SetCurrentSource(normal);
-  window->GetSourceList()->Update();
   
   normal->Delete();
 }
@@ -163,7 +160,6 @@ void vtkPVPolyData::Glyph()
   this->GetPVSource()->GetView()->AddComposite(glyph);
   
   window->SetCurrentSource(glyph);
-  window->GetSourceList()->Update();
 
   glyph->Delete();
 }
@@ -185,7 +181,6 @@ void vtkPVPolyData::GetGhostCells()
   this->GetPVSource()->GetView()->AddComposite(rgc);
   
   window->SetCurrentSource(rgc);
-  window->GetSourceList()->Update();
 
   rgc->Delete();
 }
@@ -207,7 +202,6 @@ void vtkPVPolyData::ParallelDecimate()
   this->GetPVSource()->GetView()->AddComposite(paraDeci);
   
   window->SetCurrentSource(paraDeci);
-  window->GetSourceList()->Update();
   
   paraDeci->Delete();
 }

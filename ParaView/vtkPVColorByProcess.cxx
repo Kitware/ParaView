@@ -133,6 +133,7 @@ void vtkPVColorByProcess::ParameterChanged()
     this->GetFilter()->SetProgressMethod(ColorByProcessProgress, this);
     this->GetFilter()->SetEndMethod(EndColorByProcessProgress, this);
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
   
   this->GetView()->Render();

@@ -130,6 +130,7 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
     this->GetShrink()->SetProgressMethod(ShrinkPolyDataProgress, this);
     this->GetShrink()->SetEndMethod(EndShrinkPolyDataProgress, this);
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
 
   window->GetMainView()->SetSelectedComposite(this);
@@ -154,5 +155,3 @@ vtkShrinkPolyData *vtkPVShrinkPolyData::GetShrink()
 {
   return vtkShrinkPolyData::SafeDownCast(this->PolyDataSource);
 }
-
-

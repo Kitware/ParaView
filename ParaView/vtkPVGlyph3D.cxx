@@ -280,6 +280,7 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+    window->GetSourceList()->Update();
     }
   
   window->GetMainView()->SetSelectedComposite(this);

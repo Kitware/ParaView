@@ -405,6 +405,7 @@ void vtkPVImageSlice::SliceChanged()
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+    window->GetSourceList()->Update();
 
     this->GetSliceStyle()->SetExtent(this->GetSlice()->GetOutputWholeExtent());
     

@@ -190,15 +190,10 @@ void vtkPVData::Contour()
   vtkPVWindow *window = vtkPVWindow::SafeDownCast(
     this->GetPVSource()->GetView()->GetParentWindow());
   this->GetPVSource()->GetView()->AddComposite(contour);
-//  this->GetPVSource()->VisibilityOff();
   
   window->SetCurrentSource(contour);
-  window->GetSourceList()->Update();
-  
-//  this->GetPVSource()->GetView()->Render();
   
   contour->Delete();
-//  pvd->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +213,6 @@ void vtkPVData::Cutter()
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
   window->SetCurrentSource(cutter);
-  window->GetSourceList()->Update();
   
   cutter->Delete();
 }
@@ -247,7 +241,6 @@ void vtkPVData::Elevation()
   elevation->SetHighPoint(bounds[1], 0.0, 0.0);
 
   window->SetCurrentSource(elevation);
-  window->GetSourceList()->Update();
   
   elevation->Delete();
 }
@@ -269,7 +262,6 @@ void vtkPVData::ColorByProcess()
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
   window->SetCurrentSource(pvFilter);
-  window->GetSourceList()->Update();
   
   pvFilter->Delete();
 }

@@ -150,6 +150,7 @@ void vtkPVConeSource::ConeParameterChanged()
 
   window->GetMainView()->ResetCamera();
   this->GetView()->Render();
+  window->GetSourceList()->Update();
 }
 
 

@@ -90,6 +90,7 @@ void vtkPVParallelDecimate::ParallelDecimateChanged()
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
   
   window->GetMainView()->SetSelectedComposite(this);

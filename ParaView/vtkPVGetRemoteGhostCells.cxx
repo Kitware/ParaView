@@ -100,6 +100,7 @@ void vtkPVGetRemoteGhostCells::GhostLevelChanged()
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
   
   // This line needs to be after data is initialized because we need to set

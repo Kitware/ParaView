@@ -283,6 +283,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
     this->GetElevation()->SetProgressMethod(ElevationFilterProgress, this);
     this->GetElevation()->SetEndMethod(EndElevationFilterProgress, this);
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
   
   this->GetView()->Render();

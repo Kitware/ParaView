@@ -106,7 +106,6 @@ void vtkPVImage::Clip()
   this->GetPVSource()->GetView()->AddComposite(clip);
   
   window->SetCurrentSource(clip);
-  window->GetSourceList()->Update();
   
   clip->Delete();
 }
@@ -127,7 +126,6 @@ void vtkPVImage::Slice()
   this->GetPVSource()->GetView()->AddComposite(slice);
   
   window->SetCurrentSource(slice);
-  window->GetSourceList()->Update();
   
   // Lets try to setup a good default parameters.
   this->GetImageData()->UpdateInformation();
@@ -247,9 +245,3 @@ void vtkPVImage::Update()
 
   image->Update();
 }
-
-
-
-
-
-

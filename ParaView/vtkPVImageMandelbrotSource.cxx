@@ -124,7 +124,8 @@ void vtkPVImageMandelbrotSource::CreateProperties()
 	       this->YDimension->GetEntry()->GetWidgetName());
   this->YDimension->SetLabel("Y:");
   this->ZDimension->Create(this->Application);
-  this->Script("%s configure -width 4");
+  this->Script("%s configure -width 4",
+	       this->ZDimension->GetEntry()->GetWidgetName());
   this->ZDimension->SetLabel("Z:");
   this->Script("pack %s %s %s -side left", 
 	       this->XDimension->GetWidgetName(),
@@ -307,4 +308,5 @@ void vtkPVImageMandelbrotSource::AcceptParameters()
   window->GetMainView()->SetSelectedComposite(this);
   window->GetMainView()->ResetCamera();
   this->GetView()->Render();
+  window->GetSourceList()->Update();
 }

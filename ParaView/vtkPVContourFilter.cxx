@@ -192,6 +192,7 @@ void vtkPVContourFilter::ContourValueChanged()
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+    window->GetSourceList()->Update();
     }
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();

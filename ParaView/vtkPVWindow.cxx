@@ -292,7 +292,6 @@ void vtkPVWindow::NewCone()
   this->SetCurrentSource(cone);
   
   // Clean up. (How about on the other processes?)
-  this->SourceList->Update();
   cone->Delete();
   cone = NULL;
 }
@@ -316,7 +315,6 @@ void vtkPVWindow::NewSphere()
   this->SetCurrentSource(sphere);
   
   // Clean up. (How about on the other processes?)
-  this->SourceList->Update();
   sphere->Delete();
   sphere = NULL;
 }
@@ -336,7 +334,6 @@ void vtkPVWindow::NewVolume()
   reader->SetName("volume");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);
-  this->SourceList->Update();
   
   reader->Delete();
 }
@@ -354,7 +351,6 @@ void vtkPVWindow::FractalVolume()
   source->SetName("fractal volume");
   this->MainView->AddComposite(source);
   this->SetCurrentSource(source);
-  this->SourceList->Update();
   
   source->Delete();
 }

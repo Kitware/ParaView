@@ -100,6 +100,29 @@ void vtkPVTubeFilter::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartTubeFilterProgress(void *arg)
+{
+  vtkPVTubeFilter *me = (vtkPVTubeFilter*)arg;
+  me->GetWindow()->SetStatusText("Processing Tube Filter");
+}
+
+//----------------------------------------------------------------------------
+void TubeFilterProgress(void *arg)
+{
+  vtkPVTubeFilter *me = (vtkPVTubeFilter*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetTubeFilter()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndTubeFilterProgress(void *arg)
+{
+  vtkPVTubeFilter *me = (vtkPVTubeFilter*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVTubeFilter::TubeFilterChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -110,7 +133,12 @@ void vtkPVTubeFilter::TubeFilterChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
+    this->GetTubeFilter()->SetStartMethod(StartTubeFilterProgress, this);
+    this->GetTubeFilter()->SetProgressMethod(TubeFilterProgress, this);
+    this->GetTubeFilter()->SetEndMethod(EndTubeFilterProgress, this);
+
     this->InitializeData();
+    window->GetSourceList()->Update();
     }
 
   window->GetMainView()->SetSelectedComposite(this);
