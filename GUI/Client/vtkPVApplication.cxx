@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.269");
+vtkCxxRevisionMacro(vtkPVApplication, "1.270");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -217,25 +217,28 @@ public:
 
   void DisplayDebugText(const char* t)
     {
-      this->DisplayText(t);
+      this->PVDisplayText(t);
     }
   
   void DisplayWarningText(const char* t)
     {
-      this->DisplayText(t);
+      this->PVDisplayText(t);
     }
   
   void DisplayErrorText(const char* t)
     {
-      this->DisplayText(t, 1);
+      this->PVDisplayText(t, 1);
     }
   
   void DisplayGenericWarningText(const char* t)
     {
-      this->DisplayText(t);
+      this->PVDisplayText(t);
     }
-  
-  void DisplayText(const char* t, int error = 0)
+  void DisplayText(const char* t)
+  {
+    this->PVDisplayText(t, 0);
+  }
+  void PVDisplayText(const char* t, int error = 0)
   {
 #ifdef _WIN32
     // if this is a windows application, then always
