@@ -484,8 +484,8 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
-  "--disable-registery", "-d", 
-  "Do not use registery when running ParaView (for testing).", 
+  "--disable-registry", "-g", 
+  "Do not use registry when running ParaView (for testing).", 
 #ifdef VTK_MANGLE_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -503,9 +503,9 @@ char* vtkPVApplication::CreateHelpString()
   error << "Valid arguments are: " << endl;
 
   int j=0;
-  const char* argument1 = ArgumentList[j];
-  const char* argument2 = ArgumentList[j+1];
-  const char* help = ArgumentList[j+2];
+  const char* argument1 = vtkPVApplication::ArgumentList[j];
+  const char* argument2 = vtkPVApplication::ArgumentList[j+1];
+  const char* help = vtkPVApplication::ArgumentList[j+2];
   while (argument1 && argument1[0])
     {
     error << argument1;
@@ -515,11 +515,11 @@ char* vtkPVApplication::CreateHelpString()
       }
     error << " : " << help << endl;
     j += 3;
-    argument1 = ArgumentList[j];
+    argument1 = vtkPVApplication::ArgumentList[j];
     if (argument1 && argument1[0]) 
       {
-      argument2 = ArgumentList[j+1];
-      help = ArgumentList[j+2];
+      argument2 = vtkPVApplication::ArgumentList[j+1];
+      help = vtkPVApplication::ArgumentList[j+2];
       }
     }
   error << ends;
@@ -589,8 +589,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
       if (argv[i])
         {
         int  j=0;
-        const char* argument1 = ArgumentList[j];
-        const char* argument2 = ArgumentList[j+1];
+        const char* argument1 = vtkPVApplication::ArgumentList[j];
+        const char* argument2 = vtkPVApplication::ArgumentList[j+1];
         while (argument1 && argument1[0])
           {
           if ( strcmp(argv[i], argument1) == 0 || 
@@ -599,8 +599,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
             valid = 1;
             }
           j += 3;
-          argument1 = ArgumentList[j];
-          if (argument1 && argument1[0]) {argument2 = ArgumentList[j+1];}
+          argument1 = vtkPVApplication::ArgumentList[j];
+          if (argument1 && argument1[0]) 
+            {
+            argument2 = vtkPVApplication::ArgumentList[j+1];
+            }
           }
         }
       if (!valid)
@@ -629,7 +632,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registery",
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-d",
                                           index) == VTK_OK )
