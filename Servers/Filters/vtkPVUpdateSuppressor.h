@@ -19,12 +19,12 @@
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkDataSetToDataSetFilter.h"
 
-class VTK_EXPORT vtkPVUpdateSuppressor : public vtkPolyDataToPolyDataFilter
+class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetToDataSetFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetToDataSetFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -74,7 +74,7 @@ protected:
 
   vtkTimeStamp UpdateTime;
 
-  vtkPolyData** CachedGeometry;
+  vtkDataSet** CachedGeometry;
   int CachedGeometryLength;
 
 private:
