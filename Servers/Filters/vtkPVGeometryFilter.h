@@ -26,7 +26,7 @@ class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkHierarchicalBoxDataSet;
-class vtkHierarchicalBoxOutlineFilter;
+//class vtkHierarchicalBoxOutlineFilter;
 class vtkImageData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
@@ -103,7 +103,7 @@ protected:
   vtkMultiProcessController* Controller;
   vtkOutlineSource *OutlineSource;
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
-  vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
+  //vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
 
   int CheckAttributes(vtkDataObject* input);
 

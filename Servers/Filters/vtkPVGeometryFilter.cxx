@@ -23,7 +23,7 @@
 #include "vtkGeometryFilter.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkHierarchicalBoxOutlineFilter.h"
+//#include "vtkHierarchicalBoxOutlineFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
@@ -40,7 +40,7 @@
 #include "vtkCallbackCommand.h"
 #include "vtkGarbageCollector.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.44");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.45");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -55,7 +55,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->NumberOfRequiredInputs = 0;
   this->SetNumberOfInputPorts(1);
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
-  this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
+  //this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
 
   // Setup a callback for the internal readers to report progress.
   this->InternalProgressObserver = vtkCallbackCommand::New();
@@ -76,10 +76,10 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
     {
     this->DataSetSurfaceFilter->Delete();
     }
-  if(this->HierarchicalBoxOutline)
-    {
-    this->HierarchicalBoxOutline->Delete();
-    }
+//   if(this->HierarchicalBoxOutline)
+//     {
+//     this->HierarchicalBoxOutline->Delete();
+//     }
   this->OutlineSource->Delete();
   this->InternalProgressObserver->Delete();
   this->SetController(0);
@@ -336,14 +336,14 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
 
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input)
+void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *)
 {
-  vtkHierarchicalBoxDataSet* ds = input->NewInstance();
-  ds->ShallowCopy(input);
-  this->HierarchicalBoxOutline->SetInput(ds);
-  ds->Delete();
-  this->HierarchicalBoxOutline->Update();
-  this->GetOutput()->ShallowCopy(this->HierarchicalBoxOutline->GetOutput());
+//   vtkHierarchicalBoxDataSet* ds = input->NewInstance();
+//   ds->ShallowCopy(input);
+//   this->HierarchicalBoxOutline->SetInput(ds);
+//   ds->Delete();
+//   this->HierarchicalBoxOutline->Update();
+//   this->GetOutput()->ShallowCopy(this->HierarchicalBoxOutline->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -621,8 +621,8 @@ void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
   this->Superclass::ReportReferences(collector);
   vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter,
                             "DataSetSurfaceFilter");
-  vtkGarbageCollectorReport(collector, this->HierarchicalBoxOutline,
-                            "HierarchicalBoxOutline");
+//   vtkGarbageCollectorReport(collector, this->HierarchicalBoxOutline,
+//                             "HierarchicalBoxOutline");
 }
 
 //----------------------------------------------------------------------------
