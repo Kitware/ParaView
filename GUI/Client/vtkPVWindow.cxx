@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.584");
+vtkCxxRevisionMacro(vtkPVWindow, "1.585");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4607,6 +4607,10 @@ void vtkPVWindow::SetProgress(const char* text, int val)
   if ( val == 0 || val > 100 )
     {
     return;
+    }
+  if ( strlen(text) > 4 && text[0] == 'v' && text[1] == 't' && text[2] == 'k' )
+    {
+    text += 3;
     }
   this->ModifiedEnableState = 1;
   this->SetEnabled(0);
