@@ -37,11 +37,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWEventNotifier.h"
 
-#ifdef _WIN32
+#if defined _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
-#else
+#elif defined VTK_USE_MESA
 #include "vtkMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
+#else
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkOpenGLRenderer.h"
 #endif
 
 #include "vtkTimerLog.h"
@@ -146,7 +149,7 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
     } 
   else 
     {
-#ifndef WIN32
+#ifdef VTK_USE_MESA
     // Condition is here until we fix the resize bug in vtkMesarenderWindow.
     localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
       	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
@@ -205,7 +208,7 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
       } 
     else 
       {
-#ifndef WIN32
+#ifdef VTK_USE_MESA
       ((vtkMesaRenderWindow *)renWin)-> \
 	         SetRGBACharPixelData(0,0, windowSize[0]-1, \
 			     windowSize[1]-1,(unsigned char*)localPdata,0);
@@ -367,7 +370,7 @@ void vtkPVRenderView::Clone(vtkPVApplication *pvApp)
 // Should use superclass offscreen rendering stuf ?
 void vtkPVRenderView::OffScreenRenderingOn()
 {
-#ifndef WIN32  
+#ifdef VTK_USE_MESA  
   this->Renderer->Delete();
   this->Renderer = NULL;
   this->RenderWindow->Delete();
