@@ -13,6 +13,8 @@
 =========================================================================*/
 #include "vtkPVPluginsDialog.h"
 
+//#include "vtkAssertions.h"
+
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
@@ -25,7 +27,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.3");
 
 int vtkPVPluginsDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -69,6 +71,8 @@ vtkPVPluginsDialog::~vtkPVPluginsDialog()
 //----------------------------------------------------------------------------
 void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 {
+  //  vtkRequire("app_exists",app!=NULL);
+
   // Invoke super method
   this->Superclass::Create(app, args);
 
@@ -200,6 +204,8 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 int vtkPVPluginsDialog::Invoke()
 {
+  int result=0;
+
   if (this->IsCreated()) // should be require("is_created",this->IsCreated());
     {
       // Display one row per plugin
@@ -217,8 +223,11 @@ int vtkPVPluginsDialog::Invoke()
         }
 #endif
     }
-  
-  return this->Superclass::Invoke();
+  result=this->Superclass::Invoke();
+
+  //  vtkEnsure("valid_result",(result==0)&&(result!=1));
+
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -226,5 +235,15 @@ void vtkPVPluginsDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  //  os << indent << "Entry: " << this->Entry << endl;
+  os << indent << "PluginsFrame: " << this->PluginsFrame << endl;
+  os << indent << "NameButton: " << this->NameButton << endl;
+  os << indent << "TypeButton: " << this->TypeButton << endl;
+  os << indent << "LoadedButton: " << this->LoadedButton << endl;
+  os << indent << "AutoLoadButton: " << this->AutoLoadButton << endl;
+  os << indent << "PathButton: " << this->PathButton << endl;
+  os << indent << "InfoButton: " << this->InfoButton<< endl;
+  os << indent << "ButtonsFrame: " << this->ButtonsFrame << endl;
+  os << indent << "AddPluginButton: " << this->AddPluginButton << endl;
+  os << indent << "HelpButton: " << this->HelpButton << endl;
+  os << indent << "CloseButton: " << this->CloseButton<< endl;
 }
