@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.35");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.36");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -74,7 +74,6 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->OptionWidth = 0;
   
   this->DefaultValue = 0;
-  this->AcceptCalled = 0;
   
   this->Property = NULL;
 }
@@ -221,8 +220,6 @@ void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
   this->Property->SetVTKSourceTclName(sourceTclName);
   
   this->Property->AcceptInternal();
-  
-  this->AcceptCalled = 1;
 }
 
 

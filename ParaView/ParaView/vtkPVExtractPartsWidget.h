@@ -113,8 +113,6 @@ protected:
   // Called to inactivate widget (after accept is called).
   void Inactivate();
 
-  int AcceptCalled;
-
   vtkPVScalarListWidgetProperty *Property;
   
   vtkPVExtractPartsWidget(const vtkPVExtractPartsWidget&); // Not implemented

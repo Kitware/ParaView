@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.19");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -60,7 +60,6 @@ vtkPVLabeledToggle::vtkPVLabeledToggle()
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
-  this->AcceptCalled = 0;
   this->DefaultValue = 0;
   this->Property = NULL;
 }
@@ -195,8 +194,6 @@ void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
   this->Property->SetIndex(this->GetState());
   this->Property->SetVTKSourceTclName(sourceTclName);
   this->Property->AcceptInternal();
-  
-  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------

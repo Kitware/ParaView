@@ -207,8 +207,6 @@ protected:
   int MinLabelWidth;
   int MaxLabelWidth;
 
-  int AcceptCalled;
-  
   vtkPVScalarListWidgetProperty *Property;
   
 //BTX

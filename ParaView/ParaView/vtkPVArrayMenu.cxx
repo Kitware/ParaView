@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.43");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -91,8 +91,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
 
-  this->AcceptCalled = 0;
-  
   this->Property = NULL;
 }
 
@@ -394,7 +392,6 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------

@@ -205,7 +205,6 @@ protected:
 
   float DefaultValues[6];
   vtkSetVector6Macro(DefaultValues, float);
-  int AcceptCalled;
   
   vtkPVScalarListWidgetProperty *Property;
   

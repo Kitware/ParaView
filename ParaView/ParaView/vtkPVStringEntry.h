@@ -121,7 +121,6 @@ protected:
   char* DefaultValue;
   vtkSetStringMacro(DefaultValue);
   vtkGetStringMacro(DefaultValue);
-  int AcceptCalled;
 
   vtkPVStringWidgetProperty *Property;
   

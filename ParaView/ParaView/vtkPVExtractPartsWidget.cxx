@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.9");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -72,8 +72,6 @@ vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
-  
-  this->AcceptCalled = 0;
   
   this->Property = NULL;
 }
@@ -227,7 +225,6 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
   delete [] numScalars;
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 

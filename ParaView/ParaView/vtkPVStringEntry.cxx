@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.21");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -65,7 +65,6 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->Entry->SetParent(this);
   this->EntryLabel = 0;
   this->DefaultValue = 0;
-  this->AcceptCalled = 0;
   this->Property = 0;
 }
 
@@ -206,7 +205,6 @@ void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
   this->Property->SetString(this->GetValue());
   this->Property->SetVTKSourceTclName(sourceTclName);
   this->Property->AcceptInternal();
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------

@@ -124,7 +124,6 @@ protected:
   
   int DefaultValue;
   vtkSetMacro(DefaultValue, int);
-  int AcceptCalled;
 
   vtkPVIndexWidgetProperty *Property;
   

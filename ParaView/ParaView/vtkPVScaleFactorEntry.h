@@ -70,7 +70,6 @@ public:
   // Description:
   // Move widget state to vtk object or back.
   virtual void ResetInternal();
-  virtual void AcceptInternal(const char* sourceTclName);
   
 protected:
   vtkPVScaleFactorEntry();
@@ -88,7 +87,6 @@ protected:
   vtkPVInputMenu *InputMenu;
   vtkPVSource *Input;
   void SetInput(vtkPVSource *input);
-  int AcceptCalled;
   
 private:
   vtkPVScaleFactorEntry(const vtkPVScaleFactorEntry&); // Not implemented

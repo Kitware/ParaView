@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.26");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,7 +77,6 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->UseWidgetCommand = 0;
 
   this->Property = NULL;
-  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -217,7 +216,6 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
     pvwp->GetWidget()->AcceptInternal(sourceTclName);
     }
 
-  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;
 }
 

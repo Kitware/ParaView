@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVWidget, "1.39");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -87,6 +87,7 @@ vtkPVWidget::vtkPVWidget()
 
   this->TraceNameState = vtkPVWidget::Uninitialized;
   this->SuppressReset = 0;
+  this->AcceptCalled = 0;
   
   this->UseWidgetRange = 0;
   this->WidgetRange[0] = 0;
@@ -156,6 +157,7 @@ void vtkPVWidget::Accept()
       }
     }
 
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------

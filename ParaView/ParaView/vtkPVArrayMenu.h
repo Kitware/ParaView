@@ -233,8 +233,6 @@ protected:
   // Resets the values based on the array.
   void UpdateComponentMenu();
   
-  int AcceptCalled;
-
   vtkPVStringAndScalarListWidgetProperty *Property;
   
 //BTX

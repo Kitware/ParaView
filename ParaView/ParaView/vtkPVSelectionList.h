@@ -150,7 +150,6 @@ protected:
   vtkSetStringMacro(CurrentName);
 
   int DefaultValue;
-  int AcceptCalled;
   vtkSetMacro(DefaultValue, int);
 
   vtkPVIndexWidgetProperty *Property;

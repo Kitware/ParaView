@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.26");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -85,8 +85,6 @@ vtkPVExtentEntry::vtkPVExtentEntry()
   this->Range[0] = this->Range[2] = this->Range[4] = -VTK_LARGE_INTEGER;
   this->Range[1] = this->Range[3] = this->Range[5] = VTK_LARGE_INTEGER;
 
-  this->AcceptCalled = 0;
-  
   this->Property = NULL;
 
   this->AnimationAxis = 0;
@@ -259,7 +257,6 @@ void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------

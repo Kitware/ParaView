@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.2");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -56,7 +56,6 @@ vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
   this->InputMenu = NULL;
   this->Input = NULL;
-  this->AcceptCalled = 0;
 }
 
 vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
@@ -73,12 +72,6 @@ void vtkPVScaleFactorEntry::ResetInternal()
   this->Update();
 }
 
-void vtkPVScaleFactorEntry::AcceptInternal(const char *sourceTclName)
-{
-  this->Superclass::AcceptInternal(sourceTclName);
-  this->AcceptCalled = 1;
-}
-
 void vtkPVScaleFactorEntry::Update()
 {
   this->UpdateScaleFactor();
@@ -93,7 +86,7 @@ void vtkPVScaleFactorEntry::UpdateScaleFactor()
     }
   
   vtkPVSource *input = this->InputMenu->GetCurrentValue();
-  if (!input || input == this->Input)
+  if (!input)
     {
     return;
     }

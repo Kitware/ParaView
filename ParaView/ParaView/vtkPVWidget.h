@@ -276,6 +276,7 @@ protected:
 
   vtkPVSource* PVSource;
 
+  int AcceptCalled;
 
   int UseWidgetRange;
   float WidgetRange[2];

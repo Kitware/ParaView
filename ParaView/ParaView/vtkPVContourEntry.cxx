@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.38");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -70,7 +70,6 @@ vtkPVContourEntry::vtkPVContourEntry()
 
   this->SuppressReset = 1;
   
-  this->AcceptCalled = 0;
   this->Property = NULL;
   
   this->ArrayMenu = NULL;
@@ -149,8 +148,6 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
     }
   delete [] cmds;
   delete [] numScalars;
-  
-  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------

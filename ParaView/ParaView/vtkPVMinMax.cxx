@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.21");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -85,8 +85,6 @@ vtkPVMinMax::vtkPVMinMax()
   this->MaxLabelWidth = 18;
 
   this->ArrayMenu = NULL;
-
-  this->AcceptCalled = 0;
 
   this->Property = NULL;
 }
@@ -320,7 +318,6 @@ void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
-  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------

@@ -157,8 +157,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  int AcceptCalled;
-
   vtkPVExtentWidgetProperty *Property;
   int AnimationAxis;
   
