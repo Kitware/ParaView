@@ -55,6 +55,11 @@ vtkKWCheckButton::vtkKWCheckButton()
   this->MyText = 0;
 }
 
+vtkKWCheckButton::~vtkKWCheckButton() 
+{
+  this->SetMyText(0);
+}
+
 void vtkKWCheckButton::SetIndicator(int ind)
 {
   if (ind != this->IndicatorOn)

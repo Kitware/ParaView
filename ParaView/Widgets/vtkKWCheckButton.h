@@ -79,7 +79,7 @@ protected:
   vtkSetStringMacro(MyText);
 
   vtkKWCheckButton();
-  ~vtkKWCheckButton() {};
+  ~vtkKWCheckButton();
 
   int IndicatorOn;
   char* MyText;

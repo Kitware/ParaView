@@ -320,6 +320,7 @@ vtkPVApplication::~vtkPVApplication()
   if ( this->TraceFile )
     {
     delete this->TraceFile;
+    this->TraceFile = 0;
     }
 }
 

@@ -47,6 +47,7 @@ vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
 vtkPVPlaneWidget.cxx
+vtkPVPointWidget.cxx
 vtkPVProbe.cxx
 vtkPVReaderModule.cxx
 vtkPVRenderView.cxx 
