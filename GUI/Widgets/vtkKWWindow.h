@@ -377,6 +377,7 @@ protected:
   vtkKWMenu *MenuHelp;
   vtkKWMenu *PageMenu;
 
+  vtkKWFrame *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;
   vtkKWLabel *StatusImage;
 

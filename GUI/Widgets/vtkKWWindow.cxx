@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.191");
+vtkCxxRevisionMacro(vtkKWWindow, "1.192");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -153,6 +153,7 @@ vtkKWWindow::vtkKWWindow()
   this->MiddleFrame           = vtkKWSplitFrame::New();
   this->ViewFrame             = vtkKWFrame::New();
 
+  this->StatusFrameSeparator  = vtkKWFrame::New();
   this->StatusFrame           = vtkKWFrame::New();
   this->StatusLabel           = vtkKWLabel::New();
   this->StatusImage           = vtkKWLabel::New();
@@ -246,6 +247,7 @@ vtkKWWindow::~vtkKWWindow()
   this->MenuBarSeparatorFrame->Delete();
   this->ViewFrame->Delete();
   this->MiddleFrame->Delete();
+  this->StatusFrameSeparator->Delete();
   this->StatusFrame->Delete();
   this->StatusImage->Delete();
   this->StatusLabel->Delete();
@@ -369,7 +371,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     {
     this->Menu->AddCascade("Help", this->MenuHelp, 0);
     }
-  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
+  this->MenuHelp->AddCommand("Help", this, "DisplayHelp", 0);
 
   if (app->HasCheckForUpdates())
     {
@@ -405,23 +407,15 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // To force the toolbar on top, I am creating a separate "MiddleFrame" 
   // for the ViewFrame and PropertiesParent
 
-  int min_size = 380;
-
-  this->MiddleFrame->SetSeparatorSize(0);
-  this->MiddleFrame->SetFrame1MinimumSize(min_size);
-
   if (app->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) &&
-      app->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) >= min_size)
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
     {
-    this->MiddleFrame->SetFrame1Size(
-      app->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
-    }
-  else
-    {
-    this->MiddleFrame->SetFrame1Size(min_size);
+    int reg_size = app->GetIntRegisteryValue(
+      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
+    if (reg_size >= this->MiddleFrame->GetFrame1MinimumSize())
+      {
+      this->MiddleFrame->SetFrame1Size(reg_size);
+      }
     }
 
   this->MiddleFrame->SetParent(this);
@@ -448,12 +442,25 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Notebook->Create(app, "");
   this->Notebook->AlwaysShowTabsOn();
 
+  // Status frame separator
+
+  this->StatusFrameSeparator->SetParent(this);
+  this->StatusFrameSeparator->Create(app, "-height 2 -bd 1");
+#if defined(_WIN32)
+  this->StatusFrameSeparator->ConfigureOptions("-relief groove");
+#else
+  this->StatusFrameSeparator->ConfigureOptions("-relief sunken");
+#endif
+
+  this->Script("pack %s -side top -fill x -pady 2",
+               this->StatusFrameSeparator->GetWidgetName());
+  
   // Status frame
 
   this->StatusFrame->SetParent(this);
-  this->StatusFrame->Create(app, "");
+  this->StatusFrame->Create(app, NULL);
   
-  this->Script("pack %s -side top -fill x -pady 2",
+  this->Script("pack %s -side top -fill x -pady 0",
                this->StatusFrame->GetWidgetName());
   
   // Status frame : image
@@ -462,10 +469,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->CreateStatusImage();
 
   this->StatusImage->SetParent(this->StatusFrame);
-  this->StatusImage->Create(app, "");
+  this->StatusImage->Create(app, "-relief sunken -bd 1");
 
-  this->Script("%s configure -image %s -relief sunken -bd 1 -fg white "
-               "-bg white -highlightbackground white -highlightcolor white "
+  this->Script("%s configure -image %s -fg white -bg white "
+               "-highlightbackground white -highlightcolor white "
                "-highlightthickness 0 -padx 0 -pady 0", 
                this->StatusImage->GetWidgetName(),
                this->StatusImageName);
@@ -476,17 +483,17 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : label
 
   this->StatusLabel->SetParent(this->StatusFrame);
-  this->StatusLabel->Create(app, "-relief sunken -padx 3 -bd 1 -anchor w");
+  this->StatusLabel->Create(app, "-relief sunken -bd 0 -padx 3 -anchor w");
 
-  this->Script("pack %s -side left -padx 2 -expand yes -fill both",
+  this->Script("pack %s -side left -padx 1 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
 
   // Status frame : progress frame
 
   this->ProgressFrame->SetParent(this->StatusFrame);
-  this->ProgressFrame->Create(app, "-relief sunken -bd 2");
+  this->ProgressFrame->Create(app, "-relief sunken -bd 1");
 
-  this->Script("pack %s -side left -padx 2 -fill y", 
+  this->Script("pack %s -side left -padx 0 -fill y", 
                this->ProgressFrame->GetWidgetName());
 
   // Status frame : progress frame : gauge
@@ -504,16 +511,16 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : tray frame
 
   this->TrayFrame->SetParent(this->StatusFrame);
-  this->TrayFrame->Create(app, "");
+  this->TrayFrame->Create(app, "-relief sunken -bd 1");
 
   this->Script(
-    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both", 
-    this->TrayFrame->GetWidgetName());
+   "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both",
+   this->TrayFrame->GetWidgetName());
 
   // Status frame : tray frame : error image
 
   this->TrayImageError->SetParent(this->TrayFrame);
-  this->TrayImageError->Create(app, "-relief sunken -bd 2");
+  this->TrayImageError->Create(app, "");
 
   this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
   
@@ -879,7 +886,7 @@ void vtkKWWindow::ShowWindowProperties()
 
   this->Notebook->UnpackSiblings();
 
-  this->Script("pack %s -pady 0 -padx 2 -fill both -expand yes -anchor n",
+  this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
 }
 
