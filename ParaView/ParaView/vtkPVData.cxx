@@ -40,8 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVData.h"
-#include "vtkToolkits.h"
-#include "vtkPVConfig.h"
 
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -62,16 +60,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVColorMap.h"
+#include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkScalarBarActor.h"
+#include "vtkString.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
+#include "vtkToolkits.h"
 #include "vtkTreeComposite.h"
-#include "vtkPVColorMap.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
@@ -1520,7 +1521,10 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
                          this->PropertyTclName, r, g, b);
   pvApp->BroadcastScript("%s SetAmbientColor 1.0 1.0 1.0",
                          this->PropertyTclName);
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1540,7 +1544,10 @@ void vtkPVData::ChangeColorMapToRedBlue()
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -1561,7 +1568,10 @@ void vtkPVData::ChangeColorMapToBlueRed()
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -1582,13 +1592,21 @@ void vtkPVData::ChangeColorMapToGrayscale()
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetColorRange(float min, float max)
 {
+  if ( this->ColorRangeMinEntry->GetValueAsFloat() == min &&
+       this->ColorRangeMaxEntry->GetValueAsFloat() == max )
+    {
+    return;
+    }
   this->AddTraceEntry("$kw(%s) SetColorRange %f %f", 
                       this->GetTclName(), min, max);
 
@@ -1620,7 +1638,10 @@ void vtkPVData::ResetColorRange()
 
   this->PVColorMap->ResetScalarRange();
   this->UpdateProperties();
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1638,7 +1659,10 @@ void vtkPVData::ColorRangeEntryCallback()
     }
 
   this->SetColorRange(min, max);
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1736,7 +1760,10 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
 
   // Synchronize the UI with the new color map.
   this->UpdateProperties();
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1796,15 +1823,47 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
   this->Script("pack %s -after %s -fill x", this->ScalarBarFrame->GetWidgetName(),
                this->ColorFrame->GetWidgetName());
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetRepresentation(const char* repr)
+{
+  if ( vtkString::Equals(repr, "Wireframe") )
+    {
+    this->DrawWireframe();
+    }
+  else if ( vtkString::Equals(repr, "Surface") )
+    {
+    this->DrawSurface();
+    }
+  else if ( vtkString::Equals(repr, "Points") )
+    {
+    this->DrawPoints();
+    }
+  else
+    {
+    vtkErrorMacro("Don't know the representation: " << repr);
+    this->DrawSurface();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::DrawWireframe()
 {
+  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
+                         "Wireframe") )
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
+  this->RepresentationMenu->SetValue("Wireframe");
 
   if (this->PropertyTclName)
     {
@@ -1822,15 +1881,25 @@ void vtkPVData::DrawWireframe()
                            this->PropertyTclName);
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::DrawPoints()
 {
+  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
+                         "Points") )
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
+  this->RepresentationMenu->SetValue("Points");
 
   if (this->PropertyTclName)
     {
@@ -1848,15 +1917,25 @@ void vtkPVData::DrawPoints()
                            this->PropertyTclName);
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::DrawSurface()
 {
+  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
+                         "Surface") )
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+  this->RepresentationMenu->SetValue("Surface");
 
   if (this->PropertyTclName)
     {
@@ -1874,17 +1953,43 @@ void vtkPVData::DrawSurface()
     this->PreviousWasSolid = 1;
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVData::SetInterpolation(const char* repr)
+{
+  if ( vtkString::Equals(repr, "Flat") )
+    {
+    this->SetInterpolationToFlat();
+    }
+  else if ( vtkString::Equals(repr, "Gouraud") )
+    {
+    this->SetInterpolationToGouraud();
+    }
+  else
+    {
+    vtkErrorMacro("Don't know the interpolation: " << repr);
+    this->DrawSurface();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolationToFlat()
 {
+  if ( vtkString::Equals(this->InterpolationMenu->GetValue(), "Flat") )
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", this->GetTclName());
+  this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
+                      this->GetTclName());
+  this->InterpolationMenu->SetValue("Flat");
 
   if (this->PropertyTclName)
     {
@@ -1892,16 +1997,26 @@ void vtkPVData::SetInterpolationToFlat()
                            this->PropertyTclName);
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolationToGouraud()
 {
+  if ( vtkString::Equals(this->InterpolationMenu->GetValue(), "Gouraud") )
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", this->GetTclName());
+  this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
+                      this->GetTclName());
+  this->InterpolationMenu->SetValue("Gouraud");
 
   if (this->PropertyTclName)
     {
@@ -1909,7 +2024,10 @@ void vtkPVData::SetInterpolationToGouraud()
                            this->PropertyTclName);
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -1926,7 +2044,11 @@ void vtkPVData::AmbientChanged()
 
   
   this->SetAmbient(ambient);
-  this->GetPVRenderView()->EventuallyRender(); */
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -2086,14 +2208,20 @@ void vtkPVData::CenterCamera()
 
 
   pvApp->BroadcastScript("%s ResetCameraClippingRange", tclName);
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::VisibilityCheckCallback()
 {
   this->SetVisibility(this->VisibilityCheck->GetState());
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2259,7 +2387,10 @@ void vtkPVData::ScalarBarCheckCallback()
   this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
                       this->ScalarBarCheck->GetState());
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
-  this->GetPVRenderView()->EventuallyRender();  
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2268,13 +2399,20 @@ void vtkPVData::CubeAxesCheckCallback()
   this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(),
                       this->CubeAxesCheck->GetState());
   this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
-  this->GetPVRenderView()->EventuallyRender();  
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetPointSize(int size)
 {
+  if ( this->PointSizeScale->GetValue() == size )
+    {
+    return;
+    }
   this->PointSizeScale->SetValue(size);
   this->ChangePointSize();
 }
@@ -2282,6 +2420,10 @@ void vtkPVData::SetPointSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVData::SetLineWidth(int width)
 {
+  if ( this->LineWidthScale->GetValue() == width )
+    {
+    return;
+    }
   this->LineWidthScale->SetValue(width);
   this->ChangeLineWidth();
 }
@@ -2301,7 +2443,10 @@ void vtkPVData::ChangePointSize()
   this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
                       (int)(this->PointSizeScale->GetValue()));
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 } 
 
 //----------------------------------------------------------------------------
@@ -2319,7 +2464,10 @@ void vtkPVData::ChangeLineWidth()
   this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
                       (int)(this->LineWidthScale->GetValue()));
 
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -2536,7 +2684,10 @@ void vtkPVData::ScalarBarOrientationCallback()
     this->PVColorMap->SetScalarBarOrientationToHorizontal();
     this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
     }
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2554,7 +2705,10 @@ void vtkPVData::SetOpacity(float val)
                                             this->PropTclName, val);
   this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(),
                       val);
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2581,7 +2735,10 @@ void vtkPVData::SetActorTranslate(float x, float y, float z)
                                             this->PropTclName, x, y, z);
   this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
                       this->GetTclName(), x, y, z);  
-  this->GetPVRenderView()->EventuallyRender();
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2611,7 +2768,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.127 $");
+  this->ExtractRevision(os,"$Revision: 1.128 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2619,17 +2776,132 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeSelf(os, indent);
   os << indent << "Visibility " << this->VisibilityCheck->GetState() << endl;
+  // Color by is not serialized because of gui does not follow tracing
   os << indent << "ColorBy " << this->ColorMenu->GetValue() << endl;
+  if ( !vtkString::Equals(this->ColorMenu->GetValue(), "Property") )
+    {
+    os << indent << "ColorRange " << this->ColorRangeMinEntry->GetValueAsFloat()
+       << " " << this->ColorRangeMaxEntry->GetValueAsFloat() << endl;
+    }
+
   os << indent << "Representation " << this->RepresentationMenu->GetValue() << endl;
   os << indent << "Interpolation " << this->InterpolationMenu->GetValue() << endl;
   os << indent << "PointSize " << this->PointSizeScale->GetValue() << endl;
   os << indent << "LineWidth " << this->LineWidthScale->GetValue() << endl;
-  os << indent << "Translate {" << this->TranslateEntry[0]->GetValue() << " "
+  os << indent << "CubeAxes " << this->CubeAxesCheck->GetState() << endl;
+  os << indent << "ActorTranslate " 
+     << this->TranslateEntry[0]->GetValue() << " "
      << this->TranslateEntry[1]->GetValue() << " " 
-     << this->TranslateEntry[1]->GetValue() << "}"  << endl;
+     << this->TranslateEntry[1]->GetValue() << endl;
   os << indent << "Opacity " << this->Opacity->GetValue() << endl;
 }
 
+//------------------------------------------------------------------------------
+void vtkPVData::SerializeToken(istream& is, const char token[1024])
+{
+  if ( vtkString::Equals(token, "Visibility") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetVisibility(cor);
+    }
+  else if ( vtkString::Equals(token, "PointSize") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetPointSize(cor);
+    }
+  else if ( vtkString::Equals(token, "LineWidth") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetLineWidth(cor);
+    }
+  else if ( vtkString::Equals(token, "CubeAxes") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetCubeAxesVisibility(cor);
+    }
+  else if ( vtkString::Equals(token, "Opacity") )
+    {
+    float cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetOpacity(cor);
+    }
+  else if ( vtkString::Equals(token, "Representation") )
+    {
+    char repr[1024];
+    repr[0] = 0;
+    if (! (is >> repr) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetRepresentation(repr);
+    }
+  else if ( vtkString::Equals(token, "Interpolation") )
+    {
+    char repr[1024];
+    repr[0] = 0;
+    if (! (is >> repr) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetInterpolation(repr);
+    }
+  else if ( vtkString::Equals(token, "ActorTranslate") )
+    {
+    float cor[3];
+    int cc;
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetActorTranslate(cor);
+    }
+  else if ( vtkString::Equals(token, "ColorRange") )
+    {
+    float cor[2];
+    int cc;
+    for ( cc = 0; cc < 2; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetColorRange(cor[0], cor[1]);
+    }
+  else
+    {
+    //cout << "Unknown Token for " << this->GetClassName() << ": " 
+    //     << token << endl;
+    this->Superclass::SerializeToken(is,token);  
+    }
+}
+  
 //----------------------------------------------------------------------------
 void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
                                        const char *arrayName, int component)
