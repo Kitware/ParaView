@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // The amount of padding that is to be added to the internal vertical padding of
 // the selected tab (basically defines the additional height of the selected
-// tab compared to the unselect tab).
+// tab compared to an unselected tab).
 
 #define VTK_KW_NB_TAB_SELECT_BD_Y  2
 
@@ -66,13 +66,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_KW_NB_TAB_BD           2
 
-// The amount of horizontal padding around the tab row itself (i.e. defines
-// a margin between the first and last tab and the border of the notebook widget
+// The amount of horizontal padding around the tabs frame itself (i.e. defines
+// a margin between the first (respectively last) tab and the left (respectively
+// right) border of the notebook widget
 
 #define VTK_KW_NB_TAB_FRAME_PADX   10
 
 // Given the HSV (Hue, Saturation, Value) of a frame, give the % of Value used
-// by the corresponding tab when not selected.
+// by the corresponding tab when it is not selected (i.e. dim unselected tabs).
 
 #define VTK_KW_NB_TAB_UNSELECTED_VALUE 0.93
 
@@ -84,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.38");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.39");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -140,6 +141,8 @@ vtkKWNotebook::vtkKWNotebook()
   this->AlwaysShowTabs = 0;
   this->ShowAllPagesWithSameTag = 0;
   this->ShowOnlyPagesWithSameTag = 0;
+  this->ShowOnlyMostRecentPages = 0;
+  this->NumberOfMostRecentPages = 4;
   this->PagesCanBePinned = 0;
 #ifdef USE_NOTEBOOK_ICONS
   this->ShowIcons      = 1;
@@ -156,6 +159,8 @@ vtkKWNotebook::vtkKWNotebook()
   this->TabsFrame      = vtkKWWidget::New();
 
   this->Pages          = vtkKWNotebook::PagesContainer::New();
+
+  this->MostRecentPages = vtkKWNotebook::PagesContainer::New();
 }
 
 //------------------------------------------------------------------------------
@@ -184,6 +189,10 @@ vtkKWNotebook::~vtkKWNotebook()
   // Delete the container
 
   this->Pages->Delete();
+
+  // Empty the most recent pages
+
+  this->MostRecentPages->Delete();
 }
 
 //------------------------------------------------------------------------------
@@ -386,6 +395,59 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPageMatchingTag(int tag)
 }
 
 //------------------------------------------------------------------------------
+vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
+{
+  if (!this->IsCreated())
+    {
+    return NULL;
+    }
+
+  // Get the slaves in the tabs frame
+
+  char **slaves = 0;
+  int nb_slaves = vtkKWTkUtilities::GetSlaves(
+    this->Application->GetMainInterp(),this->TabsFrame->GetWidgetName(),&slaves);
+  if (!nb_slaves)
+    {
+    return NULL;
+    }
+
+  // Iterate over each slave and find the corresponding page and its tag
+
+  vtkKWNotebook::Page *found = NULL;
+  int i;
+  for (i = 0 ; i < nb_slaves && !found; i++)
+    {
+    vtkKWNotebook::Page *page = NULL;
+    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(page) == VTK_OK && 
+          page->Tag != tag && 
+          !strcmp(slaves[i], page->TabFrame->GetWidgetName()))
+        {
+        found = page;
+        break;
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+
+  // Deallocate slaves
+
+  for (i = 0 ; i < nb_slaves; i++)
+    {
+    delete [] slaves[i];
+    }
+  delete [] slaves;
+
+  return found;
+}
+
+//------------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPages()
 {
   return (unsigned int)this->Pages->GetNumberOfItems();
@@ -546,7 +608,8 @@ int vtkKWNotebook::AddPage(const char *title,
       << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
       << this->GetTclName() << " Raise " << page->Id << "}" << endl
       << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " PinPageToggleCallback " << page->Id << "}" << endl;
+      << this->GetTclName() << " PinPageToggleCallback " << page->Id << "}" 
+      << endl;
 
   // Create the icon if any. We want to keep both the icon and the image label
   // since the icon is required to recreate the label when its background
@@ -582,9 +645,16 @@ int vtkKWNotebook::AddPage(const char *title,
 
   // Show the page. Set Visibility to Off first. If this page can really
   // be shown, Visibility will be set to On automatically.
+  // Do not show anything if we are maintaining a list of most recent pages
+  // shown (which should be controled by the user, not the way developpers
+  // have added pages).
 
   page->Visibility = 0;
-  this->ShowPage(page);
+  
+  if (!this->ShowOnlyMostRecentPages)
+    {
+    this->ShowPage(page);
+    }
 
   return page->Id;
 }
@@ -656,15 +726,15 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
   page->Delete();
   delete page;
 
+  // Bring or remove more pages depending on options
+  
+  this->ConstrainVisiblePages();
+
   // Schedule a resize since removing a page might make a the tab frame smaller
   // (the <Configure> event might do the trick too, but I don't trust Tk, 
   // yadi yada...)
 
   this->ScheduleResize();
-
-  // Update pages
-  
-  this->BringMorePages();
 
   return 1;
 }
@@ -717,8 +787,6 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
     return;
     }
   
-  ostrstream cmd;
-
   // Lower the current one (unpack the page, shrink the selected tab)
 
   if (page->Id != this->CurrentId)
@@ -729,46 +797,58 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
       this->LowerPage(old_page);
       }
     }
-    
-  // Bring up the new one (pack the page, pack/enlarge the selected tab)
 
-  cmd << "pack " << page->Frame->GetWidgetName() << " -fill both -anchor n" 
-      << endl
-      << "pack " << page->TabFrame->GetWidgetName() 
-      << " -side left -anchor s -ipadx 0 "
-      << " -ipady " << VTK_KW_NB_TAB_SELECT_BD_Y 
-      << " -padx " << VTK_KW_NB_TAB_PADX << endl;
+  // Set the selected page
 
-  // Warning: the following can have *very* nasty side effects. For example, 
-  // selected a vtkKWView might trigger a ViewSelectedEvent that will bring
-  // up the UI for that view. If showing that UI involves raising a page,
-  // the focus will be lost *aynchronously* (because of the events). Therefore,
-  // although the view has been selected, the focus is not in the view, and
-  // events like keys might not be triggered.
-  // Let's NOT use it :) Focus is evil.
-  // cmd << "focus " << page->Frame->GetWidgetName() << endl;
-
-  cmd << ends;
-  this->Script(cmd.str());
-  cmd.rdbuf()->freeze(0);
-  
-  this->UpdatePageTabBackgroundColor(page, 1);
-  
   this->CurrentId = page->Id;
 
   // A raised page becomes automatically visible (i.e., it's a way to unhide it)
 
   page->Visibility = 1;
 
+  // Show the tab body
+
+  ostrstream cmd;
+  cmd << "pack " << page->Frame->GetWidgetName() << " -fill both -anchor n" 
+      << endl;
+
+  // Show the page tab
+
+  this->ShowPageTab(page);
+  
+  // Select the page tab: enlarge it
+
+  cmd << "pack " << page->TabFrame->GetWidgetName() 
+      << " -ipadx 0 -ipady " << VTK_KW_NB_TAB_SELECT_BD_Y 
+      << " -padx " << VTK_KW_NB_TAB_PADX
+      << endl;
+
+  // Warning: the following can have *very* nasty side effects. For example, 
+  // select a vtkKWView might trigger a ViewSelectedEvent that will bring
+  // up the UI for that view. If showing that UI involves raising a page,
+  // the focus will be lost *aynchronously* (because of the events). Therefore,
+  // although the view has been selected, the focus is not in the view, and
+  // events like keys might not be triggered.
+  // => Let's NOT use it :) Focus is evil.
+  // cmd << "focus " << page->Frame->GetWidgetName() << endl;
+
+  cmd << ends;
+  this->Script(cmd.str());
+  cmd.rdbuf()->freeze(0);
+  
+  // Update the page color
+
+  this->UpdatePageTabBackgroundColor(page, 1);
+ 
+  // Bring or remove more pages depending on options
+  
+  this->ConstrainVisiblePages();
+
   // Schedule a resize since raising a page might make a larger tab or a larger
   // page show up (the <Configure> event might do the trick too, but I don't
   // trust Tk that much)
 
   this->ScheduleResize();
-
-  // Update pages
-  
-  this->BringMorePages();
 }
 
 //------------------------------------------------------------------------------
@@ -784,7 +864,7 @@ void vtkKWNotebook::RaiseFirstPageMatchingTag(int tag)
 }
 
 //------------------------------------------------------------------------------
-void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
+void vtkKWNotebook::ShowPageTab(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
     {
@@ -792,24 +872,77 @@ void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
     }
   
   ostrstream cmd;
+  cmd << "pack " << page->TabFrame->GetWidgetName() << " -side left -anchor s";
 
-  // Shrink the tab (no ipady)
+  // If the tab was not packed, we are about to bring up a new page tab
+  // which should be enqueue in the most recent pages list.
 
-  cmd << "pack " << page->TabFrame->GetWidgetName() 
-      << " -side left -anchor s -ipadx 0 -ipady 0 "
-      << " -padx " << VTK_KW_NB_TAB_PADX << endl;
+  if (this->ShowOnlyMostRecentPages && 
+      page->Visibility && 
+      !page->TabFrame->IsPacked())
+    {
+    this->EnqueueMostRecentPage(page);
+
+    // Also, if we show only the most recent pages, the expected behaviour would
+    // be to bring the page so that it is packed as the first one in the list.
+    // If ShowAllPagesWithSameTag is Off, just pack the tab in front of all
+    // others, otherwise try to pack in front of the first page that has a
+    // different tag, so that pages with the same tag will still be packed
+    // in the right order.
+
+    if (page->TabFrame->GetParent()->GetNumberOfPackedChildren())
+      {
+      if (!this->ShowAllPagesWithSameTag)
+        {
+        cmd << " -before [lindex [pack slaves " 
+            << page->TabFrame->GetParent()->GetWidgetName() << "] 0]";
+        }
+      else
+        {
+        vtkKWNotebook::Page *other_page = 
+          this->GetFirstPackedPageNotMatchingTag(page->Tag);
+        if (other_page)
+          {
+          cmd << " -before " << other_page->TabFrame->GetWidgetName();
+          }
+        else
+          {
+          cmd << " -before [lindex [pack slaves " 
+              << page->TabFrame->GetParent()->GetWidgetName() << "] 0]";
+          }
+        }
+      }
+    }
 
   cmd << ends;
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
+    {
+    return;
+    }
+  
+  // Show the page tab
+
+  this->ShowPageTab(page);
+
+  // Unselect the page tab: shrink it (no ipady)
+
+  this->Script("pack %s -ipadx 0 -ipady 0 -padx %d",
+               page->TabFrame->GetWidgetName(), VTK_KW_NB_TAB_PADX);
+
+  // Update the page color (dim it)
 
   this->UpdatePageTabBackgroundColor(page, 0);
 
-  this->ScheduleResize();
+  // Make sure everything has been resized properly
 
-  // Update pages
-  
-  this->BringMorePages();
+  this->ScheduleResize();
 }
 
 //------------------------------------------------------------------------------
@@ -902,19 +1035,48 @@ void vtkKWNotebook::ShowPage(vtkKWNotebook::Page *page)
     return;
     }
   
-  page->Visibility = 1;
-
-  // If the number of visible pages is now 1, raise this one automatically
-  // otherwise just display the page tab in the non-selected mode "low" mode.
+  // If the number of visible pages is 0, raise this one automatically
     
-  if (this->GetNumberOfVisiblePages() == 1)
+  if (this->GetNumberOfVisiblePages() == 0)
     {
     this->RaisePage(page);
+    return;
     }
-  else
+
+  page->Visibility = 1;
+
+  // Otherwise just display the page tab in the non-selected mode "low" mode.
+
+  this->ShowPageTabAsLow(page);
+
+  // Bring or remove more pages depending on options
+  
+  this->ConstrainVisiblePages();
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::CanBeHidden(int id)
+{
+  return this->CanBeHidden(this->GetPage(id));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::CanBeHidden(const char *title)
+{
+  return this->CanBeHidden(this->GetPage(title));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::CanBeHidden(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
     {
-    this->ShowPageTabAsLow(page);
+    return -1;
     }
+  
+  // A pinned page can not be hidden
+
+  return !page->Pinned;
 }
 
 //------------------------------------------------------------------------------
@@ -932,7 +1094,10 @@ void vtkKWNotebook::HidePage(const char *title)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
 {
-  if (page == NULL || !this->IsCreated() || !page->Visibility || page->Pinned)
+  if (page == NULL || 
+      !this->IsCreated() || 
+      !page->Visibility || 
+      !this->CanBeHidden(page))
     {
     return;
     }
@@ -963,12 +1128,15 @@ void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
   if (page->TabFrame->IsPacked())
     {
     this->Script("pack forget %s", page->TabFrame->GetWidgetName());
-    this->ScheduleResize();
     }
 
-  // Update pages
+  // Bring or remove more pages depending on options
   
-  this->BringMorePages();
+  this->ConstrainVisiblePages();
+
+  // Make sure everything has been resized properly
+
+  this->ScheduleResize();
 }
 
 //------------------------------------------------------------------------------
@@ -1039,6 +1207,24 @@ void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 }
 
 //------------------------------------------------------------------------------
+void vtkKWNotebook::ShowPagesMatchingTagReverse(int tag)
+{
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->GoToLastItem();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+      {
+      this->ShowPage(page);
+      }
+    it->GoToPreviousItem();
+    }
+  it->Delete();
+}
+
+//------------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1093,6 +1279,18 @@ void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
 }
 
 //------------------------------------------------------------------------------
+int vtkKWNotebook::EnqueueMostRecentPage(vtkKWNotebook::Page *page)
+{
+  if (page == NULL)
+    {
+    return 0;
+    }
+
+  this->MostRecentPages->PrependItem(page);
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 void vtkKWNotebook::PinPage(int id)
 {
   this->PinPage(this->GetPage(id));
@@ -1138,6 +1336,27 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 
   page->Pinned = 0;
   this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
+}
+
+//------------------------------------------------------------------------------
+unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
+{
+  unsigned int count = 0;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Pinned)
+      {
+      count++;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return count;
 }
 
 //------------------------------------------------------------------------------
@@ -1371,13 +1590,17 @@ void vtkKWNotebook::UpdateMaskPosition()
     // be queried if it is not mapped. In that case use a slower method by
     // computing the size of previous slaves inside the container. Hopefully
     // this will be done only at startup, not in later interaction.
+    // UPDATE: if it is mapped, it does not seem to be reliable, so let's use
+    // the slowest method anyway.
 
+#if 0
     if (tab_is_mapped)
       {
       this->Script("winfo x %s", page->TabFrame->GetWidgetName());
       tab_x = vtkKWObject::GetIntegerResult(this->Application);
       }
     else
+#endif
       {
       vtkKWTkUtilities::GetPackSlaveHorizontalPosition(
         this->Application->GetMainInterp(),
@@ -1615,10 +1838,11 @@ void vtkKWNotebook::SetShowAllPagesWithSameTag(int arg)
     {
     return;
     }
+
   this->ShowAllPagesWithSameTag = arg;
   this->Modified();
 
-  this->BringMorePages();
+  this->ConstrainVisiblePages();
 }
 
 //----------------------------------------------------------------------------
@@ -1628,18 +1852,90 @@ void vtkKWNotebook::SetShowOnlyPagesWithSameTag(int arg)
     {
     return;
     }
+
   this->ShowOnlyPagesWithSameTag = arg;
   this->Modified();
 
-  this->BringMorePages();
+  this->ConstrainVisiblePages();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::BringMorePages()
+void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
+{
+  if (this->ShowOnlyMostRecentPages == arg)
+    {
+    return;
+    }
+
+  this->ShowOnlyMostRecentPages = arg;
+  this->Modified();
+
+  // Empty the most recent pages buffer
+
+  this->MostRecentPages->RemoveAllItems();
+
+  // If we are enabling this feature, put the current tabs in the most
+  // recent pages
+
+  if (this->ShowOnlyMostRecentPages && this->IsCreated())
+    {
+    char **slaves = 0;
+    int nb_slaves = vtkKWTkUtilities::GetSlaves(
+      this->Application->GetMainInterp(),
+      this->TabsFrame->GetWidgetName(), &slaves);
+
+    // Iterate over each slave and find the corresponding page
+
+    if (nb_slaves)
+      {
+      int i;
+      for (i = nb_slaves - 1; i >= 0; i--)
+        {
+        vtkKWNotebook::Page *page = NULL;
+        vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+        it->InitTraversal();
+        while (!it->IsDoneWithTraversal())
+          {
+          if (it->GetData(page) == VTK_OK && 
+              !strcmp(slaves[i], page->TabFrame->GetWidgetName()))
+            {
+            this->EnqueueMostRecentPage(page);
+            break;
+            }
+          it->GoToNextItem();
+          }
+        it->Delete();
+
+        delete [] slaves[i];
+        }
+      
+      delete [] slaves;
+      }
+    }
+
+  // Make sure the constraint are satisfied
+
+  this->ConstrainVisiblePages();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::ConstrainVisiblePages()
 {
   if (!this->IsCreated())
     {
     return;
+    }
+
+  // Show only the pages with the same tag (as the current selected page,
+  // except if it is pinned)
+
+  if (this->ShowOnlyPagesWithSameTag)
+    {
+    vtkKWNotebook::Page *selected_page = this->GetPage(this->CurrentId);
+    if (selected_page && !selected_page->Pinned)
+      {
+      this->HidePagesNotMatchingTag(selected_page->Tag);
+      }
     }
 
   // Show all pages with the same tag
@@ -1661,16 +1957,36 @@ void vtkKWNotebook::BringMorePages()
     it->Delete();
     }
 
-  // Show only the pages with the same tag (as the current selected page,
-  // except if it is pinned)
+  // Show only the most recent pages
 
-  if (this->ShowOnlyPagesWithSameTag)
+  if (this->ShowOnlyMostRecentPages && 
+      this->NumberOfMostRecentPages > 0 && 
+      this->MostRecentPages->GetNumberOfItems() > this->NumberOfMostRecentPages)
     {
-    vtkKWNotebook::Page *selected_page = this->GetPage(this->CurrentId);
-    if (selected_page && !selected_page->Pinned)
+    int diff = 
+      this->MostRecentPages->GetNumberOfItems() - this->NumberOfMostRecentPages;
+
+    vtkIdType key;
+    vtkKWNotebook::Page *page = NULL;
+    vtkKWNotebook::PagesContainerIterator *it = 
+      this->MostRecentPages->NewIterator();
+
+    // There are move pages than allowed, try to remove some of them
+
+    it->GoToLastItem();
+    while (diff && !it->IsDoneWithTraversal())
       {
-      this->HidePagesNotMatchingTag(selected_page->Tag);
+      int res = (it->GetKey(key) == VTK_OK && it->GetData(page) == VTK_OK);
+      it->GoToPreviousItem();
+      if (res && 
+          this->CanBeHidden(page) &&
+          this->MostRecentPages->RemoveItem(key) == VTK_OK)
+        {
+        this->HidePage(page);
+        diff--;
+        }
       }
+    it->Delete();
     }
 }
 
@@ -1715,6 +2031,10 @@ void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowAllPagesWithSameTag ? "On" : "Off") << endl;
   os << indent << "ShowOnlyPagesWithSameTag: " 
      << (this->ShowOnlyPagesWithSameTag ? "On" : "Off") << endl;
+  os << indent << "ShowOnlyMostRecentPages: " 
+     << (this->ShowOnlyMostRecentPages ? "On" : "Off") << endl;
+  os << indent << "NumberOfMostRecentPages: " 
+     << this->GetNumberOfMostRecentPages() << endl;
   os << indent << "ShowIcons: " << (this->ShowIcons ? "On" : "Off")
      << endl;
   os << indent << "PagesCanBePinned: " << (this->PagesCanBePinned ? "On" : "Off")

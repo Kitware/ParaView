@@ -58,6 +58,8 @@ class vtkKWImageLabel;
 //BTX
 template<class DataType> class vtkLinkedList;
 template<class DataType> class vtkLinkedListIterator;
+template<class DataType> class vtkVector;
+template<class DataType> class vtkVectorIterator;
 //ETX
 
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
@@ -90,8 +92,11 @@ public:
   unsigned int GetNumberOfPages();
   
   // Description:
-  // Set/Get a page tag. A tag (int) can be associated to a page. This provides
-  // a way to group pages. The default tag, if not provided, is 0.
+  // Set/Get a page tag. A tag (int) can be associated to a page (given the page
+  // id). This provides a way to group pages. The default tag, if not provided,
+  // is 0. 
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered.
   void SetPageTag(int id, int tag);
   void SetPageTag(const char *title, int tag);
   int GetPageTag(int id);
@@ -99,9 +104,9 @@ public:
 
   // Description:
   // Raise the specified page to be on the top (i.e. the one selected).
-  // If a tag is provided, the page which title and tag match will be raised.
-  // This provide a way to search within a group of pages, since several pages
-  // could have the same title.
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered. In the same way, if a tag is provided with the 
+  // title, the page which title *and* tag match is considered.
   // GetRaisedPageId() returns the id of the page raised at the moment, -1 if
   // none is raised.
   // RaiseFirstPageMatchingTag() is a convenience method use to raise the first
@@ -113,11 +118,11 @@ public:
   void RaiseFirstPageMatchingTag(int tag);
   
   // Description:
-  // Get the vtkKWWidget for the frame of the specified page (Tab).
-  // The UI components should be inserted into these frames.
-  // If a tag is provided, the page which title and tag match will be accessed.
-  // This provide a way to search within a group of pages, since several pages
-  // could have the same title.
+  // Get the vtkKWWidget corresponding to the frame of the specified page (Tab).
+  // This is where the UI components should be inserted.
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered. In the same way, if a tag is provided with the 
+  // title, the page which title *and* tag match is considered.
   // Return NULL on error.
   vtkKWWidget *GetFrame(int id);
   vtkKWWidget *GetFrame(const char *title);
@@ -125,22 +130,27 @@ public:
 
   // Description:
   // Remove a page from the notebook.
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered.
   // If the currently selected page is removed, it is unselected first and
-  // the first visible tab is selected.
+  // the first visible tab (if any) becomes selected instead.
   // Return 1 on success, 0 on error.
   int RemovePage(int id);
   int RemovePage(const char *title);
 
   // Description:
-  // Convenience methode to all pages matching a tag.
+  // Convenience method to remove all pages matching a tag.
   void RemovePagesMatchingTag(int tag);
   
   // Description:
   // Show/hide a page tab (i.e. Set/Get the page visibility). Showing a page 
-  // tab does not raise a page, it just makes the page selectable by displaying
+  // tab does not raise the page, it just makes the page selectable by displaying
   // its tab. A hidden page tab is not displayed in the tabs: the corresponding
-  // page can not be selected. If the currently selected page is about to be
-  // hidden, it is unselected first and the first visible tab becomes selected.
+  // page can not be selected. 
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered.
+  // If the currently selected page is hidden, it is unselected first and
+  // the first visible tab (if any) becomes selected instead.
   void ShowPage(int id);
   void ShowPage(const char *title);
   void HidePage(int id);
@@ -149,6 +159,8 @@ public:
   void SetPageVisibility(const char *title, int flag);
   int GetPageVisibility(int id);
   int GetPageVisibility(const char *title);
+  int CanBeHidden(int id);
+  int CanBeHidden(const char *title);
 
   // Description:
   // Return the number of visible pages in the notebook.
@@ -156,28 +168,45 @@ public:
 
   // Description:
   // Convenience methods provided to show/hide all page tabs matching or not
-  // matching a given tag.
+  // matching a given tag. ShowPagesMatchingTagReverse processes pages starting
+  // from the last one.
   void HidePagesMatchingTag(int tag);
   void ShowPagesMatchingTag(int tag);
+  void ShowPagesMatchingTagReverse(int tag);
   void HidePagesNotMatchingTag(int tag);
   void ShowPagesNotMatchingTag(int tag);
 
   // Description:
-  // Automatically bring up page tabs so that all page tabs that have the same 
-  // tag are always shown.
+  // Make the notebook automatically bring up page tabs with the same tag 
+  // (i.e. all page tabs that have the same tag are always shown).
   virtual void SetShowAllPagesWithSameTag(int);
   vtkGetMacro(ShowAllPagesWithSameTag, int);
   vtkBooleanMacro(ShowAllPagesWithSameTag, int);
   
   // Description:
-  // Automatically hide page tabs so that only those page tabs that have the 
-  // same tag as the currently selected page are shown.
+  // Make the notebook automatically show only those page tabs that have the 
+  // same tag as the currently selected page (i.e. once a page tab has been
+  // selected, all pages not sharing the same tag are hidden).
   virtual void SetShowOnlyPagesWithSameTag(int);
   vtkGetMacro(ShowOnlyPagesWithSameTag, int);
   vtkBooleanMacro(ShowOnlyPagesWithSameTag, int);
   
   // Description:
+  // Make the notebook automatically maintain a list of most recently shown
+  // page. The size of this list can be set (defaults to 4). Once it is full,
+  // any new shown page will make the least recent page hidden.
+  // It is suggested that ShowAllPagesWithSameTag and ShowOnlyPagesWithSameTag
+  // shoud be Off for this feature to work properly.
+  virtual void SetShowOnlyMostRecentPages(int);
+  vtkGetMacro(ShowOnlyMostRecentPages, int);
+  vtkBooleanMacro(ShowOnlyMostRecentPages, int);
+  vtkSetMacro(NumberOfMostRecentPages, int);
+  vtkGetMacro(NumberOfMostRecentPages, int);
+
+  // Description:
   // Pin/unpin a page tab. A pinned page tab can not be hidden.
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered.
   void PinPage(int id);
   void PinPage(const char *title);
   void UnpinPage(int id);
@@ -188,6 +217,10 @@ public:
   virtual void SetPagesCanBePinned(int);
   vtkGetMacro(PagesCanBePinned, int);
   vtkBooleanMacro(PagesCanBePinned, int);
+
+  // Description:
+  // Return the number of pinned pages in the notebook.
+  unsigned int GetNumberOfPinnedPages();
   
   // Description:
   // The notebook will automatically resize itself to fit its
@@ -229,6 +262,8 @@ protected:
   int ShowIcons;
   int ShowAllPagesWithSameTag;
   int ShowOnlyPagesWithSameTag;
+  int ShowOnlyMostRecentPages;
+  int NumberOfMostRecentPages;
   int PagesCanBePinned;
 
   vtkKWWidget *TabsFrame;
@@ -260,24 +295,30 @@ protected:
   typedef vtkLinkedList<Page*> PagesContainer;
   typedef vtkLinkedListIterator<Page*> PagesContainerIterator;
   PagesContainer *Pages;
+  PagesContainer *MostRecentPages;
 
   // Return a pointer to a page.
-  // Note that this method accepts both a page ID or a page title (in the later 
-  // case, if two tabs have the same title, the first one will be chosen).
+  // If a page title is provided instead of a page id, the first page matching
+  // that title is considered. In the same way, if a tag is provided with the 
+  // title, the page which title *and* tag match is considered.
 
   Page* GetPage(int id);
   Page* GetPage(const char *title);
   Page* GetPage(const char *title, int tag);
 
-  // Get the first visible page, the first page matching a tag
+  // Get the first visible page
+  // Get the first page matching a tag
+  // Get the first packed page not matching a tag
 
   Page* GetFirstVisiblePage();
   Page* GetFirstPageMatchingTag(int tag);
+  Page* GetFirstPackedPageNotMatchingTag(int tag);
   
   // Raise, Lower, Remove, Show, Hide, Pin, Unpin, Tag a specific page
 
   void SetPageTag(Page*, int tag);
   void RaisePage(Page*);
+  void ShowPageTab(Page*);
   void ShowPageTabAsLow(Page*);
   void LowerPage(Page*);
   int RemovePage(Page*);
@@ -286,7 +327,9 @@ protected:
   void PinPage(Page*);
   void UnpinPage(Page*);
   int GetPageVisibility(Page*);
+  int CanBeHidden(Page*);
   int GetPageTag(Page*);
+  int EnqueueMostRecentPage(Page*);
 
   // Update the tab frame color of a page given a selection status
 
@@ -298,7 +341,7 @@ protected:
   int CurrentId;
   int Expanding;
 
-  // Get the number of pages in the notebook (and the number of visible pages).
+  // Returns true if some tabs are visible.
 
   int AreTabsVisible();
 
@@ -307,10 +350,12 @@ protected:
   void UpdateBodyPosition();
   void UpdateMaskPosition();
 
-  // Bring more pages depending on ShowAllPagesWithSameTag and
-  // ShowOnlyPagesWithSameTag
+  // Constrain the visible pages depending on:
+  // ShowAllPagesWithSameTag,
+  // ShowOnlyPagesWithSameTag, 
+  // ShowOnlyMostRecentPages
 
-  void BringMorePages();
+  void ConstrainVisiblePages();
 
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented

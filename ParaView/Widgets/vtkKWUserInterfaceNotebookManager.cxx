@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.2");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.3");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -296,19 +296,19 @@ int vtkKWUserInterfaceNotebookManager::Show(
 {
   if (!this->IsCreated())
     {
-    vtkErrorMacro("Can not show all pages if the manager has not been created.");
+    vtkErrorMacro("Can not show pages if the manager has not been created.");
     return 0;
     }
 
   if (!panel)
     {
-    vtkErrorMacro("Can not show all pages from a NULL panel.");
+    vtkErrorMacro("Can not show the pages from a NULL panel.");
     return 0;
     }
   
   if (!this->HasPanel(panel))
     {
-    vtkErrorMacro("Can not show all pages from a panel that is not "
+    vtkErrorMacro("Can not show the pages from a panel that is not "
                   "in the manager.");
     return 0;
     }
@@ -328,11 +328,23 @@ int vtkKWUserInterfaceNotebookManager::Show(
   int tag = this->GetPanelId(panel);
   if (tag < 0)
     {
-    vtkErrorMacro("Can not access the panel to show all pages.");
+    vtkErrorMacro("Can not access the panel to show its pages.");
     return 0;
     }
 
-  this->Notebook->ShowPagesMatchingTag(tag);
+  // If the notebook is maintaining most recent pages, we have to show
+  // the pages belonging to the same group starting from the last one, so
+  // that the most recent one will be the first page in that group (i.e.
+  // the last shown)
+
+  if (this->Notebook->GetShowOnlyMostRecentPages())
+    {
+    this->Notebook->ShowPagesMatchingTagReverse(tag);
+    }
+  else
+    {
+    this->Notebook->ShowPagesMatchingTag(tag);
+    }
 
   return 1;
 }
