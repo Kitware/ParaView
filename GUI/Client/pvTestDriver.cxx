@@ -166,7 +166,6 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   int i;
   for(i =1; i < argc - 1; ++i)
     {
-    fprintf(stderr, "DOING: %s\n" , argv[i]);
     if(strcmp(argv[i], "--test-rc") == 0)
       {
       this->ArgStart = i+1;
