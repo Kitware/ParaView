@@ -104,6 +104,12 @@ public:
   // Description:
   // We need to kill the slave processes
   virtual void Exit();
+
+  // Description:
+  // Destroy the main window and associated objects without exiting.
+  // This simply calls superclass' Exit() but does not tell remote
+  // nodes to stop processing RMIs.
+  virtual void DestroyGUI();
   
   // Description:
   // Initialize Tcl/Tk

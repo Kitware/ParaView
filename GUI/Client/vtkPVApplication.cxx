@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.306");
+vtkCxxRevisionMacro(vtkPVApplication, "1.307");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1832,6 +1832,13 @@ void vtkPVApplication::Close(vtkKWWindow *win)
     }
 
   this->Superclass::Close(win);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DestroyGUI()
+{  
+  this->vtkKWApplication::Exit();
+  this->InExit = 0;
 }
 
 //----------------------------------------------------------------------------
