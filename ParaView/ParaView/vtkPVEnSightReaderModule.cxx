@@ -241,8 +241,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
 
 //----------------------------------------------------------------------------
 // Prompt the user for the first variables loaded
-int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName,
-                                                       vtkGenericEnSightReader *reader)
+int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName)
 {
   vtkKWOKCancelDialog *dialog = vtkKWOKCancelDialog::New();
   dialog->Create(this->Application, "");
@@ -604,7 +603,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     {
     if ( ! pvApp->GetRunningParaViewScript())
       {
-      if ( this->InitialVariableSelection(tclName, reader) == 0)
+      if ( this->InitialVariableSelection(tclName) == 0)
         {
         pvApp->BroadcastScript("%s Delete", tclName);
         delete [] tclName;

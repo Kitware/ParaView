@@ -120,8 +120,7 @@ protected:
                            vtkGenericEnSightReader* reader, float& time);
 
   // Prompt the user for the variables loaded first.
-  int InitialVariableSelection(const char* tclName,
-                               vtkGenericEnSightReader* reader);
+  int InitialVariableSelection(const char* tclName);
   
   // Make sure that all case files in the master file are compatible.
   vtkEnSightReader* VerifyMasterFile(vtkPVApplication* app,
