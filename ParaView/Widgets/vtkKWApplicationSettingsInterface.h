@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 
+#define VTK_VV_ASI_LABEL                        "Application Settings"
+
 #define VTK_KW_ASI_PREFERENCES_LABEL            "Preferences"
 
 #define VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
