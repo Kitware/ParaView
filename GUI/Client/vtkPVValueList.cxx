@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.18");
+vtkCxxRevisionMacro(vtkPVValueList, "1.19");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -545,8 +545,6 @@ void vtkPVValueList::AddValue(double val)
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   int numContours;
 
   numContours = this->ContourValues->GetNumberOfContours();
