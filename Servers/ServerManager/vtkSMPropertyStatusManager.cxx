@@ -24,7 +24,7 @@
 
 #include <vtkstd/map>
 vtkStandardNewMacro(vtkSMPropertyStatusManager);
-vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.1");
+vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.2");
 
 //*****************************************************************************
 class vtkSMPropertyStatusManagerInternals
@@ -150,6 +150,11 @@ int vtkSMPropertyStatusManager::HasPropertyChangedInternal(
   if (dest->GetNumberOfElements() != num_elems)
     {
     return 1;
+    }
+
+  if (static_cast<unsigned int>(index) >= num_elems)
+    {// index is beyond range, we know nothing about it.
+    return 0;
     }
   
   vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(src);
