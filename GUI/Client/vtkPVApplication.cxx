@@ -66,6 +66,7 @@
 #include "vtkProbeFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMApplication.h"
 #include "vtkShortArray.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
@@ -106,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.284");
+vtkCxxRevisionMacro(vtkPVApplication, "1.285");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -506,6 +507,8 @@ vtkPVApplication::vtkPVApplication()
   this->DemoPath = NULL;
 
   this->LogThreshold = 0.01;
+
+  this->SMApplication = vtkSMApplication::New();
 }
 
 //----------------------------------------------------------------------------
@@ -534,6 +537,9 @@ vtkPVApplication::~vtkPVApplication()
   this->Observer->Delete();
   this->Observer = 0;
   this->SetBatchScriptName(0);
+
+  this->SMApplication->Finalize();
+  this->SMApplication->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -854,6 +860,39 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->SetArgv0(argv[0]);
     }
 
+#ifdef VTK_USE_MANGLED_MESA
+  
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-r",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "--use-satellite-software",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-s",
+                                          index) == VTK_OK ||
+       getenv("PV_SOFTWARE_RENDERING") )
+    {
+    this->UseSoftwareRendering = 1;
+    if ( getenv("PV_SOFTWARE_RENDERING") ||
+         vtkPVApplication::CheckForArgument(
+           argc, argv, "--use-satellite-software", index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-s",
+                                            index) == VTK_OK)
+      {
+      this->UseSatelliteSoftware = 1;
+      }
+    }
+#endif
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-offscreen-rendering",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-os",
+                                          index) == VTK_OK ||
+       getenv("PV_OFFSCREEN") )
+    {
+    this->UseOffscreenRendering = 1;
+    }
+  
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--batch",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-b",
@@ -1292,39 +1331,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->SetRenderModuleName(newarg);
     }
     
-#ifdef VTK_USE_MANGLED_MESA
-  
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-r",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--use-satellite-software",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-s",
-                                          index) == VTK_OK ||
-       getenv("PV_SOFTWARE_RENDERING") )
-    {
-    this->UseSoftwareRendering = 1;
-    if ( getenv("PV_SOFTWARE_RENDERING") ||
-         vtkPVApplication::CheckForArgument(
-           argc, argv, "--use-satellite-software", index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-s",
-                                            index) == VTK_OK)
-      {
-      this->UseSatelliteSoftware = 1;
-      }
-    }
-#endif
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-offscreen-rendering",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-os",
-                                          index) == VTK_OK ||
-       getenv("PV_OFFSCREEN") )
-    {
-    this->UseOffscreenRendering = 1;
-    }
-  
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-composite",
                                           index) == VTK_OK  ||
        vtkPVApplication::CheckForArgument(argc, argv, "-dc",
@@ -1379,7 +1385,7 @@ void vtkPVApplication::Initialize()
                     << imf << "SetUseMesaClasses" << 1
                     << vtkClientServerStream::End;
     pm->DeleteStreamObject(imf);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     if (this->UseSatelliteSoftware)
       {
@@ -1388,6 +1394,9 @@ void vtkPVApplication::Initialize()
       }
     }
 #endif
+
+  this->SMApplication->Initialize();
+
   this->ApplicationInitialized = 1;
 }
 
@@ -2189,6 +2198,17 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CaveConfigurationFileName: " 
     << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(null)") << endl;
   os << indent << "DisableComposite: " << this->DisableComposite << endl;
+
+  os << indent << "SMApplication: ";
+  if (this->SMApplication)
+    {
+    os << endl;
+    this->SMApplication->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

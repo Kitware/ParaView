@@ -37,6 +37,7 @@ class vtkProbeFilter;
 class vtkProcessObject;
 class vtkPVApplicationObserver;
 class vtkPVProgressHandler;
+class vtkSMApplication;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -51,6 +52,10 @@ public:
   // Return error (1) if the arguments are not formed properly.
   // Returns 0 if all went well.
   int ParseCommandLineArguments(int argc, char*argv[]);
+
+  // Description:
+  // Returns the server manager application.
+  vtkGetObjectMacro(SMApplication, vtkSMApplication);
 
   //BTX
   // Description:
@@ -530,6 +535,8 @@ protected:
   int ProgressRequests;
 
   int ApplicationInitialized;
+
+  vtkSMApplication* SMApplication;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
