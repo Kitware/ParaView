@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.284");
+vtkCxxRevisionMacro(vtkPVData, "1.285");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -375,6 +375,7 @@ void vtkPVData::SetVisibilityCheckState(int v)
     if (this->VisibilityCheck->GetState() != v)
       {
       this->VisibilityCheck->SetState(v);
+      this->GetPVRenderView()->UpdateNavigationWindow(this->GetPVSource(), 0);
       }
     }
 }
