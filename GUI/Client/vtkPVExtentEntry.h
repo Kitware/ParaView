@@ -53,7 +53,11 @@ public:
   // Description:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int Mode);
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int Mode);
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+    {
+      this->AnimationMenuCallback(ai, 0);
+    }
 
   // Description:
   // The label.
@@ -118,6 +122,11 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain
+  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai, int idx);
   
 protected:
   vtkPVExtentEntry();

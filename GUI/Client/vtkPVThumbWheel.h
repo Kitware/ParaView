@@ -92,7 +92,13 @@ public:
 
   // Description:
   // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+  virtual void AddAnimationScriptsToMenu(
+    vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain
+  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
 
 protected:
   vtkPVThumbWheel();

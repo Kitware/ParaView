@@ -88,6 +88,10 @@ public:
   // Called when menu item (above) is selected.  Neede for tracing.
   // Would not be necessary if menus traced invocations.
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int idx);
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+    {
+      this->AnimationMenuCallback(ai, 0);
+    }
 
   // Description:
   // This is the data type the vtk object is expecting.
@@ -147,6 +151,11 @@ public:
   // Description:
   // Set the AcceptCalled flag (vtkPVPointSourceWidget needs access to it.)
   vtkSetMacro(AcceptCalled, int);
+
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain
+  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai, int idx);
 
 protected:
   vtkPVVectorEntry();

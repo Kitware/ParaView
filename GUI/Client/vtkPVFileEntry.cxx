@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.94");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.95");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -943,6 +943,26 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVFileEntry::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
+{
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!prop || !dom)
+    {
+    vtkErrorMacro("Required property or domain (files) could not be found.");
+    return;
+    }
+
+  ai->SetTimeStart(0);
+  ai->SetTimeEnd(dom->GetNumberOfStrings()-1);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   if (ai->InitializeTrace(NULL))
@@ -950,6 +970,8 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
       this->GetTclName(), ai->GetTclName());
     }
+
+  this->Superclass::AnimationMenuCallback(ai);
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMStringListDomain *dom = 0;
@@ -963,12 +985,18 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     vtkErrorMacro("Required property or domain (files) could not be found.");
     return;
     }
+
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
   
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(dom);
-  ai->SetTimeStart(0);
-  ai->SetTimeEnd(dom->GetNumberOfStrings()-1);
+  this->ResetAnimationRange(ai);
   ai->SetTypeToInt();
   ai->Update();
 }

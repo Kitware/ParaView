@@ -69,6 +69,11 @@ public:
   virtual void Update();
 
   // Description:
+  // Overwritten by sub-classes. Any widget that contains a proxy
+  // should call UpdateVTKObjects on it in this method.
+  virtual void UpdateVTKObjects() {};
+
+  // Description:
   // Widgets that depend on the value of this widget can 
   // set up a dependance here.  When ModifedCallback or Update is called 
   // on this widget, it will call Update on widgets in this list.  
@@ -144,7 +149,13 @@ public:
   virtual void AddAnimationScriptsToMenu(
     vtkKWMenu* vtkNotUsed(menu), 
     vtkPVAnimationInterfaceEntry* vtkNotUsed(object) ) {};
- 
+
+  // Description:
+  // Default implementation of method called when this widget is
+  // selected as the parameter to be animated. Disabled ResetRangeButton.
+  // Should be chained by subclasses.
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry*);
+
   // Description:
   // Create the widget. All sub-classes should use this
   // signature because widgets are created using vtkPVWidget

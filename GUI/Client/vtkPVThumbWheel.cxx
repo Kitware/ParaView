@@ -18,6 +18,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -32,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.10");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -207,23 +208,11 @@ void vtkPVThumbWheel::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+void vtkPVThumbWheel::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
-    {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
-                        this->GetTclName(), ai->GetTclName());
-    }
-  
-  ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
-
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *rangeDomain = prop->GetDomain("range");
   
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(rangeDomain);
-  ai->SetAnimationElement(0);
-
   if (rangeDomain)
     {
     vtkSMDoubleRangeDomain *drd =
@@ -254,7 +243,37 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     {
     vtkErrorMacro("Could not find required domain (range)");
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+{
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+                        this->GetTclName(), ai->GetTclName());
+    }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
+  ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
+
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *rangeDomain = prop->GetDomain("range");
+  
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+  ai->SetAnimationElement(0);
+
+  this->ResetAnimationRange(ai);
+
   ai->Update();
 }
 

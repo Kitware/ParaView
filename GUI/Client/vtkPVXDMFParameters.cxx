@@ -22,6 +22,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -149,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.25");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -489,6 +490,17 @@ void vtkPVXDMFParameters::AddAnimationScriptsToMenu(
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVXDMFParameters::ResetAnimationRange(
+  vtkPVAnimationInterfaceEntry *ai, const char *name)
+{
+  vtkPVXDMFParametersInternals::Parameter *p = 
+    this->Internals->GetParameter(name);
+
+  ai->SetTimeStart(p->Min);
+  ai->SetTimeEnd(p->Max);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVXDMFParameters::AnimationMenuCallback(
   vtkPVAnimationInterfaceEntry *ai, const char *name, unsigned int idx)
 {
@@ -498,11 +510,19 @@ void vtkPVXDMFParameters::AnimationMenuCallback(
                         this->GetTclName(), ai->GetTclName(), name);
     }
   
-  vtkPVXDMFParametersInternals::Parameter *p = 
-    this->Internals->GetParameter(name);
+  this->Superclass::AnimationMenuCallback(ai);
+
   char label[1024];
   sprintf(label, "%s_%s", this->GetTraceName(), name);
   ai->SetLabelAndScript(label, NULL, this->GetTraceName());
+
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, 
+          "ResetAnimationRange %s %s", ai->GetTclName(), name);
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *rangeDomain = prop->GetDomain("range");
@@ -510,8 +530,7 @@ void vtkPVXDMFParameters::AnimationMenuCallback(
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(rangeDomain);
   ai->SetAnimationElement(idx);
-  ai->SetTimeStart(p->Min);
-  ai->SetTimeEnd(p->Max);
+  this->ResetAnimationRange(ai, name);
   ai->SetTypeToInt();
   ai->Update();
 }

@@ -143,6 +143,11 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain
+  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
  
 protected:
   vtkPVFileEntry();

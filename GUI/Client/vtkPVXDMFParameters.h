@@ -87,8 +87,9 @@ public:
   // Description:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
-  void AnimationMenuCallback(
+  virtual void AnimationMenuCallback(
     vtkPVAnimationInterfaceEntry *ai, const char* name, unsigned int idx);
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry*) {}
 
 
   //BTX
@@ -109,6 +110,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain
+  virtual void ResetAnimationRange(
+    vtkPVAnimationInterfaceEntry* ai, const char* name);
+
 protected:
   vtkPVXDMFParameters();
   ~vtkPVXDMFParameters();

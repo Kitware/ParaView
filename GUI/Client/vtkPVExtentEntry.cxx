@@ -20,6 +20,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -38,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.46");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -422,22 +423,12 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 
   cascadeMenu->Delete();
   cascadeMenu = NULL;
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(prop->GetDomain("extent"));
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
-                                             int mode)
+void vtkPVExtentEntry::ResetAnimationRange(
+  vtkPVAnimationInterfaceEntry *ai, int mode)
 {
-  if (ai->InitializeTrace(NULL))
-    {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
-      this->GetTclName(), ai->GetTclName(), mode);
-    }
-
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMExtentDomain *dom = 0;
   if (prop)
@@ -488,6 +479,45 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
     {
     ai->SetTimeEnd(val);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
+                                             int mode)
+{
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
+      this->GetTclName(), ai->GetTclName(), mode);
+    }
+
+  this->Superclass::AnimationMenuCallback(ai);
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMExtentDomain *dom = 0;
+  if (prop)
+    {
+    dom = vtkSMExtentDomain::SafeDownCast(prop->GetDomain("extent"));
+    }
+  
+  if (!prop || !dom)
+    {
+    vtkErrorMacro("Error getting property or domain (extent).");
+    return;
+    }
+  
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "ResetAnimationRange %s %d", ai->GetTclName(), mode);
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
+
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(dom);
+
+  this->ResetAnimationRange(ai, mode);
+
   ai->SetAnimationElement(mode);
   ai->Update();
 }

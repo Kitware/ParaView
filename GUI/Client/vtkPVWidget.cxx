@@ -21,6 +21,7 @@
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkSMProperty.h"
@@ -44,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVWidget, "1.55");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -247,6 +248,14 @@ void vtkPVWidget::AcceptedCallback()
     }
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVWidget::AnimationMenuCallback(vtkPVAnimationInterfaceEntry* ai)
+{
+  ai->SetResetRangeButtonState(0);
+  ai->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
 vtkPVApplication *vtkPVWidget::GetPVApplication() 
 {
   return vtkPVApplication::SafeDownCast(this->GetApplication());

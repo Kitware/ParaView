@@ -16,6 +16,7 @@
 
 #include "vtkContourValues.h"
 #include "vtkKWListBox.h"
+#include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
@@ -28,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.53");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -169,6 +170,33 @@ void vtkPVContourEntry::ResetInternal()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVContourEntry::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
+{
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDoubleRangeDomain *rangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(
+    prop->GetDomain(this->DomainName));
+    
+
+  if (!rangeDomain)
+    {
+    vtkErrorMacro("Required domain scalar_range could not be found");
+    return;
+    }
+
+  int minExists, maxExists;
+  double min = rangeDomain->GetMinimum(0, minExists);
+  double max = rangeDomain->GetMaximum(0, maxExists);
+  if (minExists)
+    {
+    ai->SetTimeStart(min);
+    }
+  if (maxExists)
+    {
+    ai->SetTimeEnd(max);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   if (ai->InitializeTrace(NULL))
@@ -176,6 +204,8 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
+
+  this->Superclass::AnimationMenuCallback(ai);
 
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetAnimationElement(0);
@@ -191,20 +221,18 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     return;
     }
 
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
+
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(rangeDomain);
 
-  int minExists, maxExists;
-  double min = rangeDomain->GetMinimum(0, minExists);
-  double max = rangeDomain->GetMaximum(0, maxExists);
-  if (minExists && maxExists)
-    {
-    ai->SetTimeStart(min);
-    ai->SetTimeEnd(max);
-    }
-
+  this->ResetAnimationRange(ai);
   ai->Update();
-
 }
 
 //----------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.53");
+vtkCxxRevisionMacro(vtkPVScale, "1.54");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -506,24 +507,14 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
 }
 
-//----------------------------------------------------------------------------
-void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+//-----------------------------------------------------------------------------
+void vtkPVScale::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
-    {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-                        this->GetTclName(), ai->GetTclName());
-    }
-  
-  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
-  
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *dom = prop->GetDomain("range");
-  
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(dom);
-  ai->SetAnimationElement(0);
-  
+
+  int minSet = 0;
+  int maxSet = 0;
   if (dom)
     {
     vtkSMIntRangeDomain *iDom = vtkSMIntRangeDomain::SafeDownCast(dom);
@@ -533,30 +524,30 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       {
       int min = iDom->GetMinimum(0, minExists);
       int max = iDom->GetMaximum(0, maxExists);
-      if (minExists && maxExists)
+      if (minExists)
         {
         ai->SetTimeStart(min);
-        ai->SetTimeEnd(max);
+        minSet = 1;
         }
-      else
+      if (maxExists)
         {
-        ai->SetTimeStart(this->GetRangeMin());
-        ai->SetTimeEnd(this->GetRangeMax());
+        ai->SetTimeEnd(max);
+        maxSet = 1;
         }
       }
     else if (dDom)
       {
       double min = dDom->GetMinimum(0, minExists);
       double max = dDom->GetMaximum(0, maxExists);
-      if (minExists && maxExists)
+      if (minExists)
         {
         ai->SetTimeStart(min);
-        ai->SetTimeEnd(max);
+        minSet = 1;
         }
-      else
+      if (maxExists)
         {
-        ai->SetTimeStart(this->GetRangeMin());
-        ai->SetTimeEnd(this->GetRangeMax());
+        ai->SetTimeEnd(max);
+        maxSet = 1;
         }
       }
     else
@@ -564,12 +555,47 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       vtkErrorMacro("Could not find required domain (range)");
       }
     }
-  else
+
+  if (!minSet)
     {
     ai->SetTimeStart(this->GetRangeMin());
+    }
+  if (!maxSet)
+    {
     ai->SetTimeEnd(this->GetRangeMax());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+{
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+                        this->GetTclName(), ai->GetTclName());
+    }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
+  ai->SetLabelAndScript(
+    this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
+  
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *dom = prop->GetDomain("range");
+
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
+  
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(dom);
+  ai->SetAnimationElement(0);
+  
+  this->ResetAnimationRange(ai);
+
   ai->Update();
 }
 
