@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.14");
+vtkCxxRevisionMacro(vtkKWEntry, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -85,17 +85,30 @@ float vtkKWEntry::GetValueAsFloat()
 void vtkKWEntry::SetValue(const char *s)
 {
   int ro = 0;
-  if ( this->ReadOnly )
+  if (this->ReadOnly)
     {
     this->ReadOnlyOff();
     ro = 1;
     }
+
+  int was_disabled = !this->Enabled;
+  if (was_disabled)
+    {
+    this->SetEnabled(1);
+    }
+
   this->Script("%s delete 0 end", this->GetWidgetName());
   if (s)
     {
     this->Script("%s insert 0 {%s}", this->GetWidgetName(),s);
     }
-  if ( ro )
+
+  if (was_disabled)
+    {
+    this->SetEnabled(0);
+    }
+
+  if (ro)
     {
     this->ReadOnlyOn();
     }
