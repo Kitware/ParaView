@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.86");
+vtkCxxRevisionMacro(vtkPVProbe, "1.87");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -203,9 +203,14 @@ void vtkPVProbe::CreateProperties()
     
     pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
                            this->GetVTKSourceTclName());
-    // This is not going to work because of empty extent on client ...
-    //pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-    //                       this->GetVTKSourceTclName());
+    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
+                           this->GetVTKSourceTclName());
+    // Special condition to signal the client.
+    // Because both processes of the Socket controller think they are 0!!!!
+    if (pvApp->GetClientMode())
+      {
+      this->Script("%s SetController {}", this->GetVTKSourceTclName());
+      }
     
     vtkPVGenericRenderWindowInteractor* iren = 
       this->GetPVWindow()->GetInteractor();
@@ -350,8 +355,7 @@ void vtkPVProbe::Deselect(int doPackForget)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag, 
-                                  int vtkFlag)
+void vtkPVProbe::SaveInBatchScript(ofstream *file)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();  
 
@@ -407,7 +411,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
-  *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+  *file << this->GetPVInput(0)->GetPVSource()->GetVTKSourceTclName()
         << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)
@@ -437,7 +441,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
       }
     }
   
-  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
+  this->GetPVOutput(0)->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------

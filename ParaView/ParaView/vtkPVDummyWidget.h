@@ -75,6 +75,10 @@ public:
   virtual void Accept(const char* sourceTclName) { this->ModifiedFlag = 0;}
   virtual void Reset(const char* sourceTclName) { this->ModifiedFlag = 0;}
 
+  // Description:
+  // Empty method to keep superclass from complaining.
+  virtual void Trace(ofstream *file, const char *root) {};
+
 protected:
   vtkPVDummyWidget();
   ~vtkPVDummyWidget();

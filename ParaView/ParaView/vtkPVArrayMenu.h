@@ -149,10 +149,6 @@ public:
   virtual void Reset(const char* sourceTclName);
 
   // Description:
-  // The widget saves it state/command in the vtk tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // Set the menus value as a string.
   // Used by the Accept and Reset callbacks.
   // Can also be used from a script.
@@ -199,6 +195,9 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVArrayMenu();
@@ -247,6 +246,10 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // The widget saves it state/command in the vtk tcl script.
+  void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 };
 
 #endif

@@ -85,10 +85,6 @@ public:
   vtkGetStringMacro(SphereTclName);
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
@@ -112,6 +108,10 @@ public:
   void SetCenter(float c[3]) { this->SetCenter(c[0], c[1], c[2]); }
   void SetRadius();
   void SetRadius(float);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVSphereWidget();
@@ -140,6 +140,12 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  // This saves the implicit sphere.  Parts will share this
+  // one sphere.
+  virtual void SaveInBatchScript(ofstream *file);
 
 private:
   vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented

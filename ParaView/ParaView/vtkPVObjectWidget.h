@@ -68,10 +68,6 @@ public:
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);
 
-  // Description:
-  // An interface for saving a widget into a script.
-  virtual void SaveInTclScript(ofstream *file);
-
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -103,6 +99,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // An interface for saving a widget into a script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 };
 
 #endif

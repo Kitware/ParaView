@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.14");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -147,6 +147,7 @@ void vtkPVScalarRangeLabel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Range: " << this->GetRange() << endl;
 }
 
+//----------------------------------------------------------------------------
 vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::ClonePrototype(
   vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -154,6 +155,7 @@ vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::ClonePrototype(
   return vtkPVScalarRangeLabel::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScalarRangeLabel::CopyProperties(vtkPVWidget* clone, 
                                            vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)

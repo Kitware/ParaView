@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.10");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -71,39 +71,12 @@ vtkPVAdvancedReaderModule::~vtkPVAdvancedReaderModule()
 }
 
 //----------------------------------------------------------------------------
+// This method used to fix the output data type of clone.
+// It does nothing now, so we should get rid of it........ !!!!!!!!
 int vtkPVAdvancedReaderModule::Initialize(const char* fname, 
                                           vtkPVReaderModule*& clone)
 {
-  // If the reader has as an output vtkDataSet or vtkPointSet, then we
-  // should fix it, but just for the clone process. After the clone
-  // process, we should change it back.
-  int isdatasetreader = vtkString::Equals(this->OutputClassName, "vtkDataSet");
-  int ispointsetreader = vtkString::Equals(this->OutputClassName, "vtkPointSet");
-  if ( ispointsetreader || isdatasetreader )
-    {
-    char* res = vtkString::Duplicate(
-      this->Script("%s PVAdvancedReaderTempVar", this->SourceClassName));
-
-    // TODO: Change the hardcoded "FileName" to something more elaborate
-    this->Script("%s Set%s %s", res, "FileName", fname);
-    this->Script("%s UpdateInformation", res);
-    this->SetOutputClassName(this->Script("[ %s GetOutput ] GetClassName", res));
-    this->Script("%s Delete", res);
-    delete[] res;
-    }
-
   int retVal = this->Superclass::Initialize(fname, clone);
-
-  // If the reader was dataset or pointset reader, then modify the
-  // default output class name back to whatever it was before.
-  if ( isdatasetreader )
-    {
-    this->SetOutputClassName("vtkDataSet");
-    }
-  if ( ispointsetreader )
-    {
-    this->SetOutputClassName("vtkPointSet");
-    }
 
   if (retVal != VTK_OK)
     {

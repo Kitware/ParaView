@@ -137,8 +137,8 @@ public:
 
   // Description:
   // Make the tcl script save the images of the animation.
-  void SaveInTclScript(ofstream *file, const char *fileRoot,
-                       const char* extension, const char* writerName);
+  void SaveInBatchScript(ofstream *file, const char *fileRoot,
+                         const char* extension, const char* writerName);
 
   // Description:
   // If the animation is controlling a specific PVWidget, then

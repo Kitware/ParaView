@@ -96,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.190");
+vtkCxxRevisionMacro(vtkPVData, "1.191");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -202,6 +202,12 @@ vtkPVData::vtkPVData()
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
   this->ColorSetByUser = 0;
+
+  this->GeometryMemorySize = 0;
+  this->LODMemorySize = 0;
+  this->GeometryCollected = 0;
+  this->LODCollected = 0;
+  this->GeometryInformationValid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -384,6 +390,7 @@ vtkPVDataInformation* vtkPVData::GetDataInformation()
 void vtkPVData::InvalidateDataInformation()
 {
   this->DataInformationValid = 0;
+  this->GeometryInformationValid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1209,37 +1216,11 @@ void vtkPVData::UpdatePropertiesInternal()
   vtkPVWindow *window;
   int defPoint = 0;
   vtkPVArrayInformation *defArray;
-  vtkPVPart *part;
-  int idx, num;
 
   // Default is the scalars to use when current color is not found.
   // This is sort of a mess, and should be handled by a color selection widget.
   defCmd[0] = '\0'; 
   defArray = NULL;
-
-  // Set LOD based on point threshold of render view.
-  // This is imperfect because the critera is based on
-  // the data, not the rendered geometry.
-  // It the solution communication in the PVLodActor?
-  int numberOfPoints = this->DataInformation->GetNumberOfPoints();
-  if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
-    {
-    num = this->GetNumberOfPVParts();
-    for (idx = 0; idx < num; ++idx)
-      {  
-      part = this->GetPVPart(idx);
-      pvApp->BroadcastScript("%s EnableLODOn", part->GetPropTclName());
-      }
-    }
-  else
-    {
-    num = this->GetNumberOfPVParts();
-    for (idx = 0; idx < num; ++idx)
-      {  
-      part = this->GetPVPart(idx);
-      pvApp->BroadcastScript("%s EnableLODOff", part->GetPropTclName());
-      }
-    }
 
   if (this->PVColorMap)
     {
@@ -1322,7 +1303,8 @@ void vtkPVData::UpdatePropertiesInternal()
   sprintf(tmp, "Number of cells: %d", 
           this->DataInformation->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
-  sprintf(tmp, "Number of points: %d", numberOfPoints);
+  sprintf(tmp, "Number of points: %d", 
+          this->DataInformation->GetNumberOfPoints());
   this->NumPointsLabel->SetLabel(tmp);
   
   this->DataInformation->GetBounds(bounds);
@@ -1843,9 +1825,9 @@ void vtkPVData::DrawSurface()
         pvApp->BroadcastScript("%s SetRepresentationToSurface",
                                part->GetPropertyTclName());
         }
-      this->PreviousWasSolid = 1;
       }
     }
+  this->PreviousWasSolid = 1;
 
   if ( this->GetPVRenderView() )
     {
@@ -1980,58 +1962,7 @@ void vtkPVData::Initialize()
   vtkDebugMacro( << "Initialize --------")
   
   this->GetDataInformation()->GetBounds(bounds);
-  if (bounds[0] < 0)
-    {
-    bounds[0] += 0.05 * (bounds[1] - bounds[0]);
-    if (bounds[1] > 0)
-      {
-      bounds[1] += 0.05 * (bounds[1] - bounds[0]);
-      }
-    else
-      {
-      bounds[1] -= 0.05 * (bounds[1] - bounds[0]);
-      }
-    }
-  else
-    {
-    bounds[0] -= 0.05 * (bounds[1] - bounds[0]);
-    bounds[1] += 0.05 * (bounds[1] - bounds[0]);
-    }
-  if (bounds[2] < 0)
-    {
-    bounds[2] += 0.05 * (bounds[3] - bounds[2]);
-    if (bounds[3] > 0)
-      {
-      bounds[3] += 0.05 * (bounds[3] - bounds[2]);
-      }
-    else
-      {
-      bounds[3] -= 0.05 * (bounds[3] - bounds[2]);
-      }
-    }
-  else
-    {
-    bounds[2] -= 0.05 * (bounds[3] - bounds[2]);
-    bounds[3] += 0.05 * (bounds[3] - bounds[2]);
-    }
-  if (bounds[4] < 0)
-    {
-    bounds[4] += 0.05 * (bounds[5] - bounds[4]);
-    if (bounds[5] > 0)
-      {
-      bounds[5] += 0.05 * (bounds[5] - bounds[4]);
-      }
-    else
-      {
-      bounds[5] -= 0.05 * (bounds[5] - bounds[4]);
-      }
-    }
-  else
-    {
-    bounds[4] -= 0.05 * (bounds[5] - bounds[4]);
-    bounds[5] += 0.05 * (bounds[5] - bounds[4]);
-    }
-  
+
   tclName = this->GetPVRenderView()->GetRendererTclName();
   
   sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
@@ -2402,92 +2333,122 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::SaveInTclScript(ofstream *file, int interactiveFlag, 
-                                int vtkFlag)
+void vtkPVData::SaveInBatchScript(ofstream *file)
 {
   float range[2];
   const char* scalarMode;
   char* result;
   char* renTclName;
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int partIdx, numParts;
+  int sourceCount;
+  int numSources;
+  int outputCount;
+  int numOutputs;
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
   if (this->GetVisibility())
     {
-    *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
-          << part->GetGeometryTclName() << " SetInput [" 
-          << this->GetPVSource()->GetVTKSourceTclName() << " GetOutput]\n";
-
     if (this->PVColorMap)
       {
-      this->PVColorMap->SaveInTclScript(file, interactiveFlag, vtkFlag);
+      this->PVColorMap->SaveInBatchScript(file);
       }
+    numSources = this->GetPVSource()->GetNumberOfVTKSources();
+    // Easier to initialize the output traversal this way.
+    // We want to exaust each sources output, then move to the next source.
+    sourceCount = -1;
+    numOutputs = 0;
+    outputCount = 0;
+    numParts = this->GetNumberOfPVParts();
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      part = this->GetPVPart(partIdx);
+      // Get the next output from the sequence of sources/outputs.
+      if (outputCount >= numOutputs)
+        { // Move to next source
+        ++sourceCount;
+        if (sourceCount >= numSources)
+          { // sanity check
+          vtkErrorMacro("We ran out of sources.");
+          return;
+          }
+        numOutputs = this->GetPVSource()->GetVTKSource(sourceCount)->GetNumberOfOutputs();
+        outputCount = 0;
+        }
 
-    *file << "vtkPolyDataMapper " << part->GetMapperTclName() << "\n\t"
-          << part->GetMapperTclName() << " SetInput ["
-          << part->GetGeometryTclName() << " GetOutput]\n\t";  
-    *file << part->GetMapperTclName() << " SetImmediateModeRendering "
-          << part->GetMapper()->GetImmediateModeRendering() << "\n\t";
-    part->GetMapper()->GetScalarRange(range);
-    *file << part->GetMapperTclName() << " UseLookupTableScalarRangeOn\n\t";
-    *file << part->GetMapperTclName() << " SetScalarVisibility "
-          << part->GetMapper()->GetScalarVisibility() << "\n\t"
-          << part->GetMapperTclName() << " SetScalarModeTo";
-    scalarMode = part->GetMapper()->GetScalarModeAsString();
-    *file << scalarMode << "\n";
-    if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
-        strcmp(scalarMode, "UseCellFieldData") == 0)
-      {
-      *file << "\t" << part->GetMapperTclName() << " SelectColorArray {"
-            << part->GetMapper()->GetArrayName() << "}\n";
-      }
-    if (this->PVColorMap)
-      {
-      *file << part->GetMapperTclName() << " SetLookupTable " 
-            << this->PVColorMap->GetLookupTableTclName() << endl;
-      }
+      *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
+            << part->GetGeometryTclName() << " SetInput [" 
+            << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
+            << " GetOutput " << outputCount << "]\n";
+      // Move to next output
+      ++outputCount;
+
+
+      *file << "vtkPolyDataMapper " << part->GetMapperTclName() << "\n\t"
+            << part->GetMapperTclName() << " SetInput ["
+            << part->GetGeometryTclName() << " GetOutput]\n\t";  
+      *file << part->GetMapperTclName() << " SetImmediateModeRendering "
+            << part->GetMapper()->GetImmediateModeRendering() << "\n\t";
+      part->GetMapper()->GetScalarRange(range);
+      *file << part->GetMapperTclName() << " UseLookupTableScalarRangeOn\n\t";
+      *file << part->GetMapperTclName() << " SetScalarVisibility "
+            << part->GetMapper()->GetScalarVisibility() << "\n\t"
+            << part->GetMapperTclName() << " SetScalarModeTo";
+      scalarMode = part->GetMapper()->GetScalarModeAsString();
+      *file << scalarMode << "\n";
+      if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
+          strcmp(scalarMode, "UseCellFieldData") == 0)
+        {
+        *file << "\t" << part->GetMapperTclName() << " SelectColorArray {"
+              << part->GetMapper()->GetArrayName() << "}\n";
+        }
+      if (this->PVColorMap)
+        {
+        *file << part->GetMapperTclName() << " SetLookupTable " 
+              << this->PVColorMap->GetLookupTableTclName() << endl;
+        }
   
-    *file << "vtkActor " << part->GetPropTclName() << "\n\t"
-          << part->GetPropTclName() << " SetMapper " << part->GetMapperTclName() << "\n\t"
-          << "[" << part->GetPropTclName() << " GetProperty] SetRepresentationTo"
-          << part->GetProperty()->GetRepresentationAsString() << "\n\t"
-          << "[" << part->GetPropTclName() << " GetProperty] SetInterpolationTo"
-          << part->GetProperty()->GetInterpolationAsString() << "\n";
+      *file << "vtkActor " << part->GetPropTclName() << "\n\t"
+            << part->GetPropTclName() << " SetMapper " << part->GetMapperTclName() << "\n\t"
+            << "[" << part->GetPropTclName() << " GetProperty] SetRepresentationTo"
+            << part->GetProperty()->GetRepresentationAsString() << "\n\t"
+            << "[" << part->GetPropTclName() << " GetProperty] SetInterpolationTo"
+            << part->GetProperty()->GetInterpolationAsString() << "\n";
 
-    *file << "\t[" << part->GetPropTclName() << " GetProperty] SetAmbient "
-          << part->GetProperty()->GetAmbient() << "\n";
-    *file << "\t[" << part->GetPropTclName() << " GetProperty] SetDiffuse "
-          << part->GetProperty()->GetDiffuse() << "\n";
-    *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecular "
-          << part->GetProperty()->GetSpecular() << "\n";
-    *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecularPower "
-          << part->GetProperty()->GetSpecularPower() << "\n";
-    float *color = part->GetProperty()->GetSpecularColor();
-    *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecularColor "
-          << color[0] << " " << color[1] << " " << color[2] << "\n";
-    if (part->GetProperty()->GetLineWidth() > 1)
-      {
-      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetLineWidth "
-          << part->GetProperty()->GetLineWidth() << "\n";
-      }
-    if (part->GetProperty()->GetPointSize() > 1)
-      {
-      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetPointSize "
-          << part->GetProperty()->GetPointSize() << "\n";
-      }
+      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetAmbient "
+            << part->GetProperty()->GetAmbient() << "\n";
+      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetDiffuse "
+            << part->GetProperty()->GetDiffuse() << "\n";
+      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecular "
+            << part->GetProperty()->GetSpecular() << "\n";
+      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecularPower "
+            << part->GetProperty()->GetSpecularPower() << "\n";
+      float *color = part->GetProperty()->GetSpecularColor();
+      *file << "\t[" << part->GetPropTclName() << " GetProperty] SetSpecularColor "
+            << color[0] << " " << color[1] << " " << color[2] << "\n";
+      if (part->GetProperty()->GetLineWidth() > 1)
+        {
+        *file << "\t[" << part->GetPropTclName() << " GetProperty] SetLineWidth "
+            << part->GetProperty()->GetLineWidth() << "\n";
+        }
+      if (part->GetProperty()->GetPointSize() > 1)
+        {
+        *file << "\t[" << part->GetPropTclName() << " GetProperty] SetPointSize "
+            << part->GetProperty()->GetPointSize() << "\n";
+        }
 
-    if (!part->GetMapper()->GetScalarVisibility())
-      {
-      float propColor[3];
-      part->GetProperty()->GetColor(propColor);
-      *file << "[" << part->GetPropTclName() << " GetProperty] SetColor "
-            << propColor[0] << " " << propColor[1] << " " << propColor[2]
-            << "\n";
-      }
+      if (!part->GetMapper()->GetScalarVisibility())
+        {
+        float propColor[3];
+        part->GetProperty()->GetColor(propColor);
+        *file << "[" << part->GetPropTclName() << " GetProperty] SetColor "
+              << propColor[0] << " " << propColor[1] << " " << propColor[2]
+              << "\n";
+        }
 
-    *file << renTclName << " AddActor " << part->GetPropTclName() << "\n";
-    }  
+      *file << renTclName << " AddActor " << part->GetPropTclName() << "\n";
+      }  
+    }
 
   if (this->CubeAxesCheck->GetState())
     {
@@ -2503,6 +2464,11 @@ void vtkPVData::SaveInTclScript(ofstream *file, int interactiveFlag,
           << this->CubeAxesTclName << " SetInertia 20\n";
     *file << renTclName << " AddProp " << this->CubeAxesTclName << "\n";
     }
+}
+//----------------------------------------------------------------------------
+void vtkPVData::SaveState(ofstream *file)
+{
+  // ............. fill in later .........
 }
 
 //----------------------------------------------------------------------------
@@ -2534,10 +2500,13 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
 
-  if (this->GetPVPart())
+  os << indent << "NumberOfPVParts: " << this->GetNumberOfPVParts() << endl;
+  if (this->GeometryInformationValid)
     {
-    os << indent << "Part: \n";
-    this->GetPVPart()->PrintSelf(os, indent.GetNextIndent());
+    os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
+    os << indent << "LODMemorySize: " << this->LODMemorySize << endl;
+    os << indent << "GeometryCollected: " << this->GeometryCollected << endl;
+    os << indent << "LODCollected: " << this->LODCollected << endl;
     }
 }
 
@@ -2995,8 +2964,9 @@ void vtkPVData::SetCollectThreshold(float threshold)
     {
     return;
     }
-  this->CollectThreshold = threshold;
 
+  this->GeometryInformationValid = 0;
+  this->CollectThreshold = threshold;
 
   num = this->GetNumberOfPVParts();
   for (idx = 0; idx < num; ++idx)
@@ -3017,11 +2987,83 @@ void vtkPVData::SetCollectThreshold(float threshold)
 
 
 //----------------------------------------------------------------------------
+unsigned long vtkPVData::GetGeometryMemorySize()
+{
+  if ( ! this->GeometryInformationValid)
+    {
+    this->UpdateGeometryInformation();
+    }
+  return this->GeometryMemorySize;
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkPVData::GetLODMemorySize()
+{
+  if ( ! this->GeometryInformationValid)
+    {
+    this->UpdateGeometryInformation();
+    }
+  return this->LODMemorySize;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVData::GetGeometryCollected()
+{
+  if ( ! this->GeometryInformationValid)
+    {
+    this->UpdateGeometryInformation();
+    }
+  return this->GeometryCollected;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVData::GetLODCollected()
+{
+  if ( ! this->GeometryInformationValid)
+    {
+    this->UpdateGeometryInformation();
+    }
+  return this->LODCollected;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::UpdateGeometryInformation()
+{
+  int numParts, idx;
+  vtkPVPart *part;
+
+  this->GeometryMemorySize = 0;
+  this->LODMemorySize = 0;
+  this->GeometryCollected = 1;
+  this->LODCollected = 1;
+
+  numParts = this->GetNumberOfPVParts();
+  for (idx = 0; idx < numParts; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GeometryMemorySize += part->GetGeometryMemorySize();
+    this->LODMemorySize += part->GetLODMemorySize();
+    if ( ! part->GetGeometryCollected())
+      {
+      this->GeometryCollected = 0;
+      }
+    if ( ! part->GetLODCollected())
+      {
+      this->LODCollected = 0;
+      }
+    }
+
+  this->GeometryInformationValid = 1;
+}
+
+
+
+//----------------------------------------------------------------------------
 void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.190 $");
+  this->ExtractRevision(os,"$Revision: 1.191 $");
 }
 
 //----------------------------------------------------------------------------

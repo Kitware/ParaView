@@ -28,7 +28,7 @@ $pv(vtkTemp199) SetPoint1 0 0 0
 $pv(vtkTemp199) SetPoint2 1 1 1
 $pv(vtkTemp180) AcceptCallback
 set pv(vtkTemp215) [$pv(vtkTemp1) CreatePVSource Threshold]
-set pv(vtkTemp229) [$pv(vtkTemp215) GetPVWidget {Lower Threshold}]
+set pv(vtkTemp229) [$pv(vtkTemp215) GetPVWidget {MinMax}]
 $pv(vtkTemp229) SetMinValue 0.069000
 $pv(vtkTemp229) SetMaxValue 0.255880
 $pv(vtkTemp215) AcceptCallback

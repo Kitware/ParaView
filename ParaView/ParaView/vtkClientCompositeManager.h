@@ -142,6 +142,12 @@ public:
   };
 //ETX
 
+  // Description:
+  // Switch between local client rendering and distributed compositing.
+  vtkSetMacro(UseCompositing, int);
+  vtkGetMacro(UseCompositing, int);
+  vtkBooleanMacro(UseCompositing, int);
+
 protected:
   vtkClientCompositeManager();
   ~vtkClientCompositeManager();
@@ -213,6 +219,7 @@ protected:
   int UseChar;
   int UseRGB;
 
+  int UseCompositing;
 
 private:
   vtkClientCompositeManager(const vtkClientCompositeManager&); // Not implemented

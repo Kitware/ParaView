@@ -95,8 +95,12 @@ public:
 
   // Description:
   // Saves the value of this widget into a VTK Tcl script.
-  // This does what the superclass does, but also create the line source.
-  void SaveInTclScript(ofstream *file);
+  // This creates the line source (one for all parts).
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVLineSourceWidget();

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.3");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -563,11 +563,11 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   // Populate the scalar and array menu using collected data information.
   if (strcmp(newMode, "point") == 0)
     {
-    fdi = this->PVSource->GetPVInput()->GetDataInformation()->GetPointDataInformation();
+    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetPointDataInformation();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    fdi = this->PVSource->GetPVInput()->GetDataInformation()->GetCellDataInformation();
+    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetCellDataInformation();
     }
   
   if (fdi)
@@ -650,6 +650,38 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
 }
 
 
+//---------------------------------------------------------------------------
+void vtkPVCalculatorWidget::Trace(ofstream *file, const char* root)
+{
+  int num, idx;
+  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));
+  char* variableName;
+  char* arrayName;
+  int   component;
+
+  num = calc->GetNumberOfScalarArrays();
+  for (idx = 0; idx < num; ++ idx)
+    {
+    variableName = calc->GetScalarVariableName(idx);
+    arrayName = calc->GetScalarArrayName(idx);
+    component = calc->GetSelectedScalarComponent(idx);
+    *file << "$" << root << "(" << this->GetTclName() << ") AddScalarVariable {"
+          << variableName << "} {" << arrayName << "} " << component << endl;
+    }
+
+  num = calc->GetNumberOfVectorArrays();
+  for (idx = 0; idx < num; ++ idx)
+    {
+    variableName = calc->GetVectorVariableName(idx);
+    arrayName = calc->GetVectorArrayName(idx);
+    *file << "$" << root << "(" << this->GetTclName() << ") AddVectorVariable {"
+          << variableName << "} {" << arrayName << "}" << endl;
+    }
+
+  *file << "$" << root << "(" << this->GetTclName() << ") SetFunctionLabel {"
+        << this->FunctionLabel->GetLabel() << "}" << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Accept()
 {
@@ -716,58 +748,58 @@ void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::SaveInTclScript(ofstream *file)
+void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
 {
   int i;
-  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));
+  int numSources, sourceIdx;
 
-  // This is just the super classes method "SaveInTclScript" without
-  // saving the output.
-  // The correct way to do this is to create a calculator PVWidget.
-  // I am just fixing bugs for a release right now.
+  numSources = this->PVSource->GetNumberOfVTKSources();
+  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+    {
+    vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(sourceIdx));
 
-  // Detect special sources we do not handle yet.
-  if (calc == NULL)
-    {
-    return;
-    }
+    // Detect special sources we do not handle yet.
+    if (calc == NULL)
+      {
+      return;
+      }
 
-  // This suff is what should be in PVWidgets.
-  *file << "\t" << this->PVSource->GetVTKSourceTclName() << " SetAttributeModeToUse";
-  if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
-    {
-    *file << "PointData\n\t";
-    }
-  else
-    {
-    *file << "CellData\n\t";
-    }
+    // This suff is what should be in PVWidgets.
+    *file << "\t" << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+          << " SetAttributeModeToUse";
+    if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
+      {
+      *file << "PointData\n\t";
+      }
+    else
+      {
+      *file << "CellData\n\t";
+      }
   
-  for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
-    {
-    *file << this->PVSource->GetVTKSourceTclName() << " AddScalarVariable "
-          << calc->GetScalarVariableName(i) << " "
-          << calc->GetScalarArrayName(i) 
-          << " " << calc->GetSelectedScalarComponent(i)
-          << "\n\t";
-    }
-  for (i = 0; i < ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
-         GetNumberOfVectorArrays(); i++)
-    {
-    *file << this->PVSource->GetVTKSourceTclName() << " AddVectorVariable "
-          << ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
-      GetVectorVariableName(i) << " "
-          << ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
-      GetVectorArrayName(i)
-          << " 0 1 2\n\t";
-    }  
+    for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
+      {
+      *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+            << " AddScalarVariable "
+            << calc->GetScalarVariableName(i) << " "
+            << calc->GetScalarArrayName(i) 
+            << " " << calc->GetSelectedScalarComponent(i)
+            << "\n\t";
+      }
+    for (i = 0; i < calc->GetNumberOfVectorArrays(); i++)
+      {
+      *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+            << " AddVectorVariable "
+            << calc->GetVectorVariableName(i) << " "
+            << calc->GetVectorArrayName(i)
+            << " 0 1 2\n\t";
+      }  
 
-  if ( this->FunctionLabel->IsCreated() )
-    {
-    *file << "\t" << this->PVSource->GetVTKSourceTclName() << " SetFunction {"  
-          << this->FunctionLabel->GetLabel() << "}\n";
+    if ( this->FunctionLabel->IsCreated() )
+      {
+      *file << "\t" << this->PVSource->GetVTKSourceTclName(sourceIdx) << " SetFunction {"  
+            << this->FunctionLabel->GetLabel() << "}\n";
+      }
     }
-
 }
 
 //----------------------------------------------------------------------------

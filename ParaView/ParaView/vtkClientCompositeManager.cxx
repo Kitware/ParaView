@@ -50,7 +50,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.6");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.7");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -133,6 +133,7 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->BaseArray = NULL;
 
   this->SquirtCompression = 0;
+  this->UseCompositing = 1;
 }
 
   
@@ -246,6 +247,12 @@ void vtkClientCompositeManager::StartRender()
   static int firstRender = 1;
   float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
+  if ( ! this->UseCompositing)
+    {
+    this->RenderWindow->EraseOn();
+    return;
+    }
+
   if (firstRender)
     {
     firstRender = 0;
@@ -267,6 +274,7 @@ void vtkClientCompositeManager::StartRender()
 
   if (controller == NULL)
     {
+    this->RenderWindow->EraseOn();
     return;
     }
 

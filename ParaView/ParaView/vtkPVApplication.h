@@ -330,11 +330,11 @@ protected:
 
   int StartGUI;
 
-  int RunVTKScript;
+  int RunBatchScript;
 
-  char* VTKScriptName;
-  vtkSetStringMacro(VTKScriptName);
-  vtkGetStringMacro(VTKScriptName);
+  char* BatchScriptName;
+  vtkSetStringMacro(BatchScriptName);
+  vtkGetStringMacro(BatchScriptName);
 
   // Command line arguments.
   int ClientMode;

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.20");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -115,7 +115,7 @@ void vtkPVSphereWidget::CenterResetCallback()
     return;
     }
 
-  input = this->PVSource->GetPVInput();
+  input = this->PVSource->GetPVInput(0);
   if (input == NULL)
     {
     return;
@@ -206,13 +206,35 @@ void vtkPVSphereWidget::Accept()
   this->Accept(this->ObjectTclName);
 }
 
+
+//---------------------------------------------------------------------------
+void vtkPVSphereWidget::Trace(ofstream *file, const char* root)
+{
+  float rad;
+  float val[3];
+  int cc;
+  
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+    }
+  *file << "$" << root << "(" << this->GetTclName() << ") SetCenter "
+        << val[0] << " " << val[1] << " " << val[2] << endl;
+
+  rad = atof(this->RadiusEntry->GetValue());
+  this->AddTraceEntry("$kw(%s) SetRadius %f", 
+                      this->GetTclName(), rad);
+  *file << "$" << root << "(" << this->GetTclName() << ") SetRadius "
+        << rad << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::UpdateVTKObject(const char* sourceTclName)
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::SaveInTclScript(ofstream *file)
+void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkSphere " << this->SphereTclName << endl;
   *file << "\t" << this->SphereTclName << " SetCenter ";
@@ -386,7 +408,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
     {
-    vtkPVData *input = this->PVSource->GetPVInput();
+    vtkPVData *input = this->PVSource->GetPVInput(0);
     if (input)
       {
       double bds[6];

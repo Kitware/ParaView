@@ -83,6 +83,7 @@ protected:
   ~vtkPVGenericRenderWindowInteractor();
   
   vtkPVRenderView *PVRenderView;
+  int ReductionFactor;
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented

@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVWidget, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -218,10 +218,37 @@ vtkPVApplication *vtkPVWidget::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::SaveInTclScript(ofstream *file)
+void vtkPVWidget::SaveInBatchScript(ofstream *file)
 {
-  file = file;
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("SaveInBatchScript requires a PVSource.")
+    return;
+    }
+
+  int numSources, sourceIdx;
+  numSources = this->PVSource->GetNumberOfVTKSources();
+  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+    {
+    this->SaveInBatchScriptForPart(file, 
+                  this->PVSource->GetVTKSourceTclName(sourceIdx));
+    }
 }
+//----------------------------------------------------------------------------
+//void vtkPVWidget::Trace(ofstream *, const char* )
+//{
+//  vtkErrorMacro("Trace not define for widget " << this->GetClassName());
+//}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
+{
+  // Either SaveInBatchScript or SaveInBatchScriptForPart
+  // must be defined.
+  vtkErrorMacro("Method not defined in subclass: " << this->GetClassName());
+}
+
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
@@ -360,7 +387,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.28 $");
+  this->ExtractRevision(os,"$Revision: 1.29 $");
 }
 
 //----------------------------------------------------------------------------

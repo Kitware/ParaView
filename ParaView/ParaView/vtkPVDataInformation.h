@@ -72,7 +72,8 @@ public:
 
   // Description:
   // Transfer information about a single vtk data object into
-  // this object.
+  // this object. Note:  CopyFromData does not set 
+  // the GeometryMemorySize or LODMemorySize.
   void CopyFromData(vtkDataSet* data);
   void DeepCopy(vtkPVDataInformation* info);
 

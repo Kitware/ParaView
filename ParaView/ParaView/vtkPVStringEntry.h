@@ -88,13 +88,6 @@ public:
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
 
-  // Description:
-  // This widget needs a special "SaveInTclScript" method
-  // because the string has to be enclosed by brackets.
-  // This method is used internally by PVSources to save
-  // parameters into a VTK Tcl script.
-  void SaveInTclScript(ofstream *file);
-
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -104,6 +97,10 @@ public:
   vtkPVStringEntry* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVStringEntry();
@@ -126,6 +123,13 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // This widget needs a special "SaveInBatchScript" method
+  // because the string has to be enclosed by brackets.
+  // This method is used internally by PVSources to save
+  // parameters into a VTK Tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 };
 
 #endif

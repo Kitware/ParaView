@@ -126,7 +126,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.33");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -739,7 +739,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeStartEntry && this->TimeStartEntry->IsCreated())
     {
-    this->TimeStartEntry->SetValue(this->TimeStart, 2);
+    this->TimeStartEntry->SetValue(this->TimeStart, 3);
     if (this->InPlay)
       {
       this->TimeStartEntry->EnabledOff();
@@ -752,7 +752,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeEndEntry && this->TimeEndEntry->IsCreated())
     {
-    this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+    this->TimeEndEntry->SetValue(this->TimeEnd, 3);
     if (this->InPlay)
       {
       this->TimeEndEntry->EnabledOff();
@@ -765,7 +765,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->TimeStepEntry && this->TimeStepEntry->IsCreated())
     {
-    this->TimeStepEntry->SetValue(this->TimeStep, 2);
+    this->TimeStepEntry->SetValue(this->TimeStep, 3);
     if (this->InPlay)
       {
       this->TimeStepEntry->EnabledOff();
@@ -1231,10 +1231,10 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SaveInTclScript(ofstream *file, 
-                                              const char* fileRoot,
-                                              const char* extension,
-                                              const char* writerName)
+void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
+                                                const char* fileRoot,
+                                                const char* extension,
+                                                const char* writerName)
 {
   float t;
   float sgn;

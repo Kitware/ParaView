@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.12");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -158,6 +158,29 @@ void vtkPVContainerWidget::Accept(const char* sourceTclName)
 void vtkPVContainerWidget::Accept()
 {
   vtkErrorMacro("Accept requires a source name.");
+}
+
+//---------------------------------------------------------------------------
+void vtkPVContainerWidget::Trace(ofstream *file, const char* root)
+{
+  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkPVWidget* widget;
+  while ( !it->IsDoneWithTraversal() )
+    {
+    widget = 0;
+    it->GetData(widget);
+    if (widget)
+      {
+      *file << "set " << root << "(" << widget->GetTclName() << ") "
+            << "[$" << root << "(" << this->GetTclName() << ") "
+            << "GetPVWidget {" << widget->GetTraceName() << "}]" << endl;
+
+      widget->Trace(file, root);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -280,7 +303,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::SaveInTclScript(ofstream *file)
+void vtkPVContainerWidget::SaveInBatchScript(ofstream *file)
 {
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
@@ -290,7 +313,7 @@ void vtkPVContainerWidget::SaveInTclScript(ofstream *file)
     it->GetData(widget);
     if (widget) 
       {
-      widget->SaveInTclScript(file);
+      widget->SaveInBatchScript(file);
       }
     it->GoToNextItem();
     }

@@ -75,10 +75,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
@@ -96,6 +92,11 @@ public:
   virtual void SetCenter(float f[3]) { this->SetCenter(f[0], f[1], f[2]); }
   void SetNormal(float,float,float);
   virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  // Saves a plane (one for all parts).
+  virtual void SaveInBatchScript(ofstream *file);
 
 protected:
   vtkPVPlaneWidget();

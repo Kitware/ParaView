@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.23");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -216,6 +216,13 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   this->ModifiedCallback();
 }
 
+//---------------------------------------------------------------------------
+void vtkPVFileEntry::Trace(ofstream *file, const char* root)
+{
+  // I assume the quotes are for eveluating an output tcl variable.
+  *file << "$" << root << "(" << this->GetTclName() << ") SetValue \""
+        << this->GetValue() << "\"" << endl;
+}
 
 
 //----------------------------------------------------------------------------

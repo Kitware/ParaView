@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.7");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.8");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -106,6 +106,19 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
                            this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
+    }
+}
+
+
+//---------------------------------------------------------------------------
+void vtkPVComponentSelection::Trace(ofstream *file, const char* root)
+{
+  int i;
+  
+  for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetState "
+          << i << " " << this->GetState(i) << endl;
     }
 }
 

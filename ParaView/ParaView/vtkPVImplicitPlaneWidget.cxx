@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVImplicitPlaneWidget.h"
 
+#include "vtkArrayMap.txx"
 #include "vtkCamera.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVProcessModule.h"
@@ -53,19 +54,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 #include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
+#include "vtkPVInputMenu.h"
 #include "vtkPVXMLElement.h"
 #include "vtkImplicitPlaneWidget.h"
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.12");
+
+vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -74,6 +79,8 @@ int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 {
   int cc;
+
+  this->InputMenu = 0;
 
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
@@ -95,6 +102,8 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 {
+  this->SetInputMenu(NULL);
+
   if (this->PlaneTclName)
     {
     this->GetPVApplication()->BroadcastScript("%s Delete", 
@@ -130,7 +139,7 @@ void vtkPVImplicitPlaneWidget::CenterResetCallback()
     return;
     }
 
-  input = this->PVSource->GetPVInput();
+  input = this->PVSource->GetPVInput(0);
   if (input == NULL)
     {
     return;
@@ -295,6 +304,25 @@ void vtkPVImplicitPlaneWidget::Accept(const char* sourceTclName)
   this->Superclass::Accept(sourceTclName);
 }
 
+//---------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Trace(ofstream *file, const char* root)
+{
+  float val[3];
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+    }
+  *file << "$" << root << "(" << this->GetTclName() << ") SetCenter "
+        << val[0] << " " << val[1] << " " << val[2] << endl;
+   for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof( this->NormalEntry[cc]->GetValue() );
+    }
+  *file << "$" << root << "(" << this->GetTclName() << ") SetNormal "
+        << val[0] << " " << val[1] << " " << val[2] << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Accept()
 {
@@ -302,7 +330,7 @@ void vtkPVImplicitPlaneWidget::Accept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SaveInTclScript(ofstream *file)
+void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkPlane " << this->PlaneTclName << endl;
   *file << "\t" << this->PlaneTclName << " SetOrigin ";
@@ -319,13 +347,52 @@ void vtkPVImplicitPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "PlaneTclName: " 
      << ( this->PlaneTclName ? this->PlaneTclName : "none" ) << endl;
+  os << indent << "InputMenu: " << this->GetInputMenu();
 }
 
-vtkPVImplicitPlaneWidget* vtkPVImplicitPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVImplicitPlaneWidget::ClonePrototypeInternal(
+                                 vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
-  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
-  return vtkPVImplicitPlaneWidget::SafeDownCast(clone);
+  vtkPVWidget* pvWidget = 0;
+
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+
+    vtkPVImplicitPlaneWidget* ipw = vtkPVImplicitPlaneWidget::SafeDownCast(pvWidget);
+    if (!ipw)
+      {
+      vtkErrorMacro("Internal error. Could not downcast pointer.");
+      pvWidget->Delete();
+      return 0;
+      }
+    
+    if (this->InputMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
+      ipw->SetInputMenu(im);
+      im->Delete();
+      }
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+
+  return pvWidget;
 }
 
 //----------------------------------------------------------------------------
@@ -526,7 +593,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   // Initialize the center of the plane based on the input bounds.
   if (this->PVSource)
     {
-    vtkPVData *input = this->PVSource->GetPVInput();
+    vtkPVData *input = this->PVSource->GetPVInput(0);
     if (input)
       {
       float bds[6];
@@ -585,6 +652,33 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
+  
+  // Setup the InputMenu.
+  const char* input_menu = element->GetAttribute("input_menu");
+  if(!input_menu)
+    {
+    vtkErrorMacro("No input_menu attribute.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* ame = element->LookupElement(input_menu);
+  if (!ame)
+    {
+    vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+    return 0;
+    }
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+  if(!imw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+    return 0;
+    }
+  imw->AddDependent(this);
+  this->SetInputMenu(imw);
+  imw->Delete();  
+  
   return 1;
 }
 
@@ -646,4 +740,33 @@ void vtkPVImplicitPlaneWidget::SetNormal()
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Update()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *input;
+  float bds[6];
+
+  this->Superclass::Update();
+
+  if (this->InputMenu == NULL)
+    {
+    return;
+    }
+
+  input = this->InputMenu->GetPVData();
+  if (input)
+    {
+    input->GetDataInformation()->GetBounds(bds);
+    pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
+                           bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
+
+    // Should I also move the center of the plane?  Keep the old plane?
+    // Keep the old normal?
+
+    // There has to be a better way to que a render.
+    this->GetPVApplication()->GetMainWindow()->GetMainView()->EventuallyRender();
+    }
 }

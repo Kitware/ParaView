@@ -95,10 +95,6 @@ public:
   // Description:
   // Clear the function.
   void ClearFunction();
-  
-  // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
 
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
@@ -110,6 +106,14 @@ public:
   // This method resets the widget values from the VTK filter.
   virtual void Reset();
   virtual void Reset(const char* vtkSourceTclName);
+    
+  // Description:
+  // Save this source to a file.  We need more than just the source tcl name.
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVCalculatorWidget();
@@ -161,7 +165,7 @@ protected:
   vtkKWPushButton* ButtonRightParenthesis;
   vtkKWMenuButton* ScalarsMenu;
   vtkKWMenuButton* VectorsMenu;
-  
+
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
 };

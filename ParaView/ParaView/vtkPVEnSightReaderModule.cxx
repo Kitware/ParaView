@@ -56,7 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVPassThrough.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectTimeSet.h"
 #include "vtkPVSourceCollection.h"
@@ -71,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.34");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.35");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -548,9 +547,6 @@ int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *, const char*)
 int vtkPVEnSightReaderModule::Initialize(const char* fname, 
                                          vtkPVReaderModule*& clone)
 {
-  // Hack to get around the output type check in ClonePrototype
-  this->SetOutputClassName("vtkPolyData");
-
   clone = 0;
   if (this->CloneAndInitialize(0, clone) != VTK_OK)
     {
@@ -1044,9 +1040,7 @@ const char *vtkPVEnSightReaderModule::GetByteOrderAsString()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file, 
-                                               int vtkNotUsed(interactiveFlag),
-                                               int vtkNotUsed(vtkFlag))
+void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
 {
   vtkGenericEnSightReader *reader = 
     vtkGenericEnSightReader::SafeDownCast(this->GetVTKSource());

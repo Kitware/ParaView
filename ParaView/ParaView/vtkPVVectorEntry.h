@@ -126,10 +126,6 @@ public:
   vtkGetStringMacro(ScriptValue);
 
   // Description:
-  // An interface for saving a widget into a script.
-  virtual void SaveInTclScript(ofstream *file);
-
-  // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
 
@@ -182,6 +178,10 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
@@ -219,6 +219,11 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // An interface for saving a widget into a script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+
 };
 
 #endif

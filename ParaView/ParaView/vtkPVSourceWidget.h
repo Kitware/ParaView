@@ -66,7 +66,7 @@ public:
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
-  virtual void SaveInTclScript(ofstream *file);
+  virtual void SaveInBatchScript(ofstream *file);
 
 protected:
   vtkPVSourceWidget();
@@ -77,6 +77,10 @@ protected:
 
   char* OutputTclName;
   vtkSetStringMacro(OutputTclName);
+
+  // Description:
+  // A method for saving a widget into a VTK Tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 
   vtkPVSourceWidget(const vtkPVSourceWidget&); // Not implemented
   void operator=(const vtkPVSourceWidget&); // Not implemented

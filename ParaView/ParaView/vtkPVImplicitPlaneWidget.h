@@ -56,6 +56,7 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVImplicitPlaneWidget : public vtkPV3DWidget
 {
@@ -92,23 +93,8 @@ public:
   vtkGetStringMacro(PlaneTclName);
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  virtual void SaveInTclScript(ofstream *file);
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
-
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVImplicitPlaneWidget* ClonePrototype(vtkPVSource* pvSource,
-                                           vtkArrayMap<vtkPVWidget*, 
-                                           vtkPVWidget*>* map);
-//ETX
 
   // Description:
   // This class redefines SetBalloonHelpString since it
@@ -128,6 +114,24 @@ public:
   virtual void SetNormal(float,float,float);
   virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }
 
+  // Description:
+  // The input from the input menu is used to place the widget.
+  virtual void SetInputMenu(vtkPVInputMenu*);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  // One plane object is create for all parts.
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
+  // Description: 
+  // Called when the input chages (before accept).
+  virtual void Update();
+
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
@@ -139,6 +143,8 @@ protected:
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+
+  vtkPVInputMenu *InputMenu;
 
   vtkKWEntry *CenterEntry[3];
   vtkKWPushButton *CenterResetButton;
@@ -159,6 +165,18 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  virtual vtkPVWidget* ClonePrototypeInternal(
+                                       vtkPVSource* pvSource,
+                                       vtkArrayMap<vtkPVWidget*, 
+                                       vtkPVWidget*>* map);
+//ETX
 
 private:
   vtkPVImplicitPlaneWidget(const vtkPVImplicitPlaneWidget&); // Not implemented

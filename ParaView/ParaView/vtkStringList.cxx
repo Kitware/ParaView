@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.6");
+vtkCxxRevisionMacro(vtkStringList, "1.7");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -189,6 +189,13 @@ void vtkStringList::Reallocate(int num)
 //----------------------------------------------------------------------------
 void vtkStringList::PrintSelf(ostream& os, vtkIndent indent)
 {
+  int idx, num;
+
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "NumberOfStrings: " << this->GetNumberOfStrings() << endl;
+  num = this->GetNumberOfStrings();
+  os << indent << "NumberOfStrings: " << num << endl;
+  for (idx = 0; idx < num; ++idx)
+    {
+    os << idx << ": " << this->GetString(idx) << endl;
+    }
 }

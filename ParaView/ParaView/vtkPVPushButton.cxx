@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPushButton);
-vtkCxxRevisionMacro(vtkPVPushButton, "1.6");
+vtkCxxRevisionMacro(vtkPVPushButton, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVPushButton::vtkPVPushButton()
@@ -66,12 +66,14 @@ vtkPVPushButton::~vtkPVPushButton()
   this->SetEntryLabel(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPushButton::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
   this->Button->SetLabel(label);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPushButton::SetBalloonHelpString(const char *str)
 {
 

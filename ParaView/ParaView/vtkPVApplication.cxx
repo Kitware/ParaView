@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.179");
+vtkCxxRevisionMacro(vtkPVApplication, "1.180");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -334,8 +334,8 @@ vtkPVApplication::vtkPVApplication()
 
   this->StartGUI = 1;
 
-  this->VTKScriptName = 0;
-  this->RunVTKScript = 0;
+  this->BatchScriptName = 0;
+  this->RunBatchScript = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -687,18 +687,18 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->SetArgv0(argv[0]);
     }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--run-vtk-script",
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--batch",
                                           index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-rv",
+       vtkPVApplication::CheckForArgument(argc, argv, "-b",
                                           index) == VTK_OK )
     {
     int i;
     for (i=1; i < argc; i++)
       {
-      if (vtkPVApplication::CheckForExtension(argv[i], ".tcl"))
+      if (vtkPVApplication::CheckForExtension(argv[i], ".pvb"))
         {
-        this->RunVTKScript = 1;
-        this->SetVTKScriptName(argv[i]);
+        this->RunBatchScript = 1;
+        this->SetBatchScriptName(argv[i]);
         break;
         }
       }
@@ -951,10 +951,10 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  if (this->RunVTKScript)
+  if (this->RunBatchScript)
     {
     this->BroadcastScript("$Application LoadScript {%s}", 
-                          this->GetVTKScriptName());
+                          this->GetBatchScriptName());
     this->Exit();
     return;
     }

@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.45");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.46");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1570,8 +1570,7 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
 
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
-                                    int vtkFlag)
+void vtkPVColorMap::SaveInBatchScript(ofstream *file)
 {
   if (this->VisitedFlag)
     {
@@ -1600,17 +1599,9 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
     sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
     ostrstream actor;
 
-    if (interactiveFlag && vtkFlag)
-      {
-      *file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
-      *file << "\t" << scalarBarTclName << " SetInteractor iren" << "\n";
-      actor << "[" << scalarBarTclName << " GetScalarBarActor]" << ends;
-      }
-    else
-      {
-      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-      actor << scalarBarTclName << ends;
-      }
+    //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
+    *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
+    actor << scalarBarTclName << ends;
 
     *file << "\t" << actor.str() << " SetLookupTable " 
           << this->LookupTableTclName << "\n";
@@ -1644,15 +1635,8 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
     this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
     tlprop.rdbuf()->freeze(0);
 
-    if (interactiveFlag && vtkFlag)
-      {
-      *file << "\t" << scalarBarTclName << " EnabledOn\n";
-      }
-    else
-      {
-      *file << this->GetPVRenderView()->GetRendererTclName() 
-            << " AddActor " << scalarBarTclName << endl;
-      }
+    *file << this->GetPVRenderView()->GetRendererTclName() 
+          << " AddActor " << scalarBarTclName << endl;
 
     actor.rdbuf()->freeze(0);
     }

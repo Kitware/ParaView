@@ -74,7 +74,7 @@ public:
 
   // Description:
   // Special method because of custom widgets are not pvWidgets.
-  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
+  virtual void SaveInBatchScript(ofstream *file);
     
   // Description:
   // Try to read a given file. Return VTK_OK on success, VTK_ERROR

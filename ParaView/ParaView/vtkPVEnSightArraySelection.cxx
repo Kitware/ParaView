@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightArraySelection);
-vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.4");
+vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.5");
 
 //-------------------------------------------------------------------------
 int vtkPVEnSightArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -108,9 +108,22 @@ void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
                              sourceTclName, check->GetText(),
                              attributeType);
       }
+    }
 
-    this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(), 
-                        check->GetText(), check->GetState());
+  this->Trace(pvApp->GetTraceFile(), "kw");
+}
+
+
+//---------------------------------------------------------------------------
+void vtkPVEnSightArraySelection::Trace(ofstream *file, const char* root)
+{
+  vtkKWCheckButton *check;
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetArrayStatus {"
+          << check->GetText() << "} " << check->GetState() << endl;
     }
 }
 
@@ -229,7 +242,7 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
     }
 }
 
-void vtkPVEnSightArraySelection::SaveInTclScript(ofstream *file)
+void vtkPVEnSightArraySelection::SaveInBatchScript(ofstream *file)
 {
   vtkKWCheckButton *check;
   int state;

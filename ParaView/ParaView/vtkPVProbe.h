@@ -77,7 +77,7 @@ public:
 
   // Description:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
-  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
+  virtual void SaveInBatchScript(ofstream *file);
   
   // Description:
   // Access to the ShowXYPlotToggle from Tcl

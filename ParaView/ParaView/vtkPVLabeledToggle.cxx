@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.16");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -166,6 +166,13 @@ void vtkPVLabeledToggle::Disable()
 void vtkPVLabeledToggle::Accept()
 {
   this->Accept(this->ObjectTclName);
+}
+
+//---------------------------------------------------------------------------
+void vtkPVLabeledToggle::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetState "
+        << this->GetState() << endl;
 }
 
 //----------------------------------------------------------------------------

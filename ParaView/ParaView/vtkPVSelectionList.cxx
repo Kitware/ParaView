@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.31");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.32");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -197,10 +197,12 @@ void vtkPVSelectionList::SetLabel(const char* label)
     }
 }
   
+//----------------------------------------------------------------------------
 const char *vtkPVSelectionList::GetLabel()
 {
   return this->Label->GetLabel();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Accept()
 {
@@ -219,6 +221,14 @@ void vtkPVSelectionList::Accept()
                          this->CurrentValue); 
 
   this->ModifiedFlag = 0;
+}
+
+
+//---------------------------------------------------------------------------
+void vtkPVSelectionList::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue {"
+        << this->GetCurrentValue() << "}" << endl;
 }
 
 

@@ -150,7 +150,12 @@ public:
 
   // Description:
   // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file);
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // Used by PVSource to save this widgets state.
+  // It does not initialize trace or check modified.
+  virtual void Trace(ofstream *file, const char* root) = 0;
   
   // Description:
   // This mehtod is used by the animation editor to access all the animation 
@@ -267,6 +272,13 @@ protected:
   vtkPVWidget* GetPVWidgetFromParser(vtkPVXMLElement* element,
                                      vtkPVXMLPackageParser* parser);
   vtkPVWindow* GetPVWindowFormParser(vtkPVXMLPackageParser* parser);
+
+
+  // Saves for a specific part.  SaveInBatchScript loops over parts.
+  // This is the way Accept and Reset should work.
+  virtual void SaveInBatchScriptForPart(ofstream *file, 
+                                        const char* sourceTclName);
+
 };
 
 #endif

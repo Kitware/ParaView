@@ -73,7 +73,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_PV_REMOTE_SCRIPT_RMI_TAG         838427
 #define VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG 838428
 #define VTK_PV_SATELLITE_SCRIPT              838431
+
+#define VTK_PV_ROOT_SCRIPT_RMI_TAG           838485
+#define VTK_PV_ROOT_RESULT_RMI_TAG           838486
+#define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
+#define VTK_PV_ROOT_RESULT_TAG               838488
  
+
+
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVRootScript(void *localArg, void *remoteArg, 
+                            int vtkNotUsed(remoteArgLength),
+                            int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  self->Script((char*)remoteArg);
+}
+
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVRootResult(void *localArg, void* , 
+                            int vtkNotUsed(remoteArgLength),
+                            int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  char* result = self->GetApplication()->GetMainInterp()->result;
+  int length = static_cast<int>(strlen(result)) + 1;
+
+  self->GetSocketController()->Send(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if (length > 0)
+    {
+    self->GetSocketController()->Send(result, length, 1, VTK_PV_ROOT_RESULT_TAG);  
+    }
+}
+
+
 
 //----------------------------------------------------------------------------
 // This RMI is only on MPI controller (procs 1->num-1) of server.
@@ -113,7 +148,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.12");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.13");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -250,6 +285,13 @@ void vtkPVClientServerModule::Initialize()
 
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
+
+    // For root script: Execute script only on process 0 of server.
+    this->SocketController->AddRMI(vtkPVRootScript, (void *)(this), 
+                                   VTK_PV_ROOT_SCRIPT_RMI_TAG);
+    // For root script: Return result back to client.
+    this->SocketController->AddRMI(vtkPVRootResult, (void *)(this), 
+                                   VTK_PV_ROOT_RESULT_RMI_TAG);
     
     // Loop listening to the socket for RMI's.
     this->SocketController->AddRMI(vtkPVBroadcastScript, (void *)(this), 
@@ -275,6 +317,8 @@ void vtkPVClientServerModule::Initialize()
     // Now we are exiting.
     }
 }
+
+
 
 
 
@@ -355,6 +399,62 @@ int vtkPVClientServerModule::GetPartitionId()
     }
   return 0;
 }
+
+
+
+//----------------------------------------------------------------------------
+// Called only on client
+void vtkPVClientServerModule::RootSimpleScript(const char *str)
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Missing application object.");
+    return;
+    }
+  if (!str || (strlen(str) < 1))
+    {
+    return;
+    }
+
+  if ( ! this->ClientMode)
+    {
+    vtkErrorMacro("NotExpecting this call on the server.");
+    return;
+    }
+
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+                                     VTK_PV_ROOT_SCRIPT_RMI_TAG);
+}
+//----------------------------------------------------------------------------
+// Called only on client
+char* vtkPVClientServerModule::NewRootResult()
+{
+  int length;
+  char *result;
+
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Missing application object.");
+    return NULL;
+    }
+
+  if ( ! this->ClientMode)
+    {
+    vtkErrorMacro("NotExpecting this call on the server.");
+    return NULL;
+    }
+
+  this->SocketController->TriggerRMI(1, "", VTK_PV_ROOT_RESULT_RMI_TAG);
+  this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if (length <= 0)
+    {
+    return NULL;
+    }
+  result = new char[length];
+  this->SocketController->Receive(result, length, 1, VTK_PV_ROOT_RESULT_TAG);
+  return result;  
+}
+
 
 
 //----------------------------------------------------------------------------

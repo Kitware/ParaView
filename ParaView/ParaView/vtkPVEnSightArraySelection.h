@@ -70,7 +70,11 @@ public:
   
   // Description:
   // Save this widget to a file.
-  virtual void SaveInTclScript(ofstream *file);
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVEnSightArraySelection();

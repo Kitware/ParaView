@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkPVServerFileDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
@@ -98,6 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
 #include "vtkPVWriter.h"
+#include "vtkPVInputProperty.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
@@ -126,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.413");
+vtkCxxRevisionMacro(vtkPVWindow, "1.414");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -231,7 +233,7 @@ vtkPVWindow::vtkPVWindow()
   // This stores the state of a menu during grab.
   this->MenuState = vtkArrayMap<const char*, int>::New();
 
-  // The writers (used in SaveInTclScript) mapped to the extensions
+  // The writers (used in SaveInBatchScript) mapped to the extensions
   this->Writers = vtkArrayMap<const char*, const char*>::New();
   this->Writers->SetItem(".jpg", "vtkJPEGWriter");
   this->Writers->SetItem(".JPG", "vtkJPEGWriter");
@@ -671,18 +673,22 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // Add advanced file options
   int clidx = this->GetFileMenuIndex();
-  this->MenuFile->InsertCommand(clidx++, "Export VTK Script", this,
-                                "ExportVTKScript", 7,
-                                "Write a script which can be "
-                                "parsed by the vtk executable");
+  this->MenuFile->InsertCommand(clidx++, "Save Batch Script", this,
+                                "SaveBatchScript", 7,
+                                "Write a script which can run "
+                                "in batch by ParaView");
 
   this->MenuFile->InsertSeparator(clidx++);
 
   this->MenuFile->InsertCommand(clidx++, "Load Session", this, 
                                 "LoadScript", 0,
                                 "Restore a trace of actions.");
+  this->MenuFile->InsertCommand(clidx++, "Save Session State", this,
+                                "SaveState", 7,
+                                "Write the current state of ParaView "
+                                "in a file.");
   this->MenuFile->InsertCommand(clidx++,
-                                "Save Session", this, 
+                                "Save Session Trace", this, 
                                 "SaveTrace", 3,
                                 "Save a trace of every action "
                                 "since start up.");
@@ -1063,6 +1069,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   pvApp->BroadcastScript("vtkPVGenericRenderWindowInteractor pvRenderWindowInteractor");
   pvApp->BroadcastScript("pvRenderWindowInteractor SetRenderWindow %s", 
                          this->MainView->GetRenderWindowTclName());
+  pvApp->BroadcastScript("pvRenderWindowInteractor SetInteractorStyle {}"); 
   this->SetInteractorTclName("pvRenderWindowInteractor");  
   this->Script("%s SetInteractor pvRenderWindowInteractor", this->GetTclName());
 
@@ -1422,8 +1429,8 @@ void vtkPVWindow::ResizeCenterActor()
     }
 
   it->Delete();
-  if ((! first) && (bounds[0] < bounds[1]) && 
-      (bounds[2] < bounds[3]) && (bounds[4] < bounds[5]))
+  if ((! first) && (bounds[0] <= bounds[1]) && 
+      (bounds[2] <= bounds[3]) && (bounds[4] <= bounds[5]))
     {
     pvApp->BroadcastScript("%s SetScale %f %f %f", this->CenterActorTclName,
                            0.25 * (bounds[1]-bounds[0]),
@@ -1771,7 +1778,8 @@ void vtkPVWindow::OpenCallback()
   str << "{{ParaView Files} {" << this->FileExtensions << "}} "
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
-  vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
+  //vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
+  vtkPVServerFileDialog* loadDialog = vtkPVServerFileDialog::New();
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
@@ -2294,21 +2302,21 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ExportVTKScript()
+void vtkPVWindow::SaveBatchScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(exportDialog, "ExportVTKLastPath");
+  this->RetrieveLastPath(exportDialog, "SaveBatchLastPath");
   exportDialog->SetParent(this);
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
-  exportDialog->SetTitle("Save VTK Script");
-  exportDialog->SetDefaultExtension(".tcl");
-  exportDialog->SetFileTypes("{{Tcl Scripts} {.tcl}} {{All Files} {.*}}");
+  exportDialog->SetTitle("Save Batch Script");
+  exportDialog->SetDefaultExtension(".pvb");
+  exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
-    this->SaveInTclScript(exportDialog->GetFileName(), 1);
-    this->SaveLastPath(exportDialog, "ExportVTKLastPath");
+    this->SaveBatchScript(exportDialog->GetFileName());
+    this->SaveLastPath(exportDialog, "SaveBatchLastPath");
     }
   exportDialog->Delete();
 }
@@ -2333,65 +2341,28 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
   return 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWindow::ImportVTKScript(const char* vtkNotUsed(name))
-{
-  vtkPVSourceCollection* col = this->GetSourceList("Sources");
-  while ( col->GetNumberOfItems() > 0 )
-    {
-    vtkPVSource* source = col->GetLastPVSource();
-    if ( !source )
-      {
-      break;
-      }
-    this->DeleteSourceAndOutputs(source);
-    }
-
-  col = this->GetSourceList("GlyphSources");
-  col->RemoveAllItems();
-
-  // Get rid of all color maps.
-  vtkPVColorMap *cm;  
-  this->PVColorMaps->InitTraversal();
-  while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
-    {
-    cm->SetScalarBarVisibility(0);
-    cm->SetParent(NULL);
-    }
-  this->PVColorMaps->RemoveAllItems();
-
-
-  //pvApp->SetRunningParaViewScript(1);
-  //this->vtkKWWindow::LoadScript(name);
-  //pvApp->SetRunningParaViewScript(0);
-  //this->MainView->EventuallyRender();
-  // MainView was a bad pointer.  I will look into it later.
-  //this->Script("RenWin1 Render");
-}
-
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
+void vtkPVWindow::SaveBatchScript(const char* filename)
 {
-  ofstream *file;
   vtkPVSource *pvs;
   int imageFlag = 0;
   int animationFlag = 0;
   int offScreenFlag = 0;
-  int interactiveFlag = 1;
   char *path = NULL;
-      
+  ofstream* file;    
+  
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
     vtkErrorMacro("Could not open file " << filename);
     delete file;
-    file = NULL;
     return;
     }
 
-  *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
-           << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
+  *file << "# ParaView Version " 
+        << this->GetPVApplication()->GetMajorVersion()
+        << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
   if (this->PackageNames->GetNumberOfItems() > 0)
     {
@@ -2414,7 +2385,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   // Descide what this script should do.
   // Save an image or series of images, or run interactively.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && vtkString::Length(script) > 0 && vtkFlag)
+  if (script && vtkString::Length(script) > 0)
     {
     if (vtkKWMessageDialog::PopupYesNo(
           this->Application, this, "Animation", 
@@ -2422,23 +2393,15 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
           vtkKWMessageDialog::QuestionIcon))
       {
       animationFlag = 1;
-      interactiveFlag = 0;
       }
     }
   
-  if (animationFlag == 0 && vtkFlag)
+  if (animationFlag == 0)
     {
-    if (vtkKWMessageDialog::PopupYesNo(
-          this->Application, this, "Image", 
-          "Do you want your script to save an image?", 
-          vtkKWMessageDialog::QuestionIcon))
-      {
-      imageFlag = 1;
-      interactiveFlag = 0;
-      }
+    imageFlag = 1;
     }
 
-  if ( (animationFlag || imageFlag) && vtkFlag )
+  if (animationFlag || imageFlag)
     {
     this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
@@ -2482,20 +2445,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       }
     }
 
-  if (vtkFlag)
-    {
-    *file << "package require vtk\n";
-    if (interactiveFlag)
-      {    
-      *file << "package require vtkinteraction\n";
-      }
-    }
-  else
-    {
-    *file << "# Script generated for regression test within ParaView.\n";
-    }
-
-  this->GetMainView()->SaveInTclScript(file, interactiveFlag, vtkFlag);
+  this->GetMainView()->SaveInBatchScript(file);
 
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
@@ -2535,17 +2485,14 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->SaveInTclScript(file, interactiveFlag, vtkFlag);
+    pvs->SaveInBatchScript(file);
     cit->GoToNextItem();
     }
   cit->Delete();
 
-  if (vtkFlag)
-    {
-    *file << "vtkCompositeManager compManager\n\t";
-    *file << "compManager SetRenderWindow RenWin1 \n\t";
-    *file << "compManager InitializePieces\n\n";
-    }
+  *file << "vtkCompositeManager compManager\n\t";
+  *file << "compManager SetRenderWindow RenWin1 \n\t";
+  *file << "compManager InitializePieces\n\n";
 
   if (path && vtkString::Length(path) > 0)
     {
@@ -2591,33 +2538,129 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
         delete [] newPath;
         newPath = tmpStr;
         }
-      this->AnimationInterface->SaveInTclScript(file, newPath, extension,
-                                                writerName);
+      this->AnimationInterface->SaveInBatchScript(file, newPath, extension,
+                                                  writerName);
       delete [] newPath;
       }
     delete [] path;
     *file << "vtkCommand DeleteAllObjects\n";
     *file << "exit";
     }
-  else
+
+  delete file;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveState()
+{
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(exportDialog, "SaveStateLastPath");
+  exportDialog->SetParent(this);
+  exportDialog->Create(this->Application,0);
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save State");
+  exportDialog->SetDefaultExtension(".pvs");
+  exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {.*}}");
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0)
     {
-    if (vtkFlag && interactiveFlag)
-      {
-      *file << "# enable user interface interactor\n"
-            << "iren AddObserver UserEvent {wm deiconify .vtkInteract}\n"
-            << "iren Initialize\n\n"
-            << "# prevent the tk window from showing up then start the event loop\n"
-            << "compManager StartInteractor\n";
-      }
+    this->SaveState(exportDialog->GetFileName());
+    this->SaveLastPath(exportDialog, "SaveStateLastPath");
+    }
+  exportDialog->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveState(const char* filename)
+{
+  vtkPVSource *pvs;
+  char *path = NULL;
+  ofstream* file;    
+  
+  file = new ofstream(filename, ios::out);
+  if (file->fail())
+    {
+    vtkErrorMacro("Could not open file " << filename);
+    delete file;
+    return;
     }
 
-  if (file)
+  *file << "# ParaView State Version " 
+        << this->GetPVApplication()->GetMajorVersion()
+        << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
+
+  /*
+  if (this->PackageNames->GetNumberOfItems() > 0)
     {
-    file->close();
-    delete file;
-    file = NULL;
+    *file << vtkPVApplication::LoadComponentProc << endl;
+    vtkLinkedListIterator<const char*>* it = this->PackageNames->NewIterator();
+    while (!it->IsDoneWithTraversal())
+      {
+      const char* name = 0;
+      if (it->GetData(name) == VTK_OK && name)
+        {
+        *file << "::paraview::load_component " << name << endl;
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
     }
+  *file << endl << endl;
+  */
+
+  *file << "set pv(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
+  *file << "set pv(" << this->GetMainView()->GetTclName() 
+        << ") [$pv(" << this->GetTclName() << ") GetMainView]" << endl;
+
+  vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
+    this->SourceLists->NewIterator();
+
+  // Mark all sources as not visited.
+  while( !it->IsDoneWithTraversal() )
+    {    
+    vtkPVSourceCollection* col = 0;
+    if (it->GetData(col) == VTK_OK && col)
+      {
+      vtkCollectionIterator *cit = col->NewIterator();
+      cit->InitTraversal();
+      while ( !cit->IsDoneWithTraversal() )
+        {
+        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+        pvs->SetVisitedFlag(0);
+        cit->GoToNextItem();
+        }
+      cit->Delete();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  // Mark all color maps as not visited.
+  vtkPVColorMap *cm;
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SetVisitedFlag(0);
+    }
+
+  // Loop through sources saving the visible sources.
+  vtkPVSourceCollection* modules = this->GetSourceList("Sources");
+  vtkCollectionIterator* cit = modules->NewIterator();
+  cit->InitTraversal();
+  while ( !cit->IsDoneWithTraversal() )
+    {
+    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs->SaveState(file);
+    cit->GoToNextItem();
+    }
+  cit->Delete();
+
+  // Save the view at the end so camera get set properly.
+  this->GetMainView()->SaveState(file);
+
+  delete file;
+  file = NULL;
 }
+
 
 //----------------------------------------------------------------------------
 // Not implemented yet.
@@ -2651,7 +2694,7 @@ void vtkPVWindow::UpdateSourceMenu()
       {
       // Check if this is a source (or a toolbar module). We do not want to 
       // add those to the source lists.
-      if (proto && proto->GetNumberOfInputClasses() == 0 && 
+      if (proto && proto->GetNumberOfInputProperties() == 0 && 
           !proto->GetToolbarModule())
         {
         numFilters++;
@@ -2714,7 +2757,8 @@ void vtkPVWindow::UpdateFilterMenu()
         {
         // Check if this is an appropriate filter by comparing
         // it's input type with the current data object's type.
-        if (proto && proto->GetIsValidInput(this->CurrentPVData))
+        if (proto && proto->GetInputProperty(0) &&
+            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVData, proto))
           {
           it->GetKey(key);
 
@@ -3148,7 +3192,8 @@ void vtkPVWindow::EnableToolbarButtons()
       vtkPVSource* proto = 0;
       if ( this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
         {
-        if ( proto->GetIsValidInput(this->CurrentPVData) )
+        if (proto->GetInputProperty(0) &&
+            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVData, proto) )
           {
           button->EnabledOn();
           }
@@ -3307,7 +3352,7 @@ void vtkPVWindow::SaveTrace()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
@@ -3864,7 +3909,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.413 $");
+  this->ExtractRevision(os,"$Revision: 1.414 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3932,14 +3977,14 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
         int cc;
         for ( cc = 0; cc < source->GetNumberOfPVInputs(); cc ++ )
           {
-          vtkPVData* data = source->GetNthPVInput(cc);
+          vtkPVData* data = source->GetPVInput(cc);
           if ( data && data->GetPVSource() )
             {
             this->SerializeSource(os, indent, data->GetPVSource(), writtenMap);
             }
           }
         }
-      vtkPVSource* inputsource = source->GetInputPVSource();
+      vtkPVSource* inputsource = source->GetInputPVSource(0);
       os << indent << "Module " << source->GetName() << " " 
          << source->GetModuleName() << " " 
          << (inputsource?inputsource->GetName():"None") << " ";

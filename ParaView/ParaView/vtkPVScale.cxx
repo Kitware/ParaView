@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.14");
+vtkCxxRevisionMacro(vtkPVScale, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -208,6 +208,14 @@ void vtkPVScale::Accept()
 
   this->ModifiedFlag = 0;
 }
+
+//---------------------------------------------------------------------------
+void vtkPVScale::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetValue "
+        << this->Scale->GetValue() << endl;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVScale::Reset()

@@ -158,6 +158,17 @@ public:
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
+  // Description:
+  // These methods give information about geometry.
+  // How much memory is used by the geometry to render
+  // (both full resolution and LOD) will determine
+  // Whether rendering will occur on client or server.
+  // It uses the collection filters to get its information.
+  unsigned long GetGeometryMemorySize();
+  unsigned long GetLODMemorySize();
+  int GetGeometryCollected();
+  int GetLODCollected();
+
 protected:
   vtkPVPart();
   ~vtkPVPart();

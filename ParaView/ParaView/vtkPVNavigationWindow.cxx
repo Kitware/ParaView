@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.17");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.18");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -169,7 +169,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
         
         if (source->GetPVInputs())
           {
-          if (source->GetPVInput()->GetPVSource())
+          if (source->GetPVInput(0)->GetPVSource())
             {
             // Draw ellipsis indicating that this source has a source.
             this->Script("%s create line %d %d %d %d",

@@ -66,6 +66,7 @@ class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVData;
 class vtkPVInputMenu;
+class vtkPVInputProperty;
 class vtkPVLabel;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
@@ -75,11 +76,6 @@ class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
 class vtkCollection;
-
-//BTX
-template <class DType> 
-class vtkVector;
-//ETX
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -118,13 +114,10 @@ public:
   // Description:
   // Although not all sources will need or use this input, I want to 
   // avoid duplicating VTK's source class structure.
-  virtual void SetPVInput(vtkPVData *input);
-  virtual vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
+  virtual void SetPVInput(int idx, vtkPVData *input);
+  virtual vtkPVData* GetPVInput(int idx) {return this->GetNthPVInput(idx);}
   vtkGetMacro(NumberOfPVInputs, int);
-  vtkPVData *GetNthPVInput(int idx);
   void RemoveAllPVInputs();
-  void SetNthPVInput(int idx, vtkPVData *input);
-
 
   // Description:
   // Set/get the first output of this source. Most source are setup
@@ -234,7 +227,11 @@ public:
   // Save the renderer and render window to a file.
   // The "vtkFlag" argument is only set when regression testing.
   // It causes the actors to b e added to the ParaView renderer. 
-  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
+  virtual void SaveInBatchScript(ofstream *file);
+  // SaveState is similar to save batch in its recursive traversal
+  // of the sources.  It is similar to trace for widgets.
+  // After it is completed, I will try to share code ...
+  virtual void SaveState(ofstream *file);
 
   // Description:
   // Make the Accept button turn red/white when one of the parameters 
@@ -317,19 +314,30 @@ public:
   virtual void InitializePrototype() {}
 
   // Description:
-  // For now we are supporting only one input and output.
-  void AddInputClassName(const char* classname);
-  vtkIdType GetNumberOfInputClasses();
-  vtkSetStringMacro(OutputClassName);
-  vtkGetStringMacro(OutputClassName);
+  // Description of the VTK filter.
   vtkSetStringMacro(SourceClassName);
   vtkGetStringMacro(SourceClassName);
 
+  // Descriptions:
+  // Properties that describe the inputs to the filter of type
+  // "SourceCLassName".  Name is the string used to format
+  // Set/Add/Get methods.  "Input" or "Source" ...
+  // First you get the input property using the name,
+  // then you and fill it in (name is already set).
+  // The first get creates the property and returns it.
+  // The order the properties are created are important.
+  // The first one will be the default input.
+  vtkIdType GetNumberOfInputProperties();
+  vtkPVInputProperty* GetInputProperty(int idx);
+  vtkPVInputProperty* GetInputProperty(const char* name);
+
   // Description:
-  // This method is called by the window to determine if this filter should be
-  // added to the filter menu.  Right now, only the class name of the input
-  // is checked.  In the future, attributes could be checked as well.
-  virtual int GetIsValidInput(vtkPVData *input);
+  // Option set by the xml filter input element "quantity".
+  // When 1 (xml: Multiple), then VTK source takes one input which has multiple
+  // inputs (uses AddInput).  
+  // If 0, then PVSource Inputs match each VTK filter inputs.
+  vtkSetMacro(VTKMultipleInputsFlag, int);
+  vtkGetMacro(VTKMultipleInputsFlag, int);
 
   // Description:
   // Certain modules are not deletable (for example, glyph sources).
@@ -396,7 +404,7 @@ public:
 
   // Description:
   // This method returns the input source as a Tcl string.
-  vtkPVSource* GetInputPVSource();
+  vtkPVSource* GetInputPVSource(int idx);
 
   // Description:
   // Check whether the source has been initialized 
@@ -424,13 +432,6 @@ public:
   // Update the properties page.
   void UpdateProperties();
 
-  // Description:
-  // Option set by the xml filter element.
-  // When this flag is on, then one VTK filter handles all
-  // of the parts in a PVData.
-  vtkSetMacro(VTKMultipleInputFlag, int);
-  vtkGetMacro(VTKMultipleInputFlag, int);
-
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -442,7 +443,7 @@ protected:
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
-                                       char* inputType, char* help, 
+                                       char* help, 
                                        vtkPVSourceCollection* sources);
 
   vtkPVRenderView* GetPVRenderView();
@@ -474,6 +475,8 @@ protected:
   void SetNumberOfPVInputs(int num);
   vtkPVData **PVInputs;
   int NumberOfPVInputs; 
+  vtkPVData *GetNthPVInput(int idx);
+  void SetNthPVInput(int idx, vtkPVData *input);
    
   void SetNthPVOutput(int idx, vtkPVData *output);
 
@@ -512,8 +515,6 @@ protected:
   vtkKWLabeledEntry *LabelEntry;
   vtkKWLabeledLabel *LongHelpLabel;
 
-    
-  char *OutputClassName;
   char *SourceClassName;
 
   // Whether the source should make its input invisible.
@@ -537,20 +538,19 @@ protected:
 
   int ToolbarModule;
 
-//BTX
-  vtkVector<const char*>* InputClassNames;
-//ETX
   // This ivar is here so that Probe will not have any sources which
   // have more than one part. A value of -1 means no restrictions.
   int RequiredNumberOfInputParts;
-  // This flag indicates that the VTK source can take multiple inputs.
-  // The input may have multiple parts, but the output will have only one part.
-  // By default, this flag is off (0) indicating the VTK filter
-  // takes one input, and has one output.  A VTK filter will
-  // be created for each part.
-  int VTKMultipleInputFlag;
+  // This value is set by the xml <input quantity="..."/> attributes
+  // to characterize the VTK source.  a value of 1 (set by "Multiple")
+  // indicates any number of inputs can be had with the AddInput method.
+  int VTKMultipleInputsFlag;
+  vtkCollection* InputProperties;
 
   vtkPVSource* Prototype;
+
+  // Taking responsibility of saving inputs away from input menu.
+  void SetInputsInBatchScript(ofstream *file);
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented

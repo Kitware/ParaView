@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.6");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -91,7 +91,7 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::SaveInTclScript(ofstream *file)
+void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 {
   float pt[3];
   float rad;
@@ -99,7 +99,7 @@ void vtkPVPointSourceWidget::SaveInTclScript(ofstream *file)
   
   if (this->SourceTclName == NULL || this->PointWidget == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
@@ -243,6 +243,29 @@ void vtkPVPointSourceWidget::Accept(const char* sourceTclName)
 void vtkPVPointSourceWidget::Accept()
 {
   this->Accept(this->SourceTclName);
+}
+
+//---------------------------------------------------------------------------
+void vtkPVPointSourceWidget::Trace(ofstream *file, const char* root)
+{
+  *file << "set " << root << "(" << this->PointWidget->GetTclName() << ") "
+        << "[$" << root << "(" << this->GetTclName() << ") "
+        << "GetPVWidget {" << this->PointWidget->GetTraceName() << "}]" 
+        << endl;
+  this->PointWidget->Trace(file, root);
+
+  *file << "set " << root << "(" << this->RadiusWidget->GetTclName() << ") "
+        << "[$" << root << "(" << this->GetTclName() << ") "
+        << "GetPVWidget {" << this->RadiusWidget->GetTraceName() << "}]" 
+        << endl;
+  this->RadiusWidget->Trace(file, root);
+
+  *file << "set " 
+        << root << "(" << this->NumberOfPointsWidget->GetTclName() << ") "
+        << "[$" << root << "(" << this->GetTclName() << ") "
+        << "GetPVWidget {" << this->NumberOfPointsWidget->GetTraceName() 
+        << "}]" << endl;
+  this->NumberOfPointsWidget->Trace(file, root);
 }
 
 //----------------------------------------------------------------------------

@@ -136,10 +136,6 @@ public:
   // Set and Get the widget selection.
   const char* GetCurrentVTKValue();
   const char* GetVTKValue(int i);
-
-  // Description:
-  // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
     
 //BTX
   // Description:
@@ -166,6 +162,14 @@ public:
   vtkSetMacro(UseWidgetCommand, int);
   vtkGetMacro(UseWidgetCommand, int);
   vtkBooleanMacro(UseWidgetCommand, int);
+
+  // Description:
+  // Since sub widgets may hove their own objects ...
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVSelectWidget();
@@ -198,6 +202,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 
 private:
   vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented

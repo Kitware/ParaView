@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.30");
 
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -289,40 +289,46 @@ void vtkPVVectorEntry::Accept(const char* sourceTclName)
   vtkKWEntry *entry;
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
   char acceptCmd[1024];
 
   // Start the trace entry and the accept command.
   if (traceFile && this->InitializeTrace())
     {
-    traceFlag = 1;
+    this->Trace(traceFile, "kw");
     }
 
-  if (traceFlag && this->ModifiedFlag)
-    {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetValue";
-    }
   sprintf(acceptCmd, "%s Set%s ", sourceTclName, this->VariableName);
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
   while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
     {
-    if (traceFlag && this->ModifiedFlag)
-      {
-      *traceFile << " " << entry->GetValue();
-      }
     strcat(acceptCmd, entry->GetValue());
     strcat(acceptCmd, " ");
-    }
-  if (traceFlag && this->ModifiedFlag)
-    {
-    *traceFile << endl;
     }
   pvApp->BroadcastScript(acceptCmd);
 
   this->ModifiedFlag = 0;  
 }
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::Trace(ofstream *file, const char* root)
+{
+  vtkKWEntry *entry;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  *file << "$" << root << "(" << this->GetTclName() << ") SetValue";
+
+  // finish all the arguments for the trace file and the accept command.
+  this->Entries->InitTraversal();
+  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+    {
+    *file << " " << entry->GetValue();
+    }
+  *file << endl;
+}
+
+
 
 //---------------------------------------------------------------------------
 void vtkPVVectorEntry::Reset(const char* sourceTclName)
@@ -578,15 +584,16 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVVectorEntry::SaveInTclScript(ofstream *file)
+void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
+                                                const char* sourceTclName)
 {
   if (this->ScriptValue == NULL)
     {
-    vtkPVObjectWidget::SaveInTclScript(file);
+    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceTclName);
     return;
     }
   
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
+  *file << "\t" << sourceTclName << " Set" << this->VariableName;
   *file << " " << this->ScriptValue << "\n";
 }
 

@@ -103,7 +103,12 @@ public:
 
   // Description:
   // Create the point source in the VTK Tcl script.
-  void SaveInTclScript(ofstream *file);
+  // Savea a point source (one for all parts).
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVPointSourceWidget();

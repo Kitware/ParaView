@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.33");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.34");
 
 //===========================================================================
 //***************************************************************************
@@ -332,7 +332,7 @@ void vtkPV3DWidget::ActualPlaceWidget()
   //  }
   //this->Widget3D->SetInput(data);
   float bds[6];
-  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bds);
+  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", 
                          this->Widget3DTclName, 

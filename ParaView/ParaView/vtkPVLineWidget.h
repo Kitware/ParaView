@@ -145,8 +145,8 @@ public:
   virtual void SetBalloonHelpString(const char *str);
 
   // Description:
-  // Used internally. Method to save widget parameters into vtk tcl script.
-  virtual void SaveInTclScript(ofstream *file);
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVLineWidget();
@@ -196,6 +196,10 @@ protected:
   char *ResolutionLabelText;
 
   int ShowResolution;
+
+  // Description:
+  // Used internally. Method to save widget parameters into vtk tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

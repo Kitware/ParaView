@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.16");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -106,7 +106,7 @@ void vtkPVPointWidget::PositionResetCallback()
     return;
     }
 
-  input = this->PVSource->GetPVInput();
+  input = this->PVSource->GetPVInput(0);
   if (input == NULL)
     {
     return;
@@ -164,10 +164,7 @@ void vtkPVPointWidget::Accept(const char* sourceTclName)
 
   if (traceFlag)
     {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
-               << this->PositionEntry[0]->GetValue() << " "
-               << this->PositionEntry[1]->GetValue() << " "
-               << this->PositionEntry[2]->GetValue() << endl;
+    this->Trace(traceFile, "kw");
     }
   this->UpdateVTKObject();
   
@@ -178,6 +175,15 @@ void vtkPVPointWidget::Accept(const char* sourceTclName)
 void vtkPVPointWidget::Accept()  
 {
   this->Accept(this->ObjectTclName);
+}
+
+//---------------------------------------------------------------------------
+void vtkPVPointWidget::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetPosition "
+        << this->PositionEntry[0]->GetValue() << " "
+        << this->PositionEntry[1]->GetValue() << " "
+        << this->PositionEntry[2]->GetValue() << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -200,7 +206,8 @@ void vtkPVPointWidget::UpdateVTKObject()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SaveInTclScript(ofstream *)
+void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, 
+                                                const char*)
 {
 }
 
@@ -341,7 +348,7 @@ void vtkPVPointWidget::ActualPlaceWidget()
   this->Superclass::ActualPlaceWidget();
 
   double bounds[6];
-  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bounds);
+  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bounds);
 
   this->SetPosition((bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2, 
                     (bounds[4]+bounds[5])/2);

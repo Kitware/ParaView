@@ -25,7 +25,7 @@
 #include "vtkPolyData.h"
 #include "vtkSocketController.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.7");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.8");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -45,6 +45,7 @@ vtkDuplicatePolyData::vtkDuplicatePolyData()
 
   this->SocketController = NULL;
   this->ClientFlag = 0;
+  this->MemorySize = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -289,6 +290,8 @@ void vtkDuplicatePolyData::Execute()
     {
     this->SocketController->Send(output, 1, 18732);
     }
+
+  this->MemorySize = output->GetActualMemorySize();
 }
 
 
@@ -348,5 +351,7 @@ void vtkDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
       }
     os << endl;
     }
+
+  os << indent << "MemorySize: " << this->MemorySize << endl;
 }
 

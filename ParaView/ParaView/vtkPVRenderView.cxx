@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.234");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.235");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -235,7 +235,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
-  this->LODThreshold = 1000;
+  this->LODThreshold = 2.0;
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
 
@@ -611,12 +611,12 @@ void vtkPVRenderView::PrepareForDelete()
                              this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
                              this->ImmediateModeCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%d",
+    pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%f",
                              this->LODThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
 
-    if (this->Composite)
+    if (this->Composite || pvapp->GetClientMode())
       {
       pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
                                this->CollectThreshold);
@@ -1137,7 +1137,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->LODThresholdScale->SetParent(this->LODScalesFrame);
   this->LODThresholdScale->Create(this->Application, 
                                   "-resolution 0.1 -orient horizontal");
-  this->LODThresholdScale->SetRange(0, 18);
+  this->LODThresholdScale->SetRange(0.0, 6.0);
   this->LODThresholdScale->SetResolution(0.1);
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);
@@ -1147,22 +1147,21 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
     {
     this->SetLODThreshold(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "LODThreshold"));
+      pvwindow->GetFloatRegisteryValue(2, "RunTime", "LODThreshold"));
     }
   else
     {
     this->SetLODThreshold(this->LODThreshold);
     }
-  if (this->LODThreshold > 0 )
-    {
-    this->LODThresholdScale->SetValue(18.0-log((double)(this->LODThreshold)));
-    }
-  this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
+
+  this->LODThresholdScale->SetValue(this->CollectThreshold);
+  this->LODThresholdScale->SetCommand(this, 
+                                      "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
-    "This slider adjusts when the decimated level-of-detail models are used. "
-    "Threshold is based on number of points.  "
-    "\nLeft: Use slow full-resolution models. "
-    "Right: Use fast decimated models.");
+    "This slider determines whether to use decimated models "
+    "during interaction.  Threshold critera is based on size "
+    "of geometry in mega bytes.  "
+    "Left: Always use full resolution. Right: Always use decimated models.");    
 
   int row = 0;
 
@@ -1249,7 +1248,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // LOD parameters: collection threshold
   // Conditional interface should really be part of a module. !!!!
-  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 &&
+  if ((pvapp->GetClientMode() || pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
       !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
@@ -1270,7 +1269,7 @@ void vtkPVRenderView::CreateViewProperties()
         pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
       {
       this->SetCollectThreshold(
-        pvwindow->GetIntRegisteryValue(2, "RunTime", "CollectThreshold"));
+        pvwindow->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold"));
       }
     else
       {
@@ -1857,13 +1856,16 @@ void vtkPVRenderView::StartRender()
   this->Composite->SetReductionFactor((int)newReductionFactor);
 }
 
-void vtkPVRenderView::UpdateAllPVData()
+int vtkPVRenderView::UpdateAllPVData(int interactive)
 {
+  int geometryCollectedFlag = 1;
+  int deciCollectedFlag = 1;
+  unsigned long geometryMemorySize = 0;
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( !pvwindow || !pvApp )
     {
-    return;
+    return 0;
     }
   vtkPVSourceCollection* col = 0;
   //cout << "Update all PVData" << endl;
@@ -1880,11 +1882,30 @@ void vtkPVRenderView::UpdateAllPVData()
       if ( source->GetInitialized() && source->GetVisibility() )
         {
         data->ForceUpdate(pvApp);
+        if (data->GetLODCollected() == 0)
+          {
+          deciCollectedFlag = 0;
+          }
+        if (data->GetGeometryCollected() == 0)
+          {
+          geometryCollectedFlag = 0;
+          }
+        geometryMemorySize += data->GetGeometryMemorySize();
         }
       it->GoToNextItem();
       }
     it->Delete();
     }
+
+
+  // We need to decide globally whether to use decimated geometry.  
+  if (interactive && geometryMemorySize > this->LODThreshold*1000)
+    {
+    pvApp->SetGlobalLODFlag(1);
+    return deciCollectedFlag;
+    }
+  pvApp->SetGlobalLODFlag(0);
+  return geometryCollectedFlag;
 }
 
 //----------------------------------------------------------------------------
@@ -1892,10 +1913,10 @@ void vtkPVRenderView::Render()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   int abort;
+  int renderLocally;
 
   this->Update();
-
-  this->UpdateAllPVData();
+  renderLocally = this->UpdateAllPVData(1);
 
   this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
   //this->RenderWindow->SetDesiredUpdateRate(20.0);
@@ -1911,21 +1932,27 @@ void vtkPVRenderView::Render()
     return;
     }
 
-  if (this->Composite)
+
+  // The composite is not set for powerwall or client server.
+  // Only the CompositeTclName is set.  I should change this
+  // or eliminate the Composite pointer.
+  if (this->CompositeTclName)
     {
+    if (renderLocally)
+      {
+      this->Script("%s UseCompositingOff", this->CompositeTclName);
+      }
+    else
+      {
+      this->Script("%s UseCompositingOn", this->CompositeTclName);
+      }
+    }
+
+  if (this->Composite && ! renderLocally)
+    { // just set up the reduction factor
     this->StartRender();
     }
 
-  // I have this test here so that setting the frame rate slider to 0 will
-  // cause full res to render.  It needs to be cleaned up.
-  if (this->InteractiveUpdateRate > 0.001)
-    {
-    pvApp->SetGlobalLODFlag(1);
-    }
-  else
-    {
-    pvApp->SetGlobalLODFlag(0);
-    }
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
@@ -1969,8 +1996,26 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 {
   //cout << "EventuallyRenderCallback()" << endl;
   int abort;
+  int renderLocally;
+
   vtkPVApplication *pvApp = this->GetPVApplication();
-  this->UpdateAllPVData();
+  renderLocally = this->UpdateAllPVData(0);
+
+  // Tell composite whether to render locally  or composite.
+  // The composite is not set for powerwall or client server.
+  // Only the CompositeTclName is set.  I should change this
+  // or eliminate the Composite pointer.
+  if (this->CompositeTclName)
+    {
+    if (renderLocally)
+      {
+      this->Script("%s UseCompositingOff", this->CompositeTclName);
+      }
+    else
+      {
+      this->Script("%s UseCompositingOn", this->CompositeTclName);
+      }
+    }
 
   // sanity check
   if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
@@ -2127,12 +2172,13 @@ void vtkPVRenderView::ImmediateModeCallback()
 void vtkPVRenderView::LODThresholdScaleCallback()
 {
   float value = this->LODThresholdScale->GetValue();
-  int threshold;
+  float threshold;
 
   // Value should be between 0 and 18.
   // producing threshold between 65Mil and 1.
-  threshold = static_cast<int>(exp(18.0 - value));
-  
+  //threshold = static_cast<int>(exp(18.0 - value));
+  threshold = value;  
+
   // Use internal method so we do not reset the slider.
   // I do not know if it would cause a problem, but ...
   this->SetLODThresholdInternal(threshold);
@@ -2144,18 +2190,19 @@ void vtkPVRenderView::LODThresholdScaleCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODThreshold(int threshold)
+void vtkPVRenderView::SetLODThreshold(float threshold)
 {
   float value;
   
-  if (threshold <= 0.0)
-    {
-    value = VTK_LARGE_FLOAT;
-    }
-  else
-    {
-    value = 18.0 - log((double)(threshold));
-    }
+  //if (threshold <= 0.0)
+  //  {
+  //  value = VTK_LARGE_FLOAT;
+  //  }
+  //else
+  //  {
+  //  value = 18.0 - log((double)(threshold));
+  //  }
+  value = threshold;
   this->LODThresholdScale->SetValue(value);
 
   this->SetLODThresholdInternal(threshold);
@@ -2167,51 +2214,14 @@ void vtkPVRenderView::SetLODThreshold(int threshold)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODThresholdInternal(int threshold)
+void vtkPVRenderView::SetLODThresholdInternal(float threshold)
 {
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  vtkPVData *pvd;
-  vtkPVApplication *pvApp;
   char str[256];
 
-  if (threshold < 1000)
-    {
-    sprintf(str, "%d points", threshold);
-    }
-  else if (threshold < 1000000)
-    {
-    sprintf(str, "%.1fK points", (float)(threshold) / 1000.0);
-    }
-  else
-    {
-    sprintf(str, "%.1fM points", (float)(threshold) / 1000000.0);
-    }
-
+  sprintf(str, "%.1f MBytes", threshold);
   this->LODThresholdValue->SetLabel(str);
 
   this->LODThreshold = threshold;
-
-  pvApp = this->GetPVApplication();
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
-    {
-    vtkErrorMacro("Missing window.");
-    return;
-    }
-  sources = pvWin->GetSourceList("Sources");
-  sources->InitTraversal();
-
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    if (pvs->GetInitialized())
-      {
-      pvd = pvs->GetPVOutput();
-      // This gathers and displays information
-      pvd->UpdateProperties();
-      }
-    }
 }
 
 
@@ -2514,8 +2524,7 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SaveInTclScript(ofstream *file,
-                                      int interactiveFlag, int vtkFlag)
+void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
   vtkCamera *camera;
   float position[3];
@@ -2527,22 +2536,14 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file,
   int *size;
 
   size = this->RenderWindow->GetSize();
-  if (vtkFlag)
-    {
-    *file << "vtkRenderer " << this->RendererTclName << "\n\t";
-    color = this->Renderer->GetBackground();
-    *file << this->RendererTclName << " SetBackground "
-          << color[0] << " " << color[1] << " " << color[2] << endl;
-    *file << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
-          << this->RenderWindowTclName << " AddRenderer "
-          << this->RendererTclName << "\n\t";
-    *file << this->RenderWindowTclName << " SetSize " << size[0] << " " << size[1] << endl;
-    if (vtkFlag && interactiveFlag)
-      {
-      *file << "vtkRenderWindowInteractor iren\n\t"
-            << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
-      }
-    }
+  *file << "vtkRenderer " << this->RendererTclName << "\n\t";
+  color = this->Renderer->GetBackground();
+  *file << this->RendererTclName << " SetBackground "
+        << color[0] << " " << color[1] << " " << color[2] << endl;
+  *file << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
+        << this->RenderWindowTclName << " AddRenderer "
+        << this->RendererTclName << "\n\t";
+  *file << this->RenderWindowTclName << " SetSize " << size[0] << " " << size[1] << endl;
 
   camera = this->GetRenderer()->GetActiveCamera();
   camera->GetPosition(position);
@@ -2564,6 +2565,31 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file,
         << clippingRange[1] << "\n";
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SaveState(ofstream* file)
+{
+  vtkCamera *camera;
+  float position[3];
+  float focalPoint[3];
+  float viewUp[3];
+  float *color;
+
+  color = this->Renderer->GetBackground();
+  *file << "$pv(" << this->GetTclName() << ") SetBackgroundColor " 
+        << color[0] << " " << color[1] << " " << color[2] << endl;
+
+  camera = this->GetRenderer()->GetActiveCamera();
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  camera->GetViewUp(viewUp);
+  
+  *file << "$pv(" << this->GetTclName() << ") SetCameraState " 
+        << position[0] << " " << position[1] << " " << position[2] << " "
+        << focalPoint[0] << " " << focalPoint[1] << " " << focalPoint[2] << " "
+        << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl; 
+
+}
 
 //----------------------------------------------------------------------------
 int* vtkPVRenderView::GetRenderWindowSize()
@@ -2655,7 +2681,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.234 $");
+  this->ExtractRevision(os,"$Revision: 1.235 $");
 }
 
 //------------------------------------------------------------------------------

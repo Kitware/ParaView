@@ -1,5 +1,4 @@
 SET( ParaView_SRCS
-#vtkPVWizard.cxx
 vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
 vtkClientCompositeManager.cxx
@@ -9,6 +8,7 @@ vtkExtractCTHPart.cxx
 vtkGroup.cxx
 vtkKWBoundsDisplay.cxx
 vtkKWExtractGeometryByScalar.cxx
+vtkMergeArrays.cxx
 vtkMultiOut.cxx
 vtkMultiOut2.cxx
 vtkMultiOut3.cxx
@@ -21,6 +21,7 @@ vtkPVApplicationSettingsInterface.cxx
 vtkPVArrayInformation.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
+vtkPVBatchExporter.cxx
 vtkPVBoundsDisplay.cxx
 vtkPVCalculatorWidget.cxx
 vtkPVCameraIcon.cxx
@@ -50,7 +51,6 @@ vtkPVExtractPartsWidget.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGhostLevelDialog.cxx
-vtkPVGlyph3D.cxx 
 vtkPVGlyphFilter.cxx
 vtkPVGroupInputsWidget.cxx
 vtkPVImageContinuousDilate3D.cxx
@@ -60,7 +60,12 @@ vtkPVImageGradientMagnitude.cxx
 vtkPVImageMedian3D.cxx
 vtkPVImplicitPlaneWidget.cxx
 vtkPVInitialize.cxx
+vtkPVInputArrayRequirement.cxx
+vtkPVInputFixedTypeRequirement.cxx
+vtkPVInputGroupRequirement.cxx
 vtkPVInputMenu.cxx 
+vtkPVInputProperty.cxx
+vtkPVInputRequirement.cxx
 vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
 vtkPVInteractorStyleControl.cxx
@@ -79,7 +84,7 @@ vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
 vtkPVPLOT3DReaderModule.cxx
 vtkPVPart.cxx
-vtkPVPassThrough.cxx
+vtkPVPLOT3DReaderModule.cxx
 vtkPVPivotManipulator.cxx
 vtkPVPlaneWidget.cxx
 vtkPVPointSourceWidget.cxx
@@ -97,6 +102,8 @@ vtkPVSelectCustomReader.cxx
 vtkPVSelectTimeSet.cxx
 vtkPVSelectWidget.cxx 
 vtkPVSelectionList.cxx
+vtkPVSelectTimeSet.cxx
+vtkPVServerFileDialog.cxx
 vtkPVSource.cxx 
 vtkPVSourceCollection.cxx
 vtkPVSourceList.cxx
@@ -104,7 +111,6 @@ vtkPVSourceWidget.cxx
 vtkPVSourcesNavigationWindow.cxx
 vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
-vtkPVThreshold.cxx 
 vtkPVThresholdFilter.cxx
 vtkPVTimerLogDisplay.cxx
 vtkPVTraceFileDialog.cxx

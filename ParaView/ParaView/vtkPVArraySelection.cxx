@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.22");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.23");
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -255,6 +255,20 @@ void vtkPVArraySelection::Reset(const char* sourceTclName)
     }
 }
 
+
+//---------------------------------------------------------------------------
+void vtkPVArraySelection::Trace(ofstream *file, const char* root)
+{
+  vtkKWCheckButton *check;
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetArrayStatus {"
+          << check->GetText() << "} " << check->GetState() << endl;
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Accept()
 {
@@ -363,7 +377,7 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
 
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::SaveInTclScript(ofstream *file)
+void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
   vtkKWCheckButton *check;
   int state;

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -74,17 +74,18 @@ void vtkPVObjectWidget::SetObjectVariable(const char* objName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
+void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
+                                                 const char* sourceTclName)
 {
   char *result;
   
-  if (this->ObjectTclName == NULL || this->VariableName == NULL)
+  if (sourceTclName == NULL || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
+  *file << "\t" << sourceTclName << " Set" << this->VariableName;
   this->Script("set tempValue [%s Get%s]", 
                this->ObjectTclName, this->VariableName);
   result = this->Application->GetMainInterp()->result;
@@ -136,7 +137,7 @@ void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.10 $");
+  this->ExtractRevision(os,"$Revision: 1.11 $");
 }
 
 //----------------------------------------------------------------------------

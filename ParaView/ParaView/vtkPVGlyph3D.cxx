@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
-vtkCxxRevisionMacro(vtkPVGlyph3D, "1.76");
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.77");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -154,7 +154,7 @@ void vtkPVGlyph3D::InitializePrototype()
     "Glyph", "GlyphSource", "vtkPolyData",
     "Select the data set to use as the glyph geometry.",
     this->GetPVWindow()->GetSourceList("GlyphSources"));
-  sourceMenu->SetVTKInputName("Source");
+  sourceMenu->SetInputName("Source");
   sourceMenu->SetModifiedCommand(this->GetTclName(), 
                                 "SetAcceptButtonColorToRed");
     

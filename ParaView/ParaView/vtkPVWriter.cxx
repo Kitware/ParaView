@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.4");
+vtkCxxRevisionMacro(vtkPVWriter, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -90,6 +90,10 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel)
 {
+  if (data == NULL)
+    {
+    return 0;
+    }
   return (parallel == this->Parallel) && data->IsA(this->InputClassName);
 }
 

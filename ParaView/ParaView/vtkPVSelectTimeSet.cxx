@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.14");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -256,6 +256,15 @@ void vtkPVSelectTimeSet::Accept()
 
   this->ModifiedFlag = 0;
 }
+
+//---------------------------------------------------------------------------
+void vtkPVSelectTimeSet::Trace(ofstream *file, const char* root)
+{
+  this->Script("%s selection get", this->Tree->GetWidgetName());
+  *file << "$" << root << "(" << this->GetTclName() << ") SetTimeValueCallback {"
+        << this->Application->GetMainInterp()->result << "}" << endl;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Reset()

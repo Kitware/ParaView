@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.16");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -205,6 +205,12 @@ void vtkPVStringEntry::Accept(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
+//---------------------------------------------------------------------------
+void vtkPVStringEntry::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetValue {"
+        << this->GetValue() << "}" << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::Reset()
@@ -280,19 +286,20 @@ const char* vtkPVStringEntry::GetValue()
 
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::SaveInTclScript(ofstream *file)
+void vtkPVStringEntry::SaveInBatchScriptForPart(ofstream *file, 
+                                                const char* sourceTclName)
 {
   char *result;
   
-  if (this->ObjectTclName == NULL || this->VariableName == NULL)
+  if (sourceTclName == NULL || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
+  *file << "\t" << sourceTclName << " Set" << this->VariableName;
   this->Script("set tempValue [%s Get%s]", 
-               this->ObjectTclName, this->VariableName);
+               sourceTclName, this->VariableName);
   result = this->Application->GetMainInterp()->result;
   *file << " {" << result << "}\n";
 }

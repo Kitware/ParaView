@@ -50,7 +50,7 @@ int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.5");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -165,6 +165,16 @@ void vtkPVLineSourceWidget::Accept()
   this->Accept(this->SourceTclName);
 }
 
+//---------------------------------------------------------------------------
+void vtkPVLineSourceWidget::Trace(ofstream *file, const char* root)
+{
+  *file << "set " << root << "(" << this->LineWidget->GetTclName() << ") "
+        << "[$" << root << "(" << this->GetTclName() << ") "
+        << "GetPVWidget {" << this->LineWidget->GetTraceName() << "}]" 
+        << endl;
+  this->LineWidget->Trace(file, root);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Select()
 {
@@ -178,13 +188,13 @@ void vtkPVLineSourceWidget::Deselect()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::SaveInTclScript(ofstream *file)
+void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
   float pt[3];
   
   if (this->SourceTclName == NULL || this->LineWidget == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 

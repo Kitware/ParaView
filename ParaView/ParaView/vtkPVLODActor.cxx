@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.15");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
@@ -71,8 +71,6 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
-
-  this->EnableLOD = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -97,7 +95,7 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->Mapper;
     }
 
-  if (this->EnableLOD && vtkPVApplication::GetGlobalLODFlag())
+  if (vtkPVApplication::GetGlobalLODFlag())
     {
     return this->LODMapper;
     }
@@ -327,5 +325,4 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LODMapper: " << this->GetLODMapper() << endl;
-  os << indent << "EnableLOD: " << (this->EnableLOD?"on":"off") << endl;
 }

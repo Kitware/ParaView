@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWScale;
 class vtkKWLabel;
+class vtkPVArrayMenu;
 
 class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 {
@@ -74,6 +75,10 @@ public:
   virtual void Reset(const char* sourceTclName);
 
   // Description:
+  // This calculates new range to display (using the array menu).
+  virtual void Update();
+
+  // Description:
   // This method allows scripts to modify the widgets value.
   void  SetMinValue(float val);
   float GetMinValue();
@@ -85,6 +90,10 @@ public:
   void GetRange(float range[2]);
 
   // Description:
+  // Use the scalar range of the selected array to set the min max range.
+  void SetArrayMenu(vtkPVArrayMenu* widget);
+
+  // Description:
   // These commands are used to set/get values on/from the
   // underlying VTK object.
   vtkSetStringMacro(GetMinCommand);
@@ -93,10 +102,6 @@ public:
   vtkGetStringMacro(GetMinCommand);
   vtkGetStringMacro(GetMaxCommand);
   vtkGetStringMacro(SetCommand);
-  
-  // Description:
-  // Save this widget to a file
-  virtual void SaveInTclScript(ofstream *file);
 
   // Description:
   // Callback for min scale
@@ -166,10 +171,16 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
 protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
   
+  vtkPVArrayMenu* ArrayMenu;  
+
   vtkKWLabel *MinLabel;
   vtkKWLabel *MaxLabel;
   vtkKWScale *MinScale;
@@ -205,6 +216,10 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+  
+  // Description:
+  // Save this widget to a file
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 };
 
 #endif

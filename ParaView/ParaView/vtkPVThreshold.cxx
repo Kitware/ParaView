@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.54");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.55");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -106,7 +106,7 @@ void vtkPVThreshold::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
+  this->AddInputMenu("Input", "PVInput",
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSourceList("Sources"));
   
@@ -139,7 +139,7 @@ void vtkPVThreshold::CreateProperties()
   // Well ... I do not know why we need a special PV object for threshold.
   // Get rid of this special object !!!!!!!!!!!!!!!!!
   vtkPVArrayInformation *ai;
-  ai = this->GetPVInput()->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  ai = this->GetPVInput(0)->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
   if (ai)
     {
     ai->GetComponentRange(0,range);
@@ -204,7 +204,7 @@ void vtkPVThreshold::UpdateMinMaxScale()
   range[0] = 0;
   range[1] = 1;
 
-  vtkPVData* input = this->GetPVInput();
+  vtkPVData* input = this->GetPVInput(0);
   if (input)
     {
     int pointDataFlag = 0;
@@ -307,8 +307,7 @@ void vtkPVThreshold::UpdateScalars()
   this->MinMaxScale->SetMinValue(range[0]);
 }
 
-void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag, 
-                                     int vtkFlag)
+void vtkPVThreshold::SaveInBatchScript(ofstream *file)
 {
   
   if (this->VisitedFlag)
@@ -317,14 +316,14 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
   this->VisitedFlag = 1;
 
-  this->GetPVInput()->GetPVSource()->SaveInTclScript(file, interactiveFlag,vtkFlag);
+  this->GetPVInput(0)->GetPVSource()->SaveInBatchScript(file);
 
   *file << this->GetVTKSource()->GetClassName() << " "
         << this->GetVTKSourceTclName() << "\n";
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetInput [";
 
-  *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+  *file << this->GetPVInput(0)->GetPVSource()->GetVTKSourceTclName()
         << " GetOutput]\n\t";
   
   *file << this->GetVTKSourceTclName() << " SetAttributeModeToUse";
@@ -337,12 +336,12 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag,
     *file << "CellData\n\t";
     }
   
-  this->MinMaxScale->SaveInTclScript(file);
+  this->MinMaxScale->SaveInBatchScript(file);
   *file << "\t";
-  this->AllScalarsCheck->SaveInTclScript(file);
+  this->AllScalarsCheck->SaveInBatchScript(file);
   *file << "\n";
   
-  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
+  this->GetPVOutput(0)->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------

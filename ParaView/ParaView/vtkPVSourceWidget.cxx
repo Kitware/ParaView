@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -81,14 +81,12 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceWidget::SaveInTclScript(ofstream *file)
+void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
 {
   char *result;
   
-  if (this->ObjectTclName == NULL || this->VariableName == NULL 
-      || this->SourceTclName)
+  if (this->SourceTclName)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
     return;
     } 
 
@@ -96,7 +94,20 @@ void vtkPVSourceWidget::SaveInTclScript(ofstream *file)
   result = this->Application->GetMainInterp()->result;
   *file << result << " " << this->SourceTclName << "\n";
 
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+  // This will loop through all parts and call SaveInBatchScriptForPart.
+  this->Superclass::SaveInBatchScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceWidget::SaveInBatchScriptForPart(ofstream *file, 
+                                                 const char* sourceTclName)
+{
+  if (sourceTclName == NULL || this->VariableName == NULL)
+    {
+    return;
+    } 
+
+  *file << "\t" << sourceTclName << " Set" << this->VariableName
         << " " << this->SourceTclName << endl;
 }
 

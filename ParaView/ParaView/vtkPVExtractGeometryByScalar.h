@@ -60,8 +60,8 @@ public:
   
   // Description:
   // Save this source to a file.
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
-  
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkPVExtractGeometryByScalar();
   ~vtkPVExtractGeometryByScalar();

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -68,9 +68,9 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
-
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
+
   this->Name = NULL;
 }
 
@@ -107,6 +107,7 @@ void vtkPVDataInformation::Initialize()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
+
   this->SetName(NULL);
 }
 
@@ -331,6 +332,15 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
       return 1;
       }
     }
+  if (strcmp(type, "vtkStructuredData") == 0)
+    {
+    if (this->DataSetType == VTK_IMAGE_DATA || 
+        this->DataSetType == VTK_STRUCTURED_GRID ||
+        this->DataSetType == VTK_RECTILINEAR_GRID)
+      {
+      return 1;
+      }
+    }
 
   return 0;
 }
@@ -358,15 +368,21 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
 
   // Figure out message length, and allocate memory.
   // 1- First byte is a flag specifying big or little endian (ignore for now).
-  // 1- Second byte specifies the data set type.  
+  // 1- Second byte specifies the data set type.
+  length = 2;
+  
   // - vtkIdType for numberOfPoints
   // - vtkIdType for numberOfCells
+  length += 2*sizeof(vtkIdType);
+
+  // 1 unsigned longs for memory size.
+  length += sizeof(unsigned long);
+
   // - 6 doubles for bounds.
   // - 6 integers for extent.
+  length +=  + 6*sizeof(double) + 6*sizeof(int);
+
   // - For each data set attributes ...
-
-  length = 2 + 2*sizeof(vtkIdType) + 6*sizeof(double) + 6*sizeof(int);
-
   // Now add space for all of the cell and point data information.
   length += this->PointDataInformation->GetMessageLength();
   length += this->CellDataInformation->GetMessageLength();
@@ -375,7 +391,7 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   int nameLength = 0;
   if (this->Name)
     {
-    nameLength = strlen(this->Name);
+    nameLength = static_cast<int>(strlen(this->Name));
     }
   if (nameLength > 255)
     {
@@ -401,6 +417,10 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   tmp += sizeof(vtkIdType);
   *((vtkIdType*)tmp) = this->NumberOfCells;
   tmp += sizeof(vtkIdType);
+  // Memory Size
+  *((unsigned long*)tmp) = this->MemorySize;
+  tmp += sizeof(unsigned long);
+
   // Bounds
   for (idx = 0; idx < 6; ++idx)
     {
@@ -463,6 +483,9 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
 
   this->NumberOfCells = *((vtkIdType*)tmp);
   tmp += sizeof(vtkIdType);
+
+  this->MemorySize = *((unsigned long*)tmp);
+  tmp += sizeof(unsigned long);
 
   // Bounds
   for (idx = 0; idx < 6; ++idx)

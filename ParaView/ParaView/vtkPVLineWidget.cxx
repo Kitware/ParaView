@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -297,32 +297,33 @@ void vtkPVLineWidget::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
 
   // Start the trace entry and the accept command.
   if (this->ModifiedFlag && traceFile && this->InitializeTrace())
     {
-    traceFlag = 1;
-    }
-
-  if (traceFlag)
-    {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint1 "
-               << this->Point1[0]->GetValue() << " "
-               << this->Point1[1]->GetValue() << " "
-               << this->Point1[2]->GetValue() << endl;
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint2 "
-               << this->Point2[0]->GetValue() << " "
-               << this->Point2[1]->GetValue() << " "
-               << this->Point2[2]->GetValue() << endl;
-    *traceFile << "$kw(" << this->GetTclName() << ") SetResolution "
-               << this->ResolutionEntry->GetValue() << endl;
+    this->Trace(traceFile, "kw");
     }
 
   this->Superclass::Accept();
   this->SuppressReset = 0;
 }
 
+//---------------------------------------------------------------------------
+void vtkPVLineWidget::Trace(ofstream *file, const char* root)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  *file << "$" << root << "(" << this->GetTclName() << ") SetPoint1 "
+        << this->Point1[0]->GetValue() << " "
+        << this->Point1[1]->GetValue() << " "
+        << this->Point1[2]->GetValue() << endl;
+  *file << "$" << root << "(" << this->GetTclName() << ") SetPoint2 "
+        << this->Point2[0]->GetValue() << " "
+        << this->Point2[1]->GetValue() << " "
+        << this->Point2[2]->GetValue() << endl;
+  *file << "$" << root << "(" << this->GetTclName() << ") SetResolution "
+        << this->ResolutionEntry->GetValue() << endl;
+}
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::Accept(const char* sourceTclName)
 {
@@ -403,9 +404,9 @@ void vtkPVLineWidget::ActualPlaceWidget()
   float bds[6];
   float x, y, z;
 
-  if ( this->PVSource->GetPVInput() )
+  if ( this->PVSource->GetPVInput(0) )
     {
-    this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bds);
+    this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
 
     x = (bds[0]+bds[1])/2; 
     y = bds[2]; 
@@ -432,17 +433,17 @@ void vtkPVLineWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SaveInTclScript(ofstream *file)
+void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
+                                               const char* sourceTclName)
 {
   char *result;
-
 
   // Point1
   if (this->Point1Variable)
     {  
-    *file << "\t" << this->ObjectTclName << " Set" << this->Point1Variable;
+    *file << "\t" << sourceTclName << " Set" << this->Point1Variable;
     this->Script("set tempValue [%s Get%s]", 
-                 this->ObjectTclName, this->Point1Variable);
+                 sourceTclName, this->Point1Variable);
     result = this->Application->GetMainInterp()->result;
     *file << " " << result << "\n";
     }
@@ -450,9 +451,9 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
   // Point2
   if (this->Point2Variable)
     {
-    *file << "\t" << this->ObjectTclName << " Set" << this->Point2Variable;
+    *file << "\t" << sourceTclName << " Set" << this->Point2Variable;
     this->Script("set tempValue [%s Get%s]", 
-                 this->ObjectTclName, this->Point2Variable);
+                 sourceTclName, this->Point2Variable);
     result = this->Application->GetMainInterp()->result;
     *file << " " << result << "\n";
     }
@@ -460,9 +461,9 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
   // Resolution
   if (this->ResolutionVariable)
     {
-    *file << "\t" << this->ObjectTclName << " Set" << this->ResolutionVariable;
+    *file << "\t" << sourceTclName << " Set" << this->ResolutionVariable;
     this->Script("set tempValue [%s Get%s]", 
-                 this->ObjectTclName, this->ResolutionVariable);
+                 sourceTclName, this->ResolutionVariable);
     result = this->Application->GetMainInterp()->result;
     *file << " " << result << "\n";
     }

@@ -43,12 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
+#include "vtkSource.h"
 #include "vtkPVApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVSource.h"
@@ -58,33 +60,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.38");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.39");
+vtkCxxSetObjectMacro(vtkPVInputMenu,InputProperty,vtkPVInputProperty);
+
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
 {
-  this->InputType = NULL;
   this->InputName = NULL;
+  this->InputProperty = NULL;
   this->Sources = NULL;
   this->CurrentValue = NULL;
 
   this->Label = vtkKWLabel::New();
   this->Menu = vtkKWOptionMenu::New();
-  this->VTKInputName = NULL;
-  // Default name.
-  this->SetVTKInputName("Input");
 }
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::~vtkPVInputMenu()
 {
-  if (this->InputType)
-    {
-    delete [] this->InputType;
-    this->InputType = NULL;
-    }
   this->SetInputName(NULL);
-  this->SetVTKInputName(NULL);
+  this->SetInputProperty(NULL);
   this->Sources = NULL;
 
   this->Label->Delete();
@@ -134,11 +130,14 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
   vtkObject *o;
   vtkPVSource *source;
   int currentFound = 0;
+  vtkPVInputProperty *inProp;
   
   if (sources == NULL)
     {
     return;
     }
+
+  inProp = this->GetInputProperty();
 
   this->ClearEntries();
   sources->InitTraversal();
@@ -179,10 +178,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     return 0;
     }
 
-  // The next section of code eliminates any inputs which
-  // do not match the current input part for part.
-  // I is assumed the the PVSource has already created its
-  // vtkFilters and their outputs, and these can not change.
+  // Have to have the same number of parts as last input.
   pvd = pvs->GetPVOutput();
   if (pvd == NULL)
     {
@@ -193,29 +189,16 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     vtkPVData *currentData = this->CurrentValue->GetPVOutput();
     if (currentData != NULL)
       {
-     // Only accept inputs which match part for part.
-      int partIdx, numParts;
-      numParts = currentData->GetNumberOfPVParts(); 
-      if (pvd->GetNumberOfPVParts() != numParts)
+      if (pvd->GetNumberOfPVParts() != currentData->GetNumberOfPVParts())
         {
         return 0;
-        }
-      for (partIdx = 0; partIdx < numParts; ++partIdx)
-        {
-        vtkPVDataInformation *info1;
-        vtkPVDataInformation *info2;
-        info1 = pvd->GetPVPart(partIdx)->GetDataInformation();
-        info2 = currentData->GetPVPart(partIdx)->GetDataInformation();
-        if (info1->GetDataSetType() != info2->GetDataSetType())
-          {
-          return 0;
-          }
         }
       }
     }
 
-  if (this->InputType == NULL || 
-      ! pvs->GetPVOutput()->GetDataInformation()->DataSetTypeIsA(this->InputType))
+  // Has to meet all requirments from XML filter description.
+  if ( ! this->GetInputProperty()->GetIsValidInput(pvs->GetPVOutput(), 
+                                                   this->PVSource))
     {
     return 0;
     }
@@ -293,7 +276,7 @@ int vtkPVInputMenu::CheckForLoop(vtkPVSource *pvs)
   int res = 0;
   for ( cc = 0; cc < pvs->GetNumberOfPVInputs(); cc ++ )
     {
-    vtkPVData* data = pvs->GetNthPVInput(cc);
+    vtkPVData* data = pvs->GetPVInput(cc);
     if ( data && data->GetPVSource() )
       {
       res += this->CheckForLoop(data->GetPVSource());
@@ -313,40 +296,53 @@ vtkPVData *vtkPVInputMenu::GetPVData()
   return pvs->GetPVOutput();
 }
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //----------------------------------------------------------------------------
-//vtkDataSet *vtkPVInputMenu::GetVTKData()
-//{
-//  vtkPVSource *pvs = this->GetCurrentValue();
-//
-//  if (pvs == NULL)
-//    {
-//    return NULL;
-//    }
-//  return pvs->GetPVOutput()->GetPVPart()->GetVTKData();
-//}
-
-
-//----------------------------------------------------------------------------
-void vtkPVInputMenu::SaveInTclScript(ofstream *file)
+// vtkPVSource handles this now.
+void vtkPVInputMenu::SaveInBatchScript(ofstream*)
 {
-  if (this->CurrentValue == NULL)
-    {
-    return;
-    }
-  *file << "\t";
-  // This is a bit of a hack to get the input name.
-  *file << this->PVSource->GetVTKSourceTclName() << " Set" 
-        << this->VTKInputName << " ["
-        << this->CurrentValue->GetVTKSourceTclName() << " GetOutput]\n";
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::ModifiedCallback()
 {
   this->vtkPVWidget::ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+// We should probably cache this value.
+// compute it once when the InputName is set ...
+int vtkPVInputMenu::GetPVInputIndex()
+{
+  int num, idx;
+
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource must be set before translation.");
+    return 0;
+    }
+  num = this->PVSource->GetNumberOfInputProperties();
+  for (idx = 0; idx < num; ++idx)
+    {
+    if (strcmp(this->InputName, 
+               this->PVSource->GetInputProperty(idx)->GetName()) == 0)
+      {
+      return idx;
+      }
+    }
+
+  vtkErrorMacro("Cound not find VTK input name: " << this->InputName);
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVInputProperty* vtkPVInputMenu::GetInputProperty()
+{
+  if (this->InputProperty == NULL)
+    {
+    this->SetInputProperty(this->PVSource->GetInputProperty(this->InputName));
+    }
+
+  return this->InputProperty; 
 }
 
 //----------------------------------------------------------------------------
@@ -366,33 +362,46 @@ void vtkPVInputMenu::Accept(const char* sourceTclName)
 
   if (this->CurrentValue)
     {
-    this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
+    this->Script("%s SetPVInput %d %s", this->PVSource->GetTclName(), 
+                 this->GetPVInputIndex(),
                  this->CurrentValue->GetPVOutput()->GetTclName());
     if (this->CurrentValue->InitializeTrace())
       {
+      // I could use the trace method ....
       this->AddTraceEntry("$kw(%s) SetCurrentValue $kw(%s)", 
                            this->GetTclName(), 
                            this->CurrentValue->GetTclName());
       }
-    // Make input data invisible.
-    vtkPVData* input = this->PVSource->GetPVInput();
-    if (input)
-      {
-      if (this->PVSource->GetReplaceInput() && input->GetPropertiesCreated())
-        {
-        input->SetVisibilityInternal(0);
-        }
-      }
-
     }
   else
     {
-    this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
+    this->Script("%s SetPVInput %d {}", this->PVSource->GetTclName(), 
+                 this->GetPVInputIndex());
     this->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
                          this->GetTclName());
     }
-  this->ModifiedFlag=1;
+
+  // ??? used to be set to one ???
+  this->ModifiedFlag=0;
 }
+
+
+//---------------------------------------------------------------------------
+void vtkPVInputMenu::Trace(ofstream *file, const char* root)
+{
+  if (this->CurrentValue)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
+          << "$" << root << "(" << this->CurrentValue->GetTclName() << ")\n";
+    }
+  else
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
+          << "{}\n";
+    }
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Reset(const char* sourceTclName)
@@ -408,9 +417,9 @@ void vtkPVInputMenu::Reset(const char* sourceTclName)
 
   // Set the current value.  The catch is here because GlyphSource is
   // initially NULL which causes an error.
-  this->Script("catch {%s SetCurrentValue [[%s Get%s] GetPVSource]}", 
-               this->GetTclName(), 
-               this->PVSource->GetTclName(), this->InputName);    
+  this->Script("catch {%s SetCurrentValue [[%s GetPVInput %d] GetPVSource]}", 
+               this->GetTclName(), this->PVSource->GetTclName(), 
+               this->GetPVInputIndex());    
 
   // Only turn modified off if the SetCurrentValue was successful.
   if (this->GetIntegerResult(this->Application) == 0)
@@ -423,6 +432,7 @@ void vtkPVInputMenu::Reset(const char* sourceTclName)
     }
 }
 
+//----------------------------------------------------------------------------
 vtkPVInputMenu* vtkPVInputMenu::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -430,6 +440,7 @@ vtkPVInputMenu* vtkPVInputMenu::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVInputMenu::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -439,9 +450,7 @@ void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     {
     pvim->SetLabel(this->Label->GetLabel());
     pvim->SetInputName(this->InputName);
-    pvim->SetInputType(this->InputType);
     pvim->SetSources(this->GetSources());
-    pvim->SetVTKInputName(this->VTKInputName);
     }
   else 
     {
@@ -474,16 +483,7 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetInputName("Input");
     }
-  
-  // Setup the InputType.
-  const char* input_type = element->GetAttribute("input_type");
-  if(!input_type)
-    {
-    vtkErrorMacro("No input_type attribute.");
-    return 0;
-    }
-  this->SetInputType(input_type);
-  
+    
   vtkPVWindow* window = this->GetPVWindowFormParser(parser);
   const char* source_list = element->GetAttribute("source_list");
   if(source_list)
@@ -529,8 +529,4 @@ void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
      << endl;
-  os << indent << "InputType: " << (this->InputType?this->InputType:"none") 
-     << endl;
-  os << indent << "VTKInputName: " 
-     << (this->VTKInputName?this->VTKInputName:"none") << endl;
 }

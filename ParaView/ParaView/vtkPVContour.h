@@ -63,7 +63,7 @@ public:
   // Description:
   // This does the same thing as the superclass, but also
   // checks for scalars.
-  virtual void SetPVInput(vtkPVData* input);
+  virtual void SetPVInput(int idx, vtkPVData* input);
   
 protected:
   vtkPVContour();

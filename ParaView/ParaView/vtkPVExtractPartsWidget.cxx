@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.2");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -208,6 +208,26 @@ void vtkPVExtractPartsWidget::Accept(const char* vtkSourceTclName)
 }
 
 
+//---------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::SetSelectState(int idx, int val)
+{
+  this->PartSelectionList->SetSelectState(idx, val);
+}
+
+
+//---------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::Trace(ofstream *file, const char* root)
+{
+  int idx, num;
+
+  num = this->PartSelectionList->GetNumberOfItems();
+  for (idx = 0; idx < num; ++idx)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetSelectState "
+          << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVExtractPartsWidget::Reset()
 {
@@ -228,7 +248,7 @@ void vtkPVExtractPartsWidget::Reset(const char* vtkSourceTclName)
 
   this->PartSelectionList->DeleteAll();
   // Loop through all of the parts of the input adding to the list.
-  input = this->PVSource->GetPVInput();
+  input = this->PVSource->GetPVInput(0);
   num = input->GetNumberOfPVParts();
   for (idx = 0; idx < num; ++idx)
     {
@@ -280,8 +300,21 @@ void vtkPVExtractPartsWidget::AllOffCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::SaveInTclScript(ofstream *file)
+// Multiple input filter has only one VTK source.
+void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 {
+  int num, idx;
+  int state;
+
+  num = this->PartSelectionList->GetNumberOfItems();
+
+  // Now loop through the input mask setting the selection states.
+  for (idx = 0; idx < num; ++idx)
+    {
+    state = this->PartSelectionList->GetSelectState(idx);  
+    *file << "\t" << this->PVSource->GetVTKSourceTclName(0) 
+          << " SetInputMask " << idx << " " << state << endl;  
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -99,10 +99,6 @@ public:
   void Deselect();
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // Return ith widget.
   vtkPVWidget* GetPVWidget(vtkIdType i);
 
@@ -127,6 +123,10 @@ public:
                                     vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkPVContainerWidget();
   ~vtkPVContainerWidget();
@@ -143,6 +143,10 @@ protected:
                         vtkPVXMLPackageParser* parser);
 
   char* PackDirection;
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 private:
   vtkPVContainerWidget(const vtkPVContainerWidget&); // Not implemented

@@ -93,10 +93,6 @@ public:
   void DeleteValueCallback();
 
   // Description:
-  // The widget saves it state/command in the vtk tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                          vtkPVAnimationInterface *ai);
@@ -121,6 +117,10 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
@@ -144,6 +144,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,      
                         vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // The widget saves it state/command in the vtk tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 };
 
 #endif

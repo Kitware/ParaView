@@ -81,10 +81,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  void SaveInTclScript(ofstream *file);
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
@@ -101,6 +97,14 @@ public:
   void SetPosition();
   void SetPosition(float,float,float);
   void GetPosition(float pt[3]);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
 
 protected:
   vtkPVPointWidget();

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkPVWidgetCollection );
-vtkCxxRevisionMacro(vtkPVWidgetCollection, "1.2");
+vtkCxxRevisionMacro(vtkPVWidgetCollection, "1.3");
 
 vtkPVWidget *vtkPVWidgetCollection::GetNextPVWidget() 
 { 
@@ -66,6 +66,11 @@ vtkPVWidget *vtkPVWidgetCollection::GetLastPVWidget()
 
 void vtkPVWidgetCollection::AddItem(vtkPVWidget *a) 
 {
+  if (a == NULL)
+    {
+    vtkErrorMacro("NULL Widget.");
+    return;
+    }
   this->vtkCollection::AddItem(static_cast<vtkObject *>(a));
 }
 

@@ -54,6 +54,7 @@ class vtkDataSet;
 class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkPVData;
+class vtkPVInputProperty;
 class vtkPVSourceCollection;
 
 class VTK_EXPORT vtkPVInputMenu : public vtkPVWidget
@@ -81,17 +82,11 @@ public:
   // and memory leaks.  We may wnet to fix his later.
   void SetSources(vtkPVSourceCollection *sources);
   vtkPVSourceCollection *GetSources();
-
-  // Description:
-  // Set/Get the class type for this input menu
-  vtkSetStringMacro(InputType);
-  vtkGetStringMacro(InputType);
   
   // Description:
   // The input name is usually "Input", but can be something else
   // (i.e. Source). Used to format commands in accept and reset methods.
   vtkSetStringMacro(InputName);
-  vtkGetStringMacro(InputName);
   
   // Description:
   // Gets called when the accept button is pressed.
@@ -132,13 +127,7 @@ public:
 
   // Description:
   // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file);
-
-  // Description:
-  // This is the name used to set the input in the VTK filter.
-  // It is needed to save tcl scripts.
-  vtkSetStringMacro(VTKInputName);
-  vtkGetStringMacro(VTKInputName);
+  virtual void SaveInBatchScript(ofstream *file);
 
 //BTX
   // Description:
@@ -150,14 +139,15 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
 
-
-  char* InputType;
   char* InputName;
-  char *VTKInputName;
   
   vtkPVSource *CurrentValue;
   vtkPVSourceCollection *Sources;
@@ -180,6 +170,17 @@ protected:
   // loop. This code will determine if the operation would cause the
   // loop.
   int CheckForLoop(vtkPVSource *pvs);
+
+  // Description:
+  // This converts the InputName into an index.
+  // SetSource -> SetNthPVInput(idx, ...);
+  int GetPVInputIndex();
+
+  // Description:
+  // Get the property for this input.
+  vtkPVInputProperty* GetInputProperty();
+  void SetInputProperty(vtkPVInputProperty *prop);
+  vtkPVInputProperty *InputProperty;
 
   // Description:
   // Adds a collection of sources to the menu.

@@ -51,10 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 #include "vtkTimerLog.h"
+#include "vtkKWScale.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -191,6 +192,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->ButtonFrame->Create(app, "frame", "");
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
+
   this->DismissButton->SetParent(this->ButtonFrame);
   this->DismissButton->Create(app, "");
   this->DismissButton->SetCommand(this, "Dismiss");

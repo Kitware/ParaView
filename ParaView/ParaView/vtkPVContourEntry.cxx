@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.20");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -328,6 +328,23 @@ void vtkPVContourEntry::Accept(const char* sourceTclName)
 }
 
 
+//---------------------------------------------------------------------------
+void vtkPVContourEntry::Trace(ofstream *file, const char* root)
+{
+  int i, numContours;
+  float value;
+
+  *file << "$" << root << "(" << this->GetTclName() << ") RemoveAllValues \n";
+
+  numContours = this->ContourValuesList->GetNumberOfItems();
+  for (i = 0; i < numContours; i++)
+    {
+    value = atof(this->ContourValuesList->GetItem(i));
+    *file << "$" << root << "(" << this->GetTclName() << ") AddValue "
+          << value << endl;
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVContourEntry::Accept()
 {
@@ -341,7 +358,8 @@ void vtkPVContourEntry::Accept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContourEntry::SaveInTclScript(ofstream *file)
+void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
+                                                 const char* sourceTclName)
 {
   int i;
   float value;
@@ -353,7 +371,7 @@ void vtkPVContourEntry::SaveInTclScript(ofstream *file)
     {
     value = atof(this->ContourValuesList->GetItem(i));
     *file << "\t";
-    *file << this->PVSource->GetVTKSourceTclName() << " SetValue " 
+    *file << sourceTclName << " SetValue " 
           << i << " " << value << endl;
     }
 }

@@ -100,10 +100,6 @@ public:
   void SetArrayStatus(const char *name, int status);
 
   // Description:
-  // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file);
-
-  // Description:
   // Get the number of array names listed in this widget.
   int GetNumberOfArrays();
   
@@ -118,6 +114,15 @@ public:
                                       vtkPVWidget*>* map);
 //ETX
   
+  // Description:
+  // Save this widget to a file. 
+  // Ingore parts for thsi reader specific widget. 
+  virtual void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();

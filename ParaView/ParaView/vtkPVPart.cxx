@@ -60,9 +60,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.2");
+vtkCxxRevisionMacro(vtkPVPart, "1.3");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -243,63 +244,76 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   // This should be changed to origin and spacing determined globally.
 
-#ifdef VTK_USE_MPI
+  if (1) // We could avoid these filters if one processor and not client server.
+    {
 
-  // Create the collection filters which allow small models to render locally.  
-  // They also redistributed data for SGI pipes option.
-  // ===== Primary branch:
-  sprintf(tclName, "Collect%d", this->InstanceCount);
+    // Create the collection filters which allow small models to render locally.  
+    // They also redistributed data for SGI pipes option.
+    // ===== Primary branch:
+    sprintf(tclName, "Collect%d", this->InstanceCount);
 
-  // Different filter for  pipe redistribution.
-  if (pvApp->GetUseRenderingGroup())
-    {
-    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                           pvApp->GetNumberOfPipes());
-    }
-  else if (pvApp->GetUseTiledDisplay())
-    {
-    pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-    }
-  this->SetCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->CollectTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
-                         this->CollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
-                         this->CollectTclName);
-  //
-  // ===== LOD branch:
-  sprintf(tclName, "LODCollect%d", this->InstanceCount);
+    // Different filter for  pipe redistribution.
+    if (pvApp->GetUseRenderingGroup())
+      {
+      pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+      pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
+                             pvApp->GetNumberOfPipes());
+      }
+    else if (pvApp->GetUseTiledDisplay())
+      {
+      pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+      }
+    this->SetCollectTclName(tclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                           this->CollectTclName, this->GeometryTclName);
+    pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
+                           this->CollectTclName);
+    pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
+                           this->CollectTclName);
+    //
+    // ===== LOD branch:
+    sprintf(tclName, "LODCollect%d", this->InstanceCount);
 
-  // Different filter for pipe redistribution.
-  if (pvApp->GetUseRenderingGroup())
-    {
-    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                           pvApp->GetNumberOfPipes());
-    }
-  else if (pvApp->GetUseTiledDisplay())
-    {
-    pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-    }
-  this->SetLODCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
-#endif
+    // Different filter for pipe redistribution.
+    if (pvApp->GetUseRenderingGroup())
+      {
+      pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+      pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
+                             pvApp->GetNumberOfPipes());
+      }
+    else if (pvApp->GetUseTiledDisplay())
+      {
+      pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+      }
+    this->SetLODCollectTclName(tclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                           this->LODCollectTclName, this->LODDeciTclName);
+    pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}", 
+                           this->LODCollectTclName);
+    pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
+                           this->LODCollectTclName);
 
+    // Handle collection setup with client server.
+    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
+                           this->CollectTclName);
+    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
+                           this->LODCollectTclName);
+    // Special condition to signal the client.
+    // Because both processes of the Socket controller think they are 0!!!!
+    if (pvApp->GetClientMode())
+      {
+      this->Script("%s SetController {}", this->CollectTclName);
+      this->Script("%s SetController {}", this->LODCollectTclName);
+      }
+    }
 
 
 
@@ -385,6 +399,40 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   pvApp->GetProcessModule()->InitializePVPartPartition(this);
 }
+
+//----------------------------------------------------------------------------
+unsigned long vtkPVPart::GetGeometryMemorySize()
+{
+  // I hate having to get this unsigned long value through tcl as an integer.
+  this->Script("%s GetMemorySize", this->CollectTclName);
+  return static_cast<unsigned long>(this->GetIntegerResult(this->Application));
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkPVPart::GetLODMemorySize()
+{
+  // I hate having to get this unsigned long value through tcl as an integer.
+  this->Script("%s GetMemorySize", this->LODCollectTclName);
+  return static_cast<unsigned long>(this->GetIntegerResult(this->Application));
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPart::GetGeometryCollected()
+{
+  // Although I might use the total memory size of all parts for the 
+  // local vs. compositing rendering decision, for now I will render 
+  // localy only if all the parts have collected. 
+  this->Script("%s GetCollected", this->CollectTclName);
+  return this->GetIntegerResult(this->Application);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPart::GetLODCollected()
+{
+  this->Script("%s GetCollected", this->LODCollectTclName);
+  return this->GetIntegerResult(this->Application);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVPart::GatherDataInformation()

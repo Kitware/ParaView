@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.58");
+vtkCxxRevisionMacro(vtkPVContour, "1.59");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -102,7 +102,7 @@ void vtkPVContour::CreateProperties()
 // Print a warning if input has no scalars
 void vtkPVContour::VerifyInput()
 {
-  vtkPVData* input = this->GetPVInput();
+  vtkPVData* input = this->GetPVInput(0);
   if (!input)
     {
     return;
@@ -125,14 +125,19 @@ void vtkPVContour::VerifyInput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContour::SetPVInput(vtkPVData *input)
+void vtkPVContour::SetPVInput(int idx, vtkPVData *input)
 {
-  if (input == this->GetPVInput())
+  if (idx != 0)
+    {
+    vtkErrorMacro("Contour has only one input.");
+    return;
+    }
+  if (input == this->GetPVInput(0))
     {
     return;
     }
 
-  this->vtkPVSource::SetPVInput(input);
+  this->vtkPVSource::SetPVInput(idx, input);
   this->VerifyInput();
 }
 

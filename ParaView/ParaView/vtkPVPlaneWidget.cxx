@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.32");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -94,7 +94,7 @@ void vtkPVPlaneWidget::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
+void vtkPVPlaneWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkPlane " << this->PlaneTclName << endl;
   *file << "\t" << this->PlaneTclName << " SetOrigin ";

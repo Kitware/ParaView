@@ -73,7 +73,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.4");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.5");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -290,6 +290,64 @@ void vtkPVProcessModule::InitializePVPartPartition(vtkPVPart *part)
   this->Script("%s SetUpdatePiece %d", 
                part->GetLODUpdateSuppressorTclName(), 0);
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::RootScript(char *format, ...)
+{
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
+  
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(buffer, format, var_args);
+  va_end(var_args);
+  
+  this->RootSimpleScript(buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::RootSimpleScript(const char *script)
+{
+  // Default implementation just executes locally.
+  this->Script(script);
+}
+
+
+//----------------------------------------------------------------------------
+char* vtkPVProcessModule::NewRootResult()
+{
+  char* str;
+  char* result;
+
+  result = this->Application->GetMainInterp()->result;
+  str = new char[strlen(result)+1];
+  strcpy(str, result);
+
+  return str;
+}
+
+
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)

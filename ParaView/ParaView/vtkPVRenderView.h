@@ -185,10 +185,9 @@ public:
   void AddBindings();
   
   // Description:
-  // Save the renderer and render window to a file.
-  // The "vtkFlag" argument is only set when regression testing.
-  // It causes the actors to b e added to the ParaView renderer. 
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
+  // Export the renderer and render window to a file.
+  void SaveInBatchScript(ofstream *file);
+  void SaveState(ofstream *file);
 
   // Description:
   // Change the background color.
@@ -300,14 +299,14 @@ public:
   // Description:
   // This method sets the threshold without tracing or
   // changing the UI scale.
-  void SetLODThresholdInternal(int threshold);
+  void SetLODThresholdInternal(float threshold);
 
   // Description:
   // This methods can be used from a script.  
   // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODThreshold(int);
-  vtkGetMacro(LODThreshold, int);
-  vtkBooleanMacro(LODThreshold, int);
+  void SetLODThreshold(float);
+  vtkGetMacro(LODThreshold, float);
+  vtkBooleanMacro(LODThreshold, float);
 
 
   // Description:
@@ -380,8 +379,11 @@ protected:
 
   void CalculateBBox(char* name, int bbox[4]);
 
-  void UpdateAllPVData();
-
+  // This is used before a render to make sure all visible sources
+  // have been updated.  It returns 1 if all the data has been collected
+  // and the render should be local.
+  int UpdateAllPVData(int interactive);
+ 
   int Interactive;
 
   int UseReductionFactor;
@@ -458,7 +460,7 @@ protected:
 
   int DisableRenderingFlag;
 
-  int LODThreshold;
+  float LODThreshold;
   int LODResolution;
   float CollectThreshold;
 

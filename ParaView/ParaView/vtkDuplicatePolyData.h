@@ -64,6 +64,12 @@ public:
   vtkSetMacro(ClientFlag,int);
   vtkGetMacro(ClientFlag,int);
 
+  // Description:
+  // This returns to size of the output (on this process).
+  // This method is not really used.  It is needed to have
+  // the same API as vtkCollectPolyData.
+  vtkGetMacro(MemorySize, unsigned long);
+
 protected:
   vtkDuplicatePolyData();
   ~vtkDuplicatePolyData();
@@ -84,6 +90,8 @@ protected:
   // For client server mode.
   vtkSocketController *SocketController;
   int ClientFlag;
+
+  unsigned long MemorySize;
 
 private:
   vtkDuplicatePolyData(const vtkDuplicatePolyData&); // Not implemented

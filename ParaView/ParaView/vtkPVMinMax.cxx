@@ -47,10 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkKWScale.h"
 #include "vtkKWLabel.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.16");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.17");
+
+vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -78,6 +82,12 @@ vtkPVMinMax::vtkPVMinMax()
 
   this->MinLabelWidth = 18;
   this->MaxLabelWidth = 18;
+
+  this->ArrayMenu = NULL;
+
+  // We do not want the filter default value.
+  // We use the range of the scalars instead.
+  this->SuppressReset = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -100,18 +110,23 @@ vtkPVMinMax::~vtkPVMinMax()
   this->SetSetCommand(NULL);
   this->SetMinHelp(0);
   this->SetMaxHelp(0);
+
+  this->SetArrayMenu(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinimumLabel(const char* label)
 {
   this->MinLabel->SetLabel(label);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaximumLabel(const char* label)
 {
   this->MaxLabel->SetLabel(label);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinimumHelp(const char* help)
 {
   // This check is needed to prevent errors when using
@@ -128,6 +143,7 @@ void vtkPVMinMax::SetMinimumHelp(const char* help)
   
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaximumHelp(const char* help)
 {
   // This check is needed to prevent errors when using
@@ -237,13 +253,10 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinValue(float val)
 {
+  this->MinScale->SetValue(val);
   if (val > this->MaxScale->GetValue())
     {
-    this->MinScale->SetValue(this->MaxScale->GetValue());
-    }
-  else
-    {
-    this->MinScale->SetValue(val); 
+    this->MaxScale->SetValue(val);
     }
   
   this->ModifiedCallback();
@@ -252,13 +265,10 @@ void vtkPVMinMax::SetMinValue(float val)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaxValue(float val)
 {
+  this->MaxScale->SetValue(val);
   if (val < this->MinScale->GetValue())
     {
-    this->MaxScale->SetValue(this->MinScale->GetValue());
-    }
-  else
-    {
-    this->MaxScale->SetValue(val); 
+    this->MinScale->SetValue(val);
     }
   
   this->ModifiedCallback();
@@ -291,10 +301,24 @@ void vtkPVMinMax::Accept()
   this->Accept(this->ObjectTclName);
 }
 
+//---------------------------------------------------------------------------
+void vtkPVMinMax::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetMaxValue "
+        << this->MaxScale->GetValue() << endl;
+  *file << "$" << root << "(" << this->GetTclName() << ") SetMinValue "
+        << this->MinScale->GetValue() << endl;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Reset(const char* sourceTclName)
 {
+  if (this->SuppressReset)
+    {
+    return;
+    }
+
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
@@ -306,13 +330,75 @@ void vtkPVMinMax::Reset(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Reset()
 {
   this->Reset(this->ObjectTclName);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMinMax::Update()
+{
+  float range[2];
+  float oldRange[2];
+
+  vtkPVArrayInformation *ai;
+
+  if (this->ArrayMenu == NULL)
+    {
+    vtkErrorMacro("Array menu has not been set.");
+    return;
+    }
+
+  ai = this->ArrayMenu->GetArrayInformation();
+  if (ai == NULL || ai->GetName() == NULL)
+    {
+    return;
+    }
+
+  ai->GetComponentRange(0, range);
+
+  if (range[0] > range[1])
+    {
+    vtkErrorMacro("Invalid Data Range");
+    return;
+    }
+  
+  if (range[0] == range[1])
+    {
+    // Special case to avoid log(0).
+    this->MinScale->SetRange(range);
+    this->MaxScale->SetRange(range);
+
+    this->MinScale->SetValue(range[0]);
+    this->MaxScale->SetValue(range[1]);
+    return;
+    }
+
+  // Find the place value resolution.
+  int place = (int)(log10((double)(range[1]-range[2])) - 1.5);
+  double resolution = pow(10.0, (double)(place));
+  // Now find the range at resolution values.
+  range[0] = (float)(floor((double)(range[0]) / resolution) * resolution);
+  range[1] = (float)(ceil((double)(range[1]) / resolution) * resolution);
+
+
+  oldRange[1] = this->MinScale->GetRangeMax();
+  oldRange[0] = this->MinScale->GetRangeMin();
+
+  // Detect when the array has changed.
+  if (oldRange[0] != range[0] || oldRange[1] != range[1])
+    {
+    this->MinScale->SetResolution(resolution);
+    this->MinScale->SetRange(range);
+
+    this->MaxScale->SetResolution(resolution);
+    this->MaxScale->SetRange(range);
+
+    this->MinScale->SetValue(range[0]);
+    this->MaxScale->SetValue(range[1]);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetResolution(float res)
@@ -339,40 +425,43 @@ void vtkPVMinMax::MinValueCallback()
 {
   if (this->MinScale->GetValue() > this->MaxScale->GetValue())
     {
-    this->MinScale->SetValue(this->MaxScale->GetValue());
-    }
-  
-  this->ModifiedCallback();
-}
-
-void vtkPVMinMax::MaxValueCallback()
-{
-  if (this->MaxScale->GetValue() < this->MinScale->GetValue())
-    {
     this->MaxScale->SetValue(this->MinScale->GetValue());
     }
   
   this->ModifiedCallback();
 }
 
-void vtkPVMinMax::SaveInTclScript(ofstream *file)
+//----------------------------------------------------------------------------
+void vtkPVMinMax::MaxValueCallback()
+{
+  if (this->MaxScale->GetValue() < this->MinScale->GetValue())
+    {
+    this->MinScale->SetValue(this->MaxScale->GetValue());
+    }
+  
+  this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::SaveInBatchScriptForPart(ofstream *file,
+                                           const char* sourceTclName)
 {
   char *result;
   
-  *file << this->ObjectTclName << " " << this->SetCommand;
+  *file << sourceTclName << " " << this->SetCommand;
   this->Script("set tempValue [%s %s]", 
-               this->ObjectTclName, 
-               this->GetMinCommand);
+               sourceTclName, this->GetMinCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result;
 
   this->Script("set tempValue [%s %s]", 
-               this->ObjectTclName, 
-               this->GetMaxCommand);
+               sourceTclName, this->GetMaxCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
 }
 
+
+//----------------------------------------------------------------------------
 vtkPVMinMax* vtkPVMinMax::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -380,6 +469,7 @@ vtkPVMinMax* vtkPVMinMax::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVMinMax::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -387,6 +477,15 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVMinMax* pvmm = vtkPVMinMax::SafeDownCast(clone);
   if (pvmm)
     {
+    if (this->ArrayMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVArrayMenu* am = this->ArrayMenu->ClonePrototype(pvSource, map);
+      pvmm->SetArrayMenu(am);
+      am->Delete();
+      }
+
     pvmm->SetMinimumLabel(this->MinLabel->GetLabel());
     pvmm->SetMaximumLabel(this->MaxLabel->GetLabel());
     pvmm->SetMinimumHelp(this->MinHelp);
@@ -410,7 +509,32 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
                                    vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
-  
+
+  // Setup the ArrayMenu.
+  const char* array_menu = element->GetAttribute("array_menu");
+  if(!array_menu)
+    {
+    vtkErrorMacro("No array_menu attribute.");
+    return 0;
+    }
+  vtkPVXMLElement* ame = element->LookupElement(array_menu);
+  if (!ame)
+    {
+    vtkErrorMacro("Couldn't find ArrayMenu element " << array_menu);
+    return 0;
+    }
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+  vtkPVArrayMenu* amw = vtkPVArrayMenu::SafeDownCast(w);
+  if(!amw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get ArrayMenu widget " << array_menu);
+    return 0;
+    }
+  amw->AddDependent(this);
+  this->SetArrayMenu(amw);
+  amw->Delete();  
+
   // Setup the MinimumLabel.
   const char* min_label = element->GetAttribute("min_label");
   if(!min_label)

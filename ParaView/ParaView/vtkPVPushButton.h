@@ -98,6 +98,10 @@ public:
   // This method is called when button is pressed.
   void ExecuteCommand();
 
+  // Description:
+  // Empty method to keep superclass from complaining.
+  virtual void Trace(ofstream *file, const char *root) {};
+
 protected:
   vtkPVPushButton();
   ~vtkPVPushButton();

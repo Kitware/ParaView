@@ -72,7 +72,7 @@ public:
 
   // Description:
   // Save this source to a file.
-  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
+  virtual void SaveInBatchScript(ofstream *file);
 
   virtual void UpdateScalars();
 

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.2");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -169,11 +169,10 @@ void vtkPVGroupInputsWidget::Accept(const char* vtkSourceTclName)
 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag)
+  if (this->ModifiedFlag && this->InitializeTrace())
     {
     this->Inactivate();
-    //this->AddTraceEntry("$kw(%s) SetFunctionLabel",
-    //                     this->GetTclName());
+    this->Trace(pvApp->GetTraceFile(), "kw");
     }
 
   // Now loop through the input mask setting the selection states.
@@ -193,7 +192,7 @@ void vtkPVGroupInputsWidget::Accept(const char* vtkSourceTclName)
     state = this->PartSelectionList->GetSelectState(idx);
     if (state)
       {
-      this->PVSource->SetNthPVInput(count++, pvd);
+      this->PVSource->SetPVInput(count++, pvd);
       // Special replace input feature.
       // Visibility of ALL selected input turned off.
       pvs->SetVisibility(0);
@@ -210,6 +209,25 @@ void vtkPVGroupInputsWidget::Accept(const char* vtkSourceTclName)
   this->ModifiedFlag = 0;
 }
 
+//---------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::SetSelectState(int idx, int val)
+{
+  this->PartSelectionList->SetSelectState(idx, val);
+}
+
+
+//---------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::Trace(ofstream *file, const char* root)
+{
+  int idx, num;
+
+  num = this->PartSelectionList->GetNumberOfItems();
+  for (idx = 0; idx < num; ++idx)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetSelectState "
+          << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::Reset()
@@ -260,7 +278,7 @@ void vtkPVGroupInputsWidget::Reset(const char* vtkSourceTclName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::SaveInTclScript(ofstream *file)
+void vtkPVGroupInputsWidget::SaveInBatchScript(ofstream *file)
 {
 }
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLPackageParser.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkStringList.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -51,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWidget.h"
+#include "vtkPVInputProperty.h"
+#include "vtkPVInputRequirement.h"
 #include "vtkPVWindow.h"
 #include "vtkPVWriter.h"
 #include "vtkPVXMLElement.h"
@@ -58,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.19");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.20");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -119,6 +122,29 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
   pvWidget->SetTraceNameState(vtkPVWidget::Default);
   tname.rdbuf()->freeze(0);
   return pvWidget;
+}
+
+//----------------------------------------------------------------------------
+vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
+                                                      vtkPVXMLElement* element)
+{
+  // Create the object with the instantiator.
+  vtkObject* object = 0;
+  ostrstream name;
+  name << "vtkPVInput" << element->GetName() << ends;
+  object = vtkInstantiator::CreateInstance(name.str());
+  name.rdbuf()->freeze(0);
+  
+  // Make sure we got a widget.
+  vtkPVInputRequirement* pvir = vtkPVInputRequirement::SafeDownCast(object);
+  if(!pvir)
+    {
+    if(object) { object->Delete(); }
+    vtkErrorMacro("Error creating " << element->GetName());
+    return 0;
+    }
+  
+  return pvir;
 }
 
 //----------------------------------------------------------------------------
@@ -399,35 +425,6 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     pvm = vtkPVSource::New();
     }
   
-  // Setup the filter's input type.
-  const char* input = me->GetAttribute("input");
-  if(!input)
-    {
-    vtkErrorMacro("Filter module missing input attribute.");
-    return;
-    }
-
-  const char* start = input;
-  const char* end = 0;
-  
-  // Parse the space-separated list.
-  while(*start)
-    {
-    while(*start && vtkPVXMLPackageParserIsSpace(*start)) { ++start; }
-    end = start;
-    while(*end && !vtkPVXMLPackageParserIsSpace(*end)) { ++end; }
-    int length = end-start;
-    if(length)
-      {
-      char* entry = new char[length+1];
-      strncpy(entry, start, length);
-      entry[length] = '\0';
-      pvm->AddInputClassName(entry);
-      delete [] entry;
-      }
-    start = end;
-    }
-
   // Determines whether the input of this filter will remain
   // visible
   int replace_input;
@@ -464,6 +461,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
   vtkPVApplication *pvApp = this->Window->GetPVApplication();
   pvm->SetApplication(pvApp);
   pvm->SetParametersParent(this->Window->GetMainView()->GetSourceParent());
+  const char* classAttr;
 
   const char* menu_name = me->GetAttribute("menu_name");
   if(menu_name) { pvm->SetMenuName(menu_name); }
@@ -525,17 +523,6 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     command.rdbuf()->freeze(0);
     pvm->SetToolbarModule(1);
     }
-
-  const char* output = me->GetAttribute("output");
-  if (output) 
-    { 
-    pvm->SetOutputClassName(output); 
-    }
-  else
-    {
-    vtkErrorMacro("Module missing output attribute.");
-    return 0;
-    }
   
   // Loop over the elements describing the module.
   unsigned int i;
@@ -545,8 +532,11 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     const char* name = element->GetName();
     if(strcmp(name, "Source") == 0)
       {  // Item describing a VTK source.
-      const char* type = element->GetAttribute("class");
-      if (type) { pvm->SetSourceClassName(type); }
+      classAttr = element->GetAttribute("class");
+      if (classAttr) 
+        { 
+        pvm->SetSourceClassName(classAttr); 
+        }
       else
         {
         vtkErrorMacro("Source missing class.");
@@ -554,27 +544,10 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
         }
       }
     else if (strcmp(name, "Filter") == 0)
-      { // Item describing a VTK filter.
-      const char* type = element->GetAttribute("class");
-      if(type) { pvm->SetSourceClassName(type); }
-      else
+      { // Item describing a VTK filter and inputs.
+      if (this->ParseVTKFilter(element, pvm) == 0)
         {
-        vtkErrorMacro("Filter missing class.");
         return 0;
-        }
-      // Attribute that tells whether the filter takes multiple
-      // inputs.  Different options handle multiple parts differently.
-      type = element->GetAttribute("input_quantity");
-      if (type) 
-        {
-        if (strcmp(type, "Single") == 0)
-          {
-          pvm->SetVTKMultipleInputFlag(0);
-          }
-        else if (strcmp(type, "Multiple"))
-          { 
-          pvm->SetVTKMultipleInputFlag(1);
-          } 
         }
       }
     else
@@ -596,6 +569,109 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 
   return 1;
 }
+
+
+
+//----------------------------------------------------------------------------
+// Parses information about a VTK source and inputs.
+int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement, 
+                                          vtkPVSource* pvm)
+{
+  vtkPVXMLElement* inputElement;
+  vtkPVXMLElement* rElement;
+  unsigned int rIdx;
+  const char* classAttr;
+  const char* quantityAttr;
+
+  //static int hack = 1;
+  //if (hack)
+  //  {
+  //  Sleep(15000);
+  //  hack = 0;
+  //  }
+
+  classAttr = filterElement->GetAttribute("class");
+  if (classAttr) 
+    { 
+    pvm->SetSourceClassName(classAttr); 
+    }
+  else
+    {
+    vtkErrorMacro("Filter missing class.");
+    return 0;
+    }
+
+  // Loop over inputs of filter.
+  unsigned int filterIdx;
+  for(filterIdx=0; filterIdx < filterElement->GetNumberOfNestedElements(); ++filterIdx)
+    {
+    inputElement = filterElement->GetNestedElement(filterIdx);
+    const char* inputElementName = inputElement->GetName();
+    if (strcmp(inputElementName, "Input") == 0)
+      { // Item describing a VTK filter input.
+      // Get name (used for set/add method) of input from attribute.
+      const char* inputName = inputElement->GetAttribute("name");
+      if (inputName == NULL) 
+        { 
+        vtkErrorMacro("Input missing name. " << classAttr);
+        return 0;
+        }
+
+      // Get the class name for this input.
+      const char* inputClass = inputElement->GetAttribute("class");
+      if(!inputClass)
+        {
+        vtkErrorMacro("Input element missing input attribute. " << classAttr);
+        return 0;
+        }
+      vtkPVInputProperty *prop = pvm->GetInputProperty(inputName);
+      prop->SetType(inputClass);
+
+      // Attribute that tells whether the filter uses AddInput.
+      quantityAttr = inputElement->GetAttribute("quantity");
+      if (quantityAttr) 
+        {
+        if (strcmp(quantityAttr, "Multiple") == 0 || 
+            strcmp(quantityAttr, "multiple") == 0)
+          { 
+          pvm->SetVTKMultipleInputsFlag(1);
+          }
+        } 
+
+      // We allow only one input with quantity "Multiple".
+      // Let the user know of a violation.
+      if (pvm->GetVTKMultipleInputsFlag() && 
+          pvm->GetNumberOfInputProperties() > 1)
+        {
+        vtkWarningMacro("Only one 'multiple' input is allowed. " << classAttr);
+        return 0;
+        }
+
+      // Find all restrictions for this input.
+      for(rIdx=0; rIdx < inputElement->GetNumberOfNestedElements(); ++rIdx)
+        {
+        rElement = inputElement->GetNestedElement(rIdx);
+        vtkPVInputRequirement *pvir;
+        pvir = this->CreatePVInputRequirement(rElement);
+        if(!pvir) { return 0; }
+
+        if(!pvir->ReadXMLAttributes(rElement, this))
+          {
+          pvir->Delete();
+          pvir = 0;
+          }
+        prop->AddRequirement(pvir);
+        pvir->Delete();      
+        }
+      }
+    else
+      { // Only input elements inside filter element.
+      vtkWarningMacro("UnKnown XML element (" << inputElementName 
+                      << ") in filter: " << classAttr);
+      }
+    }
+  return 1;
+}  
 
 //----------------------------------------------------------------------------
 int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)

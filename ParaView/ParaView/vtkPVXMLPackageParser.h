@@ -57,6 +57,7 @@ class vtkArrayMap;
 class vtkPVSource;
 class vtkPVWindow;
 class vtkPVWidget;
+class vtkPVInputRequirement;
 
 class VTK_EXPORT vtkPVXMLPackageParser : public vtkPVXMLParser
 {
@@ -88,6 +89,8 @@ protected:
   void CreateWriter(vtkPVXMLElement* ma);
   int CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm);
   int LoadLibrary(vtkPVXMLElement* le);
+  int ParseVTKFilter(vtkPVXMLElement* filterElement, 
+                     vtkPVSource* pvm);
   
   //BTX
   typedef vtkArrayMap<vtkPVXMLElement*, vtkPVWidget*> InternalWidgetMap;
@@ -107,6 +110,7 @@ protected:
 private:  
   // Used by GetPVWidget.  Do not call directly.
   vtkPVWidget* CreatePVWidget(vtkPVXMLElement* element);
+  vtkPVInputRequirement* CreatePVInputRequirement(vtkPVXMLElement* element);
 
 private:
   vtkPVXMLPackageParser(const vtkPVXMLPackageParser&);  // Not implemented.

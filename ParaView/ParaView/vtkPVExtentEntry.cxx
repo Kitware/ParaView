@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.15");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -242,13 +242,7 @@ void vtkPVExtentEntry::Accept(const char* sourceTclName)
 
   if (traceFlag)
     {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetValue ";
-    for(int i=0; i<3; i++)
-      {
-      *traceFile << this->MinMax[i]->GetMinValue() << " "
-                 << this->MinMax[i]->GetMaxValue() << " ";
-      }
-    *traceFile << endl;
+    this->Trace(traceFile, "kw");
     }
 
   pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
@@ -267,6 +261,21 @@ void vtkPVExtentEntry::Accept()
 {
   this->Accept(this->ObjectTclName);
 }
+
+
+//---------------------------------------------------------------------------
+void vtkPVExtentEntry::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetValue ";
+  for(int i=0; i<3; i++)
+    {
+    *file << this->MinMax[i]->GetMinValue() << " "
+          << this->MinMax[i]->GetMaxValue() << " ";
+    }
+  *file << endl;
+}
+
+
 
 //---------------------------------------------------------------------------
 void vtkPVExtentEntry::Reset(const char* sourceTclName)

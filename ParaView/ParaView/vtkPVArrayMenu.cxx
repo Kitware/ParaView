@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.34");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 
@@ -437,7 +437,7 @@ void vtkPVArrayMenu::Accept(const char* sourceTclName)
                            this->SelectedComponent);
     this->AddTraceEntry("$kw(%s) SetSelectedComponent {%s}", 
                         this->GetTclName(), 
-                        this->ArrayName);
+                        this->SelectedComponent);
     }
 
   this->ModifiedFlag = 0;
@@ -449,6 +449,28 @@ void vtkPVArrayMenu::Accept()
 {
   this->Accept(this->ObjectTclName);
 }
+
+//---------------------------------------------------------------------------
+void vtkPVArrayMenu::Trace(ofstream *file, const char* root)
+{
+  if (this->ArrayName)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetValue {"
+          << this->ArrayName << "}" << endl;
+    }
+  else
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") SetValue {}\n";
+    }
+
+  if (this->ShowComponentMenu)
+    {
+    *file << "$" << root << "(" << this->GetTclName() << ") "
+          << "SetSelectedComponent " << this->SelectedComponent << endl;
+    }
+
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Reset(const char* sourceTclName)
@@ -498,16 +520,17 @@ void vtkPVArrayMenu::Reset()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::SaveInTclScript(ofstream *file)
+void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
+                                              const char* sourceTclName)
 {
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
     this->AttributeType);
 
-  if (this->ObjectTclName == NULL)
+  if (sourceTclName == NULL)
     {
-    vtkErrorMacro("Subclass must not have implemented SaveInTclScript. " 
+    vtkErrorMacro("Sanity check failed. " 
                   << this->GetClassName());
     return;
     }
@@ -515,19 +538,19 @@ void vtkPVArrayMenu::SaveInTclScript(ofstream *file)
   if (this->ArrayName)
     {
     *file << "\t";
-    *file << this->ObjectTclName << " Select" << this->InputName
+    *file << sourceTclName << " Select" << this->InputName
           << attributeName << " {" << this->ArrayName << "}\n";
     }
   else
     {
     *file << "\t";
-    *file << this->ObjectTclName << " Select" << this->InputName
+    *file << sourceTclName << " Select" << this->InputName
           << attributeName << " {}\n";
     }
   if (this->ShowComponentMenu)
     {
     *file << "\t";
-    *file << this->ObjectTclName << " Select" << this->InputName
+    *file << sourceTclName << " Select" << this->InputName
           << attributeName << "Component "  << this->SelectedComponent << endl;
     }
 }

@@ -70,7 +70,7 @@ public:
 
   // Description:
   // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
+  void SaveInBatchScript(ofstream *file);
 
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
@@ -87,6 +87,14 @@ public:
   // Button callbacks.
   void AllOnCallback();
   void AllOffCallback();
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file, const char *root);
+
+  // Description:
+  // Access metod necessary for scripting.
+  void SetSelectState(int idx, int val);
 
 protected:
   vtkPVExtractPartsWidget();

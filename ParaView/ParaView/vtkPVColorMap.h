@@ -166,7 +166,7 @@ public:
 
   // Description:
   // Save out the mapper and actor to a file.
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
+  void SaveInBatchScript(ofstream *file);
     
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.

@@ -215,19 +215,21 @@ public:
   
   // Description:
   // Access from script for regression test.
-  void SaveInTclScript(const char *filename, int vtkFlag);
+  void SaveBatchScript(const char *filename);
 
   // Description:
   // Save the pipeline as a tcl script. Callback from menu.
   // Promps for a file name.
-  void ExportVTKScript();
+  void SaveBatchScript();
 
   // Description:
-  // This method is used strictly for testing the export VTK script feature.
-  // It clears all sources and color maps, and then loads a script
-  // which was generated with the vtkFlag off.  
-  // This only loads the script on process 0. 
-  void ImportVTKScript(const char *fileName);
+  // Like trace, but only final state.
+  void SaveState(const char *filename);
+
+  // Description:
+  // Save the state as a tcl script. Callback from menu.
+  // Promps for a file name.
+  void SaveState();
 
   // Description:
   // Copy the trace file to a file with the specified file name.

@@ -102,12 +102,6 @@ public:
   // Get the bounds of the current mapper.
   float *GetBounds();
 
-  // Description:
-  // A flag to disable reduction.
-  vtkSetMacro(EnableLOD, int);
-  vtkGetMacro(EnableLOD, int);
-  vtkBooleanMacro(EnableLOD, int);
-
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();

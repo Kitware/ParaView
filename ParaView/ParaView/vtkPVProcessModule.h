@@ -119,6 +119,16 @@ public:
   // This initializes the data object to request the correct partiaion.
   virtual void InitializePVPartPartition(vtkPVPart* part);
 
+  // Description:
+  // This executes a script on process 0 of the server.
+  // Used mainly for client server operation.
+  // Getting the result returns a string which has to be deleted.
+//BTX
+  void  RootScript(char *EventString, ...);
+//ETX
+  virtual void  RootSimpleScript(const char *str);
+  virtual char* NewRootResult();
+
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.21");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -198,7 +198,9 @@ void vtkPVSelectWidget::Accept(const char* sourceTclName)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ModifiedFlag)
-    {  
+    {
+    // We cannot call Trace(...) here because it does not 
+    // check modified or initialize and it calles trace on sub widgets.
     this->AddTraceEntry("$kw(%s) SetCurrentValue {%s}", this->GetTclName(), 
                          this->GetCurrentValue());
     }
@@ -221,7 +223,26 @@ void vtkPVSelectWidget::Accept(const char* sourceTclName)
 
   this->ModifiedFlag = 0;
 }
-  
+
+//---------------------------------------------------------------------------
+void vtkPVSelectWidget::Trace(ofstream *file, const char* root)
+{
+  *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
+        << this->GetCurrentValue() << endl;
+
+  if (this->CurrentIndex >= 0)
+    {
+    vtkPVWidget *pvw;
+    pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    *file << "set " << root << "(" << pvw->GetTclName() << ") "
+          << "[$" << root << "(" << this->GetTclName() << ") "
+          << "GetPVWidget {" << pvw->GetTraceName() << "}]" << endl;
+
+    pvw->Trace(file, root);
+    }
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVSelectWidget::Accept()
 {
@@ -458,20 +479,26 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   this->ModifiedCallback();
 }
 
-
-
 //----------------------------------------------------------------------------
-void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
+void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
   vtkPVWidget *pvw;
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
-  pvw->SaveInTclScript(file);
+  pvw->SaveInBatchScript(file);
  
-  this->Script("%s Get%s",this->ObjectTclName,this->VariableName);
+  // Supper class loops over parts and calls SaveInBatchScriptForPart.
+  this->Superclass::SaveInBatchScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file, 
+                                                 const char* sourceTclName)
+{
+  this->Script("%s Get%s",sourceTclName,this->VariableName);
   const char *tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
   if (tmp && strlen(tmp) > 0)
     {
-    *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+    *file << "\t" << sourceTclName << " Set" << this->VariableName
           << " " << this->GetCurrentVTKValue() << endl;
     }
 }

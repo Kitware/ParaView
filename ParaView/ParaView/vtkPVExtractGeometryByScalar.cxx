@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.10");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.11");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
@@ -81,7 +81,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  this->AddInputMenu("Input", "PVInput", "vtkUnstructuredGrid",
+  this->AddInputMenu("Input", "PVInput",
                      "Select the input for the filter.",
                      this->GetPVWindow()->GetSourceList("Sources"));
   
@@ -93,7 +93,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   
   float range[2];
   vtkPVArrayInformation *ai;
-  ai = this->GetPVInput()->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  ai = this->GetPVInput(0)->GetDataInformation()->GetPointDataInformation()->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
   if (ai)
     {
     ai->GetComponentRange(0, range);
@@ -115,9 +115,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVExtractGeometryByScalar::SaveInTclScript(
-  ofstream* vtkNotUsed(file), int vtkNotUsed(interactiveFlag), 
-  int vtkNotUsed(vtkFlag))
+void vtkPVExtractGeometryByScalar::SaveInBatchScript(ofstream*)
 {
 }
 

@@ -122,6 +122,13 @@ public:
   // Module dependant method for collecting data information from all procs.
   virtual void GatherDataInformation(vtkDataSet *data);
 
+  // Description:
+  // This executes a script on process 0 of the server.
+  // Used mainly for client server operation.
+  // Getting the result returns a string which has to be deleted.
+  virtual void  RootSimpleScript(const char *str);
+  virtual char* NewRootResult();
+
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

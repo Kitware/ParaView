@@ -56,12 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
-#include "vtkPVPassThrough.h"
 #include "vtkStructuredGrid.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.12");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -82,7 +81,6 @@ vtkPVPLOT3DReaderModule::~vtkPVPLOT3DReaderModule()
 void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 {
   const char* tclName = this->GetVTKSourceTclName();
-  char *outputTclName, *connectionTclName;
   vtkPVData *pvd = 0;
   int i;
   vtkPVWindow* window = this->GetPVWindow();
