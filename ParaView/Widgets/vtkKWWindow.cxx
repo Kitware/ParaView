@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.186");
+vtkCxxRevisionMacro(vtkKWWindow, "1.187");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1675,11 +1675,15 @@ void vtkKWWindow::UpdateEnableState()
   this->PropagateEnableState(this->SelectedView);
   this->PropagateEnableState(this->MiddleFrame);
   this->PropagateEnableState(this->StatusFrame);
-  this->PropagateEnableState(this->StatusImage);
   this->PropagateEnableState(this->StatusLabel);
   this->PropagateEnableState(this->PropertiesParent);
   this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->MenuBarSeparatorFrame);
+
+  // Do not disable the status image, it has not functionality attached 
+  // anyway, and is used to display the application logo: disabling it 
+  // makes it look ugly.
+  //this->PropagateEnableState(this->StatusImage);
 
   // Given the state, can we close or not ?
 
