@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.25");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -989,7 +989,8 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
             << pos[0] << " " << pos[1] << "\n";
       *file << "\t" << scalarBarTclName << " SetTitle {" 
             << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
-      *file << "Ren1 AddActor " << scalarBarTclName << endl;
+      *file << this->GetPVRenderView()->GetRendererTclName() 
+            << " AddActor " << scalarBarTclName << endl;
       }
     }
 }
