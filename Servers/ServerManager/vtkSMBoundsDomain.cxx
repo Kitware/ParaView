@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.5");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -116,7 +116,7 @@ void vtkSMBoundsDomain::UpdateOriented()
       }
 
     double min = dist[0], max = dist[0];
-    for (int i=1; i<8; i++)
+    for (i=1; i<8; i++)
       {
       if ( dist[i] < min )
         {

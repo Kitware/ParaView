@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneProxy::vtkSMImplicitPlaneProxy()
@@ -50,14 +50,15 @@ void vtkSMImplicitPlaneProxy::UpdateVTKObjects()
                   "Please make sure that the configuration file is correct.");
     return;
     }
-  for (unsigned int i=0; i<3; i++)
+  unsigned int i;
+  for (i=0; i<3; i++)
     {
     origin[i] = this->Origin[i] + this->Offset*normal->GetElement(i);
     }
 
   vtkClientServerStream str;
-  int numObjects = this->GetNumberOfIDs();
-  for (int i=0; i<numObjects; i++)
+  unsigned int numObjects = this->GetNumberOfIDs();
+  for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke
         << this->GetID(i) << "SetOrigin" << origin[0] << origin[1] << origin[2]
