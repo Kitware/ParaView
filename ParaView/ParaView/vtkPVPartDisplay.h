@@ -73,9 +73,11 @@ public:
   virtual void SetPVApplication(vtkPVApplication *pvApp);
   vtkGetObjectMacro(PVApplication,vtkPVApplication);
 
+  //BTX
   // Description:
   // Connect the geometry filter to the display pipeline.
   virtual void ConnectToGeometry(vtkClientServerID );
+  //ETX
 
   // Description:
   // This method updates the piece that has been assigned to this process.

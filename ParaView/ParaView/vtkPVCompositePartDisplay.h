@@ -46,10 +46,12 @@ public:
   virtual void SetLODCollectionDecision(int val);
   vtkGetMacro(LODCollectionDecision, int);
 
+  //BTX
   // Description:
   // Connect the geometry filter to the display pipeline.
   virtual void ConnectToGeometry(vtkClientServerID geometryID);
-          
+  //ETX
+
   // Description:
   // Collection filters for both levels of detail.
   vtkGetMacro(CollectID, vtkClientServerID);
