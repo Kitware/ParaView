@@ -184,6 +184,16 @@ public:
   // Also reset the vtkClientServerStream object.
   virtual void SendStreamToClientAndServerRoot();
 
+  // Description:
+  // Send the stream represented by the given string to the client,
+  // server, or both.  This should not be called by C++ code and is
+  // provided only for debugging and testing purposes.  Returns 1 if
+  // the string is successfully parsed and 0 otherwise.
+  virtual int SendStringToClient(const char*);
+  virtual int SendStringToClientAndServer(const char*);
+  virtual int SendStringToServer(const char*);
+  virtual int SendStringToServerRoot(const char*);
+
   //BTX
   // Description:
   // Get the interpreter used on the local process.

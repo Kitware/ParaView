@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.29");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.30");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -510,4 +510,48 @@ int vtkPVProcessModule::LoadModule(const char* name)
 int vtkPVProcessModule::LoadModuleInternal(const char* name)
 {
   return this->Interpreter->Load(name);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::SendStringToClient(const char* str)
+{
+  if(!this->ClientServerStream->StreamFromString(str))
+    {
+    return 0;
+    }
+  this->SendStreamToClient();
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::SendStringToClientAndServer(const char* str)
+{
+  if(!this->ClientServerStream->StreamFromString(str))
+    {
+    return 0;
+    }
+  this->SendStreamToClientAndServerRoot();
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::SendStringToServer(const char* str)
+{
+  if(!this->ClientServerStream->StreamFromString(str))
+    {
+    return 0;
+    }
+  this->SendStreamToServer();
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::SendStringToServerRoot(const char* str)
+{
+  if(!this->ClientServerStream->StreamFromString(str))
+    {
+    return 0;
+    }
+  this->SendStreamToServerRoot();
+  return 1;
 }
