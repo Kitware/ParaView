@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.23");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.24");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -283,8 +283,8 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   *file << "$pv(" << this->GetPVWindow()->GetTclName() << ") OpenCustom {" 
         << this->GetModuleName() << "} {" 
         << this->FileEntry->GetValue() << "}\n"; 
-  *file << "set $pv(" << this->GetTclName() << ") [$pv("
-        << this->GetPVWindow()->GetTclName() << "GetCurrentPVSource]\n";
+  *file << "set pv(" << this->GetTclName() << ") [$pv("
+        << this->GetPVWindow()->GetTclName() << ") GetCurrentPVSource]\n";
 }
 
 
