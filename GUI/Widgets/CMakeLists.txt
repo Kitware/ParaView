@@ -38,8 +38,11 @@ SET( KWWidgets_SRCS
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
   vtkKWGenericRenderWindowInteractor.cxx
+  vtkKWHistogram.cxx
+  vtkKWHistogramSet.cxx
   vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotation.cxx 
+  vtkKWIcon.cxx
   vtkKWLabel.cxx
   vtkKWLabeledCheckButton.cxx
   vtkKWLabeledCheckButtonSet.cxx 
@@ -193,6 +196,8 @@ ENDIF (WIN32)
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
+
+SUBDIRS(Utilities)
 
 IF(VTK_WRAP_TCL)
   VTK_WRAP_TCL2(KWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
