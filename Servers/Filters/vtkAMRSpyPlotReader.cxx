@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.7");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.8");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -322,6 +322,14 @@ void vtkAMRSpyPlotReader::ExecuteInformation()
   ifs.close();
   if ( strcmp(buffer, "spydata") == 0 )
     {
+    
+    // Set case file name and clean/initialize file map
+    this->SetCurrentFileName(this->FileName);
+    this->Internals->Clean();
+    
+    // Add filename to filemap
+    this->Internals->Files[this->FileName] = spcth_initialize();
+    
     this->UpdateMetaData(this->FileName);
     this->GetOutput()->SetMaximumNumberOfPieces(1);
     }
