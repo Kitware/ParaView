@@ -110,7 +110,7 @@ $kw(vtkTemp1162) AddValue 170
 $kw(vtkTemp1162) AddValue 120
 $kw(vtkTemp1162) AddValue 50
 set kw(vtkTemp1169) [$kw(vtkTemp1156) GetPVWidget {Compute Normals}]
-$kw(vtkTemp1169) SetState 1
+$kw(vtkTemp1169) SetState 0
 set kw(vtkTemp1172) [$kw(vtkTemp1156) GetPVWidget {Compute Gradients}]
 $kw(vtkTemp1172) SetState 0
 set kw(vtkTemp1175) [$kw(vtkTemp1156) GetPVWidget {Compute Scalars}]
