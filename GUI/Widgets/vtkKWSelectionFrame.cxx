@@ -19,11 +19,12 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWIcon.h"
 #include "vtkKWToolbarSet.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.24");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -31,10 +32,12 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBar              = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
+  this->CloseButton           = vtkKWPushButton::New();
   this->ToolbarSet            = vtkKWToolbarSet::New();
   this->TitleBarRightSubframe = vtkKWFrame::New();
   this->BodyFrame             = vtkKWFrame::New();
 
+  this->CloseCommand          = NULL;
   this->SelectionListCommand  = NULL;
   this->SelectCommand         = NULL;
   this->DoubleClickCommand    = NULL;
@@ -57,6 +60,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 
   this->Selected          = 0;
   this->ShowSelectionList = 1;
+  this->ShowCloseButton = 0;
   this->ShowToolbarSet    = 0;
 }
 
@@ -81,6 +85,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     this->SelectionList = NULL;
     }
 
+  if (this->CloseButton)
+    {
+    this->CloseButton->Delete();
+    this->CloseButton = NULL;
+    }
+
   if (this->TitleBarRightSubframe)
     {
     this->TitleBarRightSubframe->Delete();
@@ -97,6 +107,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     {
     this->BodyFrame->Delete();
     this->BodyFrame = NULL;
+    }
+
+  if (this->CloseCommand)
+    {
+    delete [] this->CloseCommand;
+    this->CloseCommand = NULL;
     }
 
   if (this->SelectionListCommand)
@@ -143,16 +159,24 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->SelectionList->IndicatorOff();
   this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
 
+  // The close button
+
+  this->CloseButton->SetParent(this->TitleBar);
+  this->CloseButton->Create(app, NULL);
+  this->CloseButton->SetImageOption(vtkKWIcon::ICON_SHRINK);
+  this->CloseButton->SetCommand(this, "CloseCallback");
+  this->CloseButton->SetBalloonHelpString("Close window");
+
   // The title itself
 
   this->Title->SetParent(this->TitleBar);
-  this->Title->Create(app, NULL);
+  this->Title->Create(app, "-justify left -anchor w");
   this->Title->SetLabel("<Click to Select>");
   
   // The subframe on the right
 
   this->TitleBarRightSubframe->SetParent(this->TitleBar);
-  this->TitleBarRightSubframe->Create(app, NULL);
+  this->TitleBarRightSubframe->Create(app, "");
 
   // The toobar
 
@@ -197,7 +221,7 @@ void vtkKWSelectionFrame::Pack()
   if (this->TitleBar->IsCreated())
     {
     tk_cmd << "pack " << this->TitleBar->GetWidgetName()
-           << " -side top -fill x -expand no" << endl;
+           << " -side top -fill x -expand n" << endl;
     }
 
   if (this->ShowSelectionList && this->SelectionList->IsCreated())
@@ -209,15 +233,22 @@ void vtkKWSelectionFrame::Pack()
   if (this->Title->IsCreated())
     {
     tk_cmd << "pack " << this->Title->GetWidgetName()
-           << " -side left -anchor w -fill y" << endl;
+           << " -side left -anchor w -fill x -expand y" << endl;
     }
   
   if (this->TitleBarRightSubframe->IsCreated())
     {
     tk_cmd << "pack " << this->TitleBarRightSubframe->GetWidgetName()
-           << " -side right -anchor e -padx 4" << endl;
+           << " -side left -anchor e -padx 2 -fill x -expand n" << endl;
     }
   
+  if (this->ShowCloseButton && this->CloseButton->IsCreated())
+    {
+    tk_cmd << "pack " << this->CloseButton->GetWidgetName()
+           << " -side left -anchor e -fill y -padx 1 -pady 1 ";
+    tk_cmd << endl;
+    }
+
   if (this->ShowToolbarSet && this->ToolbarSet->IsCreated())
     {
     tk_cmd << "pack " << this->ToolbarSet->GetWidgetName()
@@ -410,6 +441,20 @@ void vtkKWSelectionFrame::SetShowSelectionList(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetShowCloseButton(int arg)
+{
+  if (this->ShowCloseButton == arg)
+    {
+    return;
+    }
+
+  this->ShowCloseButton = arg;
+
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetShowToolbarSet(int arg)
 {
   if (this->ShowToolbarSet == arg)
@@ -487,6 +532,13 @@ void vtkKWSelectionFrame::SetSelectionListCommand(vtkKWObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetCloseCommand(vtkKWObject *object,
+                                          const char *method)
+{
+  this->SetObjectMethodCommand(&this->CloseCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
                                                     const char *method)
 {
@@ -507,6 +559,16 @@ void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
     {
     this->Script("eval {%s {%s} %s}",
                  this->SelectionListCommand, menuItem, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::CloseCallback()
+{
+  if (this->CloseCommand)
+    {
+    this->Script("eval {%s %s}",
+                 this->CloseCommand, this->GetTclName());
     }
 }
 
@@ -546,10 +608,18 @@ void vtkKWSelectionFrame::UpdateEnableState()
 
   this->PropagateEnableState(this->TitleBar);
   this->PropagateEnableState(this->SelectionList);
+  this->PropagateEnableState(this->CloseButton);
   this->PropagateEnableState(this->Title);
   this->PropagateEnableState(this->TitleBarRightSubframe);
   this->PropagateEnableState(this->ToolbarSet);
   this->PropagateEnableState(this->BodyFrame);
+
+  if (this->SelectionList && 
+      this->SelectionList->GetMenu() &&
+      !this->SelectionList->GetMenu()->GetNumberOfItems())
+    {
+    this->SelectionList->SetEnabled(0);
+    }
 
   if (this->Enabled)
     {
@@ -570,6 +640,7 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
      << endl;
   os << indent << "SelectionList: " << this->SelectionList << endl;
+  os << indent << "CloseButton: " << this->CloseButton << endl;
   os << indent << "ToolbarSet: " << this->ToolbarSet << endl;
   os << indent << "TitleColor: ("
      << this->TitleColor[0] << ", " 
@@ -589,6 +660,7 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundSelectedColor[2] << ")" << endl;
   os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
   os << indent << "ShowSelectionList: " << (this->ShowSelectionList ? "On" : "Off") << endl;
+  os << indent << "ShowCloseButton: " << (this->ShowCloseButton ? "On" : "Off") << endl;
   os << indent << "ShowToolbarSet: " << (this->ShowToolbarSet ? "On" : "Off") << endl;
 }
 

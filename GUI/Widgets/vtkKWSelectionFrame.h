@@ -22,6 +22,7 @@
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
+class vtkKWPushButton;
 class vtkKWToolbarSet;
 
 class VTK_EXPORT vtkKWSelectionFrame : public vtkKWWidget
@@ -60,6 +61,17 @@ public:
   vtkGetMacro(ShowSelectionList, int);
   vtkBooleanMacro(ShowSelectionList, int);
   vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
+
+  // Description:
+  // Show/Hide the close button
+  // Set the close command, called when the frame is closed by the user.
+  // This command will be passed a pointer to this object.
+  virtual void SetCloseCommand(
+    vtkKWObject *object, const char *method);
+  virtual void SetShowCloseButton(int);
+  vtkGetMacro(ShowCloseButton, int);
+  vtkBooleanMacro(ShowCloseButton, int);
+  vtkGetObjectMacro(CloseButton, vtkKWPushButton);
 
   // Description:
   // Set the select command, called when the frame is selected by the user
@@ -105,6 +117,7 @@ public:
 
   // Description:
   // Callbacks
+  virtual void CloseCallback();
   virtual void SelectionListCallback(const char *menuItem);
   virtual void SelectCallback();
   virtual void DoubleClickCallback();
@@ -129,6 +142,7 @@ protected:
   
   vtkKWFrame      *TitleBar;
   vtkKWMenuButton *SelectionList;
+  vtkKWPushButton *CloseButton;
   vtkKWToolbarSet *ToolbarSet;
   vtkKWLabel      *Title;
   vtkKWFrame      *TitleBarRightSubframe;
@@ -146,12 +160,14 @@ protected:
   float TitleBackgroundColor[3];
   float TitleBackgroundSelectedColor[3];
 
+  char *CloseCommand;
   char *SelectionListCommand;
   char *SelectCommand;
   char *DoubleClickCommand;
 
   int Selected;
   int ShowSelectionList;
+  int ShowCloseButton;
   int ShowToolbarSet;
 
 private:
