@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.13");
+vtkCxxRevisionMacro(vtkKWIcon, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -442,6 +442,14 @@ void vtkKWIcon::SetImageData(int image)
         image_transfer_width, image_transfer_height,
         image_transfer_pixel_size, 
         image_transfer_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRASHCAN:
+      this->SetImageData(
+        image_trashcan, 
+        image_trashcan_width, image_trashcan_height,
+        image_trashcan_pixel_size, 
+        image_trashcan_buffer_length);
       break;
       
     case vtkKWIcon::ICON_WARNING:
