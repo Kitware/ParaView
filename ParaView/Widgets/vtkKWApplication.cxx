@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.130");
+vtkCxxRevisionMacro(vtkKWApplication, "1.131");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1296,6 +1296,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
      << endl;
   os << indent << "ExitOnReturn: " << (this->ExitOnReturn ? "on":"off") << endl;
+  os << indent << "InExit: " << (this->InExit ? "on":"off") << endl;
   if (this->SplashScreen)
     {
     os << indent << "SplashScreen: " << this->SplashScreen << endl;
