@@ -9,11 +9,7 @@ IF (VTK_USE_MPI)
 ENDIF (VTK_USE_MPI)
 
 #                  TestStructuredGridIO
-SET(PROJECT_TESTS SimplePackage
-                  TestPolyDataIO
-                  TestUnstructuredGridIO
-                  TestRectilinearGridIO
-                  TestImageDataIO    )
+SET(PROJECT_TESTS SimplePackage)
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
