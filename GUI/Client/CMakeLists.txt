@@ -261,6 +261,20 @@ MACRO(PARAVIEW_LINK_LIBRARIES LIBS)
 ENDMACRO(PARAVIEW_LINK_LIBRARIES LIBS)
 
 #
+# Adds extra ParaView link directories
+#
+MACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES DIRS)
+  SET(current_dirs ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+  FOREACH(dir ${DIRS})
+    IF(${current_dirs} MATCHES ${dir})
+    ELSE(${current_dirs} MATCHES ${dir})
+      SET(current_dirs ${current_dirs} ${dir})
+    ENDIF(${current_dirs} MATCHES ${dir})
+  ENDFOREACH(dir)
+  SET(PARAVIEW_EXTRA_LINK_DIRECTORIES "${current_dirs}" CACHE INTERNAL "")
+ENDMACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES)
+
+#
 # Imported project adds source files
 # This ones need to be fixed, so that first are not wrapped. This will be fixed
 # once the server changes are merged.
