@@ -79,7 +79,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.9");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.10");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -571,18 +571,32 @@ const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename,
                                                      const char *dir, 
                                                      char *try_fname)
 {
+  if (!filename || !dir || !try_fname)
+    {
+    return 0;
+    }
+
   // Get the basename of 'filename'
 
   char *filename_base = new char [strlen(filename) + 1];
   vtkKWDirectoryUtilities::GetFilenameName(filename, filename_base);
 
-  // Check if 'dir' is really a directory
+  // Check if 'dir' is really a directory 
+  // If win32 and is like C:, accept it as a dir
 
   char *real_dir = 0;
   if (!vtkKWDirectoryUtilities::FileIsDirectory(dir))
     {
-    real_dir = new char [strlen(dir) + 1];
-    dir = vtkKWDirectoryUtilities::GetFilenamePath(dir, real_dir);
+#if _WIN32
+    size_t dir_len = strlen(dir);
+    if (dir[dir_len - 1] != ':')
+      {
+#endif
+      real_dir = new char [strlen(dir) + 1];
+      dir = vtkKWDirectoryUtilities::GetFilenamePath(dir, real_dir);
+#if _WIN32
+      }
+#endif
     }
 
   // Try to find the file in 'dir'
@@ -590,8 +604,11 @@ const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename,
   char *res = 0;
   if (filename_base && dir)
     {
+    size_t dir_len = strlen(dir);
+    int has_slash = 
+      (dir_len && (dir[dir_len - 1] == '/' || dir[dir_len - 1] == '\\'));
     sprintf(try_fname, "%s%s%s", 
-            real_dir, (*real_dir ? "/" : ""), filename_base);
+            dir, (has_slash ? "" : "/"), filename_base);
     if (vtkKWDirectoryUtilities::FileExists(try_fname))
       {
       res = try_fname;
