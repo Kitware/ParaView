@@ -123,7 +123,8 @@ protected:
   void ResizeBottomRight();
   
   void SquareRenderer();
-  
+
+  unsigned long StartEventObserverId;  
 private:
   vtkPVAxesWidget(const vtkPVAxesWidget&);  // Not implemented
   void operator=(const vtkPVAxesWidget&);  // Not implemented

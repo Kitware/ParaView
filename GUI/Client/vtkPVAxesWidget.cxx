@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -58,6 +58,8 @@ public:
 
 vtkPVAxesWidget::vtkPVAxesWidget()
 {
+  this->StartEventObserverId = 0;
+
   this->EventCallbackCommand->SetCallback(vtkPVAxesWidget::ProcessEvents);
   
   this->Observer = vtkPVAxesWidgetObserver::New();
@@ -154,7 +156,8 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     this->AxesActor->SetVisibility(1);
     // We need to copy the camera before the compositing observer is called.
     // Compositing temporarily changes the camera to display an image.
-    this->ParentRenderer->AddObserver(vtkCommand::StartEvent,this->Observer,1);
+    this->StartEventObserverId = 
+      this->ParentRenderer->AddObserver(vtkCommand::StartEvent,this->Observer,1);
     this->InvokeEvent(vtkCommand::EnableEvent, NULL);
     }
   else
@@ -171,7 +174,10 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     if (this->ParentRenderer)
       {
       this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
-      this->ParentRenderer->RemoveObserver(vtkCommand::StartEvent);
+      if (this->StartEventObserverId != 0)
+        {
+        this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
+        }
       }
     
     this->InvokeEvent(vtkCommand::DisableEvent, NULL);
