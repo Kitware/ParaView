@@ -73,7 +73,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.37");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -109,6 +109,9 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->TraceName = 0;
   this->TimeStart = 0;
   this->TimeEnd = 100;
+  this->TimeEquationStyle = 0;
+  this->TimeEquationPhase = 0.;
+  this->TimeEquationFrequency = 1.;
   this->TimeEquation = 0;
   this->Label = 0;
 
@@ -267,6 +270,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->TimeEquationFrequencyEntry->Create( pvApp, 0 );
   this->TimeEquationFrequencyEntry->SetValue( 1. );
   this->TimeEquationFrequencyEntry->SetMinimumValue( 0. );
+  this->TimeEquationFrequencyEntry->SetClampMinimumValue( 1 );
   this->TimeEquationFrequencyEntry->SetResolution( 0.5 );
   this->TimeEquationFrequencyEntry->DisplayEntryOn();
   this->TimeEquationFrequencyEntry->DisplayLabelOn();
@@ -374,6 +378,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   frame->Delete();
   this->UpdateStartEndValueToEntry();
+  this->UpdateTimeEquationValuesToEntry();
   this->SetupBinds();
 
   this->SetLabelAndScript("None", 0, 0);
@@ -909,10 +914,10 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
 
     case 2: // Sinusoidal wave
       // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) )/2 )
-      str << "("
-          << cmin << " + (" << cmax << " - " << cmin << ") * sin( 8*atan(1)* ("
+      str << "((" << cmin << " + " << cmax 
+          << " + (" << cmax << " - " << cmin << ") * sin( 8*atan(1)* ("
           << this->TimeEquationFrequency << "*$globalPVTime + "
-          << this->TimeEquationPhase << "/360.))/2.)";
+          << this->TimeEquationPhase << "/360.)))/2.)";
       break;
       }
     str << " ]";
