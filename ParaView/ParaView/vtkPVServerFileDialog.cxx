@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.5");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -964,12 +964,12 @@ void vtkPVServerFileDialog::Update()
   int *dirMask;
   char* result;
   if(!this->LastPath)
-    {
-    // This directory has to be taken from the server.
-    vtkKWDirectoryUtilities* du = vtkKWDirectoryUtilities::New();
-    this->SetLastPath(du->GetCWD());
-    du->Delete();
-    du = NULL;
+    {    
+    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
+    result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
+    this->SetLastPath(result);
+    delete [] result;
+    result = NULL;
     }
 
   // Try to open the directory.
@@ -980,11 +980,12 @@ void vtkPVServerFileDialog::Update()
     { // can not open directory.
     delete [] result;
     result = NULL;
-    // This should be taken from the server. .....
-    vtkKWDirectoryUtilities* du = vtkKWDirectoryUtilities::New();
-    this->SetLastPath(du->GetCWD());
-    du->Delete();
-    du = NULL;
+
+    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
+    result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
+    this->SetLastPath(result);
+    delete [] result;
+    
     // Try to open the new directory.
     this->GetPVApplication()->GetProcessModule()->RootScript(
                      "%s Open {%s}", this->DirectoryToolTclName, this->LastPath);
