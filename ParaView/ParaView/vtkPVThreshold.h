@@ -47,13 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVThreshold_h
 
 #include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkPVMinMax.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkThreshold.h"
+
+class vtkKWOptionMenu;
+class vtkKWWidget;
+class vtkKWLabel;
+class vtkKWOptionMenu;
+class vtkPVMinMax;
+class vtkPVLabeledToggle;
 
 class VTK_EXPORT vtkPVThreshold : public vtkPVSource
 {

@@ -40,15 +40,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVThreshold.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVData.h"
-#include "vtkPVWindow.h"
+
+#include "vtkDataSet.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWOptionMenu.h"
+#include "vtkKWPushButton.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVLabeledToggle.h"
+#include "vtkPVMinMax.h"
+#include "vtkPVWindow.h"
+#include "vtkSource.h"
+#include "vtkStringList.h"
+#include "vtkThreshold.h"
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
