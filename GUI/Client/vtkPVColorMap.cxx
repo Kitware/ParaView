@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.102");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.103");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -129,9 +129,6 @@ void vtkPVColorMap::SetPVRenderView(vtkPVRenderView *rv)
 vtkPVColorMap::vtkPVColorMap()
 {
   this->CommandFunction = vtkPVColorMapCommand;
-
-  // Used to be in vtkPVActorComposite
-  static int instanceCount = 0;
 
   this->UseCount = 0;
   
@@ -1834,8 +1831,6 @@ void vtkPVColorMap::Update()
     {
     range[1] = range[0] + 0.001;
     }
-
-  int fixme;  // Compute resolution ...
 
   this->ColorRangeWidget->SetWholeRange(range[0], range[1]);
 
