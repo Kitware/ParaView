@@ -100,7 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.151");
+vtkCxxRevisionMacro(vtkPVApplication, "1.152");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -716,7 +716,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
                                           index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-u",
+       vtkPVApplication::CheckForArgument(argc, argv, "-p",
                                           index) == VTK_OK )
     {
     this->UseRenderingGroup = 1;
