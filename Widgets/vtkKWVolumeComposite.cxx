@@ -82,17 +82,6 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->MedResResampler       = vtkImageResample::New();
   this->VolumeProMapper       = vtkVolumeProMapper::New();
 
-  if ( this->VolumeProMapper->GetNumberOfBoards() > 0 )
-    {
-    this->LODVolume->SetLODMapper( this->RayCastID, this->VolumeProMapper );
-    this->UsingVolumeProMapper = 1;
-    this->LODVolume->AutomaticLODSelectionOff();
-    this->LODVolume->SetSelectedLODID( this->RayCastID );
-    }
-  else
-    {
-    this->UsingVolumeProMapper = 0;
-    }
 
   gradientEstimator = vtkFiniteDifferenceGradientEstimator::New();
   directionEncoder  = vtkRecursiveSphereDirectionEncoder::New();
@@ -109,6 +98,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->VolumeProperty->SetDiffuse(0.0);
   this->VolumeProperty->SetSpecular(0.0);
   this->VolumeProperty->SetSpecularPower(1.0);
+  this->VolumeProperty->ShadeOff();
   this->RayCastMapper->SetVolumeRayCastFunction(this->Composite);
 
 
@@ -136,10 +126,23 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->VolumeProperty->SetScalarOpacity(pwf);
 
   vtkColorTransferFunction *ctf = vtkColorTransferFunction::New();
-  ctf->AddRGBPoint(0.0,   0.3, 0.3, 0.3);
+  ctf->AddRGBPoint(0.0,   1.0, 1.0, 1.0);
+  ctf->AddRGBPoint(255.0,   1.0, 1.0, 1.0);
   this->VolumeProperty->SetColor(ctf);
 
   this->CommandFunction = vtkKWVolumeCompositeCommand;
+
+  if ( this->VolumeProMapper->GetNumberOfBoards() > 0 )
+    {
+    this->LODVolume->SetLODMapper( this->RayCastID, this->VolumeProMapper );
+    this->UsingVolumeProMapper = 1;
+    this->LODVolume->AutomaticLODSelectionOff();
+    this->LODVolume->SetSelectedLODID( this->RayCastID );
+    }
+  else
+    {
+    this->UsingVolumeProMapper = 0;
+    }
 
   pwf->Delete();
   ctf->Delete();
@@ -168,6 +171,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 
   input->Update();
   this->RayCastMapper->SetInput(input);
+  this->VolumeProMapper->SetInput(input);
   this->HiResTextureMapper->SetInput(input);
 
   input->GetDimensions( size );
@@ -215,7 +219,34 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
       this->LODVolume->AddLOD( this->MedResTextureMapper,
 			       this->VolumeProperty, 0.0 );
     }
+  vtkPiecewiseFunction *pwf = 
+    this->VolumeProperty->GetScalarOpacity();
+  vtkGenericWarningMacro("input " << *input);
+  vtkGenericWarningMacro("GetInput " << *this->GetInput() );
+  
+  float *range = input->GetScalarRange();
+  float max;
+
+  max = range[1];
+  max = (max <= 255.0)?(255.0):(max);
+  max = (max > 255.0 && max <= 4095.0)?(4095.0):(max);
+  max = (max > 4095.0)?(65535.0):(max);
+  
+  pwf->RemoveAllPoints();
+  pwf->AddPoint(  0, 0.0);
+  pwf->AddPoint(max, 1.0);
+  
+  pwf = vtkPiecewiseFunction::New();
+  pwf->AddPoint(         0.0, 0.0);
+  pwf->AddPoint(         1.0, 0.0);
+  pwf->AddPoint( (max/ 50.0), 1.0);
+  pwf->AddPoint(         max, 1.0);
+  this->VolumeProperty->SetGradientOpacity(pwf);
+  pwf->Delete();
+  this->VolumeProMapper->GradientOpacityModulationOn();
 }
+
+
 
 vtkImageData *vtkKWVolumeComposite::GetInput()
 {
