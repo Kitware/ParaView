@@ -54,6 +54,7 @@ void pvTestDriver::SeparateArguments(const char* str,
   vtkstd::string arg = str;
   vtkstd::string::size_type pos1 = 0;
   vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
+  cerr << "SeparateArguments:" <<  str << endl;
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
@@ -117,13 +118,7 @@ void pvTestDriver::CollectConfiguredOptions()
   this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
 # endif
 # ifdef VTK_MPI_POSTFLAGS
-  SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
-# endif  
-# ifdef VTK_MPI_CLIENT_FLAGS
-  this->SeparateArguments(VTK_MPI_CLIENT_FLAGS, this->MPIClientFlags);
-# endif
-# ifdef VTK_MPI_SERVER_FLAGS
-  SeparateArguments(VTK_MPI_SERVER_FLAGS, this->MPIServerFlags);
+  this->SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
 # endif  
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
@@ -172,6 +167,7 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   int i;
   for(i =1; i < argc - 1; ++i)
     {
+    fprintf(stderr, "DOING: %s\n" , argv[i]);
     if(strcmp(argv[i], "--test-rc") == 0)
       {
       this->ArgStart = i+1;
@@ -184,17 +180,29 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->TimeOut = atoi(argv[i+1]);
       fprintf(stderr, "The timeout was set to %f.\n", this->TimeOut);
       }
-    if(strcmp(argv[i], "--client-flags") == 0)
+    if(strncmp(argv[i], "--client-preflags",17) == 0)
       {
-      this->SeparateArguments(argv[i+1], this->MPIClientFlags);
+      this->SeparateArguments(argv[i+1], this->MPIClientPreFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras client flags were specified.\n");
+      fprintf(stderr, "Extras client preflags were specified.\n");
       }
-    if(strcmp(argv[i], "--server-flags") == 0)
+    if(strncmp(argv[i], "--client-postflags",18) == 0)
       {
-      this->SeparateArguments(argv[i+1], this->MPIServerFlags);
+      this->SeparateArguments(argv[i+1], this->MPIClientPostFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras server flags were specified.\n");
+      fprintf(stderr, "Extras client postflags were specified.\n");
+      }
+    if(strncmp(argv[i], "--server-preflags",17) == 0)
+      {
+      this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
+      this->ArgStart = i+2;
+      fprintf(stderr, "Extras server preflags were specified.\n");
+      }
+    if(strncmp(argv[i], "--server-postflags",18 ) == 0)
+      {
+      this->SeparateArguments(argv[i+1], this->MPIServerPostFlags);
+      this->ArgStart = i+2;
+      fprintf(stderr, "Extras server postflags were specified.\n");
       }
     }
   
@@ -233,17 +241,17 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
     // If there is specific flags for the client to pass to mpirun, add them
     if( strcmp( paraviewFlags, "--client" ) == 0)
       {
-      for(unsigned int i = 0; i < this->MPIClientFlags.size(); ++i)
+      for(unsigned int i = 0; i < this->MPIClientPreFlags.size(); ++i)
         {
-        commandLine.push_back(this->MPIClientFlags[i].c_str());
+        commandLine.push_back(this->MPIClientPreFlags[i].c_str());
         }
       }
     // If there is specific flags for the server to pass to mpirun, add them
     if( strcmp( paraviewFlags, "--server" ) == 0)
       {
-      for(unsigned int i = 0; i < this->MPIServerFlags.size(); ++i)
+      for(unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
         {
-        commandLine.push_back(this->MPIServerFlags[i].c_str());
+        commandLine.push_back(this->MPIServerPreFlags[i].c_str());
         }
       }
     }
@@ -265,6 +273,22 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
     {
     commandLine.push_back(MPIPostFlags[i].c_str());
     }
+    // If there is specific flags for the server to pass to paraview, add them
+    if( strcmp( paraviewFlags, "--client" ) == 0)
+      {
+      for(unsigned int i = 0; i < this->MPIClientPostFlags.size(); ++i)
+        {
+        commandLine.push_back(this->MPIClientPostFlags[i].c_str());
+        }
+      }
+    // If there is specific flags for the server to pass to mpirun, add them
+    if( strcmp( paraviewFlags, "--server" ) == 0)
+      {
+      for(unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
+        {
+        commandLine.push_back(this->MPIServerPostFlags[i].c_str());
+        }
+      }
   commandLine.push_back(0);
 }
 

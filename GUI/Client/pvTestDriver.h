@@ -77,8 +77,10 @@ private:
   
   // MPIClientFlags / MPIServerFlags allows you to specify flags specific for 
   // the client or the server
-  vtkstd::vector<vtkstd::string> MPIClientFlags;
-  vtkstd::vector<vtkstd::string> MPIServerFlags;
+  vtkstd::vector<vtkstd::string> MPIClientPreFlags;
+  vtkstd::vector<vtkstd::string> MPIServerPreFlags;
+  vtkstd::vector<vtkstd::string> MPIClientPostFlags;
+  vtkstd::vector<vtkstd::string> MPIServerPostFlags;
   
   // Specify the number of process flag, this can be set using: VTK_MPI_NUMPROC_FLAG. 
   // This is then split into : 
