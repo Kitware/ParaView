@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.4");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.5");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -809,7 +809,7 @@ void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
     }
   this->Script = vtkString::Duplicate(scr);
 
-  if ( !this->ScriptEditor->IsCreated() )
+  if ( !this->ScriptEditor->IsCreated() && this->ScriptEditor->IsAlive() )
     {
     return;
     }
