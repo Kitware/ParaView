@@ -23,6 +23,7 @@ SET(Common_SRCS
   vtkPVProgressHandler.cxx
   vtkPVOptions.cxx
   vtkPVCreateProcessModule.cxx
+  vtkPVGenericAttributeInformation.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(

@@ -20,11 +20,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 
+#include "vtkGenericAttributeCollection.h"
+#include "vtkGenericAttribute.h"
+#include "vtkPVGenericAttributeInformation.h"
+
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -144,6 +148,96 @@ vtkPVDataSetAttributesInformation
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::
+CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *da)
+{
+  int idx;
+  int num;
+  vtkGenericAttribute *array;
+  short infoArrayIndex;
+//  int attribute;
+
+  // Clear array information.
+  this->ArrayInformation->RemoveAllItems();
+  for (idx = 0; idx < 5; ++idx)
+    {
+    this->AttributeIndices[idx] = -1;
+    }
+
+  // Copy Point Data
+  num = da->GetNumberOfAttributes();
+  infoArrayIndex = 0;
+  for (idx = 0; idx < num; ++idx)
+    {
+    array = da->GetAttribute(idx);
+    if(array->GetCentering()==vtkPointCentered)
+      {
+      if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
+        {
+        vtkPVGenericAttributeInformation *info = vtkPVGenericAttributeInformation::New();
+        info->CopyFromObject(array);
+        this->ArrayInformation->AddItem(info);
+        info->Delete();
+#if 0
+        // Record default attributes.
+        attribute = da->IsArrayAnAttribute(idx);
+        if (attribute > -1)
+          {
+          this->AttributeIndices[attribute] = infoArrayIndex;
+          }
+#endif
+        ++infoArrayIndex;
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::
+CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *da)
+{
+    int idx;
+  int num;
+  vtkGenericAttribute *array;
+  short infoArrayIndex;
+//  int attribute;
+
+  // Clear array information.
+  this->ArrayInformation->RemoveAllItems();
+  for (idx = 0; idx < 5; ++idx)
+    {
+    this->AttributeIndices[idx] = -1;
+    }
+
+  // Copy Cell Data
+  num = da->GetNumberOfAttributes();
+  infoArrayIndex = 0;
+  for (idx = 0; idx < num; ++idx)
+    {
+    array = da->GetAttribute(idx);
+    if(array->GetCentering()==vtkPointCentered)
+      {
+      if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
+        {
+        vtkPVGenericAttributeInformation *info = vtkPVGenericAttributeInformation::New();
+        info->CopyFromObject(array);
+        this->ArrayInformation->AddItem(info);
+        info->Delete();
+#if 0
+        // Record default attributes.
+        attribute = da->IsArrayAnAttribute(idx);
+        if (attribute > -1)
+          {
+          this->AttributeIndices[attribute] = infoArrayIndex;
+          }
+#endif
+        ++infoArrayIndex;
+        }
+      }
+    }
+}
+  
 //----------------------------------------------------------------------------
 void
 vtkPVDataSetAttributesInformation

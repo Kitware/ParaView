@@ -28,11 +28,12 @@
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
+#include "vtkGenericDataSet.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -47,7 +48,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
-
+  
   this->Name = 0;
   this->DataClassName = 0;
   this->NumberOfDataSets = 0;
@@ -60,6 +61,7 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->PointDataInformation = NULL;
   this->CellDataInformation->Delete();
   this->CellDataInformation = NULL;
+  
   this->SetName(0);
   this->SetDataClassName(0);
 }
@@ -113,7 +115,7 @@ void vtkPVDataInformation::Initialize()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
-
+  
   this->SetName(0);
   this->SetDataClassName(0);
 }
@@ -235,6 +237,42 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
 
 }
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
+{
+  int idx;
+  double *bds;
+
+  this->SetDataClassName(data->GetClassName());
+  this->DataSetType = data->GetDataObjectType();
+
+  // Look for a name stored in Field Data.
+  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
+  if (nameArray)
+    {
+    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
+    this->SetName(str);
+    }
+
+  this->NumberOfPoints = data->GetNumberOfPoints();
+  if (!this->NumberOfPoints)
+    {
+    return;
+    }
+  this->NumberOfCells = data->GetNumberOfCells();
+  bds = data->GetBounds();
+  for (idx = 0; idx < 6; ++idx)
+    {
+    this->Bounds[idx] = bds[idx];
+    }
+  this->MemorySize = data->GetActualMemorySize();
+
+  // Copy Point Data information
+  this->PointDataInformation->CopyFromGenericAttributesOnPoints(data->GetAttributes());
+
+  // Copy Cell Data information
+  this->CellDataInformation->CopyFromGenericAttributesOnCells(data->GetAttributes());
+}
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
@@ -250,6 +288,13 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (cds)
     {
     this->CopyFromCompositeDataSet(cds);
+    return;
+    }
+
+  vtkGenericDataSet* ads = vtkGenericDataSet::SafeDownCast(object);
+  if (ads)
+    {
+    this->CopyFromGenericDataSet(ads);
     return;
     }
 
@@ -295,8 +340,17 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
       }
     else
       {
-      this->DataSetType = VTK_POINT_SET;
-      this->SetDataClassName("vtkPointSet");
+      if(this->DataSetType == VTK_GENERIC_DATA_SET ||
+         info->GetDataSetType() == VTK_GENERIC_DATA_SET )
+        {
+        this->DataSetType = VTK_GENERIC_DATA_SET;
+        this->SetDataClassName("vtkGenericDataSet");
+        }
+      else
+        {
+        this->DataSetType = VTK_POINT_SET;
+        this->SetDataClassName("vtkPointSet");
+        }
       }
     }
 
@@ -341,6 +395,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
   // Now for the messy part, all of the arrays.
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+//  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
 
   if (this->Name == NULL)
     {
@@ -392,7 +447,11 @@ const char* vtkPVDataInformation::GetDataSetTypeAsString()
     {
     return "vtkHierarchicalBoxDataSet";
     }
-
+  if (this->DataSetType == VTK_GENERIC_DATA_SET)
+    {
+    return "vtkGenericDataSet";
+    }
+  
   return "UnknownType";
 }
 
@@ -471,7 +530,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
   this->CellDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
-
+  
   *css << vtkClientServerStream::End;
 }
 
@@ -550,13 +609,13 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   // Cell data array information.
   if(!css->GetArgumentLength(0, 10, &length))
     {
-    vtkErrorMacro("Error parsing length of point data information.");
+    vtkErrorMacro("Error parsing length of cell data information.");
     return;
     }
   data.resize(length);
   if(!css->GetArgument(0, 10, &*data.begin(), length))
     {
-    vtkErrorMacro("Error parsing point data information.");
+    vtkErrorMacro("Error parsing cell data information.");
     return;
     }
   dcss.SetData(&*data.begin(), length);

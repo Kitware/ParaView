@@ -29,6 +29,7 @@
 class vtkCollection;
 class vtkDataSetAttributes;
 class vtkPVArrayInformation;
+class vtkGenericAttributeCollection;
 
 class VTK_EXPORT vtkPVDataSetAttributesInformation : public vtkPVInformation
 {
@@ -43,6 +44,10 @@ public:
   void CopyFromDataSetAttributes(vtkDataSetAttributes* data);
   void DeepCopy(vtkPVDataSetAttributesInformation* info);
 
+  void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *data);
+  void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *data);
+  
+  
   // Description:
   // Intersect information of argument with information currently
   // in this object.  Arrays must be in both

@@ -30,6 +30,7 @@ class vtkCollection;
 class vtkCompositeDataSet;
 class vtkDataSet;
 class vtkPVDataSetAttributesInformation;
+class vtkGenericDataSet;
 
 class VTK_EXPORT vtkPVDataInformation : public vtkPVInformation
 {
@@ -98,7 +99,8 @@ protected:
 
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
   void CopyFromDataSet(vtkDataSet* data);
-
+  void CopyFromGenericDataSet(vtkGenericDataSet *data);
+  
   // Data information collected from remote processes.
   int            DataSetType;
   int            NumberOfDataSets;

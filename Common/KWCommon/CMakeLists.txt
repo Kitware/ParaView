@@ -66,6 +66,7 @@ ENDIF(KWSYS_NAMESPACE)
 IF(ParaView_SOURCE_DIR)
   TARGET_LINK_LIBRARIES (vtkKWCommon
     vtkFiltering
+    vtkGenericFiltering
     vtkGraphics
     vtkIO
     vtkImaging
@@ -76,12 +77,14 @@ ELSE(ParaView_SOURCE_DIR)
     vtkImagingTCL 
     vtkGraphicsTCL 
     vtkIOTCL
-    vtkFilteringTCL   
+    vtkFilteringTCL
+    vtkGenericFilteringTCL   
     vtkRenderingTCL   
     vtkImaging
     vtkGraphics
     vtkIO
     vtkFiltering
+    vtkGenericFiltering
     vtkRendering
     )
 
