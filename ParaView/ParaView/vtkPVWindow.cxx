@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.346");
+vtkCxxRevisionMacro(vtkPVWindow, "1.347");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -675,11 +675,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                     "Write a script which can be "
                                     "parsed by the vtk executable");
   
-  this->AdvancedMenu->InsertCommand(5, "Delete All Sources", this, 
-                                    "DeleteAllSourcesCallback", 
-                                    1, "Delete all sources currently created in ParaView");
-              
-
   this->AdvancedMenu->InsertCommand(7, "Open Package", this, "OpenPackage", 2,
                                     "Open a ParaView package and load the "
                                     "contents");
@@ -719,7 +714,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     5, "Error Log", this, 
     "ShowErrorLog", 2, 
     "Show log of all errors and warnings");
-  
+
+  // Edit menu
+
+  this->GetMenuEdit()->InsertCommand(5, "Delete All Sources", this, 
+                                     "DeleteAllSourcesCallback", 
+                                     1, "Delete all sources currently created in ParaView");
 }
 
 //----------------------------------------------------------------------------
@@ -3547,7 +3547,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.346 $");
+  this->ExtractRevision(os,"$Revision: 1.347 $");
 }
 
 //----------------------------------------------------------------------------
