@@ -282,7 +282,8 @@ void vtkPVData::GetBounds(float bounds[6])
   else
     {
     this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces());
+				this->Assignment->GetNumberOfPieces(),
+				0);
     this->Data->Update();
     }
   
@@ -357,7 +358,8 @@ void vtkPVData::TransmitBounds()
   else
     {
     this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces());
+				this->Assignment->GetNumberOfPieces(),
+				0);
     this->Data->Update();
     }
   
@@ -508,7 +510,8 @@ void vtkPVData::Update()
   if (this->Assignment)
     {
     this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-                                this->Assignment->GetNumberOfPieces());
+                                this->Assignment->GetNumberOfPieces(),
+				0);
     }
 
   this->Data->Update();
