@@ -14,33 +14,34 @@
 =========================================================================*/
 #include "vtkPVLODPartDisplay.h"
 
-#include "vtkPVLODPartDisplayInformation.h"
+#include "vtkClientServerStream.h"
+#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkImageData.h"
+#include "vtkKWCheckButton.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkQuadricClustering.h"
-#include "vtkProp3D.h"
 #include "vtkPVApplication.h"
+#include "vtkPVColorMap.h"
+#include "vtkPVConfig.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVConfig.h"
-#include "vtkKWCheckButton.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
+#include "vtkProp3D.h"
 #include "vtkProperty.h"
+#include "vtkQuadricClustering.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkStructuredGrid.h"
 #include "vtkString.h"
+#include "vtkStructuredGrid.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-#include "vtkPVColorMap.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
-#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.15");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -502,35 +503,39 @@ void vtkPVLODPartDisplay::SetPointLabelVisibility(int val)
     }
   
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
-  
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->PointLabelMapperID << "SetInput"
-    << this->Part->GetVTKDataID()
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke << this->PointLabelMapperID
-    << "GetLabelTextProperty" << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << vtkClientServerStream::LastResult << "SetFontSize" << 24
-    << vtkClientServerStream::End;
-  
-  if (val)
+
+  vtkPVDataInformation* di = this->GetPart()->GetDataInformation();
+  if (di->DataSetTypeIsA("vtkDataSet"))
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << pvApp->GetRenderModule()->GetRendererID() << "AddProp"
-      << this->PointLabelActorID << vtkClientServerStream::End;
-    }
-  else
-    {
+      << this->PointLabelMapperID << "SetInput"
+      << this->Part->GetVTKDataID()
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << this->PointLabelMapperID
+      << "GetLabelTextProperty" << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << pvApp->GetRenderModule()->GetRendererID() << "RemoveProp"
-      << this->PointLabelActorID << vtkClientServerStream::End;
+      << vtkClientServerStream::LastResult << "SetFontSize" << 24
+      << vtkClientServerStream::End;
+    
+    if (val)
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << pvApp->GetRenderModule()->GetRendererID() << "AddProp"
+        << this->PointLabelActorID << vtkClientServerStream::End;
+      }
+    else
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << pvApp->GetRenderModule()->GetRendererID() << "RemoveProp"
+        << this->PointLabelActorID << vtkClientServerStream::End;
+      }
+    pm->SendStreamToServer();
     }
-  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
