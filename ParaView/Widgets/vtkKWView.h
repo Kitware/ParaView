@@ -185,7 +185,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 
   // Description:
   // Make sure that the Views property parent is currently packed
-  void PackProperties();
+  virtual void PackProperties();
   
   // Description:
   // Render the image.
