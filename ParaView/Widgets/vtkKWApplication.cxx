@@ -466,12 +466,12 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
     }
   if ( reg->ReadValue( temp, "InstalledPath", loc ) )
     {
-    sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
+    sprintf(temp,"%s/%s.chm::/Introduction.htm",
             loc,this->ApplicationName);
     }
   else
     {
-    sprintf(temp,"%s.chm::/Introduction/Introduction.htm",
+    sprintf(temp,"%s.chm::/Introduction.htm",
 	    this->ApplicationName);
     }
   

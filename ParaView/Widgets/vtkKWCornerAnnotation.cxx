@@ -218,6 +218,7 @@ void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
   color[1] = g;
   color[2] = b;
   this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
+  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
 }
 
 void vtkKWCornerAnnotation::OnDisplayCorner() 
@@ -236,6 +237,7 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
     this->View->RemoveComposite(this->CornerComposite);
     this->View->Render();
     }
+  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
 }
 
 int vtkKWCornerAnnotation::GetVisibility() 
@@ -266,6 +268,7 @@ void vtkKWCornerAnnotation::CornerChanged(int i)
     {
     this->View->Render();
     }
+  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
 }
 
 // Description:
@@ -346,7 +349,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

@@ -99,6 +99,7 @@ class VTK_EXPORT vtkKWEvent
     ChangeMouseOperationsEvent,
     ChangeStandardInteractivityEvent,
     SwitchToVolumeProEvent,
+    ViewAnnotationChangedEvent,
     // PV
     InitializeTraceEvent
   };

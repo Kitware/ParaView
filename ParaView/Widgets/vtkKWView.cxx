@@ -554,6 +554,7 @@ void vtkKWView::SetHeaderTextColor( float r, float g, float b )
   color[1] = g;
   color[2] = b;
   this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
+  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
 float* vtkKWView::GetHeaderTextColor()
@@ -1197,6 +1198,8 @@ void vtkKWView::OnDisplayHeader()
     this->RemoveComposite(this->HeaderComposite);
     this->Render();
     }
+  
+  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
 void vtkKWView::HeaderChanged() 
@@ -1206,6 +1209,7 @@ void vtkKWView::HeaderChanged()
     {
     this->Render();
     }
+  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
 void vtkKWView::InteractOn()
@@ -1313,7 +1317,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.58 $");
+  this->ExtractRevision(os,"$Revision: 1.59 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1397,6 +1401,7 @@ void vtkKWView::SetCornerTextColor( float rgb[3] )
     return;
     }
   this->CornerAnnotation->SetTextColor( rgb );
+  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
 float *vtkKWView::GetCornerTextColor()

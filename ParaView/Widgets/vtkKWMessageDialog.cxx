@@ -217,7 +217,8 @@ int vtkKWMessageDialog::Invoke()
 		 x, y);
     }
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
-
+  this->Script("update idletasks");
+  
   return vtkKWDialog::Invoke();
 }
 
