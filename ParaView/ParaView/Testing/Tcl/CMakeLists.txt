@@ -40,6 +40,7 @@ SET(PROJECT_TESTS
   OrientationWidget
   ProbeLine
   ProbePoint
+  ReadPVD
   ScalarBar
   ScalarRangeLabel
   ScalarSelection

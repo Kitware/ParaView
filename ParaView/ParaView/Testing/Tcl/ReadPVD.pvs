@@ -1,0 +1,63 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp4) [$Application GetMainWindow]
+set kw(vtkTemp18) [$kw(vtkTemp4) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp18) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
+    }
+} 
+
+set kw(vtkTemp898) [$kw(vtkTemp4) InitializeReadCustom "PVDReader" "C:/ParaView/Data/Data/chombo3d.pvd"]
+$kw(vtkTemp4) ReadFileInformation $kw(vtkTemp898) "C:/ParaView/Data/Data/chombo3d.pvd"
+$kw(vtkTemp4) FinalizeRead $kw(vtkTemp898) "C:/ParaView/Data/Data/chombo3d.pvd"
+set kw(vtkTemp903) [$kw(vtkTemp898) GetPVWidget {Filename}]
+$kw(vtkTemp903) SetValue "C:/ParaView/Data/Data/chombo3d.pvd"
+$kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
+$kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
+set kw(vtkTemp1014) [$kw(vtkTemp4) CreatePVSource CellDataToPointData]
+set kw(vtkTemp1024) [$kw(vtkTemp1014) GetPVWidget {Input}]
+$kw(vtkTemp1024) SetCurrentValue $kw(vtkTemp898)
+set kw(vtkTemp1021) [$kw(vtkTemp1014) GetPVWidget {PassCellData}]
+$kw(vtkTemp1021) SetState 0
+$kw(vtkTemp1014) AcceptCallback
+$kw(vtkTemp4) SetCurrentPVSourceCallback $kw(vtkTemp1014)
+set kw(vtkTemp1138) [$kw(vtkTemp4) CreatePVSource Contour]
+set kw(vtkTemp1185) [$kw(vtkTemp1138) GetPVWidget {Input}]
+$kw(vtkTemp1185) SetCurrentValue $kw(vtkTemp1014)
+set kw(vtkTemp1186) [$kw(vtkTemp1138) GetPVWidget {Scalars}]
+$kw(vtkTemp1186) SetValue {phi}
+set kw(vtkTemp1150) [$kw(vtkTemp1138) GetPVWidget {Contour Values}]
+$kw(vtkTemp1150) RemoveAllValues 
+$kw(vtkTemp1150) AddValue -0.02
+set kw(vtkTemp1176) [$kw(vtkTemp1138) GetPVWidget {Compute Normals}]
+$kw(vtkTemp1176) SetState 1
+set kw(vtkTemp1179) [$kw(vtkTemp1138) GetPVWidget {Compute Gradients}]
+$kw(vtkTemp1179) SetState 0
+set kw(vtkTemp1182) [$kw(vtkTemp1138) GetPVWidget {Compute Scalars}]
+$kw(vtkTemp1182) SetState 1
+$kw(vtkTemp1138) AcceptCallback
+$kw(vtkTemp18) SetCameraState 10.542 21.511 -16.692  4.000 4.000 4.000  0.972 -0.153 0.178
+
+# Fix the size of the image.
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+   
+$Application Exit
