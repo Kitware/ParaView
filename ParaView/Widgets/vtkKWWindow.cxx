@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWToolbar.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
 #include "vtkKWWidgetCollection.h"
@@ -64,13 +65,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 #include "vtkVector.txx"
+#include "vtkVectorIterator.txx"
 
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.144");
+vtkCxxRevisionMacro(vtkKWWindow, "1.145");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -295,6 +297,8 @@ vtkKWWindow::vtkKWWindow()
   this->ExitDialogWidget = 0;
 
   this->TclInteractor = NULL;
+
+  this->Toolbars = vtkVector<vtkKWToolbar*>::New();
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -374,6 +378,12 @@ vtkKWWindow::~vtkKWWindow()
   this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
+
+  if (this->Toolbars)
+    {
+    this->Toolbars->Delete();
+    }
+
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -1112,7 +1122,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.144 $");
+  this->ExtractRevision(os,"$Revision: 1.145 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1152,8 +1162,7 @@ int vtkKWWindow::ExitDialog()
     this->GetApplicationSettingsInterface();
   if (asi)
     {
-    int r = this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME);
-    asi->SetConfirmExit(r ? 0 : 1);
+    asi->Update();
     }
  
   return ret;
@@ -1524,6 +1533,51 @@ void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long,
                                        float *, void *)
 {
   // No implementation
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::UpdateToolbarAspect()
+{
+  int flat_frame;
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
+    {
+    flat_frame = this->Application->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
+    }
+  else
+    {
+    flat_frame = vtkKWToolbar::GetGlobalFlatAspect();
+    }
+
+  int flat_buttons;
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
+    {
+    flat_buttons = this->Application->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
+    }
+  else
+    {
+    flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+    }
+
+  if (this->Toolbars)
+    {
+    vtkKWToolbar *tb = NULL;
+    vtkVectorIterator<vtkKWToolbar *> *it = this->Toolbars->NewIterator();
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(tb) == VTK_OK)
+        {
+        tb->SetFlatAspect(flat_frame);
+        tb->SetWidgetsFlatAspect(flat_buttons);
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

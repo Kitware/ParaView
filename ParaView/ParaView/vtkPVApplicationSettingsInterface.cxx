@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
@@ -57,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.5");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.6");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -65,18 +64,10 @@ int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
 {
-  this->Window = 0;
-
   // Interface settings
 
   this->ShowSourcesDescriptionCheckButton = 0;
   this->ShowSourcesNameCheckButton = 0;
-
-  // Toolbar settings
-
-  this->ToolbarSettingsFrame = 0;
-  this->FlatFrameCheckButton = 0;
-  this->FlatButtonsCheckButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -97,39 +88,6 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
     this->ShowSourcesNameCheckButton->Delete();
     this->ShowSourcesNameCheckButton = NULL;
     }
-
-  // Toolbar settings
-
-  if (this->ToolbarSettingsFrame)
-    {
-    this->ToolbarSettingsFrame->Delete();
-    this->ToolbarSettingsFrame = NULL;
-    }
-
-  if (this->FlatFrameCheckButton)
-    {
-    this->FlatFrameCheckButton->Delete();
-    this->FlatFrameCheckButton = NULL;
-    }
-
-  if (this->FlatButtonsCheckButton)
-    {
-    this->FlatButtonsCheckButton->Delete();
-    this->FlatButtonsCheckButton = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetWindow(vtkPVWindow *arg)
-{
-  if (this->Window == arg)
-    {
-    return;
-    }
-  this->Window = arg;
-  this->Modified();
-
-  this->Update();
 }
 
 // ---------------------------------------------------------------------------
@@ -153,6 +111,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   frame = this->InterfaceSettingsFrame->GetFrame();
 
+  // --------------------------------------------------------------
   // Interface settings : show sources description
 
   if (!this->ShowSourcesDescriptionCheckButton)
@@ -163,24 +122,8 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ShowSourcesDescriptionCheckButton->SetParent(frame);
   this->ShowSourcesDescriptionCheckButton->Create(app, 0);
   this->ShowSourcesDescriptionCheckButton->SetText("Show sources description");
-
-  if (app->HasRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY))
-    {
-    this->ShowSourcesDescriptionCheckButton->SetState(
-      app->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY));
-    }
-  else
-    {
-    app->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", 1);
-    this->ShowSourcesDescriptionCheckButton->SetState(1);
-    }
-
   this->ShowSourcesDescriptionCheckButton->SetCommand(
     this, "ShowSourcesDescriptionCallback");
-
   this->ShowSourcesDescriptionCheckButton->SetBalloonHelpString(
     "This advanced option adjusts whether the sources description "
     "are shown in the parameters page.");
@@ -188,6 +131,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   tk_cmd << "pack " << this->ShowSourcesDescriptionCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
+  // --------------------------------------------------------------
   // Interface settings : show sources name
 
   if (!this->ShowSourcesNameCheckButton)
@@ -199,24 +143,8 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ShowSourcesNameCheckButton->Create(app, 0);
   this->ShowSourcesNameCheckButton->SetText(
     "Show sources name in source browsers");
-
-  if (app->HasRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY))
-    {
-    this->ShowSourcesNameCheckButton->SetState(
-      app->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY));
-    }
-  else
-    {
-    app->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", 0);
-    this->ShowSourcesNameCheckButton->SetState(0);
-    }
-
   this->ShowSourcesNameCheckButton->SetCommand(
     this, "ShowSourcesNameCallback");
-
   this->ShowSourcesNameCheckButton->SetBalloonHelpString(
     "This advanced option adjusts whether the unique source names "
     "are shown in the source browsers. This name is normally useful "
@@ -226,95 +154,6 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
-  // Toolbar settings : main frame
-
-  if (!this->ToolbarSettingsFrame)
-    {
-    this->ToolbarSettingsFrame = vtkKWLabeledFrame::New();
-    }
-
-  this->ToolbarSettingsFrame->SetParent(
-    this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL));
-  this->ToolbarSettingsFrame->ShowHideFrameOn();
-  this->ToolbarSettingsFrame->Create(app, 0);
-  this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");
-    
-  tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2" << endl;
-  
-  frame = this->ToolbarSettingsFrame->GetFrame();
-
-  // Toolbar settings : flat frame
-
-  if (!this->FlatFrameCheckButton)
-    {
-    this->FlatFrameCheckButton = vtkKWCheckButton::New();
-    }
-
-  this->FlatFrameCheckButton->SetParent(frame);
-  this->FlatFrameCheckButton->Create(app, 0);
-  this->FlatFrameCheckButton->SetText("Flat frame");
-
-  if (app->HasRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY))
-    {
-    this->FlatFrameCheckButton->SetState(
-      app->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY));
-    }
-  else
-    {
-    app->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY, "%d",
-      vtkKWToolbar::GetGlobalFlatAspect());
-    this->FlatFrameCheckButton->SetState(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    }
-
-  this->FlatFrameCheckButton->SetCommand(
-    this, "FlatFrameCallback");
-
-  this->FlatFrameCheckButton->SetBalloonHelpString(
-    "Display the toolbar frames using a flat aspect.");  
-
-  tk_cmd << "pack " << this->FlatFrameCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
-
-  // Toolbar settings : flat buttons
-
-  if (!this->FlatButtonsCheckButton)
-    {
-    this->FlatButtonsCheckButton = vtkKWCheckButton::New();
-    }
-
-  this->FlatButtonsCheckButton->SetParent(frame);
-  this->FlatButtonsCheckButton->Create(app, 0);
-  this->FlatButtonsCheckButton->SetText("Flat buttons");
-
-  if (app->HasRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY))
-    {
-    this->FlatButtonsCheckButton->SetState(
-      app->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY));
-    }
-  else
-    {
-    app->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d",
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    this->FlatButtonsCheckButton->SetState(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    }
-  this->FlatButtonsCheckButton->SetCommand(
-    this, "FlatButtonsCallback");
-
-  this->FlatButtonsCheckButton->SetBalloonHelpString(
-    "Display the toolbar buttons using a flat aspect.");  
-  
-  tk_cmd << "pack " << this->FlatButtonsCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
-
   // Pack 
 
   tk_cmd << ends;
@@ -327,14 +166,51 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetShowSourcesDescription(int v)
+void vtkPVApplicationSettingsInterface::Update()
 {
-  if (this->IsCreated())
+  this->Superclass::Update();
+
+  if (!this->IsCreated())
     {
-    int flag = v ? 1 : 0;
-    this->ShowSourcesDescriptionCheckButton->SetState(flag);
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
+    return;
+    }
+
+  // Interface settings : show sources description
+
+  if (this->ShowSourcesDescriptionCheckButton)
+    {
+    if (this->Application->HasRegisteryValue(
+          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY))
+      {
+      this->ShowSourcesDescriptionCheckButton->SetState(
+        this->Application->GetIntRegisteryValue(
+          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY));
+      }
+    else
+      {
+      this->Application->SetRegisteryValue(
+        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", 1);
+      this->ShowSourcesDescriptionCheckButton->SetState(1);
+      }
+    }
+
+  // Interface settings : show sources name
+
+  if (this->ShowSourcesNameCheckButton)
+    {
+    if (this->Application->HasRegisteryValue(
+          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY))
+      {
+      this->ShowSourcesNameCheckButton->SetState(
+        this->Application->GetIntRegisteryValue(
+          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY));
+      }
+    else
+      {
+      this->Application->SetRegisteryValue(
+        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", 0);
+      this->ShowSourcesNameCheckButton->SetState(0);
+      }
     }
 }
 
@@ -344,25 +220,15 @@ void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
  if (this->IsCreated())
    {
    int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
-   this->SetShowSourcesDescription(flag);
-     
-   if (this->Window)
+   this->GetApplication()->SetRegisteryValue(
+     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
+   
+   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->Window);
+   if (win)
      {
-     this->Window->SetShowSourcesLongHelp(flag);
+     win->SetShowSourcesLongHelp(flag);
      }
    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetShowSourcesName(int v)
-{
-  if (this->IsCreated())
-    {
-    int flag = v ? 1 : 0;
-    this->ShowSourcesNameCheckButton->SetState(flag);
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -371,63 +237,15 @@ void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
  if (this->IsCreated())
    {
    int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
-   this->SetShowSourcesName(flag);
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
 
-   if (this->Window && this->Window->GetMainView())
+   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->Window);
+   if (win && win->GetMainView())
      {
-     this->Window->GetMainView()->SetSourcesBrowserAlwaysShowName(flag);
+     win->GetMainView()->SetSourcesBrowserAlwaysShowName(flag);
      }
    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetFlatFrame(int v)
-{
-  if (this->IsCreated())
-    {
-    int flag = v ? 1 : 0;
-    this->FlatFrameCheckButton->SetState(flag);
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", flag);
-    if (this->Window)
-      {
-      this->Window->UpdateToolbarAspect();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::FlatFrameCallback()
-{
-  if (this->IsCreated())
-    {
-    this->SetFlatFrame(this->FlatFrameCheckButton->GetState() ? 1 : 0);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetFlatButtons(int v)
-{
-  if (this->IsCreated())
-    {
-    int flag = v ? 1 : 0;
-    this->FlatButtonsCheckButton->SetState(flag);
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", flag); 
-    if (this->Window)
-      {
-      this->Window->UpdateToolbarAspect();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::FlatButtonsCallback()
-{
-  if (this->IsCreated())
-    {
-    this->SetFlatButtons(this->FlatButtonsCheckButton->GetState() ? 1 : 0);
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -446,34 +264,10 @@ void vtkPVApplicationSettingsInterface::UpdateEnableState()
     {
     this->ShowSourcesNameCheckButton->SetEnabled(this->Enabled);
     }
-
-  // Toolbar settings
-
-  if (this->ToolbarSettingsFrame)
-    {
-    this->ToolbarSettingsFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->FlatFrameCheckButton)
-    {
-    this->FlatFrameCheckButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->FlatButtonsCheckButton)
-    {
-    this->FlatButtonsCheckButton->SetEnabled(this->Enabled);
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "Window: " << this->Window << endl;
-
-  // Toolbar settings
-
-  os << indent << "ToolbarSettingsFrame: " 
-     << this->ToolbarSettingsFrame << endl;
 }

@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.412");
+vtkCxxRevisionMacro(vtkPVWindow, "1.413");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -158,6 +158,7 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for modifying user interaction
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
+  this->Toolbars->AppendItem(this->InteractorToolbar);
 
   //this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
@@ -165,6 +166,7 @@ vtkPVWindow::vtkPVWindow()
     
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
+  this->Toolbars->AppendItem(this->Toolbar);
 
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
@@ -175,6 +177,8 @@ vtkPVWindow::vtkPVWindow()
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   
   this->PickCenterToolbar = vtkKWToolbar::New();
+  this->Toolbars->AppendItem(this->PickCenterToolbar);
+
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
   this->HideCenterButton = vtkKWPushButton::New();
@@ -1822,45 +1826,6 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
   return this->ApplicationSettingsInterface;
 }
 
-void vtkPVWindow::UpdateToolbarAspect()
-{
-  int flat_frame;
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY))
-    {
-    flat_frame = this->Application->GetIntRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY);
-    }
-  else
-    {
-    flat_frame = vtkKWToolbar::GetGlobalFlatAspect();
-    }
-
-  int flat_buttons;
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY))
-    {
-    flat_buttons = this->Application->GetIntRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY);
-    }
-  else
-    {
-    flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
-    }
-
-  this->InteractorToolbar->SetFlatAspect(flat_frame);
-  this->InteractorToolbar->SetWidgetsFlatAspect(flat_buttons);
-
-  this->Toolbar->SetFlatAspect(flat_frame);
-  this->Toolbar->SetWidgetsFlatAspect(flat_buttons);
-
-  this->PickCenterToolbar->SetFlatAspect(flat_frame);
-  this->PickCenterToolbar->SetWidgetsFlatAspect(flat_buttons);
-
-//   this->FlySpeedToolbar->SetFlatAspect(flat_frame);
-//   this->FlySpeedToolbar->SetWidgetsFlatAspect(flat_buttons);
-}
-
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetShowSourcesLongHelp(int v)
 {
@@ -1869,7 +1834,7 @@ void vtkPVWindow::SetShowSourcesLongHelp(int v)
       this->GetApplicationSettingsInterface());
   if (asi)
     {
-    asi->SetShowSourcesDescription(v ? 1 : 0);
+    asi->Update();
     }
 
   if (this->ShowSourcesLongHelp == v)
@@ -3899,7 +3864,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.412 $");
+  this->ExtractRevision(os,"$Revision: 1.413 $");
 }
 
 //----------------------------------------------------------------------------

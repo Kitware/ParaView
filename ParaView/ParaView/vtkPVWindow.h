@@ -491,9 +491,6 @@ public:
   // Get the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
-  // Callback: update the toolbar aspects once toolbar settings have been changed
-  void UpdateToolbarAspect();
-
   // Description:
   // I am using this method instead of MakeTclObject.
   void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);

@@ -61,6 +61,7 @@ class vtkKWNotebook;
 class vtkKWProgressGauge;
 class vtkKWSplitFrame;
 class vtkKWTclInteractor;
+class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
 class vtkKWView;
 class vtkKWViewCollection;
@@ -330,6 +331,13 @@ public:
   // the windows and last is the arguments of the event.
   static void ProcessEvent(vtkObject *, unsigned long, void *, void *);
 
+  // Description:
+  // Update the toolbar aspect once the toolbar settings have been changed
+  virtual void UpdateToolbarAspect();
+  //BTX
+  vtkGetObjectMacro(Toolbars, vtkVector<vtkKWToolbar*>);
+  //ETX
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -409,6 +417,10 @@ protected:
   // Description:
   // This vector holds the list of most recently used files.
   vtkVector<vtkKWWindowMenuEntry*> *RecentFilesVector;
+
+  // Description:
+  // This vector holds the list of toolbars.
+  vtkVector<vtkKWToolbar*> *Toolbars;
 //ETX
 
   vtkKWTclInteractor *TclInteractor;

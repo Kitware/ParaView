@@ -59,10 +59,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY     "ShowSplashScreen"
 #define VTK_KW_SHOW_TOOLTIPS_REG_KEY          "ShowBalloonHelp"
 
+#define VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY     "ToolbarFlatFrame"
+#define VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY   "ToolbarFlatButtons"
+
 //------------------------------------------------------------------------------
 
 class vtkKWLabeledFrame;
 class vtkKWCheckButton;
+class vtkKWWindow;
 
 class VTK_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
 {
@@ -72,30 +76,19 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set/Get the window (do not ref count it since the window will ref count
+  // this widget).
+  vtkGetObjectMacro(Window, vtkKWWindow);
+  virtual void SetWindow(vtkKWWindow*);
+
+  // Description:
   // Create the interface objects.
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Set ConfirmExit UI On/Off programmatically. 
-  // Save the setting to registry.
-  void SetConfirmExit(int);
-
-  // Description:
-  // Set SaveGeometry UI On/Off programmatically. 
-  // Save the setting to registry.
-  void SetSaveGeometry(int);
-
-  // Description:
-  // Set ShowSplashScreen UI On/Off programmatically. 
-  // Save the setting to registry.
-  // Call the vtkKWapplication::SetShowSplashScreen() method accordingly.
-  void SetShowSplashScreen(int);
-
-  // Description:
-  // Set ShowBalloonHelp (tooltips) UI On/Off programmatically. 
-  // Save the setting to registry.
-  // Call the vtkKWapplication::SetShowBalloonHelp() method accordingly.
-  void SetShowBalloonHelp(int);
+  // Refresh the interface given the current value of the Window and its
+  // views/composites/widgets.
+  virtual void Update();
 
   // Description:
   // Callback used when interaction has been performed.
@@ -103,10 +96,16 @@ public:
   void SaveGeometryCallback();
   void ShowSplashScreenCallback();
   void ShowBalloonHelpCallback();
+  void FlatFrameCallback();
+  void FlatButtonsCallback();
 
 protected:
   vtkKWApplicationSettingsInterface();
   ~vtkKWApplicationSettingsInterface();
+
+  vtkKWWindow       *Window;
+
+  // Interface settings
 
   vtkKWLabeledFrame *InterfaceSettingsFrame;
 
@@ -114,6 +113,12 @@ protected:
   vtkKWCheckButton  *SaveGeometryCheckButton;
   vtkKWCheckButton  *ShowSplashScreenCheckButton;
   vtkKWCheckButton  *ShowBalloonHelpCheckButton;
+
+  // Toolbar settings
+
+  vtkKWLabeledFrame *ToolbarSettingsFrame;
+  vtkKWCheckButton  *FlatFrameCheckButton;
+  vtkKWCheckButton  *FlatButtonsCheckButton;
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
