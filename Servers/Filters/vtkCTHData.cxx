@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.18");
+vtkCxxRevisionMacro(vtkCTHData, "1.19");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -1482,15 +1482,8 @@ vtkIdType vtkCTHData::GetNumberOfCellsForBlock(int blockId)
 {
   vtkIdType nCells=1;
   int i;
-  
-  // Charles this is a left over 'hack' from what you
-  // had before. I'm guessing that you're getting the
-  // point dimension instead of the cell dimensions
-  // to account for ghost cells???? I really have
-  // no idea, but you need this method to return
-  // the cell dimensions +1 in each direction in 
-  // order for logic in other place in the code to work
-  int *dims = this->GetBlockPointDimensions(blockId);
+
+  int *dims = this->GetBlockCellDimensions(blockId);
 
   for (i=0; i<3; i++)
     {
@@ -1500,7 +1493,7 @@ vtkIdType vtkCTHData::GetNumberOfCellsForBlock(int blockId)
       }
     if (dims[i] > 1)
       {
-      nCells *= (dims[i]-1);
+      nCells *= dims[i];
       }
     }
   return nCells;
@@ -1521,7 +1514,7 @@ vtkIdType vtkCTHData::GetNumberOfPointsForBlock(int blockId)
       }
     if (dims[i] > 1)
       {
-      nCells *= (dims[i]-1);
+      nCells *= dims[i];
       }
     }
   return nCells;
