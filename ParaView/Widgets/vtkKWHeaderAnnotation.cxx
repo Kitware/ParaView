@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.1");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.2");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -407,6 +407,8 @@ void vtkKWHeaderAnnotation::HeaderTextCallback()
 //----------------------------------------------------------------------------
 void vtkKWHeaderAnnotation::UpdateEnableState()
 {
+  this->Superclass::UpdateEnableState();
+
   if (this->TextEntry)
     {
     this->TextEntry->SetEnabled(this->Enabled);
