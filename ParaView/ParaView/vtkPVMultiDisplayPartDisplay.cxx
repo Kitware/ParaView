@@ -40,14 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVMultiDisplayPartDisplay.h"
+
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkMultiProcessController.h"
+#include "vtkPVProcessModule.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.6.4.1");
 
 
 //----------------------------------------------------------------------------
@@ -73,38 +75,36 @@ void vtkPVMultiDisplayPartDisplay::SetLODCollectionDecision(int)
 void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   this->Superclass::CreateParallelTclObjects(pvApp);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  // Special case when TileDisplay is not running client server.
-  if ( ! pvApp->GetClientMode())
-    {
-    pvApp->BroadcastScript("%s ZeroEmptyOn; %s ZeroEmptyOn",
-                          this->CollectTclName,
-                          this->LODCollectTclName);
-
-    // Broadcast for subclasses.  
-    pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [expr {[[$Application GetProcessModule] GetNumberOfPartitions]-1}]",
-                          this->LODUpdateSuppressorTclName);
-    pvApp->BroadcastScript("%s SetUpdatePiece [expr {[[$Application GetProcessModule] GetPartitionId]-1}]",
-                          this->LODUpdateSuppressorTclName);
-    pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [expr {[[$Application GetProcessModule] GetNumberOfPartitions]-1}]",
-                          this->UpdateSuppressorTclName);
-    pvApp->BroadcastScript("%s SetUpdatePiece [expr {[[$Application GetProcessModule] GetPartitionId]-1}]",
-                          this->UpdateSuppressorTclName);
-    // Local pipeline has no data, or all of the data?
-    }
-  else
+  if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
-    pvApp->Script("%s SetClientFlag 1; %s SetClientFlag 1",
-                  this->CollectTclName,
-                  this->LODCollectTclName);
-    }   
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetClientFlag" << 1
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetClientFlag" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    }
+  else
+    {
+    vtkErrorMacro("Cannot run tile display without client-server mode.");
+    }
 
   int* dims = pvApp->GetTileDimensions();
-  pvApp->BroadcastScript("%s InitializeSchedule %d; %s InitializeSchedule %d", 
-                         this->CollectTclName, dims[0]*dims[1],
-                         this->LODCollectTclName, dims[0]*dims[1]);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "InitializeSchedule" << (dims[0]*dims[1])
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "InitializeSchedule" << (dims[0]*dims[1])
+    << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------

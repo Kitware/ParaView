@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.11");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.12");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1673,7 +1673,7 @@ void vtkPVData::DrawPoints()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
@@ -1745,7 +1745,7 @@ void vtkPVData::DrawSurface()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (!this->PreviousWasSolid)
         {
@@ -1814,7 +1814,7 @@ void vtkPVData::DrawOutline()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
@@ -2438,24 +2438,24 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
  //      *file << "vtkPolyDataMapper " << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
 //             << part->GetPartDisplay()->GetMapperTclName() << " SetInput ["
 //             << part->GetGeometryTclName() << " GetOutput]\n\t";  
-      *file << part->GetPartDisplay()->GetMapperTclName() << " SetImmediateModeRendering "
-            << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
+            << "pvTemp" << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
-      *file << part->GetPartDisplay()->GetMapperTclName() << " UseLookupTableScalarRangeOn\n\t";
-      *file << part->GetPartDisplay()->GetMapperTclName() << " SetScalarVisibility "
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
             << part->GetPartDisplay()->GetMapper()->GetScalarVisibility() << "\n\t"
-            << part->GetPartDisplay()->GetMapperTclName() << " SetScalarModeTo";
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarModeTo";
       scalarMode = part->GetPartDisplay()->GetMapper()->GetScalarModeAsString();
       *file << scalarMode << "\n";
       if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
           strcmp(scalarMode, "UseCellFieldData") == 0)
         {
-        *file << "\t" << part->GetPartDisplay()->GetMapperTclName() << " SelectColorArray {"
+        *file << "\t" << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SelectColorArray {"
               << part->GetPartDisplay()->GetMapper()->GetArrayName() << "}\n";
         }
       if (this->PVColorMap)
         {
-        *file << part->GetPartDisplay()->GetMapperTclName() << " SetLookupTable pvTemp" 
+        *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetLookupTable pvTemp" 
               << this->PVColorMap->GetLookupTableID() << endl;
         }
   
@@ -2473,7 +2473,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
             << part->GetPartDisplay()->GetProperty()->GetDiffuse() << "\n";
       *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecular "
             << part->GetPartDisplay()->GetProperty()->GetSpecular() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecularPower "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularPower "
             << part->GetPartDisplay()->GetProperty()->GetSpecularPower() << "\n";
       float *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
       *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularColor "

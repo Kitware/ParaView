@@ -75,12 +75,12 @@ public:
 
   // Description:
   // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(char* geometryTclName);
+  virtual void ConnectToGeometry(vtkClientServerID geometryID);
           
   // Description:
   // Collection filters for both levels of detail.
-  vtkGetStringMacro(CollectTclName);
-  vtkGetStringMacro(LODCollectTclName);
+  vtkGetMacro(CollectID, vtkClientServerID);
+  vtkGetMacro(LODCollectID, vtkClientServerID);
 
   // Description:
   // This is a little different than superclass 
@@ -95,11 +95,8 @@ protected:
   int CollectionDecision;
   int LODCollectionDecision;
 
-  char *CollectTclName;
-  vtkSetStringMacro(CollectTclName);
-
-  char *LODCollectTclName;
-  vtkSetStringMacro(LODCollectTclName);
+  vtkClientServerID CollectID;
+  vtkClientServerID LODCollectID;
   
   // Description:
   // This method should be called immediately after the object is constructed.

@@ -125,7 +125,6 @@ public:
   vtkGetMacro(PropertyID, vtkClientServerID);
   vtkGetMacro(MapperID, vtkClientServerID);
 
-
   // Description:
   // Not referenced counted.  I might get rid of this reference later.
   virtual void SetPart(vtkPVPart* part) {this->Part = part;}
@@ -135,22 +134,6 @@ public:
   // PVSource calls this when it gets modified.
   void InvalidateGeometry();
 
-  char* UpdateSuppressorTclName;
-  const char* GetPropertyTclName() 
-    {
-      return "";
-    }
-  const char* GetMapperTclName()
-    {
-      return "";
-    }
-  const char* GetPropTclName()
-    {
-      return "";
-    }
-  char* PropTclName;
-  char* MapperTclName;
-  char* PropertyTclName;
 protected:
   vtkPVPartDisplay();
   ~vtkPVPartDisplay();
@@ -168,12 +151,12 @@ protected:
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;
   vtkProp *Prop;
-        
+
   vtkClientServerID PropID;
   vtkClientServerID PropertyID;
   vtkClientServerID MapperID;
   vtkClientServerID UpdateSuppressorID;
-    
+
   // Here to create unique names.
   int InstanceCount;
 

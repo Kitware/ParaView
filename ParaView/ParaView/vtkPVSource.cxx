@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.15");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.16");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -646,7 +646,7 @@ void vtkPVSource::AddVTKSource(vtkClientServerID id)
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
-void vtkPVSource::AddVTKSource(const char *tclName)
+void vtkPVSource::AddVTKSource(const char*)
 {
   vtkErrorMacro("No longer supported.");
 }
@@ -2525,7 +2525,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << this->NumberOfOutputsInformation << endl;
 }
 
-const char *vtkPVSource::GetVTKSourceTclName(int idx)
+const char *vtkPVSource::GetVTKSourceTclName(int)
 {
   return "";
 }

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.4");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.5");
 
 
 //----------------------------------------------------------------------------
@@ -203,12 +203,23 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     vtkPolyDataMapper::SafeDownCast(
       pm->GetObjectFromID(this->MapperID));
 
-  // ****  need to fix this
-//   // Broadcast for subclasses.  
-//   pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
-//                         this->UpdateSuppressorTclName);
-//   pvApp->BroadcastScript("%s SetUpdatePiece [[$Application GetProcessModule] GetPartitionId]",
-//                         this->UpdateSuppressorTclName);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -418,9 +429,9 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Visibility: " << this->Visibility << endl;
   os << indent << "Part: " << this->Part << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;
-  os << indent << "MapperTclName: " << this->MapperID.ID << endl;
-  os << indent << "PropTclName: " << this->PropID.ID << endl;
-  os << indent << "PropertyTclName: " << this->PropertyID.ID << endl;
+  os << indent << "MapperID: " << this->MapperID.ID << endl;
+  os << indent << "PropID: " << this->PropID.ID << endl;
+  os << indent << "PropertyID: " << this->PropertyID.ID << endl;
   os << indent << "PVApplication: " << this->PVApplication << endl;
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;

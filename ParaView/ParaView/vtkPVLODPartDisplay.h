@@ -105,10 +105,6 @@ public:
   vtkGetMacro(LODMapperID,vtkClientServerID);
   vtkGetMacro(LODDeciID,vtkClientServerID);
   
-  vtkGetStringMacro(LODUpdateSuppressorTclName);
-  vtkGetStringMacro(LODMapperTclName);
-  vtkGetStringMacro(LODDeciTclName);
-    
   // Description:
   // Returns an up to data information object.
   // Do not keep a reference to this object.
@@ -123,15 +119,6 @@ protected:
   vtkClientServerID LODUpdateSuppressorID;
   vtkClientServerID LODMapperID;
   vtkClientServerID LODDeciID;
-  
-  char *LODMapperTclName;
-  vtkSetStringMacro(LODMapperTclName);
-  
-  char *LODDeciTclName;
-  vtkSetStringMacro(LODDeciTclName);
-    
-  char *LODUpdateSuppressorTclName;
-  vtkSetStringMacro(LODUpdateSuppressorTclName);
   
   // Description:
   // This method should be called immediately after the object is constructed.
