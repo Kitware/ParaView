@@ -1967,6 +1967,11 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
              class="vtkDataSet">
       </Input>
     </Filter>
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
     <PointWidget trace_name="Point" variable="WorldPoint"/>
     <SelectionList variable="PickCell"
                    label="Pick Type"
