@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.20");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.21");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -381,6 +381,8 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     delete [] this->HistogramLogModeChangedCommand;
     this->HistogramLogModeChangedCommand = NULL;
     }
+
+  this->SetParameterTicksFormat(NULL);
 }
 
 //----------------------------------------------------------------------------
