@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.5");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.6");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -311,7 +311,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Color map: parameter name
 
   this->ArrayNameLabel->SetParent(this->ColorMapFrame->GetFrame());
-  this->ArrayNameLabel->Create(this->Application, "");
+  this->ArrayNameLabel->Create(this->Application, "-anchor w");
   this->ArrayNameLabel->SetLabel("Parameter: ");
 
   // Color map: range
@@ -416,10 +416,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   // Color map: pack
 
-  this->Script("pack %s -side top -expand t -fill x -anchor nw",
-               this->ArrayNameLabel->GetWidgetName());
-
-  this->Script("pack %s %s %s -side top -expand t -fill x",
+  this->Script("pack %s %s %s %s -side top -expand t -fill x -anchor nw",
+               this->ArrayNameLabel->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName(),
                this->ColorEditorFrame->GetWidgetName(),
                this->NumberOfColorsScale->GetWidgetName());
@@ -466,12 +464,12 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   // Pack
 
-  this->Script("pack %s %s %s -side top -anchor n -fill x -pady 2", 
+  this->Script("pack %s %s %s -side top -anchor n -fill x -padx 2 -pady 2", 
                this->ColorMapFrame->GetWidgetName(), 
                this->ScalarBarFrame->GetWidgetName(),
                this->BackButton->GetWidgetName());
 
-  this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
+  //  this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
 
   this->SetColorSchemeToRedBlue();
 }
