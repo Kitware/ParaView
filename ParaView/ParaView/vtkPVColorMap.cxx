@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.31");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.32");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -539,6 +539,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarTitleLabel->Create(this->Application, label_settings);
   
   this->ScalarBarTitleEntry->SetParent(this->ScalarBarTitleFrame);
+  this->ScalarBarTitleEntry->SetWidth(10);
   this->ScalarBarTitleEntry->Create(this->Application, "");
   this->Script("bind %s <KeyPress-Return> {%s ScalarBarTitleEntryCallback}",
                this->ScalarBarTitleEntry->GetWidgetName(),
@@ -548,6 +549,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->GetTclName()); 
 
   this->ScalarBarVectorTitleEntry->SetParent(this->ScalarBarTitleFrame);
+  this->ScalarBarVectorTitleEntry->SetWidth(
+    this->ScalarBarTitleEntry->GetWidth() / 2);
   this->ScalarBarVectorTitleEntry->Create(this->Application, "");
   this->Script("bind %s <KeyPress-Return> {%s ScalarBarVectorTitleEntryCallback}",
                this->ScalarBarVectorTitleEntry->GetWidgetName(),
@@ -577,13 +580,15 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->Script("grid %s -row 1 -column 1 -columnspan 2 -sticky nws %s",
                this->TitleTextProperty->GetWidgetName(),
                grid_settings);
+
   if (this->NumberOfVectorComponents > 1)
     {
     this->Script("grid %s -row 0 -column 2 -sticky news %s",
                  this->ScalarBarVectorTitleEntry->GetWidgetName(),
                  grid_settings);
+    this->Script("grid columnconfigure %s 2 -weight 3",
+                 this->ScalarBarVectorTitleEntry->GetParent()->GetWidgetName());
     }
-  
 
   // Scalar bar : Label control
 
@@ -595,6 +600,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarLabelFormatLabel->Create(this->Application, label_settings);
   
   this->ScalarBarLabelFormatEntry->SetParent(this->ScalarBarLabelFormatFrame);
+  this->ScalarBarLabelFormatEntry->SetWidth(
+    this->ScalarBarTitleEntry->GetWidth());
   this->ScalarBarLabelFormatEntry->Create(this->Application, "");
   this->Script("bind %s <KeyPress-Return> {%s ScalarBarLabelFormatEntryCallback}",
                this->ScalarBarLabelFormatEntry->GetWidgetName(),
@@ -658,11 +665,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   int weights[2];
   weights[0] = 0;
-  weights[1] = 1;
+  weights[1] = 4;
 
   float factors[2];
-  factors[0] = 1.3;
-  factors[1] = 1.0;
+  factors[0] = 1.15;
+  factors[1] = 0.0;
 
   vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
     this->Application->GetMainInterp(), 2, widgets, factors, weights);
