@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenuButton.h"
 #include "vtkKWTkUtilities.h"
 
-#include "Resources/vtkKWDownArrow.h"
+#include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.1");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.2");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -109,10 +109,10 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   char *imageName = new char[strlen(app->GetMainInterp()->result)+1];
   strcpy(imageName, app->GetMainInterp()->result);
   vtkKWTkUtilities::UpdatePhoto(app->GetMainInterp(), imageName,
-                                image_KWDownArrow, image_KWDownArrow_width,
-                                image_KWDownArrow_height,
-                                image_KWDownArrow_pixel_size,
-                                image_KWDownArrow_buffer_length);
+                                image_KWArrowDown, image_KWArrowDown_width,
+                                image_KWArrowDown_height,
+                                image_KWArrowDown_pixel_size,
+                                image_KWArrowDown_buffer_length);
   this->Script("%s configure -image %s -indicatoron 0",
                this->SelectionList->GetWidgetName(), imageName);
 
