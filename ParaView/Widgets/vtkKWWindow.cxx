@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.1");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.2");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -657,6 +657,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
       this->Script("wm geometry %s %s", wname, geometry);
       }
     }
+  else
+    {
+    this->Script("wm geometry %s 900x700+0+0", wname);
+    }
 
   this->StatusFrame->Create(app,"frame","");
 
@@ -1231,7 +1235,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.2 $");
 }
 
 int vtkKWWindow::ExitDialog()
