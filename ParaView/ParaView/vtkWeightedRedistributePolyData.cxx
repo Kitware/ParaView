@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.10");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.11");
 
 //-------------------------------------------------------------------
 
@@ -376,8 +376,11 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
             }
           } // end while (numToSend>0)
         rsCntSend[type][ostart] = cnt;
-        rsSendTo[type][ostart]  = new int[cnt];
-        rsSendNum[type][ostart] = new vtkIdType[cnt];
+        if (cnt>0)
+          {
+          rsSendTo[type][ostart]  = new int[cnt];
+          rsSendNum[type][ostart] = new vtkIdType[cnt];
+          }
         for (int i=0; i<cnt;i++)
           {
           rsSendTo[type][ostart][i]  = sendToTemp[i];
@@ -399,7 +402,11 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         {
         maxCntSend+=rsCntSend[type][id];
         }
-      int* tempSend = new int[maxCntSend];
+      int* tempSend = NULL;
+      if (maxCntSend>0)
+        {
+        tempSend = new int[maxCntSend];
+        }
       int j;
 
       int currSendCnt = 0;
@@ -427,11 +434,17 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           } // end loop over rsCntSend
         } // end loop over type
       remoteSched[id].SendCount = currSendCnt;
-      remoteSched[id].SendTo = new int[currSendCnt];
-      remoteSched[id].SendNumber = new vtkIdType*[NUM_CELL_TYPES];
+      if (currSendCnt >0)
+        {
+          remoteSched[id].SendTo = new int[currSendCnt];
+          remoteSched[id].SendNumber = new vtkIdType*[NUM_CELL_TYPES];
+        }
       for (type=0; type<NUM_CELL_TYPES; type++)
         {
-        remoteSched[id].SendNumber[type] = new vtkIdType[currSendCnt];
+        if (currSendCnt >0)
+          {
+          remoteSched[id].SendNumber[type] = new vtkIdType[currSendCnt];
+          }
         }
 
       for (i=0; i<currSendCnt; i++)
@@ -461,8 +474,23 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         } // end loop over number of processors processors sent to
 
       // ... clean up ...
-      delete [] tempSend;
+      if (tempSend != NULL) {delete [] tempSend;}
       } // end loop over procs
+   
+    for (type=0; type<NUM_CELL_TYPES; type++)
+      {
+      for (id=0; id<numProcs; id++)
+        {
+        if (rsCntSend[type][id]>0)
+          {
+          delete [] rsSendTo[type][id];
+          delete [] rsSendNum[type][id];
+          }
+        }
+        delete [] rsCntSend[type];
+        delete [] rsSendTo[type]; 
+        delete [] rsSendNum[type]; 
+      }
 
     for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0;} 
     // ... count up how processors a processor will be receiving from ...
@@ -479,13 +507,21 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     //  and how many to receive ...
     for (id = 0; id < numProcs; id++) 
       {
-      remoteSched[id].ReceiveFrom = 
-        new int [remoteSched[id].ReceiveCount]; 
-      remoteSched[id].ReceiveNumber= new vtkIdType* [NUM_CELL_TYPES]; 
+      //remoteSched[id].ReceiveFrom = 
+       // new int [remoteSched[id].ReceiveCount]; 
+      if (remoteSched[id].ReceiveCount>0)
+        {
+        remoteSched[id].ReceiveFrom = 
+          new int[remoteSched[id].ReceiveCount];
+        remoteSched[id].ReceiveNumber= new vtkIdType* [NUM_CELL_TYPES]; 
+        }
       for (type=0; type<NUM_CELL_TYPES; type++)
         {
-        remoteSched[id].ReceiveNumber[type]  = 
-          new vtkIdType [remoteSched[id].ReceiveCount]; 
+        if (remoteSched[id].ReceiveCount>0)
+          {
+          remoteSched[id].ReceiveNumber[type]  = 
+            new vtkIdType [remoteSched[id].ReceiveCount]; 
+          }
         }
       }
 
@@ -573,17 +609,29 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         remoteSched[0].NumberOfCells[type];
       }
     localSched->SendCount  = remoteSched[0].SendCount;
-    localSched->ReceiveCount   = remoteSched[0].ReceiveCount;
-    localSched->SendTo   = new int [localSched->SendCount];
-    localSched->ReceiveFrom  = new int [localSched->ReceiveCount];
-    localSched->SendNumber  = new vtkIdType* [NUM_CELL_TYPES];
-    localSched->ReceiveNumber   = new vtkIdType* [NUM_CELL_TYPES];
+    localSched->ReceiveCount = remoteSched[0].ReceiveCount;
+    if (localSched->SendCount>0)
+      {
+      localSched->SendTo   = new int [localSched->SendCount];
+      localSched->SendNumber  = new vtkIdType* [NUM_CELL_TYPES];
+      }
+    if (localSched->ReceiveCount>0)
+      {
+      localSched->ReceiveFrom  = new int [localSched->ReceiveCount];
+      localSched->ReceiveNumber   = new vtkIdType* [NUM_CELL_TYPES];
+      }
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
-      localSched->SendNumber[type]  = 
-        new vtkIdType [localSched->SendCount];
-      localSched->ReceiveNumber[type]   = 
-        new vtkIdType [localSched->ReceiveCount];
+      if (localSched->SendCount>0)
+        {
+        localSched->SendNumber[type]  = 
+          new vtkIdType [localSched->SendCount];
+        }
+      if (localSched->ReceiveCount>0)
+        {
+        localSched->ReceiveNumber[type]   = 
+          new vtkIdType [localSched->ReceiveCount];
+        }
       }
     for (i=0;i<localSched->SendCount; i++)
       {
@@ -628,6 +676,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     this->Controller->Receive(schedArray2, schedLen2, 0, 
       SCHED_2_TAG); 
 
+    localSched->NumberOfCells = new vtkIdType[NUM_CELL_TYPES]; 
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
       localSched->NumberOfCells[type] = schedArray2[type];
@@ -676,4 +725,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     delete [] schedArray1;
     delete [] schedArray2;
     }
+
+  delete [] remoteSched;
+
 }

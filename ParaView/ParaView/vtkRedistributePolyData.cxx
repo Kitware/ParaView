@@ -94,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.15");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.16");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -2997,6 +2997,7 @@ vtkRedistributePolyData::vtkCommSched::~vtkCommSched()
 {
   delete [] this->SendTo;
   delete [] this->ReceiveFrom;
+
   int type;
   
   for (type=0; type<NUM_CELL_TYPES; type++)
@@ -3035,5 +3036,7 @@ vtkRedistributePolyData::vtkCommSched::~vtkCommSched()
   delete [] this->SendNumber;
   delete [] this->ReceiveNumber;
   delete [] this->KeepCellList;
+  delete [] this->NumberOfCells;
+
 }
 //*****************************************************************
