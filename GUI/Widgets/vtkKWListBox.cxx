@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.29");
+vtkCxxRevisionMacro(vtkKWListBox, "1.30");
 
 
 //----------------------------------------------------------------------------
@@ -126,6 +126,11 @@ const char *vtkKWListBox::GetSelection()
   this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
                this->Listbox->GetWidgetName());
   char* result = this->GetApplication()->GetMainInterp()->result;
+
+  if (this->CurrentSelection)
+    {
+    delete [] this->CurrentSelection;
+    }
   this->CurrentSelection = strcpy(new char[strlen(result)+1], result);
   return this->CurrentSelection;
 }

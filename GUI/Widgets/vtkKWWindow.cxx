@@ -45,7 +45,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.203");
+vtkCxxRevisionMacro(vtkKWWindow, "1.204");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -845,6 +845,9 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name)
   command << "ToggleToolbarVisibility " << id << " " << name << ends;
   this->ToolbarsMenu->AddCheckButton(
     name, rbv, this, command.str(), "Show/Hide this toolbar");
+
+  delete [] rbv;
+  
   this->ToolbarsMenu->CheckCheckButton(this, name, 1);
   command.rdbuf()->freeze(0);
 }
