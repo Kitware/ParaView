@@ -854,10 +854,12 @@ int main(int argc,char *argv[])
   if (argc == 5)
     {
     fout = fopen(argv[4],"w");
+    data.OutputFileName = argv[4];
     }
   else
     {
     fout = fopen(argv[3],"w");
+    data.OutputFileName = argv[3];
     }
   
   if (!fout)
@@ -1837,35 +1839,35 @@ case 129:
 
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"void Set%s (float, float);",
+     sprintf(currentFunction->Signature,"void Set%s (double, double);",
        yyvsp[-1].str);
      sprintf(temps,"Set%s",yyvsp[-1].str); 
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 2;
-     currentFunction->ArgTypes[0] = 1;
+     currentFunction->ArgTypes[0] = 7;
      currentFunction->ArgCounts[0] = 0;
-     currentFunction->ArgTypes[1] = 1;
+     currentFunction->ArgTypes[1] = 7;
      currentFunction->ArgCounts[1] = 0;
      currentFunction->ReturnType = 2;
      output_function();
 
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"void Set%s (float a[2]);",
+     sprintf(currentFunction->Signature,"void Set%s (double a[2]);",
        yyvsp[-1].str);
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 1;
-     currentFunction->ArgTypes[0] = 301;
+     currentFunction->ArgTypes[0] = 307;
      currentFunction->ArgCounts[0] = 2;
      output_function();
      
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"float *Get%s ();", yyvsp[-1].str);
+     sprintf(currentFunction->Signature,"double *Get%s ();", yyvsp[-1].str);
      sprintf(temps,"Get%s",yyvsp[-1].str); 
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 0;
-     currentFunction->ReturnType = 301;
+     currentFunction->ReturnType = 307;
      currentFunction->HaveHint = 1;
      currentFunction->HintSize = 2;
      output_function();
@@ -1883,40 +1885,40 @@ case 130:
      currentFunction->ReturnType = 309;
      currentFunction->ReturnClass = vtkstrdup("vtkCoordinate");
      output_function();
-
+     
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"void Set%s (float, float, float);",
+     sprintf(currentFunction->Signature,"void Set%s (double, double, double);",
        yyvsp[-1].str);
      sprintf(temps,"Set%s",yyvsp[-1].str); 
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 3;
-     currentFunction->ArgTypes[0] = 1;
+     currentFunction->ArgTypes[0] = 7;
      currentFunction->ArgCounts[0] = 0;
-     currentFunction->ArgTypes[1] = 1;
+     currentFunction->ArgTypes[1] = 7;
      currentFunction->ArgCounts[1] = 0;
-     currentFunction->ArgTypes[2] = 1;
+     currentFunction->ArgTypes[2] = 7;
      currentFunction->ArgCounts[2] = 0;
      currentFunction->ReturnType = 2;
      output_function();
 
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"void Set%s (float a[3]);",
+     sprintf(currentFunction->Signature,"void Set%s (double a[3]);",
        yyvsp[-1].str);
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 1;
-     currentFunction->ArgTypes[0] = 301;
+     currentFunction->ArgTypes[0] = 307;
      currentFunction->ArgCounts[0] = 3;
      output_function();
      
      currentFunction->Signature = (char *)malloc(2048);
      sigAllocatedLength = 2048;
-     sprintf(currentFunction->Signature,"float *Get%s ();", yyvsp[-1].str);
+     sprintf(currentFunction->Signature,"double *Get%s ();", yyvsp[-1].str);
      sprintf(temps,"Get%s",yyvsp[-1].str); 
      currentFunction->Name = vtkstrdup(temps);
      currentFunction->NumberOfArguments = 0;
-     currentFunction->ReturnType = 301;
+     currentFunction->ReturnType = 307;
      currentFunction->HaveHint = 1;
      currentFunction->HintSize = 3;
      output_function();
@@ -1956,6 +1958,23 @@ case 131:
    currentFunction->ReturnType = 309;
    currentFunction->ReturnClass = vtkstrdup(yyvsp[-3].str);
    output_function();
+
+   if ( data.IsConcrete )
+     {
+     currentFunction->Signature = (char *)malloc(2048);
+     sigAllocatedLength = 2048;
+     sprintf(currentFunction->Signature, "%s *SafeDownCast (vtkObject* o);",
+             yyvsp[-3].str);
+     sprintf(temps,"SafeDownCast"); 
+     currentFunction->Name = vtkstrdup(temps);
+     currentFunction->NumberOfArguments = 1;
+     currentFunction->ArgTypes[0] = 309;
+     currentFunction->ArgCounts[0] = 1;
+     currentFunction->ArgClasses[0] = vtkstrdup("vtkObject");
+     currentFunction->ReturnType = 2309;
+     currentFunction->ReturnClass = vtkstrdup(yyvsp[-3].str);
+     output_function();
+     }
    }
 break;
 #line 1940 "vtkParse.tab.c"
