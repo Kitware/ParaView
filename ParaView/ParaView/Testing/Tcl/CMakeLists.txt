@@ -2,9 +2,9 @@ SET(TEST_PATH "ParaView")
 SET(RUN_WITH_MPI 0)
 IF (VTK_USE_MPI)
   IF (UNIX)
-    IF (MPIRUN)
+    IF (VTK_MPIRUN_EXE)
       SET(RUN_WITH_MPI 1)
-    ENDIF (MPIRUN)
+    ENDIF (VTK_MPIRUN_EXE)
   ENDIF (UNIX)
 ENDIF (VTK_USE_MPI)
 
@@ -46,7 +46,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
-    ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
+    ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
              --disable-registry
              ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
                -D ${PARAVIEW_SOURCE_DIR}/Data 
