@@ -6,6 +6,7 @@ SET(Filters_SRCS
   vtkColorByPart.cxx
   vtkExtractCells.cxx
   vtkGroup.cxx
+  vtkMazeSource.cxx
   vtkMergeArrays.cxx
   vtkMergeCells.cxx
   vtkMultiOut2.cxx
