@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.274");
+vtkCxxRevisionMacro(vtkPVData, "1.275");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1938,7 +1938,6 @@ void vtkPVData::DrawPoints()
 //----------------------------------------------------------------------------
 void vtkPVData::DrawVolume()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
   int idx, num;
 
