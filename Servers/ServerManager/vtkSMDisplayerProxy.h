@@ -30,6 +30,7 @@
 class vtkSMDisplayerProxyInternals;
 class vtkSMPart;
 class vtkSMDisplayWindowProxy;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMDisplayerProxy : public vtkSMProxy
 {
