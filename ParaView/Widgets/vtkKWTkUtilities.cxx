@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.20");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.21");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -1016,6 +1016,85 @@ int vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
   delete [] col_widths;
 
   return ok;
+}
+
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
+  Tcl_Interp *interp,
+  int nb_of_widgets,
+  const char **widgets,
+  const char *options)
+{
+  // Get the maximum width
+
+  int width, length, maxwidth = 0;
+
+  int widget;
+  for (widget = 0; widget < nb_of_widgets; widget++)
+    {
+    // Get the -width
+
+    ostrstream getwidth;
+    getwidth << widgets[widget] << " cget -width" << ends;
+    int res = Tcl_GlobalEval(interp, getwidth.str());
+    getwidth.rdbuf()->freeze(0);
+    if (res != TCL_OK || !interp->result || !interp->result[0])
+      {
+      vtkGenericWarningMacro(<< "Unable to get label -width! " 
+                             <<interp->result);
+      continue;
+      }
+    width = atoi(interp->result);
+
+    // Get the -text length
+
+    ostrstream getlength;
+    getlength << widgets[widget] << " cget -text" << ends;
+    res = Tcl_GlobalEval(interp, getlength.str());
+    getlength.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to get label -text! " 
+                             << interp->result);
+      continue;
+      }
+    length = interp->result ? strlen(interp->result) : 0;
+
+    // Store the max
+
+    if (width > maxwidth)
+      {
+      maxwidth = width;
+      }
+    if (length > maxwidth)
+      {
+      maxwidth = length;
+      }
+    }
+
+  // Synchronize labels
+
+  ostrstream setwidth;
+  for (widget = 0; widget < nb_of_widgets; widget++)
+    {
+    setwidth << widgets[widget] << " config -width " << maxwidth;
+    if (options)
+      {
+      setwidth << " " << options;
+      }
+    setwidth << endl;
+    }
+  setwidth << ends;
+  int res = Tcl_GlobalEval(interp, setwidth.str());
+  setwidth.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to synchronize labels width! " 
+                           << interp->result);
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

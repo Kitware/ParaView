@@ -173,6 +173,15 @@ public:
                                                const float *factors = 0,
                                                const int *weights = 0);
 
+  // Description:
+  // Synchronize the width of a set of label widgets. The maximum size is found
+  // and assigned to each label. Additionally it will apply the "options" to
+  // each widget (if any).
+  static int SynchroniseLabelsMaximumWidth(Tcl_Interp *interp,
+                                           int nb_of_widgets,
+                                           const char **widgets,
+                                           const char *options = 0);
+
   //ETX
 
 protected:
