@@ -56,7 +56,7 @@ vtkPVConeSource::vtkPVConeSource()
   this->RadiusEntry->SetParent(this->Properties);
   this->ResolutionEntry = vtkKWEntry::New();
   this->ResolutionEntry->SetParent(this->Properties);
-  this->Accept = vtkKWWidget::New();
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
   this->ConeSource = vtkConeSource::New();  
 }
@@ -107,8 +107,7 @@ void vtkPVConeSource::CreateProperties()
   this->HeightEntry->SetValue(this->ConeSource->GetHeight(), 2);
   this->ResolutionEntry->Create(this->Application, "");
   this->ResolutionEntry->SetValue(this->ConeSource->GetResolution());
-  this->Accept->Create(this->Application, "button",
-	                     "-text Accept");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ConeParameterChanged");
   this->Script("pack %s %s %s %s %s %s %s",
 	       this->Accept->GetWidgetName(),
@@ -180,6 +179,7 @@ void vtkPVConeSource::ConeParameterChanged()
   window->GetMainView()->SetSelectedComposite(this);
 
   this->GetView()->Render();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------

@@ -91,8 +91,11 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->RangeMaxLabel = vtkKWLabel::New();
   this->RangeMaxLabel->SetParent(this->RangeFrame);
   
-  this->Accept = vtkKWWidget::New();
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
+  
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
   
   this->Elevation = vtkElevationFilter::New();
 
@@ -151,6 +154,9 @@ vtkPVElevationFilter::~vtkPVElevationFilter()
   this->Accept->Delete();
   this->Accept = NULL;
   
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
+  
   this->Elevation->Delete();
   this->Elevation = NULL;
 }
@@ -173,8 +179,11 @@ void vtkPVElevationFilter::CreateProperties()
   high = this->GetElevation()->GetHighPoint();
   range = this->GetElevation()->GetScalarRange();
 
-  this->Accept->Create(this->Application, "button",
-		       "-text Accept");
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
+  this->Script("pack %s", this->SourceButton->GetWidgetName());
+  
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ElevationParameterChanged");
 
   this->LowPointLabel->Create(this->Application, "-pady 6");
@@ -350,7 +359,6 @@ void vtkPVElevationFilter::ElevationParameterChanged()
     this->SetOutput(newData);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     newData->SetAssignment(a);
-//    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
@@ -360,7 +368,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
   
-  this->GetWindow()->ResetCameraCallback();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -419,4 +427,15 @@ void vtkPVElevationFilter::SetScalarRange(float min, float max)
     }  
   
   this->GetElevation()->SetScalarRange(min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
 }

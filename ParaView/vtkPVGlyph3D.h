@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
+#include "vtkKWPushButton.h"
 #include "vtkGlyph3D.h"
 #include "vtkPVSource.h"
 
@@ -73,6 +74,7 @@ public:
   
   void ShowGlyphSource();
   void ScaleFactorChanged();
+  void GetSource();
   
 protected:
   vtkPVGlyph3D();
@@ -80,10 +82,11 @@ protected:
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
   
-  vtkKWWidget *GlyphSourceButton;
+  vtkKWPushButton *GlyphSourceButton;
   vtkKWLabel *ScaleFactorLabel;
   vtkKWEntry *ScaleFactorEntry;
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *SourceButton;
 
   vtkGlyph3D *Glyph;
   vtkPVSource *GlyphSource;

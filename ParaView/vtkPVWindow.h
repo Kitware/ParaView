@@ -105,6 +105,7 @@ protected:
   vtkKWPushButton *ResetCameraButton;
   vtkKWPushButton *PreviousSourceButton;
   vtkKWPushButton *NextSourceButton;
+  vtkKWPushButton *SourceListButton;
 
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

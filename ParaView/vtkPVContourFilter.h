@@ -29,10 +29,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVContourFilter_h
 #define __vtkPVContourFilter_h
 
-#include "vtkKWLabel.h"
 #include "vtkContourFilter.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -65,6 +65,7 @@ public:
   void SetValue(int contour, float val);
   
   void ContourValueChanged();
+  void GetSource();
 
   vtkGetObjectMacro(Contour, vtkContourFilter);
 
@@ -74,9 +75,10 @@ protected:
   vtkPVContourFilter(const vtkPVContourFilter&) {};
   void operator=(const vtkPVContourFilter&) {};
   
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
   vtkKWEntry *ContourValueEntry;
   vtkKWLabel *ContourValueLabel;
+  vtkKWPushButton *SourceButton;
 
   vtkContourFilter  *Contour;
 };

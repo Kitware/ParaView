@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVImageClip_h
 
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkImageClip.h"
 #include "vtkKWEntry.h"
 #include "vtkPVSource.h"
@@ -62,6 +63,7 @@ public:
   void SetOutputWholeExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
   
   void ExtentsChanged();
+  void GetSource();
 
   vtkGetObjectMacro(ImageClip, vtkImageClip);
   
@@ -71,7 +73,8 @@ protected:
   vtkPVImageClip(const vtkPVImageClip&) {};
   void operator=(const vtkPVImageClip&) {};
   
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *SourceButton;
   vtkKWEntry *ClipXMinEntry;
   vtkKWLabel *ClipXMinLabel;
   vtkKWEntry *ClipXMaxEntry;

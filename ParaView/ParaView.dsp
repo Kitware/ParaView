@@ -233,6 +233,14 @@ SOURCE=.\vtkPVElevationFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVExtentTranslator.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVExtentTranslatorTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVGlyph3D.cxx
 # End Source File
 # Begin Source File
@@ -290,14 +298,6 @@ SOURCE=.\vtkPVMenuButtonTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVPolyData.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVPolyDataMapper.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVPolyDataMapperTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -734,6 +734,26 @@ InputName=vtkPVElevationFilter
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVExtentTranslator.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVExtentTranslator.h
+InputName=vtkPVExtentTranslator
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVGlyph3D.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -883,26 +903,6 @@ SOURCE=.\vtkPVPolyData.h
 # Begin Custom Build
 InputPath=.\vtkPVPolyData.h
 InputName=vtkPVPolyData
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVPolyDataMapper.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVPolyDataMapper.h
-InputName=vtkPVPolyDataMapper
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

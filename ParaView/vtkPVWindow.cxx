@@ -75,6 +75,7 @@ vtkPVWindow::vtkPVWindow()
   this->ResetCameraButton = vtkKWPushButton::New();
   this->PreviousSourceButton = vtkKWPushButton::New();
   this->NextSourceButton = vtkKWPushButton::New();
+  this->SourceListButton = vtkKWPushButton::New();
   this->Sources = vtkKWCompositeCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
@@ -94,6 +95,8 @@ vtkPVWindow::~vtkPVWindow()
   this->PreviousSourceButton = NULL;
   this->NextSourceButton->Delete();
   this->NextSourceButton = NULL;
+  this->SourceListButton->Delete();
+  this->SourceListButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -115,7 +118,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
   this->GetMenuProperties()->AddRadioButton(1," ParaView Window", 
-                                            rbv, this, "ShowWindowProperties");
+                                           rbv, this, "ShowWindowProperties");
   delete [] rbv;
 
   // create the top level
@@ -148,9 +151,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->NextSourceButton->SetParent(this->Toolbar);
   this->NextSourceButton->Create(app, "-text Next");
   this->NextSourceButton->SetCommand(this, "NextSource");
-  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
+  this->SourceListButton->SetParent(this->Toolbar);
+  this->SourceListButton->Create(app, "-text SourceList");
+  this->SourceListButton->SetCommand(this, "ShowWindowProperties");
+  this->Script("pack %s %s %s -side left -pady 0 -fill none -expand no",
 	       this->PreviousSourceButton->GetWidgetName(),
-	       this->NextSourceButton->GetWidgetName());
+	       this->NextSourceButton->GetWidgetName(),
+	       this->SourceListButton->GetWidgetName());
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->Toolbar->GetWidgetName());
   
@@ -284,6 +291,8 @@ void vtkPVWindow::NewVolume()
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);
   this->SourceList->Update();
+  
+  reader->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -347,6 +356,7 @@ void vtkPVWindow::NextSource()
   
   this->MainView->Render();
   this->SourceList->Update();
+  this->MainView->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -362,8 +372,8 @@ void vtkPVWindow::PreviousSource()
   
   this->MainView->Render();
   this->SourceList->Update();
+  this->MainView->ResetCamera();
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetNextSource()
@@ -392,8 +402,7 @@ void vtkPVWindow::ResetCameraCallback()
   this->MainView->Render();
 }
 
-
-
+//----------------------------------------------------------------------------
 void vtkPVWindow::ShowWindowProperties()
 {
   this->ShowProperties();

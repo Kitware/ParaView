@@ -41,8 +41,10 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
-  this->Accept = vtkKWWidget::New();
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this->Properties);
   this->Shrink = vtkShrinkPolyData::New();
@@ -53,6 +55,8 @@ vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
 { 
   this->Accept->Delete();
   this->Accept = NULL;
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
   
   this->ShrinkFactorScale->Delete();
   this->ShrinkFactorScale = NULL;
@@ -79,12 +83,15 @@ void vtkPVShrinkPolyData::CreateProperties()
   this->ShrinkFactorScale->SetRange(0, 1);
   this->ShrinkFactorScale->SetValue(this->GetShrink()->GetShrinkFactor());
   
-  this->Accept->Create(this->Application, "button", "-text Accept");
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ShrinkFactorChanged");
-  this->Script("pack %s %s", this->ShrinkFactorScale->GetWidgetName(),
-	this->Accept->GetWidgetName());
+  this->Script("pack %s %s %s",
+	       this->SourceButton->GetWidgetName(),
+	       this->Accept->GetWidgetName(),
+	       this->ShrinkFactorScale->GetWidgetName());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::SetOutput(vtkPVPolyData *pvd)
@@ -101,13 +108,11 @@ void vtkPVShrinkPolyData::SetOutput(vtkPVPolyData *pvd)
   pvd->SetPolyData(this->Shrink->GetOutput());
 }
 
-
 //----------------------------------------------------------------------------
 vtkPVPolyData *vtkPVShrinkPolyData::GetOutput()
 {
   return vtkPVPolyData::SafeDownCast(this->Output);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::ShrinkFactorChanged()
@@ -135,6 +140,7 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
 
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -150,7 +156,6 @@ void vtkPVShrinkPolyData::SetShrinkFactor(float factor)
   this->Shrink->SetShrinkFactor(factor);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
 {
@@ -164,4 +169,15 @@ void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
   
   this->GetShrink()->SetInput(pvData->GetPolyData());
   this->Input = pvData;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVShrinkPolyData::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
 }

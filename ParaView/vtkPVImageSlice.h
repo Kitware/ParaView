@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageClip.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkPVSource.h"
 
@@ -63,6 +64,7 @@ public:
   void SelectX();
   void SelectY();
   void SelectZ();
+  void GetSource();
 
   vtkGetObjectMacro(Slice, vtkImageClip);
   
@@ -75,7 +77,8 @@ protected:
   vtkPVImageSlice(const vtkPVImageSlice&) {};
   void operator=(const vtkPVImageSlice&) {};
   
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *SourceButton;
   vtkKWEntry *SliceEntry;
   vtkKWLabel *SliceLabel;
   vtkKWRadioButton *XDimension;

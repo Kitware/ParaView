@@ -43,13 +43,15 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 {
   this->CommandFunction = vtkPVGlyph3DCommand;
   
-  this->GlyphSourceButton = vtkKWWidget::New();
+  this->GlyphSourceButton = vtkKWPushButton::New();
   this->GlyphSourceButton->SetParent(this->Properties);
   this->ScaleFactorEntry = vtkKWEntry::New();
   this->ScaleFactorEntry->SetParent(this->Properties);
   this->ScaleFactorLabel = vtkKWLabel::New();
   this->ScaleFactorLabel->SetParent(this->Properties);
-  this->Accept = vtkKWWidget::New();
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
   
   this->Glyph = vtkGlyph3D::New();
@@ -64,6 +66,8 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
   this->ScaleFactorEntry = NULL;
   this->ScaleFactorLabel->Delete();
   this->ScaleFactorLabel = NULL;
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
   this->Accept->Delete();
   this->Accept = NULL;
   
@@ -83,25 +87,25 @@ void vtkPVGlyph3D::CreateProperties()
   // must set the application
   this->vtkPVSource::CreateProperties();
   
-  this->GlyphSourceButton->Create(this->Application, "button",
-			 "-text GetGlyphSource");
+  this->GlyphSourceButton->Create(this->Application, "-text GetGlyphSource");
   this->GlyphSourceButton->SetCommand(this, "ShowGlyphSource");
   
   this->ScaleFactorEntry->Create(this->Application, "");
   this->ScaleFactorEntry->SetValue(1, 2);
   this->ScaleFactorLabel->Create(this->Application, "");
   this->ScaleFactorLabel->SetLabel("Scale Factor:");
-  this->Accept->Create(this->Application, "button",
-		       "-text Accept");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ScaleFactorChanged");
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
   
-  this->Script("pack %s %s %s %s",
+  this->Script("pack %s %s %s %s %s",
+	       this->SourceButton->GetWidgetName(),
 	       this->GlyphSourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->ScaleFactorLabel->GetWidgetName(),
 	       this->ScaleFactorEntry->GetWidgetName());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
@@ -118,7 +122,6 @@ void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
   this->Input = pvData;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
 {
@@ -132,7 +135,6 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
   
   this->GetGlyph()->SetSource(pvData->GetPolyData());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pvd)
@@ -155,7 +157,6 @@ vtkPVPolyData *vtkPVGlyph3D::GetOutput()
   return vtkPVPolyData::SafeDownCast(this->Output);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetGlyphSource(vtkPVSource *comp)
 {
@@ -176,7 +177,6 @@ void vtkPVGlyph3D::SetScaleModeToDataScalingOff()
   this->GetGlyph()->SetScaleModeToDataScalingOff();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetScaleFactor(float factor)
 {
@@ -191,8 +191,6 @@ void vtkPVGlyph3D::SetScaleFactor(float factor)
   this->GetGlyph()->SetScaleFactor(factor);
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::ShowGlyphSource()
 {
@@ -205,7 +203,7 @@ void vtkPVGlyph3D::ShowGlyphSource()
   this->GlyphSource->GetView()->Render();
   window->GetSourceList()->Update();
   
-  this->GetWindow()->ResetCameraCallback();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -257,7 +255,6 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     this->SetOutput(pvd);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvd->SetAssignment(a);
-//    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
@@ -267,5 +264,16 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   window->GetMainView()->SetSelectedComposite(this);
 
   this->GetView()->Render();
+  window->GetMainView()->ResetCamera();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
+}

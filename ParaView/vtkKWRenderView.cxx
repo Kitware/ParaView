@@ -179,7 +179,7 @@ void KWRenderView_IdleRender( ClientData arg )
 }
 
 void vtkKWRenderView::IdleRenderCallback()
-{  
+{
   int rescheduleDelay;
   int needToRender = 0;
   int abortFlag;
@@ -860,5 +860,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }

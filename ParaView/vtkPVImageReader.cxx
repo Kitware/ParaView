@@ -36,9 +36,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 //----------------------------------------------------------------------------
 vtkPVImageReader::vtkPVImageReader()
 {
-  this->Accept = vtkKWWidget::New();
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
-  this->Open = vtkKWWidget::New();
+  this->Open = vtkKWPushButton::New();
   this->Open->SetParent(this->Properties);
   
   this->XLabel = vtkKWLabel::New();
@@ -65,6 +65,18 @@ vtkPVImageReader::~vtkPVImageReader()
   this->Accept = NULL;
   this->Open->Delete();
   this->Open = NULL;
+  this->XLabel->Delete();
+  this->XLabel = NULL;
+  this->XDimension->Delete();
+  this->XDimension = NULL;
+  this->YLabel->Delete();
+  this->YLabel = NULL;
+  this->YDimension->Delete();
+  this->YDimension = NULL;
+  this->ZLabel->Delete();
+  this->ZLabel = NULL;
+  this->ZDimension->Delete();
+  this->ZDimension = NULL;
   
   this->ImageReader->Delete();
   this->ImageReader = NULL;
@@ -81,11 +93,11 @@ void vtkPVImageReader::CreateProperties()
 {  
   this->vtkPVSource::CreateProperties();
   
-  this->Accept->Create(this->Application, "button", "-text Accept");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ImageAccepted");
   this->Script("pack %s", this->Accept->GetWidgetName());
   
-  this->Open->Create(this->Application, "button", "-text OpenFile");
+  this->Open->Create(this->Application, "-text OpenFile");
   this->Open->SetCommand(this, "OpenFile");
   this->Script("pack %s", this->Open->GetWidgetName());
   
@@ -168,6 +180,7 @@ void vtkPVImageReader::ImageAccepted()
     }
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------

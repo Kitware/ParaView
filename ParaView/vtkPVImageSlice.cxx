@@ -42,8 +42,10 @@ vtkPVImageSlice::vtkPVImageSlice()
 {
   this->CommandFunction = vtkPVImageSliceCommand;
   
-  this->Accept = vtkKWWidget::New();
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
   
   this->SliceEntry = vtkKWEntry::New();
   this->SliceEntry->SetParent(this->Properties);
@@ -64,6 +66,8 @@ vtkPVImageSlice::~vtkPVImageSlice()
 { 
   this->Accept->Delete();
   this->Accept = NULL;
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
   
   this->SliceEntry->Delete();
   this->SliceEntry = NULL;
@@ -124,9 +128,12 @@ void vtkPVImageSlice::CreateProperties()
   this->SliceEntry->Create(this->Application, "");
   this->SliceEntry->SetValue(sliceNumber);
   
-  this->Accept->Create(this->Application, "button", "-text Accept");
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "SliceChanged");
-  this->Script("pack %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s %s %s %s",
+	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->SliceLabel->GetWidgetName(),
 	       this->SliceEntry->GetWidgetName(),
@@ -191,7 +198,7 @@ void vtkPVImageSlice::SliceChanged()
   
   this->GetView()->Render();  
   window->GetMainView()->SetSelectedComposite(this);
-  this->GetWindow()->ResetCameraCallback();
+  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -272,11 +279,13 @@ vtkPVImage *vtkPVImageSlice::GetOutput()
   return vtkPVImage::SafeDownCast(this->Output);
 }
 
-
-
-
-
-
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
+}

@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
+#include "vtkKWPushButton.h"
 #include "vtkImageReader.h"
 #include "vtkPVSource.h"
 
@@ -65,8 +66,8 @@ protected:
   vtkPVImageReader(const vtkPVImageReader&) {};
   void operator=(const vtkPVImageReader&) {};
   
-  vtkKWWidget *Accept;
-  vtkKWWidget *Open;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *Open;
   vtkKWLabel *XLabel;
   vtkKWEntry *XDimension;
   vtkKWLabel *YLabel;

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkShrinkPolyData.h"
 #include "vtkKWScale.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -54,6 +55,7 @@ public:
   vtkPVPolyData *GetOutput();
   
   void ShrinkFactorChanged();
+  void GetSource();
 
   vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
 
@@ -71,7 +73,8 @@ protected:
   vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
   void operator=(const vtkPVShrinkPolyData&) {};
   
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *SourceButton;
   vtkKWScale *ShrinkFactorScale;
 
   vtkShrinkPolyData *Shrink;

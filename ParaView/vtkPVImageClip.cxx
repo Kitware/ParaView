@@ -41,7 +41,10 @@ vtkPVImageClip::vtkPVImageClip()
 {
   this->CommandFunction = vtkPVImageClipCommand;
   
-  this->Accept = vtkKWWidget::New();
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
+  
+  this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
   
   this->ClipXMinEntry = vtkKWEntry::New();
@@ -76,7 +79,10 @@ vtkPVImageClip::vtkPVImageClip()
 
 //----------------------------------------------------------------------------
 vtkPVImageClip::~vtkPVImageClip()
-{ 
+{
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
+  
   this->Accept->Delete();
   this->Accept = NULL;
   
@@ -151,9 +157,12 @@ void vtkPVImageClip::CreateProperties()
   this->ClipZMaxEntry->Create(this->Application, "");
   this->ClipZMaxEntry->SetValue(extents[5]);
   
-  this->Accept->Create(this->Application, "button", "-text Accept");
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
+  this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ExtentsChanged");
-  this->Script("pack %s %s %s %s %s %s %s %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->ClipXMinLabel->GetWidgetName(),
 	       this->ClipXMinEntry->GetWidgetName(),
@@ -253,5 +262,16 @@ void vtkPVImageClip::ExtentsChanged()
   
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
-  this->GetWindow()->ResetCameraCallback();
+  window->GetMainView()->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
 }

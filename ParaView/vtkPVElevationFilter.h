@@ -33,6 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkElevationFilter.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -63,7 +64,8 @@ public:
   vtkGetObjectMacro(Elevation, vtkElevationFilter);
   
   void ElevationParameterChanged();
-
+  void GetSource();
+  
   // Description:
   // All pipeline calls have to use vtkKWObjects so GetTclName will work.
   // The methods executes on all processes.
@@ -106,7 +108,8 @@ protected:
   vtkKWLabel *RangeMinLabel;
   vtkKWLabel *RangeMaxLabel;
   
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
+  vtkKWPushButton *SourceButton;
 
   vtkElevationFilter *Elevation;
 };

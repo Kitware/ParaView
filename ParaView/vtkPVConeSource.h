@@ -38,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkShrinkPolyData.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -88,7 +89,7 @@ protected:
   vtkKWEntry *RadiusEntry;
   vtkKWLabel *ResolutionLabel;
   vtkKWEntry *ResolutionEntry;
-  vtkKWWidget *Accept;
+  vtkKWPushButton *Accept;
 
   vtkConeSource *ConeSource;
 };
