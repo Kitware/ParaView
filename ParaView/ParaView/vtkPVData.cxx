@@ -354,11 +354,11 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
   
-  sprintf(tclName, "Collect%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  this->SetCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->CollectTclName, this->GeometryTclName);
+  //sprintf(tclName, "Collect%d", this->InstanceCount);
+  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  //this->SetCollectTclName(tclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+  //                       this->CollectTclName, this->GeometryTclName);
   
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
@@ -372,8 +372,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+  //                       this->CollectTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->CollectTclName);
+                         this->GeometryTclName);
   
   sprintf(tclName, "ScalarBar%d", this->InstanceCount);
   this->SetScalarBarTclName(tclName);
@@ -402,11 +404,11 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
 
-  sprintf(tclName, "LODCollect%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  this->SetLODCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODCollectTclName, this->LODDeciTclName);
+  //sprintf(tclName, "LODCollect%d", this->InstanceCount);
+  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  //this->SetLODCollectTclName(tclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+  //                       this->LODCollectTclName, this->LODDeciTclName);
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
@@ -1649,10 +1651,12 @@ void vtkPVData::Initialize()
 			       this->GetVTKDataTclName());
     }
   
-  // Do we really need to do this here ???????????????  I don't think so.
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+  //			 this->LODMapperTclName,
+  //			 this->LODCollectTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
 			 this->LODMapperTclName,
-			 this->LODCollectTclName);
+			 this->LODDeciTclName);
 
   vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();
