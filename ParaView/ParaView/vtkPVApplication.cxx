@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.164");
+vtkCxxRevisionMacro(vtkPVApplication, "1.165");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1529,8 +1529,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ProcessModule: " << this->ProcessModule << endl;;
-  os << indent << "MajorVersion: " << this->MajorVersion << endl;
-  os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;

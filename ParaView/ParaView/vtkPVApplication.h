@@ -183,12 +183,6 @@ public:
   vtkPVWindow *GetMainWindow();
 
   // Description:
-  // ParaView version is always MajorVersion.MinorVersion.
-  // Change these in the constructor.
-  vtkGetMacro(MajorVersion, int);
-  vtkGetMacro(MinorVersion, int);
-
-  // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
   void DisplayHelp(vtkKWWindow* master);
@@ -346,9 +340,6 @@ protected:
                    char *filename = 0);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
-
-  int MajorVersion;
-  int MinorVersion;
 
   // For running with SGI pipes.
   int NumberOfPipes;
