@@ -89,7 +89,8 @@ public:
 
   // Description:
   // Get/Set a stream to which an execution log is written.
-  vtkSetMacro(LogStream, ostream*);
+  void SetLogFile(const char* name);
+  virtual void SetLogStream(ostream* ostr);
   vtkGetMacro(LogStream, ostream*);
 
   // Description:
@@ -135,6 +136,7 @@ protected:
 
   // A stream to which a log is written.
   ostream* LogStream;
+  ofstream* LogFileStream;
 
   // Internal message processing functions.
   int ProcessCommandNew(const vtkClientServerStream& css, int midx);

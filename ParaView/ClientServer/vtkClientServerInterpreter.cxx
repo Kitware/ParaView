@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.8");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.9");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -55,6 +55,7 @@ vtkClientServerInterpreter::vtkClientServerInterpreter()
   this->ClassToFunctionMap = ClassToFunctionMapType::New();
   this->LastResultMessage = new vtkClientServerStream;
   this->LogStream = 0;
+  this->LogFileStream = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -71,6 +72,9 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
     hi->GoToNextItem();
     }
   hi->Delete();
+
+  // End logging.
+  this->SetLogStream(0);
 
   this->IDToMessageMap->Delete();
   this->ClassToFunctionMap->Delete();
@@ -133,6 +137,49 @@ vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
   // Convert the result to an ID object.
   vtkClientServerID result = {id};
   return result;
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerInterpreter::SetLogFile(const char* name)
+{
+  // Close any existing log.
+  this->SetLogStream(0);
+
+  // If a non-empty name was given, open a new log file.
+  if(name && name[0])
+    {
+    this->LogFileStream = new ofstream(name);
+    if(this->LogFileStream && *this->LogFileStream)
+      {
+      this->LogStream = this->LogFileStream;
+      }
+    else
+      {
+      vtkErrorMacro("Error opening log file \"" << name << "\" for writing.");
+      if(this->LogFileStream)
+        {
+        delete this->LogFileStream;
+        this->LogFileStream = 0;
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerInterpreter::SetLogStream(ostream* ostr)
+{
+  if(ostr != this->LogStream)
+    {
+    // Close the current log file, if any.
+    if(this->LogStream && this->LogStream == this->LogFileStream)
+      {
+      delete this->LogFileStream;
+      this->LogFileStream = 0;
+      }
+
+    // Set the log to use the given stream.
+    this->LogStream = ostr;
+    }
 }
 
 //----------------------------------------------------------------------------
