@@ -35,7 +35,6 @@ SET(Filters_SRCS
   vtkCTHDataToCTHDataFilter.cxx
   vtkCTHDataToPolyDataFilter.cxx
   vtkCTHExtractAMRPart.cxx
-  vtkCTHAMRBlockIdScalars.cxx
   vtkCTHAMRCellToPointData.cxx
   vtkCTHAMRContour.cxx
   vtkCTHAMRExtractPart.cxx
