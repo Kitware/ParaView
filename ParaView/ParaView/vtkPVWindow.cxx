@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.451");
+vtkCxxRevisionMacro(vtkPVWindow, "1.452");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4181,10 +4181,10 @@ void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
     }
   while ( source->GetNumberOfPVConsumers() > 0 )
     {
-    vtkPVData* output = source->GetPVOutput();
-    if ( output && output->GetPVSource() )
+    vtkPVSource* consumer = source->GetPVConsumer(0);
+    if ( consumer )
       {
-      this->DeleteSourceAndOutputs(output->GetPVSource());
+      this->DeleteSourceAndOutputs(consumer);
       }
     }
   source->DeleteCallback();
