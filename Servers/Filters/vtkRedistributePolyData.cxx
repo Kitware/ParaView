@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.18");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -57,11 +57,7 @@ _TimerInfo timerInfo8;
 vtkRedistributePolyData::vtkRedistributePolyData()
 {
   this->Controller = NULL;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
-  if( this->Controller )
-    {
-    this->Controller->Register(this);
-    }
+  this->SetController( vtkMultiProcessController::GetGlobalController() );
 
   this->ColorProc = 0;
 }
@@ -578,9 +574,20 @@ void vtkRedistributePolyData::Execute()
 //*****************************************************************
 void vtkRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkPolyDataToPolyDataFilter::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Controller (" << this->Controller << ")\n";
+  os << indent << "Controller :";
+  if( this->Controller )
+    {
+    os << endl;
+    this->Controller->PrintSelf( os, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)\n";
+    }
+
+  os << indent << "ColorProc :" << this->ColorProc  << "\n";
 }
 
 
