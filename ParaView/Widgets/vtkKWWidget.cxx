@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.80");
+vtkCxxRevisionMacro(vtkKWWidget, "1.81");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.80 $");
+  this->ExtractRevision(os,"$Revision: 1.81 $");
 }
 
 //----------------------------------------------------------------------------
@@ -663,19 +663,30 @@ const char* vtkKWWidget::ConvertInternalStringToTkString(const char *str)
 {
   if (!str || !this->IsCreated())
     {
-    return "";
+    return NULL;
     }
 
-  const char *encoding = vtkKWWidget::GetCharacterEncodingAsString(
-    this->GetApplication()->GetCharacterEncoding());
+  // No encoding known ? The fast way
 
-  this->Script(
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding == VTK_ENCODING_NONE || 
+      app_encoding == VTK_ENCODING_UNKNOWN)
+    {
+    return str;
+    }
+
+  // Otherwise try to encode/decode
+
+  const char *tk_encoding = 
+    vtkKWWidget::GetCharacterEncodingAsString(app_encoding);
+
+  return this->Script(
     "if {[catch {encoding convertfrom %s {%s}} __foo__]} {"
     "  encoding convertfrom identity {%s} "
     "} { "
     "  set __foo__ "
     "}", 
-    encoding, str, str);
+    tk_encoding, str, str);
 }
 
 //----------------------------------------------------------------------------
@@ -683,8 +694,19 @@ const char* vtkKWWidget::ConvertTkStringToInternalString(const char *str)
 {
   if (!str || !this->IsCreated())
     {
-    return "";
+    return NULL;
     }
+
+  // No encoding known ? The fast way
+
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding == VTK_ENCODING_NONE || 
+      app_encoding == VTK_ENCODING_UNKNOWN)
+    {
+    return str;
+    }
+
+  // Otherwise try to encode/decode
 
   return this->Script("encoding convertfrom identity {%s}", str);
 }
