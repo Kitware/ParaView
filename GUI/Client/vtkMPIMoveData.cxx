@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.11");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.12");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -724,35 +724,33 @@ void vtkMPIMoveData::ClearBuffer()
 void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
 {
   // Protect from empty data.
-  if (data->GetNumberOfPoints() == 0)
+  if (data && data->GetNumberOfPoints() > 0)
     {
-    this->NumberOfBuffers = 0;
+    // Copy input to isolate reader from the pipeline.
+    vtkDataSet* d = data->NewInstance();
+    d->CopyStructure(data);
+    d->GetPointData()->PassData(data->GetPointData());
+    d->GetCellData()->PassData(data->GetCellData());
+    // Marshal with writer.
+    vtkDataSetWriter *writer = vtkDataSetWriter::New();
+    writer->SetFileTypeToBinary();
+    writer->WriteToOutputStringOn();
+    writer->SetInput(d);
+    writer->Write();
+    // Get string.
+    this->NumberOfBuffers = 1;
+    this->BufferLengths = new int[1];
+    this->BufferLengths[0] = writer->GetOutputStringLength();
+    this->BufferOffsets = new int[1];
+    this->BufferOffsets[0] = 0;
+    this->BufferTotalLength = this->BufferLengths[0];
+    this->Buffers = writer->RegisterAndGetOutputString();
+
+    writer->Delete();
+    writer = 0;
+    d->Delete();
+    d = 0;
     }
-
-  // Copy input to isolate reader from the pipeline.
-  vtkDataSet* d = data->NewInstance();
-  d->CopyStructure(data);
-  d->GetPointData()->PassData(data->GetPointData());
-  d->GetCellData()->PassData(data->GetCellData());
-  // Marshal with writer.
-  vtkDataSetWriter *writer = vtkDataSetWriter::New();
-  writer->SetFileTypeToBinary();
-  writer->WriteToOutputStringOn();
-  writer->SetInput(d);
-  writer->Write();
-  // Get string.
-  this->NumberOfBuffers = 1;
-  this->BufferLengths = new int[1];
-  this->BufferLengths[0] = writer->GetOutputStringLength();
-  this->BufferOffsets = new int[1];
-  this->BufferOffsets[0] = 0;
-  this->BufferTotalLength = this->BufferLengths[0];
-  this->Buffers = writer->RegisterAndGetOutputString();
-
-  d->Delete();
-  d = 0;
-  writer->Delete();
-  writer = 0;
 }
 
 
