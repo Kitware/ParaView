@@ -5,3 +5,5 @@ ${PARAVIEW_BINARY_DIR}/Demos/Demo1.tcl @ONLY)
 CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/Demos/Demo2.tcl.in
 ${PARAVIEW_BINARY_DIR}/Demos/Demo2.tcl @ONLY)
+
+INSTALL_FILES(/share/ParaView/Demos .tcl ${PARAVIEW_BINARY_DIR}/Demos/Demo1)

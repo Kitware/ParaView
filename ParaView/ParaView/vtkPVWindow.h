@@ -142,6 +142,10 @@ public:
   // Open a data file.
   void OpenCallback();
   vtkPVSource *Open(char *fileName);
+
+  // Description:
+  // Play the demo
+  void PlayDemo();
   
   // Description:
   // Callback from the calculator button.

@@ -48,6 +48,10 @@ ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
                ESCAPE_QUOTES)
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVDemoPaths.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVDemoPaths.h
+               ESCAPE_QUOTES)
+
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
 
 INCLUDE_DIRECTORIES(${EXPAT_SOURCE_DIR}/xmlparse)

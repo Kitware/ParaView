@@ -163,6 +163,10 @@ public:
   vtkGetMacro(MajorVersion, int);
   vtkGetMacro(MinorVersion, int);
 
+  // Description:
+  // Show help.
+  void DisplayHelp();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
