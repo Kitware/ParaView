@@ -69,15 +69,13 @@ public:
   
   // Description:
   // This will be used to label the UI.
-  vtkSetStringMacro(VariableName);
-  vtkGetStringMacro(VariableName);
+  vtkSetStringMacro(Label);
+  vtkGetStringMacro(Label);
 
   // Description:
-  // Most commands can be derived from the names ...
-  vtkSetStringMacro(SetCommand);
-  vtkGetStringMacro(SetCommand);
-  vtkSetStringMacro(GetCommand);
-  vtkGetStringMacro(GetCommand);
+  // The name of the variable used for scripting.
+  vtkSetStringMacro(VariableName);
+  vtkGetStringMacro(VariableName);
   
   // Description:
   // This specifies the type of widget to use.
@@ -130,9 +128,8 @@ protected:
   vtkPVMethodInterface(const vtkPVMethodInterface&) {};
   void operator=(const vtkPVMethodInterface&) {};
 
+  char *Label;
   char *VariableName;
-  char *SetCommand;
-  char *GetCommand;
 
   vtkIdList *ArgumentTypes;
   

@@ -56,13 +56,24 @@ public:
   static vtkPVLabeledToggle* New();
   vtkTypeMacro(vtkPVLabeledToggle, vtkPVWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
-              char *getCmd, char *help, const char *tclName);
+  // Description:
+  // Setting the label also sets the name.
+  void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetName(str);}
+  const char* GetLabel() { return this->Label->GetLabel();}
+
+  void Create(vtkKWApplication *pvApp, char *help);
   
   // Description:
-  // Called when accept button is pushed.  Just adds to trace
-  // file and calls supperclass accept.
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void Accept();
+  
+  // Description:
+  // Called when the reset button is pushed.
+  // Sets widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
+  virtual void Reset();
   
   // Description:
   // This method allows scripts to modify the widgets value.

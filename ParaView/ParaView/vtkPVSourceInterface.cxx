@@ -255,30 +255,27 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       {
       if (this->GetDataFileName())
         {
-        this->Script("%s %s %s",
-              pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
+        this->Script("%s Set%s %s",
+              pvs->GetVTKSourceTclName(), mInt->GetVariableName(),
               this->GetDataFileName());
         }
-      pvs->AddFileEntry(mInt->GetVariableName(), 
-			mInt->GetSetCommand(),
-			mInt->GetGetCommand(), 
+      pvs->AddFileEntry(mInt->GetLabel(), 
+			mInt->GetVariableName(),
 			mInt->GetFileExtension(),
                         mInt->GetBalloonHelp());
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_TOGGLE)
       {
-      pvs->AddLabeledToggle(mInt->GetVariableName(), 
-			    mInt->GetSetCommand(),
-			    mInt->GetGetCommand(),
+      pvs->AddLabeledToggle(mInt->GetLabel(), 
+			    mInt->GetVariableName(),
                             mInt->GetBalloonHelp());
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
       {
       int i;
       vtkStringList *l;
-      pvs->AddModeList(mInt->GetVariableName(),
-		       mInt->GetSetCommand(),
-		       mInt->GetGetCommand(),
+      pvs->AddModeList(mInt->GetLabel(),
+		       mInt->GetVariableName(),
                        mInt->GetBalloonHelp());
       l = mInt->GetSelectionEntries();
       for (i = 0; i < l->GetLength(); ++i)
@@ -291,57 +288,50 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
       {
-      this->Script("eval %s %s [%s GetWholeExtent]",
-		   pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
+      this->Script("eval %s Set%s [%s GetWholeExtent]",
+		   pvs->GetVTKSourceTclName(), mInt->GetVariableName(),
 		   pvs->GetNthPVInput(0)->GetVTKDataTclName());
-      pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand(),
+      pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
+			   mInt->GetVariableName(),
                            mInt->GetBalloonHelp());      
       }
     else if (mInt->GetNumberOfArguments() == 1)
       {
       if (mInt->GetArgumentType(0) == VTK_STRING)
         {
-        pvs->AddStringEntry(mInt->GetVariableName(), 
-                            mInt->GetSetCommand(),
-                            mInt->GetGetCommand(),
+        pvs->AddStringEntry(mInt->GetLabel(), 
+                            mInt->GetVariableName(),
                             mInt->GetBalloonHelp());
         }
       else
         {
-        pvs->AddLabeledEntry(mInt->GetVariableName(), 
-                             mInt->GetSetCommand(),
-                             mInt->GetGetCommand(),
+        pvs->AddLabeledEntry(mInt->GetLabel(), 
+                             mInt->GetVariableName(),
                              mInt->GetBalloonHelp());
         }
       }
     else if (mInt->GetNumberOfArguments() == 2)
       {
-      pvs->AddVector2Entry(mInt->GetVariableName(), "", "", 
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand(),
+      pvs->AddVector2Entry(mInt->GetLabel(), "", "", 
+			   mInt->GetVariableName(),
                            mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 3)
       {
-      pvs->AddVector3Entry(mInt->GetVariableName(), "", "", "",
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand(),
+      pvs->AddVector3Entry(mInt->GetLabel(), "", "", "",
+			   mInt->GetVariableName(),
                            mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 4)
       {
-      pvs->AddVector4Entry(mInt->GetVariableName(), "", "", "", "",
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand(),
+      pvs->AddVector4Entry(mInt->GetLabel(), "", "", "", "",
+			   mInt->GetVariableName(),
                            mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 6)
       {
-      pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand(),
+      pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
+			   mInt->GetVariableName(),
                            mInt->GetBalloonHelp());
       }
     else
@@ -407,9 +397,9 @@ void vtkPVSourceInterface::SaveInTclScript(ofstream *file, const char *sourceNam
         widgetType != VTK_PV_METHOD_WIDGET_SELECTION &&
         widgetType != VTK_PV_METHOD_WIDGET_ENTRY)
       {
-      *file << "\t" << sourceName << " " << currentMethod->GetSetCommand();
-      this->Script("set tempValue [%s %s]", sourceName,
-                   currentMethod->GetGetCommand());
+      *file << "\t" << sourceName << " Set" << currentMethod->GetVariableName();
+      this->Script("set tempValue [%s Get%s]", sourceName,
+                   currentMethod->GetVariableName());
       result = this->Application->GetMainInterp()->result;
       *file << " " << result << "\n";
       }

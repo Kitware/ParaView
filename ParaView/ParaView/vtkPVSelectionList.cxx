@@ -121,60 +121,28 @@ void vtkPVSelectionList::SetLabel(const char* label)
 }
   
 
-
-//----------------------------------------------------------------------------
-void vtkPVSelectionList::SetAccessMethods(const char* setCmd, 
-                                          const char* getCmd)
-{
-  this->ResetCommands->RemoveAllItems();
-  this->AcceptCommands->RemoveAllItems();
-  
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource not set.");
-    return;
-    }
-
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Create widget before setting access methods.");
-    return;
-    }
-
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
-  
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
-                                 this->GetTclName(), 
-                                 this->PVSource->GetVTKSourceTclName(), 
-                                 getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s %s [%s GetCurrentValue]",
-                                  this->PVSource->GetVTKSourceTclName(),
-                                  setCmd,
-                                  this->GetTclName());
-}
-
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
+  if (this->ModifiedFlag)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) SetCurrentValue {%d}", this->GetTclName(), 
                          this->GetCurrentValue());
     }
+
+  // Command to update the UI.
+  //his->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
+  //                               this->GetTclName(), 
+  //                               this->PVSource->GetVTKSourceTclName(), 
+  //                               getCmd); 
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects do not yet have to have the same Tcl name!
+  //this->AcceptCommands->AddString("%s %s [%s GetCurrentValue]",
+  //                                this->PVSource->GetVTKSourceTclName(),
+  //                                setCmd,
+  //                                this->GetTclName());
 
   this->vtkPVWidget::Accept();
 }

@@ -55,16 +55,16 @@ vtkPVLabeledToggle* vtkPVLabeledToggle::New()
   return new vtkPVLabeledToggle;
 }
 
+//----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
 {
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
-
-  this->PVSource = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVLabeledToggle::~vtkPVLabeledToggle()
 {
   this->CheckButton->Delete();
@@ -73,9 +73,8 @@ vtkPVLabeledToggle::~vtkPVLabeledToggle()
   this->Label = NULL;
 }
 
-void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
-                                char *setCmd, char *getCmd, char *help,
-                                const char *tclName)
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *help)
 {
   const char* wname;
   
@@ -84,35 +83,20 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
     vtkErrorMacro("LabeledToggle already created");
     return;
     }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling create");
-    return;
-    }
 
-  // For getting the widget in a script.
-  this->SetName(label);
-  
   this->SetApplication(pvApp);
-  
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
   
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
-  if (label && label[0] != '\0')
+  this->Label->Create(pvApp, "-width 18 -justify right");
+  if (help)
     {
-    this->Label->Create(pvApp, "-width 18 -justify right");
-    this->Label->SetLabel(label);
-    if (help)
-      {
-      this->Label->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->Label->SetBalloonHelpString(help);
     }
+  this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the check button
   this->CheckButton->Create(pvApp, "");
@@ -122,19 +106,9 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
     this->CheckButton->SetBalloonHelpString(help);
     }
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 this->CheckButton->GetTclName(), tclName,
-                                 getCmd); 
-  
-  // Format a command to move value from widget to vtkObjects (on all
-  // processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s %s [%s GetState]", tclName, setCmd,
-                                  this->CheckButton->GetTclName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabeledToggle::SetState(int val)
 {
   int oldVal;
@@ -149,23 +123,37 @@ void vtkPVLabeledToggle::SetState(int val)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabeledToggle::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
-    {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
-    pvApp->AddTraceEntry("$pv(%s) SetState %d", this->GetTclName(), 
-                         this->CheckButton->GetState());
+  if ( ! this->ModifiedFlag)
+    {
+    return;
     }
 
-  this->vtkPVWidget::Accept();
+  pvApp->AddTraceEntry("$pv(%s) SetState %d", this->GetTclName(), 
+                       this->GetState());
+
+  pvApp->BroadcastScript("%s Set%s %d", this->ObjectTclName, 
+                         this->VariableName, this->GetState());
+
+  this->ModifiedFlag = 0;
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::Reset()
+{
+  if ( ! this->ModifiedFlag)
+    {
+    return;
+    }
+
+  this->Script("%s SetState [%s Get%s]", this->CheckButton->GetTclName(),
+               this->ObjectTclName, this->VariableName);
+
+  this->ModifiedFlag = 0;
+
 }

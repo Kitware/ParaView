@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 class vtkKWRadioButton;
+class vtkPVData;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
@@ -60,6 +61,14 @@ public:
   static vtkPVArraySelection* New();
   vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
   
+  // Description:
+  // The array selection list is taken from this data.
+  // This is not reference counted for fear of loops.
+  // Try reference counting in the future.
+  // Note: In the future, I would like to use the vtkPVData or vtkData instead of the vtkPVSource.
+  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() { return this->PVSource;}
+
   // Description:
   // Create a Tk widget
   void Create(vtkKWApplication *app);
@@ -109,12 +118,15 @@ protected:
   vtkPVArraySelection(const vtkPVArraySelection&) {};
   void operator=(const vtkPVArraySelection&) {};
 
+
+
   int NumberOfComponents;
   int UsePointData;
   
   char *EntryCallback;
   vtkDataSet *VTKData;
-  
+  vtkPVSource *PVSource;
+    
   vtkSetStringMacro(EntryCallback);
   
   vtkKWWidget *ArraySelectionFrame;

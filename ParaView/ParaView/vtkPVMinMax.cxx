@@ -69,7 +69,7 @@ vtkPVMinMax::vtkPVMinMax()
 
   this->GetMinCommand = NULL;
   this->GetMaxCommand = NULL;
-  this->PVSource = NULL;
+  this->SetCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -89,6 +89,7 @@ vtkPVMinMax::~vtkPVMinMax()
   this->MaxFrame = NULL;
   this->SetGetMinCommand(NULL);
   this->SetGetMaxCommand(NULL);
+  this->SetSetCommand(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -100,11 +101,6 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
   if (this->Application)
     {
     vtkErrorMacro("PVScale already created");
-    return;
-    }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling create");
     return;
     }
 
@@ -169,23 +165,6 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
     }
   this->Script("pack %s -fill x -expand t", this->MaxScale->GetWidgetName());
 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->MinScale->GetTclName(), 
-                                 this->PVSource->GetVTKSourceTclName(), 
-                                 getMinCmd); 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->MaxScale->GetTclName(), 
-                                 this->PVSource->GetVTKSourceTclName(), 
-                                 getMaxCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s %s [%s GetMinValue] [%s GetMaxValue]",
-                                  this->PVSource->GetVTKSourceTclName(),
-                                  setCmd, this->GetTclName(),
-                                  this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -238,24 +217,34 @@ void vtkPVMinMax::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
+  if (this->ModifiedFlag)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) SetMinValue %f", this->GetTclName(), 
                          this->MinScale->GetValue());
     pvApp->AddTraceEntry("$pv(%s) SetMaxValue %f", this->GetTclName(), 
                          this->MaxScale->GetValue());
     }
 
-  this->vtkPVWidget::Accept();
+  pvApp->BroadcastScript("%s %s %f %f",
+                         this->ObjectTclName, this->SetCommand,
+                         this->GetMinValue(), this->GetMaxValue());
+
+  this->ModifiedFlag = 0;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::Reset()
+{
+  // Command to update the UI.
+  this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
+               this->ObjectTclName, this->GetMinCommand); 
+  this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
+               this->ObjectTclName, this->GetMaxCommand); 
+
+  this->ModifiedFlag = 0;
+}
+
 
 void vtkPVMinMax::SetResolution(float res)
 {

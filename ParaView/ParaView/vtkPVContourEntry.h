@@ -89,6 +89,13 @@ public:
   void AddValueCallback();
   void DeleteValueCallback();
 
+  // Description:
+  // Need the filter to set the countour.
+  // I would like to get rid of this ivar.
+  // It is not reference counted for fear of loops.
+  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() { return this->PVSource;}
+
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
@@ -102,6 +109,9 @@ protected:
   vtkKWEntry* NewValueEntry;
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
+
+  // I would like to get rid of this reference.
+  vtkPVSource *PVSource;
 };
 
 #endif

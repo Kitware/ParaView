@@ -55,16 +55,16 @@ vtkPVStringEntry* vtkPVStringEntry::New()
   return new vtkPVStringEntry;
 }
 
+//----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
 {
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-
-  this->PVSource = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVStringEntry::~vtkPVStringEntry()
 {
   this->Entry->Delete();
@@ -73,9 +73,9 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->Label = NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
-                              char *setCmd, char *getCmd, char *help,
-                              const char *tclName)
+                              char *help)
 {
   const char* wname;
   
@@ -84,19 +84,11 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
     vtkErrorMacro("StringEntry already created");
     return;
     }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling Create");
-    return;
-    }
 
   // For getting the widget in a script.
   this->SetName(label);
   
   this->SetApplication(pvApp);
-  
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
   
   // create the top level
   wname = this->GetWidgetName();
@@ -124,21 +116,11 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
     }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
-  
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->Entry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all
-  // processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue]]",
-  //                                this->PVSource->GetTclName(), tclName,
-  //                                setCmd, this->Entry->GetTclName());
-  this->AcceptCommands->AddString("%s %s [%s GetValue]",
-                                  tclName, setCmd, this->Entry->GetTclName());
+
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVStringEntry::SetValue(const char* fileName)
 {
   const char *old;
@@ -160,24 +142,36 @@ void vtkPVStringEntry::SetValue(const char* fileName)
 
 
 
+//----------------------------------------------------------------------------
 void vtkPVStringEntry::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
-    {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
+  if (this->ModifiedFlag)
+    {
     pvApp->AddTraceEntry("$pv(%s) SetValue {%s}", this->GetTclName(), 
                          this->GetValue());
     }
 
-  this->vtkPVWidget::Accept();
+  pvApp->BroadcastScript("%s Set%s %s",
+                         this->ObjectTclName, this->VariableName,
+                         this->GetValue());
+
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::Reset()
+{
+  if ( ! this->ModifiedFlag)
+    {
+    return;
+    }
+
+  // Command to update the UI.
+  this->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(), 
+               this->ObjectTclName, this->VariableName); 
+
+  this->ModifiedFlag = 0;
 }
 

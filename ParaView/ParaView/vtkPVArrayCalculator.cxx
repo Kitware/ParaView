@@ -251,12 +251,13 @@ void vtkPVArrayCalculator::CreateProperties()
                this->AttributeModeMenu->GetWidgetName());
   
   this->ArrayNameEntry->SetParent(this->ParameterFrame->GetFrame());
-  this->ArrayNameEntry->SetPVSource(this);
+  this->ArrayNameEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                          "ResultArrayName");
+  this->ArrayNameEntry->SetModifiedCommand(this->GetTclName(), 
+                                            "ChangeAcceptButtonColor");
   this->Widgets->AddItem(this->ArrayNameEntry);
   this->ArrayNameEntry->Create(pvApp, "Result Array Name:",
-                               "SetResultArrayName", "GetResultArrayName",
-                               "Set the name of the array to hold the results of this computation",
-                               this->GetVTKSourceTclName());
+                               "Set the name of the array to hold the results of this computation");
   this->Script("pack %s -side top -fill x",
                this->ArrayNameEntry->GetWidgetName());
   

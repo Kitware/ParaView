@@ -670,24 +670,16 @@ void vtkPVSourceInterfaceParser::SetStandardMethodInterface(const char* element,
                                                             const char* get,
                                                             const char* help)
 {
+  // I changed SetCommand and GetCommand to simply VariableName.
+  // I am putting a hack here temporarily to see if the change will work out.
+  // If it does, I will add a label to XML and take out the Set/Get commands.
+  // Get variable name from set. Ignore get.
   if(name)
     {
-    this->PVMethodInterface->SetVariableName(name);
+    this->PVMethodInterface->SetLabel(name);
     if(!set)
       {
-      char* buf = new char[strlen(name)+4];
-      strcpy(buf, "Set");
-      strcat(buf, name);
-      this->PVMethodInterface->SetSetCommand(buf);
-      delete [] buf;
-      }
-    if(!get)
-      {
-      char* buf = new char[strlen(name)+4];
-      strcpy(buf, "Get");
-      strcat(buf, name);
-      this->PVMethodInterface->SetGetCommand(buf);
-      delete [] buf;
+      this->PVMethodInterface->SetVariableName(name);
       }
     }
   else
@@ -695,7 +687,12 @@ void vtkPVSourceInterfaceParser::SetStandardMethodInterface(const char* element,
     this->ReportMissingAttribute(element, "name");
     }
   
-  if(set) { this->PVMethodInterface->SetSetCommand(set); }
-  if(get) { this->PVMethodInterface->SetGetCommand(get); }
-  if(help) { this->PVMethodInterface->SetBalloonHelp(help); }
+  if(set && strlen(set) > 3) 
+    { 
+    this->PVMethodInterface->SetVariableName(set+3); 
+    }
+  if(help) 
+    { 
+    this->PVMethodInterface->SetBalloonHelp(help);
+    }
 }

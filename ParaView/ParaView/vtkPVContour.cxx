@@ -103,9 +103,10 @@ void vtkPVContour::CreateProperties()
   this->ScalarRangeLabel->Create(pvApp, "");
   
   entry = vtkPVContourEntry::New();
+  entry->SetPVSource(this);
   entry->SetParent(this->GetParameterFrame()->GetFrame());
   entry->SetLabel("Contour Values");
-  entry->SetPVSource(this);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(pvApp);
   this->Widgets->AddItem(entry);
 
@@ -117,32 +118,34 @@ void vtkPVContour::CreateProperties()
   
   computeNormalsCheck = vtkPVLabeledToggle::New();
   computeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeNormalsCheck->SetPVSource(this);
-  computeNormalsCheck->Create(pvApp, "Compute Normals",
-                              "SetComputeNormals", "GetComputeNormals",
-                              "Select whether to compute normals",
-                               this->GetVTKSourceTclName());
+  computeNormalsCheck->SetLabel("Compute Normals");
+  computeNormalsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                         "ComputeNormals");
+  computeNormalsCheck->SetModifiedCommand(this->GetTclName(), 
+                                          "ChangeAcceptButtonColor");
+  computeNormalsCheck->Create(pvApp, "Select whether to compute normals");
   computeNormalsCheck->SetState(1);
   this->Widgets->AddItem(computeNormalsCheck);
 
   computeGradientsCheck = vtkPVLabeledToggle::New();
   computeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeGradientsCheck->SetPVSource(this);
-  computeGradientsCheck->Create(pvApp, "Compute Gradients",
-                                "SetComputeGradients",
-                                "GetComputeGradients",
-                                "Select whether to compute gradients",
-                                this->GetVTKSourceTclName());
+  computeGradientsCheck->SetLabel("Compute Gradients");
+  computeGradientsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                           "ComputeGradients");
+  computeGradientsCheck->SetModifiedCommand(this->GetTclName(), 
+                                            "ChangeAcceptButtonColor");
+  computeGradientsCheck->Create(pvApp, "Select whether to compute gradients");
   computeGradientsCheck->SetState(0);
   this->Widgets->AddItem(computeGradientsCheck);
   
   computeScalarsCheck = vtkPVLabeledToggle::New();
   computeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  computeScalarsCheck->SetPVSource(this);
-  computeScalarsCheck->Create(pvApp, "Compute Scalars",
-                              "SetComputeScalars", "GetComputeScalars",
-                              "Select whether to compute scalars",
-                              this->GetVTKSourceTclName());
+  computeScalarsCheck->SetLabel("Compute Scalars");
+  computeScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                         "ComputeScalars");
+  computeScalarsCheck->SetModifiedCommand(this->GetTclName(), 
+                                          "ChangeAcceptButtonColor");
+  computeScalarsCheck->Create(pvApp, "Select whether to compute scalars");
   computeScalarsCheck->SetState(1);
   this->Widgets->AddItem(computeScalarsCheck);
 

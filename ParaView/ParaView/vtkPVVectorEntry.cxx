@@ -63,8 +63,6 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   this->Label->SetParent(this);
   this->Entries = vtkKWWidgetCollection::New();
   this->SubLabels = vtkKWWidgetCollection::New();
-
-  this->PVSource = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -80,24 +78,16 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
 
 //---------------------------------------------------------------------------
 void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
-                              int vectorLength, char **subLabels,
-                              char *setCmd, char *getCmd,
-                              char *help, const char *tclName)
+                              int vectorLength, char **subLabels, char *help)
 {
   const char* wname;
   int i;
   vtkKWEntry* entry;
   vtkKWLabel* subLabel;
-  char acceptCmd[1024];
   
   if (this->Application)
     {
     vtkErrorMacro("VectorEntry already created");
-    return;
-    }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling Create");
     return;
     }
   
@@ -106,9 +96,6 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
 
   this->SetApplication(pvApp);
 
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
-  
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
@@ -124,9 +111,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
       }
     this->Script("pack %s -side left", this->Label->GetWidgetName());
     }
-  
-  sprintf(acceptCmd, "eval %s %s ", tclName, setCmd);
-  
+    
   // Now the sublabels and entries
   for (i = 0; i < vectorLength; i++)
     {
@@ -154,53 +139,68 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
                  entry->GetWidgetName());
     this->Entries->AddItem(entry);
     
-    this->ResetCommands->AddString("%s SetValue [lindex [%s %s] %d]",
-                                   entry->GetTclName(), tclName, getCmd, i);
-    strcat(acceptCmd, "[");
-    strcat(acceptCmd, entry->GetTclName());
-    strcat(acceptCmd, " GetValue]");
-    if (i < vectorLength-1)
-      {
-      strcat(acceptCmd, " ");
-      }
     entry->Delete();
     }
-  
-  strcat(acceptCmd, "");
-  this->AcceptCommands->AddString(acceptCmd);
 }
 
 
 //---------------------------------------------------------------------------
 void vtkPVVectorEntry::Accept()
 {
+  vtkKWEntry *entry;
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
+  char acceptCmd[1024];
 
-  if (this->ModifiedFlag && this->PVSource && traceFile)
+  if ( ! this->ModifiedFlag)
     {
-    vtkKWEntry *entry;
-    int num, idx;
-  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
-    *traceFile << "$pv(" << this->GetTclName() << ") SetValue";
-    num = this->Entries->GetNumberOfItems();
-    for (idx = 0; idx < num; ++idx)
-      {
-      entry = this->GetEntry(idx);
-      *traceFile << " " << entry->GetValue();
-      }
-    *traceFile << endl;
+    return;
     }
 
-  this->vtkPVWidget::Accept();
+  // Start the trace entry and the accept command.
+  if (traceFile)
+    {
+    *traceFile << "$pv(" << this->GetTclName() << ") SetValue";
+    }
+  sprintf(acceptCmd, "%s Set%s ", this->ObjectTclName, this->VariableName);
+
+  // finish all the arguments for the trace file and the accept command.
+  this->Entries->InitTraversal();
+  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+    {
+    if (traceFile)
+      {
+      *traceFile << " " << entry->GetValue();
+      }
+    strcat(acceptCmd, entry->GetValue());
+    strcat(acceptCmd, " ");
+    }
+  pvApp->BroadcastScript(acceptCmd);
+
+  this->ModifiedFlag = 0;  
+}
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::Reset()
+{
+  vtkKWEntry *entry;
+  int count = 0;
+
+  if ( ! this->ModifiedFlag)
+    {
+    return;
+    }
+
+  // Set each entry to the appropriate value.
+  this->Entries->InitTraversal();
+  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+    {
+    this->Script("%s SetValue [lindex [%s Get%s] %d]",
+                 entry->GetTclName(), this->ObjectTclName, this->VariableName, 
+                 count++); 
+    }
+
+  this->ModifiedFlag = 0;
 }
 
 //---------------------------------------------------------------------------

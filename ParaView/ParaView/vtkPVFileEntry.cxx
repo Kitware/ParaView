@@ -63,8 +63,6 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Entry->SetParent(this);
   this->PushButton = vtkKWPushButton::New();
   this->PushButton->SetParent(this);
-
-  this->PVSource = NULL;
 }
 
 vtkPVFileEntry::~vtkPVFileEntry()
@@ -77,9 +75,8 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->Label = NULL;
 }
 
-void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
-                            char *getCmd, char *ext, char *help,
-                            const char *tclName)
+void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
+                            char *ext, char *help)
 {
   const char* wname;
   
@@ -88,19 +85,11 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
     vtkErrorMacro("FileEntry already created");
     return;
     }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling Create");
-    return;
-    }
   
   // For getting the widget in a script.
   this->SetName(label);
   this->SetApplication(pvApp);
 
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
-  
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
@@ -146,15 +135,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
     {
     this->PushButton->SetCommand(this->Entry, "SetValue [tk_getOpenFile]");
     }
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->Entry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all
-  // processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s %s [%s GetValue]",
-                                  tclName, setCmd, this->Entry->GetTclName());
 }
 
 
@@ -183,23 +163,29 @@ void vtkPVFileEntry::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
+  if (this->ModifiedFlag)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) SetValue {%s}", this->GetTclName(), 
                          this->GetValue());
     }
 
+  pvApp->BroadcastScript("%s Set%s %s",
+                         this->ObjectTclName, this->VariableName, 
+                         this->Entry->GetValue());
+
+  // The supper does nothing but turn the modified flag off.
   this->vtkPVWidget::Accept();
 }
 
 
+void vtkPVFileEntry::Reset()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
 
+  pvApp->BroadcastScript("%s SetValue [%s Get%s]",
+                         this->Entry->GetTclName(),
+                         this->ObjectTclName, this->VariableName); 
 
+  // The supper does nothing but turn the modified flag off.
+  this->vtkPVWidget::Reset();
+}

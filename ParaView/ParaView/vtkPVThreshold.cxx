@@ -139,7 +139,8 @@ void vtkPVThreshold::CreateProperties()
     }
   
   this->MinMaxScale->SetParent(this->GetParameterFrame()->GetFrame());
-  this->MinMaxScale->SetPVSource(this);
+  this->MinMaxScale->SetObjectVariable(this->GetVTKSourceTclName(), "");
+  this->MinMaxScale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   this->MinMaxScale->Create(pvApp, "Lower Threshold", "Upper Threshold",
                             range[0], range[1], (range[1] - range[0]) / 100.0,
                             "ThresholdBetween", "GetLowerThreshold",
@@ -149,10 +150,12 @@ void vtkPVThreshold::CreateProperties()
   this->Widgets->AddItem(this->MinMaxScale);
   
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->AllScalarsCheck->SetPVSource(this);
-  this->AllScalarsCheck->Create(pvApp, "AllScalars", "SetAllScalars",
-                                "GetAllScalars", "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.",
-                                this->GetVTKSourceTclName());
+  this->AllScalarsCheck->SetLabel("AllScalars");
+  this->AllScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                           "AllScalars");
+  this->AllScalarsCheck->SetModifiedCommand(this->GetTclName(), 
+                                           "ChangeAcceptButtonColor");
+  this->AllScalarsCheck->Create(pvApp, "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
   this->Widgets->AddItem(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
 

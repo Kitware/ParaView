@@ -109,6 +109,13 @@ public:
   // Menu callback when an item is selected.
   void MenuEntryCallback(vtkPVSource *pvs);
 
+  // Description:
+  // Need the source to get the input.
+  // I would like to get rid of this ivar.
+  // It is not reference counted for fear of loops.
+  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() { return this->PVSource;}
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
@@ -120,6 +127,9 @@ protected:
   vtkPVSource *CurrentValue;
   vtkCollection *Sources;
   
+  // I would like to get rid of this.
+  vtkPVSource *PVSource;
+
   vtkKWLabel *Label;
   vtkKWOptionMenu *Menu;
 

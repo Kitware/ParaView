@@ -217,14 +217,6 @@ void vtkPVInputMenu::Accept()
 
   if (this->ModifiedFlag && this->PVSource)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
                          this->GetTclName(), 
                          this->CurrentValue->GetTclName());
@@ -257,6 +249,9 @@ void vtkPVInputMenu::Reset()
 
   // Super and source do nothing.  We have to do every thing here.
 
+  // Turn ModifiedFlag off here in case "AddSources" sets a default.
+  this->ModifiedFlag = 0;
+  
   // The list of possible inputs could have changed.
   this->AddSources(this->Sources);
 
@@ -266,5 +261,4 @@ void vtkPVInputMenu::Reset()
                this->GetTclName(), 
                this->PVSource->GetTclName(), this->InputName);
     
-  this->vtkPVWidget::Reset();
 }

@@ -62,6 +62,7 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->NewValueEntry = vtkKWEntry::New();
   this->AddValueButton = vtkKWPushButton::New();
   this->DeleteValueButton = vtkKWPushButton::New();
+  this->PVSource = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -81,6 +82,8 @@ vtkPVContourEntry::~vtkPVContourEntry()
   this->NewValueFrame = NULL;
   this->DeleteValueButton->Delete();
   this->DeleteValueButton = NULL;
+
+  this->SetPVSource(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -246,14 +249,6 @@ void vtkPVContourEntry::Accept()
 
   if (this->ModifiedFlag)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) RemoveAllValues", 
                          this->GetTclName());
     pvApp->BroadcastScript("%s SetNumberOfContours %d",

@@ -166,8 +166,8 @@ vtkPVWindow::vtkPVWindow()
   this->ThresholdInterface->SetOutputClassName("vtkUnstructuredGrid");
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("ThresholdRange");
-  mInt->SetSetCommand("ThresholdBetween");
+  mInt->SetLabel("ThresholdRange");
+  mInt->SetVariableName("ThresholdBetween");
   // There is no simple get string.
   //mInt->SetGetCommand("");
   mInt->AddFloatArgument();
@@ -191,9 +191,8 @@ vtkPVWindow::vtkPVWindow()
   this->CutPlaneInterface->SetOutputClassName("vtkPolyData");
   // Offset:
   mInt = vtkPVMethodInterface::New();
+  mInt->SetLabel("Offset");
   mInt->SetVariableName("Offset");
-  mInt->SetSetCommand("SetOffset");
-  mInt->SetGetCommand("GetOffset");
   mInt->AddFloatArgument();
   this->CutPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
@@ -201,8 +200,7 @@ vtkPVWindow::vtkPVWindow()
   // Center:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Origin");
-  mInt->SetSetCommand("SetOrigin");
-  mInt->SetGetCommand("GetOrigin");
+  mInt->SetLabel("Origin");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
@@ -212,8 +210,7 @@ vtkPVWindow::vtkPVWindow()
   // Normal:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Normal");
-  mInt->SetSetCommand("SetNormal");
-  mInt->SetGetCommand("GetNormal");
+  mInt->SetLabel("Normal");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
@@ -237,8 +234,7 @@ vtkPVWindow::vtkPVWindow()
   // Offset:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Offset");
-  mInt->SetSetCommand("SetOffset");
-  mInt->SetGetCommand("GetOffset");
+  mInt->SetLabel("Offset");
   mInt->AddFloatArgument();
   this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
@@ -246,8 +242,7 @@ vtkPVWindow::vtkPVWindow()
   // Center:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Origin");
-  mInt->SetSetCommand("SetOrigin");
-  mInt->SetGetCommand("GetOrigin");
+  mInt->SetLabel("Origin");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
@@ -257,8 +252,7 @@ vtkPVWindow::vtkPVWindow()
   // Normal:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Normal");
-  mInt->SetSetCommand("SetNormal");
-  mInt->SetGetCommand("GetNormal");
+  mInt->SetLabel("Normal");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();

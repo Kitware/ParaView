@@ -56,20 +56,25 @@ vtkPVWidget* vtkPVWidget::New()
   return new vtkPVWidget;
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
   this->AcceptCommands = vtkStringList::New();
   this->ResetCommands = vtkStringList::New();
 
-  this->SetCommand = NULL;
-  this->GetCommand = NULL;
+  this->ObjectTclName = NULL;
+  this->VariableName = NULL;
 
-  this->TraceInitialized = 0;
-  this->ModifiedFlag = 0;
+  this->ModifiedCommandObjectTclName = NULL;
+  this->ModifiedCommandMethod = NULL;
+
+  this->TraceVariableInitialized = 0;
+  // Start modified because empty widgets do not match their variables.
+  this->ModifiedFlag = 1;
   this->Name = NULL;
-  this->PVSource = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
   this->AcceptCommands->Delete();
@@ -77,27 +82,41 @@ vtkPVWidget::~vtkPVWidget()
   this->ResetCommands->Delete();
   this->ResetCommands = NULL;
   
-  this->SetSetCommand(NULL);
-  this->SetGetCommand(NULL);
+  this->SetObjectTclName(NULL);
+  this->SetVariableName(NULL);
 
-  this->PVSource = NULL;
+  this->SetModifiedCommandObjectTclName(NULL);
+  this->SetModifiedCommandMethod(NULL);
 }
 
-void vtkPVWidget::SetPVSource(vtkPVSource *source)
+//----------------------------------------------------------------------------
+void vtkPVWidget::SetObjectVariable(const char* objName, const char* varName)
 {
-  this->PVSource = source;
+  this->SetObjectTclName(objName);
+  this->SetVariableName(varName);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
+                                     const char* methodAndArgs)
+{
+  this->SetModifiedCommandObjectTclName(cmdObject);
+  this->SetModifiedCommandMethod(methodAndArgs);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
 {
   char *result;
   
-  *file << sourceName << " " << this->SetCommand;
-  this->Script("set tempValue [%s %s]", sourceName, this->GetCommand);
+  *file << sourceName << " Set" << this->VariableName;
+  this->Script("set tempValue [%s Get%s]", 
+               this->ObjectTclName, this->VariableName);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWidget::Accept()
 {
   int num, i;
@@ -112,6 +131,7 @@ void vtkPVWidget::Accept()
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWidget::Reset()
 {
   int num, i;
@@ -126,11 +146,14 @@ void vtkPVWidget::Reset()
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWidget::ModifiedCallback()
 {
   this->ModifiedFlag = 1;
-  if (this->PVSource)
+  
+  if (this->ModifiedCommandObjectTclName && this->ModifiedCommandMethod)
     {
-    this->PVSource->ChangeAcceptButtonColor();
+    this->Script("%s %s", this->ModifiedCommandObjectTclName,
+                 this->ModifiedCommandMethod);
     }
 }

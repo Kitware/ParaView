@@ -676,22 +676,22 @@ void vtkPVAnimationInterface::SetMethodInterfaceIndex(int idx)
       char str[1024];
       if (mInt->GetArgumentType(0) == VTK_FLOAT)
         {
-        sprintf(str, "%s %s $pvTime", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetSetCommand());
+        sprintf(str, "%s Set%s $pvTime", this->PVSource->GetVTKSourceTclName(),
+                mInt->GetVariableName());
         }
       else if (mInt->GetArgumentType(0) == VTK_INT)
         {
-        sprintf(str, "%s %s [expr int($pvTime)]", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetSetCommand());
+        sprintf(str, "%s Set%s [expr int($pvTime)]", this->PVSource->GetVTKSourceTclName(),
+                mInt->GetVariableName());
         }
       else if (mInt->GetArgumentType(0) == VTK_STRING)
         {
         // Do the best we can for a default.
         // Append the time onto the current value of the string.
-        this->Script("%s %s", this->PVSource->GetVTKSourceTclName(),
-                     mInt->GetGetCommand());
-        sprintf(str, "%s %s \"%s[expr int($pvTime)]\"", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetSetCommand(),
+        this->Script("%s Get%s", this->PVSource->GetVTKSourceTclName(),
+                     mInt->GetVariableName());
+        sprintf(str, "%s Get%s \"%s[expr int($pvTime)]\"", this->PVSource->GetVTKSourceTclName(),
+                mInt->GetVariableName(),
                 this->Application->GetMainInterp()->result);
         }
       else

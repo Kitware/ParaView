@@ -1015,9 +1015,17 @@ void vtkPVSource::UpdateVTKSourceParameters()
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     widget = this->Widgets->GetNextKWWidget();
-    pvw = vtkPVWidget::SafeDownCast(widget); 
-    if (pvw)
+    pvw = vtkPVWidget::SafeDownCast(widget);
+    if (pvw && pvw->GetModifiedFlag())
       {
+      if ( ! pvw->GetTraceVariableInitialized())
+        {
+        this->GetPVApplication()->AddTraceEntry(
+                         "set pv(%s) [$pv(%s) GetPVWidget {%s}]",
+                         pvw->GetTclName(), this->GetTclName(),
+                         pvw->GetName());
+        pvw->SetTraceVariableInitialized(1);
+        }
       pvw->Accept();
       }
     }
@@ -1522,6 +1530,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   inputMenu->SetSources(sources);
   inputMenu->SetParent(this->ParameterFrame->GetFrame());
   inputMenu->SetLabel(label);
+  inputMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   inputMenu->Create(this->Application);
   inputMenu->SetInputName(inputName);
   inputMenu->SetInputType(inputType);
@@ -1535,22 +1544,16 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
 
 
 //----------------------------------------------------------------------------
-vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
-                                                  char *getCmd, char* help,
-                                                  vtkKWObject *o)
+vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName, 
+                                                  char* help)
 {
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
-
   vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
   this->Widgets->AddItem(toggle);
   toggle->SetParent(this->ParameterFrame->GetFrame());
-  toggle->SetPVSource(this);
-  toggle->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  toggle->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  toggle->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  toggle->SetLabel(label);
+  toggle->Create(this->Application, help);
 
   this->Script("pack %s -fill x -expand t", toggle->GetWidgetName());
   
@@ -1561,24 +1564,17 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
-                                          char *getCmd, char *ext, char *help,
-                                          vtkKWObject *o)
+vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
+                                          char *ext, char *help)
 {
   vtkPVFileEntry *entry;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   entry = vtkPVFileEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, setCmd, getCmd, ext, help, tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, ext, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
@@ -1589,24 +1585,17 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
-                                              char *getCmd, char *help,
-                                              vtkKWObject *o)
+vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName, 
+                                              char *help)
 {
   vtkPVStringEntry *entry;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   entry = vtkPVStringEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
@@ -1617,25 +1606,17 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
-                                               char *getCmd, char* help,
-                                               vtkKWObject *o)
+vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName, 
+                                               char* help)
 {
   vtkPVVectorEntry *entry;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, 1, NULL, setCmd, getCmd, help,
-                tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, 1, NULL, help);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
   entry->Delete();
@@ -1646,19 +1627,11 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-                                               char *setCmd, char *getCmd,
-                                               char *help, vtkKWObject *o)
+                                               char *varName, char *help)
 {
   vtkPVVectorEntry *entry;
   char* subLabels[2];
   int i;
-  
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
   
   subLabels[0] = new char[strlen(l1) + 1];
   strcpy(subLabels[0], l1);
@@ -1667,9 +1640,9 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, 2, subLabels, setCmd, getCmd, help,
-                tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, 2, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1684,21 +1657,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
-                                               char *l3, char *setCmd,
-                                               char *getCmd, char* help,
-                                               vtkKWObject *o)
+                                               char *l3, char *varName, 
+                                               char* help)
 {
   vtkPVVectorEntry *entry;
   char* subLabels[3];
   int i;
   
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
-
   subLabels[0] = new char[strlen(l1) + 1];
   strcpy(subLabels[0], l1);
   subLabels[1] = new char[strlen(l2) + 1];
@@ -1708,9 +1673,9 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, 3, subLabels, setCmd, getCmd, help,
-                tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, 3, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1727,19 +1692,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
                                                char *l3, char *l4,
-                                               char *setCmd, char *getCmd,
-                                               char* help, vtkKWObject *o)
+                                               char *varName, char* help)
 {
   vtkPVVectorEntry* entry;
   char* subLabels[4];
   int i;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   subLabels[0] = new char[strlen(l1) + 1];
   strcpy(subLabels[0], l1);
@@ -1753,9 +1710,9 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, 4, subLabels, setCmd, getCmd, help,
-                tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, 4, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1773,21 +1730,13 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
 // so that a loop can be used to create the widgets.
 vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
                                                char *l3, char *l4, char *l5,
-                                               char *l6, char *setCmd,
-                                               char *getCmd, char *help,
-                                               vtkKWObject *o)
+                                               char *l6, char *varName, 
+                                               char *help)
 
 {
   vtkPVVectorEntry *entry;
   char* subLabels[6];
   int i;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   subLabels[0] = new char[strlen(l1) + 1];
   strcpy(subLabels[0], l1);
@@ -1805,9 +1754,9 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->SetPVSource(this);
-  entry->Create(this->Application, label, 6, subLabels, setCmd, getCmd, help,
-                tclName);
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, label, 6, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1822,25 +1771,18 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
 
 
 //----------------------------------------------------------------------------
-vtkPVScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
+vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
                                   float min, float max, float resolution,
-                                  char* help, vtkKWObject *o)
+                                  char* help)
 {
   vtkPVScale *scale;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
 
   scale = vtkPVScale::New();
   this->Widgets->AddItem(scale);
   scale->SetParent(this->ParameterFrame->GetFrame());
-  scale->SetPVSource(this);
-  scale->Create(this->Application, label, min, max, resolution, 
-                setCmd, getCmd, help);
+  scale->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  scale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  scale->Create(this->Application, label, min, max, resolution, help);
 
   this->Script("pack %s -fill x -expand t", scale->GetWidgetName());
 
@@ -1851,17 +1793,17 @@ vtkPVScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd,
-                                             char *getCmd, char *help,
-                                             vtkKWObject *o)
+vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *varName, 
+                                             char *help)
 {
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   this->Widgets->AddItem(sl);
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel(label);
-  sl->SetPVSource(this);
+  sl->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  sl->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   sl->Create(this->Application);
-  sl->SetAccessMethods(setCmd, getCmd);
+
   if (help)
     {
     sl->SetBalloonHelpString(help);

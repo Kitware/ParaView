@@ -48,8 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkPVMethodInterface::vtkPVMethodInterface()
 {
   this->VariableName = NULL;
-  this->SetCommand = NULL;
-  this->GetCommand = NULL;
+  this->Label = NULL;
   this->ArgumentTypes = vtkIdList::New();
   this->WidgetType = VTK_PV_METHOD_WIDGET_ENTRY;
   this->SelectionEntries = NULL;
@@ -61,8 +60,7 @@ vtkPVMethodInterface::vtkPVMethodInterface()
 vtkPVMethodInterface::~vtkPVMethodInterface()
 {
   this->SetVariableName(NULL);
-  this->SetSetCommand(NULL);
-  this->SetGetCommand(NULL);
+  this->SetLabel(NULL);
   this->ArgumentTypes->Delete();
   this->ArgumentTypes = NULL;
   if (this->SelectionEntries)

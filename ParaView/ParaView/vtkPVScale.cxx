@@ -62,8 +62,6 @@ vtkPVScale::vtkPVScale()
   this->Label->SetParent(this);
   this->Scale = vtkKWScale::New();
   this->Scale->SetParent(this);
-
-  this->PVSource = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -77,17 +75,11 @@ vtkPVScale::~vtkPVScale()
 
 //----------------------------------------------------------------------------
 void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
-                        float min, float max, float resolution,
-                        char *setCmd, char *getCmd, char *help)
+                        float min, float max, float resolution, char *help)
 {
   if (this->Application)
     {
     vtkErrorMacro("PVScale already created");
-    return;
-    }
-  if ( ! this->PVSource)
-    {
-    vtkErrorMacro("PVSource must be set before calling create");
     return;
     }
 
@@ -96,9 +88,6 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
   
   this->SetApplication(pvApp);
 
-  this->SetSetCommand(setCmd);
-  this->SetGetCommand(getCmd);
-  
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
@@ -123,17 +112,6 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
     }
   this->Script("pack %s -side left -fill x -expand t", 
                this->Scale->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->Scale->GetTclName(), 
-                                 this->PVSource->GetVTKSourceTclName(), 
-                                 getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s %s [%s GetValue]",
-                                  this->PVSource->GetVTKSourceTclName(),
-                                  setCmd, this->GetTclName());
 }
 
 
@@ -159,21 +137,38 @@ void vtkPVScale::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->PVSource)
+  if (this->ModifiedFlag)
     {  
-    if ( ! this->TraceInitialized)
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPVWidget {%s}]",
-                           this->GetTclName(), this->PVSource->GetTclName(),
-                           this->Name);
-      this->TraceInitialized = 1;
-      }
-
     pvApp->AddTraceEntry("$pv(%s) SetValue %f", this->GetTclName(), 
                          this->Scale->GetValue());
     }
 
-  this->vtkPVWidget::Accept();
+  if (this->ObjectTclName && this->VariableName)
+    {
+    pvApp->BroadcastScript("%s Set%s %d", 
+                           this->ObjectTclName,
+                           this->VariableName, 
+                           this->GetValue());
+    }
+
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::Reset()
+{
+  if ( ! this->ModifiedFlag)
+    {  
+    return;
+    }
+
+  if (this->ObjectTclName && this->VariableName)
+    {
+    this->Script("%s SetValue [%s Get%s]", this->Scale->GetTclName(),
+                  this->ObjectTclName, this->VariableName);
+    }
+
+  this->ModifiedFlag = 0;
 }
 
 

@@ -241,26 +241,32 @@ void vtkPVGlyph3D::CreateProperties()
                this->VectorModeMenu->GetWidgetName());
   
   this->OrientCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->OrientCheck->SetPVSource(this);
-  this->OrientCheck->Create(pvApp, "Orient", "SetOrient", "GetOrient",
-                            "Select whether to orient the glyphs",
-                            this->GetVTKSourceTclName());
+  this->OrientCheck->SetLabel("Orient");
+  this->OrientCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                       "Orient");
+  this->OrientCheck->SetModifiedCommand(this->GetTclName(), 
+                                        "ChangeAcceptButtonColor");
+  this->OrientCheck->Create(pvApp, "Select whether to orient the glyphs");
   this->OrientCheck->SetState(1);
   this->Widgets->AddItem(this->OrientCheck);
   
   this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleCheck->SetPVSource(this);
-  this->ScaleCheck->Create(pvApp, "Scale", "SetScaling", "GetScaling",
-                           "Select whether to scale the glyphs",
-                           this->GetVTKSourceTclName());
+  this->ScaleCheck->SetLabel("Scale");
+  this->ScaleCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                      "Scaling");
+  this->ScaleCheck->SetModifiedCommand(this->GetTclName(), 
+                                        "ChangeAcceptButtonColor");
+  this->ScaleCheck->Create(pvApp, "Select whether to scale the glyphs");
   this->ScaleCheck->SetState(1);
   this->Widgets->AddItem(this->ScaleCheck);
   
   this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleEntry->SetPVSource(this);
-  this->ScaleEntry->Create(pvApp, "Scale Factor:", 1, NULL, "SetScaleFactor",
-                           "GetScaleFactor", "Select the amount to scale the glyphs by",
-                           this->GetVTKSourceTclName());
+  this->ScaleEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
+                                      "ScaleFactor");
+  this->ScaleEntry->SetModifiedCommand(this->GetTclName(), 
+                                        "ChangeAcceptButtonColor");
+  this->ScaleEntry->Create(pvApp, "Scale Factor:", 1, NULL,
+                           "Select the amount to scale the glyphs by");
   this->Widgets->AddItem(this->ScaleEntry);
   this->ScaleEntry->GetEntry(0)->SetValue("1.0");
 
@@ -273,7 +279,7 @@ void vtkPVGlyph3D::CreateProperties()
   // Make sure the Input menus reflect the actual values.
   // This call is called too many times.  
   // It does not hurt anything, but should be cleaned up.
-  this->UpdateParameterWidgets();
+  this->UpdateParameterWidgets();  
 }
 
 void vtkPVGlyph3D::ChangeScaleMode()

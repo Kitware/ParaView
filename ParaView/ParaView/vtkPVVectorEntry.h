@@ -57,17 +57,26 @@ public:
   vtkTypeMacro(vtkPVVectorEntry, vtkPVWidget);
 
   void Create(vtkKWApplication *pvApp, char *label, int vectorLength,
-              char **subLabels, char *setCmd, char *getCmd, char *help,
-              const char *tclName);
+              char **subLabels, char *help);
   
   // Description:
-  // This accept call adds a line to the trace file if the widget has changed.
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void Accept();
+  
+  // Description:
+  // Called when the reset button is pushed.
+  // Sets widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
+  virtual void Reset();
 
+  // Description:
+  // I will eventually remove access to internal widgets once I figure
+  // out how to get the vectors value in Tcl with any number of componenets.
   vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
-  
   vtkKWLabel* GetSubLabel(int idx);
   vtkKWEntry* GetEntry(int idx);
 

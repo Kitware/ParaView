@@ -64,6 +64,18 @@ public:
   vtkTypeMacro(vtkPVWidget, vtkKWWidget);
 
   // Description:
+  // The point of a PV widget is that it is an interface for
+  // some objects state/ivars.  This is one way the object/variable
+  // can be specified. Subclasses may have seperate or addition
+  // variables for specifying the relationship.
+  void SetObjectVariable(const char *objectTclName, const char *var);
+
+  // Description:
+  // This commands is an optional action that will be called when
+  // the widget is modified.
+  void SetModifiedCommand(const char* cmdObject, const char* methodAndArgs);
+
+  // Description:
   // The methods get called by the source when 
   // the Accept or Reset buttons are pressed.
   virtual void Accept();
@@ -71,21 +83,19 @@ public:
 
   // Description:
   // This method gets called when the user changes the widgets value,
-  // or a script changes the widgets value.  
+  // or a script changes the widgets value.  Ideally, this method should 
+  // be protected.
   virtual void ModifiedCallback();
-  
-  // Description:
-  // Set the vtkPVSource associated with this vtkPVWidget
-  void SetPVSource(vtkPVSource *source);
-  vtkGetObjectMacro(PVSource, vtkPVSource);
 
   // Description:
-  // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
+  // Access to the flag that indicates whether the widgets
+  // has been modified and is out of sync with its VTK object.
+  vtkGetMacro(ModifiedFlag,int);
   
   // Description:
   // With this name, you can get this widget from the PVSource.
   // It is to allow access to this widget from a script.
+  // In most widgets, it is the same as the label.
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
@@ -93,6 +103,18 @@ public:
   // Conveniance method that casts the application to a PV application.
   vtkPVApplication *GetPVApplication() 
     {return vtkPVApplication::SafeDownCast(this->Application);}
+
+  // Description:
+  // The owner of this object is responsible for setting the variable
+  // in the trace file that refers to this object.  This flag should
+  // be set to indicate whether the variable has been set in the trace.
+  // The variable is just the array pv index by the objects Tcl name.
+  vtkSetMacro(TraceVariableInitialized,int);
+  vtkGetMacro(TraceVariableInitialized,int);
+
+  // Description:
+  // Save this widget to a file.  
+  virtual void SaveInTclScript(ofstream *file, const char *sourceName);  
 
 protected:
   vtkPVWidget();
@@ -103,22 +125,25 @@ protected:
   vtkStringList *AcceptCommands;
   vtkStringList *ResetCommands;
   
-  char *SetCommand;
-  char *GetCommand;
-  
-  vtkSetStringMacro(SetCommand);
-  vtkSetStringMacro(GetCommand);
-  
-  vtkPVSource *PVSource;
+  char *ObjectTclName;
+  char *VariableName;
+  vtkSetStringMacro(ObjectTclName);
+  vtkSetStringMacro(VariableName);
 
+  char *ModifiedCommandObjectTclName;
+  char *ModifiedCommandMethod;
+  vtkSetStringMacro(ModifiedCommandObjectTclName);
+  vtkSetStringMacro(ModifiedCommandMethod);
+  
   // This flag indicates that a variable has been defined in the 
   // trace file for this widget.
-  int TraceInitialized;
+  int TraceVariableInitialized;
   // This flag indicates that the widget has changed and should be
   // added to the trace file.
   int ModifiedFlag;
 
   // This name allows access to this widget from a script.
+  // In most widgets, it is the same as the label.
   char *Name;
 };
 

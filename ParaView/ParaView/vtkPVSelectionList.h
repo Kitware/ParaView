@@ -67,10 +67,6 @@ public:
   // Returns 0 if there was an error.
   int Create(vtkKWApplication *app);
 
-  // Description:
-  // Set the method names that will be used during Reset and Accept.
-  void SetAccessMethods(const char* setCmd, const char* getCmd);
-
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value
   // is used to set and get the current selection programmatically.

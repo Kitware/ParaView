@@ -56,13 +56,20 @@ public:
   static vtkPVStringEntry* New();
   vtkTypeMacro(vtkPVStringEntry, vtkPVWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
-              char *getCmd, char *help, const char *tclName);
+  void Create(vtkKWApplication *pvApp, char *label, char *help);
   
   // Description:
-  // Called when accept button is pushed.  Just adds to trace
-  // file and calls supperclass accept.
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void Accept();
+  
+  // Description:
+  // Called when the reset button is pushed.
+  // Sets widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
+  virtual void Reset();
+
   
   // Description:
   // This method allows scripts to modify the widgets value.
