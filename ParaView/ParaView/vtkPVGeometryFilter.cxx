@@ -38,7 +38,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.16");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.17");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -89,28 +89,31 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 {
   if (input->IsA("vtkDataSet"))
     {
-    if (!static_cast<vtkDataSet*>(input)->CheckAttributes())
+    if (static_cast<vtkDataSet*>(input)->CheckAttributes())
       {
-      return 0;
+      return 1;
       }
     }
-//   else if (input->IsA("vtkCompositeDataSet"))
-//     {
-//     vtkCompositeDataSet* compInput = 
-//       static_cast<vtkCompositeDataSet*>(input);
-//     vtkCompositeDataIterator* iter = compInput->NewIterator();
-//     while (!iter->IsDoneWithTraversal())
-//       {
-//       vtkDataObject* curDataSet = iter->GetCurrentDataObject();
-//       if (curDataSet && !this->CheckAttributes(curDataSet))
-//         {
-//         return 0;
-//         }
-//       iter->GoToNextItem();
-//       }
-//     iter->Delete();
-//     }
-  return 1;
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  else if (input->IsA("vtkCompositeDataSet"))
+    {
+    vtkCompositeDataSet* compInput = 
+      static_cast<vtkCompositeDataSet*>(input);
+    vtkCompositeDataIterator* iter = compInput->NewIterator();
+    iter->GoToFirstItem();
+    while (!iter->IsDoneWithTraversal())
+      {
+      vtkDataObject* curDataSet = iter->GetCurrentDataObject();
+      if (curDataSet && this->CheckAttributes(curDataSet))
+        {
+        return 1;
+        }
+      iter->GoToNextItem();
+      }
+    iter->Delete();
+    }
+#endif
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -123,7 +126,7 @@ void vtkPVGeometryFilter::Execute()
     return;
     }
 
-  if (!this->CheckAttributes(input))
+  if (this->CheckAttributes(input))
     {
     return;
     }
