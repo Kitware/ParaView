@@ -129,7 +129,6 @@ public:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
   void Script(const char *EventString, ...);
-  void SimpleScript(char *EventString);
   void SimpleScript(const char *EventString);
   const char* EvaluateString(const char *String, ...);
   const char* ExpandFileName(const char *String, ...);

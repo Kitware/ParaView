@@ -197,17 +197,6 @@ void vtkKWApplication::Script(const char *format, ...)
   vsprintf(event, format, var_args);
   va_end(var_args);
 
-  this->SimpleScript(event);
-}
-
-void vtkKWApplication::SimpleScript(char *event)
-{
-//#define VTK_DEBUG_SCRIPT
-#ifdef VTK_DEBUG_SCRIPT
-    vtkOutputWindow::GetInstance()->DisplayText(event);
-    vtkOutputWindow::GetInstance()->DisplayText("\n");
-#endif
-  
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
