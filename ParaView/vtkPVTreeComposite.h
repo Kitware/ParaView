@@ -45,16 +45,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION see also
 // vtkMultiProcessController vtkRenderWindow.
 
+#include "vtkToolkits.h"
 #ifndef __vtkPVTreeComposite_h
 #define __vtkPVTreeComposite_h
-
-#include "vtkTreeComposite.h"
-#include "vtkPVRenderView.h"
-#include "vtkToolkits.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #endif
+
+#include "vtkTreeComposite.h"
+#include "vtkPVRenderView.h"
+
 
 class VTK_EXPORT vtkPVTreeComposite : public vtkTreeComposite
 {
