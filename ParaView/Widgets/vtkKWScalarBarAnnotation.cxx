@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.8");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.9");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -273,6 +273,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->TitleEntry->SetParent(this->TitleFrame);
   this->TitleEntry->Create(app, 0);
   this->TitleEntry->SetLabel("Title:");
+  this->TitleEntry->GetEntry()->SetWidth(20);
   this->TitleEntry->GetEntry()->BindCommand(this, "ScalarBarTitleCallback");
 
   this->TitleEntry->SetBalloonHelpString(
@@ -342,6 +343,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->LabelFormatEntry->SetParent(this->LabelFrame);
   this->LabelFormatEntry->Create(app, 0);
   this->LabelFormatEntry->SetLabel("Label format:");
+  this->LabelFormatEntry->GetEntry()->SetWidth(20);
   this->LabelFormatEntry->GetEntry()->BindCommand(
     this, "ScalarBarLabelFormatCallback");
 
