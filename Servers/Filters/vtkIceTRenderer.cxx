@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.12");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.13");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -92,6 +92,7 @@ void vtkIceTRenderer::DeviceRender()
     this->vtkOpenGLRenderer::DeviceRender();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+    this->InvokeEvent(vtkCommand::EndEvent,NULL);
     return;
     }
 
@@ -239,12 +240,6 @@ int vtkIceTRenderer::UpdateGeometry()
 
   this->NumberOfPropsRendered = 0;
 
-  if ( this->PropArrayCount == 0 ) 
-    {
-    this->InvokeEvent(vtkCommand::EndEvent,NULL);
-    return 0;
-    }
-
   //First, get the current transformation.
   GLdouble projection[16];
   GLdouble modelview[16];
@@ -328,9 +323,6 @@ int vtkIceTRenderer::UpdateGeometry()
         this->PropArray[i]->RenderOverlay(this);
       }
     }
-
-  this->InvokeEvent(vtkCommand::EndEvent,NULL);
-  this->RenderTime.Modified();
 
   vtkDebugMacro("Rendered " << this->NumberOfPropsRendered
                 << " actors");
