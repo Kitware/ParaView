@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for MedVIP
-# modified by S. Barre (Time-stamp: <2002-12-11 10:09:09 barre>
+# modified by S. Barre (Time-stamp: <2004-06-15 12:50:56 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = ParaView
@@ -73,7 +73,7 @@ EXCLUDE_PATTERNS     =
 HTML_ALIGN_MEMBERS   = YES
 ALPHABETICAL_INDEX   = YES
 COLS_IN_ALPHA_INDEX  = 3
-IGNORE_PREFIX        = vtkKW vtkPV vtk
+IGNORE_PREFIX        = vtkKW vtkPV vtkSM vtk
 
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION      = YES
