@@ -147,7 +147,7 @@ protected:
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
-#include "vtkImageIterator.txx"
+#include "vtkVector.txx"
 #endif 
 
 #endif
