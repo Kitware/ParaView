@@ -160,4 +160,11 @@ IF(BUILD_SHARED_LIBS)
   INSTALL_TARGETS(/lib
     vtkPVServerManagerTCL
     vtkPVServerManager)
+  INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION}/ServerManager/Resources FILES
+    Resources/filters.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+    )
 ENDIF(BUILD_SHARED_LIBS)
