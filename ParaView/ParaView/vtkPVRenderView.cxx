@@ -1121,6 +1121,10 @@ void vtkPVRenderView::UpdateAllPVData()
 {
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( !pvwindow || !pvApp )
+    {
+    return;
+    }
   vtkPVSourceCollection* col = 0;
   //cout << "Update all PVData" << endl;
   col = pvwindow->GetSourceList("Sources");
