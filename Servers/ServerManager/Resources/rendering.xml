@@ -266,7 +266,11 @@
      </SubProxy>
 
      <SubProxy>
+#ifdef VTK_USE_MPI
+       <Proxy name="composite" class="vtkPVTreeComposite">
+#else
        <Proxy name="composite" class="vtkCompositeRenderManager">
+#endif
        </Proxy>
      </SubProxy>
    </DisplayWindowProxy>
