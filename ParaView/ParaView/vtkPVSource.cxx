@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.259");
+vtkCxxRevisionMacro(vtkPVSource, "1.260");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2386,6 +2386,7 @@ void vtkPVSource::SerializeToken(istream& is, const char token[1024])
     }
   else if ( vtkString::Equals(token, "Output") )
     {
+    this->Accept(0, 0);
     vtkPVData* output = this->GetPVOutput();
     if (!output )
       {
@@ -2396,7 +2397,6 @@ void vtkPVSource::SerializeToken(istream& is, const char token[1024])
       output->Delete();
       }
     //this->AcceptCallback();
-    this->Accept(0, 0);
     output->Serialize(is);
     }
   else if ( vtkString::Equals(token, "NumberOfPVInputs") )
@@ -2487,7 +2487,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.259 $");
+  this->ExtractRevision(os,"$Revision: 1.260 $");
 }
 
 //----------------------------------------------------------------------------
