@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.440");
+vtkCxxRevisionMacro(vtkPVWindow, "1.441");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2511,7 +2511,6 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 void vtkPVWindow::SaveBatchScript(const char* filename)
 {
   vtkPVSource *pvs;
-  int imageFlag = 0;
   int offScreenFlag = 0;
   int animationFlag = 0;
   const char *imageFileName = NULL;
@@ -4204,7 +4203,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.440 $");
+  this->ExtractRevision(os,"$Revision: 1.441 $");
 }
 
 //-----------------------------------------------------------------------------

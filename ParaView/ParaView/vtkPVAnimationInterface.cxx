@@ -136,7 +136,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.47");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1519,8 +1519,6 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
     this->GetPVApplication()->GetProcessModule()->ServerScript(
             "vtkXMLPPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
     this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "pvAnimWriter SetInput[pvAnimCompleteArrays GetOutput]"); 
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
             "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetEndPiece [[$Application GetProcessModule] GetPartitionId]; pvAnimWriter SetStartPiece [[$Application GetProcessModule] GetPartitionId]", 
             this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
     }
@@ -1590,7 +1588,9 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
           if (numPartitions > 1)
             {
             this->GetPVApplication()->GetProcessModule()->ServerScript(
-                    "pvAnimCompleteArrays SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
+                    "pvAnimCompleteArrays SetInput [%s GetInput]; "
+                    "pvAnimWriter SetInput [pvAnimCompleteArrays GetOutput]; "
+                    "pvAnimWriter SetFileName %s; pvAnimWriter Write", 
                     part->GetPartDisplay()->GetMapperTclName(), fileName,
                     this->GetPVApplication()->GetProcessModule()->GetPartitionId());
             }
@@ -1614,8 +1614,16 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
       t = TimeEnd;
       }
     }
+
   this->GetPVApplication()->GetProcessModule()->ServerScript(
                                                    "pvAnimWriter Delete");
+  if (numParitions > 1)
+    {
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+                                          "pvAnimCompleteArrays Delete");
+
+    }
+  
 
   delete [] fileName;
   fileName = NULL;
