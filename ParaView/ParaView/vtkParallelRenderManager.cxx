@@ -88,7 +88,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -170,9 +170,9 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "RootProcessId: " << this->RootProcessId << endl;
 
-  os << indent << "Last render time: " << this->GetRenderTime() << endl;
-  os << indent << "Last image processing time: "
-     << this->GetImageProcessingTime() << endl;
+  //os << indent << "Last render time: " << this->GetRenderTime() << endl;
+  //os << indent << "Last image processing time: "
+  //   << this->GetImageProcessingTime() << endl;
 }
 
 vtkRenderWindow *vtkParallelRenderManager::MakeRenderWindow()
