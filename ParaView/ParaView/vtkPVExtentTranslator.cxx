@@ -45,124 +45,102 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkSource.h"
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.11");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVExtentTranslator::vtkPVExtentTranslator()
 {
   this->OriginalSource = NULL;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVExtentTranslator::~vtkPVExtentTranslator()
 {
   this->SetOriginalSource(NULL);
 }
 
-//----------------------------------------------------------------------------
-int vtkPVExtentTranslator::PieceToExtent()
+//-----------------------------------------------------------------------------
+int vtkPVExtentTranslator::ThreadSafePieceToExtent(int piece, int numPieces, 
+                                      int ghostLevel, int *wholeExtent, 
+                                      int *resultExtent, int splitMode, 
+                                      int byPoints)
 {
-  //cerr << this << " PieceToExtent: " << this->Piece << " of " << this->NumberOfPieces << endl;
-  //cerr << "OriginalData: " << this->OriginalSource << endl;
-  //cerr << "OriginalData is of type " << this->OriginalSource->GetClassName() << endl;
-  //cerr << "OriginalSource: " << this->OriginalSource->GetSource() << endl;
-  //cerr << "OriginalSource is of type: " << this->OriginalSource->GetSource()->GetClassName() << endl;
-  
-  
+  int ret;
+  int origWholeExt[6];
+
   if (this->OriginalSource == NULL)
-    { // If the user has not set the original source, then just default
-    // to the method in the superclass.
-    return this->vtkExtentTranslator::PieceToExtent();
+    {
+    memcpy(origWholeExt, wholeExtent, sizeof(int)*6);    
+    }
+  else
+    {
+    this->OriginalSource->UpdateInformation();
+    this->OriginalSource->GetWholeExtent(origWholeExt);
     }
 
-  this->OriginalSource->UpdateInformation();
-  this->OriginalSource->GetWholeExtent(this->Extent);
-
-  //cerr << this << "WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
-  //     << this->Extent[4] << ", " << this->Extent[5] << endl;
-  
-  if (this->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent,
-                        this->GetSplitMode()) == 0)
+  memcpy(resultExtent, origWholeExt, sizeof(int)*6);
+  if (byPoints)
     {
-    //cerr << "Split thinks nothing is in the piece" << endl;
-    //cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-    //   << this->Extent[2] << ", " << this->Extent[3] << ", "
-    //   << this->Extent[4] << ", " << this->Extent[5] << endl;    
+    ret = this->SplitExtentByPoints(piece, numPieces, resultExtent, splitMode);
+    }
+  else
+    {
+    ret = this->SplitExtent(piece, numPieces, resultExtent, splitMode);
+    }
+    
+  if (ret == 0)
+    {
     // Nothing in this piece.
-    this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
-    this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
-    //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-    //   << this->Extent[2] << ", " << this->Extent[3] << ", " 
-    //   << this->Extent[4] << ", " << this->Extent[5] << endl;    
+    resultExtent[0] = resultExtent[2] = resultExtent[4] = 0;
+    resultExtent[1] = resultExtent[3] = resultExtent[5] = -1;
     return 0;
     }
 
-  //cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
-  //     << this->Extent[4] << ", " << this->Extent[5] << endl;    
-  
-  // Consider ghost levels.
-  this->Extent[0] -= this->GhostLevel;
-  this->Extent[1] += this->GhostLevel;
-  this->Extent[2] -= this->GhostLevel;
-  this->Extent[3] += this->GhostLevel;
-  this->Extent[4] -= this->GhostLevel;
-  this->Extent[5] += this->GhostLevel;
-
-  // Clip with the whole extent passed in.
-  if (this->Extent[0] < this->WholeExtent[0])
+  if (ghostLevel > 0)
     {
-    this->Extent[0] = this->WholeExtent[0];
-    }  
-  if (this->Extent[1] > this->WholeExtent[1])
-    {
-    this->Extent[1] = this->WholeExtent[1];
+    resultExtent[0] -= ghostLevel;
+    resultExtent[1] += ghostLevel;
+    resultExtent[2] -= ghostLevel;
+    resultExtent[3] += ghostLevel;
+    resultExtent[4] -= ghostLevel;
+    resultExtent[5] += ghostLevel;
+    
+    if (resultExtent[0] < origWholeExt[0])
+      {
+      resultExtent[0] = origWholeExt[0];
+      }
+    if (resultExtent[1] > origWholeExt[1])
+      {
+      resultExtent[1] = origWholeExt[1];
+      }
+    if (resultExtent[2] < origWholeExt[2])
+      {
+      resultExtent[2] = origWholeExt[2];
+      }
+    if (resultExtent[3] > origWholeExt[3])
+      {
+      resultExtent[3] = origWholeExt[3];
+      }
+    if (resultExtent[4] < origWholeExt[4])
+      {
+      resultExtent[4] = origWholeExt[4];
+      }
+    if (resultExtent[5] > origWholeExt[5])
+      {
+      resultExtent[5] = origWholeExt[5];
+      }
     }
-  if (this->Extent[2] < this->WholeExtent[2])
-    {
-    this->Extent[2] = this->WholeExtent[2];
-    }  
-  if (this->Extent[3] > this->WholeExtent[3])
-    {
-    this->Extent[3] = this->WholeExtent[3];
-    }
-  if (this->Extent[4] < this->WholeExtent[4])
-    {
-    this->Extent[4] = this->WholeExtent[4];
-    }  
-  if (this->Extent[5] > this->WholeExtent[5])
-    {
-    this->Extent[5] = this->WholeExtent[5];
-    }
-  
-  
-  if (this->Extent[0] > this->Extent[1] ||
-      this->Extent[2] > this->Extent[3] ||
-      this->Extent[4] > this->Extent[5])
-    {
-    this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
-    this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
-    //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-    //   << this->Extent[2] << ", " << this->Extent[3] << ", " 
-    //   << this->Extent[4] << ", " << this->Extent[5] << endl;
-    return 0;
-    }  
-  
-  //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
-  //     << this->Extent[4] << ", " << this->Extent[5] << endl;
-  
+    
   return 1;
 }
 
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentTranslator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

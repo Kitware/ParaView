@@ -71,7 +71,10 @@ public:
   virtual void SetOriginalSource(vtkDataSet*);
   vtkGetObjectMacro(OriginalSource,vtkDataSet);
 
-  int PieceToExtent();
+  virtual int ThreadSafePieceToExtent(int piece, int numPieces, 
+                                      int ghostLevel, int *wholeExtent, 
+                                      int *resultExtent, int splitMode, 
+                                      int byPoints);
 
 protected:
   vtkPVExtentTranslator();
