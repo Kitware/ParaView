@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLKWUserInterfaceNotebookManagerWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWWindowWriter);
-vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWWindowWriter::GetRootElementName()
@@ -80,7 +80,6 @@ int vtkXMLKWWindowWriter::AddNestedElements(vtkXMLDataElement *elem)
   // User Interface
 
   vtkXMLDataElement *ui_elem = vtkXMLDataElement::New();
-  ui_elem->SetName(vtkXMLKWWindowWriter::GetUserInterfaceElementName());
   elem->AddNestedElement(ui_elem);
   ui_elem->Delete();
   this->WriteUserInterfaceElement(ui_elem);
@@ -103,6 +102,10 @@ int vtkXMLKWWindowWriter::WriteUserInterfaceElement(
     vtkWarningMacro(<< "The KWWindow is not set!");
     return 0;
     }
+
+  // Set name
+
+  ui_elem->SetName(vtkXMLKWWindowWriter::GetUserInterfaceElementName());
 
   // Set attributes
  

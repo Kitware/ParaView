@@ -66,6 +66,11 @@ public:
   // store the interface manager.
   static char* GetUserInterfaceManagerElementName();
 
+  // Description:
+  // Add the user-interface internal/nested elements
+  // Return 1 on success, 0 otherwise.
+  virtual int WriteUserInterfaceElement(vtkXMLDataElement *ui_elem);
+
 protected:
   vtkXMLKWWindowWriter() {};
   ~vtkXMLKWWindowWriter() {};  
@@ -74,11 +79,6 @@ protected:
   // Add the root element internal/nested elements
   // Return 1 on success, 0 otherwise.
   virtual int AddNestedElements(vtkXMLDataElement *elem);
-
-  // Description:
-  // Add the user-interface internal/nested elements
-  // Return 1 on success, 0 otherwise.
-  virtual int WriteUserInterfaceElement(vtkXMLDataElement *ui_elem);
 
 private:
   vtkXMLKWWindowWriter(const vtkXMLKWWindowWriter&);  // Not implemented.

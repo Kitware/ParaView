@@ -61,14 +61,14 @@ public:
   // is supposed to read and process.
   virtual char* GetRootElementName();
 
-protected:  
-  vtkXMLKWWindowReader() {};
-  ~vtkXMLKWWindowReader() {};
-
   // Description:
   // Parse the user-interface element part.
   // Return 1 on success, 0 otherwise.
   virtual int ParseUserInterfaceElement(vtkXMLDataElement *ui_elem);
+
+protected:  
+  vtkXMLKWWindowReader() {};
+  ~vtkXMLKWWindowReader() {};
 
 private:
   vtkXMLKWWindowReader(const vtkXMLKWWindowReader&); // Not implemented
