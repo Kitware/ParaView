@@ -487,7 +487,6 @@ public:
   // I am using this method instead of MakeTclObject.
   void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);
   vtkPVGenericRenderWindowInteractor* GetInteractor() {return this->Interactor;}
-  vtkGetStringMacro(InteractorTclName);
 
   // Description:
   // For flip books. These methods should really be in a render module.

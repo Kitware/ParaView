@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.1");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -331,7 +331,9 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
     }
   o = NULL;
   
-  if (myId != 0)
+  int rootOnly = tmpInfo->GetRootOnly();
+  
+  if (myId != 0 && !rootOnly)
     {
     int msgLength;
     unsigned char* msg;
@@ -353,15 +355,18 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
   this->TemporaryInformation->CopyFromObject(object);
-  for (idx = 1; idx < numProcs; ++idx)
+  if (!rootOnly)
     {
-    this->Controller->Receive(&msgLength, 1, idx, 498798);
-    msg = new unsigned char[msgLength];
-    this->Controller->Receive(msg, msgLength, idx, 498799);
-    tmpInfo->CopyFromMessage(msg);
-    this->TemporaryInformation->AddInformation(tmpInfo);
-    delete [] msg;
-    msg = NULL;
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(&msgLength, 1, idx, 498798);
+      msg = new unsigned char[msgLength];
+      this->Controller->Receive(msg, msgLength, idx, 498799);
+      tmpInfo->CopyFromMessage(msg);
+      this->TemporaryInformation->AddInformation(tmpInfo);
+      delete [] msg;
+      msg = NULL;
+      }
     }
   tmpInfo->Delete();
   tmpInfo = NULL;

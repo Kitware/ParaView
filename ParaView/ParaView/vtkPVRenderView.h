@@ -57,7 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWView.h"
 
-class vtkInteractorObserver;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
@@ -256,13 +255,6 @@ public:
   // Switch to the View Properties menu back and forth
   void SwitchBackAndForthToViewProperties();
 
-  vtkGetObjectMacro(Renderer2D, vtkRenderer);
-  
-  virtual void Add2DComposite(vtkKWComposite *c);
-  virtual void Remove2DComposite(vtkKWComposite *c);
-
-  void Enable3DWidget(vtkInteractorObserver *o);
-  
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -320,9 +312,6 @@ protected:
   char *MenuLabelSwitchBackAndForthToViewProperties;
   vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
 
-  vtkRenderer *Renderer2D;
-  
-private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented
 };

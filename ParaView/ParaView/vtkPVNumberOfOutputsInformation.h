@@ -71,6 +71,8 @@ public:
   virtual int GetMessageLength() { return sizeof(int); }
   virtual void WriteMessage(unsigned char *msg);
   
+  virtual void AddInformation(vtkPVInformation*) {};
+  
 protected:
   vtkPVNumberOfOutputsInformation();
   ~vtkPVNumberOfOutputsInformation();
