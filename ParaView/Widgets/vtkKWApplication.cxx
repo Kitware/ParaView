@@ -160,11 +160,28 @@ const char* vtkKWApplication::EvaluateString(const char *String, ...)
   vsprintf(event, String, var_args);
   va_end(var_args);
   ostrstream str;
-  str << "eval return " << event << ends;
-  str.rdbuf()->freeze(0);
+  str << "eval set vtkKWApplicationEvaluateStringTemporaryString " 
+      << event << ends;
   this->SimpleScript(str.str());
+  str.rdbuf()->freeze(0);
   return this->MainInterp->result;
 }
+
+const char* vtkKWApplication::ExpandFileName(const char *String, ...)
+{
+  char event[16000];
+  
+  va_list var_args;
+  va_start(var_args, String);
+  vsprintf(event, String, var_args);
+  va_end(var_args);
+  ostrstream str;
+  str << "eval file join \"" << event << "\"" << ends;
+  this->SimpleScript(str.str());
+  str.rdbuf()->freeze(0);
+  return this->MainInterp->result;
+}
+
 void vtkKWApplication::Script(const char *format, ...)
 {
   char event[16000];

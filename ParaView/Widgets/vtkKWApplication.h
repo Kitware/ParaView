@@ -128,6 +128,7 @@ public:
   void SimpleScript(char *EventString);
   void SimpleScript(const char *EventString);
   const char* EvaluateString(const char *String, ...);
+  const char* ExpandFileName(const char *String, ...);
 //ETX
 
   // Description:
