@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.5");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.6");
 
 
 //----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void vtkSMCubeAxesDisplayProxy::CreateVTKObjects(int num)
     vtkErrorMacro("Failed to find property FlyMode.");
     return;
     }
-  ivp->SetElement(0, 1);
+  ivp->SetElement(0, 0);
   
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(

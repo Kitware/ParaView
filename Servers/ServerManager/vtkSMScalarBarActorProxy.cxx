@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -72,6 +72,7 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
 
   // Let's set bold/shadow/italic on the text properties.
   vtkSMIntVectorProperty* ivp;
+  vtkSMDoubleVectorProperty* dvp;
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     labelTextProperty->GetProperty("Bold"));
@@ -96,6 +97,15 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     titleTextProperty->GetProperty("Italic"));
   ivp->SetElement(0, 1);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Position"));
+  dvp->SetElements2(0.87, 0.25);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Position2"));
+  dvp->SetElements2(0.13, 0.5);
+
   this->UpdateVTKObjects();
 }
 
