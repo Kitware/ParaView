@@ -12,10 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRenderViewProxy
+// .NAME vtkPVRenderViewProxy - Forwards calls to the vtkPVRenderView class
+//
 // .SECTION Description
 // This class is used to allow separation between client GUI code and server code.
 // It forwards calls to the vtkPVRenderView class.
+//
+// .SECTION See Also
+// vtkPVRenderModuleProxy
 
 #ifndef __vtkPVRenderViewProxy_h
 #define __vtkPVRenderViewProxy_h
