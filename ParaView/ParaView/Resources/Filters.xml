@@ -1203,7 +1203,7 @@ The Reflection filter reflects the input data set across the specified plane. Th
           menu_name="Ribbon"
           root_name="Ribbon"
           module_type="Filter"
-          long_help="This filter generates ribon surface from lines.  It is useful for displaying streamlines."
+          long_help="This filter generates ribbon surface from lines.  It is useful for displaying streamlines."
           short_help="Create ribbon surfaces from lines.">
     <Filter class="vtkPVRibbonFilter">
       <Input name="Input"
@@ -1223,6 +1223,13 @@ The Reflection filter reflects the input data set across the specified plane. Th
                input_menu="im"
                number_of_components="3"
                help="Select the input normals to process."/>
+    <ArrayMenu input_name="Input"
+               trace_name="Scalars"
+               attribute_type="Scalars"
+               label="Scalars"
+               input_menu="im"
+               number_of_components="1"
+               help="Select the input scalars to process."/>
     <ScaleFactorEntry variable="Width"
                       input_menu="im"
                       trace_name="Width"
@@ -1238,13 +1245,18 @@ The Reflection filter reflects the input data set across the specified plane. Th
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
+    <LabeledToggle label="Use default normal"
+                   trace_name="UseDefaultNormal"
+                   variable="UseDefaultNormal"
+                   help="When this option is off, default normals will be generated if the input contains no normals. If on, the Default normal will be used."
+                   default_value="0"/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Default normal"
                  trace_name="DefaultNormal"
                  variable="DefaultNormal"
                  type="float"
                  length="3"
-                 help="When this option is on, default normals will be calculated if the input contains no normals"
+                 help="Specify the normal to use if Use default normal is on."
                  default_value="0.0 0.0 1.0"/>
     <LabeledToggle label="Vary width"
                    trace_name="VaryWidth"
