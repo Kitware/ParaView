@@ -15,26 +15,28 @@
 #include "vtkPVXMLPackageParser.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkStringList.h"
+#include "vtkKWDirectoryUtilities.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVCameraManipulator.h"
+#include "vtkPVInputProperty.h"
+#include "vtkPVInputRequirement.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWidget.h"
-#include "vtkPVInputProperty.h"
-#include "vtkPVInputRequirement.h"
 #include "vtkPVWindow.h"
 #include "vtkPVWriter.h"
 #include "vtkPVXMLElement.h"
 #include "vtkParaViewInstantiator.h"
+#include "vtkSMApplication.h"
+#include "vtkStringList.h"
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.33");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.34");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -237,6 +239,10 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
     else if(strcmp(name, "Writer") == 0)
       {
       this->CreateWriter(element);
+      }
+    else if(strcmp(name, "ServerManagerFile") == 0)
+      {
+      this->LoadServerManagerFile(element);
       }
     else if(strcmp(name, "Library") == 0)
       {
@@ -673,6 +679,48 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
     }
   this->Window->AddPackageName(name);
 
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXMLPackageParser::LoadServerManagerFile(vtkPVXMLElement* le)
+{
+  // Get the library name.
+  const char* name = le->GetAttribute("name");
+  if(!name)
+    {
+    vtkErrorMacro("Library missing name attribute.");
+    return 0;
+    }
+
+  // Check if a directory is specified.
+  char* tmpDir = 0;
+  const char* directory = le->GetAttribute("directory");
+  if (!directory)
+    {
+    if (this->GetFileName())
+      {
+      tmpDir = new char[strlen(this->GetFileName())+1];
+      }
+    else
+      {
+      tmpDir = new char[2];
+      }
+    vtkKWDirectoryUtilities::GetFilenamePath(this->GetFileName(), tmpDir);
+    directory = tmpDir;
+    }
+
+  // Load the module on the server nodes.
+  vtkSMApplication* sma =
+    this->Window->GetPVApplication()->GetSMApplication();
+  if(!sma->ParseConfigurationFile(name, directory))
+    {
+    vtkErrorMacro("Error loading server manager configuraiton file: " << name);
+    delete[] tmpDir;
+    return 0;
+    }
+
+  delete[] tmpDir;
   return 1;
 }
 
