@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.362");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.363");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1200,7 +1200,7 @@ void vtkPVRenderView::CreateViewProperties()
     "should be used sparingly.", //Warmth
     "Set/Get the intensity of the key light.  The key light is the "
     "brightest light in the scene.  The intensities of the other two "
-    "lights are ratios of the key light's intensity." //Intensity
+    "lights are ratios of the key light's intensity.", //Intensity
     "Set the position of the key, fill, and back lights "
     "using angular methods.  Elevation corresponds to latitude."
     "It is recommended that the key light "
