@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.134");
+vtkCxxRevisionMacro(vtkKWView, "1.135");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1182,12 +1182,12 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if ( this->SupportSaveAsImage )
     {
     // add the save as image option
-    pw->GetMenuFile()->InsertSeparator(this->ParentWindow->GetFileMenuIndex());
     pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
                                      "Save View Image",
                                      this, 
                                      "SaveAsImage", 8,
                                      "Save an image of the current view contents");
+    pw->GetMenuFile()->InsertSeparator(this->ParentWindow->GetFileMenuIndex());
     }
   
   if ( this->SupportPrint )
@@ -1565,7 +1565,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.134 $");
+  this->ExtractRevision(os,"$Revision: 1.135 $");
 }
 
 //----------------------------------------------------------------------------

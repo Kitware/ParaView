@@ -45,7 +45,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.199");
+vtkCxxRevisionMacro(vtkKWWindow, "1.200");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -333,7 +333,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   if (this->SupportPrint)
     {
-    this->MenuFile->AddSeparator();
     this->MenuFile->AddCascade(
       VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
     this->MenuFile->AddSeparator();
@@ -1324,7 +1323,7 @@ int vtkKWWindow::GetFileMenuIndex()
 
   if (this->GetMenuFile()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
     {
-    return this->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) - 1;  
+    return this->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL);
     }
 
   // Otherwise find Close or Exit if Close was removed
@@ -1339,7 +1338,7 @@ int vtkKWWindow::GetFileMenuIndex()
     clidx = this->GetMenuFile()->GetIndex("Exit");  
     }
 
-  return clidx - 1;  
+  return clidx;  
 }
 
 //----------------------------------------------------------------------------

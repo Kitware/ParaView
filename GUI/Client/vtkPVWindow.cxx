@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.624");
+vtkCxxRevisionMacro(vtkPVWindow, "1.625");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -791,6 +791,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->AddRecentFilesMenu(NULL, this);
   
+  clidx = this->GetFileMenuIndex();
+
+  this->MenuFile->InsertSeparator(clidx++);
+
   /*
   // Open XML package
   this->MenuFile->InsertCommand(clidx++, "Open Package", this, 
