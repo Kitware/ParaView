@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.58");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.59");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -180,6 +180,7 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
   if (fromReader)
     {
     prop = isvp;
+    this->Selection->RemoveAllArrays();
     }
   else
     {
