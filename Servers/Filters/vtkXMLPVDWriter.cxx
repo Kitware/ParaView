@@ -36,6 +36,7 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
+#include <kwsys/SystemTools.hxx>
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -69,7 +70,7 @@ int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.8");
 
 class vtkXMLPVDWriterInternals
 {
@@ -173,7 +174,13 @@ int vtkXMLPVDWriter::WriteInternal()
   // Create the subdirectory for the internal files.
   vtkstd::string subdir = this->Internal->FilePath;
   subdir += this->Internal->FilePrefix;
-  this->MakeDirectory(subdir.c_str());
+  if( !this->MakeDirectory(subdir.c_str()) )
+    {
+    vtkErrorMacro( << "Sorry unable to create directory: " << subdir.c_str() 
+                   << endl << "Last systen error was: " 
+                   << kwsys::SystemTools::GetLastSystemError().c_str() );
+    return 0;
+    }
   
   // Write each input.
   int i, j;
@@ -275,15 +282,15 @@ int vtkXMLPVDWriter::WriteCollectionFileIfRequested()
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::MakeDirectory(const char* name)
+int vtkXMLPVDWriter::MakeDirectory(const char* name)
 {
-  vtkXMLPVDWriterMakeDirectory(name);  
+  return vtkXMLPVDWriterMakeDirectory(name);
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::RemoveDirectory(const char* name)
+int vtkXMLPVDWriter::RemoveDirectory(const char* name)
 {
-  vtkXMLPVDWriterRemoveDirectory(name);
+  return vtkXMLPVDWriterRemoveDirectory(name);
 }
 
 //----------------------------------------------------------------------------
