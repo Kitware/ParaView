@@ -10,13 +10,14 @@ SET( ParaViewShared_SRCS
   vtkPVProcessModule.cxx
   vtkPVTreeComposite.cxx
   vtkStringList.cxx
-  vtkPVProgressHandler.cxx
+  vtkPVProgressHandler.cxx  
   )
 
 SET( ParaViewServer_SRCS
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
   vtkExtractCTHPart.cxx
+  vtkMPIMToNSocketConnection.cxx
   vtkMultiDisplayManager.cxx
   vtkPVDReader.cxx
   vtkPVServerArraySelection.cxx
@@ -58,6 +59,7 @@ ENDIF(XDMF_FOUND)
 
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
+  vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx

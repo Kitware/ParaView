@@ -92,6 +92,8 @@ public:
   // Module dependant method for collecting data information from all procs.
   virtual void GatherInformation(vtkPVInformation* info,
                                  vtkClientServerID id);
+  virtual void GatherInformationRenderServer(vtkPVInformation* info,
+                                             vtkClientServerID id);
   //ETX
   virtual void GatherInformationInternal(const char* infoClassName,
                                          vtkObject* object);
@@ -121,40 +123,23 @@ public:
   void ProcessMessage(unsigned char* arg, size_t len);
   
   // Description:
-  // Send current ClientServerStream data to the client
+  // Send the current ClientServerStream data to different places and 
+  // combinations of places.  Possible places are the Client, the 
+  // Server (data server), or the RenderServer.  Also the stream
+  // can be sent to the root of the render and data servers.
+  // Most combinations are possible.
   virtual void SendStreamToClient();
-  
-  // Description:
-  // Send current ClientServerStream data to the server
   virtual void SendStreamToServer();
-  
-  // Send the current vtkClientServerStream contents to the server
-  // root node.  Also reset the vtkClientServerStream object.
-  virtual void SendStreamToServerRoot();
-
-  // Description:
-  // Send current ClientServerStream data to the server and the client.
-  virtual void SendStreamToClientAndServer();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
-  virtual void SendStreamToClientAndServerRoot();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
-  virtual void SendStreamToRenderServerRoot();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
   virtual void SendStreamToRenderServer();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToServerRoot();
+  virtual void SendStreamToRenderServerRoot(); 
+  virtual void SendStreamToClientAndServerRoot();
   virtual void SendStreamToRenderServerAndServerRoot();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToClientAndRenderServerRoot(); 
+  virtual void SendStreamToClientAndServer();
+  virtual void SendStreamToClientAndRenderServer();
   virtual void SendStreamToRenderServerAndServer();
+  virtual void SendStreamToRenderServerClientAndServer();
 
   //BTX
   // Description:
@@ -213,13 +198,17 @@ protected:
   // variable is set to 1 in this function, then a remote paraview
   // should be started with StartRemoteParaView.
   int OpenConnectionDialog(int* start);
+
+  // Description:
+  // Create connection between render server and data server
+  void InitializeRenderServer();
   
   int NumberOfServerProcesses;
   int ClientMode;
   vtkSocketController* SocketController;
   int RenderServerMode;
   vtkSocketController* RenderServerSocket;
-
+  int NumberOfRenderServerProcesses;
   // To pass arguments through controller single method.
   int    ArgumentCount;
   char** Arguments;
@@ -235,7 +224,7 @@ protected:
   int Port;
   int MultiProcessMode;
   int NumberOfProcesses;
-  
+  int GatherRenderServer;
   vtkClientServerStream* LastServerResultStream;
   
   vtkKWRemoteExecute* RemoteExecution;

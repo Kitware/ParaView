@@ -79,6 +79,7 @@
 #include "vtkGraphicsFactory.h"
 #include "vtkImagingFactory.h"
 #include "vtkSocketController.h"
+#include "vtkMPIMToNSocketConnectionPortInformation.h"
 
 #include "vtkPVProgressHandler.h"
 
@@ -106,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.258");
+vtkCxxRevisionMacro(vtkPVApplication, "1.259");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -208,6 +209,14 @@ public:
 
   void DisplayText(const char* t)
   {
+#ifdef _WIN32
+    // if this is a windows application, then always
+    // send the output to stderr.  Most running paraview
+    // won't see the output, but if you use a terminal that supports
+    // the output from a windows program like rxvt then you
+    // can see the output in the console.
+    cerr << t << "\n";
+#endif
     if ( this->Windows && this->Windows->GetNumberOfItems() &&
          this->Windows->GetLastKWWindow() )
       {
@@ -1212,6 +1221,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+
   if ( ! this->ProcessModule )
     {
     vtkErrorMacro("No process module");
@@ -1574,19 +1584,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   else
     {
-    if(this->ClientMode && this->RenderServerMode)
-      {
-      cout << "test stream object on render server\n";
-      vtkPVProcessModule* pm = this->GetProcessModule();
-      vtkClientServerID id = pm->NewStreamObject("vtkObject");
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << id
-                      << "DebugOn"
-                      << vtkClientServerStream::End;
-      pm->DeleteStreamObject(id);
-      pm->SendStreamToRenderServerRoot();
-      
-      }
     this->vtkKWApplication::Start(argc,argv);
     }
   this->OutputWindow->SetWindowCollection(0);

@@ -62,7 +62,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.41");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.42");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -157,6 +157,12 @@ int vtkPVProcessModule::GetPartitionId()
 int vtkPVProcessModule::GetNumberOfPartitions()
 {
   return 1;
+}
+
+void vtkPVProcessModule::GatherInformationRenderServer(vtkPVInformation* ,
+                                                       vtkClientServerID )
+{
+  vtkErrorMacro("This should only be called from the client of a client render server mode paraview");
 }
 
 //----------------------------------------------------------------------------
@@ -346,6 +352,27 @@ void vtkPVProcessModule::SendStreamToRenderServerAndServer()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndRenderServer()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset(); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToRenderServerClientAndServer()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset(); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndRenderServerRoot()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset(); 
+}
+
+//----------------------------------------------------------------------------
 vtkClientServerID vtkPVProcessModule::NewStreamObject(const char* type)
 {
   vtkClientServerStream& stream = this->GetStream();
@@ -442,7 +469,8 @@ void vtkPVProcessModule::InitializeInterpreter()
   // Create the interpreter and supporting stream.
   this->Interpreter = vtkClientServerInterpreter::New();
   this->ClientServerStream = new vtkClientServerStream;
-
+  this->Interpreter->SetLogFile("./cs.log");
+  
   // Setup a callback for the interpreter to report errors.
   this->InterpreterObserver = vtkCallbackCommand::New();
   this->InterpreterObserver->SetCallback(&vtkPVProcessModule::InterpreterCallbackFunction);
