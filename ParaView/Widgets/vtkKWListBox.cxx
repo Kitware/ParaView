@@ -101,12 +101,20 @@ int vtkKWListBox::GetSelectionIndex()
   this->Script("%s curselection", this->Listbox->GetWidgetName(),
 	       this->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
-  return atoi(result);
+  if ( strlen(result)>0 )
+    {
+    return atoi(result);
+    }
+  return -1;
 }
 
   
 const char *vtkKWListBox::GetSelection()
 {
+  if ( this->GetSelectionIndex() < 0 )
+    {
+    return 0;
+    }
   this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
 	       this->Listbox->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
