@@ -21,12 +21,12 @@ if [ "x$build_tcl" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
   "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS} || exit 1
 else
-  echo "-- Found existing Tcl, not reruning configure"
+  echo "-- Found existing Tcl, not rerunning configure"
 fi
 
 if [ "x$build_tcl" = "xtrue" -o "x$build_tk" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tk8.4.5/unix"
   "@TclTk_SOURCE_DIR@/tk8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS} || exit 1
 else
-  echo "-- Found existing Tk, not reruning configure"
+  echo "-- Found existing Tk, not rerunning configure"
 fi
