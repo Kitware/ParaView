@@ -134,6 +134,10 @@ protected:
   int Dimensionality; // point = 0, line = 1
 
   vtkPVData *PVProbeSource;
+  
+  char *XYPlotTclName;
+  vtkSetStringMacro(XYPlotTclName);
+  int InstanceCount;
 };
 
 #endif

@@ -38,6 +38,8 @@ int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
 {
+  static int instanceCount = 0;
+  
   this->CommandFunction = vtkPVProbeCommand;
 
   this->DimensionalityMenu = vtkKWOptionMenu::New();
@@ -85,6 +87,12 @@ vtkPVProbe::vtkPVProbe()
   this->Dimensionality = -1;
   
   this->PVProbeSource = NULL;
+  
+  this->XYPlotTclName = NULL;
+  
+  // Create a unique id for creating tcl names.
+  ++instanceCount;
+  this->InstanceCount = instanceCount;
 }
 
 //----------------------------------------------------------------------------
@@ -150,6 +158,12 @@ vtkPVProbe::~vtkPVProbe()
   this->ProbeFrame = NULL;
 
   this->SetPVProbeSource(NULL);
+  
+  if (this->XYPlotTclName)
+    {
+    this->Script("%s Delete", this->XYPlotTclName);
+    this->SetXYPlotTclName(NULL);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -171,6 +185,7 @@ void vtkPVProbe::CreateProperties()
   float bounds[6];
   vtkKWWidget *frame;
   vtkPVApplication* pvApp = this->GetPVApplication();
+  char tclName[100];
   
   this->vtkPVSource::CreateProperties();
 
@@ -337,6 +352,15 @@ void vtkPVProbe::CreateProperties()
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
   this->UsePoint();
+  
+  sprintf(tclName, "XYPlot%d", this->InstanceCount);
+  this->SetXYPlotTclName(tclName);
+  pvApp->MakeTclObject("vtkXYPlotActor", this->XYPlotTclName);
+  this->Script("[%s GetPositionCoordinate] SetValue 0.05 0.05 0",
+	       this->XYPlotTclName);
+  this->Script("[%s GetPosition2Coordinate] SetValue 0.8 0.3 0",
+	       this->XYPlotTclName);
+  this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
 }
 
 void vtkPVProbe::SetInteractor()
@@ -369,6 +393,16 @@ void vtkPVProbe::AcceptCallback()
       (vtkTclGetPointerFromObject(this->GetNthPVOutput(0)->GetVTKDataTclName(),
 				  "vtkPolyData", pvApp->GetMainInterp(),
 				  error));
+    this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
+		 this->GetPVRenderView()->GetRendererTclName(),
+		 this->XYPlotTclName);
+    
+    if (atoi(pvApp->GetMainInterp()->result) > 0)
+      {
+      this->Script("%s RemoveActor %s",
+		   this->GetPVRenderView()->GetRendererTclName(),
+		   this->XYPlotTclName);
+      }
     
     vtkPointData *pd = probeOutput->GetPointData();
     
@@ -424,15 +458,16 @@ void vtkPVProbe::AcceptCallback()
     }
   else if (this->Dimensionality == 1)
     {
-    this->Script("vtkXYPlotActor xyplot");
-    this->Script("xyplot AddInput [%s GetOutput]",
-		 this->GetVTKSourceTclName());
-    this->Script("[xyplot GetPositionCoordinate] SetValue 0.05 0.05 0");
-    this->Script("[xyplot GetPosition2Coordinate] SetValue 0.8 0.3 0");
-    this->Script("xyplot SetNumberOfXLabels 5");
-    this->Script("%s AddActor xyplot",
-		 this->GetWindow()->GetMainView()->GetRendererTclName());
-    this->Script("xyplot Delete");
+    this->Script("set numItems [[%s GetInputList] GetNumberOfItems]",
+		 this->XYPlotTclName);
+    if (atoi(pvApp->GetMainInterp()->result) == 0)
+      {
+      this->Script("%s AddInput [%s GetOutput]", this->XYPlotTclName,
+		   this->GetVTKSourceTclName());
+      }
+    this->Script("%s AddActor %s",
+		 this->GetWindow()->GetMainView()->GetRendererTclName(),
+		 this->XYPlotTclName);
     }
 
   this->Interactor->SetCursorVisibility(0);
@@ -572,6 +607,16 @@ void vtkPVProbe::UpdateProbe()
 void vtkPVProbe::Deselect(vtkKWView *view)
 {
   this->Interactor->SetCursorVisibility(0);
+  this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
+	       this->GetPVRenderView()->GetRendererTclName(),
+	       this->XYPlotTclName);
+  
+  if (atoi(this->GetPVApplication()->GetMainInterp()->result) > 0)
+    {
+    this->Script("%s RemoveActor %s",
+		 this->GetPVRenderView()->GetRendererTclName(),
+		 this->XYPlotTclName);
+    }
   this->vtkPVSource::Deselect(view);
 }
 
