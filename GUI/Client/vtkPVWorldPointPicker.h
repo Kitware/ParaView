@@ -24,7 +24,7 @@
 
 #include "vtkWorldPointPicker.h"
 
-class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 
 class VTK_EXPORT vtkPVWorldPointPicker : public vtkWorldPointPicker
 {
@@ -33,12 +33,11 @@ public:
   vtkTypeRevisionMacro(vtkPVWorldPointPicker,vtkWorldPointPicker);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // To use compositied z buffer value, we must have access to the compositer.
-  virtual void SetRenderModule(vtkPVRenderModule*);
-  vtkGetObjectMacro(RenderModule, vtkPVRenderModule);
-//ETX
+  virtual void SetRenderModuleProxy(vtkSMRenderModuleProxy* rm)
+    { this->RenderModuleProxy = rm; }
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
 
   // Description:
   // A pick method that uses composited zbuffer.
@@ -49,7 +48,7 @@ protected:
   vtkPVWorldPointPicker();
   ~vtkPVWorldPointPicker();
 
-  vtkPVRenderModule *RenderModule;
+  vtkSMRenderModuleProxy* RenderModuleProxy;
 
   vtkPVWorldPointPicker(const vtkPVWorldPointPicker&); // Not implemented
   void operator=(const vtkPVWorldPointPicker&); // Not implemented

@@ -25,7 +25,7 @@
 
 #include "vtkPVSource.h"
 
-class vtkSMPointLabelDisplay;
+class vtkSMPointLabelDisplayProxy;
 
 class vtkCollection;
 class vtkKWFrame;
@@ -47,15 +47,20 @@ public:
   // Control the visibility of the pick display as well.
   virtual void SetVisibilityNoTrace(int val);
 
+  // Description:
+  // Called when the delete button is pressed.
+  virtual void DeleteCallback();
+
 protected:
   vtkPVPick();
   ~vtkPVPick();
 
-  // I am putting this here so that the display is added to the render module
-  // only once.  There may be a better check using the Proxy.
-  int DisplayHasBeenAddedToTheRenderModule;
-  
-  vtkSMPointLabelDisplay* PointLabelDisplay;
+  // Name with which the point label display is registered with the
+  // proxy manager.
+  char* PickLabelDisplayProxyName;
+  vtkSetStringMacro(PickLabelDisplayProxyName);
+
+  vtkSMPointLabelDisplayProxy* PickLabelDisplayProxy;
   vtkKWWidget *DataFrame;
 
   vtkCollection* LabelCollection;

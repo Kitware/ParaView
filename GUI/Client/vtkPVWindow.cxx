@@ -137,7 +137,7 @@
 #include "vtkSMRenderModuleProxy.h"
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.3");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.4");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1142,7 +1142,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     return;
     }
   // Set the render module on the CenterOfRotationStyle
-  this->CenterOfRotationStyle->SetRenderModule(pvApp->GetProcessModule()->GetRenderModule());
+  this->CenterOfRotationStyle->SetRenderModuleProxy(
+    pvApp->GetRenderModuleProxy());
   this->CenterOfRotationStyle->SetPVWindow(this);
  
   // Make sure the widget is name appropriately: paraview instead of a number.

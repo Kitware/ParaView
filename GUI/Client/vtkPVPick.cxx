@@ -14,11 +14,11 @@
 #include "vtkPVPick.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkSMPointLabelDisplay.h"
+#include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVRenderModule.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
@@ -26,6 +26,8 @@
 #include "vtkCollectionIterator.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSourceNotebook.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMInputProperty.h"
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -33,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -45,26 +47,28 @@ vtkPVPick::vtkPVPick()
   // We cannot process inputs that have more than one part yet.
   this->RequiredNumberOfInputParts = 1;
   
-  this->PointLabelDisplay = vtkSMPointLabelDisplay::New();
+  this->PickLabelDisplayProxy = 0; 
+  this->PickLabelDisplayProxyName = 0;
 
   this->DataFrame = vtkKWWidget::New();
   this->LabelCollection = vtkCollection::New();
-  this->DisplayHasBeenAddedToTheRenderModule = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPick::~vtkPVPick()
-{  
-  if (this->GetPVApplication() 
-   && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
+{   
+  if (this->PickLabelDisplayProxyName)
     {
-    this->GetPVApplication()->GetProcessModule()->
-      GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    pxm->UnRegisterProxy("displays", this->PickLabelDisplayProxyName);
+    this->SetPickLabelDisplayProxyName(0);
     }
-
-  this->PointLabelDisplay->SetVisibility(0);
-  this->PointLabelDisplay->Delete();
-  this->PointLabelDisplay = NULL;
+  
+  if (this->PickLabelDisplayProxy)
+    {
+    this->PickLabelDisplayProxy->Delete();
+    this->PickLabelDisplayProxy = NULL;
+    }
 
   this->DataFrame->Delete();
   this->DataFrame = NULL;
@@ -77,19 +81,28 @@ vtkPVPick::~vtkPVPick()
 //----------------------------------------------------------------------------
 void vtkPVPick::SetVisibilityNoTrace(int val)
 {
-  if (this->PointLabelDisplay)
+  if (this->PickLabelDisplayProxy)
     {
-    this->PointLabelDisplay->SetVisibility(val);
+    this->PickLabelDisplayProxy->cmSetVisibility(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
 }
 
 
 //----------------------------------------------------------------------------
+void vtkPVPick::DeleteCallback()
+{
+  if (this->PickLabelDisplayProxy)
+    {
+    this->RemoveDisplayFromRenderModule(this->PickLabelDisplayProxy); 
+    }
+  this->Superclass::DeleteCallback();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPick::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  this->PointLabelDisplay->SetProcessModule(pvApp->GetProcessModule());
 
   this->Superclass::CreateProperties();
 
@@ -97,6 +110,41 @@ void vtkPVPick::CreateProperties()
   this->DataFrame->Create(pvApp, "frame", "");
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
+  // Create Point label display proxy.
+  ostrstream str;
+  str << this->GetSourceList() << "."
+    << this->GetName() << "." << "PickLabelDisplay"
+    << ends;
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  this->PickLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
+    pxm->NewProxy("displays", "PointLabelDisplay"));
+  if (!this->PickLabelDisplayProxy)
+    {
+    vtkErrorMacro("Failed to create Pick Label Display proxy.");
+    return;
+    }
+  
+  this->SetPickLabelDisplayProxyName(str.str());
+  str.rdbuf()->freeze(0);
+  pxm->RegisterProxy("displays", this->PickLabelDisplayProxyName,
+    this->PickLabelDisplayProxy);
+
+  // Set the input.
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    this->PickLabelDisplayProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on PickLabelDisplayProxy.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->GetProxy());
+  this->PickLabelDisplayProxy->cmSetVisibility(0);
+  this->PickLabelDisplayProxy->UpdateVTKObjects();
+  
+  // Add to render module.
+  this->AddDisplayToRenderModule(this->PickLabelDisplayProxy);
 }
 
 
@@ -106,19 +154,9 @@ void vtkPVPick::AcceptCallbackInternal()
   // call the superclass's method
   this->Superclass::AcceptCallbackInternal();
     
-  if (this->DisplayHasBeenAddedToTheRenderModule == 0)
-    {
-    // Connect to the display.
-    // These should be merged.
-    this->PointLabelDisplay->SetInput(this->GetProxy());
-    this->GetPVApplication()->GetProcessModule()->
-      GetRenderModule()->AddDisplay(this->PointLabelDisplay);
-    this->DisplayHasBeenAddedToTheRenderModule = 1;
-    }
-
   // We need to update manually for the case we are probing one point.
-  this->PointLabelDisplay->Update();
-  this->PointLabelDisplay->SetVisibility(1);
+  this->PickLabelDisplayProxy->Update();
+  this->PickLabelDisplayProxy->cmSetVisibility(1);
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
   this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
@@ -140,7 +178,11 @@ void vtkPVPick::UpdateGUI()
 {
   this->ClearDataLabels();
   // Get the collected data from the display.
-  vtkUnstructuredGrid* d = this->PointLabelDisplay->GetCollectedData();
+  if (!this->PickLabelDisplayProxy)
+    {
+    return;
+    }
+  vtkUnstructuredGrid* d = this->PickLabelDisplayProxy->GetCollectedData();
   if (d == 0)
     {
     return;

@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.2");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.3");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1845,6 +1845,10 @@ void vtkPVSource::DeleteCallback()
 void vtkPVSource::AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp)
 {
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  if (!rm)
+    {
+    return;
+    }
   /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetProperty("AddDisplay"));
@@ -1866,6 +1870,7 @@ void vtkPVSource::AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp)
 void vtkPVSource::RemoveDisplayFromRenderModule(vtkSMDisplayProxy* pDisp)
 {
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+
   /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetProperty("RemoveDisplay"));

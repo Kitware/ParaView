@@ -22,7 +22,7 @@
 #define __vtkPVInteractorStyleCenterOfRotation_h
 
 #include "vtkInteractorStyle.h"
-class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 class vtkPVWindow;
 class vtkPVWorldPointPicker;
 
@@ -47,12 +47,9 @@ public:
   // Access to the center of rotation values
   vtkGetVector3Macro(Center, float);
 
-//BTX
   // Description:
   // The render module is for picking.
-  void SetRenderModule(vtkPVRenderModule* rm);
-  //vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
-//ETX
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy* rm);
 
   void SetPVWindow(vtkPVWindow* );
   vtkPVWindow* GetPVWindow() { return this->PVWindow;}
@@ -67,7 +64,7 @@ protected:
   
   vtkPVWorldPointPicker *Picker;
   // For picking.  Use a proxy in the future.
-  vtkPVRenderModule* RenderModule;
+  vtkSMRenderModuleProxy* RenderModuleProxy;
   vtkPVWindow*       PVWindow;
   
   vtkPVInteractorStyleCenterOfRotation(const vtkPVInteractorStyleCenterOfRotation&); // Not implemented
