@@ -7,7 +7,7 @@ SET (TRIGGER_SITE
        "http://${DROP_SITE}/cgi-bin/Submit-ParaView-TestingResults.pl")
 
 # Dart server configuration 
-SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView")
+SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
 SET (CVS_WEB_CVSROOT "ParaView")
 SET (DOXYGEN_URL "http://${DROP_SITE}/" )
 SET (GNATS_WEB_URL "http://${DROP_SITE}/")
