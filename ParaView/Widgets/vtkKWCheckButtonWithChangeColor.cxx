@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.1");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.2");
 
 int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
                                            int argc, char *argv[]);
@@ -60,6 +60,8 @@ vtkKWCheckButtonWithChangeColor::vtkKWCheckButtonWithChangeColor()
 
   this->CheckButton       = vtkKWCheckButton::New();
   this->ChangeColorButton = vtkKWChangeColorButton::New();
+
+  this->DisableChangeColorButtonWhenNotChecked = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -110,9 +112,9 @@ void vtkKWCheckButtonWithChangeColor::Create(vtkKWApplication *app, const char *
 
   this->Pack();
 
-  // Update enable state
+  // Update
 
-  this->UpdateEnableState();
+  this->Update();
 }
 
 // ----------------------------------------------------------------------------
@@ -142,6 +144,38 @@ void vtkKWCheckButtonWithChangeColor::Pack()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCheckButtonWithChangeColor::Update()
+{
+  // Update enable state
+
+  this->UpdateEnableState();
+
+  // Disable the color change button if not checked
+
+  if (this->DisableChangeColorButtonWhenNotChecked &&
+      this->ChangeColorButton && 
+      this->CheckButton && this->CheckButton->IsCreated())
+    {
+    this->ChangeColorButton->SetEnabled(
+      this->CheckButton->GetState() ? this->Enabled : 0);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWCheckButtonWithChangeColor::SetDisableChangeColorButtonWhenNotChecked(
+  int _arg)
+{
+  if (this->DisableChangeColorButtonWhenNotChecked == _arg)
+    {
+    return;
+    }
+  this->DisableChangeColorButtonWhenNotChecked = _arg;
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCheckButtonWithChangeColor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -164,4 +198,7 @@ void vtkKWCheckButtonWithChangeColor::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "CheckButton: " << this->CheckButton << endl;
   os << indent << "ChangeColorButton: " << this->ChangeColorButton << endl;
+
+  os << indent << "DisableChangeColorButtonWhenNotChecked: " 
+     << (this->DisableChangeColorButtonWhenNotChecked ? "On" : "Off") << endl;
 }

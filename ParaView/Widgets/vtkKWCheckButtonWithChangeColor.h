@@ -67,12 +67,26 @@ public:
   vtkGetObjectMacro(CheckButton, vtkKWCheckButton);
   vtkGetObjectMacro(ChangeColorButton, vtkKWChangeColorButton);
   
+  // Description:
+  // Refresh the interface given the current value of the widgets and Ivars
+  virtual void Update();
+
+  // Description:
+  // Disable the color button when the checkbutton is not checked.
+  // You will have to call the Update() method manually though, to reflect
+  // that state.
+  virtual void SetDisableChangeColorButtonWhenNotChecked(int);
+  vtkBooleanMacro(DisableChangeColorButtonWhenNotChecked, int);
+  vtkGetMacro(DisableChangeColorButtonWhenNotChecked, int);
+
 protected:
   vtkKWCheckButtonWithChangeColor();
   ~vtkKWCheckButtonWithChangeColor();
 
   vtkKWCheckButton       *CheckButton;
   vtkKWChangeColorButton *ChangeColorButton;
+
+  int DisableChangeColorButtonWhenNotChecked;
 
   // Pack or repack the widget
 
