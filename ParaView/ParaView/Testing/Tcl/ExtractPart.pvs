@@ -1,0 +1,167 @@
+$Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp17) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp544) [$kw(vtkTemp1) CreatePVSource ConeSource]
+set kw(vtkTemp550) [$kw(vtkTemp544) GetPVWidget {Resolution}]
+$kw(vtkTemp550) SetValue 36
+set kw(vtkTemp553) [$kw(vtkTemp544) GetPVWidget {Radius}]
+$kw(vtkTemp553) SetValue 0.5
+set kw(vtkTemp556) [$kw(vtkTemp544) GetPVWidget {Height}]
+$kw(vtkTemp556) SetValue 1
+$kw(vtkTemp544) AcceptCallback
+set kw(vtkTemp572) [$kw(vtkTemp544) GetPVOutput]
+$kw(vtkTemp572) ChangeActorColor 0.000000 0.501961 0.752941
+
+$kw(vtkTemp17) SetCameraState 3.815 -2.912 4.266  0.969 0.459 -0.448  -0.680 0.337 0.651
+
+set kw(vtkTemp666) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp672) [$kw(vtkTemp666) GetPVWidget {Center}]
+$kw(vtkTemp672) SetValue 1 0 0
+set kw(vtkTemp677) [$kw(vtkTemp666) GetPVWidget {Radius}]
+$kw(vtkTemp677) SetValue 0.5
+set kw(vtkTemp680) [$kw(vtkTemp666) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp680) SetValue 18
+set kw(vtkTemp683) [$kw(vtkTemp666) GetPVWidget {Start Theta}]
+$kw(vtkTemp683) SetValue 0
+set kw(vtkTemp686) [$kw(vtkTemp666) GetPVWidget {End Theta}]
+$kw(vtkTemp686) SetValue 360
+set kw(vtkTemp689) [$kw(vtkTemp666) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp689) SetValue 12
+set kw(vtkTemp692) [$kw(vtkTemp666) GetPVWidget {Start Phi}]
+$kw(vtkTemp692) SetValue 0
+set kw(vtkTemp695) [$kw(vtkTemp666) GetPVWidget {End Phi}]
+$kw(vtkTemp695) SetValue 180
+$kw(vtkTemp666) AcceptCallback
+set kw(vtkTemp802) [$kw(vtkTemp1) CreatePVSource CylinderSource]
+set kw(vtkTemp808) [$kw(vtkTemp802) GetPVWidget {Resolution}]
+$kw(vtkTemp808) SetValue 24
+set kw(vtkTemp811) [$kw(vtkTemp802) GetPVWidget {Height}]
+$kw(vtkTemp811) SetValue 1
+set kw(vtkTemp814) [$kw(vtkTemp802) GetPVWidget {Radius}]
+$kw(vtkTemp814) SetValue 0.5
+set kw(vtkTemp817) [$kw(vtkTemp802) GetPVWidget {Center}]
+$kw(vtkTemp817) SetValue 2 0 0
+$kw(vtkTemp802) AcceptCallback
+set kw(vtkTemp930) [$kw(vtkTemp1) CreatePVSource CubeSource]
+set kw(vtkTemp936) [$kw(vtkTemp930) GetPVWidget {XLength}]
+$kw(vtkTemp936) SetValue 1
+set kw(vtkTemp939) [$kw(vtkTemp930) GetPVWidget {YLength}]
+$kw(vtkTemp939) SetValue 1
+set kw(vtkTemp942) [$kw(vtkTemp930) GetPVWidget {ZLength}]
+$kw(vtkTemp942) SetValue 1
+set kw(vtkTemp945) [$kw(vtkTemp930) GetPVWidget {Center}]
+$kw(vtkTemp945) SetValue 0 1 0
+$kw(vtkTemp930) AcceptCallback
+set kw(vtkTemp1055) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp1061) [$kw(vtkTemp1055) GetPVWidget {Center}]
+$kw(vtkTemp1061) SetValue 1 1 0
+set kw(vtkTemp1066) [$kw(vtkTemp1055) GetPVWidget {Radius}]
+$kw(vtkTemp1066) SetValue 0.5
+set kw(vtkTemp1069) [$kw(vtkTemp1055) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp1069) SetValue 4
+set kw(vtkTemp1072) [$kw(vtkTemp1055) GetPVWidget {Start Theta}]
+$kw(vtkTemp1072) SetValue 0
+set kw(vtkTemp1075) [$kw(vtkTemp1055) GetPVWidget {End Theta}]
+$kw(vtkTemp1075) SetValue 360
+set kw(vtkTemp1078) [$kw(vtkTemp1055) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp1078) SetValue 2
+set kw(vtkTemp1081) [$kw(vtkTemp1055) GetPVWidget {Start Phi}]
+$kw(vtkTemp1081) SetValue 0
+set kw(vtkTemp1084) [$kw(vtkTemp1055) GetPVWidget {End Phi}]
+$kw(vtkTemp1084) SetValue 180
+$kw(vtkTemp1055) AcceptCallback
+set kw(vtkTemp1191) [$kw(vtkTemp1) CreatePVSource SuperquadricSource]
+set kw(vtkTemp1197) [$kw(vtkTemp1191) GetPVWidget {Center}]
+$kw(vtkTemp1197) SetValue 2 1 0
+set kw(vtkTemp1202) [$kw(vtkTemp1191) GetPVWidget {Scale}]
+$kw(vtkTemp1202) SetValue 1 1 1
+set kw(vtkTemp1207) [$kw(vtkTemp1191) GetPVWidget {ThetaResolution}]
+$kw(vtkTemp1207) SetValue 16
+set kw(vtkTemp1210) [$kw(vtkTemp1191) GetPVWidget {PhiResolution}]
+$kw(vtkTemp1210) SetValue 16
+set kw(vtkTemp1213) [$kw(vtkTemp1191) GetPVWidget {Thickness}]
+$kw(vtkTemp1213) SetValue 0.3333
+set kw(vtkTemp1216) [$kw(vtkTemp1191) GetPVWidget {ThetaRoundness}]
+$kw(vtkTemp1216) SetValue 1
+set kw(vtkTemp1219) [$kw(vtkTemp1191) GetPVWidget {PhiRoundness}]
+$kw(vtkTemp1219) SetValue 1
+set kw(vtkTemp1222) [$kw(vtkTemp1191) GetPVWidget {Size}]
+$kw(vtkTemp1222) SetValue 0.5
+set kw(vtkTemp1225) [$kw(vtkTemp1191) GetPVWidget {Toroidal}]
+$kw(vtkTemp1225) SetState 1
+$kw(vtkTemp1191) AcceptCallback
+set kw(vtkTemp1333) [$kw(vtkTemp1) CreatePVSource GroupParts]
+$kw(vtkTemp572) SetVisibility 0
+set kw(vtkTemp708) [$kw(vtkTemp666) GetPVOutput]
+$kw(vtkTemp708) SetVisibility 0
+set kw(vtkTemp836) [$kw(vtkTemp802) GetPVOutput]
+$kw(vtkTemp836) SetVisibility 0
+set kw(vtkTemp961) [$kw(vtkTemp930) GetPVOutput]
+$kw(vtkTemp961) SetVisibility 0
+set kw(vtkTemp1097) [$kw(vtkTemp1055) GetPVOutput]
+$kw(vtkTemp1097) SetVisibility 0
+set kw(vtkTemp1239) [$kw(vtkTemp1191) GetPVOutput]
+$kw(vtkTemp1239) SetVisibility 0
+set kw(vtkTemp1339) [$kw(vtkTemp1333) GetPVWidget {inputs}]
+$kw(vtkTemp1339) AllOffCallback
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp544) 1
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp666) 1
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp802) 1
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp930) 1
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp1055) 1
+$kw(vtkTemp1339) SetSelectState $kw(vtkTemp1191) 1
+$kw(vtkTemp1333) AcceptCallback
+set kw(vtkTemp1484) [$kw(vtkTemp1) CreatePVSource ExtractParts]
+set kw(vtkTemp1490) [$kw(vtkTemp1484) GetPVWidget {parts}]
+$kw(vtkTemp1490) SetSelectState 0 0
+$kw(vtkTemp1490) SetSelectState 1 1
+$kw(vtkTemp1490) SetSelectState 2 1
+$kw(vtkTemp1490) SetSelectState 3 0
+$kw(vtkTemp1490) SetSelectState 4 0
+$kw(vtkTemp1490) SetSelectState 5 1
+$kw(vtkTemp1484) AcceptCallback
+$kw(vtkTemp17) SetBackgroundColor 0.000000 0.000000 0.000000
+$kw(vtkTemp572) SetVisibility 1
+set kw(vtkTemp1612) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+$kw(vtkTemp17) SetCameraState 3.582 -1.893 4.982  0.989 0.381 -0.476  -0.722 0.446 0.529
+set kw(vtkTemp1623) [$kw(vtkTemp1612) GetPVWidget {Line}]
+$kw(vtkTemp1623) SetPoint1 0.78370 -0.55628 0.39389
+$kw(vtkTemp1623) SetPoint2 2.52220 1.34950 -0.39080
+$kw(vtkTemp1623) SetResolution 20
+$kw(vtkTemp1612) AcceptCallback
+
+# Retrace
+  update
+  $Application StopRecordingScript
+  [ $Application GetMainWindow ] DeleteAllSources
+  # Source the trace to regenerate the sources.
+  if {[catch {set channel [open test.tmp w]}] == 0 } {
+     close $channel
+     file delete -force test.tmp
+     source "[$Application GetTraceFileName]"
+  }
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+   
+$Application Exit
