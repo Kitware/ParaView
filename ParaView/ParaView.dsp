@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 "C:\Program Files\Argonne National Lab\MPICH.NT.1.2.0.4\SDK\lib\mpich.lib" "C:\Program Files\Argonne National Lab\MPICH.NT.1.2.0.4\SDK\lib\pmpich.lib" ..\..\vtkbin\Debug\lib\vtktcl.lib ..\Widgets\Debug\vtkKWWidgetsTcl.lib ..\..\vtkbin\Debug\lib\vtkPatented.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkGraphics5.lib vtkContrib.lib vtkParallel.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"../Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
+# ADD LINK32 ..\..\vtkbin\Debug\lib\vtktcl.lib ..\Widgets\Debug\vtkKWWidgetsTcl.lib ..\..\vtkbin\Debug\lib\vtkPatented.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkGraphics5.lib vtkContrib.lib vtkParallel.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"../Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -134,14 +134,6 @@ SOURCE=.\vtkDummyRenderWindowInteractor.cxx
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractorTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkFastGeometryFilter.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkFastGeometryFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -377,6 +369,14 @@ SOURCE=.\vtkPVMethodInterfaceTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVOutputWindow.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVOutputWindowTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVRenderView.cxx
 # End Source File
 # Begin Source File
@@ -583,26 +583,6 @@ InputName=vtkDummyRenderWindowInteractor
 # Begin Custom Build
 InputPath=.\vtkDummyRenderWindowInteractor.h
 InputName=vtkDummyRenderWindowInteractor
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkFastGeometryFilter.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkFastGeometryFilter.h
-InputName=vtkFastGeometryFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1210,6 +1190,26 @@ SOURCE=.\vtkPVMethodInterface.h
 # Begin Custom Build
 InputPath=.\vtkPVMethodInterface.h
 InputName=vtkPVMethodInterface
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVOutputWindow.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVOutputWindow.h
+InputName=vtkPVOutputWindow
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
