@@ -4,13 +4,9 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 SET(Filters_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
-  vtkExtractCells.cxx
   vtkGroup.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
-  vtkMultiOut2.cxx
-  vtkMultiOut3.cxx
-  vtkMultiOut.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
@@ -29,9 +25,6 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
-  vtkPlanesIntersection.cxx
-  vtkPointsProjectedHull.cxx
-  vtkExtractUserDefinedPiece.cxx
   vtkStructuredCacheFilter.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
@@ -43,10 +36,14 @@ IF(VTK_USE_MPI)
       vtkAllToNRedistributePolyData.cxx
       vtkBoxClipDataSet.cxx
       vtkDistributedDataFilter.cxx
+      vtkExtractCells.cxx
+      vtkExtractUserDefinedPiece.cxx
       vtkKdTree.cxx
       vtkMergeCells.cxx
       vtkMPIDuplicatePolyData.cxx
       vtkPKdTree.cxx
+      vtkPlanesIntersection.cxx
+      vtkPointsProjectedHull.cxx
       vtkPVDuplicatePolyData.cxx
       vtkRedistributePolyData.cxx
       vtkTiledDisplaySchedule.cxx

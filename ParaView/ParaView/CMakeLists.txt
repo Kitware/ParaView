@@ -15,7 +15,6 @@ SET( ParaViewShared_SRCS
 SET( ParaViewServer_SRCS
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
-  vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
@@ -123,7 +122,6 @@ SET( ParaViewClient_SRCS
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
   vtkPVInteractorStyleControl.cxx
-  vtkPVInteractorStyleFly.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
@@ -148,7 +146,6 @@ SET( ParaViewClient_SRCS
   vtkPVPLOT3DReaderModule.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
-  vtkPVPivotManipulator.cxx
   vtkPVPlaneWidget.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx

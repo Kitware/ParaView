@@ -17,9 +17,6 @@
 #include "vtkGroup.h"
 #include "vtkHDF5RawImageReader.h"
 #include "vtkMergeArrays.h"
-#include "vtkMultiOut.h"
-#include "vtkMultiOut2.h"
-#include "vtkMultiOut3.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVConnectivityFilter.h"
@@ -63,9 +60,6 @@ int main()
   c = vtkGroup::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
   c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
-  c = vtkMultiOut::New(); c->Print(cout); c->Delete();
-  c = vtkMultiOut2::New(); c->Print(cout); c->Delete();
-  c = vtkMultiOut3::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();

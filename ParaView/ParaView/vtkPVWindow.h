@@ -519,13 +519,8 @@ protected:
   // This should be made into a 3D Widget.
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
 
-  // Fly should also be made into a manipulator.
-//  vtkPVInteractorStyleFly *FlyStyle;
-
-    
   // Interactor stuff
   vtkKWToolbar *InteractorToolbar;
-//  vtkKWRadioButton *FlyButton;
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
   vtkKWRadioButton *TrackballCameraButton;
