@@ -105,7 +105,7 @@ vtkClientCompositeManager
 vtkPVApplication
 vtkPVProcessModule
 vtkPVClientServerModule
-vtkPVMPIPRocessModule
+vtkPVMPIProcessModule
 vtkKWObject
 vtkKWApplication
 )

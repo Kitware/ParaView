@@ -39,6 +39,10 @@ struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
     {
     return this->ID == i.ID;
     }
+  int operator!=(const vtkClientServerID& i) const
+    {
+    return this->ID != i.ID;
+    }
   // The identifying integer.
   vtkTypeUInt32 ID;
 };
