@@ -40,6 +40,9 @@ vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
 vtkPVInteractorStyleControl.cxx
 vtkPVInteractorStyleFly.cxx
+vtkPVJoystickFly.cxx
+vtkPVJoystickFlyIn.cxx
+vtkPVJoystickFlyOut.cxx
 vtkPVLODActor.cxx
 vtkPVLabel.cxx
 vtkPVLabeledToggle.cxx
@@ -89,6 +92,7 @@ ABSTRACT_FILES(
 vtkPVObjectWidget
 vtkPVWidget
 vtkPV3DWidget
+vtkPVJoystickFly
 )
 
 # Setup vtkInstantiator registration for this library's classes.

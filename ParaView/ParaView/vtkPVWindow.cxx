@@ -80,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVInteractorStyleFly.h"
+#include "vtkPVJoystickFlyIn.h"
+#include "vtkPVJoystickFlyOut.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -1303,16 +1305,24 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   manipulator = NULL;
   // ----
   manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(2);
   iscontrol2D->AddManipulator("Pan", manipulator);
   iscontrol3D->AddManipulator("Pan", manipulator);
   manipulator->Delete();
   manipulator = NULL;
   // ----
   manipulator = vtkPVTrackballZoom::New();
-  manipulator->SetButton(3);
   iscontrol2D->AddManipulator("Zoom", manipulator);
   iscontrol3D->AddManipulator("Zoom", manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVJoystickFlyIn::New();
+  iscontrol3D->AddManipulator("FlyIn", manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVJoystickFlyOut::New();
+  iscontrol3D->AddManipulator("FlyOut", manipulator);
   manipulator->Delete();
   manipulator = NULL;
   // ----

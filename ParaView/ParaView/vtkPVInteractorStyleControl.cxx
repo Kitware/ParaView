@@ -176,6 +176,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   clone->SetButton(mouse+1);
   clone->SetShift(shift);
   clone->SetControl(control);
+  clone->SetApplication(this->Application);
 
   vtkCollectionIterator *it = this->ManipulatorCollection->NewIterator();
   it->InitTraversal();
@@ -389,6 +390,7 @@ void vtkPVInteractorStyleControl::StoreRegistery()
   if ( !this->Application || !this->RegisteryName )
     {
     vtkErrorMacro("Application and type of Interactor Style Controler have to be defined");
+    return;
     }
   int cc;
   char manipulator[100];
@@ -411,4 +413,5 @@ void vtkPVInteractorStyleControl::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Frame: " << this->LabeledFrame << endl;
   os << indent << "DefaultManipulator: " << (this->DefaultManipulator?this->DefaultManipulator:"None") << endl;
   os << indent << "ManipulatorCollection: " << this->ManipulatorCollection << endl;
+  os << indent << "RegisteryName: " << (this->RegisteryName?this->RegisteryName:"none") << endl;
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCameraManipulator.h
+  Module:    vtkPVJoystickFly.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,87 +39,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCameraManipulator - Abstraction of style away from button.
+// .NAME vtkPVJoystickFly - Rotates camera with xy mouse movement.
 // .SECTION Description
-// vtkPVCameraManipulator is a superclass for actions inside an interactor 
-// style and associated with a single button.  An example might be
-// rubber-band bounding-box zoom.  This abstraction allows a camera 
-// manipulator to be assigned to any button.  This super class
-// might become a subclass of vtkInteractorObserver in the future. 
+// vtkPVJoystickFly allows the user to interactively
+// manipulate the camera, the viewpoint of the scene.
 
+#ifndef __vtkPVJoystickFly_h
+#define __vtkPVJoystickFly_h
 
-#ifndef __vtkPVCameraManipulator_h
-#define __vtkPVCameraManipulator_h
-
-#include "vtkObject.h"
+#include "vtkPVCameraManipulator.h"
 
 class vtkRenderer;
-class vtkRenderWindowInteractor;
-class vtkKWApplication;
 
-class VTK_EXPORT vtkPVCameraManipulator : public vtkObject
+class VTK_EXPORT vtkPVJoystickFly : public vtkPVCameraManipulator
 {
 public:
-  static vtkPVCameraManipulator *New();
-  vtkTypeRevisionMacro(vtkPVCameraManipulator, vtkObject);
+  static vtkPVJoystickFly *New();
+  vtkTypeRevisionMacro(vtkPVJoystickFly, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Event bindings controlling the effects of pressing mouse buttons
   // or moving the mouse.
   virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *iren);
+                           vtkRenderWindowInteractor *rwi);
   virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *iren);
+                            vtkRenderWindowInteractor *rwi);
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *iren);
-  
-  // Description:
-  // These settings determine which button and modifiers the
-  // manipulator responds to. Button can be either 1 (left), 2
-  // (middle), and 3 right.
-  vtkSetMacro(Button, int);
-  vtkGetMacro(Button, int);
-  vtkSetMacro(Shift, int);
-  vtkGetMacro(Shift, int);
-  vtkBooleanMacro(Shift, int);
-  vtkSetMacro(Control, int);
-  vtkGetMacro(Control, int);
-  vtkBooleanMacro(Control, int);
+                          vtkRenderWindowInteractor *rwi);
 
   // Description:
   // For setting the center of rotation.
   vtkSetVector3Macro(Center, float);
   vtkGetVector3Macro(Center, float);
-
-  // Description:
-  // In order to make calls on the application, we need a pointer to
-  // it.
-  void SetApplication(vtkKWApplication*);
-  vtkGetObjectMacro(Application, vtkKWApplication);
-
+  
 protected:
-  vtkPVCameraManipulator();
-  ~vtkPVCameraManipulator();
-
-  void ResetLights();
-
-  int Button;
-  int Shift;
-  int Control;
-
-  int LastX;
-  int LastY;
+  vtkPVJoystickFly();
+  ~vtkPVJoystickFly();
 
   float Center[3];
   float DisplayCenter[2];
-  void ComputeDisplayCenter(vtkRenderer *ren);
 
-  vtkKWApplication *Application;
+  int In;
+  int FlyFlag;
 
-private:
-  vtkPVCameraManipulator(const vtkPVCameraManipulator&); // Not implemented
-  void operator=(const vtkPVCameraManipulator&); // Not implemented
+  double Speed;
+  double Scale;
+  double LastRenderTime;
+  double CameraXAxis[3];
+  double CameraYAxis[3];
+  double CameraZAxis[3];
+
+  void Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi, 
+           float scale, float speed);
+  void ComputeCameraAxes(vtkRenderer*);
+
+  vtkPVJoystickFly(const vtkPVJoystickFly&); // Not implemented
+  void operator=(const vtkPVJoystickFly&); // Not implemented
 };
 
 #endif
