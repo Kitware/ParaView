@@ -136,7 +136,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.13");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -442,10 +442,6 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  if ( ! this->InitializeTrace(file))
-    {
-    return;
-    }
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " UpdateInformation" << endl;
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
