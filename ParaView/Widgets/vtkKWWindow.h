@@ -195,6 +195,10 @@ public:
   int GetFileMenuIndex();
 
   // Description:
+  // Return the index of the entry above the "About" entry in the help menu.
+  int GetHelpMenuIndex();
+
+  // Description:
   // Install a menu bar into this window.
   void InstallMenu(vtkKWMenu* menu);
 

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.175");
+vtkCxxRevisionMacro(vtkKWWindow, "1.176");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -394,18 +394,23 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuHelp->SetParent(this->Menu);
   this->MenuHelp->SetTearOff(0);
   this->MenuHelp->Create(app, "");
+
   if (this->SupportHelp)
     {
     this->Menu->AddCascade("Help", this->MenuHelp, 0);
     }
-
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
-  this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
 
   if (app->HasCheckForUpdates())
     {
     this->MenuHelp->AddCommand("Check For Updates", app, "CheckForUpdates", 0);
     }
+
+  this->MenuHelp->AddSeparator();
+  ostrstream about_label;
+  about_label << "About " << app->GetApplicationName() << ends;
+  this->MenuHelp->AddCommand(about_label.str(), this, "DisplayAbout", 0);
+  about_label.rdbuf()->freeze(0);
 
   // Menubar separator
 
@@ -1310,6 +1315,24 @@ int vtkKWWindow::GetFileMenuIndex()
     }
 
   return clidx - 1;  
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindow::GetHelpMenuIndex()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // Find about
+
+  if (this->MenuHelp->HasItem("About*"))
+    {
+    return this->MenuHelp->GetIndex("About*") - 1;
+    }
+
+  return this->MenuHelp->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
