@@ -153,7 +153,7 @@ void vtkPVConeSource::SetRadius(float rad)
   
   this->GetConeSource()->SetRadius(rad);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetRadius %f", this->GetTclName(), rad);
     }
@@ -166,7 +166,7 @@ void vtkPVConeSource::SetHeight(float height)
   
   this->GetConeSource()->SetHeight(height);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetHeight %f", this->GetTclName(), height);
     }
@@ -179,7 +179,7 @@ void vtkPVConeSource::SetResolution(int res)
   
   this->GetConeSource()->SetResolution(res);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetResolution %d", this->GetTclName(), res);
     }

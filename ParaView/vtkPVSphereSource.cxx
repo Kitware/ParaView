@@ -150,7 +150,7 @@ void vtkPVSphereSource::SetRadius(float rad)
   
   this->GetSphereSource()->SetRadius(rad);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetRadius %f", this->GetTclName(), rad);
     }
@@ -163,7 +163,7 @@ void vtkPVSphereSource::SetPhiResolution(int res)
   
   this->GetSphereSource()->SetPhiResolution(res);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetPhiResolution %d", this->GetTclName(), res);
     }
@@ -176,7 +176,7 @@ void vtkPVSphereSource::SetThetaResolution(int res)
   
   this->GetSphereSource()->SetThetaResolution(res);
   
-  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProccesId() == 0)
     {
     pvApp->BroadcastScript("%s SetThetaResolution %d", this->GetTclName(), res);
     }
