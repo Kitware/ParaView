@@ -71,8 +71,8 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVRenderModule.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWorldPointPicker.cxx
-  vtkPVXMLElement.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
+  vtkPVXMLPackageParser.cxx
   )
 
 SET( ParaViewClient_SRCS
