@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.30");
+vtkCxxRevisionMacro(vtkKWMenu, "1.31");
 
 
 
@@ -820,8 +820,8 @@ void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* state)
   // Mark all sources as not visited.
   while( !it->IsDoneWithTraversal() )
     {    
-    int state;
-    const char* item;
+    int state = 0;
+    const char* item = 0;
     if (it->GetKey(item) == VTK_OK && item && it->GetData(state) == VTK_OK)
       {
       if ( state == vtkKWMenu::Active )

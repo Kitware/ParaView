@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.49");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.50");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -201,7 +201,7 @@ void vtkPVThreshold::UpdateMinMaxScale()
     {
     vtkDataSet* thresholdInput = input->GetVTKData();
     vtkDataArray* scalars=0;
-    int pointDataFlag;
+    int pointDataFlag = 0;
     
     mode = this->AttributeModeMenu->GetValue();
     if (mode && strcmp(mode, "Point Data") == 0)

@@ -41,7 +41,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.3");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
@@ -69,7 +69,7 @@ struct vtkTiledDisplayRendererInfo
 
 #define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
 #define vtkInitializeVector2(v) { v[0] = 0; v[1] = 0; }
-#define vtkInitializeCompositeRendererInfoMacro(r)      \
+#define vtkInitializeTiledDisplayRendererInfoMacro(r)      \
   {                                                     \
   vtkInitializeVector3(r.CameraPosition);               \
   vtkInitializeVector3(r.CameraFocalPoint);             \
@@ -174,8 +174,6 @@ void vtkTiledDisplayManagerRenderRMI(void *arg, void *, int, int)
 // Only process 0 needs start and end render callbacks.
 void vtkTiledDisplayManager::SetRenderWindow(vtkRenderWindow *renWin)
 {
-  vtkRenderer *ren = 0;
-
   if (this->RenderWindow == renWin)
     {
     return;
@@ -329,8 +327,12 @@ void vtkTiledDisplayManager::SatelliteStartRender()
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkMultiProcessController *controller = this->Controller;
   
-  vtkInitializeCompositeRendererInfoMacro(renInfo);
-  
+  vtkInitializeTiledDisplayRendererInfoMacro(renInfo);
+  // Initialize to get rid of a warning.
+  winInfo.Size[0] = winInfo.Size[1] = 0;
+  winInfo.NumberOfRenderers = 1;
+  winInfo.DesiredUpdateRate = 10.0;
+
   // Receive the window size.
   controller->Receive((char*)(&winInfo), 
                       sizeof(struct vtkTiledDisplayRenderWindowInfo), 0, 
