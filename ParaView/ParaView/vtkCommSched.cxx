@@ -115,6 +115,7 @@ vtkCommSched::~vtkCommSched()
   }
   if (keepCellList != NULL) delete [] keepCellList; 
 }
+#if 0
 //*****************************************************************
 // ... copy constructor ...
 vtkCommSched::vtkCommSched(vtkCommSched& sched)
@@ -156,7 +157,7 @@ vtkCommSched::vtkCommSched(vtkCommSched& sched)
   
 }
 //*****************************************************************
-
+#endif
 void vtkCommSched::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkObject::PrintSelf(os,indent);

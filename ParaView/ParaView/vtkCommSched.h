@@ -87,7 +87,7 @@ public:
   ~vtkCommSched();
   
   static vtkCommSched* New();
-  vtkCommSched(vtkCommSched&);
+  //vtkCommSched(vtkCommSched&);
   
   int cntSend;
   int cntRec;
