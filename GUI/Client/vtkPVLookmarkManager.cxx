@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.10");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.11");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -2863,8 +2863,8 @@ char *vtkPVLookmarkManager::GetUnusedLookmarkName()
 {
   char *name = new char[50];
   vtkKWLookmark *lmkWidget;
-  vtkIdType i,k,numberOfItems;
-  i=0;
+  vtkIdType k,numberOfItems;
+  int i=0;
   numberOfItems = this->KWLookmarks->GetNumberOfItems();
   
   while(i<=numberOfItems)
