@@ -48,7 +48,7 @@ vtkPVDataSetToPolyDataFilter* vtkPVDataSetToPolyDataFilter::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToPolyDataFilter::SetInput(vtkPVData *pvData)
+void vtkPVDataSetToPolyDataFilter::SetPVInput(vtkPVData *pvData)
 {
   vtkDataSetToPolyDataFilter *f;
   
@@ -56,10 +56,10 @@ void vtkPVDataSetToPolyDataFilter::SetInput(vtkPVData *pvData)
   
   f->SetInput(pvData->GetData());
 
-  this->vtkPVSource::SetNthInput(0, pvData);
+  this->vtkPVSource::SetNthPVInput(0, pvData);
   if (pvData)
     {
-    this->Inputs[0]->AddPVSourceToUsers(this);
+    this->PVInputs[0]->AddPVSourceToUsers(this);
     }
 }
 

@@ -46,7 +46,7 @@ public:
 
   // Description:
   // The methods execute on all processes.
-  void SetInput(vtkPVPolyData *pvData);
+  void SetPVInput(vtkPVPolyData *pvData);
   
 protected:
   vtkPVPolyDataToPolyDataFilter();

@@ -56,9 +56,9 @@ public:
 
   // Description:
   // Used to connect pipelines.  Executes in all processes.
-  void SetInput(vtkPVImageData *pvi);
+  void SetPVInput(vtkPVImageData *pvi);
 
-  vtkPVImageData *GetInput();
+  vtkPVImageData *GetPVInput();
   
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage

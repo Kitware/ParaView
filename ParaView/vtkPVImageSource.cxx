@@ -71,7 +71,7 @@ vtkPVImageData *vtkPVImageSource::GetPVOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::InitializeOutput()
+void vtkPVImageSource::InitializePVOutput()
 {
   vtkPVImageData *output;
   vtkPVData *input;
@@ -81,7 +81,7 @@ void vtkPVImageSource::InitializeOutput()
   output->Clone(this->GetPVApplication());
   this->SetPVOutput(output);
 
-  input = this->GetInput();  
+  input = this->GetPVInput();  
   if (input != NULL)
     {
     assignment = input->GetAssignment();
@@ -113,7 +113,7 @@ vtkImageSource *vtkPVImageSource::GetVTKImageSource()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVImageData *vtkPVImageSource::GetInput()
+vtkPVImageData *vtkPVImageSource::GetPVInput()
 {
-  return (vtkPVImageData *)this->vtkPVSource::GetNthInput(0);
+  return (vtkPVImageData *)this->vtkPVSource::GetNthPVInput(0);
 }

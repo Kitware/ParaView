@@ -48,7 +48,7 @@ vtkPVImageToImageFilter* vtkPVImageToImageFilter::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageToImageFilter::SetInput(vtkPVImageData *pvData)
+void vtkPVImageToImageFilter::SetPVInput(vtkPVImageData *pvData)
 {
   vtkImageToImageFilter *f;
   
@@ -56,9 +56,9 @@ void vtkPVImageToImageFilter::SetInput(vtkPVImageData *pvData)
   f = vtkImageToImageFilter::SafeDownCast(this->GetVTKSource());
   f->SetInput(pvData->GetImageData());
 
-  this->vtkPVSource::SetNthInput(0, pvData);
+  this->vtkPVSource::SetNthPVInput(0, pvData);
   if (pvData)
     {
-    this->Inputs[0]->AddPVSourceToUsers(this);
+    this->PVInputs[0]->AddPVSourceToUsers(this);
     }  
 }

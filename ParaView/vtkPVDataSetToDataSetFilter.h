@@ -47,7 +47,7 @@ public:
   // Description:
   // This method gets called when the accept button is pressed
   // for the first time.  It creates a pvData and its assignement.
-  void InitializeOutput();  
+  void InitializePVOutput();  
   
   // Description:
   // Although the data is created in the initialize method,
@@ -60,9 +60,9 @@ public:
   // Description:
   // All pipeline calls have to use vtkKWObjects so GetTclName will work.
   // The methods executes on all processes.
-  void SetInput(vtkPVData *pvData);
+  void SetPVInput(vtkPVData *pvData);
   
-  vtkPVData *GetInput();
+  vtkPVData *GetPVInput();
   
 protected:
   vtkPVDataSetToDataSetFilter();

@@ -45,7 +45,7 @@ public:
 
   // Description:
   // The methods execute on all processes.
-  void SetInput(vtkPVImageData *pvData);
+  void SetPVInput(vtkPVImageData *pvData);
   
 protected:
   vtkPVImageToImageFilter();

@@ -94,11 +94,11 @@ public:
   virtual void SetName(const char *name);
   char* GetName();
   
-  vtkPVData **GetInputs() { return this->Inputs; };
-  vtkPVData *GetNthInput(int idx);
-  vtkGetMacro(NumberOfInputs, int);
-  void SqueezeInputArray();
-  void RemoveAllInputs();
+  vtkPVData **GetPVInputs() { return this->PVInputs; };
+  vtkPVData *GetNthPVInput(int idx);
+  vtkGetMacro(NumberOfPVInputs, int);
+  void SqueezePVInputArray();
+  void RemoveAllPVInputs();
   
   // Description:
   // This just returns the application typecast correctly.
@@ -112,7 +112,7 @@ public:
   // Creates the output and assignment.
   // If there is an input, it uses its assignement. 
   // Otherwise, it creates a new one.
-  virtual void InitializeOutput() {};
+  virtual void InitializePVOutput() {};
   
   // Description:
   // Called when the accept button is pressed.
@@ -183,7 +183,7 @@ public:
   // Description:
   // This will add a selection list that allows the user to select an input.
   // It does not work right now.  It does add a method interface however.
-  void AddInputList();
+  void AddPVInputList();
   
   // Description:
   // Set the vtk source that will be a part of the pipeline.
@@ -227,16 +227,16 @@ protected:
   vtkSource *VTKSource;
   char *VTKSourceTclName;
 
-  vtkPVData **Inputs;
-  int NumberOfInputs;
+  vtkPVData **PVInputs;
+  int NumberOfPVInputs;
   
   // Called to allocate the input array.  Copies old inputs.
-  void SetNumberOfInputs(int num);
+  void SetNumberOfPVInputs(int num);
   
   // protected methods for setting inputs.
-  void SetNthInput(int idx, vtkPVData *input);
-  void AddInput(vtkPVData *input);
-  void RemoveInput(vtkPVData *input);
+  void SetNthPVInput(int idx, vtkPVData *input);
+  void AddPVInput(vtkPVData *input);
+  void RemovePVInput(vtkPVData *input);
   
   // The name is just for display.
   char      *Name;

@@ -45,7 +45,7 @@ public:
   // This is called the first time the accept button is pressed.
   // It creates the output and assignement.  
   // The assignement is important for structured data.
-  void InitializeOutput();
+  void InitializePVOutput();
     
   // Description:
   // Although the data is created in the initialize method,
@@ -53,7 +53,7 @@ public:
   void SetPVOutput(vtkPVImageData *pvi);
   vtkPVImageData *GetPVOutput();
 
-  vtkPVImageData *GetInput();
+  vtkPVImageData *GetPVInput();
 
 protected:
   vtkPVImageSource();

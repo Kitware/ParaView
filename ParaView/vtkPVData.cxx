@@ -226,7 +226,7 @@ void vtkPVData::Contour()
 			"vtkSingleContourFilter",
 			"Contour", ++instanceCount));
   if (f == NULL) {return;}
-  f->SetInput(this);
+  f->SetPVInput(this);
   ((vtkSingleContourFilter*)f->GetVTKSource())->SetFirstValue((range[0] +
 							       range[1])/2.0);
   
@@ -236,7 +236,7 @@ void vtkPVData::Contour()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
-  f->AddInputList();
+  f->AddPVInputList();
   f->AddLabeledEntry("Value", "SetFirstValue", "GetFirstValue");
   f->AddLabeledToggle("ComputeNormals", "SetComputeNormals",
 		      "GetComputeNormals");
@@ -258,7 +258,7 @@ void vtkPVData::Cutter()
   vtkPVCutter *cutter = vtkPVCutter::New();
   
   cutter->Clone(pvApp);
-  cutter->SetInput(this);
+  cutter->SetPVInput(this);
   
   cutter->SetOrigin(0, 0, 0);
   cutter->SetNormal(0, 0, 1);
@@ -269,7 +269,7 @@ void vtkPVData::Cutter()
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
   window->SetCurrentSource(cutter);
-  cutter->AddInputList();
+  cutter->AddPVInputList();
   
   cutter->Delete();
 }
@@ -290,7 +290,7 @@ void vtkPVData::Elevation()
 			"vtkElevationFilter",
 			"Elevation", ++instanceCount));
   if (f == NULL) {return;}
-  f->SetInput(this);
+  f->SetPVInput(this);
   ((vtkElevationFilter*)f->GetVTKSource())->SetLowPoint(bounds[0], 0, 0);
   ((vtkElevationFilter*)f->GetVTKSource())->SetHighPoint(bounds[1], 0, 0);
   
@@ -300,7 +300,7 @@ void vtkPVData::Elevation()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
-  f->AddInputList();
+  f->AddPVInputList();
   f->AddVector3Entry("LowPoint", "X", "Y", "Z", "SetLowPoint", "GetLowPoint");
   f->AddVector3Entry("HighPoint", "X", "Y", "Z", "SetHighPoint",
 		     "GetHighPoint");
@@ -328,7 +328,7 @@ void vtkPVData::ExtractEdges()
 			"vtkExtractEdges",
 			"ExtractEdges", ++instanceCount));
   if (f == NULL) {return;}
-  f->SetInput(this);
+  f->SetPVInput(this);
   
   // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
@@ -336,7 +336,7 @@ void vtkPVData::ExtractEdges()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
-  f->AddInputList();
+  f->AddPVInputList();
   f->UpdateParameterWidgets();
   
   // Clean up. (How about on the other processes?)
@@ -359,7 +359,7 @@ void vtkPVData::ColorByProcess()
 			"vtkColorByProcess",
 			"ColorByProcess", ++instanceCount));
   if (f == NULL) {return;}
-  f->SetInput(this);
+  f->SetPVInput(this);
   
   // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
@@ -367,7 +367,7 @@ void vtkPVData::ColorByProcess()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
-  f->AddInputList();
+  f->AddPVInputList();
   f->UpdateParameterWidgets();
   
   // Clean up. (How about on the other processes?)

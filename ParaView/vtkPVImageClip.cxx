@@ -120,7 +120,7 @@ void vtkPVImageClip::CreateProperties()
   extents = this->GetImageClip()->GetOutputWholeExtent();
 
   this->GetExtentStyle()->
-    SetImageData((vtkImageData*)this->GetInput()->GetData());
+    SetImageData((vtkImageData*)this->GetPVInput()->GetData());
   this->GetExtentStyle()->SetExtent(extents);
   
   this->ClipXMinEntry->Create(this->Application);
@@ -159,13 +159,13 @@ void vtkPVImageClip::CreateProperties()
 
 
 //----------------------------------------------------------------------------
-void vtkPVImageClip::SetInput(vtkPVImageData *pvi)
+void vtkPVImageClip::SetPVInput(vtkPVImageData *pvi)
 {
   this->GetImageClip()->SetInput(pvi->GetImageData());
-  this->vtkPVSource::SetNthInput(0, pvi);
+  this->vtkPVSource::SetNthPVInput(0, pvi);
   if (pvi)
     {
-    this->Inputs[0]->AddPVSourceToUsers(this);
+    this->PVInputs[0]->AddPVSourceToUsers(this);
     }
 }
 
@@ -276,8 +276,8 @@ void vtkPVImageClip::ExtentsChanged()
     pvi->SetAssignment(a);
     this->GetPVOutput()->GetData()->
       SetUpdateExtent(this->GetPVOutput()->GetData()->GetWholeExtent());
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->GetInput()->GetScalarBar()->VisibilityOff();
+    this->GetPVInput()->GetActorComposite()->VisibilityOff();
+    this->GetPVInput()->GetScalarBar()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
@@ -300,8 +300,8 @@ void vtkPVImageClip::GetSource()
 {
   this->GetPVOutput()->GetActorComposite()->VisibilityOff();
   this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
+    SetSelectedComposite(this->GetPVInput()->GetPVSource());
+  this->GetPVInput()->GetActorComposite()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
 }
@@ -337,7 +337,7 @@ void vtkPVImageClip::Select(vtkKWView *view)
 }
 
 //---------------------------------------------------------------------------
-vtkPVImageData *vtkPVImageClip::GetInput()
+vtkPVImageData *vtkPVImageClip::GetPVInput()
 {
-  return (vtkPVImageData *)(this->vtkPVSource::GetNthInput(0));
+  return (vtkPVImageData *)(this->vtkPVSource::GetNthPVInput(0));
 }

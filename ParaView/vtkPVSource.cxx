@@ -52,8 +52,8 @@ vtkPVSource::vtkPVSource()
   this->CommandFunction = vtkPVSourceCommand;
   this->Name = NULL;
   
-  this->Inputs = NULL;
-  this->NumberOfInputs = 0;
+  this->PVInputs = NULL;
+  this->NumberOfPVInputs = 0;
   this->PVOutput = NULL;
   this->VTKSource = NULL;
   this->VTKSourceTclName = NULL;
@@ -88,22 +88,22 @@ vtkPVSource::~vtkPVSource()
     this->PVOutput = NULL;
     }
   
-  for (i = 0; i < this->NumberOfInputs; i++)
+  for (i = 0; i < this->NumberOfPVInputs; i++)
     {
-    if (this->Inputs[i])
+    if (this->PVInputs[i])
       {
-      this->Inputs[i]->UnRegister(this);
-      this->Inputs[i] = NULL;
+      this->PVInputs[i]->UnRegister(this);
+      this->PVInputs[i] = NULL;
       }
     }
 
-  if (this->Inputs)
+  if (this->PVInputs)
     {
-    delete [] this->Inputs;
-    this->Inputs = 0;
+    delete [] this->PVInputs;
+    this->PVInputs = 0;
     }
   
-  this->NumberOfInputs = 0;
+  this->NumberOfPVInputs = 0;
 
   this->SetVTKSource(NULL);
 
@@ -1452,7 +1452,7 @@ void vtkPVSource::AddModeListItem(char *name, int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddInputList()
+void vtkPVSource::AddPVInputList()
 {
   // The type should be VTK_OBJECT maybe.
   // Interface will specify the vtk source input, but UI will deal with 
@@ -1482,8 +1482,8 @@ void vtkPVSource::AcceptCallback()
     vtkPVActorComposite *ac;
     vtkPVScalarBar *sb;
     
-    input = this->GetNthInput(0);
-    this->InitializeOutput();
+    input = this->GetNthPVInput(0);
+    this->InitializePVOutput();
     this->CreateDataPage();
     ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
@@ -1521,9 +1521,9 @@ void vtkPVSource::CancelCallback()
     // inputs, but not sure how to do that since the PVData is NULL at this
     // point.
     
-    for (i = 0; i < this->GetNumberOfInputs(); i++)
+    for (i = 0; i < this->GetNumberOfPVInputs(); i++)
       {
-      this->GetNthInput(i)->RemovePVSourceFromUsers(this);
+      this->GetNthPVInput(i)->RemovePVSourceFromUsers(this);
       }
     
     // We need to unpack the notebook for this source and pack the one for the
@@ -1575,9 +1575,9 @@ void vtkPVSource::DeleteCallback()
     // inputs, but not sure how to do that since the PVData is NULL at this
     // point.
     
-    for (i = 0; i < this->GetNumberOfInputs(); i++)
+    for (i = 0; i < this->GetNumberOfPVInputs(); i++)
       {
-      this->GetNthInput(i)->RemovePVSourceFromUsers(this);
+      this->GetNthPVInput(i)->RemovePVSourceFromUsers(this);
       }
     
     // We need to unpack the notebook for this source and pack the one for the
@@ -1669,12 +1669,12 @@ void vtkPVSource::UpdateNavigationCanvas()
                this->NavigationCanvas->GetWidgetName());
 
   // Put the inputs in the canvas.
-  if (this->Inputs)
+  if (this->PVInputs)
     {
     y = 10;
-    for (i = 0; i < this->NumberOfInputs; i++)
+    for (i = 0; i < this->NumberOfPVInputs; i++)
       {
-      source = this->Inputs[i]->GetPVSource();
+      source = this->PVInputs[i]->GetPVSource();
       if (source)
         {
         // Draw the name of the assembly.
@@ -1722,9 +1722,9 @@ void vtkPVSource::UpdateNavigationCanvas()
                        yMid, xMid, yMid);
           }
         
-        if (source->GetInputs())
+        if (source->GetPVInputs())
           {
-          if (source->GetNthInput(0)->GetPVSource())
+          if (source->GetNthPVInput(0)->GetPVSource())
             {
             // Draw ellipsis indicating that this source has a source.
             this->Script("%s create line %d %d %d %d",
@@ -1855,13 +1855,13 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
 
 typedef vtkPVData *vtkPVDataPointer;
 //---------------------------------------------------------------------------
-void vtkPVSource::SetNumberOfInputs(int num)
+void vtkPVSource::SetNumberOfPVInputs(int num)
 {
   int idx;
   vtkPVDataPointer *inputs;
 
   // in case nothing has changed.
-  if (num == this->NumberOfInputs)
+  if (num == this->NumberOfPVInputs)
     {
     return;
     }
@@ -1876,64 +1876,64 @@ void vtkPVSource::SetNumberOfInputs(int num)
     }
 
   // Copy old inputs
-  for (idx = 0; idx < num && idx < this->NumberOfInputs; ++idx)
+  for (idx = 0; idx < num && idx < this->NumberOfPVInputs; ++idx)
     {
-    inputs[idx] = this->Inputs[idx];
+    inputs[idx] = this->PVInputs[idx];
     }
   
   // delete the previous arrays
-  if (this->Inputs)
+  if (this->PVInputs)
     {
-    delete [] this->Inputs;
-    this->Inputs = NULL;
-    this->NumberOfInputs = 0;
+    delete [] this->PVInputs;
+    this->PVInputs = NULL;
+    this->NumberOfPVInputs = 0;
     }
   
   // Set the new array
-  this->Inputs = inputs;
+  this->PVInputs = inputs;
   
-  this->NumberOfInputs = num;
+  this->NumberOfPVInputs = num;
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::SetNthInput(int idx, vtkPVData *input)
+void vtkPVSource::SetNthPVInput(int idx, vtkPVData *input)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // Handle parallelism.
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
 			   input->GetTclName());
     }
   
   if (idx < 0)
     {
-    vtkErrorMacro(<< "SetNthInput: " << idx << ", cannot set input. ");
+    vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");
     return;
     }
   // Expand array if necessary.
-  if (idx >= this->NumberOfInputs)
+  if (idx >= this->NumberOfPVInputs)
     {
-    this->SetNumberOfInputs(idx + 1);
+    this->SetNumberOfPVInputs(idx + 1);
     }
   
   // does this change anything?
-  if (input == this->Inputs[idx])
+  if (input == this->PVInputs[idx])
     {
     return;
     }
   
-  if (this->Inputs[idx])
+  if (this->PVInputs[idx])
     {
-    this->Inputs[idx]->RemovePVSourceFromUsers(this);
-    this->Inputs[idx]->UnRegister(this);
-    this->Inputs[idx] = NULL;
+    this->PVInputs[idx]->RemovePVSourceFromUsers(this);
+    this->PVInputs[idx]->UnRegister(this);
+    this->PVInputs[idx] = NULL;
     }
   else
     {
-    this->Inputs[idx] = vtkPVData::New();
+    this->PVInputs[idx] = vtkPVData::New();
     }
   
   if (input)
@@ -1941,12 +1941,12 @@ void vtkPVSource::SetNthInput(int idx, vtkPVData *input)
     input->Register(this);
     }
 
-  this->Inputs[idx] = input;
+  this->PVInputs[idx] = input;
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::AddInput(vtkPVData *input)
+void vtkPVSource::AddPVInput(vtkPVData *input)
 {
   int idx;
   
@@ -1956,21 +1956,21 @@ void vtkPVSource::AddInput(vtkPVData *input)
     }
   this->Modified();
   
-  for (idx = 0; idx < this->NumberOfInputs; ++idx)
+  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
     {
-    if (this->Inputs[idx] == NULL)
+    if (this->PVInputs[idx] == NULL)
       {
-      this->Inputs[idx] = input;
+      this->PVInputs[idx] = input;
       return;
       }
     }
   
-  this->SetNumberOfInputs(this->NumberOfInputs + 1);
-  this->Inputs[this->NumberOfInputs - 1] = input;
+  this->SetNumberOfPVInputs(this->NumberOfPVInputs + 1);
+  this->PVInputs[this->NumberOfPVInputs - 1] = input;
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::RemoveInput(vtkPVData *input)
+void vtkPVSource::RemovePVInput(vtkPVData *input)
 {
   int idx, loc;
   
@@ -1981,9 +1981,9 @@ void vtkPVSource::RemoveInput(vtkPVData *input)
   
   // find the input in the list of inputs
   loc = -1;
-  for (idx = 0; idx < this->NumberOfInputs; ++idx)
+  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
     {
-    if (this->Inputs[idx] == input)
+    if (this->PVInputs[idx] == input)
       {
       loc = idx;
       }
@@ -1994,81 +1994,81 @@ void vtkPVSource::RemoveInput(vtkPVData *input)
     return;
     }
   
-  this->Inputs[loc]->UnRegister(this);
-  this->Inputs[loc] = NULL;
+  this->PVInputs[loc]->UnRegister(this);
+  this->PVInputs[loc] = NULL;
 
   // if that was the last input, then shrink the list
-  if (loc == this->NumberOfInputs - 1)
+  if (loc == this->NumberOfPVInputs - 1)
     {
-    this->SetNumberOfInputs(this->NumberOfInputs - 1);
+    this->SetNumberOfPVInputs(this->NumberOfPVInputs - 1);
     }
   
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::SqueezeInputArray()
+void vtkPVSource::SqueezePVInputArray()
 {
   int idx, loc;
   
   // move NULL entries to the end
-  for (idx = 0; idx < this->NumberOfInputs; ++idx)
+  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
     {
-    if (this->Inputs[idx] == NULL)
+    if (this->PVInputs[idx] == NULL)
       {
-      for (loc = idx+1; loc < this->NumberOfInputs; loc++)
+      for (loc = idx+1; loc < this->NumberOfPVInputs; loc++)
         {
-        this->Inputs[loc-1] = this->Inputs[loc];
+        this->PVInputs[loc-1] = this->PVInputs[loc];
         }
-      this->Inputs[this->NumberOfInputs -1] = NULL;
+      this->PVInputs[this->NumberOfPVInputs -1] = NULL;
       }
     }
 
   // adjust the size of the array
   loc = -1;
-  for (idx = 0; idx < this->NumberOfInputs; ++idx)
+  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
     {
-    if (loc == -1 && this->Inputs[idx] == NULL)
+    if (loc == -1 && this->PVInputs[idx] == NULL)
       {
       loc = idx;
       }
     }
   if (loc > 0)
     {
-    this->SetNumberOfInputs(loc);
+    this->SetNumberOfPVInputs(loc);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::RemoveAllInputs()
+void vtkPVSource::RemoveAllPVInputs()
 {
-  if ( this->Inputs )
+  if ( this->PVInputs )
     {
-    for (int idx = 0; idx < this->NumberOfInputs; ++idx)
+    for (int idx = 0; idx < this->NumberOfPVInputs; ++idx)
       {
-      if ( this->Inputs[idx] )
+      if ( this->PVInputs[idx] )
         {
-        this->Inputs[idx]->UnRegister(this);
-        this->Inputs[idx] = NULL;
+        this->PVInputs[idx]->UnRegister(this);
+        this->PVInputs[idx] = NULL;
         }
       }
 
-    delete [] this->Inputs;
-    this->Inputs = NULL;
-    this->NumberOfInputs = 0;
+    delete [] this->PVInputs;
+    this->PVInputs = NULL;
+    this->NumberOfPVInputs = 0;
     this->Modified();
     }
 }
 
 //---------------------------------------------------------------------------
-vtkPVData *vtkPVSource::GetNthInput(int idx)
+vtkPVData *vtkPVSource::GetNthPVInput(int idx)
 {
-  if (idx >= this->NumberOfInputs)
+  if (idx >= this->NumberOfPVInputs)
     {
     return NULL;
     }
   
-  return (vtkPVData *)(this->Inputs[idx]);
+  return (vtkPVData *)(this->PVInputs[idx]);
 }
 
 //----------------------------------------------------------------------------

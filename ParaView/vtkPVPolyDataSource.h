@@ -53,7 +53,7 @@ public:
   // Description:
   // This method gets called when the accept button is pressed
   // for the first time.  It creates a pvData and assignment.
-  void InitializeOutput();
+  void InitializePVOutput();
 
   // Description:
   // Although the data is created in the initialize method,
@@ -61,7 +61,7 @@ public:
   void SetPVOutput(vtkPVPolyData *pvd);
   vtkPVPolyData *GetPVOutput();
 
-  vtkPVPolyData *GetInput();
+  vtkPVPolyData *GetPVInput();
   
 protected:
   vtkPVPolyDataSource();

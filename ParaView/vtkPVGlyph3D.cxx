@@ -61,7 +61,7 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 void vtkPVGlyph3D::AcceptCallback()
 {
   
-  if (this->vtkPVSource::GetNthInput(1) == NULL)
+  if (this->vtkPVSource::GetNthPVInput(1) == NULL)
     {
     vtkPVPolyDataSource *cone;
     cone = this->GetWindow()->CreateCone();    
@@ -90,10 +90,10 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
   
   f->SetSource(pvData->GetPolyData());
   
-  this->vtkPVSource::SetNthInput(1, pvData);
+  this->vtkPVSource::SetNthPVInput(1, pvData);
   if (pvData)
     {
-    this->Inputs[1]->AddPVSourceToUsers(this);
+    this->PVInputs[1]->AddPVSourceToUsers(this);
     }
 }
 

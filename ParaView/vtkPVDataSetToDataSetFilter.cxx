@@ -51,13 +51,13 @@ vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::InitializeOutput()
+void vtkPVDataSetToDataSetFilter::InitializePVOutput()
 {
   vtkPVData *input;
   vtkPVData *output;
   vtkPVAssignment *assignment;
   
-  input = this->GetInput();
+  input = this->GetPVInput();
   if (input == NULL)
     {
     vtkErrorMacro("Input not set.");
@@ -119,7 +119,7 @@ vtkPVImageData *vtkPVDataSetToDataSetFilter::GetPVImageDataOutput()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
+void vtkPVDataSetToDataSetFilter::SetPVInput(vtkPVData *pvData)
 {
   vtkDataSetToDataSetFilter *f;
   
@@ -133,10 +133,10 @@ void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
   
   f->SetInput(pvData->GetData());
 
-  this->vtkPVSource::SetNthInput(0, pvData);
+  this->vtkPVSource::SetNthPVInput(0, pvData);
   if (pvData)
     {
-    this->Inputs[0]->AddPVSourceToUsers(this);
+    this->PVInputs[0]->AddPVSourceToUsers(this);
     }
 }
 
@@ -158,7 +158,7 @@ vtkPVDataSetToDataSetFilter::GetVTKDataSetToDataSetFilter()
 }
 
 //--------------------------------------------------------------------------
-vtkPVData *vtkPVDataSetToDataSetFilter::GetInput()
+vtkPVData *vtkPVDataSetToDataSetFilter::GetPVInput()
 {
-  return (vtkPVData *)(this->vtkPVSource::GetNthInput(0));
+  return (vtkPVData *)(this->vtkPVSource::GetNthPVInput(0));
 }

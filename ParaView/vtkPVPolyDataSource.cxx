@@ -71,13 +71,13 @@ vtkPVPolyData *vtkPVPolyDataSource::GetPVOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::InitializeOutput()
+void vtkPVPolyDataSource::InitializePVOutput()
 {
   vtkPVData *input;
   vtkPVPolyData *output;
   vtkPVAssignment *assignment;
   
-  input = this->vtkPVSource::GetNthInput(0);
+  input = this->vtkPVSource::GetNthPVInput(0);
   output = vtkPVPolyData::New();
   output->Clone(this->GetPVApplication());
   this->SetPVOutput(output);
@@ -101,9 +101,9 @@ void vtkPVPolyDataSource::SelectInputSource()
   this->GetPVOutput()->GetActorComposite()->VisibilityOff();
   this->GetPVOutput()->GetScalarBar()->VisibilityOff();
   this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetInput()->GetScalarBar()->VisibilityOn();
+    SetSelectedComposite(this->GetPVInput()->GetPVSource());
+  this->GetPVInput()->GetActorComposite()->VisibilityOn();
+  this->GetPVInput()->GetScalarBar()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
 }
@@ -125,7 +125,7 @@ vtkPolyDataSource *vtkPVPolyDataSource::GetVTKPolyDataSource()
 }
 
 //---------------------------------------------------------------------------
-vtkPVPolyData *vtkPVPolyDataSource::GetInput()
+vtkPVPolyData *vtkPVPolyDataSource::GetPVInput()
 {
-  return (vtkPVPolyData *)this->vtkPVSource::GetNthInput(0);
+  return (vtkPVPolyData *)this->vtkPVSource::GetNthPVInput(0);
 }
