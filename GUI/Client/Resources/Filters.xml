@@ -1854,7 +1854,6 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
     <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <PointWidget trace_name="Point" variable="WorldPoint"/>
     <SelectionList property="PickCell"
                    label="Pick Type"
                    trace_name="PickType"
@@ -1862,6 +1861,19 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
       <Item name="Point" value="0"/>
       <Item name="Cell" value="1"/>
     </SelectionList>
+    <SelectWidget label="Pick Method"
+                  trace_name="PickMethod"
+                  property="UseIdToPick">
+      <Item label="World Point" value="0">
+        <PointWidget trace_name="Point" variable="WorldPoint"
+                     help="Pick cell or point closest to this world point.  The 'p' key can be used to select a point under the cursor."/>
+      </Item>
+      <Item label="ID" value="1">
+        <VectorEntry  label="Id" property="Id" trace_name="Id"
+                      type="int" length="1"
+                      help="The Id of the point or cell to pick." />
+      </Item>
+    </SelectWidget>
     <Documentation>
 The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 7.4 for information about using the point widget.) Pressing the "P" key positions the point widget at the point on the data set under the current cursor position. If you select Point from the Pick Type menu, the output of the filter will be the nearest point to the point widget. If you select Cell, the output of the filter is the cell which is closest to the selected point. All the output point-centered attributes, cell-centered attributes, and original ids are displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the reference ids of the points within that cell will be labeled.
 The Pick filter operates on any type of data and produces unstructured grid output.
