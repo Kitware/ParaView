@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.34");
+vtkCxxRevisionMacro(vtkPVPart, "1.35");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -314,6 +314,44 @@ void vtkPVPart::SetVTKDataTclName(const char* tclName)
     }
 }
 
+//----------------------------------------------------------------------------
+// Create the extent translator (sources with no inputs only).
+// Needs to be before "ExtractPieces" because translator propagates.
+void vtkPVPart::CreateTranslatorIfNecessary(const char* translatorTclName)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  // We are going to create the piece filter with a dummy tcl name,
+  // setup the pipeline, and remove tcl's reference to the objects.
+  // The vtkData object will be moved to the output of the piece filter.
+  pm->GatherInformation(this->ClassNameInformation, this->VTKDataTclName);
+  char *className = this->ClassNameInformation->GetVTKClassName();
+  if (strcmp(className, "vtkImageData") == 0 ||
+      strcmp(className, "vtkStructuredPoints") == 0 ||
+      strcmp(className, "vtkStructuredGrid") == 0 ||
+      strcmp(className, "vtkRectilinearGrid") == 0 )
+    {
+    // Do not overwrite custom extent translators.
+    // PVExtent translator should really be the default,
+    // Then we would not need to do this.
+    pm->RootScript("[%s GetExtentTranslator] GetClassName",
+                   this->VTKDataTclName);
+    if (strcmp(pm->GetRootResult(),"vtkExtentTranslator") == 0)
+      {
+      pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
+      pm->ServerScript("%s SetExtentTranslator %s",
+                       this->VTKDataTclName, translatorTclName);
+      // Translator has to be set on source because it is propagated.
+      // Original source is set after transmit so reference
+      // loop can be broken when pvPart is deleted.
+      pm->ServerScript("%s SetOriginalSource %s",
+                       translatorTclName, this->VTKDataTclName);
+      pm->ServerScript("%s Delete", translatorTclName);
+      }
+    }
+
+}
 
 
 //----------------------------------------------------------------------------

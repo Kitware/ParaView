@@ -82,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.322");
+vtkCxxRevisionMacro(vtkPVSource, "1.323");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2441,35 +2441,9 @@ int vtkPVSource::InitializeData()
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
       char translatorTclName[1024];
-      translatorTclName[0] = '\0';
-      if ( ! input)
-        {
-        // Do not overwrite custom extent translators.
-        // PVExtent translator should really be the default,
-        // Then we would not need to do this.
-        pm->RootScript("[${%s} GetExtentTranslator] GetClassName",
-                       dataName);
-        if (strcmp(pm->GetRootResult(),"vtkExtentTranslator") == 0)
-          {
-          sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
-          pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
-          pm->ServerScript("${%s} SetExtentTranslator %s",
-                           dataName, translatorTclName);
-          }
-        }
-
+      sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
+      part->CreateTranslatorIfNecessary(translatorTclName);
       part->InsertExtractPiecesIfNecessary();
-      
-      if (translatorTclName[0])
-        {
-        // Translator has to be set on source because it is propagated.
-        // Original source is set after transmit so reference
-        // loop can be broken when pvPart is deleted.
-        pm->ServerScript("%s SetOriginalSource ${%s}",
-                         translatorTclName, dataName);
-        pm->ServerScript("%s Delete", translatorTclName);
-        }
-
       part->Delete();  
       }
     }

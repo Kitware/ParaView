@@ -98,6 +98,12 @@ public:
   // expense of initial generation (reading) of the data.
   void InsertExtractPiecesIfNecessary();
   
+  // Description:
+  // Create the extent translator (sources with no inputs only).
+  // Needs to be before "ExtractPieces" because translator propagates.
+  void CreateTranslatorIfNecessary(const char* translatorTclName);
+
+
   //===================
           
   // Description:
