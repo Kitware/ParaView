@@ -39,7 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWListBox.h"
 #include "vtkKitwareContourFilter.h"
 
-
 class VTK_EXPORT vtkPVContour : public vtkPVSource
 {
 public:
@@ -57,7 +56,8 @@ public:
   
   // Description:
   // Tcl callback for adding the contour values
-  void ContourValuesCallback();
+  void ContourValuesAcceptCallback();
+  void ContourValuesCancelCallback();
   
 protected:
   vtkPVContour();
@@ -65,8 +65,6 @@ protected:
   vtkPVContour(const vtkPVContour&) {};
   void operator=(const vtkPVContour&) {};
 
-  vtkKitwareContourFilter* Contour;
-  
   vtkKWLabel* ContourValuesLabel;
   vtkKWListBox *ContourValuesList;
   vtkKWWidget* NewValueFrame;

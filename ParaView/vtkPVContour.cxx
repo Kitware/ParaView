@@ -37,8 +37,6 @@ vtkPVContour::vtkPVContour()
 {
   this->CommandFunction = vtkPVContourCommand;
   
-  this->Contour = NULL;
-  
   this->ContourValuesLabel = vtkKWLabel::New();
   this->ContourValuesList = vtkKWListBox::New();
   this->NewValueFrame = vtkKWWidget::New();
@@ -89,12 +87,6 @@ void vtkPVContour::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  this->Contour = (vtkKitwareContourFilter*)this->GetVTKSource();
-  if (!this->Contour)
-    {
-    return;
-    }
-  
   this->ContourValuesLabel->SetParent(this->GetParameterFrame()->GetFrame());
   this->ContourValuesLabel->Create(pvApp, "");
   this->ContourValuesLabel->SetLabel("Contour Values");
@@ -103,7 +95,9 @@ void vtkPVContour::CreateProperties()
   this->ContourValuesList->Create(pvApp, "");
   this->ContourValuesList->SetHeight(5);
   
-  this->AcceptCommands->AddString("%s ContourValuesCallback",
+  this->AcceptCommands->AddString("%s ContourValuesAcceptCallback",
+                                  this->GetTclName());
+  this->CancelCommands->AddString("%s ContourValuesCancelCallback",
                                   this->GetTclName());
   
   this->NewValueFrame->SetParent(this->GetParameterFrame()->GetFrame());
@@ -136,16 +130,12 @@ void vtkPVContour::CreateProperties()
   
   this->ComputeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeNormalsCheck->Create(pvApp, "-text \"Compute Normals\"");
-  this->ComputeNormalsCheck->SetState(this->Contour->GetComputeNormals());
+  this->ComputeNormalsCheck->SetState(1);
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetState [%s %s]",
                                   this->ComputeNormalsCheck->GetTclName(),
                                   this->GetVTKSourceTclName(),
                                   "GetComputeNormals");
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -154,16 +144,12 @@ void vtkPVContour::CreateProperties()
 
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeGradientsCheck->Create(pvApp, "-text \"Compute Gradients\"");
-  this->ComputeGradientsCheck->SetState(this->Contour->GetComputeGradients());
+  this->ComputeGradientsCheck->SetState(0);
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetState [%s %s]",
                                   this->ComputeGradientsCheck->GetTclName(),
                                   this->GetVTKSourceTclName(),
                                   "GetComputeGradients");
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -172,16 +158,12 @@ void vtkPVContour::CreateProperties()
 
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeScalarsCheck->Create(pvApp, "-text \"Compute Scalars\"");
-  this->ComputeScalarsCheck->SetState(this->Contour->GetComputeScalars());
+  this->ComputeScalarsCheck->SetState(1);
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetState [%s %s]",
                                   this->ComputeScalarsCheck->GetTclName(),
                                   this->GetVTKSourceTclName(),
                                   "GetComputeScalars");
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -214,21 +196,38 @@ void vtkPVContour::DeleteValueCallback()
   this->ContourValuesList->DeleteRange(index, index);
 }
 
-void vtkPVContour::ContourValuesCallback()
+void vtkPVContour::ContourValuesAcceptCallback()
 {
   int i;
   float value;
   int numContours = this->ContourValuesList->GetNumberOfItems();
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->Contour->SetNumberOfContours(numContours);
+  pvApp->BroadcastScript("%s SetNumberOfContours %d",
+                         this->GetVTKSourceTclName(), numContours);
   
   for (i = 0; i < numContours; i++)
     {
     value = atof(this->ContourValuesList->GetItem(i));
-    this->Contour->SetValue(i, value);
     pvApp->BroadcastScript("%s SetValue %d %f",
                            this->GetVTKSourceTclName(),
                            i, value);
+    }
+}
+
+void vtkPVContour::ContourValuesCancelCallback()
+{
+  int i;
+  vtkKitwareContourFilter* contour =
+    (vtkKitwareContourFilter*)this->GetVTKSource();
+  int numContours = contour->GetNumberOfContours();
+  char newValue[128];
+  
+  this->ContourValuesList->DeleteAll();
+  
+  for (i = 0; i < numContours; i++)
+    {
+    sprintf(newValue, "%f", contour->GetValue(i));
+    this->ContourValuesList->AppendUnique(newValue);
     }
 }
