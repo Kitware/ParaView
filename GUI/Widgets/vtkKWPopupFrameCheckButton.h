@@ -53,7 +53,7 @@ public:
 
   // Description:
   // Update the GUI according to the value of the ivars
-  void Update();
+  virtual void Update();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
