@@ -68,9 +68,9 @@ template<class DataType> class vtkLinkedListIterator;
 class VTK_EXPORT vtkKWRadioButtonSet : public vtkKWWidget
 {
 public:
-
   static vtkKWRadioButtonSet* New();
   vtkTypeRevisionMacro(vtkKWRadioButtonSet,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the widget (a frame holding all the radiobuttons).
@@ -83,32 +83,47 @@ public:
   // Object and method parameters, if any, will be used to set the command.
   // A help string will be used, if any, to set the baloon help. 
   // Return 1 on success, 0 otherwise.
-  int AddRadioButton(int id, 
-                     const char *text, 
-                     vtkKWObject *object = 0, 
-                     const char *method_and_arg_string = 0,
-                     const char *balloonhelp_string = 0);
+  int AddButton(int id, 
+                const char *text = 0, 
+                vtkKWObject *object = 0, 
+                const char *method_and_arg_string = 0,
+                const char *balloonhelp_string = 0);
 
   // Description:
   // Get a radiobutton from the set, given its unique id.
   // It is advised not to temper with the radiobutton var name or value :)
   // Return a pointer to the radiobutton, or NULL on error.
-  vtkKWRadioButton* GetRadioButton(int id);
-  int HasRadioButton(int id);
+  vtkKWRadioButton* GetButton(int id);
+  int HasButton(int id);
 
   // Description:
   // Convenience method to select a particular button or query if it is selected.
-  void SelectRadioButton(int id);
-  int IsRadioButtonSelected(int id);
+  void SelectButton(int id);
+  int IsButtonSelected(int id);
+
+  // Description:
+  // Convenience method to hide/show a button
+  void HideButton(int id);
+  void ShowButton(int id);
+  void SetButtonVisibility(int id, int flag);
+  int GetNumberOfVisibleButtons();
 
   // Description:
   // Enable/Disable this widget. This propagates SetEnabled() calls to all
   // radiobuttons.
   virtual void SetEnabled(int);
 
+  // Description:
+  // Set the widget packing order to be horizontal (default is vertical).
+  void SetPackHorizontally(int);
+  vtkBooleanMacro(PackHorizontally, int);
+  vtkGetMacro(PackHorizontally, int);
+
 protected:
   vtkKWRadioButtonSet();
   ~vtkKWRadioButtonSet();
+
+  int PackHorizontally;
 
   //BTX
 
@@ -117,22 +132,24 @@ protected:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  
-  class RadioButtonSlot
+  class ButtonSlot
   {
   public:
     int Id;
-    vtkKWRadioButton *RadioButton;
+    vtkKWRadioButton *Button;
   };
 
-  typedef vtkLinkedList<RadioButtonSlot*> RadioButtonsContainer;
-  typedef vtkLinkedListIterator<RadioButtonSlot*> RadioButtonsContainerIterator;
-  RadioButtonsContainer *RadioButtons;
+  typedef vtkLinkedList<ButtonSlot*> ButtonsContainer;
+  typedef vtkLinkedListIterator<ButtonSlot*> ButtonsContainerIterator;
+  ButtonsContainer *Buttons;
 
   // Helper methods
 
-  RadioButtonSlot* GetRadioButtonSlot(int id);
+  ButtonSlot* GetButtonSlot(int id);
 
   //ETX
+
+  void Pack();
 
 private:
   vtkKWRadioButtonSet(const vtkKWRadioButtonSet&); // Not implemented

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.1");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.2");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -59,7 +59,8 @@ int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWRadioButtonSet::vtkKWRadioButtonSet()
 {
-  this->RadioButtons = vtkKWRadioButtonSet::RadioButtonsContainer::New();
+  this->PackHorizontally = 0;
+  this->Buttons = vtkKWRadioButtonSet::ButtonsContainer::New();
 }
 
 //----------------------------------------------------------------------------
@@ -67,21 +68,21 @@ vtkKWRadioButtonSet::~vtkKWRadioButtonSet()
 {
   // Delete all radiobuttons
 
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = NULL;
-  vtkKWRadioButtonSet::RadioButtonsContainerIterator *it = 
-    this->RadioButtons->NewIterator();
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(radiobutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      if (radiobutton_slot->RadioButton)
+      if (button_slot->Button)
         {
-        radiobutton_slot->RadioButton->Delete();
-        radiobutton_slot->RadioButton = NULL;
+        button_slot->Button->Delete();
+        button_slot->Button = NULL;
         }
-      delete radiobutton_slot;
+      delete button_slot;
       }
     it->GoToNextItem();
     }
@@ -89,24 +90,24 @@ vtkKWRadioButtonSet::~vtkKWRadioButtonSet()
 
   // Delete the container
 
-  this->RadioButtons->Delete();
+  this->Buttons->Delete();
 }
 
 //----------------------------------------------------------------------------
-vtkKWRadioButtonSet::RadioButtonSlot* 
-vtkKWRadioButtonSet::GetRadioButtonSlot(int id)
+vtkKWRadioButtonSet::ButtonSlot* 
+vtkKWRadioButtonSet::GetButtonSlot(int id)
 {
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = NULL;
-  vtkKWRadioButtonSet::RadioButtonSlot *found = NULL;
-  vtkKWRadioButtonSet::RadioButtonsContainerIterator *it = 
-    this->RadioButtons->NewIterator();
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonSlot *found = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(radiobutton_slot) == VTK_OK && radiobutton_slot->Id == id)
+    if (it->GetData(button_slot) == VTK_OK && button_slot->Id == id)
       {
-      found = radiobutton_slot;
+      found = button_slot;
       break;
       }
     it->GoToNextItem();
@@ -117,23 +118,23 @@ vtkKWRadioButtonSet::GetRadioButtonSlot(int id)
 }
 
 //----------------------------------------------------------------------------
-vtkKWRadioButton* vtkKWRadioButtonSet::GetRadioButton(int id)
+vtkKWRadioButton* vtkKWRadioButtonSet::GetButton(int id)
 {
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = 
-    this->GetRadioButtonSlot(id);
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  if (!radiobutton_slot)
+  if (!button_slot)
     {
     return NULL;
     }
 
-  return radiobutton_slot->RadioButton;
+  return button_slot->Button;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRadioButtonSet::HasRadioButton(int id)
+int vtkKWRadioButtonSet::HasButton(int id)
 {
-  return this->GetRadioButtonSlot(id) ? 1 : 0;
+  return this->GetButtonSlot(id) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------
@@ -157,16 +158,16 @@ void vtkKWRadioButtonSet::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWRadioButtonSet::SetEnabled(int arg)
 {
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = NULL;
-  vtkKWRadioButtonSet::RadioButtonsContainerIterator *it = 
-    this->RadioButtons->NewIterator();
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(radiobutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      radiobutton_slot->RadioButton->SetEnabled(arg);
+      button_slot->Button->SetEnabled(arg);
       }
     it->GoToNextItem();
     }
@@ -174,11 +175,11 @@ void vtkKWRadioButtonSet::SetEnabled(int arg)
 }
 
 //------------------------------------------------------------------------------
-int vtkKWRadioButtonSet::AddRadioButton(int id, 
-                                        const char *text, 
-                                        vtkKWObject *object, 
-                                        const char *method_and_arg_string,
-                                        const char *balloonhelp_string)
+int vtkKWRadioButtonSet::AddButton(int id, 
+                                   const char *text, 
+                                   vtkKWObject *object, 
+                                   const char *method_and_arg_string,
+                                   const char *balloonhelp_string)
 {
   // Widget must have been created
 
@@ -191,7 +192,7 @@ int vtkKWRadioButtonSet::AddRadioButton(int id,
 
   // Check if the new radiobutton has a unique id
 
-  if (this->HasRadioButton(id))
+  if (this->HasButton(id))
     {
     vtkErrorMacro("A radiobutton with that id (" << id << ") already exists "
                   "in the radiobutton set.");
@@ -200,34 +201,34 @@ int vtkKWRadioButtonSet::AddRadioButton(int id,
 
   // Add the radiobutton slot to the manager
 
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = 
-    new vtkKWRadioButtonSet::RadioButtonSlot;
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    new vtkKWRadioButtonSet::ButtonSlot;
 
-  if (this->RadioButtons->AppendItem(radiobutton_slot) != VTK_OK)
+  if (this->Buttons->AppendItem(button_slot) != VTK_OK)
     {
     vtkErrorMacro("Error while adding a radiobutton to the set.");
-    delete radiobutton_slot;
+    delete button_slot;
     return 0;
     }
   
   // Create the radiobutton
 
-  radiobutton_slot->RadioButton = vtkKWRadioButton::New();
-  radiobutton_slot->Id = id;
+  button_slot->Button = vtkKWRadioButton::New();
+  button_slot->Id = id;
 
-  radiobutton_slot->RadioButton->SetParent(this);
-  radiobutton_slot->RadioButton->Create(this->Application, 0);
-  radiobutton_slot->RadioButton->SetValue(id);
+  button_slot->Button->SetParent(this);
+  button_slot->Button->Create(this->Application, 0);
+  button_slot->Button->SetValue(id);
 
   // All radiobuttons share the same var name
 
-  if (this->RadioButtons->GetNumberOfItems())
+  if (this->Buttons->GetNumberOfItems())
     {
-    vtkKWRadioButtonSet::RadioButtonSlot *first_slot;
-    if (this->RadioButtons->GetItem(0, first_slot) == VTK_OK)
+    vtkKWRadioButtonSet::ButtonSlot *first_slot;
+    if (this->Buttons->GetItem(0, first_slot) == VTK_OK)
       {
-      radiobutton_slot->RadioButton->SetVariableName(
-        first_slot->RadioButton->GetVariableName());
+      button_slot->Button->SetVariableName(
+        first_slot->Button->GetVariableName());
       }
     }
 
@@ -235,47 +236,145 @@ int vtkKWRadioButtonSet::AddRadioButton(int id,
 
   if (text)
     {
-    radiobutton_slot->RadioButton->SetText(text);
+    button_slot->Button->SetText(text);
     }
 
   if (object && method_and_arg_string)
     {
-    radiobutton_slot->RadioButton->SetCommand(object, method_and_arg_string);
+    button_slot->Button->SetCommand(object, method_and_arg_string);
     }
 
   if (balloonhelp_string)
     {
-    radiobutton_slot->RadioButton->SetBalloonHelpString(balloonhelp_string);
+    button_slot->Button->SetBalloonHelpString(balloonhelp_string);
     }
 
-  // Pack the button
+  // Pack the pushbutton
 
-  this->Script("pack %s -side top -anchor w -expand no -fill none",
-               radiobutton_slot->RadioButton->GetWidgetName());
+  this->Pack();
 
   return 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkKWRadioButtonSet::SelectRadioButton(int id)
+// ----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::Pack()
 {
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = 
-    this->GetRadioButtonSlot(id);
-
-  if (radiobutton_slot && radiobutton_slot->RadioButton)
+  if (!this->IsCreated())
     {
-    radiobutton_slot->RadioButton->StateOn();
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
+         << "]}" << endl;
+
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  int i = 0;
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      tk_cmd << "grid " << button_slot->Button->GetWidgetName() 
+             << " -sticky " << (this->PackHorizontally ? "ews" : "nsw")
+             << " -column " << (this->PackHorizontally ? i : 0)
+             << " -row " << (this->PackHorizontally ? 0 : i)
+             << endl;
+      i++;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  tk_cmd << "grid " << (this->PackHorizontally ? "row" : "column") 
+         << "configure " << this->GetWidgetName() << " 0 -weight 1" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::SelectButton(int id)
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
+
+  if (button_slot && button_slot->Button)
+    {
+    button_slot->Button->StateOn();
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRadioButtonSet::IsRadioButtonSelected(int id)
+int vtkKWRadioButtonSet::IsButtonSelected(int id)
 {
-  vtkKWRadioButtonSet::RadioButtonSlot *radiobutton_slot = 
-    this->GetRadioButtonSlot(id);
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  return (radiobutton_slot && 
-          radiobutton_slot->RadioButton && 
-          radiobutton_slot->RadioButton->GetState()) ? 1 : 0;
+  return (button_slot && 
+          button_slot->Button && 
+          button_slot->Button->GetState()) ? 1 : 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::HideButton(int id)
+{
+  this->SetButtonVisibility(id, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::ShowButton(int id)
+{
+  this->SetButtonVisibility(id, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::SetButtonVisibility(int id, int flag)
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
+
+  if (button_slot && button_slot->Button)
+    {
+    this->Script("grid %s %s", 
+                 (flag ? "" : "remove"),
+                 button_slot->Button->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::GetNumberOfVisibleButtons()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+  return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
+}
