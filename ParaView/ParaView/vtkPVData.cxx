@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -105,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.19");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.20");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -317,6 +316,9 @@ vtkPVData::~vtkPVData()
 
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
+
+  this->AxesWidgetCheck->Delete();
+  this->AxesWidgetCheck = NULL;
   
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
