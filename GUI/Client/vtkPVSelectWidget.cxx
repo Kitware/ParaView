@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.56");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -429,7 +429,7 @@ void vtkPVSelectWidget::ResetInternal()
     else if (dvp)
       {
       const char* value;
-      int propValue = dvp->GetElement(0);
+      double propValue = dvp->GetElement(0);
       for (i = 0; i < num; i++)
         {
         value = this->GetVTKValue(i);

@@ -55,7 +55,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.37");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -391,7 +391,8 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         << " $pvTemp" << boxMatrixID.ID << endl;
   *file << "  $pvTemp" << boxMatrixID.ID << " UnRegister {}" << endl;
 
-  for(int i=0; i<16; i++)
+  int i;
+  for(i=0; i<16; i++)
     {
     *file << "  [$pvTemp" << boxMatrixID.ID
           << " GetProperty DeepCopy] SetElement " << i
