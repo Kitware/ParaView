@@ -3,24 +3,14 @@ $Application ExitOnReturnOn
 set kw(vtkTemp5) [$Application GetMainWindow]
 set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$pv(vtkTemp24) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
-    }
-} 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp24) $argv $argc
 
-set kw(vtkTemp994) [$kw(vtkTemp5) InitializeReadCustom "legacyreader" "C:/Develop/ParaView/Data/Data/vox8_bin.vtk"]
-$kw(vtkTemp5) ReadFileInformation $kw(vtkTemp994) "C:/Develop/ParaView/Data/Data/vox8_bin.vtk"
-$kw(vtkTemp5) FinalizeRead $kw(vtkTemp994) "C:/Develop/ParaView/Data/Data/vox8_bin.vtk"
+set kw(vtkTemp994) [$kw(vtkTemp5) InitializeReadCustom "legacyreader" "$DataDir/Data/vox8_bin.vtk"]
+$kw(vtkTemp5) ReadFileInformation $kw(vtkTemp994) "$DataDir/Data/vox8_bin.vtk"
+$kw(vtkTemp5) FinalizeRead $kw(vtkTemp994) "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp999) [$kw(vtkTemp994) GetPVWidget {Filename}]
-$kw(vtkTemp999) SetValue "C:/Develop/ParaView/Data/Data/vox8_bin.vtk"
+$kw(vtkTemp999) SetValue "$DataDir/Data/vox8_bin.vtk"
 $kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
 $kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
 $kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
@@ -79,28 +69,7 @@ $kw(vtkTemp311) SetScalarOpacityUnitDistance 0.380000
 $kw(vtkTemp24) SetCameraState 3.161 -4.844 6.550  1.452 0.085 1.925  -0.839 0.188 0.511
 $kw(vtkTemp24) SetCameraState 4.256 -3.987 6.843  1.627 0.237 1.960  -0.812 0.148 0.565
 
-# Fix the size of the image.
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
-update
-[[$Application GetMainWindow] GetMainView] ForceRender
-
-set didRegression 0
-
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
-       set didRegression 1
-    }
-}
-
-if { ! $didRegression } {
-    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-        if {[lindex $argv $i] == "-BT"} {
-            source [lindex $argv [expr $i + 1]]
-        }
-    }
-}
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
 
 $Application Exit

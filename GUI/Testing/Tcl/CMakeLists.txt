@@ -270,6 +270,7 @@ ADD_TEST (AnimationImages-ParaView
 ADD_TEST(VolumeRenderVox8-ParaView 
   ${PARAVIEW_EXECUTABLE} 
   ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE} 
   --disable-registry
   ${PVClientTests_SOURCE_DIR}/Tcl/VolumeRenderVox8.pvs
   -D ${PVClientTestData}
