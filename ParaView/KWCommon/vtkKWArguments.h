@@ -113,6 +113,11 @@ public:
   // Return string containing help.
   vtkGetStringMacro(Help);
 
+  // Description:
+  // Get / Set the line length. Default length is 80.
+  vtkSetMacro(LineLength, unsigned int);
+  vtkGetMacro(LineLength, unsigned int);
+
 protected:
   vtkKWArguments();
   ~vtkKWArguments();
@@ -122,6 +127,8 @@ protected:
 
   vtkKWArgumentsInternal* Internals;
   char* Help;
+
+  unsigned int LineLength;
 
 private:
   vtkKWArguments(const vtkKWArguments&); // Not implemented

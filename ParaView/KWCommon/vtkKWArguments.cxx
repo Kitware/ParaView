@@ -81,13 +81,14 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.11");
+vtkCxxRevisionMacro(vtkKWArguments, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
 {
   this->Internals = new vtkKWArgumentsInternal;
   this->Help = 0;
+  this->LineLength = 80;
 }
 
 //----------------------------------------------------------------------------
@@ -367,7 +368,52 @@ void vtkKWArguments::GenerateHelp()
       sprintf(buffer, format, argument);
       str << buffer;
       }
-    str << "\t" << this->Internals->Callbacks[mpit->first].Help <<  endl;
+    str << "\t";
+    const char* ptr = this->Internals->Callbacks[mpit->first].Help;
+    int len = strlen(ptr);
+    int cnt = 0;
+    while ( len > 0)
+      {
+      vtkstd::string::size_type cc;
+      for ( cc = 0; ptr[cc]; cc ++ )
+        {
+        if ( *ptr == ' ' || *ptr == '\t' )
+          {
+          ptr ++;
+          len --;
+          }
+        }
+      if ( cnt > 0 )
+        {
+        for ( cc = 0; cc < maxlen; cc ++ )
+          {
+          str << " ";
+          }
+        str << "\t";
+        }
+      vtkstd::string::size_type skip = len;
+      if ( skip > this->LineLength - maxlen )
+        {
+        skip = this->LineLength - maxlen;
+        for ( cc = skip-1; cc > 0; cc -- )
+          {
+          if ( ptr[cc] == ' ' || ptr[cc] == '\t' )
+            {
+            break;
+            }
+          }
+        if ( cc != 0 )
+          {
+          skip = cc;
+          }
+        }
+      cout << "Using skip: " << skip << endl;
+      str.write(ptr, skip);
+      str << endl;
+      ptr += skip;
+      len -= skip;
+      cnt ++;
+      }
     }
   str << ends;
   this->SetHelp(str.str());
