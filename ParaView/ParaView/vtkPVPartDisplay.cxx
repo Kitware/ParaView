@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.9");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -184,8 +184,10 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Property%d", this->InstanceCount);
   this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
   this->SetPropertyTclName(tclName);
-  pvApp->BroadcastScript("%s SetAmbient 0.15", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetDiffuse 0.85", this->PropertyTclName);
+  // I used to use ambient 0.15 and diffuse 0.85, but VTK did not
+  // handle it correctly.
+  pvApp->BroadcastScript("%s SetAmbient 0.0", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetDiffuse 1.0", this->PropertyTclName);
   pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
                          this->PropertyTclName);
   pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.207");
+vtkCxxRevisionMacro(vtkPVData, "1.208");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,9 +190,9 @@ vtkPVData::vtkPVData()
   this->OpacityLabel = vtkKWLabel::New();
   this->OpacityScale = vtkKWScale::New();
   
-  this->PreviousAmbient = 0.15;
+  this->PreviousAmbient = 0.0;
   this->PreviousSpecular = 0.1;
-  this->PreviousDiffuse = 0.8;
+  this->PreviousDiffuse = 1.0;
   this->PreviousWasSolid = 1;
 
   this->PVColorMap = NULL;
