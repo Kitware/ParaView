@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.4");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.5");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -127,6 +127,7 @@ vtkSMProxy::vtkSMProxy()
     pm->GetInterpreter()->ClearLastResult();
     }
   this->InUpdateVTKObjects = 0;
+  this->SelfPropertiesModified = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -498,6 +499,10 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       }
     it->second.ModifiedFlag = 0;
     }
+  else
+    {
+    this->SelfPropertiesModified = 1;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -552,16 +557,11 @@ void vtkSMProxy::UpdateInformation()
 //---------------------------------------------------------------------------
 int vtkSMProxy::ArePropertiesModified(int selfOnly /*=0*/)
 {
-  vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  for (it  = this->Internals->Properties.begin();
-    it != this->Internals->Properties.end();
-    ++it)
+  if (this->SelfPropertiesModified)
     {
-    if (it->second.ModifiedFlag)
-      {
-      return 1;
-      }
+    return 1;
     }
+
   if (!selfOnly)
     {
     vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -585,9 +585,14 @@ void vtkSMProxy::UpdateVTKObjects()
     return;
     }
   this->InUpdateVTKObjects = 1;
+  
   vtkClientServerStream str;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress();
+
+  int old_SelfPropertiesModified = this->SelfPropertiesModified;
+  
+  this->SelfPropertiesModified = 0;
 
   // Make each property push their values to each VTK object
   // referred by the proxy. This is done by appending all
@@ -599,58 +604,66 @@ void vtkSMProxy::UpdateVTKObjects()
   // number of objects to create is based on the number of inputs
   // in the case of filters)
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
+  if (old_SelfPropertiesModified)
     {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (prop->IsA("vtkSMInputProperty"))
+    for (it  = this->Internals->Properties.begin();
+      it != this->Internals->Properties.end();
+      ++it)
       {
-      if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (prop->IsA("vtkSMInputProperty"))
         {
-        if (prop->GetUpdateSelf())
+        if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
           {
-          this->PushProperty(it->first.c_str(), 
-                             this->SelfID, 
-                             vtkProcessModule::CLIENT);
+          if (prop->GetUpdateSelf())
+            {
+            this->PushProperty(it->first.c_str(), 
+              this->SelfID, 
+              vtkProcessModule::CLIENT);
+            }
           }
+        it->second.ModifiedFlag = 0;
         }
-      it->second.ModifiedFlag = 0;
       }
     }
 
   this->CreateVTKObjects(1);
-  int numObjects = this->Internals->IDs.size();
 
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
+  if (old_SelfPropertiesModified)
     {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (it->second.ModifiedFlag && 
+    int numObjects = this->Internals->IDs.size();
+
+    for (it  = this->Internals->Properties.begin();
+      it != this->Internals->Properties.end();
+      ++it)
+      {
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (it->second.ModifiedFlag && 
         !prop->GetImmediateUpdate() && 
         !prop->GetInformationOnly())
-      {
-      if (prop->GetUpdateSelf())
         {
-        this->PushProperty(it->first.c_str(), 
-                           this->SelfID, 
-                           vtkProcessModule::CLIENT);
-        }
-      else
-        {
-        for (int i=0; i<numObjects; i++)
+        if (prop->GetUpdateSelf())
           {
-          prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
+          this->PushProperty(it->first.c_str(), 
+            this->SelfID, 
+            vtkProcessModule::CLIENT);
+          }
+        else
+          {
+          for (int i=0; i<numObjects; i++)
+            {
+            prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
+            }
           }
         }
+      it->second.ModifiedFlag = 0;
       }
-    it->second.ModifiedFlag = 0;
+    if (str.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->Servers, str);
+      }
     }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
+
   pm->SendCleanupPendingProgress();
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =

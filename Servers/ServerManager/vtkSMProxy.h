@@ -448,6 +448,9 @@ protected:
   // properties are modified.
   int InUpdateVTKObjects;
 
+  // Flag used to help speed up UpdateVTKObjects and ArePropertiesModified
+  // calls.
+  int SelfPropertiesModified;
   // Indicates if any properties are modified.
   int ArePropertiesModified(int selfOnly = 0);
 
