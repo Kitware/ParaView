@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for MedVIP
-# modified by S. Barre (Time-stamp: <2001-12-21 17:49:06 barre>
+# modified by S. Barre (Time-stamp: <2002-07-29 11:07:14 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = ParaView
@@ -41,7 +41,7 @@ INPUT                = \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Widgets" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/doc_ParaView_index.dox" 
 
-TAGFILES             = "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://public.kitware.com/VTK/doc/nightly/html"
+TAGFILES             = "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
 
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO
