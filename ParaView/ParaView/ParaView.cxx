@@ -158,7 +158,7 @@ int MyMain(int argc, char *argv[])
       if (app->GetRenderModuleName() == NULL)
         { // I do not like this initialization here.
         // Think about moving it.
-#ifdef USE_ICET
+#ifdef PARAVIEW_USE_ICE_T
         app->SetRenderModuleName("IceTRenderModule");
 #else
         app->SetRenderModuleName("MultiDisplayRenderModule");

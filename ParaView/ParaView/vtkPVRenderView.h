@@ -276,6 +276,14 @@ public:
   // Returns the UI created by the render module
   vtkGetObjectMacro(RenderModuleUI, vtkPVRenderModuleUI);
 
+  // Description:
+  // Handle the edit copy menu option.
+  virtual void EditCopy();
+
+  // Description:
+  // Print the image. This may pop up a dialog box, etc.
+  virtual void PrintView();
+  
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.49.2.1");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.49.2.2");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -338,6 +338,7 @@ void vtkPVArrayMenu::AcceptInternal(vtkClientServerID sourceID)
     sprintf(cmd, "Select%s%s", this->InputName, attributeName);
     this->Property->SetVTKCommands(1, &cmd, &numStrings, &numScalars);
     this->Property->SetStrings(1, &this->ArrayName);
+    delete [] cmd;
     }
   else
     {

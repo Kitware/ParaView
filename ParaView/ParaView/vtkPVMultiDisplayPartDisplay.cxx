@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.9.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,14 @@ void vtkPVMultiDisplayPartDisplay::SetLODCollectionDecision(int)
   this->Superclass::SetLODCollectionDecision(1);
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayPartDisplay::Update()
+{
+  // Update like normal, but make sure the LOD is collected.
+  // I encountered a bug. First render was missing the LOD on the client.
+  this->Superclass::SetLODCollectionDecision(1);
+  this->Superclass::Update();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)

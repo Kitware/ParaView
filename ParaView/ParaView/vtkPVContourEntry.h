@@ -73,7 +73,6 @@ protected:
   
   vtkPVArrayMenu *ArrayMenu;
   
-  int AcceptCalled;
   void UpdateProperty();
 
   char *SetNumberCommand;

@@ -195,6 +195,7 @@ SET( ParaViewClient_SRCS
   vtkPVWidgetProperty.cxx
   vtkPVWindow.cxx
   vtkPVWindowResources.cxx
+  vtkPVWindowToImageFilter.cxx
   vtkPVWorldPointPicker.cxx
   vtkPVWriter.cxx
   vtkPVXDMFParameters.cxx

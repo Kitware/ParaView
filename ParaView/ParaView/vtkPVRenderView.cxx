@@ -16,11 +16,15 @@
 #include "vtkPVRenderModule.h"
 
 #include "vtkInstantiator.h"
+#include "vtkBMPWriter.h"
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
 #include "vtkInteractorObserver.h"
+#include "vtkJPEGWriter.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
@@ -31,6 +35,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
@@ -39,6 +44,8 @@
 #include "vtkKWWindowCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
+#include "vtkPNMWriter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVAxesWidget.h"
@@ -60,12 +67,15 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
+#include "vtkPVWindowToImageFilter.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPostScriptWriter.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkString.h"
+#include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkClientServerStream.h"
@@ -95,7 +105,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.2");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.3");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1856,7 +1866,90 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
 {
   this->EventuallyRender();
   this->Script("update");
-  this->Superclass::SaveAsImage(filename);
+
+  if ( !filename || !*filename )
+    {
+    vtkErrorMacro("Filename not specified");
+    return;
+    }
+  
+  // first get the file name
+  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
+  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+  w2i->Update();
+  
+  int success = 1;
+  
+  if (!strcmp(filename + strlen(filename) - 4,".bmp"))
+    {
+    vtkBMPWriter *bmp = vtkBMPWriter::New();
+    bmp->SetInput(w2i->GetOutput());
+    bmp->SetFileName((char *)filename);
+    bmp->Write();
+    if (bmp->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
+    bmp->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".tif"))
+    {
+    vtkTIFFWriter *tif = vtkTIFFWriter::New();
+    tif->SetInput(w2i->GetOutput());
+    tif->SetFileName((char *)filename);
+    tif->Write();
+    if (tif->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
+    tif->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".ppm"))
+    {
+    vtkPNMWriter *pnm = vtkPNMWriter::New();
+    pnm->SetInput(w2i->GetOutput());
+    pnm->SetFileName((char *)filename);
+    pnm->Write();
+    if (pnm->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
+    pnm->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".png"))
+    {
+    vtkPNGWriter *png = vtkPNGWriter::New();
+    png->SetInput(w2i->GetOutput());
+    png->SetFileName((char *)filename);
+    png->Write();
+    if (png->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
+    png->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".jpg"))
+    {
+    vtkJPEGWriter *jpg = vtkJPEGWriter::New();
+    jpg->SetInput(w2i->GetOutput());
+    jpg->SetFileName((char *)filename);
+    jpg->Write();
+    if (jpg->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
+    jpg->Delete();
+    }
+
+  w2i->Delete();
+  
+  if (!success)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this->ParentWindow, "Write Error",
+      "There is insufficient disk space to save this image. The file will be "
+      "deleted.");
+    }
 }
 
 
@@ -2047,6 +2140,121 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
   this->OrientationAxes->SetOutlineColor(r, g, b);
   this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
                                  this->OrientationAxes->GetOutlineColor());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::EditCopy()
+{
+  vtkWindow *vtkWin = this->GetVTKWindow();
+  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
+  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+  w2i->Update();
+
+#ifdef _WIN32
+  // get the pointer to the data
+  unsigned char *ptr = 
+    (unsigned char *)(w2i->GetOutput()->GetScalarPointer());
+  
+  LPBITMAPINFOHEADER  lpbi;       // pointer to BITMAPINFOHEADER
+  DWORD               dwLen;      // size of memory block
+  HANDLE              hDIB = NULL;  // handle to DIB, temp handle
+  int *size = this->GetVTKWindow()->GetSize();
+  int dataWidth = ((size[0]*3+3)/4)*4;
+  int srcWidth = size[0]*3;
+  
+  if (::OpenClipboard((HWND)this->GetVTKWindow()->GetGenericWindowId()))
+    {
+    EmptyClipboard();
+    
+    dwLen = sizeof(BITMAPINFOHEADER) + dataWidth*size[1];
+    hDIB = ::GlobalAlloc(GHND, dwLen);
+    lpbi = (LPBITMAPINFOHEADER) ::GlobalLock(hDIB);
+    
+    lpbi->biSize = sizeof(BITMAPINFOHEADER);
+    lpbi->biWidth = size[0];
+    lpbi->biHeight = size[1];
+    lpbi->biPlanes = 1;
+    lpbi->biBitCount = 24;
+    lpbi->biCompression = BI_RGB;
+    lpbi->biClrUsed = 0;
+    lpbi->biClrImportant = 0;
+    lpbi->biSizeImage = dataWidth*size[1];
+    
+    // copy the data to the clipboard
+    unsigned char *dest = (unsigned char *)lpbi + lpbi->biSize;
+    int i,j;
+    for (i = 0; i < size[1]; i++)
+      {
+      for (j = 0; j < size[0]; j++)
+        {
+        *dest++ = ptr[2];
+        *dest++ = ptr[1];
+        *dest++ = *ptr;
+        ptr += 3;
+        }
+      dest = dest + (dataWidth - srcWidth);
+      }
+    
+    SetClipboardData (CF_DIB, hDIB);
+    ::GlobalUnlock(hDIB);
+    CloseClipboard();
+    }           
+#endif
+  w2i->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PrintView()
+{
+#ifdef _WIN32
+  this->Superclass::PrintView();
+#else
+  
+  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
+  float DPI=0;
+  if (this->GetParentWindow())
+    {
+    // Is this right? Should DPI be int or float?
+    DPI = this->GetParentWindow()->GetPrintTargetDPI();
+    }
+//  TODO: SetMagnification should work in vtkPVWindowToImageFilter
+//  if (DPI >= 150.0)
+//    {
+//    w2i->SetMagnification(2);
+//    }
+//  if (DPI >= 300.0)
+//    {
+//    w2i->SetMagnification(3);
+//    }
+  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+  w2i->Update();
+  
+  this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
+  char* path = 
+    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+           this->Application->GetMainInterp()->result);
+  if (strlen(path) != 0)
+    {
+    vtkPostScriptWriter *psw = vtkPostScriptWriter::New();
+    psw->SetInput(w2i->GetOutput());
+    psw->SetFileName(path);
+    psw->Write();
+    psw->Delete();
+
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetMasterWindow(this->ParentWindow);
+    dlg->Create(this->Application,"");
+    dlg->SetText(
+      "A postscript file has been generated. You will need to\n"
+      "print this file using a print command appropriate for\n"
+      "your system. Typically this command is lp or lpr. For\n"
+      "additional information on printing a postscript file\n"
+      "please contact your system administrator.");
+    dlg->Invoke();
+    }
+  w2i->Delete();
+#endif
+  this->Printing = 0;
 }
 
 //----------------------------------------------------------------------------
