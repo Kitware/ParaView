@@ -1,0 +1,5 @@
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "/Utilities/hdf5/H5[^/\".]*\\.c[:\"]"
+  )
+
