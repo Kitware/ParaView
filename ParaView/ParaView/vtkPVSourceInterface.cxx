@@ -188,7 +188,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
                       "Set the input to this filter.", this->PVWindow->GetSources());
     }
 
-  this->PVWindow->SetCurrentPVSource(pvs);
+  this->PVWindow->AddPVSource(pvs);
 
   // Create the output.
   pvd = vtkPVData::New();

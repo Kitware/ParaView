@@ -92,6 +92,11 @@ public:
   void SetCurrentPVSource(vtkPVSource *comp);
   vtkPVSource *GetCurrentPVSource();
   vtkPVSource *GetPreviousPVSource(int idx = 1);
+
+  // Description:
+  // This adds a PVSource to the Source collection, and makes it current.
+  // No trace entry is added during this call.
+  void AddPVSource(vtkPVSource *pvs);
   
   // Description:
   // The current data is the data object that will be used as input to the next filter.

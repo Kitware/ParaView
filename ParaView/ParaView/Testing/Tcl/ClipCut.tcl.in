@@ -3,6 +3,9 @@ set DataDir "@PARAVIEW_DATA_ROOT@"
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
+# To get better coverage, log the actions of this script.
+Application StartLog "ClipCutLog.txt"
+
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
@@ -110,6 +113,9 @@ set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Offset}]
 $pv(vtkTemp463) SetValue 0.1
 $pv(vtkTemp446) AcceptCallback
 
+Application StopLog
+
+
 # Fix the size of the image.
 RenWin1 SetSize 300 300
 RenWin1 Render
@@ -119,4 +125,5 @@ source $DataDir/Utility/rtImage.tcl
 pvImageTest $DataDir/Baseline/ClipCut.png 10
    
 Application Exit
+
 

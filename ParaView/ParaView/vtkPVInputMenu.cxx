@@ -169,7 +169,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "MenuEntryCallback %s", pvs->GetTclName());
 
-  this->Menu->AddEntryWithCommand(pvs->GetVTKSourceTclName(), 
+  this->Menu->AddEntryWithCommand(pvs->GetName(), 
                                   this, methodAndArgs);
   return 1;
 }
@@ -195,7 +195,7 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
   this->CurrentValue = pvs;
   if (pvs)
     {
-    this->Menu->SetValue(pvs->GetVTKSourceTclName());
+    this->Menu->SetValue(pvs->GetName());
     }
   else
     {

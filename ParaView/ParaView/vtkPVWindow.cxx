@@ -1406,6 +1406,24 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::AddPVSource(vtkPVSource *pvs)
+{
+  if (pvs == NULL)
+    {
+    return;
+    }
+
+  if (this->Sources->IsItemPresent(pvs) == 0)
+    {
+    this->Sources->AddItem(pvs);
+    }
+
+  this->MainView->SetSelectedComposite(pvs);  
+  this->SetCurrentPVData(pvs->GetNthPVOutput(0));  
+}
+
+
+//----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetCurrentPVSource()
 {
   return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
@@ -1606,7 +1624,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
 
   this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
-  this->SetCurrentPVSource(calc);
+  this->AddPVSource(calc);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1693,7 +1711,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
 
-  this->SetCurrentPVSource(cutPlane);
+  this->AddPVSource(cutPlane);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1776,7 +1794,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
   threshold->PackScalarsMenu();
-  this->SetCurrentPVSource(threshold);
+  this->AddPVSource(threshold);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1863,7 +1881,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
 
   this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
-  this->SetCurrentPVSource(clipPlane);
+  this->AddPVSource(clipPlane);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1952,7 +1970,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
   contour->PackScalarsMenu();
-  this->SetCurrentPVSource(contour);
+  this->AddPVSource(contour);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -2037,7 +2055,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvGlyph->PackScalarsMenu();
   pvGlyph->GetVectorOperationMenu()->SetLabel("Vector Arrays:");
   pvGlyph->PackVectorsMenu();
-  this->SetCurrentPVSource(pvGlyph);
+  this->AddPVSource(pvGlyph);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -2119,7 +2137,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
 
   this->GetMainView()->AddComposite(probe);
   probe->CreateProperties();
-  this->SetCurrentPVSource(probe);
+  this->AddPVSource(probe);
 
   // Create the output.
   pvd = vtkPVData::New();

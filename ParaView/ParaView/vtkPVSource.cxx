@@ -382,9 +382,16 @@ void vtkPVSource::CreateProperties()
   // Setup the source page of the notebook.
 
   this->DisplayNameLabel->SetParent(this->Properties);
-  sprintf(displayName, "Name: %s", this->VTKSourceTclName);
+  if (this->Name != NULL)
+    {
+    sprintf(displayName, "Name: %s", this->GetName());
+    this->DisplayNameLabel->SetLabel(displayName);
+    }
+  else
+    {
+    this->DisplayNameLabel->SetLabel("Name: ");
+    }
   this->DisplayNameLabel->Create(app, "");
-  this->DisplayNameLabel->SetLabel(displayName);
   this->Script("pack %s", this->DisplayNameLabel->GetWidgetName());
   
   this->ParameterFrame->SetParent(this->Properties);
@@ -660,7 +667,19 @@ void vtkPVSource::SetName (const char* arg)
     { 
     this->Name = NULL;
     }
-  this->Modified(); 
+  this->Modified();
+  
+  // Make sure the label is upto date.
+  if (this->Name != NULL)
+    {
+    char displayName[512];
+    sprintf(displayName, "Name: %s", this->GetName());
+    this->DisplayNameLabel->SetLabel(displayName);
+    }
+  else
+    {
+    this->DisplayNameLabel->SetLabel("Name: ");
+    }   
 } 
 
 //----------------------------------------------------------------------------
