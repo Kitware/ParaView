@@ -464,9 +464,10 @@ void vtkPVProbe::CreateProperties()
   this->AddPVWidget(this->LineWidget);
   this->LineWidget->SetModifiedCommand(this->GetTclName(),
                                        "SetAcceptButtonColorToRed");
-  this->LineWidget->SetPoint1Method(this->GetTclName(), "EndPoint1");
-  this->LineWidget->SetPoint2Method(this->GetTclName(), "EndPoint2");
-  this->LineWidget->SetResolutionMethod(this->GetTclName(), "NumberOfLineDivisions");
+  this->LineWidget->SetObjectTclName(this->GetTclName());
+  this->LineWidget->SetPoint1VariableName("EndPoint1");
+  this->LineWidget->SetPoint2VariableName("EndPoint2");
+  this->LineWidget->SetResolutionVariableName("NumberOfLineDivisions");
 
   this->PointWidget->SetPVSource(this);
   this->PointWidget->SetParent(this->ProbeFrame);
