@@ -1,3 +1,105 @@
+IF (VTK_USE_MPI)
+  IF (UNIX)
+    IF (MPIRUN)
+      ADD_TEST(Arrow-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Axes-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Axes.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(BlowTest-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(CalcInput-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CalcInput.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Calculator-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Calculator.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ClipCut-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ClipCut.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(CombustorTest-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ConeCubeCylSQ-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(CutContours-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CutContours.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Delete-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.tcl         
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(EnSight-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/EnSight.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Extrusion-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Extrusion.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Glyph-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Glyph.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ImageReader-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ImageReader.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Mandelbrot-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ProbeLine-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ProbePoint-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(RotateTranslate-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ScalarSelection-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(SphereTest-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Threshold-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Threshold.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(ThresholdAttrMode-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(Trace-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Trace.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+      ADD_TEST(VectorTextSpace-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
+    ENDIF (MPIRUN)
+  ENDIF (UNIX)
+ENDIF (VTK_USE_MPI)
 
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.tcl 
