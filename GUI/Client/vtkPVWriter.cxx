@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.18");
+vtkCxxRevisionMacro(vtkPVWriter, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -76,9 +76,11 @@ int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel, int numParts)
     {
     return 0;
     }
-  return ((numParts == 1) &&
-          (parallel == this->Parallel) &&
-          data->IsA(this->InputClassName));
+  if (parallel && !this->Parallel)
+    {
+    return 0;
+    }
+  return ((numParts == 1) && data->IsA(this->InputClassName));
 }
 
 //----------------------------------------------------------------------------
