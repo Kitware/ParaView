@@ -56,11 +56,13 @@ public:
 
   // Description:
   // Convenience method to set the contents label.
-  void SetLabel(const char *label);
+  virtual void SetLabel(const char *label);
+  virtual char *GetLabel();
 
   // Description:
-  // Convenience method to set the label width.
-  void SetLabelWidth(int width);
+  // Convenience method to set/get the label width.
+  virtual void SetLabelWidth(int width);
+  virtual int GetLabelWidth();
   
 protected:
   vtkKWPushButton();

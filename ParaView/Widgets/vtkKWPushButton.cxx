@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.14");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -94,12 +94,24 @@ void vtkKWPushButton::SetLabel( const char *name )
 }
 
 //----------------------------------------------------------------------------
+char* vtkKWPushButton::GetLabel()
+{
+  return this->ButtonLabel;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPushButton::SetLabelWidth(int width)
 {
   if (this->IsCreated())
     {
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetLabelWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------
