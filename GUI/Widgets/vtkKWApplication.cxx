@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.162");
+vtkCxxRevisionMacro(vtkKWApplication, "1.163");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -245,6 +245,8 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     {
     char directory[1024];
     vtkKWDirectoryUtilities::GetFilenamePath(nameofexec, directory);
+    // remove the /bin from the end
+    directory[strlen(directory) - 4] = '\0';
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
     this->SetApplicationInstallationDirectory(
       util->ConvertToUnixSlashes(directory));
@@ -266,7 +268,19 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
       }
     else
       {
+      reg->SetGlobalScope(1);
+      if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
+        {
+        vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
+        this->SetApplicationInstallationDirectory(
+          util->ConvertToUnixSlashes(installed_path));
+        util->Delete();
+        }
+      else
+        {
       this->SetApplicationInstallationDirectory(0);
+        }
+      reg->SetGlobalScope(0);
       }
     }
 }
