@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.8");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -173,21 +173,12 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->FileTypeDescriptions = vtkStringList::New();
   this->ExtensionStrings = vtkStringList::New();
 
-  this->DirectoryToolTclName = NULL;
-
   this->ScrollBar = vtkKWWidget::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerFileDialog::~vtkPVServerFileDialog()
 {
-  if (this->DirectoryToolTclName)
-    {
-    this->GetPVApplication()->GetProcessModule()->RootScript(
-                                   "%s Delete", this->DirectoryToolTclName);
-    this->SetDirectoryToolTclName(NULL);
-    }
-
   this->TopFrame->Delete();
   this->TopFrame = NULL;
   this->MiddleFrame->Delete();
@@ -283,15 +274,6 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *args)
     }
   
   this->SetApplication(app);
-
-  // Create the remote directory object.  
-  static int instanceCount = 0;
-  ++instanceCount;
-  char str[256];
-  sprintf(str, "pvDirectoryTool%d", instanceCount);
-  this->SetDirectoryToolTclName(str);
-  this->GetPVApplication()->GetProcessModule()->RootScript(
-                                        "vtkDirectory %s", str);
 
   // create the top level
   wname = this->GetWidgetName();
@@ -910,202 +892,53 @@ vtkPVApplication* vtkPVServerFileDialog::GetPVApplication()
   return vtkPVApplication::SafeDownCast(this->Application);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVServerFileDialog::GetFiles(vtkStringList* files)
-{
-  char* result;
-  char* name;
-  int idx, num;
-  char** tmp;
-
-  this->GetPVApplication()->GetProcessModule()->RootScript(
-                    "%s GetNumberOfFiles", this->DirectoryToolTclName);
-  result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-  num = atoi(result);
-  delete [] result;
-  if (num <= 0)
-    {
-    return;
-    }
-
-  // Create a temporary array for sorting.
-  tmp = new char*[num];
-
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->GetPVApplication()->GetProcessModule()->RootScript(
-                        "%s GetFile %d", this->DirectoryToolTclName, idx);
-    name = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-    tmp[idx] = name;
-    }
-
-  // Just a dumb bubble sort.
-  int changed = 1;
-  while (changed)
-    {
-    changed = 0;
-    for (idx = 0; idx < num-1; ++idx)
-      {
-      if (this->StringGreater(tmp[idx], tmp[idx+1]))
-        {
-        name = tmp[idx];
-        tmp[idx] = tmp[idx+1];
-        tmp[idx+1] = name;
-        changed = 1;
-        }
-      }
-    }
-
-  for (idx = 0; idx < num; ++idx)
-    {
-    files->AddString(tmp[idx]);
-    delete [] tmp[idx];
-    tmp[idx] = NULL;
-    }
-  delete [] tmp;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVServerFileDialog::StringGreater(char* str1, char* str2)
-{
-  int length1;
-  int length2;
-  int min, idx;
-
-  if (str2 == NULL)
-    {
-    return 1;
-    }
-  if (str1 == NULL)
-    {
-    return 0;
-    }
-  length1 = static_cast<int>(strlen(str1));
-  length2 = static_cast<int>(strlen(str2));
-  min = length1;
-  if (length2 < min)
-    {
-    min = length2;
-    }
-
-  for (idx = 0; idx < min; ++idx)
-    {
-    if (str1[idx] > str2[idx])
-      {
-      return 1;
-      }
-    if (str1[idx] < str2[idx])
-      {
-      return 0;
-      }
-    }
-  if (length1 > length2)
-    {
-    return 1;
-    }
-
-  return 0;
-}
-
-
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Update()
 {
-  int num, idx;
-  char* name;
-  int *dirMask;
-  char* result;
+  vtkStringList* dirs = vtkStringList::New();
+  vtkStringList* files = vtkStringList::New();
+  
+  // Make sure we have a directory.
   if(!this->LastPath)
     {    
     this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
-    result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
+    char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
     this->SetLastPath(result);
     delete [] result;
     result = NULL;
     }
 
-  // Try to open the directory.
-  this->GetPVApplication()->GetProcessModule()->RootScript(
-                   "%s Open {%s}", this->DirectoryToolTclName, this->LastPath);
-  result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-  if ( ! atoi(result))
-    { // can not open directory.
-    delete [] result;
-    result = NULL;
-
-    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
-    result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-    this->SetLastPath(result);
-    delete [] result;
-    
-    // Try to open the new directory.
-    this->GetPVApplication()->GetProcessModule()->RootScript(
-                     "%s Open {%s}", this->DirectoryToolTclName, this->LastPath);
-    result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-    if ( ! atoi(result))
-      { // can not open directory.
-      vtkErrorMacro("Cannot open directory: " << this->LastPath);      
-      }
+  // Read the list of subdirectories and files.
+  if(!this->GetPVApplication()->GetProcessModule()
+     ->GetDirectoryListing(this->LastPath, dirs, files))
+    {
+    vtkErrorMacro("Cannot open directory: " << this->LastPath);
     }
-  delete [] result;
-  result = NULL;
-
+  
   this->Script("%s delete all", this->FileList->GetWidgetName());
   this->SetSelectBoxId(NULL);
-
   this->DirectoryDisplay->SetLabel(this->LastPath);
-
-  vtkStringList* files = vtkStringList::New();
-  this->GetFiles(files);
-
+  
+  // Construct the gui representation.
   int y = 10;
-  num = files->GetLength();
-  dirMask = new int[num];
-  for (idx = 0; idx < num; ++idx)
+  int dirsLen = dirs->GetLength();
+  int i;
+  for(i=0; i < dirsLen; ++i)
     {
-    name = files->GetString(idx);
-
-    // Skip these standard directrories
-    if (strcmp(name,".") == 0 || strcmp(name,"..") == 0)
-      {
-      dirMask[idx] = 1;
-      }
-    else
-      {
-      this->GetPVApplication()->GetProcessModule()->RootScript(
-                      "file isdirectory {%s/%s}", this->LastPath, name);
-      result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-      if (atoi(result))
-        {
-        dirMask[idx] = 1;
-        y = this->Insert(name, y, 1);
-        }
-      else
-        {
-        dirMask[idx] = 0;
-        }
-      delete [] result;
-      result = NULL;
-      }
-    name = NULL;
+    y = this->Insert(dirs->GetString(i), y, 1);
     }
-
-  // Previous loop put directories into list.
-  // Now add the files.
-  for (idx = 0; idx < num; ++idx)
+  int filesLen = files->GetLength();
+  for(i=0; i < filesLen; ++i)
     {
-    name = files->GetString(idx);
-    if (dirMask[idx] == 0 && this->CheckExtension(name))
+    const char* name = files->GetString(i);
+    if(this->CheckExtension(name))
       {
       y = this->Insert(name, y, 0);
       }
-    name = NULL;
     }
-  delete [] dirMask;
-  dirMask = NULL;
+  
   files->Delete();
-  files = NULL;
+  dirs->Delete();
 
   this->Reconfigure();
 }
@@ -1287,6 +1120,5 @@ void vtkPVServerFileDialog::CalculateBBox(vtkKWWidget* canvas,
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os, indent);
-  
+  this->Superclass::PrintSelf(os, indent);  
 }
