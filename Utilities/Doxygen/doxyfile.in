@@ -45,7 +45,6 @@ INPUT                = \
  "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/GUI/Widgets" \
  "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/GUI/Client" \
  "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/doc_ParaView_index.dox" 
-# "@ParaView_BINARY_DIR@/Utilities/Doxygen/dox/Servers/StreamInterpreter" \
 
 TAGFILES             = "@ParaView_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
 

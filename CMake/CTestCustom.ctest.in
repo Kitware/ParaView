@@ -18,7 +18,6 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   HeaderTesting-PVServer-Common 
   HeaderTesting-PVServer-Filters
   HeaderTesting-PVServer-ServerManager
-  HeaderTesting-PVServer-StreamInterpreter
   HeaderTesting-KWWidgets       
   HeaderTesting-PVGUI-Client    
   
@@ -27,7 +26,6 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   PrintSelf-PVServer-Common
   PrintSelf-PVServer-Filters
   PrintSelf-PVServer-ServerManager
-  PrintSelf-PVServer-StreamInterpreter
   PrintSelf-ParaView
   TestSetGet-ParaView
   TestSetObjectMacro-KWWidgets
@@ -35,7 +33,6 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   TestSetObjectMacro-PVServer-Common
   TestSetObjectMacro-PVServer-Filters
   TestSetObjectMacro-PVServer-ServerManager
-  TestSetObjectMacro-PVServer-StreamInterpreter
   TestSetObjectMacro-ParaView
   
   # this one runs python which then runs two program so no memory checking there
