@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.1");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.2");
 
 vtkPVFileEntryProperty::vtkPVFileEntryProperty()
 {
@@ -65,7 +65,6 @@ void vtkPVFileEntryProperty::SetAnimationTime(float time)
     }
   
   this->SetTimeStep(static_cast<int>(time) - widget->GetRange()[0]);
-  widget->ModifiedCallback();
   widget->Reset();
 }
 

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVWidgetProperty);
-vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.3");
 
 vtkPVWidgetProperty::vtkPVWidgetProperty()
 {
@@ -71,7 +71,7 @@ void vtkPVWidgetProperty::Reset()
 
 void vtkPVWidgetProperty::Accept()
 {
-  if (!this->Widget || !this->Widget->GetModifiedFlag())
+  if (!this->Widget)
     {
     return;
     }

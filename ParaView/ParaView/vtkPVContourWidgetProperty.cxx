@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.3");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.4");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -79,7 +79,6 @@ void vtkPVContourWidgetProperty::SetAnimationTime(float time)
     delete [] commands[1];
     delete [] commands;
     }
-  this->Widget->ModifiedCallback();
   this->Widget->Reset();
 }
 
