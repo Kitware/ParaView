@@ -74,6 +74,7 @@ public:
   enum { 
     ICON_NOICON = 0,
     ICON_ANNOTATE,
+    ICON_AXES,
     ICON_CONTOURS,
     ICON_CUT,
     ICON_ERROR,
@@ -86,6 +87,7 @@ public:
     ICON_MACROS,
     ICON_MATERIAL,
     ICON_MINUS,
+    ICON_MOVE,
     ICON_PLUS,
     ICON_PREFERENCES,
     ICON_QUESTION,
