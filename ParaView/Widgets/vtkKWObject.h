@@ -124,6 +124,4 @@ protected:
 //ETX
 };
 
-
 #endif
-
