@@ -19,6 +19,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
            vtkKWEvent.h
            vtkKWWidgets.h
            vtkbwidgets.h
+           vtkcombobox.h
            vtkKWRenderWidgetCallbackCommand.h
            )
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
