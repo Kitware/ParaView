@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.10");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.11");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -535,6 +535,9 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarLabelFormatEntry->SetBalloonHelpString(
     "Set the labels format (printf() style).");
 
+  this->SetScalarBarLabelFormat(
+    this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
+
   this->LabelTextProperty->SetParent(this->ScalarBarLabelFormatFrame);
   this->LabelTextProperty->SetTextProperty(
     this->ScalarBar->GetScalarBarActor()->GetLabelTextProperty());
@@ -619,14 +622,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   //  this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
 
   this->SetColorSchemeToRedBlue();
-
-  // Update some part of the interface
-
-  if (this->ScalarBar && this->ScalarBar->GetScalarBarActor())
-    {
-    this->SetScalarBarLabelFormat(
-      this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
-    }
 }
 
 
