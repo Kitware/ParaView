@@ -41,7 +41,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.8");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.9");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -138,7 +138,10 @@ void vtkCTHAMRContour::Execute()
     vtkTimerLog::MarkStartEvent("BlockAppend");               
     tmp->Update();
     vtkTimerLog::MarkEndEvent("BlockAppend");                  
-    output->ShallowCopy(tmp->GetOutput());
+    output->CopyStructure(tmp->GetOutput());
+    output->GetPointData()->PassData(tmp->GetOutput()->GetPointData());
+    output->GetCellData()->PassData(tmp->GetOutput()->GetCellData());
+    output->GetFieldData()->PassData(input->GetFieldData());
     }
   tmp->Delete();
   tmp = 0;

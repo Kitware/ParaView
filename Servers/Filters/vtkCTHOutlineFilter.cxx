@@ -27,7 +27,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.7");
+vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.8");
 vtkStandardNewMacro(vtkCTHOutlineFilter);
 
 //----------------------------------------------------------------------------
@@ -98,7 +98,12 @@ void vtkCTHOutlineFilter::Execute()
     tmp->ShallowCopy(append->GetOutput());
     }
   
-  this->GetOutput()->ShallowCopy(append->GetOutput());
+  vtkPolyData* aOutput = append->GetOutput();
+  vtkPolyData* output = this->GetOutput();
+  output->CopyStructure(aOutput);
+  output->GetPointData()->PassData(aOutput->GetPointData());
+  output->GetCellData()->PassData(aOutput->GetCellData());
+  output->GetFieldData()->PassData(aOutput->GetFieldData());
 
   append->Delete();
   outlineSource->Delete();

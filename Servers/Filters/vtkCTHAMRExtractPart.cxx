@@ -43,7 +43,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkCTHAMRSurface.h"
 
-vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.2");
+vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.3");
 vtkStandardNewMacro(vtkCTHAMRExtractPart);
 vtkCxxSetObjectMacro(vtkCTHAMRExtractPart,ClipPlane,vtkPlane);
 
@@ -249,7 +249,11 @@ void vtkCTHAMRExtractPart::Execute()
     tmps[idx]->Update();
     vtkTimerLog::MarkEndEvent("BlockAppend");              
     
-    output->ShallowCopy(tmps[idx]->GetOutput());
+    vtkPolyData* tmpOut = tmps[idx]->GetOutput();
+    output->CopyStructure(tmpOut);
+    output->GetPointData()->PassData(tmpOut->GetPointData());
+    output->GetCellData()->PassData(tmpOut->GetCellData());
+    output->GetFieldData()->PassData(tmpOut->GetFieldData());
     // Hopping to avoid some garbage collection time.
     tmps[idx]->RemoveAllInputs();
     tmps[idx]->Delete();
@@ -439,6 +443,7 @@ void vtkCTHAMRExtractPart::DeleteInternalPipeline()
     this->Append2 = 0;
     }
 }
+
 
 //------------------------------------------------------------------------------
 void vtkCTHAMRExtractPart::ExecutePart(const char* arrayName,
