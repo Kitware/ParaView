@@ -49,6 +49,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkPVApplication;
 class vtkPVData;
 class vtkKWCheckButton;
+class vtkScalarBarActor;
+
 
 #define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
 #define VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE      1
@@ -168,6 +170,9 @@ public:
   vtkBooleanMacro(Decimate, int);
   void DecimateCheckCallback();
 
+  void SetScalarBarVisibility(int val);  
+  void ScalarBarCheckCallback();
+
   // Description:
   // Temporary intoerface for seting the compositing reduction.
   void ReductionCallback();
@@ -234,6 +239,9 @@ protected:
   vtkTimeStamp UpdateTime;
   
   vtkKWEntry *ReductionEntry;
+
+  vtkKWCheckButton *ScalarBarCheck;
+  vtkScalarBarActor *ScalarBar;
 };
 
 #endif

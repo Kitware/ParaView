@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkFastGeometryFilter.h"
 //#include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
+#include "vtkScalarBarActor.h"
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
@@ -86,6 +87,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
   this->DecimateCheck = vtkKWCheckButton::New();
+  this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ReductionEntry = vtkKWEntry::New();
 
   this->PVData = NULL;
@@ -101,6 +103,13 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->MapperTclName = NULL;
   this->OutlineTclName = NULL;
   this->GeometryTclName = NULL;
+
+  this->ScalarBar = vtkScalarBarActor::New();  
+  this->ScalarBar->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+  this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
+  this->ScalarBar->SetOrientationToVertical();
+  this->ScalarBar->SetWidth(0.13);
+  this->ScalarBar->SetHeight(0.5);
 }
 
 
@@ -123,9 +132,9 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
-
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
-
+  
+  this->ScalarBar->SetLookupTable(this->Mapper->GetLookupTable());
   
   // Get rid of previous object created by the superclass.
   if (this->Actor)
@@ -141,7 +150,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   pvApp->BroadcastScript("%s SetMapper %s", this->ActorTclName, 
 			this->MapperTclName);
-  
+
   // Hard code assignment based on processes.
   numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
   for (id = 0; id < numProcs; ++id)
@@ -198,6 +207,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   //this->TextureFilter = NULL;
   //}
   
+  this->ScalarBar->Delete();
+  this->ScalarBar = NULL;
+  
   pvApp->BroadcastScript("%s Delete", this->MapperTclName);
   this->SetMapperTclName(NULL);
   this->Mapper = NULL;
@@ -208,6 +220,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
 
   this->DecimateCheck->Delete();
   this->DecimateCheck = NULL;
+  
+  this->ScalarBarCheck->Delete();
+  this->ScalarBarCheck = NULL;
   
   this->ReductionEntry->Delete();
   this->ReductionEntry = NULL;
@@ -297,6 +312,12 @@ void vtkPVActorComposite::CreateProperties()
                             this->DecimateCheck->GetWidgetName(),
                             this->GetTclName());
 
+  this->ScalarBarCheck->SetParent(this->Properties);
+  this->ScalarBarCheck->Create(this->Application, "-text ScalarBar");
+  this->Application->Script("%s configure -command {%s ScalarBarCheckCallback}",
+                            this->ScalarBarCheck->GetWidgetName(),
+                            this->GetTclName());
+
   this->ReductionEntry->SetParent(this->Properties);
   this->ReductionEntry->Create(this->Application, "-text CompositeReduction");
   this->ReductionEntry->SetValue(1);
@@ -325,6 +346,8 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s",
                this->DecimateCheck->GetWidgetName());
   this->Script("pack %s",
+               this->ScalarBarCheck->GetWidgetName());
+  this->Script("pack %s",
                this->ReductionEntry->GetWidgetName());
 }
 
@@ -346,14 +369,13 @@ void vtkPVActorComposite::UpdateProperties()
     }
   this->UpdateTime.Modified();
 
-  cerr << "Start timer\n";
+  vtkWarningMacro( << "Start timer");
   vtkTimerLog *timer = vtkTimerLog::New();
   timer->StartTimer();
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
   timer->StopTimer();
-  cerr << "Stop timer\n";    
-  vtkWarningMacro(<< this->PVData->GetVTKDataTclName() << " : took " 
+  vtkWarningMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
                   << timer->GetElapsedTime() << " seconds.");
   timer->Delete();
   
@@ -491,6 +513,10 @@ void vtkPVActorComposite::ColorByProperty()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
+
+  // No scalars visible.  Turn off scalar bar.
+  this->SetScalarBarVisibility(0);
+
   this->GetView()->Render();
 }
 
@@ -502,6 +528,9 @@ void vtkPVActorComposite::ColorByPointScalars()
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
                          this->MapperTclName);
+
+  this->ScalarBar->SetTitle("Point Scalars");  
+    
   this->ResetColorRange();
   this->GetView()->Render();
 }
@@ -514,6 +543,9 @@ void vtkPVActorComposite::ColorByCellScalars()
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
                          this->MapperTclName);
+
+  this->ScalarBar->SetTitle("Cell Scalars");  
+  
   this->ResetColorRange();
   this->GetView()->Render();
 }
@@ -528,6 +560,9 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
+  
+  this->ScalarBar->SetTitle(name);
+  
   this->ResetColorRange();
   this->GetView()->Render();
 }
@@ -542,6 +577,9 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
+
+  this->ScalarBar->SetTitle(name);  
+  
   this->ResetColorRange();
   this->GetView()->Render();
 }
@@ -637,7 +675,7 @@ void vtkPVActorComposite::Initialize()
     this->SetModeToDataSet();
     }
 
-  cerr << "Initialize --------\n";
+  vtkWarningMacro( << "Initialize --------")
   this->UpdateProperties();
   
   // Mapper needs an input, so the mode needs to be set first.
@@ -729,6 +767,8 @@ void vtkPVActorComposite::Select(vtkKWView *v)
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::Deselect(vtkKWView *v)
 {
+  this->SetScalarBarVisibility(0);
+
   // invoke super
   this->vtkKWComposite::Deselect(v);
 
@@ -914,6 +954,41 @@ void vtkPVActorComposite::ReductionCallback()
   
   factor = this->ReductionEntry->GetValueAsInt();
 
-  cerr << "Setting reduction factor to " << factor << endl;
+  vtkWarningMacro( << "Setting reduction factor to " << factor);
   this->PVData->GetPVSource()->GetWindow()->GetMainView()->GetComposite()->SetReductionFactor(factor);
 }
+
+  
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetScalarBarVisibility(int val)
+{
+  vtkRenderer *ren;
+  
+  ren = this->GetView()->GetRenderer();
+  
+  if (this->ScalarBarCheck->GetState() != val)
+    {
+    this->ScalarBarCheck->SetState(0);
+    }
+
+  // I am going to add and remove it from the renderer instead of using visibility.
+  // Composites should really have multiple props.
+  
+  if (val)
+    {
+    ren->AddActor(this->ScalarBar);
+    }
+  else
+    {
+    ren->RemoveActor(this->ScalarBar);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ScalarBarCheckCallback()
+{
+  this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
+  this->GetView()->Render();  
+}
+
