@@ -41,7 +41,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.3");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.4");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ void vtkCTHAMRContour::Execute()
   this->UpdateProgress(.95);
   output = this->GetOutput();
  
-  if (tmp->GetNumberOfInputs() > 0)
+  if (tmp->GetNumberOfInputConnections() > 0)
     {
     vtkTimerLog::MarkStartEvent("BlockAppend");               
     tmp->Update();
