@@ -56,6 +56,7 @@ class VTK_EXPORT vtkKWTkUtilities : public vtkObject
 public:
   static vtkKWTkUtilities* New();
   vtkTypeRevisionMacro(vtkKWTkUtilities,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Get RGB component for color (given a window)
   //BTX  
