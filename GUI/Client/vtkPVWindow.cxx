@@ -125,7 +125,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.557");
+vtkCxxRevisionMacro(vtkPVWindow, "1.558");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -144,6 +144,7 @@ vtkPVWindow::vtkPVWindow()
   this->SetTitle("Kitware ParaView");
 
   this->CommandFunction = vtkPVWindowCommand;
+  this->ModifiedEnableState = 0;
 
   // ParaView specific menus:
   // SelectMenu   -> used to select existing data objects
@@ -4490,6 +4491,7 @@ void vtkPVWindow::SetProgress(const char* text, int val)
     {
     return;
     }
+  this->ModifiedEnableState = 1;
   this->SetEnabled(0);
   this->SetStatusText(text);
   this->GetProgressGauge()->SetValue(val);
@@ -4501,6 +4503,7 @@ void vtkPVWindow::StartProgress()
 {
   this->MainView->StartBlockingRender();
   this->ExpectProgress = 1;
+  this->ModifiedEnableState = 0;
   this->LastProgress = vtkTimerLog::GetCurrentTime();
 }
 
@@ -4514,6 +4517,12 @@ void vtkPVWindow::EndProgress(int enabled)
 
   this->MainView->EndBlockingRender();
 
+  if (!this->ModifiedEnableState)
+    {
+    return;
+    }
+
+  this->ModifiedEnableState = 0;
   if ( !enabled || this->Enabled )
     {
     this->UpdateEnableState();
