@@ -367,9 +367,19 @@ void vtkKWMenu::AddSeparator()
 {
   this->Script( "%s add separator", this->GetWidgetName());
 }
+
 void vtkKWMenu::InsertSeparator(int position)
 {
   this->Script( "%s insert %d separator", this->GetWidgetName(), position);
 }
 
-
+void vtkKWMenu::SetState(int index, int state)
+{
+  char stateStr[][9] = { "normal", "active", "disabled" };
+  if ( state <= vtkKWMenu::Normal || state > vtkKWMenu::Disabled )
+    {
+    state = 0;
+    }
+  this->Script("%s entryconfigure %d -state %s", 
+	       this->GetWidgetName(), index, stateStr[state] );
+}

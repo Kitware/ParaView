@@ -137,6 +137,13 @@ public:
   vtkGetMacro(TearOff, int);
   vtkBooleanMacro(TearOff, int);
 
+  // Description:
+  // Set state of the menu entry with a given index.
+  void SetState(int index, int state);
+
+//BTX
+  enum { Normal = 0, Active, Disabled };
+//ETX
 protected:
   
   vtkKWMenu();
