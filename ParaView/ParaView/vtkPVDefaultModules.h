@@ -684,6 +684,15 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "          module_type=\"Filter\">\n"
 "    <Filter type=\"vtkProbeFilter\"/>\n"
 "  </Module>\n"
+"  <Module name=\"Pick\" \n"
+"          root_name=\"Pick\"\n"
+"          button_help=\"Pick cell or point closest to the widget\"\n"
+"          output=\"vtkUnstructuredGrid\" input=\"vtkDataSet\"\n"
+"          module_type=\"Filter\">\n"
+"    <Filter type=\"vtkPickDataSetFilter\"/>\n"
+"  <LabeledToggle variable=\"SearchCells\" help=\"Set when cells are supposed to be searched. Otherwise points will be searched.\"/>\n"
+"  <PointWidget variable=\"SamplePoint\" help=\"Sample point that we are picking.\"/>\n"
+"  </Module>\n"
 "</ModuleInterfaces>\n";
 
 // Define the standard manipulators.
