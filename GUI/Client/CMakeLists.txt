@@ -392,6 +392,7 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/pvTestDriverConfig.h.in
   ESCAPE_QUOTES)
 
 ADD_EXECUTABLE(pvTestDriver pvTestDriver.cxx)
+ADD_DEPENDENCIES(pvTestDriver paraview)
 TARGET_LINK_LIBRARIES(pvTestDriver kwsys)
 
 IF(VTK_USE_CARBON)
