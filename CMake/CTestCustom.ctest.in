@@ -4,6 +4,19 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   otherPrint-ParaView
   Example-vtkLocal
   Example-vtkMy
+
+  PrintSelf-KWWidgets	
+  PrintSelf-ParaView
+  PrintSelf-PVServer-Common
+  PrintSelf-PVServer-Filters
+  PrintSelf-PVServer-ServerManager
+  PrintSelf-PVServer-StreamInterpreter
+  TestSetObjectMacro-KWWidgets
+  TestSetObjectMacro-ParaView
+  TestSetObjectMacro-PVServer-Common
+  TestSetObjectMacro-PVServer-Filters
+  TestSetObjectMacro-PVServer-ServerManager
+  TestSetObjectMacro-PVServer-StreamInterpreter
   )
 
 SET(CTEST_CUSTOM_WARNING_MATCH
@@ -19,7 +32,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "tk8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
   "tk8.4.5/[^/]+/[^/]+/[^.]+.c[:\"]"
   "tk8.4.5/[^/]+/[^/]+.c[:\"]"
-  "jobserver unavailable"
   "xtree.[0-9]+. : warning C4702: unreachable code"
   "warning LNK4221"
   )
