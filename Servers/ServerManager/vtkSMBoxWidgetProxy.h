@@ -97,14 +97,6 @@ protected:
 
   vtkTransform*      BoxTransform;
 
-  vtkSMProxy* MatrixProxy;
-  char* MatrixProxyName;
-  vtkSetStringMacro(MatrixProxyName);
-
-  vtkSMProxy* TransformProxy;
-  char* TransformProxyName;
-  vtkSetStringMacro(TransformProxyName);
-
   //Description:
   //Sends the updated transform matrix to the server.
   void Update();

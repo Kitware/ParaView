@@ -24,7 +24,7 @@
 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.2");
 
 //===========================================================================
 //***************************************************************************
@@ -58,9 +58,6 @@ vtkSMInteractorObserverProxy::vtkSMInteractorObserverProxy()
   this->Enabled = 0;
   this->RendererInitialized = 0;
   this->InteractorInitialized = 0;
-  //Chage the SMProxy default proxy creation location
-  this->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  
 }
 
 //----------------------------------------------------------------------------
@@ -101,6 +98,9 @@ void vtkSMInteractorObserverProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+  //Chage the SMProxy default proxy creation location
+  this->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  
   //Superclass creates the actual VTK objects
   this->Superclass::CreateVTKObjects(numObjects);
 

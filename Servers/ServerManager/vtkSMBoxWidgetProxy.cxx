@@ -28,7 +28,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -42,39 +42,18 @@ vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
     this->Scale[cc] = 1.0;
     this->Rotation[cc] = 0.0;
     }
-  this->MatrixProxy = 0;
-  this->TransformProxy = 0;
-  this->MatrixProxyName = 0;
-  this->TransformProxyName = 0;
   this->SetVTKClassName("vtkBoxWidget");
 }
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::~vtkSMBoxWidgetProxy()
 {
-  if(this->TransformProxyName)
+  vtkSMProxyManager *pxm = vtkSMObject::GetProxyManager();
+  if (!pxm)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("transforms",
-      this->TransformProxyName);
+    vtkErrorMacro("ProxyManger does not exist");
     }
-  this->SetTransformProxyName(0);
-  if(this->TransformProxy)
-    {
-    this->TransformProxy->Delete();
-    this->TransformProxy = 0;
-    }
-  
-  if(this->MatrixProxyName)
-    {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("matrices",
-      this->MatrixProxyName);
-    }
-  this->SetMatrixProxyName(0);
-  if(this->MatrixProxy)
-    {
-    this->MatrixProxy->Delete();
-    this->MatrixProxy = 0;
-    }
+  this->BoxTransform = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -85,8 +64,7 @@ void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->Superclass::CreateVTKObjects(numObjects);
-  static int proxyNum = 0;
-  
+    
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
   for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
@@ -104,32 +82,22 @@ void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
     pm->SendStream(this->GetServers());
     }
   
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* transformProxy = this->GetSubProxy("transform");
   
-  //Create Transform proxy
-  this->TransformProxy = pxm->NewProxy("transforms","Transform");
-  this->TransformProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  ostrstream str;
-  str << "vtkSMBoxWidgetProxy_Transform" << proxyNum << ends;
-  this->SetTransformProxyName(str.str());
-  str.rdbuf()->freeze(0);
-  pxm->RegisterProxy("transforms",this->TransformProxyName, this->TransformProxy);
-  this->TransformProxy->CreateVTKObjects(1);
-  str.clear();
-
-  //Create matrix proxy
-  this->MatrixProxy = pxm->NewProxy("matrices","Matrix4x4");
-  this->MatrixProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  str << "vtkSMBoxWidgetProxy_Matrix4x4" << proxyNum << ends;
-  this->SetMatrixProxyName(str.str());
-  str.rdbuf()->freeze(0);
-  pxm->RegisterProxy("matrices",this->MatrixProxyName, this->MatrixProxy);
-  this->MatrixProxy->CreateVTKObjects(1);
-
+  if (!transformProxy)
+    {
+    vtkErrorMacro("Tranform must be defined in the configuration file");
+    return;
+    }
+  transformProxy->UpdateVTKObjects(); 
+  if (!this->GetSubProxy("matrix"))
+    {
+    vtkErrorMacro("Matrix proxy must be defined in the configuration file");
+    return;
+    }
   this->BoxTransform = vtkTransform::SafeDownCast(
-    pm->GetObjectFromID(this->TransformProxy->GetID(0)));
+    pm->GetObjectFromID(transformProxy->GetID(0)));
   
-  proxyNum++;
 }
 
 //----------------------------------------------------------------------------
@@ -156,8 +124,16 @@ void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
     vtkErrorMacro("Not created yet");
     return;
     }
+  vtkSMProxy* matrixProxy = this->GetSubProxy("matrix");
+  vtkSMProxy* transformProxy = this->GetSubProxy("transform");
+  if (!matrixProxy || ! transformProxy)
+    {
+    vtkErrorMacro("Matrix and Transform proxies required. Must be added to configuration file");
+    return;
+    }
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->MatrixProxy->GetProperty("DeepCopy"));
+    matrixProxy->GetProperty("DeepCopy"));
   if (dvp)
     {
     double *p = &mat->Element[0][0];
@@ -171,24 +147,24 @@ void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
     vtkErrorMacro("Could not find property DeepCopy on Matrix4x4");
     return;
     }
-  this->MatrixProxy->UpdateVTKObjects();
+  matrixProxy->UpdateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->TransformProxy->GetProperty("MatrixProxy"));
+    transformProxy->GetProperty("MatrixProxy"));
   if (pp)
     {
     pp->RemoveAllProxies();
-    pp->AddProxy(this->MatrixProxy);
+    pp->AddProxy(matrixProxy);
     }
   else
     {
     vtkErrorMacro("Could not find property Matrix on Transform");
     return;
     }
-  this->TransformProxy->UpdateVTKObjects();
+  transformProxy->UpdateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerID transformid = this->TransformProxy->GetID(0);
+  vtkClientServerID transformid = transformProxy->GetID(0);
   for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     pm->GetStream()<< vtkClientServerStream::Invoke << this->GetID(cc)
@@ -440,11 +416,5 @@ void vtkSMBoxWidgetProxy::SaveInBatchScript(ofstream *file)
 void vtkSMBoxWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "MatrixProxyName: " 
-    << (this->MatrixProxyName? this->MatrixProxyName : "none") << endl;
-  os << indent << "MatrixProxy: " << this->MatrixProxy << endl;
-  os << indent << "TransformProxyName: " << 
-    (this->TransformProxyName? this->TransformProxyName: "none") << endl;
-  os << indent << "TransformProxy: " << this->TransformProxy << endl;
   os << indent << "BoxTransform: " << this->BoxTransform << endl;
 }

@@ -459,6 +459,34 @@
         number_of_elements="1"
         update_self="1"
         default_values="1" />
+      <SubProxy>
+        <Proxy name="matrix" class="vtkMatrix4x4">
+          <!--do I have to define the interface again? -->
+          <DoubleVectorProperty
+            name="DeepCopy"
+            command="DeepCopy"
+            number_of_elements="16" 
+            argument_is_array="1"
+            default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0">
+          </DoubleVectorProperty>
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="transform" class="vtkTransform">
+          <!--do I have to define the interface again? -->
+          <ProxyProperty name="MatrixProxy" command="SetMatrix">
+            <ProxyGroupDomain name="groups">
+              <Group name="matrices"/>
+            </ProxyGroupDomain>
+          </ProxyProperty>
+          <DoubleVectorProperty
+            name="Matrix"
+            command="SetMatrix"
+            number_of_elements="16"
+            argument_is_array="1"
+            default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+        </Proxy>
+      </SubProxy>
     </BoxWidgetProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
