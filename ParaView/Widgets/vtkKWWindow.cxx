@@ -944,7 +944,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.70 $");
+  this->ExtractRevision(os,"$Revision: 1.71 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1200,11 +1200,9 @@ void vtkKWWindow::WarningMessage(const char* message)
 
 void vtkKWWindow::ErrorMessage(const char* message)
 {
-  cout << message << endl;
-  /*
+  //cout << message << endl;
   vtkKWMessageDialog::PopupMessage(this->GetApplication(),
 				   this, vtkKWMessageDialog::Error,
 				   "VTK Error",
 				   message);
-  */
 }
