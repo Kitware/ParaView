@@ -31,7 +31,7 @@ SET (USE_GNATS "On")
 # Continuous email delivery variables
 SET (CONTINUOUS_FROM "paraview-dashboard@public.kitware.com")
 SET (SMTP_MAILHOST "public.kitware.com")
-SET (CONTINUOUS_MONITOR_LIST "paraview-dashboard@public.kitware.com andy.cedilnik@kitware.com")
+SET (CONTINUOUS_MONITOR_LIST "paraview-dashboard@public.kitware.com")
 SET (CONTINUOUS_BASE_URL "${PROJECT_URL}/Testing")
 
 SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_TEST_FAILURES ON)
