@@ -23,6 +23,7 @@ SET( KWWidgets_SRCS
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
   vtkKWGenericComposite.cxx 
+  vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHeaderAnnotation.cxx 
   vtkKWLabel.cxx
   vtkKWLabeledCheckButton.cxx
@@ -73,6 +74,7 @@ SET( KWWidgets_SRCS
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
   vtkKWTclInteractor.cxx
+  vtkKWTesting.cxx
   vtkKWText.cxx 
   vtkKWTextProperty.cxx
   vtkKWThumbWheel.cxx
@@ -89,12 +91,11 @@ SET( KWWidgets_SRCS
   vtkKWWindow.cxx 
   vtkKWWindowCollection.cxx 
   vtkKWXtEmbeddedWidget.cxx 
-  vtkKWTesting.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
-  vtkKWRenderWidget.cxx
+  # vtkKWRenderWidget.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWView.cxx
   ABSTRACT
@@ -129,12 +130,12 @@ IF (TCL_TK_COPY_SUPPORT_LIBRARY)
   IF (TCL_SUPPORT_LIBRARY_PATH AND TK_SUPPORT_LIBRARY_PATH)
     INCLUDE(${VTK_TCL_TK_MACROS})
 
-    IF (CXX_TEST_PATH)
+    IF (EXECUTABLE_OUTPUT_PATH)
       VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
         ${TCL_SUPPORT_LIBRARY_PATH}
         ${TK_SUPPORT_LIBRARY_PATH}
-        ${CXX_TEST_PATH} "TclTk/lib")
-    ENDIF (CXX_TEST_PATH)
+        ${EXECUTABLE_OUTPUT_PATH} "TclTk/lib")
+    ENDIF (EXECUTABLE_OUTPUT_PATH)
 
     VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
     IF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
@@ -142,18 +143,22 @@ IF (TCL_TK_COPY_SUPPORT_LIBRARY)
     ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
 
     VTK_GET_TCL_SUPPORT_FILES(${TCL_SUPPORT_LIBRARY_PATH} "TCL_SUPPORT_FILES")
-    FOREACH (file ${TCL_SUPPORT_FILES})
-      STRING (REGEX REPLACE "${TCL_SUPPORT_LIBRARY_PATH}/" "" base ${file})
-      GET_FILENAME_COMPONENT(dest ${base} PATH)
-      INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tcl${TCL_TK_VERSION}/${dest} FILES ${file})
-    ENDFOREACH (file)
+    IF(KW_INSTALL_LIB_DIR)
+      FOREACH (file ${TCL_SUPPORT_FILES})
+        STRING (REGEX REPLACE "${TCL_SUPPORT_LIBRARY_PATH}/" "" base ${file})
+        GET_FILENAME_COMPONENT(dest ${base} PATH)
+        INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tcl${TCL_TK_VERSION}/${dest} FILES ${file})
+      ENDFOREACH (file)
+    ENDIF(KW_INSTALL_LIB_DIR)
 
     VTK_GET_TK_SUPPORT_FILES(${TK_SUPPORT_LIBRARY_PATH} "TK_SUPPORT_FILES")
-    FOREACH (file ${TK_SUPPORT_FILES})
-      STRING (REGEX REPLACE "${TK_SUPPORT_LIBRARY_PATH}/" "" base ${file})
-      GET_FILENAME_COMPONENT(dest ${base} PATH)
-      INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tk${TCL_TK_VERSION}/${dest} FILES ${file})
-    ENDFOREACH (file)
+    IF(KW_INSTALL_LIB_DIR)
+      FOREACH (file ${TK_SUPPORT_FILES})
+        STRING (REGEX REPLACE "${TK_SUPPORT_LIBRARY_PATH}/" "" base ${file})
+        GET_FILENAME_COMPONENT(dest ${base} PATH)
+        INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/lib/tk${TCL_TK_VERSION}/${dest} FILES ${file})
+      ENDFOREACH (file)
+    ENDIF(KW_INSTALL_LIB_DIR)
 
   ENDIF (TCL_SUPPORT_LIBRARY_PATH AND TK_SUPPORT_LIBRARY_PATH)
 ENDIF (TCL_TK_COPY_SUPPORT_LIBRARY)
