@@ -1,5 +1,5 @@
 PROJECT(PVClient)
-
+INCLUDE_REGULAR_EXPRESSION("vtk.*|TestClient.*")
 SET( ParaViewShared_SRCS
   vtkPVApplication.cxx
   )
