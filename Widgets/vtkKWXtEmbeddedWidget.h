@@ -48,11 +48,14 @@ public:
   void SetWindowId(void* w) { this->WindowId = w;}
   
   // Description:
-  // Create a Tk widget
+  // Create create the widget.  If WindowId is set,
+  // then the widget is placed in that window.  If it
+  // is not set, then a toplevel window is created.
   void Create(vtkKWApplication *app, char *args);
 
   // Description:
-  // display the widget
+  // If the window id is null, this deiconifies the toplevel
+  // window.
   virtual void Display();
 
 protected:

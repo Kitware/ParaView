@@ -69,8 +69,6 @@ void vtkKWXtEmbeddedWidget::Display()
 
 void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, char *args)
 {
-  const char *wname;
-
   // must set the application
   if (this->Application)
     {
@@ -81,15 +79,14 @@ void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, char *args)
   this->SetApplication(app);
 
   // create the top level
-  wname = this->GetWidgetName();
+  const char* wname = this->GetWidgetName();
   if(this->WindowId)
     {
     this->Script("toplevel %s %s -use 0x%x",wname,args, this->WindowId);
     }
   else
     {
-    this->Script("toplevel %s %s",wname,args);
+    this->Script("toplevel %s %s",wname,args); 
+    this->Script("wm withdraw %s",wname);
     }
 }
-
-
