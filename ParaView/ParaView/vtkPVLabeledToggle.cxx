@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.13");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -155,8 +155,11 @@ void vtkPVLabeledToggle::Disable()
 {
   this->Script("%s configure -state disabled", 
                this->CheckButton->GetWidgetName());
-  this->Script("%s configure -state disabled", 
-               this->Label->GetWidgetName());
+  // TCL 8.2 does not allow to disable a label. Use the checkbutton's
+  // color to make it look like disabled.
+  this->Script("%s configure -foreground [%s cget -disabledforeground]", 
+               this->Label->GetWidgetName(),
+               this->CheckButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

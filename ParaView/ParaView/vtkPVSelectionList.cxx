@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.29");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.30");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -122,7 +122,11 @@ void vtkPVSelectionList::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Disable()
 {
-  this->Script("%s configure -state disabled", this->Label->GetWidgetName());
+  // TCL 8.2 does not allow to disable a label. Use the menu's
+  // color to make it look like disabled.
+  this->Script("%s configure -foreground [%s cget -disabledforeground]", 
+               this->Label->GetWidgetName(),
+               this->Menu->GetWidgetName());
   this->Script("%s configure -state disabled", this->Menu->GetWidgetName());
 }
 
