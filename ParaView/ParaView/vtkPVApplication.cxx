@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVExtractGridButton.h"
 #include "vtkPVGlyphButton.h"
 #include "vtkPVProbeButton.h"
+#include "vtkPVVectorDisplacementButton.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVThresholdButton.h"
 #include "vtkPVWindow.h"
@@ -1011,13 +1012,19 @@ void vtkPVApplication::CreateButtonPhotos()
   this->CreatePhoto("PV3DCursorButton", PV_3D_CURSOR_BUTTON,
                     PV_3D_CURSOR_BUTTON_WIDTH, PV_3D_CURSOR_BUTTON_HEIGHT);
   this->CreatePhoto("PVActive3DCursorButton", PV_ACTIVE_3D_CURSOR_BUTTON,
-                    PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
+                    PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, 
+                    PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
   this->CreatePhoto("PVCutButton", PV_CUT_BUTTON,
                     PV_CUT_BUTTON_WIDTH, PV_CUT_BUTTON_HEIGHT);
   this->CreatePhoto("PVClipButton", PV_CLIP_BUTTON,
                     PV_CLIP_BUTTON_WIDTH, PV_CLIP_BUTTON_HEIGHT);
   this->CreatePhoto("PVExtractGridButton", PV_EXTRACT_GRID_BUTTON,
-                    PV_EXTRACT_GRID_BUTTON_WIDTH, PV_EXTRACT_GRID_BUTTON_HEIGHT);
+                    PV_EXTRACT_GRID_BUTTON_WIDTH, 
+                    PV_EXTRACT_GRID_BUTTON_HEIGHT);
+  this->CreatePhoto("PVVectorDisplacementButton", 
+                    PV_VECTOR_DISPLACEMENT_BUTTON,
+                    PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
+                    PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
 }
 
 //----------------------------------------------------------------------------
