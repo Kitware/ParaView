@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.3");
 
 
 
@@ -141,7 +141,7 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 {
   int idx;
   const char* fileName = this->PVApplication->GetCaveConfigurationFileName();
-  ifstream *File;
+  ifstream *File = 0;
   if(!fileName)
     {
     vtkErrorMacro("Missing configuration file.");
