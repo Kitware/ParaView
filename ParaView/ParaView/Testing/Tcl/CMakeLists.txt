@@ -20,6 +20,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                CombustorTest
 #               Composite
                ConeCubeCylSQ
+               CTH
                CutContours
                Data
                Delete
