@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.40");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.41");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -454,8 +454,9 @@ int vtkKWTkUtilities::GetPhotoWidth(Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
-                                       const char *widget,
-                                       int weight)
+                                      const char *font, 
+                                      char *new_font, 
+                                      int weight)
 {
   int res;
 
@@ -463,8 +464,8 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
   // Catch the weight field, replace it with bold or medium.
 
   ostrstream regsub;
-  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} [" << widget 
-         << " cget -font] {\\1" << (weight ? "bold" : "medium") 
+  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} \""
+         << font << "\" {\\1" << (weight ? "bold" : "medium") 
          << "\\3} __temp__" << ends;
 
   res = Tcl_GlobalEval(interp, regsub.str());
@@ -476,24 +477,22 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
     }
   if (atoi(Tcl_GetStringResult(interp)) == 1)
     {
-    ostrstream replace;
-    replace << widget << " config -font $__temp__" << ends;
-    res = Tcl_GlobalEval(interp, replace.str());
-    replace.rdbuf()->freeze(0);
+    res = Tcl_GlobalEval(interp, "set __temp__");
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
                              << interp->result << ")");
       return 0;
       }
+    strcpy(new_font, Tcl_GetStringResult(interp));
     return 1;
     }
 
   // Otherwise replace the -weight parameter with either bold or normal
 
   ostrstream regsub2;
-  regsub2 << "regsub -- {(.* -weight )(\\w*\\M)(.*)} [font actual [" << widget 
-          << " cget -font]] {\\1" << (weight ? "bold" : "normal") 
+  regsub2 << "regsub -- {(.* -weight )(\\w*\\M)(.*)} [font actual \""
+          << font << "\"] {\\1" << (weight ? "bold" : "normal") 
           << "\\3} __temp__" << ends;
   res = Tcl_GlobalEval(interp, regsub2.str());
   regsub2.rdbuf()->freeze(0);
@@ -504,16 +503,14 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
     }
   if (atoi(Tcl_GetStringResult(interp)) == 1)
     {
-    ostrstream replace2;
-    replace2 << widget << " config -font $__temp__" << ends;
-    res = Tcl_GlobalEval(interp, replace2.str());
-    replace2.rdbuf()->freeze(0);
+    res = Tcl_GlobalEval(interp, "set __temp__");
     if (res != TCL_OK)
       {
-      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2) ! ("
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub! (2) ("
                              << interp->result << ")");
       return 0;
       }
+    strcpy(new_font, Tcl_GetStringResult(interp));
     return 1;
     }
 
@@ -522,7 +519,68 @@ int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 int vtkKWTkUtilities::ChangeFontWeightToBold(Tcl_Interp *interp,
-                                       const char *widget)
+                                             const char *font, 
+                                             char *new_font)
+{
+  return vtkKWTkUtilities::ChangeFontWeight(interp, font, new_font, 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToNormal(Tcl_Interp *interp,
+                                               const char *font, 
+                                               char *new_font)
+{
+  return vtkKWTkUtilities::ChangeFontWeight(interp, font, new_font, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
+                                       const char *widget,
+                                       int weight)
+{
+  char font[1024], new_font[1024];
+  
+  int res;
+
+  // Get the font
+
+  ostrstream getfont;
+  getfont << widget << " cget -font" << ends;
+  res = Tcl_GlobalEval(interp, getfont.str());
+  getfont.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to getfont!");
+    return 0;
+    }
+  strcpy(font, Tcl_GetStringResult(interp));
+
+  // Change the font weight
+
+  if (!vtkKWTkUtilities::ChangeFontWeight(interp, font, new_font, weight))
+    {
+    return 0;
+    }
+
+  // Set the font
+
+  ostrstream setfont;
+  setfont << widget << " config -font \"" << new_font << "\"" << ends;
+  res = Tcl_GlobalEval(interp, setfont.str());
+  setfont.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to replace font ! ("
+                           << interp->result << ")");
+    return 0;
+    }
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToBold(Tcl_Interp *interp,
+                                             const char *widget)
 {
   return vtkKWTkUtilities::ChangeFontWeight(interp, widget, 1);
 }
@@ -597,6 +655,22 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToItalic(Tcl_Interp *interp,
+                                              const char *font, 
+                                              char *new_font)
+{
+  return vtkKWTkUtilities::ChangeFontSlant(interp, font, new_font, 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToRoman(Tcl_Interp *interp,
+                                             const char *font, 
+                                             char *new_font)
+{
+  return vtkKWTkUtilities::ChangeFontSlant(interp, font, new_font, 0);
 }
 
 //----------------------------------------------------------------------------

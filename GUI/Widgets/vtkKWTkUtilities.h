@@ -106,6 +106,10 @@ public:
 
   // Description:
   // Change the -font weight attribute of widget to bold or normal.
+  static int ChangeFontWeightToBold(
+    Tcl_Interp *interp, const char *font, char *new_font);
+  static int ChangeFontWeightToNormal(
+    Tcl_Interp *interp, const char *font, char *new_font);
   static int ChangeFontWeightToBold(Tcl_Interp *interp, const char *widget);
   static int ChangeFontWeightToNormal(Tcl_Interp *interp, const char *widget);
 
@@ -220,6 +224,8 @@ protected:
   ~vtkKWTkUtilities() {};
 
   static int ChangeFontWeight(Tcl_Interp *interp, const char *widget, int);
+  static int ChangeFontWeight(Tcl_Interp *interp, 
+                              const char *font, char *new_font, int);
   static int ChangeFontSlant(Tcl_Interp *interp, const char *widget, int);
   static int ChangeFontSlant(Tcl_Interp *interp, 
                              const char *font, char *new_font, int);
