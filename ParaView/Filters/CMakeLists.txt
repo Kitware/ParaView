@@ -37,6 +37,8 @@ SET(Filters_SRCS
   vtkStructuredCacheFilter.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
+  vtkMergeCells.cxx
+  vtkKdTree.cxx
   )
 
 IF(VTK_USE_MPI)
@@ -45,8 +47,6 @@ IF(VTK_USE_MPI)
       vtkAllToNRedistributePolyData.cxx
       vtkBoxClipDataSet.cxx
       vtkDistributedDataFilter.cxx
-      vtkKdTree.cxx
-      vtkMergeCells.cxx
       vtkPKdTree.cxx
       vtkPVDuplicatePolyData.cxx
       vtkRedistributePolyData.cxx
