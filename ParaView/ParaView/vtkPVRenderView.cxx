@@ -1185,6 +1185,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 {
   int abort;
   vtkPVApplication *pvApp = this->GetPVApplication();
+  this->UpdateAllPVData();
 
   // sanity check
   if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
