@@ -136,6 +136,10 @@ public:
   };
 
   // Description:
+  // Resets the LastResult stream.
+  void ClearLastResult();
+
+  // Description:
   // Dynamically load a wrapper module into the interpreter.  Returns
   // 1 for success and 0 for failure.
   int Load(const char* moduleName);

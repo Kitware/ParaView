@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.7");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -860,4 +860,10 @@ int vtkClientServerInterpreter::LoadInternal(const char* moduleName,
   // Call the init function.
   func(this);
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerInterpreter::ClearLastResult()
+{
+  this->LastResultMessage->Reset();
 }
