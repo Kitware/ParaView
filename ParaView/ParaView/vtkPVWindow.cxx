@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.24");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.25");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -306,7 +306,7 @@ vtkPVWindow::~vtkPVWindow()
     vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
     pm->DeleteStreamObject(this->ServerFileListingID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 
   if (this->InteractorID.ID)

@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.9");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.10");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -193,7 +193,7 @@ vtkPVXDMFParameters::~vtkPVXDMFParameters()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 }
 

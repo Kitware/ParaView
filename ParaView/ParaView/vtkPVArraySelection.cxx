@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.6");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.7");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -130,7 +130,7 @@ vtkPVArraySelection::~vtkPVArraySelection()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 
   delete this->ArraySet;
@@ -575,7 +575,7 @@ void vtkPVArraySelection::CreateServerSide()
                     << this->ServerSideID << "SetProcessModule"
                     << pm->GetProcessModuleID()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 }
 

@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.19");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.20");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -315,13 +315,10 @@ void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
   this->TemporaryInformation = info;
   this->GetStream()
     << vtkClientServerStream::Invoke
-    << this->GetApplicationID() << "GetProcessModule"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << vtkClientServerStream::LastResult
+    << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
-  this->SendStreamToServerRoot();
+  this->SendStreamToClientAndServer();
   this->TemporaryInformation = NULL;
 }
 
@@ -413,11 +410,11 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
     {
     vtkErrorMacro("Error getting file list result from server.");
     this->DeleteStreamObject(lid);
-    this->SendStreamToServer();
+    this->SendStreamToServerRoot();
     return 0;
     }
   this->DeleteStreamObject(lid);
-  this->SendStreamToServer();
+  this->SendStreamToServerRoot();
 
   // Parse the listing.
   dirs->RemoveAllItems();

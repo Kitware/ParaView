@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.5");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.6");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -228,7 +228,7 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 }
 
@@ -239,7 +239,7 @@ void vtkPVServerFileDialog::CreateServerSide()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing");
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
 }
 
