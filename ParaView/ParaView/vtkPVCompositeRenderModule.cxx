@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.14");
 
 
 
@@ -102,6 +102,8 @@ void vtkPVCompositeRenderModule::StillRender()
   unsigned long totalMemory = 0;
   int localRender;
 
+  vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+
   // Find out whether we are going to render localy.
   this->PartDisplays->InitTraversal();
   while ( (object = this->PartDisplays->GetNextItemAsObject()) )
@@ -118,7 +120,8 @@ void vtkPVCompositeRenderModule::StillRender()
   // If using a RenderingGroup (i.e. vtkAllToNPolyData), do not do
   // local rendering
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(totalMemory)/1000.0 < this->GetCompositeThreshold())
+      ((float)(totalMemory)/1000.0 < this->GetCompositeThreshold() ||
+       (!this->PVApplication->GetClientMode() && pm->GetNumberOfPartitions()<2)))
     {
     localRender = 1;
     }
@@ -195,7 +198,6 @@ void vtkPVCompositeRenderModule::StillRender()
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->CompositeID << "IsA" << "vtkClientCompositeManager"
                   << vtkClientServerStream::End;
@@ -266,7 +268,9 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // MakeCollection Decision.
   localRender = 0;
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(tmpMemory)/1000.0 < this->GetCompositeThreshold())
+      ((float)(tmpMemory)/1000.0 < this->GetCompositeThreshold() ||
+       (!this->PVApplication->GetClientMode() && pm->GetNumberOfPartitions()<2)))
+      
     {
     localRender = 1;
     }
