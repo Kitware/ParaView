@@ -11,7 +11,7 @@ ADD_TEST(TestReferenceCountedList ${CXX_TEST_PATH}/TestReferenceCountedList)
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
 
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
+LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff vtkexpat)
 
 # add in opengl
 IF (WIN32)
