@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.36");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.37");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1436,7 +1436,11 @@ void vtkKWNotebook::ScheduleResize()
     return;
     }
   this->Expanding = 1;
-  this->Script("after idle {%s Resize}", this->GetTclName());
+
+  // We need a "catch" here since in the "idle time" we could have been
+  // destroyed.
+
+  this->Script("after idle {catch {%s Resize}}", this->GetTclName());
 }
 
 //------------------------------------------------------------------------------
