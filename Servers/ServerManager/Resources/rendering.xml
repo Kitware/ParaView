@@ -187,7 +187,7 @@
         command="SetSize" 
         number_of_elements="2"
         default_values="400 400" > 
-       <DoubleRangeDomain name="range" min="1 1" />
+       <IntRangeDomain name="range" min="1 1" />
      </IntVectorProperty>
 
      <IntVectorProperty 
