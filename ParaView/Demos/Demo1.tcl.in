@@ -1,35 +1,54 @@
 if [info exists tmpPvDataDir] {
-    set DataDir $tmpPvDataDir
+    set DataDir "${tmpPvDataDir}"
 } else {
-    set DataDir "@PARAVIEW_DATA_ROOT@/Data"
+    set DataDir "@PARAVIEW_DATA_ROOT@/Data/"
 }
 
 set FoundFiles 1
+set DataDirLocal 1
 
 if ![file exists $DataDir/combxyz.bin] {
-    vtkKWMessageDialog _adialog
-    _adialog Create Application ""
-    _adialog SetText "Could not find the data file combxyz.bin.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
-    _adialog Invoke
-    _adialog Delete
-    set FoundFiles 0
+    if ![file exists combxyz.bin] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file combxyz.bin.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+}  else {
+    set DataDirLocal 0
 }
 
+
 if ![file exists $DataDir/combq.bin] {
-    vtkKWMessageDialog _adialog
-    _adialog Create Application ""
-    _adialog SetText "Could not find the data file combq.bin. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
-    _adialog Invoke
-    _adialog Delete
-    set FoundFiles 0
+    if ![file exists combq.bin] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file combq.bin. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    } 
+} else {
+    set DataDirLocal 0
 }
 
 if ![file exists $DataDir/blow.vtk] {
-    _adialog Create Application ""
-    _adialog SetText "Could not find the data file blow.vtk. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
-    _adialog Invoke
-    _adialog Delete
-    set FoundFiles 0
+    if ![file exists blow.vtk] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file blow.vtk. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+} else {
+    set DataDirLocal 0
+}
+
+if $DataDirLocal {
+    set DataDir "."
 }
 
 proc pvStopDemoAndExit {} {
@@ -429,10 +448,11 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
     RenWin1 Render
 }
 
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
 if $FoundFiles {
 
-    # hack to get the window.
-    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
     $pvWindow DisableMenus
 
     set pvMySources [$pvWindow GetSources]
@@ -454,7 +474,8 @@ if $FoundFiles {
 	global pvDemoShouldStop
 	
 	toplevel .control
-	frame .control.main -width 350 -height 150
+	wm title .control "control panel"
+	frame .control.main -width 350 -height 200
 	label .control.main.info -text "ParaView demo initializing.\n Please wait."
 	button .control.main.stop -text "Stop Demo" -command {set pvDemoShouldStop 1}
 	pack .control.main
@@ -483,10 +504,14 @@ if $FoundFiles {
 	}
 	if $pvDemoShouldStop break;
     }
-    if $pvDemoShouldExit { Application Exit }
 
-    wm protocol .paraview WM_DELETE_WINDOW { Application Exit }
     wm withdraw .control
-    $pvWindow EnableMenus
 
+}
+
+wm protocol .paraview WM_DELETE_WINDOW { $pvWindow Exit }
+$pvWindow EnableMenus
+
+if $pvDemoShouldExit {
+    $pvWindow Exit
 }
