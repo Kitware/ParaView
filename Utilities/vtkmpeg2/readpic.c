@@ -225,9 +225,12 @@ static void read_ppm( char *fname, unsigned char *frame[] )
       y = cr*r + cg*g + cb*b;
       u = cu*(b-y);
       v = cv*(r-y);
-      yp[j] = (219.0/256.0)*y + 16.5;  /* nominal range: 16..235 */
-      up[j] = (224.0/256.0)*u + 128.5; /* 16..240 */
-      vp[j] = (224.0/256.0)*v + 128.5; /* 16..240 */
+      yp[j] = (unsigned char)(
+        (219.0/256.0)*y + 16.5);  /* nominal range: 16..235 */
+      up[j] = (unsigned char)(
+        (224.0/256.0)*u + 128.5); /* 16..240 */
+      vp[j] = (unsigned char)(
+        (224.0/256.0)*v + 128.5); /* 16..240 */
     }
   }
   fclose(fd);
@@ -315,9 +318,12 @@ static void read_memory_ppm( char *fname, unsigned char *frame[] )
       y = cr*r + cg*g + cb*b;
       u = cu*(b-y);
       v = cv*(r-y);
-      yp[j] = (219.0/256.0)*y + 16.5;  /* nominal range: 16..235 */
-      up[j] = (224.0/256.0)*u + 128.5; /* 16..240 */
-      vp[j] = (224.0/256.0)*v + 128.5; /* 16..240 */
+      yp[j] = (unsigned char)(
+        (219.0/256.0)*y + 16.5);  /* nominal range: 16..235 */
+      up[j] = (unsigned char)(
+        (224.0/256.0)*u + 128.5); /* 16..240 */
+      vp[j] = (unsigned char)(
+        (224.0/256.0)*v + 128.5); /* 16..240 */
       iptr += 3;
     }
   }

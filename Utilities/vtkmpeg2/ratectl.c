@@ -123,7 +123,7 @@ unsigned char *frame;
   Tmin = (int) floor(vtkMPEG2WriterStr->bit_rate/(8.0*vtkMPEG2WriterStr->frame_rate) + 0.5);
 
   if (vtkMPEG2WriterStr->T_val<Tmin)
-    vtkMPEG2WriterStr->T_val = Tmin;
+    vtkMPEG2WriterStr->T_val = (int)Tmin;
 
   vtkMPEG2WriterStr->S_val = MPEG2_bitcount();
   vtkMPEG2WriterStr->Q_val = 0;
@@ -194,16 +194,16 @@ void MPEG2_rc_update_pict()
   switch (vtkMPEG2WriterStr->pict_type)
   {
   case I_TYPE:
-    vtkMPEG2WriterStr->Xi = X;
+    vtkMPEG2WriterStr->Xi = (int)X;
     vtkMPEG2WriterStr->d0i = vtkMPEG2WriterStr->d_val;
     break;
   case P_TYPE:
-    vtkMPEG2WriterStr->Xp = X;
+    vtkMPEG2WriterStr->Xp = (int)X;
     vtkMPEG2WriterStr->d0p = vtkMPEG2WriterStr->d_val;
     vtkMPEG2WriterStr->Np--;
     break;
   case B_TYPE:
-    vtkMPEG2WriterStr->Xb = X;
+    vtkMPEG2WriterStr->Xb = (int)X;
     vtkMPEG2WriterStr->d0b = vtkMPEG2WriterStr->d_val;
     vtkMPEG2WriterStr->Nb--;
     break;
