@@ -396,7 +396,7 @@ void vtkPVSource::Select(vtkKWView *v)
     MenuProperties->CreateRadioButtonVariable(MenuProperties,"Radio");
   
   // now add our own menu options
-  if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 10)
+  if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 1)
     {
     if (this->LastSelectedProperty == 10)
       {
