@@ -783,7 +783,6 @@ void pvTestDriver::ReportCommand(const char* const* command, const char* name)
 int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
 {
   int result = 1;
-  cout << "Report status (" << name << "): " << kwsysProcess_GetState(process) << endl;
   switch(kwsysProcess_GetState(process))
     {
     case kwsysProcess_State_Starting:
