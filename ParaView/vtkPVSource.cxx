@@ -1208,8 +1208,17 @@ void vtkPVSource::UpdateProperties()
     input = this->GetNthPVInput(idx);
     input->Update();
     }
-  this->UpdateScalarsMenu();
-  this->UpdateVectorsMenu();
+  if (this->Interface)
+    {
+    if (this->Interface->GetDefaultScalars())
+      {
+      this->UpdateScalarsMenu();
+      }
+    if (this->Interface->GetDefaultScalars())
+      {
+      this->UpdateVectorsMenu();
+      }
+    }
 }
   
 //----------------------------------------------------------------------------
