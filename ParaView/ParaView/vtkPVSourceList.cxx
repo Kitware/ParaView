@@ -211,6 +211,12 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
     it->GoToNextItem();
     }
   it->Delete();
+  if ( thisy == 0 )
+    {
+    lasty = y;
+    y = this->UpdateSource(current, y, in, (current == comp), NoBind);
+    thisy = y;
+    }
 
   this->StartY = start;
   this->LastY = lasty;
