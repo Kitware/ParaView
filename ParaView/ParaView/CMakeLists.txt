@@ -173,7 +173,7 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 # Setup vtkInstantiator registration for this library's classes.
-VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
+VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
   ${ParaView_SRCS}
   EXPORT_MACRO VTK_EXPORT
   HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
