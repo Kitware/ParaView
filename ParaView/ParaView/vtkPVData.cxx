@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.244");
+vtkCxxRevisionMacro(vtkPVData, "1.245");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2778,7 +2778,7 @@ void vtkPVData::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") ColorByPointField ";
     subStr = strrchr(colorBy, ')');
     pos = static_cast<int>(subStr - colorBy + 1);
-    if (pos == strlen(colorBy))
+    if (pos == static_cast<int>(strlen(colorBy)))
       {
       subStr = strrchr(colorBy, '(');
       pos2 = static_cast<int>(subStr - colorBy + 1);
@@ -2827,7 +2827,7 @@ void vtkPVData::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") ColorByCellField ";
     subStr = strrchr(colorBy, ')');
     pos = static_cast<int>(subStr - colorBy + 1);
-    if (pos == strlen(colorBy))
+    if (pos == static_cast<int>(strlen(colorBy)))
       {
       subStr = strrchr(colorBy, '(');
       pos2 = static_cast<int>(subStr - colorBy + 1);
