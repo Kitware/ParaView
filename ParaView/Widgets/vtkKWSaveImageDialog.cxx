@@ -78,7 +78,7 @@ void vtkKWSaveImageDialog::Invoke()
   
   while (!done)
     {
-    this->Script("tk_getSaveFile -title \"Save As Image\" -filetypes {{{Windows Bitmap} {.bmp}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
+    this->Script("tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     if (path)
       {
       free(path);
