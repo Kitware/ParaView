@@ -72,7 +72,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.4");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -649,6 +649,11 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
   this->TimeLineContainer->Create(app, NULL);
   
   this->TimeLineFrame->SetParent(this->TimeLineContainer);
+  this->TimeLine->SetParameterCursorInteractionStyle(
+    vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleDragWithLeftButton |
+    vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithRighButton |
+    vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithControlLeftButton);
+
   ostrstream tf_options;
   tf_options << "-height " << VTK_PV_ANIMATON_ENTRY_HEIGHT << ends;
   this->TimeLineFrame->Create(app, tf_options.str());
@@ -713,6 +718,10 @@ void vtkPVAnimationCue::InitializeObservers(vtkObject* object)
     object->AddObserver(vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent,
       this->Observer);
     }
+  object->AddObserver(vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent,
+    this->Observer);
+  object->AddObserver(vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent,
+    this->Observer);
 }
 
 //-----------------------------------------------------------------------------
@@ -734,7 +743,6 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
   vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
 
-  // Just invoke this event, just in case anyone is interested.
   if (wdg == this->TimeLine)
     {
     switch(event)
@@ -742,20 +750,33 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
     case vtkKWEvent::FocusInEvent:
       this->GetFocus();
       return;
-      
+
     case vtkKWEvent::FocusOutEvent:
       // NOTE: we are removing the focus of only self and not that of
       // the children (if any), since the focus presently was on self,
       // otherwise FocusOutEvent would have never been triggerred.
       this->RemoveSelfFocus();
       return;
-      
+
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
       // raise this event on this cue, so that the VAnimationInterface (if it is listening)
       // will know that selection has changed and will update to show the right
       // key frame.
       this->InvokeEvent(event, calldata);
       return;
+
+    case vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent:
+        {
+        double param = this->TimeLine->GetParameterCursorPosition();
+        pvAM->SetTimeMarker(param);
+        }
+      return;
+    case vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent:
+        {
+        double param = this->TimeLine->GetParameterCursorPosition();
+        pvAM->SetCurrentTime(param);
+        pvAM->SetTimeMarker(param);
+        }
       }
     }
   else if (vtkSMKeyFrameAnimationCueManipulatorProxy::SafeDownCast(wdg))
@@ -788,7 +809,6 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
       return;
       }
     }
-//  this->InvokeEvent(event, calldata);
 }
 
 //-----------------------------------------------------------------------------
