@@ -143,6 +143,7 @@ public:
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
   virtual void CornerAnnotationOn();
   virtual void CornerAnnotationOff();
+  virtual void SetCornerAnnotationVisibility(int v);
   virtual void SetCornerTextColor(float r, float g, float b);
   virtual void SetCornerTextColor(float *rgb)
                { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
