@@ -27,7 +27,7 @@
 #include "vtkCell.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.10");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.11");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the
@@ -435,7 +435,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
   double xmin, double xmax, double ymin, double ymax)
 {
   int i;
-  float planeEq[24];
+  double planeEq[24];
   double worldN[3], newPt[3];
 
   int *winsize = ren->GetRenderWindow()->GetSize();
@@ -459,7 +459,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
 
   for (i=4; i<6; i++)
     {
-    float *plane = planeEq + 4*i;
+    double *plane = planeEq + 4*i;
 
     worldN[0] = -plane[0];
     worldN[1] = -plane[1];
@@ -561,7 +561,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
   vtkRenderer *ren,
   double xmin, double xmax, double ymin, double ymax)
 {
-  float planeEq[24];
+  double planeEq[24];
   double newPt[3], worldN[3];
   int i;
 
@@ -578,7 +578,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
 
   double sensibleZ = vtkPlanesIntersection::SensibleZCoordinate(ren);
 
-  float *plane = planeEq;
+  double *plane = planeEq;
 
   for (i=0; i<6; i++)
     {

@@ -23,7 +23,7 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.12");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.13");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -197,10 +197,10 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     // Move the camera forward based on speed.
     // Although this has no effect for parallel projection,
     // it helps keep the pseudo view angle constant.
-    float fp[3], pos[3];
+    double fp[3], pos[3];
     cam->GetPosition(pos);
     cam->GetFocalPoint(fp);  
-    float dir[3];
+    double dir[3];
     dir[0] = fp[0] - pos[0];
     dir[1] = fp[1] - pos[1];
     dir[2] = fp[2] - pos[2];

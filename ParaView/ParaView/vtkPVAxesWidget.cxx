@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -184,7 +184,7 @@ void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
     }
   
   vtkCamera *cam = this->ParentRenderer->GetActiveCamera();
-  float pos[3], fp[3], viewup[3];
+  double pos[3], fp[3], viewup[3];
   cam->GetPosition(pos);
   cam->GetFocalPoint(fp);
   cam->GetViewUp(viewup);

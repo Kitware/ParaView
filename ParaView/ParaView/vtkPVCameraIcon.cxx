@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.13");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -114,7 +114,7 @@ void vtkPVCameraIcon::RestoreCamera()
     // copy the parameters of the current camera for this class
     // into the active camera on the client and server
     vtkCamera* camera = this->GetCamera();
-    float a[3];
+    double a[3];
     pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
                     << "SetParallelScale"
                     << camera->GetParallelScale()
