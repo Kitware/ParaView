@@ -795,6 +795,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->UpdateSelectMenu();
 
   this->DisableFilterButtons();
+  //this->AddRecentFilesToMenu("Exit",this);
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
 	       this->GetWidgetName(), this->GetTclName());
@@ -1042,10 +1043,33 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   this->GetPVApplication()->AddTraceEntry("set kw(%s) [$kw(%s) Open %s]",
                                           pvs->GetTclName(),
                                           this->GetTclName(), openFileName);
+  if ( pvs )
+    {
+    // Store MRU
+    //this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
+    }
 
   return pvs;
 }
 
+int vtkPVWindow::OpenRecentFile( char* path)
+{
+  if ( this->Open( path ) )
+    {
+    return 1;
+    }
+  else
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->GetApplication(), this, vtkKWMessageDialog::Error,
+      "Open Error", 
+      "There was a problem opening file. Please verify that the "
+      "file exists and that it is on the locaion you specified. ");
+				     
+
+    return 0;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::WriteVTKFile(char *filename)
@@ -1457,7 +1481,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
                         this->GetTclName());
     this->SetCurrentPVData(NULL);
     }
-    
+
   // This will update the parameters.  
   // I doubt the conditional is still necessary.
   if (comp)

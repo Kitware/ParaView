@@ -164,6 +164,7 @@ public:
   // Open a data file.
   void OpenCallback();
   vtkPVSource *Open(char *fileName);
+  int OpenRecentFile(char *fileName);
   
   // Description:
   // Play the demo
