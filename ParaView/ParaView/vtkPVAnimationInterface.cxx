@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.9");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.10");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -257,6 +257,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   this->Dirty = 1;
   this->ScriptAvailable = 0;
+  this->UpdatingScript = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1522,7 +1523,7 @@ void vtkPVAnimationInterface::ShowEntryInFrame(int idx)
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::ShowEntryInFrame(
-  vtkPVAnimationInterfaceEntry* entry, int in_idx /* = -1 */)
+  vtkPVAnimationInterfaceEntry* entry, int in_idx)
 {
   this->EmptyEntryFrame();
   if ( !entry )
@@ -1626,11 +1627,15 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetSourceEntry(int idx)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateNewScript()
 {
-  //cout << "UpdateNewScript" << endl;
   if ( !this->AnimationEntriesIterator )
     {
     return;
     }
+  if ( this->UpdatingScript )
+    {
+    return;
+    }
+  this->UpdatingScript = 1;
   ostrstream str;
   ostrstream cstr;
   //str << "puts \"------------- start --------------\"" << endl;
@@ -1651,6 +1656,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
       {
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      entry->Prepare();
       if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceTclName() )
         {
         smap[entry->GetPVSource()->GetVTKSourceTclName()] = 1;
@@ -1685,6 +1691,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   if ( !this->Dirty)
     {
     //cout << " \\- No change" << endl;
+    this->UpdatingScript = 0;
     return;
     }
   str << endl;
@@ -1710,6 +1717,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   this->Dirty = 0;
 
   this->ScriptAvailable = script_available;
+  this->UpdatingScript = 0;
 }
 
 //-----------------------------------------------------------------------------

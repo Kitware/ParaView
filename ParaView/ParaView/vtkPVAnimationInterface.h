@@ -190,7 +190,7 @@ public:
   void DeleteSourceItem(int item);
   void UpdateSourceMenu(int idx);
 
-  void ShowEntryInFrame(vtkPVAnimationInterfaceEntry *entry, int idx=-1);
+  void ShowEntryInFrame(vtkPVAnimationInterfaceEntry *entry, int idx);
   void ShowEntryInFrame(int idx);
   void UpdateNewScript();
   void PrepareAnimationInterface(vtkPVWindow* win);
@@ -288,6 +288,8 @@ protected:
   // Description:
   // Empty the entry frame
   void EmptyEntryFrame();
+
+  int UpdatingScript;
 
   unsigned long ErrorEventTag;
   vtkPVAnimationInterfaceObserver* Observer;

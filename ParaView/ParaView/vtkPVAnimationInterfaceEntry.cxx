@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.4");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -134,8 +134,9 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 
   this->TimeScriptEntryFrame = vtkKWFrame::New();
 
-  //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
+
+  this->ScriptEditorDirty = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +152,6 @@ void vtkPVAnimationInterfaceEntry::ExecuteEvent(vtkObject *o,
   (void)o;
   (void)event;
   (void)calldata;
-  //cout << "Source deleted" << endl;
   this->SetPVSource(0);
 }
 
@@ -191,7 +191,6 @@ int vtkPVAnimationInterfaceEntry::GetDirty()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
 {
-  //cout << "Current index: " << this->CurrentIndex << " (" << idx << ")" << endl;
   if ( this->CurrentIndex == idx )
     {
     return;
@@ -201,7 +200,6 @@ void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
   char buffer[1024];
   sprintf(buffer, "GetSourceEntry %d", idx);
   this->SetTraceReferenceCommand(buffer);
-  //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
 }
 
@@ -273,7 +271,6 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     {
     this->SourceMenuButton->SetButtonText("None");
     }
-
 
   this->SourceLabel->SetLabel("Source");
   this->MethodLabel->SetLabel("Parameter");
@@ -358,7 +355,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
 {
-  //cout << "SwitchScriptTime: " << i << endl;
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
   pvApp->Script("pack forget %s %s %s %s",
     this->DummyFrame->GetWidgetName(),
@@ -378,11 +374,13 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->ScriptEditorFrame->GetWidgetName());
     this->CustomScript = 1;
+    this->GetMethodMenuButton()->SetButtonText("Script");
     }
   else
     {
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->DummyFrame->GetWidgetName());
+    this->GetMethodMenuButton()->SetButtonText("None");
     }
 }
 
@@ -430,8 +428,7 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
 
     }
   this->UpdateMethodMenu(0);
-  this->Parent->ShowEntryInFrame(this);
-  //cout << __LINE__ << " Dirty" << endl;
+  this->Parent->ShowEntryInFrame(this, -1);
   this->Dirty = 1;
   this->Parent->UpdateNewScript();
 }
@@ -443,7 +440,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->SetScript(0);
-  this->SetLabelAndScript("None", 0);
+  this->SetLabelAndScript(0, 0);
   this->UpdateMethodMenu();
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(-1);
@@ -462,7 +459,6 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
     }
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(0);
-  this->GetMethodMenuButton()->SetButtonText("Script");
 }
 
 //-----------------------------------------------------------------------------
@@ -475,7 +471,6 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
   vtkKWMenu* menu = this->GetMethodMenuButton()->GetMenu();
   menu->DeleteAllMenuItems();
 
-  this->GetMethodMenuButton()->SetButtonText("None");
   this->StartTimeEntry->EnabledOff();
   this->EndTimeEntry->EnabledOff();
   if ( !samesource )
@@ -506,7 +501,7 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     this->StartTimeEntry->EnabledOn();
     this->EndTimeEntry->EnabledOn();
     }
-  this->Parent->ShowEntryInFrame(this);
+  this->Parent->ShowEntryInFrame(this, -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -668,6 +663,15 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
     "ScriptEditorCallback");
   this->ScriptEditor->SetBind(this, "<KeyPress-Return>",
     "ScriptEditorCallback");
+  this->ScriptEditor->SetBind(this, "<KeyPress>",
+    "MarkScriptEditorDirty");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::MarkScriptEditorDirty()
+{ 
+  //cout << "MarkScriptEditorDirty" << endl;
+  this->ScriptEditorDirty = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -680,13 +684,18 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
     script);
   this->GetMethodMenuButton()->SetButtonText("Script");
   this->Parent->UpdateNewScript();
-  this->Parent->ShowEntryInFrame(this);
+  this->Parent->ShowEntryInFrame(this, -1);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::ScriptEditorCallback()
 {
+  if ( !this->ScriptEditorDirty )
+    {
+    return;
+    }
   this->SetCustomScript(this->ScriptEditor->GetValue());
+  this->ScriptEditorDirty = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -758,7 +767,7 @@ void vtkPVAnimationInterfaceEntry::Update()
   //cout << "Type is: " << this->TypeIsInt << endl;
   this->SwitchScriptTime(1);
   this->Parent->UpdateNewScript();
-  this->Parent->ShowEntryInFrame(this);
+  this->Parent->ShowEntryInFrame(this, -1);
 }
 
 //----------------------------------------------------------------------------
@@ -806,6 +815,15 @@ void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
     }
   //cout << "SetScriptEditor: " << scr << endl;
   this->ScriptEditor->SetValue(scr);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::Prepare()
+{
+  if ( this->ScriptEditorDirty )
+    {
+    this->ScriptEditorCallback();
+    }
 }
 
 //-----------------------------------------------------------------------------
