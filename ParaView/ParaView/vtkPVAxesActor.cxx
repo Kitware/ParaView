@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.2");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.3");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
@@ -719,8 +719,16 @@ void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ConeRadius: " << this->ConeRadius << endl;
   os << indent << "ConeResolution: " << this->ConeResolution << endl;
   
-  os << indent << "NormalizedShaftLength: " << this->NormalizedShaftLength
-     << endl;
-  os << indent << "NormalizedTipLength: " << this->NormalizedTipLength << endl;
-  os << indent << "TotalLength: " << this->TotalLength << endl;
+  os << indent << "NormalizedShaftLength: " 
+     << this->NormalizedShaftLength[0] << ","
+     << this->NormalizedShaftLength[1] << ","
+     << this->NormalizedShaftLength[2] << endl;
+  os << indent << "NormalizedTipLength: " 
+     << this->NormalizedTipLength[0] << ","
+     << this->NormalizedTipLength[1] << ","
+     << this->NormalizedTipLength[2] << endl;
+  os << indent << "TotalLength: " 
+     << this->TotalLength[0] << ","
+     << this->TotalLength[1] << ","
+     << this->TotalLength[2] << endl;
 }
