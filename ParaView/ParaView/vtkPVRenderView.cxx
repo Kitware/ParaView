@@ -114,6 +114,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->CurrentInteractor = NULL;
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
+
+  this->MenuPropertiesUnderline = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -184,8 +186,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 #ifdef VTK_USE_MPI
   char *str;
   // Create the compositer.
-  str = getenv("PV_DISABLE_COMPOSITE_INTERRUPTS");
-  if ( str != NULL)
+  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
     {
     this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkTreeComposite", "TreeComp1");
     }
@@ -201,8 +202,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
 			 this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-  str = getenv("PV_OFFSCREEN");
-  if ( str != NULL)
+  if ( getenv("PV_OFFSCREEN") )
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
