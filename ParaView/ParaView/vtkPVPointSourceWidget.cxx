@@ -53,7 +53,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.6");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.7");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -166,13 +166,13 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     pm->SendStreamToClientAndServer();
     }
 
-  this->PointWidget->SetObjectID(this->ObjectID);
+  this->PointWidget->SetObjectID(this->SourceID);
   this->PointWidget->SetVariableName("Center");
   this->PointWidget->SetPVSource(this->GetPVSource());
   this->PointWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
                                        "SetAcceptButtonColorToRed");
   
-  this->RadiusWidget->SetObjectID(this->ObjectID);
+  this->RadiusWidget->SetObjectID(this->SourceID);
   this->RadiusWidget->SetVariableName("Radius");
   this->RadiusWidget->SetPVSource(this->GetPVSource());
   this->RadiusWidget->SetLabel("Radius");
@@ -185,7 +185,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true",
                this->RadiusWidget->GetWidgetName());
   
-  this->NumberOfPointsWidget->SetObjectID(this->ObjectID);
+  this->NumberOfPointsWidget->SetObjectID(this->SourceID);
   this->NumberOfPointsWidget->SetVariableName("NumberOfPoints");
   this->NumberOfPointsWidget->SetPVSource(this->GetPVSource());
   this->NumberOfPointsWidget->SetLabel("Number of Points");
