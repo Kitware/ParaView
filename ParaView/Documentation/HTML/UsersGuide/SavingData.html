@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Saving Data</title>
+</head>
+
+<body>
+<!-- Start NavBar -->
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="LoadingData.html">Prev</a>
+      </td>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+      <td valign="Top"><a href="NavigationWindow.html">Next</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<!-- End NavBar -->
+<h1>Saving Results</h1>
+
+<p>
+ParaView has several options for saving its results.  
+This simplest is just saving an image.  This option is accessible through 
+the file menu's "Save Image" entry.
+</p>
+
+<p>
+<center>
+<img alt="File Menu: Save Image" src="Images/SaveImage.jpg">
+</center>
+<p>
+
+<p>
+<center>
+<img alt="File Menu: Save Image" src="Images/SaveImageDialog.jpg">
+</center>
+<p>
+
+<p>
+The menu entry brings up the save-image dialog which allows the user
+to select a directory, file name and file type for the image.  There
+are several options for image formats including:
+  <l>
+    <li> Windows Bitmap            (.bmp)</li>
+    <li> JPEG Image                (.jpg)</li>
+    <li> Portable Network Graphics (.png)</li>
+    <li> Binary PPM                (.ppm)</li>
+    <li> TIFF Image                (.tif)</li>
+  </l>
+</p>
+
+<h2> Saving DataSets </h2>
+<p>
+You can also save the current data set in geometry files using the "Save Data" under the file menu.
+</p>
+
+<p>
+<center>
+<img alt="File Menu: Save Image" src="Images/SaveData.jpg">
+</center>
+<p>
+
+<p>
+There are currently only two file formats available for saving data sets: VTK and PVTK.
+The VTK file format is used when running on a single process.  The PVTK format is
+used when ParaView is using two or more processes.
+</p>
+<p>
+The VTK file format has the .vtk extesion.  It is the standard VTK format that can contain 
+all of the VTK data sets including: 
+  <l>
+    <li> vtkStructuredGrid, </li> 
+    <li> vtkUnstructuredGrid, </li>
+    <li> vtkPolyData, </li>
+    <li> vtkImageData, </li>
+    <li> and vtkRectilinearGrid. </li>
+  <l>
+</p>
+<p>
+When using VTK, the classes vtkDataSetReader and vtkDataWriter will 
+read and write this format.
+</p>
+
+<p>
+The PVTK file format is a parallel extension of the VTK file format.  
+Each process saves a VTK file, and a PVTK file is created to associate 
+all of the separate VTK files.  Although the PVTK file has to be on a
+file system visible to all the processes, the individual VTK piece files
+only need to be accessible to the processes that will read them.
+</p>
+
+<p>
+When using VTK, the classes
+vtkPDataSetReader and vtkPDataSetWriter can be used to read and
+write the PVTK format.  The vtkPDataSetReader can handle the M to N
+conversion if you have less processors than pieces.  If you have more
+processes than pieces, then some processes will not load any data,
+and the processing of the data set will not be load balanced.
+</p>  
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 25 09:18:28 EDT 2001
+<!-- hhmts end -->
+</body> </html>

@@ -161,7 +161,7 @@ void vtkPVContour::CreateProperties()
 
   
   this->AddValueButton->SetParent(this->NewValueFrame);
-  this->AddValueButton->Create(pvApp, "-text \"Add Value\"");
+  this->AddValueButton->Create(pvApp, "-text {Add Value}");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
   this->AddValueButton->SetBalloonHelpString("Add the new contour value to the contour values list");
   
@@ -171,7 +171,7 @@ void vtkPVContour::CreateProperties()
                this->AddValueButton->GetWidgetName());
   
   this->DeleteValueButton->SetParent(this->GetParameterFrame()->GetFrame());
-  this->DeleteValueButton->Create(pvApp, "-text \"Delete Value\"");
+  this->DeleteValueButton->Create(pvApp, "-text {Delete Value}");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
   this->DeleteValueButton->SetBalloonHelpString("Remove the currently selected contour value from the list");
   
@@ -185,6 +185,7 @@ void vtkPVContour::CreateProperties()
   this->Widgets->AddItem(this->ComputeNormalsCheck);
 
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
+
   this->ComputeGradientsCheck->SetPVSource(this);
   this->ComputeGradientsCheck->Create(pvApp, "Compute Gradients",
                                       "SetComputeGradients",
@@ -195,6 +196,7 @@ void vtkPVContour::CreateProperties()
   this->Widgets->AddItem(this->ComputeGradientsCheck);
   
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
+
   this->ComputeScalarsCheck->SetPVSource(this);
   this->ComputeScalarsCheck->Create(pvApp, "ComputeScalars",
                                     "SetComputeScalars", "GetComputeScalars",

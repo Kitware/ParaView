@@ -456,7 +456,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
+  this->GetMenuProperties()->AddRadioButton(0,"  Hide Properties", 
                                             rbv, this, "HideProperties");
   delete [] rbv;
 }
@@ -814,5 +814,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
 }

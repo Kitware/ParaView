@@ -185,6 +185,7 @@ void vtkPVClipPlane::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t",
                this->NormalZButton->GetWidgetName());
 
+
   // Offset -------------------------
   this->OffsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->OffsetEntry->SetPVSource(this);
@@ -199,6 +200,11 @@ void vtkPVClipPlane::CreateProperties()
   this->CenterResetCallback();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVClipPlane::AcceptCallback()
+{
+  this->vtkPVSource::AcceptCallback();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::CenterResetCallback()

@@ -467,7 +467,7 @@ void vtkPVActorComposite::CreateProperties()
   
   this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenuLabel->Create(this->Application, "");
-  this->ColorMenuLabel->SetLabel("Color by variable:");
+  this->ColorMenuLabel->SetLabel("Color by:");
   
   this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenu->Create(this->Application, "");    

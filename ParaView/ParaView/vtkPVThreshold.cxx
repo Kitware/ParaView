@@ -158,7 +158,7 @@ void vtkPVThreshold::CreateProperties()
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue]]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
                                   "ThresholdBetween",

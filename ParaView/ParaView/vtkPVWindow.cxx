@@ -531,6 +531,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
+  this->Script("%s entryconfigure Select -state disabled",
+	       this->Menu->GetWidgetName());
   
   this->VTKMenu->SetParent(this->GetMenu());
   this->VTKMenu->Create(this->Application, "-tearoff 0");
@@ -545,6 +547,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->FilterMenu->SetParent(this->VTKMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
   this->VTKMenu->AddCascade("Filters", this->FilterMenu, 0);  
+  this->Script("%s entryconfigure Filters -state disabled",
+	       this->VTKMenu->GetWidgetName());
   
   // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
@@ -824,6 +828,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
 
   this->DisableFilterButtons();
+
+  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
+	       this->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -861,8 +868,11 @@ void vtkPVWindow::OpenCallback()
 {
   char *openFileName = NULL;
   istream *input;
-  
-  this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#ifdef _WIN32  
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#else
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#endif
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
 
   if (strcmp(openFileName, "") == 0)
@@ -1279,10 +1289,15 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
         this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
         }
       }
+    this->Script("%s entryconfigure Filters -state normal",
+		 this->VTKMenu->GetWidgetName());
     }
   else
     {
     this->DisableFilterButtons();
+    this->Script("%s entryconfigure Filters -state disabled",
+		 this->VTKMenu->GetWidgetName());
+
     }
 }
 
@@ -1369,6 +1384,35 @@ void vtkPVWindow::ReductionCheckCallback()
 
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::UpdateSelectMenu()
+{
+  int i, numSources;
+  vtkPVSource *source;
+  char methodAndArg[512];
+
+  this->GetSelectMenu()->DeleteAllMenuItems();
+  numSources = this->GetSources()->GetNumberOfItems();
+  for (i = 0; i < numSources; i++)
+    {
+    source = (vtkPVSource*)this->GetSources()->GetItemAsObject(i);
+    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    this->GetSelectMenu()->AddCommand(source->GetName(), this, methodAndArg);
+    }
+
+  // Disable or enable the menu.
+  if (numSources == 0)
+    {
+    this->Script("%s entryconfigure Select -state disabled",
+                 this->Menu->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s entryconfigure Select -state normal",
+                 this->Menu->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
   int numMenus;
@@ -1399,6 +1443,13 @@ void vtkPVWindow::EnableMenus()
     {
     this->Script("%s entryconfigure %d -state normal",
                  this->Menu->GetWidgetName(), i);
+    }
+
+  // Disable or enable the menu.
+  if (this->GetSources()->GetNumberOfItems() == 0)
+    {
+    this->Script("%s entryconfigure Select -state disabled",
+                 this->Menu->GetWidgetName());
     }
 }
 
@@ -2000,9 +2051,9 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
     // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
-//    pvApp->BroadcastScript(
-//      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
-//      probe->GetVTKSourceTclName(), current->GetVTKDataTclName());
+    //pvApp->BroadcastScript(
+    //  "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+    //  probe->GetVTKSourceTclName(), current->GetVTKDataTclName());
 
   probe->Delete();
   pvd->Delete();

@@ -612,7 +612,7 @@ void vtkPVRenderView::ResetCamera()
   cam = this->GetRenderer()->GetActiveCamera();
   n = cam->GetViewPlaneNormal();
   mag2 = n[0]*n[0] + n[1]*n[1] + n[2]*n[2];
-  if (mag2 > 99999.0)
+  if (mag2 > 99999.0 || mag2 < -99999.0)
     {
     // Must be a problem.
     cam->SetPosition(0.0, 0.0, -1.0);

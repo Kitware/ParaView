@@ -20,9 +20,11 @@
 <!-- End NavBar -->
 <h1>Introduction</h1>
 
+<h2> Overview </h2>
+
 <p>
 ParaView is a turnkey application built on top of VTK.  
-It was designed to handle large data set by distributing the 
+ParaView was designed to handle large data sets by distributing the 
 data across multiple computers, but can also be used as a stand-alone 
 single-process application.
 </p>
@@ -30,14 +32,15 @@ single-process application.
 <p>
 ParaView's user interface and operations are closely tied to the 
 pipeline model in VTK.  Loading data creates a VTK reader object, 
-and processing the data (i.e. creating a contour) adds a VTK filter 
-to the pipeline.  Although creating a single pipeline is easy,  
-ParaView allows the user to build complex branching pipelines,
-which can get confusing.
+and processing data (i.e. creating a contour) adds a VTK filter 
+to the pipeline.  Creating a single non-branching pipeline using ParaView 
+is trivial. Each new filter adds to the end of the pipeline. 
+ParaView also allows advanced users to construct, navigate and modify 
+complex branching pipelines.
 </p>
 
 <p>
-ParaView has the concept of a current data set, which is ussually 
+ParaView has the concept of a current data set, which is usually 
 the last data loaded, or the result of the last filtering operation.
 The current data set is used as the input to any new filter created.
 The filters listed in the VTK-Filter menu are screened so that only 
@@ -47,11 +50,47 @@ by using the navigation window to move through the pipeline.
 </p>
 
 <p>
-This navigation feature allows you change parameters of any filter, 
-even if it is in the middle of the pipeline.  The pipeline 
-automactically updates to reflect changes made to filter parameters.
+The navigation feature allows you change parameters of any filter, 
+even if it is in the middle of the pipeline.  The whole pipeline 
+automatically updates to reflect changes made to filter parameters.
 </p>
 
+<h2> VTK </h2>
+Although knowledge of VTK should not be a prerequisite for using ParaView,
+there are several VTK resources available that may be useful for
+understanding ParaView.  The freely available 
+<a href="http://public.kitware.com/VTK/doc/nightly/html/">
+VTK manual pages 
+</a>
+are automatically generated from the comments in the VTK source.  
+Although several commonly used filters are directly
+accessible from ParaView's toolbars and are self explanatory, many of VTK's
+more obscure filters have to be accessed from ParaView's VTK-Source and VTK-Filters menus.
+VTK's manual pages can help you determine the function of the objects in these menus. 
+As ParaView develops further, common operations 
+will be more closely integrated in ParaView, so accessing the supplemental
+operations in the VTK-Source/VTK-Filter menus should become less common.
+</p>
+
+<p>
+The 
+<a href="http://www.kitware.com/products/vtkguide.html">
+VTK User Guide 
+</a>
+is also available if you would like a deeper 
+understanding of VTK and its pipeline model.
+</p>
+
+
+
+<h2> Parallel Execution </h2>
+
+ParaView's parallel execution model is simple.  When running on 
+more than one process, data sets are automatically divided up 
+between processes.  An identical pipeline is create in each process
+to filter and render its assigned data-set piece. The separate images
+from the individual processes are composited and displayed in the applications user interface
+running on the first process.
 
 <hr>
 <address></address>
@@ -59,3 +98,5 @@ automactically updates to reflect changes made to filter parameters.
 Last modified: Thu Oct 25 09:18:28 EDT 2001
 <!-- hhmts end -->
 </body> </html>
+
+

@@ -102,11 +102,6 @@ public:
   vtkGetObjectMacro(CurrentPVData, vtkPVData);
   
   // Description:
-  // This list contains all the sources created by the user.
-  // It is used to create input menus for filters.
-  vtkKWCompositeCollection *GetSources();
-
-  // Description:
   // This is a special list of precreated sources that can be used to glyph.
   vtkKWCompositeCollection *GetGlyphSources();
     
@@ -213,6 +208,16 @@ public:
   // Access to the RotateCamera interactor for thinks like setting its center of roation.
   vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
     {return this->RotateCameraInteractor;}
+
+  // Description:
+  // This list contains all the sources created by the user.
+  // It is used to create input menus for filters.
+  vtkKWCompositeCollection *GetSources();
+
+  // Description:
+  // When you add a source to the source list, you sould update the select menu.
+  // This object should probably have AddPVSource RemovePVSource methods ...
+  void UpdateSelectMenu();
 
   // Description:
   // Ability to disable and enable the menus on the menu bar.
