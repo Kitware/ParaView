@@ -94,9 +94,15 @@ public:
 
   void SetCenter();
   void SetCenter(float,float,float);
+  void SetCenterInternal(float,float,float);
   void SetCenter(float c[3]) { this->SetCenter(c[0], c[1], c[2]); }
+  void SetCenterInternal(float c[3]) 
+    { 
+      this->SetCenterInternal(c[0], c[1], c[2]); 
+    }
   void SetRadius();
   void SetRadius(float);
+  void SetRadiusInternal(float);
 
   // Description:
   // Called when the PVSources reset button is called.

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -150,7 +150,7 @@ void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint1(float x, float y, float z)
+void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
 {
   this->Point1[0]->SetValue(x,5);
   this->Point1[1]->SetValue(y,5);
@@ -163,11 +163,19 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
     pos[i] = this->Point1[i]->GetValueAsFloat();
     }
 
-  this->GetPVApplication()->BroadcastScript("%s SetPoint1 %f %f %f; %s SetAlignToNone",
-                                        this->Widget3DTclName, pos[0], pos[1], pos[2],
-                                        this->Widget3DTclName);
-  this->ModifiedCallback();
+  this->GetPVApplication()->BroadcastScript(
+    "%s SetPoint1 %f %f %f; %s SetAlignToNone",
+    this->Widget3DTclName, 
+    pos[0], pos[1], pos[2],
+    this->Widget3DTclName);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetPoint1(float x, float y, float z)
+{
+  this->SetPoint1Internal(x, y, z);
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -184,7 +192,7 @@ void vtkPVLineWidget::GetPoint1(float pt[3])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint2(float x, float y, float z)
+void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
 {
   this->Point2[0]->SetValue(x,5);
   this->Point2[1]->SetValue(y,5);
@@ -197,11 +205,19 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
     pos[i] = this->Point2[i]->GetValueAsFloat();
     }
 
-  this->GetPVApplication()->BroadcastScript("%s SetPoint2 %f %f %f; %s SetAlignToNone",
-                                        this->Widget3DTclName, pos[0], pos[1], pos[2],
-                                        this->Widget3DTclName);
-  this->ModifiedCallback();
+  this->GetPVApplication()->BroadcastScript(
+    "%s SetPoint2 %f %f %f; %s SetAlignToNone",
+    this->Widget3DTclName, 
+    pos[0], pos[1], pos[2],
+    this->Widget3DTclName);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetPoint2(float x, float y, float z)
+{
+  this->SetPoint2Internal(x, y, z);
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -322,12 +338,12 @@ void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->SetPoint1(this->Point1[0]->GetValueAsFloat(),
-                  this->Point1[1]->GetValueAsFloat(),
-                  this->Point1[2]->GetValueAsFloat());
-  this->SetPoint2(this->Point2[0]->GetValueAsFloat(),
-                  this->Point2[1]->GetValueAsFloat(),
-                  this->Point2[2]->GetValueAsFloat());
+  this->SetPoint1Internal(this->Point1[0]->GetValueAsFloat(),
+                          this->Point1[1]->GetValueAsFloat(),
+                          this->Point1[2]->GetValueAsFloat());
+  this->SetPoint2Internal(this->Point2[0]->GetValueAsFloat(),
+                          this->Point2[1]->GetValueAsFloat(),
+                          this->Point2[2]->GetValueAsFloat());
 
   char acceptCmd[1024];
   if ( this->Point1Variable && sourceTclName )    {    

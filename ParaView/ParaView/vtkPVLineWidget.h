@@ -73,6 +73,8 @@ public:
   void SetPoint2(float x, float y, float z);
   void GetPoint1(float pt[3]);
   void GetPoint2(float pt[3]);
+  void SetPoint1Internal(float x, float y, float z);
+  void SetPoint2Internal(float x, float y, float z);
 
   // Description:
   // Set the resolution of the line widget.
