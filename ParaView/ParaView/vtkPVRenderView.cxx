@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.253");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.254");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -277,10 +277,6 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     pvApp = this->GetPVApplication();
     }
-
-  // I do not know if it is importatn to get rid of this callback.
-  // This class created it, so why not.
-  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
 
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
@@ -1614,7 +1610,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.253 $");
+  this->ExtractRevision(os,"$Revision: 1.254 $");
 }
 
 //------------------------------------------------------------------------------

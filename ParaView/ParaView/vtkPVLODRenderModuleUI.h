@@ -94,7 +94,7 @@ public:
   
   // Description:
   // Callback for the interrupt render check button
-  void InterruptRenderCheckCallback();
+  void RenderInterruptsEnabledCheckCallback();
   
   // Description:
   // Callback for the use char check button.  
@@ -167,7 +167,7 @@ protected:
   
   vtkKWLabeledFrame *LODFrame;
   vtkKWLabeledFrame *ParallelRenderParametersFrame;
-  vtkKWCheckButton *InterruptRenderCheck;
+  vtkKWCheckButton *RenderInterruptsEnabledCheck;
   vtkKWCheckButton *CompositeWithFloatCheck;
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
@@ -187,6 +187,11 @@ protected:
   float LODThreshold;
   int LODResolution;
   float CollectThreshold;
+  int RenderInterruptsEnabled;
+
+  int CompositeWithFloatFlag;
+  int CompositeWithRGBAFlag;
+  int CompositeCompressionFlag;
 
   vtkPVLODRenderModuleUI(const vtkPVLODRenderModuleUI&); // Not implemented
   void operator=(const vtkPVLODRenderModuleUI&); // Not implemented

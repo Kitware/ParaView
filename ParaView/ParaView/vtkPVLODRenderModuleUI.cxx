@@ -91,7 +91,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.3");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -107,7 +107,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 
   this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
 
-  this->InterruptRenderCheck = vtkKWCheckButton::New();
+  this->RenderInterruptsEnabledCheck = vtkKWCheckButton::New();
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
   this->CompositeCompressionCheck = vtkKWCheckButton::New();
@@ -128,6 +128,12 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
   this->LODThreshold = 2.0;
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
+
+  this->RenderInterruptsEnabled = 1;
+
+  this->CompositeWithFloatFlag = 0;
+  this->CompositeWithRGBAFlag = 0;
+  this->CompositeCompressionFlag = 1;
 }
 
 
@@ -147,14 +153,14 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
       {
       pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
                                this->CollectThreshold);
-      pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
-                               this->InterruptRenderCheck->GetState());
+      pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
+                               this->RenderInterruptsEnabled);
       pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-                               this->CompositeWithFloatCheck->GetState());
+                               this->CompositeWithFloatFlag);
       pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-                               this->CompositeWithRGBACheck->GetState());
+                               this->CompositeWithRGBAFlag);
       pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-                               this->CompositeCompressionCheck->GetState());
+                               this->CompositeCompressionFlag);
       }
     }
 
@@ -164,8 +170,8 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
   this->ParallelRenderParametersFrame->Delete();
   this->ParallelRenderParametersFrame = 0;
 
-  this->InterruptRenderCheck->Delete();
-  this->InterruptRenderCheck = NULL;
+  this->RenderInterruptsEnabledCheck->Delete();
+  this->RenderInterruptsEnabledCheck = NULL;
 
   this->CompositeWithFloatCheck->Delete();
   this->CompositeWithFloatCheck = NULL;
@@ -270,7 +276,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODThresholdScale->SetParent(this->LODScalesFrame);
   this->LODThresholdScale->Create(this->Application, 
                                   "-resolution 0.1 -orient horizontal");
-  this->LODThresholdScale->SetRange(0.0, 6.0);
+  this->LODThresholdScale->SetRange(0.0, 20.0);
   this->LODThresholdScale->SetResolution(0.1);
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);
@@ -279,14 +285,10 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   if (pvapp &&
       pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
     {
-    this->SetLODThreshold(
-      pvapp->GetFloatRegisteryValue(2, "RunTime", "LODThreshold"));
+    this->LODThreshold = 
+      pvapp->GetFloatRegisteryValue(2, "RunTime", "LODThreshold");
     }
-  else
-    {
-    this->SetLODThreshold(this->LODThreshold);
-    }
-
+  this->SetLODThreshold(this->LODThreshold);
   this->LODThresholdScale->SetValue(this->CollectThreshold);
   this->LODThresholdScale->SetCommand(this, 
                                       "LODThresholdScaleCallback");
@@ -325,14 +327,10 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   if (pvapp &&
       pvapp->GetRegisteryValue(2, "RunTime", "LODResolution", 0))
     {
-    this->SetLODResolution(
-      pvapp->GetIntRegisteryValue(2, "RunTime", "LODResolution"));
+    this->LODResolution =
+      pvapp->GetIntRegisteryValue(2, "RunTime", "LODResolution");
     }
-  else
-    {
-    this->SetLODResolution(this->LODResolution);
-    }
-
+  this->SetLODResolution(this->LODResolution);
   this->LODResolutionScale->SetValue(150 - this->LODResolution);
   this->LODResolutionScale->SetCommand(this, "LODResolutionLabelCallback");
   this->LODResolutionScale->SetEndCommand(this, "LODResolutionScaleCallback");
@@ -352,23 +350,22 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   // LOD parameters: rendering interrupts
 
-  this->InterruptRenderCheck->SetParent(this->LODFrame->GetFrame());
-  this->InterruptRenderCheck->Create(this->Application, 
-                                     "-text \"Allow rendering interrupts\"");
-  this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCheckCallback");
+  this->RenderInterruptsEnabledCheck->SetParent(this->LODFrame->GetFrame());
+  this->RenderInterruptsEnabledCheck->Create(this->Application, 
+                                             "-text \"Allow rendering interrupts\"");
+  this->RenderInterruptsEnabledCheck->SetCommand(this, "RenderInterruptsEnabledCheckCallback");
   
   if (pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                        "InterruptRender", 0))
+                                        "RenderInterruptsEnabled", 0))
     {
-    this->InterruptRenderCheck->SetState(
-      pvapp->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
+    this->RenderInterruptsEnabled = 
+      pvapp->GetIntRegisteryValue(2, "RunTime", "InterruptRender");
     }
-  else
-    {
-    this->InterruptRenderCheck->SetState(1);
-    }
-  this->InterruptRenderCheckCallback();
-  this->InterruptRenderCheck->SetBalloonHelpString(
+  this->RenderInterruptsEnabledCheck->SetState(this->RenderInterruptsEnabled);
+  // This call just forwards the value to the render module.
+  this->RenderInterruptsEnabledCheckCallback();
+
+  this->RenderInterruptsEnabledCheck->SetBalloonHelpString(
     "Toggle the use of  render interrupts (when using MPI, this uses "
     "asynchronous messaging). When off, renders can not be interrupted.");
 
@@ -377,7 +374,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->Script("pack %s -side top -fill x -expand t -anchor w",
                this->LODScalesFrame->GetWidgetName());
   this->Script("pack %s -side top -anchor w",
-               this->InterruptRenderCheck->GetWidgetName());
+               this->RenderInterruptsEnabledCheck->GetWidgetName());
 
   // LOD parameters: collection threshold
   // Conditional interface should really be part of a module. !!!!
@@ -460,14 +457,11 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     if (pvapp && 
         pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
       {
-      this->CompositeWithFloatCheck->SetState(
-        pvapp->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite"));
-      this->CompositeWithFloatCallback();
+      this->CompositeWithFloatFlag =
+        pvapp->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite");
       }
-    else
-      {
-      this->CompositeWithFloatCheck->SetState(0);
-      }
+    this->CompositeWithFloatCheck->SetState(this->CompositeWithFloatFlag);
+    this->CompositeWithFloatCallback();
     this->CompositeWithFloatCheck->SetBalloonHelpString(
       "Toggle the use of char/float values when compositing. "
       "If rendering defects occur, try turning this on.");
@@ -476,14 +470,11 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     if (pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                           "UseRGBAInComposite", 0))
       {
-      this->CompositeWithRGBACheck->SetState(
-        pvapp->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite"));
-      this->CompositeWithRGBACallback();
+      this->CompositeWithRGBAFlag =
+        pvapp->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite");
       }
-    else
-      {
-      this->CompositeWithRGBACheck->SetState(0);
-      }
+    this->CompositeWithRGBACheck->SetState(this->CompositeWithRGBAFlag);
+    this->CompositeWithRGBACallback();
     this->CompositeWithRGBACheck->SetBalloonHelpString(
       "Toggle the use of RGB/RGBA values when compositing. "
       "This is here to bypass some bugs in some graphics card drivers.");
@@ -493,15 +484,11 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     if (pvapp && 
         pvapp->GetRegisteryValue(2, "RunTime", "UseCompressionInComposite", 0))
       {
-      this->CompositeCompressionCheck->SetState(
-        pvapp->GetIntRegisteryValue(2, "RunTime", 
-                                       "UseCompressionInComposite"));
-      this->CompositeCompressionCallback();
+      this->CompositeCompressionFlag = 
+        pvapp->GetIntRegisteryValue(2, "RunTime", "UseCompressionInComposite");
       }
-    else
-      {
-      this->CompositeCompressionCheck->SetState(1);
-      }
+    this->CompositeCompressionCheck->SetState(this->CompositeCompressionFlag);
+    this->CompositeCompressionCallback();
     this->CompositeCompressionCheck->SetBalloonHelpString(
       "Toggle the use of run length encoding when compositing. "
       "This is here to compare performance.  "
@@ -694,11 +681,12 @@ void vtkPVLODRenderModuleUI::SetCollectThresholdInternal(float threshold)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::InterruptRenderCheckCallback()
+void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
+  this->RenderInterruptsEnabled = this->RenderInterruptsEnabledCheck->GetState();
   pvApp->GetRenderModule()->SetRenderInterruptsEnabled(
-                                   this->InterruptRenderCheck->GetState());
+                                   this->RenderInterruptsEnabled);
 }
 
 //----------------------------------------------------------------------------
@@ -713,6 +701,7 @@ void vtkPVLODRenderModuleUI::CompositeWithFloatCallback(int val)
 {
   this->AddTraceEntry("$kw(%s) CompositeWithFloatCallback %d", 
                       this->GetTclName(), val);
+  this->CompositeWithFloatFlag = val;
   if ( this->CompositeWithFloatCheck->GetState() != val )
     {
     this->CompositeWithFloatCheck->SetState(val);
@@ -754,6 +743,7 @@ void vtkPVLODRenderModuleUI::CompositeWithRGBACallback(int val)
 {
   this->AddTraceEntry("$kw(%s) CompositeWithRGBACallback %d", 
                       this->GetTclName(), val);
+  this->CompositeWithRGBAFlag = val;
   if ( this->CompositeWithRGBACheck->GetState() != val )
     {
     this->CompositeWithRGBACheck->SetState(val);
@@ -796,6 +786,7 @@ void vtkPVLODRenderModuleUI::CompositeCompressionCallback(int val)
 
   this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
                       this->GetTclName(), val);
+  this->CompositeCompressionFlag = val;
   if ( this->CompositeCompressionCheck->GetState() != val )
     {
     this->CompositeCompressionCheck->SetState(val);
@@ -836,5 +827,15 @@ void vtkPVLODRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LODThreshold: " << this->LODThreshold << endl;
   os << indent << "LODResolution: " << this->LODResolution << endl;
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
+
+  os << indent << "RenderInterruptsEnabled: " 
+     << this->RenderInterruptsEnabled << endl;
+
+  os << indent << "CompositeWithFloatFlag: " 
+     << this->CompositeWithFloatFlag << endl;
+  os << indent << "CompositeWithRGBAFlag: " 
+     << this->CompositeWithRGBAFlag << endl;
+  os << indent << "CompositeCompressionFlag: " 
+     << this->CompositeCompressionFlag << endl;
 }
 
