@@ -39,6 +39,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWEventNotifier.h"
 #include "kwinit.h"
 
+
+int vtkKWApplication::WidgetVisibility = 1;
+
+
 //------------------------------------------------------------------------------
 vtkKWApplication* vtkKWApplication::New()
 {
@@ -95,8 +99,6 @@ vtkKWApplication::vtkKWApplication()
   this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
   this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
 
-  this->WidgetVisibility = 1;
-  
   this->EventNotifier = vtkKWEventNotifier::New();
   this->EventNotifier->SetApplication( this );
 }
@@ -237,7 +239,11 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Tcl_Interp *interp;
   
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
-  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+    }
   
   Tcl_FindExecutable(argv[0]);
   interp = Tcl_CreateInterp();
@@ -246,8 +252,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   
   // initialize VTK
   Vtktcl_Init(interp);
-  // initialize Widgets
-  Vtkkwwidgetstcl_Init(interp);
+  
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    // initialize Widgets
+    Vtkkwwidgetstcl_Init(interp);
+    }
   
   return interp;
 }
