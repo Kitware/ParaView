@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.34");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.35");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -344,6 +344,30 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstVisiblePage()
   while (!it->IsDoneWithTraversal())
     {
     if (it->GetData(page) == VTK_OK && page->Visibility)
+      {
+      found = page;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
+}
+
+//------------------------------------------------------------------------------
+vtkKWNotebook::Page* vtkKWNotebook::GetFirstPageMatchingTag(int tag)
+{
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::Page *found = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  // Return the first page matching tag
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Tag == tag)
       {
       found = page;
       break;
@@ -632,6 +656,10 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
 
   this->ScheduleResize();
 
+  // Update pages
+  
+  this->BringMorePages();
+
   return 1;
 }
 
@@ -731,6 +759,22 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
   // trust Tk that much)
 
   this->ScheduleResize();
+
+  // Update pages
+  
+  this->BringMorePages();
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::GetRaisedPageId()
+{
+  return this->CurrentId;
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::RaiseFirstPageMatchingTag(int tag)
+{
+  this->RaisePage(this->GetFirstPageMatchingTag(tag));
 }
 
 //------------------------------------------------------------------------------
@@ -756,6 +800,10 @@ void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
   this->UpdatePageTabBackgroundColor(page, 0);
 
   this->ScheduleResize();
+
+  // Update pages
+  
+  this->BringMorePages();
 }
 
 //------------------------------------------------------------------------------
@@ -911,6 +959,10 @@ void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
     this->Script("pack forget %s", page->TabFrame->GetWidgetName());
     this->ScheduleResize();
     }
+
+  // Update pages
+  
+  this->BringMorePages();
 }
 
 //------------------------------------------------------------------------------
@@ -1556,7 +1608,33 @@ void vtkKWNotebook::SetShowAllPagesWithSameTag(int arg)
   this->ShowAllPagesWithSameTag = arg;
   this->Modified();
 
-  if (this->IsCreated() && this->ShowAllPagesWithSameTag)
+  this->BringMorePages();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetShowOnlyPagesWithSameTag(int arg)
+{
+  if (this->ShowOnlyPagesWithSameTag == arg)
+    {
+    return;
+    }
+  this->ShowOnlyPagesWithSameTag = arg;
+  this->Modified();
+
+  this->BringMorePages();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::BringMorePages()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Show all pages with the same tag
+
+  if (this->ShowAllPagesWithSameTag)
     {
     vtkKWNotebook::Page *page = NULL;
     vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
@@ -1572,22 +1650,14 @@ void vtkKWNotebook::SetShowAllPagesWithSameTag(int arg)
       }
     it->Delete();
     }
-}
 
-//----------------------------------------------------------------------------
-void vtkKWNotebook::SetShowOnlyPagesWithSameTag(int arg)
-{
-  if (this->ShowOnlyPagesWithSameTag == arg)
-    {
-    return;
-    }
-  this->ShowOnlyPagesWithSameTag = arg;
-  this->Modified();
+  // Show only the pages with the same tag (as the current selected page,
+  // except if it is pinned)
 
-  if (this->IsCreated() && this->ShowOnlyPagesWithSameTag)
+  if (this->ShowOnlyPagesWithSameTag)
     {
     vtkKWNotebook::Page *selected_page = this->GetPage(this->CurrentId);
-    if (selected_page)
+    if (selected_page && !selected_page->Pinned)
       {
       this->HidePagesNotMatchingTag(selected_page->Tag);
       }

@@ -102,10 +102,16 @@ public:
   // If a tag is provided, the page which title and tag match will be raised.
   // This provide a way to search within a group of pages, since several pages
   // could have the same title.
+  // GetRaisedPageId() returns the id of the page raised at the moment, -1 if
+  // none is raised.
+  // RaiseFirstPageMatchingTag() is a convenience method use to raise the first
+  // page matching a given tag.
   void Raise(int id);
   void Raise(const char *title);
   void Raise(const char *title, int tag);
-
+  int GetRaisedPageId();
+  void RaiseFirstPageMatchingTag(int tag);
+  
   // Description:
   // Get the vtkKWWidget for the frame of the specified page (Tab).
   // The UI components should be inserted into these frames.
@@ -263,9 +269,10 @@ protected:
   Page* GetPage(const char *title);
   Page* GetPage(const char *title, int tag);
 
-  // Get the first visible page
+  // Get the first visible page, the first page matching a tag
 
   Page* GetFirstVisiblePage();
+  Page* GetFirstPageMatchingTag(int tag);
   
   // Raise, Lower, Remove, Show, Hide, Pin, Unpin, Tag a specific page
 
@@ -299,6 +306,11 @@ protected:
 
   void UpdateBodyPosition();
   void UpdateMaskPosition();
+
+  // Bring more pages depending on ShowAllPagesWithSameTag and
+  // ShowOnlyPagesWithSameTag
+
+  void BringMorePages();
 
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented
