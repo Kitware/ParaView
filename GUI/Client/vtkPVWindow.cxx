@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.662");
+vtkCxxRevisionMacro(vtkPVWindow, "1.663");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -319,9 +319,9 @@ vtkPVWindow::vtkPVWindow()
   this->InteractorID.ID = 0;
   this->ServerFileListingID.ID = 0;
 
+  this->SaveVisibleSourcesOnlyFlag = 0;
   #ifdef PARAVIEW_USE_LOOKMARKS
   this->PVLookmarkManager = NULL;
-  this->SaveVisibleSourcesOnlyFlag = 0;
   #endif
 }
 
@@ -937,8 +937,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Display Lookmark Manager
   this->GetMenuWindow()->InsertCommand(
     4, "Lookmark Manager", this, 
-    "DisplayLookmarkManager", 8, 
-    "Create and Manage Your Lookmarks");
+    "DisplayLookmarkManager", "Create and Manage Your Lookmarks");
 #endif
 
   // Preferences sub-menu
@@ -3253,15 +3252,10 @@ void vtkPVWindow::SaveState(const char* filename)
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
-    #ifdef PARAVIEW_USE_LOOKMARKS
     if(this->SaveVisibleSourcesOnlyFlag && pvs->GetVisibility())
       pvs->SaveState(file);
     else if(!this->SaveVisibleSourcesOnlyFlag)
       pvs->SaveState(file);
-    #endif
-    #ifndef PARAVIEW_USE_LOOKMARKS
-    pvs->SaveState(file);
-    #endif
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -3271,15 +3265,10 @@ void vtkPVWindow::SaveState(const char* filename)
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
-    #ifdef PARAVIEW_USE_LOOKMARKS
     if(this->SaveVisibleSourcesOnlyFlag && pvs->GetVisitedFlag())
       pvs->SaveStateVisibility(file);
     else if(!this->SaveVisibleSourcesOnlyFlag)
       pvs->SaveStateVisibility(file);
-    #endif
-    #ifndef PARAVIEW_USE_LOOKMARKS
-    pvs->SaveStateVisibility(file);
-    #endif
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -3294,11 +3283,18 @@ void vtkPVWindow::SaveState(const char* filename)
   // Save the view at the end so camera get set properly.
   this->GetMainView()->SaveState(file);
 
-  // Save state of the animation interface
-  this->AnimationInterface->SaveState(file);
+  // short term check to see if this is a lookmark being generated
+  // in which case it doesn't support animation saving yet
+  if(this->SaveVisibleSourcesOnlyFlag == 0)
+    {
 
-  // Save state of the new animation interface
-  this->AnimationManager->SaveState(file);
+    // Save state of the animation interface
+    this->AnimationInterface->SaveState(file);
+
+    // Save state of the new animation interface
+    this->AnimationManager->SaveState(file);
+
+    }
 
   //  Save state of the Volume Appearance editor
   this->VolumeAppearanceEditor->SaveState(file);
@@ -5356,10 +5352,10 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractorID: " << this->InteractorID << endl;
   os << indent << "InDemo: " << this->InDemo << endl;
   os << indent << "LowerToolbars: " << this->LowerToolbars << endl;
+  os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
 
   // Lookmarks part:
 #ifdef PARAVIEW_USE_LOOKMARKS
-  os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
   os << indent << "PVLookmarkManager: ";
   if( this->PVLookmarkManager )
     {

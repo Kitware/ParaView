@@ -544,11 +544,12 @@ public:
   // Display the Lookmark Manager.
   void DisplayLookmarkManager();
 
-#ifdef PARAVIEW_USE_LOOKMARKS
-  //BTX
   // Description: 
   // When on and SaveState() is called, only sources that "contribute to the view" are saved to the session script.
   vtkSetMacro(SaveVisibleSourcesOnlyFlag,int);
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  //BTX
   vtkGetObjectMacro(PVLookmarkManager, vtkPVLookmarkManager);
   //ETX
 #endif
@@ -768,9 +769,10 @@ protected:
 
 private:
 
+  int SaveVisibleSourcesOnlyFlag;
+
 #ifdef PARAVIEW_USE_LOOKMARKS
   vtkPVLookmarkManager *PVLookmarkManager;
-  int SaveVisibleSourcesOnlyFlag;
 #endif
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented

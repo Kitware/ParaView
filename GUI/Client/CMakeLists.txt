@@ -65,6 +65,13 @@ SET( ParaViewClientNotWrapped_SRCS
   ${ExtraParaViewClientNonWrapped_SRCS}
   )
 
+IF (PARAVIEW_USE_LOOKMARKS)
+  SET( ParaViewClientNotWrapped_SRCS
+    ${ParaViewClientNotWrapped_SRCS}
+    vtkXMLLookmarkElement.cxx 
+    )
+ENDIF (PARAVIEW_USE_LOOKMARKS)
+
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkKWView.cxx
@@ -190,6 +197,15 @@ SET( ParaViewClient_SRCS
   #  vtkPVRenderGroupDialog.cxx
   ${ExtraParaViewClient_SRCS}
   )
+
+IF (PARAVIEW_USE_LOOKMARKS)
+  SET( ParaViewClient_SRCS
+    ${ParaViewClient_SRCS}
+    vtkPVLookmark.cxx
+    vtkPVLookmarkManager.cxx
+    )
+ENDIF (PARAVIEW_USE_LOOKMARKS)
+
 
 INCLUDE_DIRECTORIES(
   ${KWSYS_INCLUDE_DIR}
