@@ -93,7 +93,7 @@ public:
   // vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
   enum
     {
-    StateModifiedEvent = 2000,
+    StateModifiedEvent = 2000
     };
 //ETX
 protected:
