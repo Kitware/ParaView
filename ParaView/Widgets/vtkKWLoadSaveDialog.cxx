@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.29");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.30");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -133,7 +133,7 @@ int vtkKWLoadSaveDialog::Invoke()
 
   if (path && strlen(path))
     {
-    path = this->ConvertTkStringToInternalString(path);
+    path = this->ConvertTclStringToInternalString(path);
     
     this->SetFileName(path);
     if (this->ChooseDirectory && support_choose_dir)
