@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.395");
+vtkCxxRevisionMacro(vtkPVSource, "1.396");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1859,9 +1859,8 @@ void vtkPVSource::SaveState(ofstream *file)
         << "[$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "CreatePVSource " << this->GetModuleName() << "]" << endl;
 
-  // Call accept.
-  *file << "$kw(" << this->GetTclName() << ") SetLabel " 
-        << this->GetLabel() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetLabel {" 
+        << this->GetLabel() << "}" << endl;
 
   // Let the PVWidgets set up the object.
   numWidgets = this->Widgets->GetNumberOfItems();
