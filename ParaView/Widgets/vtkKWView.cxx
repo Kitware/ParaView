@@ -567,10 +567,8 @@ void vtkKWView::SetHeaderTextColor( float r, float g, float b )
     {
     return;
     }
-
   this->HeaderColor->SetColor( r, g, b );
   this->HeaderProp->GetProperty()->SetColor( r, g, b );
-  this->Render();
   float color[3];
   color[0] = r;
   color[1] = g;
@@ -1373,7 +1371,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.71 $");
+  this->ExtractRevision(os,"$Revision: 1.72 $");
 }
 
 //----------------------------------------------------------------------------

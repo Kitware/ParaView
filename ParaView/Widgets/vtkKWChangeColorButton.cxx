@@ -99,7 +99,6 @@ void vtkKWChangeColorButton::SetColor(float r, float g, float b)
 		  (int)(r*255.5), 
 		  (int)(g*255.5), 
 		  (int)(b*255.5) );
-    this->Script( "update idletasks");
     }
 }
 
@@ -261,7 +260,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
 }
 
 //----------------------------------------------------------------------------
