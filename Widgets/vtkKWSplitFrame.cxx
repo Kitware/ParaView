@@ -288,6 +288,11 @@ void vtkKWSplitFrame::SetSeparatorWidth(int width)
 
 void vtkKWSplitFrame::Update()
 {
+  if (this->Application == NULL)
+    {
+    return;
+    }
+  
   this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
                this->Frame1->GetWidgetName(), this->Frame1Width);
   this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
