@@ -39,5 +39,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "xtree.[0-9]+. : warning C4702: unreachable code"
   "warning LNK4221"
   "variable .var_args[2]*. is used before its value is set"
+  "jobserver unavailable"
   )
 

@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.13");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.14");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -137,20 +137,12 @@ int vtkPointsProjectedHull::rectangleIntersection##which(vtkPoints *R) \
   R->Modified();                                               \
   R->GetBounds(bounds);                                        \
   double hmin, hmax, vmin, vmax;                               \
-  switch (dim)                                                 \
-    {                                                          \
-    case xdim:                                                 \
-       hmin = (double)bounds[2]; hmax = (double)bounds[3];     \
-       vmin = (double)bounds[4]; vmax = (double)bounds[5];     \
-       break;                                                  \
-    case ydim:                                                 \
-       hmin = (double)bounds[4]; hmax = (double)bounds[5];     \
-       vmin = (double)bounds[0]; vmax = (double)bounds[1];     \
-       break;                                                  \
-    case zdim:                                                 \
-       hmin = (double)bounds[0]; hmax = (double)bounds[1];     \
-       vmin = (double)bounds[2]; vmax = (double)bounds[3];     \
-       break;}                                                 \
+                                                               \
+  hmin = (double)bounds[(dim*2+2)%6];                          \
+  hmax = (double)bounds[(dim*2+2)%6+1];                        \
+  vmin = (double)bounds[(dim*2+4)%6];                          \
+  vmax = (double)bounds[(dim*2+4)%6 + 1];                      \
+                                                               \
   return rectangleIntersection##which(hmin, hmax, vmin, vmax); \
 }                                                              \
 int vtkPointsProjectedHull::rectangleIntersection##which(float hmin, \

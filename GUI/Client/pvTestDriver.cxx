@@ -199,14 +199,14 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
     {
     return 1;
     }
-  cerr << "pvTestDirver: starting process " << name << "\n";
+  cerr << "pvTestDriver: starting process " << name << "\n";
   kwsysProcess_SetTimeout(server, this->TimeOut);
   kwsysProcess_Execute(server);
   int foundWaiting = 0;
   vtkstd::string output;
   while(!foundWaiting)
     {
-    int pipe = this->WaitForAndPrintLine(name, server, output, 30.0, out, err,
+    int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
                                          &foundWaiting);
     if(pipe == kwsysProcess_Pipe_None ||
        pipe == kwsysProcess_Pipe_Timeout)
@@ -216,12 +216,12 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
     }
   if(foundWaiting)
     {
-    cerr << "pvTestDirver: " << name << " sucessfully started.\n";
+    cerr << "pvTestDriver: " << name << " sucessfully started.\n";
     return 1;
     }
   else
     {
-    cerr << "pvTestDirver: " << name << " never started.\n";
+    cerr << "pvTestDriver: " << name << " never started.\n";
     kwsysProcess_Kill(server);
     return 0;
     }
