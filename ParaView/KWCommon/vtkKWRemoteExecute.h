@@ -66,7 +66,7 @@ public:
 
   // Description:
   // Run command.
-  int RunCommand(const char* command, const char* args[]);
+  int RunCommand(const char* args[]);
 
   static void* RunCommandThread(void*);
 
@@ -98,6 +98,11 @@ public:
   vtkGetMacro(Result, int);
 
   // Description:
+  // Set SSH user
+  vtkSetStringMacro(SSHUser);
+  vtkGetStringMacro(SSHUser);
+
+  // Description:
   // Set SSH command
   vtkSetStringMacro(SSHCommand);
   vtkGetStringMacro(SSHCommand);
@@ -116,6 +121,7 @@ protected:
 
   char* SSHCommand;
   char* SSHArguments;
+  char* SSHUser;
   char* RemoteHost;
   int ProcessRunning;
   int Result;

@@ -80,7 +80,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.9");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -90,6 +90,7 @@ vtkKWRemoteExecute::vtkKWRemoteExecute()
   this->ProcessRunning = 0;
   this->Result = NOT_RUN;
 
+  this->SSHUser = 0;
   this->SSHCommand = 0;
   this->SSHArguments = 0;
 
@@ -105,8 +106,10 @@ vtkKWRemoteExecute::~vtkKWRemoteExecute()
   delete this->Internals;
   this->SetRemoteHost(0);
 
+  this->SetSSHUser(0);
   this->SetSSHCommand(0);
   this->SetSSHArguments(0);
+
   this->MultiThreader->Delete();
 }
 
@@ -178,7 +181,7 @@ int vtkKWRemoteExecute::WaitToFinish()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRemoteExecute::RunCommand(const char* command, const char* args[])
+int vtkKWRemoteExecute::RunCommand(const char* args[])
 {
 #ifdef __WITH__FORK__
   int res = 0;
@@ -199,7 +202,7 @@ int vtkKWRemoteExecute::RunCommand(const char* command, const char* args[])
       return 0;
       }
       */
-    execv(command, (char* const*)args);
+    execv(args[0], (char* const*)args);
     return 0;
     }
   cout << "Child's pid: " << pid << endl;
@@ -225,33 +228,47 @@ int vtkKWRemoteExecute::RunCommand(const char* command, const char* args[])
 void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
 {
   vtkMultiThreader::ThreadInfo *ti = static_cast<vtkMultiThreader::ThreadInfo*>(vargs);
-  vtkKWRemoteExecute* rw = static_cast<vtkKWRemoteExecute*>(ti->UserData);
-  if ( !rw )
+  vtkKWRemoteExecute* self = static_cast<vtkKWRemoteExecute*>(ti->UserData);
+  if ( !self )
     {
-    cout << "Have no pointer to RW" << endl;
-    rw->Result = vtkKWRemoteExecute::FAIL;
+    cout << "Have no pointer to self" << endl;
     return 0;
     }
 
-  cout << "Rw is " << rw << endl;
+  cout << "self is " << self << endl;
 
   vtkKWRemoteExecuteInternal::VectorOfStrings &args = 
-    rw->Internals->Args;
+    self->Internals->Args;
 
-  int cc;
+  vtkKWRemoteExecuteInternal::VectorOfStrings::size_type cc;
   int cnt=args.size()+5;
+  if ( self->SSHArguments )
+    {
+    cnt ++;
+    }
+  if ( self->SSHUser )
+    {
+    cnt += 2;
+    }
   cout << "Number of arguments: " << cnt << endl;
   char** rargs = new char*[ cnt + 3];
   int scnt=0;
-  rargs[scnt] = vtkString::Duplicate( rw->SSHCommand);
+  rargs[scnt] = vtkString::Duplicate( self->SSHCommand);
   scnt ++;
-  if ( rw->SSHArguments )
+  if ( self->SSHArguments )
     {
-    rargs[scnt] = vtkString::Duplicate( rw->SSHArguments);
+    rargs[scnt] = vtkString::Duplicate( self->SSHArguments);
+    scnt ++;
+    }
+  if ( self->SSHUser )
+    {
+    rargs[scnt] = vtkString::Duplicate("-l");
+    scnt++;
+    rargs[scnt] = vtkString::Duplicate( self->SSHUser);
     scnt ++;
     }
 
-  rargs[scnt] = vtkString::Duplicate( rw->RemoteHost);
+  rargs[scnt] = vtkString::Duplicate( self->RemoteHost);
   scnt ++;
 
   cout << "Prepend: " << rargs[0] << endl;
@@ -262,7 +279,7 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
     scnt ++;
     }
   rargs[scnt] = 0;
-  int res = rw->RunCommand(rw->SSHCommand, (const char**)rargs);
+  int res = self->RunCommand((const char**)rargs);
   for ( cc = 0; rargs[cc]; cc ++ )
     {
     delete [] rargs[cc];
@@ -270,15 +287,15 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
   delete [] rargs;
   if ( res == VTK_OK )
     {
-    rw->Result = vtkKWRemoteExecute::SUCCESS;
+    self->Result = vtkKWRemoteExecute::SUCCESS;
     }
   else
     {
-    rw->Result = vtkKWRemoteExecute::FAIL;
+    self->Result = vtkKWRemoteExecute::FAIL;
     }
-  if ( rw ) 
+  if ( self ) 
     {
-    rw->ProcessRunning = 1;
+    self->ProcessRunning = 1;
     }
   return 0;
 }
@@ -288,4 +305,7 @@ void vtkKWRemoteExecute::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "RemoteHost: " << this->RemoteHost << endl;
+  os << indent << "SSHCommand: " << (this->SSHCommand?this->SSHCommand:"(none)") << endl;
+  os << indent << "Result: " << this->Result << endl;
+  os << indent << "SSHArguments: " << (this->SSHArguments?this->SSHArguments:"(none)") << endl;
 }
