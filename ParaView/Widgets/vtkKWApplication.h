@@ -184,6 +184,13 @@ public:
   vtkSetMacro(ExitStatus, int);
   vtkGetMacro(ExitStatus, int);
 
+  // Description:
+  // When a modal dialog is up, this flag should be set.
+  // vtkKWWindow will check this at exit and if set,
+  // it will refuse to exit
+  vtkSetMacro(DialogUp, int);
+  vtkGetMacro(DialogUp, int);
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -204,6 +211,7 @@ protected:
 
   static int WidgetVisibility;
   int InExit;
+  int DialogUp;
 
   int ExitStatus;
   

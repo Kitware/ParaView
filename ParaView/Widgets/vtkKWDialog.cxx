@@ -76,6 +76,7 @@ int vtkKWDialog::Invoke()
 {
   this->Done = 0;
 
+  this->Application->SetDialogUp(1);
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
@@ -95,6 +96,7 @@ int vtkKWDialog::Invoke()
     }
   this->Script("grab release %s",this->GetWidgetName());
 
+  this->Application->SetDialogUp(0);
   return (this->Done-1);
 }
 

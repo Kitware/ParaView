@@ -115,6 +115,7 @@ vtkKWApplication::vtkKWApplication()
     }
   
   this->InExit = 0;
+  this->DialogUp = 0;
   this->TraceFile = NULL;
 
   this->ExitStatus = 0;

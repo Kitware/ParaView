@@ -406,6 +406,11 @@ void vtkKWWindow::SetSelectedView(vtkKWView *_arg)
 // invoke the apps exit when selected
 void vtkKWWindow::Exit()
 {  
+  if (this->Application->GetDialogUp())
+    {
+    this->Script("bell");
+    return;
+    }
   if (!this->InExit)
     {
     this->InExit = 1;
@@ -964,7 +969,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.78 $");
+  this->ExtractRevision(os,"$Revision: 1.79 $");
 }
 
 int vtkKWWindow::ExitDialog()
