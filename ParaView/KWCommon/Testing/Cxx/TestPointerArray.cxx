@@ -26,7 +26,7 @@ int TestList(DType*)
 {
   vtkIdType cc;
   int error = 0;
-  char* names[] = {
+  const char* names[] = {
     "Andy",
     "Amy",
     "Berk",
@@ -41,7 +41,7 @@ int TestList(DType*)
     0
   };
 
-  char separate[] = "separate";
+  const char separate[] = "separate";
 
 
   DType *strings = DType::New();
