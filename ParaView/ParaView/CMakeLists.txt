@@ -145,6 +145,10 @@ IF (VTK_USE_PATENTED)
       vtkPVKitwareContourFilter)
 ENDIF (VTK_USE_PATENTED)
 
+IF(PARAVIEW_USE_HDF5)
+  SET(ParaView_SRCS ${ParaView_SRCS} vtkHDF5RawImageReader.cxx)
+ENDIF(PARAVIEW_USE_HDF5)
+
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
   vtkPVWindowResources
@@ -210,6 +214,10 @@ ADD_EXECUTABLE(ParaView WIN32 ${ParaViewBinary_SRCS})
 
 TARGET_LINK_LIBRARIES (ParaView
                        vtkKWParaViewTCL)
+
+IF(PARAVIEW_USE_HDF5)
+  TARGET_LINK_LIBRARIES(ParaView ${PARAVIEW_HDF5_LIBRARIES})
+ENDIF(PARAVIEW_USE_HDF5)
 
 INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
