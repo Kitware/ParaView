@@ -94,6 +94,40 @@ the view along it's Z axis.  Clicking in the middle third of the view gives
 a paning interaction which translates the view along its X and Y axes.
 
 
+<h1> Levels of Detail </h1>
+
+<p>
+ParaView has two mode for rendering: still and interactive.  
+The interactive mode is set when the user is interactively
+manipulating the view.  The still mode is used for the final render
+after interaction has stopped.
+</p>
+
+<p>
+Level of details (LOD) may be used to increase the frame rate for interactive renders.
+ParaView uses two LOD techniques.  A decimated model can replace the full resolution
+model to keep the polygon count low.  Also, when ParaView is rendering in parallel,
+pixel replication is used to reduce the cost of compositing.  The application of
+these two techniques can be controlled fro the user interface.  In the upper right 
+toolbar contains a reduction check box and a frame rate slider.
+</p>
+
+<p>
+<center>
+<img alt="Frame Rate Slider" src="Images/FrameRateSlider.jpg">
+</center>
+<p>
+
+<p>
+Pixel replication is only used when the reduction box is checked.  
+The frame rate slider determines the amount of time that is allocated
+for each interactive render.  When the slider is all the way to the left,
+an unlimited amount of time is allocated, so no LOD techniques are used.
+When the slider is moved to the right, less time is allocated and ParaView
+will start using decimate models and rendering lower resolution images.
+</p>
+
+
 <hr>
 <address></address>
 <!-- hhmts start -->
