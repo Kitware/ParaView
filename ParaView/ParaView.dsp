@@ -97,6 +97,34 @@ SOURCE=.\tcl\KWParaViewInit.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkDummyRenderWindowInteractor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleExtent.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleGridExtent.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleImageExtent.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStylePlane.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStylePlaneSource.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleSphere.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWRenderView.cxx
 # End Source File
 # Begin Source File
@@ -121,14 +149,6 @@ SOURCE=.\vtkPVRenderViewTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVRenderWindowInteractor.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVRenderWindowInteractorTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVWindow.cxx
 # End Source File
 # Begin Source File
@@ -139,6 +159,34 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\vtkDummyRenderWindowInteractor.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleExtent.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleGridExtent.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleImageExtent.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStylePlane.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStylePlaneSource.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleSphere.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWRenderView.h
@@ -199,26 +247,6 @@ SOURCE=.\vtkPVRenderView.h
 # Begin Custom Build
 InputPath=.\vtkPVRenderView.h
 InputName=vtkPVRenderView
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVRenderWindowInteractor.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVRenderWindowInteractor.h
-InputName=vtkPVRenderWindowInteractor
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

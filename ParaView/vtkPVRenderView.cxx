@@ -27,7 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderWindowInteractor.h"
+#include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 
 
@@ -53,7 +53,7 @@ vtkPVRenderView::vtkPVRenderView()
 {
   this->CommandFunction = vtkPVRenderViewCommand;
   this->InteractorStyle = NULL;
-  this->Interactor = vtkPVRenderWindowInteractor::New();
+  this->Interactor = vtkDummyRenderWindowInteractor::New();
 }
 
 vtkPVRenderView::~vtkPVRenderView()
