@@ -498,14 +498,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   char *rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(2, "Source",
+  this->GetMenuProperties()->AddRadioButton(2, "  Source",
                                             rbv, this,
                                             "ShowCurrentSourceProperties");
   delete [] rbv;
 
   rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
            this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(3, "Animation",
+  this->GetMenuProperties()->AddRadioButton(3, "  Animation",
                                             rbv, this,
                                             "ShowAnimationProperties");
   delete [] rbv;

@@ -10,7 +10,6 @@ vtkKWInteractor
 vtkKWRotateCameraInteractor 
 vtkKWSelectPointInteractor
 vtkKWTranslateCameraInteractor 
-vtkPOPReader 
 vtkPVActorComposite 
 vtkPVAnimationInterface
 vtkPVApplication 

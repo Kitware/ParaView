@@ -82,7 +82,7 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
     return;
     }
   this->SetApplication(app);
-  this->Script("menu %s %s -tearoff %d", this->GetWidgetName(), args, this->TearOff); 
+  this->Script("menu %s -tearoff %d %s", this->GetWidgetName(), this->TearOff, args); 
   this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", this->GetWidgetName(),
 	       this->GetTclName());
   

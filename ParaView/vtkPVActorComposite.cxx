@@ -590,6 +590,7 @@ void vtkPVActorComposite::CreateProperties()
   
   this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
   this->VisibilityCheck->Create(this->Application, "-text Visibility");
+  this->VisibilityCheck->SetState(1);
   this->Application->Script("%s configure -command {%s VisibilityCheckCallback}",
                             this->VisibilityCheck->GetWidgetName(),
                             this->GetTclName());
@@ -798,16 +799,6 @@ void vtkPVActorComposite::UpdateProperties()
     {
     this->ColorMenu->SetValue("Property");
     this->ColorByProperty();
-    }
-
-  // Make sure the visibility check is consistent with out state.
-  if (this->GetVisibility())
-    {
-    this->VisibilityCheck->SetState(1);
-    }
-  else
-    {
-    this->VisibilityCheck->SetState(0);
     }
 }
 
@@ -1566,11 +1557,13 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
 void vtkPVActorComposite::SetScalarBarOrientationToVertical()
 {
   this->ScalarBarOrientationCheck->SetState(1);
+  this->ScalarBarOrientationCallback();
 }
 
 void vtkPVActorComposite::SetScalarBarOrientationToHorizontal()
 {
   this->ScalarBarOrientationCheck->SetState(0);
+  this->ScalarBarOrientationCallback();
 }
 
 void vtkPVActorComposite::ChangePointSize()
