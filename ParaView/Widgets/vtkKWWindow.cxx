@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.112");
+vtkCxxRevisionMacro(vtkKWWindow, "1.113");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1011,7 +1011,7 @@ void vtkKWWindow::CreateStatusImage()
   delete [] block.pixelPtr;
 }
 
-void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
+void vtkKWWindow::StoreRecentMenuToRegistery(const char * vtkNotUsed(key))
 {
   char KeyNameP[10];
   char CmdNameP[10];
@@ -1041,7 +1041,7 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     }
 }
 
-void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
+void vtkKWWindow::AddRecentFilesToMenu(const char *menuEntry, vtkKWObject *target)
 {
   char KeyNameP[10];
   char CmdNameP[10];
@@ -1095,7 +1095,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
   delete [] newMenuEntry;
 }
 
-void vtkKWWindow::AddRecentFile(char *key, char *name, vtkKWObject *target,
+void vtkKWWindow::AddRecentFile(const char *key, const char *name, vtkKWObject *target,
                                 const char *command)
 {  
   const char* filename = this->Application->ExpandFileName(name);
@@ -1128,7 +1128,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.112 $");
+  this->ExtractRevision(os,"$Revision: 1.113 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1173,7 +1173,7 @@ int vtkKWWindow::ExitDialog()
   return ret;
 }
 
-void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
+void vtkKWWindow::UpdateRecentMenu(const char * vtkNotUsed(key))
 {  
   int cc;
   for ( cc = 0; cc < this->RealNumberOfMRUFiles; cc ++ )
