@@ -75,12 +75,6 @@ protected:
   friend class vtkSMDisplayWindowProxy;
 //ETX
 
-  vtkGetObjectMacro(ActorProxy, vtkSMProxy);
-
-  vtkSMProxy* MapperProxy;
-  vtkSMProxy* ActorProxy;
-  vtkSMProxy* PropertyProxy;
-
   void DrawWireframe();
   void DrawPoints();
   void DrawSurface();

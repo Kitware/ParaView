@@ -139,16 +139,24 @@ protected:
   int GetServerID(int i);
 
   // Description:
-  // Delete all server ids.
+  // Delete all server ids on all proxies (root and sub).
   void ClearServerIDs();
+
+  // Description:
+  // Delete all server ids on root proxy.
+  void ClearServerIDsSelf();
 
   // Description:
   // Return all server ids;
   const int* GetServerIDs();
 
   // Description:
-  // Add a given server id.
+  // Add a given server id to all proxies (root and sub).
   void AddServerID(int id);
+
+  // Description:
+  // Add a given server id to root proxy.
+  void AddServerIDToSelf(int id);
 
 //BTX
   // This is a convenience method that pushes the value of one property
@@ -198,10 +206,32 @@ protected:
                    int addObserver, 
                    int doUpdate);
 
+  void AddProperty(const char* subProxyName,
+                   const char* name, 
+                   vtkSMProperty* prop, 
+                   int addObserver, 
+                   int doUpdate);
+
+  void AddPropertyToSelf(const char* name, 
+                         vtkSMProperty* prop, 
+                         int addObserver, 
+                         int doUpdate);
+
+  // Description:
+  void AddSubProxy(const char* name, vtkSMProxy* proxy);
+
+  // Description:
+  void RemoveSubProxy(const char* name);
+
+  // Description:
+  vtkSMProxy* GetSubProxy(const char* name);
+
   char* VTKClassName;
   int ObjectsCreated;
 
   vtkClientServerID SelfID;
+
+  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
 private:
   vtkSMProxyInternals* Internals;

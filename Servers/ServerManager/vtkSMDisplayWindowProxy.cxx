@@ -22,132 +22,24 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
 {
   this->SetVTKClassName("vtkRenderWindow");
 
-  this->RendererProxy = vtkSMProxy::New();
-  this->CameraProxy = vtkSMProxy::New();
-  this->CompositeProxy = vtkSMProxy::New();
   // TODO revise this: where should windowtoimage be?
   this->WindowToImage = vtkSMProxy::New();
   this->WindowToImage->ClearServerIDs();
   this->WindowToImage->AddServerID(0);
-
-  vtkSMDoubleVectorProperty* doubleVec;
-  vtkSMIntVectorProperty* intVec;
-
-  double zeros[3] = {0.0, 0.0, 0.0};
-
-  // Create the SM properties for the renderer proxy
-
-  // Note that the property is added to both the root
-  // proxy (this) and to the sub-proxy. However, observer
-  // addition as well as doUpdate are disabled when adding
-  // it to the root proxy. The only reason the property is
-  // added to the root proxy is to expose it to the outside.
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetBackground");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(zeros);
-  this->AddProperty("BackgroundColor", doubleVec, 0, 0);
-  this->RendererProxy->AddProperty("BackgroundColor", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("ResetCamera");
-  doubleVec->SetNumberOfElements(0);
-  this->AddProperty("ResetCamera", doubleVec, 0, 0);
-  this->RendererProxy->AddProperty("ResetCamera", doubleVec);
-  doubleVec->Delete();
-
-  // Create the SM properties for the camera proxy
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetPosition");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElement(0, 1);
-  doubleVec->SetElement(1, 0);
-  doubleVec->SetElement(2, 0);
-  this->AddProperty("CameraPosition", doubleVec, 0, 0);
-  this->CameraProxy->AddProperty("CameraPosition", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetFocalPoint");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(zeros);
-  this->AddProperty("CameraFocalPoint", doubleVec, 0, 0);
-  this->CameraProxy->AddProperty("CameraFocalPoint", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetViewUp");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElement(0, 0);
-  doubleVec->SetElement(1, 1);
-  doubleVec->SetElement(2, 0);
-  this->AddProperty("CameraViewUp", doubleVec, 0, 0);
-  this->CameraProxy->AddProperty("CameraViewUp", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetViewAngle");
-  doubleVec->SetNumberOfElements(1);
-  doubleVec->SetElement(0, 30);
-  this->AddProperty("CameraViewAngle", doubleVec, 0, 0);
-  this->CameraProxy->AddProperty("CameraViewAngle", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetClippingRange");
-  doubleVec->SetNumberOfElements(2);
-  doubleVec->SetElement(0, 0.01);
-  doubleVec->SetElement(1, 1000.01);
-  this->AddProperty("CameraClippingRange", doubleVec, 0, 0);
-  this->CameraProxy->AddProperty("CameraClippingRange", doubleVec);
-  doubleVec->Delete();
-
-  // Create the SM properties for the renderwindow (this) proxy
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetSize");
-  intVec->SetNumberOfElements(2);
-  intVec->SetElement(0, 400);
-  intVec->SetElement(1, 400);
-  this->AddProperty("Size", intVec);
-  intVec->Delete();
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetOffScreenRendering");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 1);
-  this->AddProperty("OffScreenRendering", intVec);
-  intVec->Delete();
 
 }
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::~vtkSMDisplayWindowProxy()
 {
-  this->RendererProxy->Delete();
-  this->CameraProxy->Delete();
-  this->CompositeProxy->Delete();
   this->WindowToImage->Delete();
-}
-
-//---------------------------------------------------------------------------
-// We overwrite this method to make sure that it is forwarded to the
-// sub-proxies as well.
-void vtkSMDisplayWindowProxy::UpdateVTKObjects()
-{
-  this->Superclass::UpdateVTKObjects();
-
-  this->RendererProxy->UpdateVTKObjects();
-  this->CameraProxy->UpdateVTKObjects();
 }
 
 //---------------------------------------------------------------------------
@@ -174,44 +66,68 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
         << vtkClientServerStream::End;
     }
 
-  this->RendererProxy->SetVTKClassName("vtkRenderer");
-  this->RendererProxy->CreateVTKObjects(numObjects);
-  for (i=0; i<numObjects; i++)
+  vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
+  if (!rendererProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->GetID(i) << "AddRenderer" << this->RendererProxy->GetID(i)
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No renderer sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << this->GetID(i) << "AddRenderer" << rendererProxy->GetID(i)
+          << vtkClientServerStream::End;
+      }
     }
 
-  this->CameraProxy->SetVTKClassName("vtkCamera");
-  this->CameraProxy->CreateVTKObjects(numObjects);
-  for (i=0; i<numObjects; i++)
+  vtkSMProxy* cameraProxy = this->GetSubProxy("camera");
+  if (!cameraProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->RendererProxy->GetID(i) 
-        << "SetActiveCamera" 
-        << this->CameraProxy->GetID(i)
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No camera sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << rendererProxy->GetID(i) 
+          << "SetActiveCamera" 
+          << cameraProxy->GetID(i)
+          << vtkClientServerStream::End;
+      }
     }
 
-  this->CompositeProxy->SetVTKClassName("vtkCompositeRenderManager");
-  this->CompositeProxy->CreateVTKObjects(numObjects);
-  for (i=0; i<numObjects; i++)
+  vtkSMProxy* compositeProxy = this->GetSubProxy("composite");
+  if (!compositeProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->CompositeProxy->GetID(i) 
-        << "SetRenderWindow" 
-        << this->GetID(i)
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << this->CompositeProxy->GetID(i) 
-        << "InitializeRMIs" 
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No composite sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << compositeProxy->GetID(i) 
+          << "SetRenderWindow" 
+          << this->GetID(i)
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << compositeProxy->GetID(i) 
+          << "InitializeRMIs" 
+          << vtkClientServerStream::End;
+      }
     }
 
-  cm->SendStreamToServers(&str, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  if (str.GetNumberOfMessages() > 0)
+    {
+    cm->SendStreamToServers(&str, 
+                            this->GetNumberOfServerIDs(),
+                            this->GetServerIDs());
+    }
 
   str.Reset();
 
@@ -293,14 +209,30 @@ void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMDisplayerProxy* display)
 {
   this->CreateVTKObjects(1);
 
+  vtkSMProxy* actorProxy = display->GetSubProxy("actor");
+  if (!actorProxy)
+    {
+    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
+  vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
+  if (!rendererProxy)
+    {
+    vtkErrorMacro("No renderer sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
   vtkClientServerStream str;
-  int numActors = display->GetActorProxy()->GetNumberOfIDs();
+  int numActors = actorProxy->GetNumberOfIDs();
   for (int i=0; i<numActors; i++)
     {
     str << vtkClientServerStream::Invoke 
-        << this->RendererProxy->GetID(0) 
+        << rendererProxy->GetID(0) 
         << "AddActor" 
-        << display->GetActorProxy()->GetID(i)
+        << actorProxy->GetID(i)
         << vtkClientServerStream::End;
     }
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();

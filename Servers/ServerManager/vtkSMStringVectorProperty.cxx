@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.3");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -182,6 +182,19 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
   delete[] eTypes;
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::SaveState(
+  const char* name, ofstream* file, vtkIndent indent)
+{
+  *file << indent << this->GetClassName() << " : " << name << " : ";
+  unsigned int size = this->GetNumberOfElements();
+  for (unsigned int i=0; i<size; i++)
+    {
+    *file << this->GetElement(i) << " ";
+    }
+  *file << endl;
 }
 
 //---------------------------------------------------------------------------

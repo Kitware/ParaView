@@ -51,6 +51,8 @@ protected:
   static vtkSMCommunicationModule* CommunicationModule;
   static vtkSMProxyManager* ProxyManager;
 
+  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+
 private:
   vtkSMObject(const vtkSMObject&); // Not implemented
   void operator=(const vtkSMObject&); // Not implemented

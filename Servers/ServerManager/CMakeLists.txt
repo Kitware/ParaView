@@ -3,6 +3,7 @@ PROJECT(ServerManager)
 SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
   vtkSMCommunicationModule.cxx
+  vtkSMDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMSimpleCommunicationModule.cxx
   vtkSMIntVectorProperty.cxx
@@ -14,6 +15,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMSourceProxy.cxx
   vtkSMDisplayerProxy.cxx
   vtkSMDisplayWindowProxy.cxx
+  vtkSMProxyGroupDomain.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMStringVectorProperty.cxx
@@ -31,6 +33,7 @@ SET( ServerManager_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMCommunicationModule.cxx
+  vtkSMDomain.cxx
   vtkSMProperty.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT

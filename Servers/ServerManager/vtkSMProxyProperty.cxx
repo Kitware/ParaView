@@ -20,7 +20,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::vtkSMProxyProperty()
@@ -77,6 +77,15 @@ void vtkSMProxyProperty::AppendCommandToStream(
     *str << nullID;
     }
   *str << vtkClientServerStream::End;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::SaveState(
+  const char* name,  ofstream* file, vtkIndent indent)
+{
+  *file << indent << this->GetClassName() 
+        << " : " << name 
+        << " : " << this->Proxy << endl;
 }
 
 //---------------------------------------------------------------------------

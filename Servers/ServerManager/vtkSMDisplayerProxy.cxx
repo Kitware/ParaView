@@ -27,72 +27,15 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
 {
-  this->SetVTKClassName("vtkPVGeometryFilter");
-
-  this->MapperProxy = vtkSMProxy::New();
-  this->ActorProxy = vtkSMProxy::New();
-  this->PropertyProxy = vtkSMProxy::New();
-
   vtkSMIntVectorProperty* intVec;
   vtkSMDoubleVectorProperty* doubleVec;
 
-  // Create the SM properties for the vtkPVGeometryFilter proxy
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetUseOutline");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 0);
-  this->AddProperty("DisplayAsOutline", intVec);
-  intVec->Delete();
-
-  // Create the SM properties for the vtkProperty proxy
-
-  double ones[3] = {1.0, 1.0, 1.0};
-
-  // Note that the property is added to both the root
-  // proxy (this) and to the sub-proxy. However, observer
-  // addition as well as doUpdate are disabled when adding
-  // it to the root proxy. The only reason the property is
-  // added to the root proxy is to expose it to the outside.
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetInterpolation");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 1);
-  this->AddProperty("Interpolation", intVec, 0, 0);
-  this->PropertyProxy->AddProperty("Interpolation", intVec);
-  intVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetPointSize");
-  doubleVec->SetNumberOfElements(1);
-  doubleVec->SetElement(0, 1);
-  this->AddProperty("PointSize", doubleVec, 0, 0);
-  this->PropertyProxy->AddProperty("PointSize", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetLineWidth");
-  doubleVec->SetNumberOfElements(1);
-  doubleVec->SetElement(0, 1);
-  this->AddProperty("LineWidth", doubleVec, 0, 0);
-  this->PropertyProxy->AddProperty("LineWidth", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetOpacity");
-  doubleVec->SetNumberOfElements(1);
-  doubleVec->SetElement(0, 1);
-  this->AddProperty("Opacity", doubleVec, 0, 0);
-  this->PropertyProxy->AddProperty("Opacity", doubleVec);
-  doubleVec->Delete();
-
-  // Create the specialized SM properties for this
+  double ones[3] = {1, 1, 1};
 
   // This property actually invokes a method on this (as opposed
   // to the VTK object on the server). Note that an observer is
@@ -118,98 +61,11 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
   intVec->SetElement(0, 2);
   this->AddProperty("Representation", intVec, 1, 0);
   intVec->Delete();
-
-  // Create the SM properties for the vtkMapper proxy
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetImmediateModeRendering");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 1);
-  this->AddProperty("ImmediateModeRendering", intVec, 0, 0);
-  this->MapperProxy->AddProperty("ImmediateModeRendering", intVec);
-  intVec->Delete();
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetScalarMode");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 0);
-  this->AddProperty("ScalarMode", intVec, 0, 0);
-  this->MapperProxy->AddProperty("ScalarMode", intVec);
-  intVec->Delete();
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetColorMode");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 0);
-  this->AddProperty("ColorMode", intVec, 1, 0);
-  this->MapperProxy->AddProperty("ColorMode", intVec);
-  intVec->Delete();
-
-  vtkSMStringVectorProperty* stringVec = vtkSMStringVectorProperty::New();
-  stringVec->SetCommand("SelectColorArray");
-  stringVec->SetNumberOfElements(1);
-  stringVec->SetElement(0, "");
-  this->AddProperty("ColorArray", stringVec, 1, 0);
-  this->MapperProxy->AddProperty("ColorArray", stringVec);
-  stringVec->Delete();
-
-  vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::New();
-  proxyProp->SetCommand("SetLookupTable");
-  proxyProp->SetProxy(0);
-  this->AddProperty("LookupTable", proxyProp, 1, 0);
-  this->MapperProxy->AddProperty("LookupTable", proxyProp);
-  proxyProp->Delete();
-
-  // Create the SM properties for the vtkActor proxy
-
-  intVec = vtkSMIntVectorProperty::New();
-  intVec->SetCommand("SetVisibility");
-  intVec->SetNumberOfElements(1);
-  intVec->SetElement(0, 1);
-  this->AddProperty("Visibility", intVec, 0, 0);
-  this->ActorProxy->AddProperty("Visibility", intVec);
-  intVec->Delete();
-
-  double zeros[3] = {0.0, 0.0, 0.0};
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetPosition");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(zeros);
-  this->AddProperty("Position", doubleVec, 0, 0);
-  this->ActorProxy->AddProperty("Position", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetScale");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(ones);
-  this->AddProperty("Scale", doubleVec, 0, 0);
-  this->ActorProxy->AddProperty("Scale", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetOrientation");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(zeros);
-  this->AddProperty("Orientation", doubleVec, 0, 0);
-  this->ActorProxy->AddProperty("Orientation", doubleVec);
-  doubleVec->Delete();
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetOrigin");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(zeros);
-  this->AddProperty("Origin", doubleVec, 0, 0);
-  this->ActorProxy->AddProperty("Origin", doubleVec);
-  doubleVec->Delete();
 }
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::~vtkSMDisplayerProxy()
 {
-  this->MapperProxy->Delete();
-  this->ActorProxy->Delete();
-  this->PropertyProxy->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -230,10 +86,6 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
 
   this->PushProperty("Color", this->SelfID, 0);
   this->SetPropertyModifiedFlag("Color", 0);
-
-  this->ActorProxy->UpdateVTKObjects();
-  this->PropertyProxy->UpdateVTKObjects();
-  this->MapperProxy->UpdateVTKObjects();
 }
 
 //---------------------------------------------------------------------------
@@ -241,7 +93,14 @@ void vtkSMDisplayerProxy::SetColor(double r, double g, double b)
 {
   vtkClientServerStream stream;
 
-  vtkClientServerID propertyID = this->PropertyProxy->GetID(0);
+  vtkSMProxy* propProxy = this->GetSubProxy("property");
+  if (!propProxy)
+    {
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+  vtkClientServerID propertyID = propProxy->GetID(0);
   stream << vtkClientServerStream::Invoke 
          << propertyID << "SetColor" << r << g << b 
          << vtkClientServerStream::End;
@@ -263,13 +122,29 @@ void vtkSMDisplayerProxy::SetScalarVisibility(int vis)
 
   int numObjects = this->GetNumberOfIDs();
   
+  vtkSMProxy* mapperProxy = this->GetSubProxy("mapper");
+  if (!mapperProxy)
+    {
+    vtkErrorMacro("No mapper sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
   for (int i=0; i<numObjects; i++)
     {
-    stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
+    stream << vtkClientServerStream::Invoke << mapperProxy->GetID(i)
            << "SetScalarVisibility" << vis << vtkClientServerStream::End;
     }
 
-  vtkClientServerID propertyID = this->PropertyProxy->GetID(0);
+  vtkSMProxy* propertyProxy = this->GetSubProxy("property");
+  if (!propertyProxy)
+    {
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
+  vtkClientServerID propertyID = propertyProxy->GetID(0);
   if (vis)
     {
     // Turn off the specular so it does not interfere with data.
@@ -320,18 +195,26 @@ void vtkSMDisplayerProxy::SetRepresentation(int repr)
 // Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawWireframe()
 {
+  vtkSMProxy* propertyProxy = this->GetSubProxy("property");
+  if (!propertyProxy)
+    {
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
   vtkClientServerStream stream;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetAmbient" << 1 
+    << propertyProxy->GetID(0) << "SetAmbient" << 1 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetDiffuse" << 0 
+    << propertyProxy->GetID(0) << "SetDiffuse" << 0 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetRepresentationToWireframe" 
+    << propertyProxy->GetID(0) << "SetRepresentationToWireframe" 
     << vtkClientServerStream::End;
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
@@ -344,18 +227,26 @@ void vtkSMDisplayerProxy::DrawWireframe()
 // Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawPoints()
 {
+  vtkSMProxy* propertyProxy = this->GetSubProxy("property");
+  if (!propertyProxy)
+    {
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
   vtkClientServerStream stream;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetAmbient" << 1 
+    << propertyProxy->GetID(0) << "SetAmbient" << 1 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetDiffuse" << 0 
+    << propertyProxy->GetID(0) << "SetDiffuse" << 0 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetRepresentationToPoints" 
+    << propertyProxy->GetID(0) << "SetRepresentationToPoints" 
     << vtkClientServerStream::End;
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
@@ -368,18 +259,26 @@ void vtkSMDisplayerProxy::DrawPoints()
 // Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawSurface()
 {
+  vtkSMProxy* propertyProxy = this->GetSubProxy("property");
+  if (!propertyProxy)
+    {
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+
   vtkClientServerStream stream;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetAmbient" << 0 
+    << propertyProxy->GetID(0) << "SetAmbient" << 0 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetDiffuse" << 1 
+    << propertyProxy->GetID(0) << "SetDiffuse" << 1 
     << vtkClientServerStream::End;
   stream 
     << vtkClientServerStream::Invoke 
-    << this->PropertyProxy->GetID(0) << "SetRepresentationToSurface" 
+    << propertyProxy->GetID(0) << "SetRepresentationToSurface" 
     << vtkClientServerStream::End;
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
@@ -401,75 +300,94 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
 
   this->CreateParts();
 
-  // Create the mapper proxy connect it to the geometry filter
-  this->MapperProxy->SetVTKClassName("vtkPolyDataMapper");
-  this->MapperProxy->CreateVTKObjects(numObjects);
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int i;
-  for (i=0; i<numObjects; i++)
+
+  vtkSMProxy* mapperProxy = this->GetSubProxy("mapper");
+  if (!mapperProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->MapperProxy->GetID(i)
-        << "SetInput"
-        << this->GetPart(i)->GetID(0)
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << this->MapperProxy->GetID(i)
-        << "SetPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << pm->GetProcessModuleID()
-        << "GetNumberOfPartitions"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << this->MapperProxy->GetID(i)
-        << "SetNumberOfPieces"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No mapper sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << mapperProxy->GetID(i)
+          << "SetInput"
+          << this->GetPart(i)->GetID(0)
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << pm->GetProcessModuleID()
+          << "GetPartitionId"
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << mapperProxy->GetID(i)
+          << "SetPiece"
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << pm->GetProcessModuleID()
+          << "GetNumberOfPartitions"
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << mapperProxy->GetID(i)
+          << "SetNumberOfPieces"
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+      }
     }
 
-  // Create the actor proxy and connect it to the mapper proxy (this)
-  this->ActorProxy->SetVTKClassName("vtkActor");
-  this->ActorProxy->CreateVTKObjects(numObjects);
-  for (i=0; i<numObjects; i++)
+  vtkSMProxy* actorProxy = this->GetSubProxy("actor");
+  if (!actorProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->ActorProxy->GetID(i)
-        << "SetMapper"
-        << this->MapperProxy->GetID(i)
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << actorProxy->GetID(i)
+          << "SetMapper"
+          << mapperProxy->GetID(i)
+          << vtkClientServerStream::End;
+
+      str << vtkClientServerStream::Invoke 
+          << mapperProxy->GetID(i) 
+          << "UseLookupTableScalarRangeOn" 
+          << vtkClientServerStream::End;
+      }
+
     }
 
-  // Create the property proxy and connect it to the actor proxy
-  this->PropertyProxy->SetVTKClassName("vtkProperty");
-  this->PropertyProxy->CreateVTKObjects(1);
-  for (i=0; i<numObjects; i++)
+  vtkSMProxy* propertyProxy = this->GetSubProxy("property");
+  if (!propertyProxy)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->ActorProxy->GetID(i) 
-        << "SetProperty" 
-        << this->PropertyProxy->GetID(0)
-        << vtkClientServerStream::End;
+    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    for (i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << actorProxy->GetID(i) 
+          << "SetProperty" 
+          << propertyProxy->GetID(0)
+          << vtkClientServerStream::End;
+      }
     }
 
-  for (i=0; i<numObjects; i++)
+  if (str.GetNumberOfMessages() > 0)
     {
-    str << vtkClientServerStream::Invoke 
-        << this->MapperProxy->GetID(i) 
-        << "UseLookupTableScalarRangeOn" 
-        << vtkClientServerStream::End;
+    vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+    cm->SendStreamToServers(&str, 
+                            this->GetNumberOfServerIDs(),
+                            this->GetServerIDs());
     }
-
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&str, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
 }
 
 //---------------------------------------------------------------------------

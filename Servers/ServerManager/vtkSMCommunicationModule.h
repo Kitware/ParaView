@@ -82,6 +82,8 @@ protected:
   ~vtkSMCommunicationModule();
 
   vtkClientServerID UniqueID;
+
+  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
     
 private:
   vtkSMCommunicationModule(const vtkSMCommunicationModule&); // Not implemented

@@ -61,6 +61,8 @@ protected:
 
   vtkSMProxy* Proxy;
 
+  virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
+
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented

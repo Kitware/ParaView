@@ -102,6 +102,8 @@ protected:
 
   int ArgumentIsArray;
 
+  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented

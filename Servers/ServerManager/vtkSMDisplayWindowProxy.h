@@ -49,11 +49,6 @@ public:
   void AddDisplayer(vtkSMDisplayerProxy* displayer);
 
   // Description:
-  // Update all VTK objects. Including the ones managed by the
-  // sub-proxies.
-  virtual void UpdateVTKObjects();
-
-  // Description:
   // Generate a screenshot from the render window.
   void WriteImage(const char* filename, const char* writerName);
 
@@ -65,9 +60,6 @@ protected:
   // Create all VTK objects including the ones for sub-proxies.
   virtual void CreateVTKObjects(int numObjects);
 
-  vtkSMProxy* RendererProxy;
-  vtkSMProxy* CameraProxy;
-  vtkSMProxy* CompositeProxy;
   vtkSMProxy* WindowToImage;
 
 private:

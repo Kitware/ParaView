@@ -59,15 +59,20 @@ public:
   // to the proxy. Managed proxies are deleted at destruction. NOTE:
   // The name has to be unique. If not, the existing proxy will be
   // replaced (and unregistered).
-  void RegisterProxy(const char* name, vtkSMProxy* proxy);
+  void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
 
   // Description:
   // Given its name returns a proxy. If not a managed proxy, returns 0.
+  vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
+
+  // Description:
+  int IsProxyInGroup(vtkSMProxy* proxy, const char* groupname);
 
   // Description:
   // Given its name, unregisters a proxy and remove it from the list
   // of managed proxies. 
+  void UnRegisterProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* name);
 
   // Description:
@@ -76,7 +81,11 @@ public:
 
   // Description:
   // Calls UpdateVTKObjects() on all managed proxies.
+  void UpdateRegisteredProxies(const char* groupname);
   void UpdateRegisteredProxies();
+
+  // Description:
+  void SaveState(const char* filename);
 
 protected:
   vtkSMProxyManager();
@@ -100,6 +109,8 @@ protected:
 //BTX
   friend class vtkSMXMLParser;
 //ETX
+
+  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
 
 private:
   vtkSMProxyManagerInternals* Internals;

@@ -94,6 +94,8 @@ protected:
 
   int ArgumentIsArray;
 
+  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+
   //BTX  
   // Description:
   // Append a command to update the vtk object with the property values(s).

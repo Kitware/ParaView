@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMProxy, "1.6");
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and
@@ -54,6 +54,9 @@ struct vtkSMProxyInternals
   // only place where name is stored
   typedef vtkstd::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
   PropertyInfoMap Properties;
+
+  typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
+  ProxyMap SubProxies;
 };
 
 //---------------------------------------------------------------------------
@@ -220,13 +223,39 @@ void vtkSMProxy::UnRegister(vtkObjectBase* obj)
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::ClearServerIDs()
+void vtkSMProxy::ClearServerIDsSelf()
 {
   this->Internals->ServerIDs.clear();
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::ClearServerIDs()
+{
+  this->ClearServerIDsSelf();
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->ClearServerIDsSelf();
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::AddServerID(int id)
+{
+  this->AddServerIDToSelf(id);
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->AddServerIDToSelf(id);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AddServerIDToSelf(int id)
 {
   this->Internals->ServerIDs.push_back(id);
 }
@@ -278,6 +307,16 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name)
     this->Internals->Properties.find(name);
   if (it == this->Internals->Properties.end())
     {
+    vtkSMProxyInternals::ProxyMap::iterator it2 =
+      this->Internals->SubProxies.begin();
+    for( ; it2 != this->Internals->SubProxies.end(); it2++)
+      {
+      vtkSMProperty* prop = it2->second.GetPointer()->GetProperty(name);
+      if (prop)
+        {
+        return prop;
+        }
+      }
     return 0;
     }
   else
@@ -310,6 +349,61 @@ void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddProperty(
+  const char* name, vtkSMProperty* prop, int addObserver, int doUpdate)
+{
+  this->AddProperty(0, name, prop, addObserver, doUpdate);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AddProperty(const char* subProxyName, 
+                             const char* name, 
+                             vtkSMProperty* prop, 
+                             int addObserver, 
+                             int doUpdate)
+{
+  if (!prop)
+    {
+    return;
+    }
+  if (!name)
+    {
+    vtkErrorMacro("Can not add a property without a name.");
+    return;
+    }
+
+  if (! subProxyName)
+    {
+    vtkSMProxyInternals::ProxyMap::iterator it2 =
+      this->Internals->SubProxies.begin();
+    for( ; it2 != this->Internals->SubProxies.end(); it2++)
+      {
+      vtkSMProperty* oldprop = it2->second.GetPointer()->GetProperty(name);
+      if (oldprop)
+        {
+        it2->second.GetPointer()->AddProperty(name, prop, addObserver, doUpdate);
+        return;
+        }
+      }
+    this->AddPropertyToSelf(name, prop, addObserver, doUpdate);
+    }
+  else
+    {
+    vtkSMProxyInternals::ProxyMap::iterator it =
+      this->Internals->SubProxies.find(name);
+
+    if (it == this->Internals->SubProxies.end())
+      {
+      vtkWarningMacro("Can not find sub-proxy " 
+                      << name  
+                      << ". Will not add property.");
+      return;
+      }
+    it->second.GetPointer()->AddProperty(name, prop, addObserver, doUpdate);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AddPropertyToSelf(
   const char* name, vtkSMProperty* prop, int addObserver, int doUpdate)
 {
   if (!prop)
@@ -428,6 +522,12 @@ void vtkSMProxy::UpdateVTKObjects()
                             this->GetServerIDs());
     }
 
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->UpdateVTKObjects();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -457,6 +557,81 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     cm->SendStreamToServers(&stream, 
                             this->GetNumberOfServerIDs(),
                             this->GetServerIDs());
+    }
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->CreateVTKObjects(numObjects);
+    }
+
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxy::GetSubProxy(const char* name)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it =
+    this->Internals->SubProxies.find(name);
+
+  if (it == this->Internals->SubProxies.end())
+    {
+    return 0;
+    }
+
+  return it->second.GetPointer();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
+{
+  // Check if the proxy already exists. If it does, we will
+  // replace it
+  vtkSMProxyInternals::ProxyMap::iterator it =
+    this->Internals->SubProxies.find(name);
+
+  if (it != this->Internals->SubProxies.end())
+    {
+    vtkWarningMacro("Proxy " << name  << " already exists. Replacing");
+    }
+
+  this->Internals->SubProxies[name] = proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RemoveSubProxy(const char* name)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it =
+    this->Internals->SubProxies.find(name);
+
+  if (it != this->Internals->SubProxies.end())
+    {
+    this->Internals->SubProxies.erase(it);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SaveState(const char* name, ofstream* file, vtkIndent indent)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    ostrstream namestr;
+    namestr << name << "." << it2->first << ends;
+    it2->second.GetPointer()->SaveState(namestr.str(), file, indent);
+    delete[] namestr.str();
+    }
+
+  *file << indent << this->GetClassName() << " : " << name << " : " << endl;
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  for (it  = this->Internals->Properties.begin();
+       it != this->Internals->Properties.end();
+       ++it)
+    {
+    it->second.Property.GetPointer()->SaveState(
+      it->first.c_str(), file, indent.GetNextIndent());
     }
 }
 

@@ -2,16 +2,194 @@
 
   <ProxyGroup name="rendering">
   
-   <DisplayerProxy name="DefaultDisplayer">
+   <DisplayerProxy name="DefaultDisplayer" class="vtkPVGeometryFilter">
+     <IntVectorProperty
+        name="DisplayAsOutline"
+        command="SetUseOutline"
+        number_of_elements="1"
+        default_values="0">
+     </IntVectorProperty>
+
+     <SubProxy>
+       <Proxy name="mapper" class="vtkPolyDataMapper">
+          <IntVectorProperty
+             name="ImmediateModeRendering"
+             command="SetImmediateModeRendering"
+             number_of_elements="1"
+             default_values="1">
+          </IntVectorProperty>
+
+          <IntVectorProperty
+             name="ScalarMode"
+             command="SetScalarMode"
+             number_of_elements="1"
+             default_values="0">
+          </IntVectorProperty>
+
+          <IntVectorProperty
+             name="ColorMode"
+             command="SetColorMode"
+             number_of_elements="1"
+             default_values="0">
+          </IntVectorProperty>
+
+         <StringVectorProperty 
+             name="ColorArray" 
+             command="SelectColorArray" 
+            number_of_elements="1" /> 
+
+         <ProxyProperty name="LookupTable" command="SetLookupTable"/>
+       </Proxy>
+     </SubProxy>
+
+     <SubProxy>
+       <Proxy name="actor" class="vtkActor">
+          <IntVectorProperty
+             name="Visibility"
+             command="SetVisibility"
+             number_of_elements="1"
+             default_values="1">
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+             name="Position"
+             command="SetPosition"
+             number_of_elements="3"
+             default_values="0 0 0">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="Scale"
+             command="SetScale"
+             number_of_elements="3"
+             default_values="1 1 1">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="Orientation"
+             command="SetOrientation"
+             number_of_elements="3"
+             default_values="0 0 0">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="Origin"
+             command="SetOrigin"
+             number_of_elements="3"
+             default_values="0 0 0">
+          </DoubleVectorProperty>
+       </Proxy>
+     </SubProxy>
+
+     <SubProxy>
+       <Proxy name="property" class="vtkProperty">
+          <IntVectorProperty
+             name="Interpolation"
+             command="SetInterpolation"
+             number_of_elements="1"
+             default_values="1">
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+             name="PointSize"
+             command="SetPointSize"
+             number_of_elements="1"
+             default_values="1">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="LineWidth"
+             command="SetLineWidth"
+             number_of_elements="1"
+             default_values="1">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="Opacity"
+             command="SetOpacity"
+             number_of_elements="1"
+             default_values="1">
+          </DoubleVectorProperty>
+       </Proxy>
+     </SubProxy>
    </DisplayerProxy>
 
-   <DisplayWindowProxy name="DefaultRenderer">
+   <DisplayWindowProxy name="DefaultDisplayWindow">
      <IntVectorProperty 
         name="WindowPosition" 
         command="SetPosition" 
         number_of_elements="2"
         default_values="0 0" > 
      </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Size" 
+        command="SetSize" 
+        number_of_elements="2"
+        default_values="400 400" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="OffScreenRendering" 
+        command="SetOffScreenRendering" 
+        number_of_elements="1"
+        default_values="1" > 
+     </IntVectorProperty>
+
+     <SubProxy>
+       <Proxy name="renderer" class="vtkRenderer">
+          <DoubleVectorProperty
+             name="BackgroundColor"
+             command="SetBackground"
+             number_of_elements="3"
+             default_values="0 0 0">
+          </DoubleVectorProperty>
+       </Proxy>
+     </SubProxy>
+
+     <SubProxy>
+       <Proxy name="camera" class="vtkCamera">
+          <DoubleVectorProperty
+             name="CameraPosition"
+             command="SetPosition"
+             number_of_elements="3"
+             default_values="1 0 0">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="CameraFocalPoint"
+             command="SetFocalPoint"
+             number_of_elements="3"
+             default_values="0 0 0">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="CameraViewUp"
+             command="SetViewUp"
+             number_of_elements="3"
+             default_values="0 1 0">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="CameraViewAngle"
+             command="SetViewAngle"
+             number_of_elements="1"
+             default_values="30">
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="CameraClippingRange"
+             command="SetClippingRange"
+             number_of_elements="2"
+             default_values="0.01 1000.01">
+          </DoubleVectorProperty>
+       </Proxy>
+     </SubProxy>
+
+     <SubProxy>
+       <Proxy name="composite" class="vtkCompositeRenderManager">
+       </Proxy>
+     </SubProxy>
    </DisplayWindowProxy>
    
   </ProxyGroup>

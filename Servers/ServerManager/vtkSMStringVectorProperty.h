@@ -87,6 +87,8 @@ protected:
 
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
+  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented
   void operator=(const vtkSMStringVectorProperty&); // Not implemented
