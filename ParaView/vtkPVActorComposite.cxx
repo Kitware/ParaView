@@ -262,6 +262,7 @@ void vtkPVActorComposite::CreateProperties()
   
   actorPage = this->GetClassName();
   this->Notebook->AddPage(actorPage);
+  this->Notebook->SetMinimumHeight(500);
   this->Properties->SetParent(this->Notebook->GetFrame(actorPage));
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",

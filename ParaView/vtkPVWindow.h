@@ -158,7 +158,7 @@ protected:
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;
-  
+
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
 

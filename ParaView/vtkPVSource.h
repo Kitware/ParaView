@@ -126,6 +126,11 @@ public:
   void DeleteCallback();
 
   // Description:
+  // A call back method from the Navigation window.
+  // This sets the input source as the selected composite.
+  void SelectSource(vtkPVSource *source);
+
+  // Description:
   // This method resets the UI values (Widgets added with the following methods).
   // It uses the GetCommand supplied to the interface.
   void UpdateParameterWidgets();
@@ -196,11 +201,6 @@ public:
   void AcceptHelper(char *method, char *args);
   void AcceptHelper2(char *tclName, char *method, char *args);  
 
-  // Description:
-  // A call back method from the Navigation window.
-  // This sets the input source as the selected composite.
-  void SelectSource(vtkPVSource *source);
-  
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
   
@@ -244,8 +244,6 @@ protected:
   char      *Name;
 
   vtkKWWidget       *Properties;
-  vtkKWLabeledFrame *NavigationFrame;
-  vtkKWWidget       *NavigationCanvas;
   void              UpdateProperties();
   vtkKWLabeledFrame *ParameterFrame;
   

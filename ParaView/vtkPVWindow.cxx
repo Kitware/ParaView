@@ -299,8 +299,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   
   this->MainView = view;
   this->MainView->SetParent(this->ViewFrame);
-  this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
+  this->MainView->Create(this->Application,"-width 200 -height 200");
   this->MainView->MakeSelected();
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();

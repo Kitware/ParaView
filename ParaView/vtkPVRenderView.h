@@ -46,6 +46,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTreeComposite.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
 
 class vtkPVApplication;
 
@@ -141,6 +142,10 @@ public:
   // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
   vtkGetObjectMacro(Composite, vtkTreeComposite);
+
+  // Description:
+  // Update the navigation window for a particular source
+  void UpdateNavigationWindow(vtkPVSource *currentSource);
   
 protected:
 
@@ -167,6 +172,10 @@ protected:
   // We are going to switch between these properties parents.
   vtkKWWidget *SourceParent;
   vtkKWWidget *ActorParent;
+
+  vtkKWLabeledFrame *NavigationFrame;
+  vtkKWWidget       *NavigationCanvas;
+
 };
 
 
