@@ -759,7 +759,9 @@
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <StringVectorProperty
         name="CellArrayStatus"
