@@ -26,18 +26,20 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
   this->DefaultElement = 0;
+  this->InputDomainName = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::~vtkSMArrayListDomain()
 {
+  this->SetInputDomainName(0);
 }
 
 //---------------------------------------------------------------------------
@@ -101,20 +103,32 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
 void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp,
                                   vtkSMSourceProxy* sp)
 {
-  vtkSMDomainIterator* di = pp->NewDomainIterator();
-  di->Begin();
-  while (!di->IsAtEnd())
+  vtkSMInputArrayDomain* iad = 0;
+  if (this->InputDomainName)
     {
-    vtkSMInputArrayDomain* iad = vtkSMInputArrayDomain::SafeDownCast(
-      di->GetDomain());
-    if (iad)
-      {
-      this->Update(sp, iad);
-      break;
-      }
-    di->Next();
+    iad = vtkSMInputArrayDomain::SafeDownCast(
+      pp->GetDomain(this->InputDomainName));
     }
-  di->Delete();
+  else
+    {
+    vtkSMDomainIterator* di = pp->NewDomainIterator();
+    di->Begin();
+    while (!di->IsAtEnd())
+      {
+      iad = vtkSMInputArrayDomain::SafeDownCast(di->GetDomain());
+      if (iad)
+        {
+        break;
+        }
+      di->Next();
+      }
+    di->Delete();
+    }
+
+  if (iad)
+    {
+    this->Update(sp, iad);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -167,6 +181,13 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
+
+  const char* input_domain_name = 
+    element->GetAttribute("input_domain_name");
+  if (input_domain_name)
+    {
+    this->SetInputDomainName(input_domain_name);
+    }
 
   // Search for attribute type with matching name.
   const char* attribute_type = element->GetAttribute("attribute_type");
