@@ -56,7 +56,7 @@
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODPartDisplayInformation.h"
-#include "vtkPVRenderModuleProxy.h"
+//#include "vtkPVRenderModuleProxy.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVRibbonFilter.h"
 #include "vtkPVServerArraySelection.h"
@@ -89,7 +89,7 @@
 #include "vtkBalancedRedistributePolyData.h"
 #include "vtkDesktopDeliveryClient.h"
 #include "vtkDesktopDeliveryServer.h"
-#include "vtkExtractCTHPart2.h"
+//#include "vtkExtractCTHPart2.h"
 #include "vtkIceTClientCompositeManager.h"
 #include "vtkIceTFactory.h"
 #include "vtkIceTRenderer.h"
@@ -152,7 +152,7 @@ int main(int , char *[])
   c = vtkPVLinearExtrusionFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVLODActor::New(); c->Print(cout); c->Delete();
   c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVRenderModuleProxy::New(); c->Print(cout); c->Delete();
+//  c = vtkPVRenderModuleProxy::New(); c->Print(cout); c->Delete();
   c = vtkPVRenderViewProxy::New(); c->Print(cout); c->Delete();
   c = vtkPVRibbonFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVServerArraySelection::New(); c->Print(cout); c->Delete();
@@ -184,7 +184,7 @@ int main(int , char *[])
   c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
-  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
+//  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
   c = vtkIceTClientCompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkIceTFactory::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
