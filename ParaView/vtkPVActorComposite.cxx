@@ -291,9 +291,9 @@ void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
 {
   this->Mapper->SetPiece(a->GetPiece());
   this->Mapper->SetNumberOfPieces(a->GetNumberOfPieces());
-  cerr << "ActorComp: " << this << ", mapper: " << this->Mapper 
-       << ", assignment: " << a << ", piece: " << a->GetPiece()
-       << ", numPieces: " << a->GetNumberOfPieces() << endl;
+  //cerr << "ActorComp: " << this << ", mapper: " << this->Mapper 
+  //     << ", assignment: " << a << ", piece: " << a->GetPiece()
+  //     << ", numPieces: " << a->GetNumberOfPieces() << endl;
 }
 
 //----------------------------------------------------------------------------

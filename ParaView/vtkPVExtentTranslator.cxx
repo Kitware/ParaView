@@ -75,12 +75,11 @@ vtkPVExtentTranslator::~vtkPVExtentTranslator()
 //----------------------------------------------------------------------------
 int vtkPVExtentTranslator::PieceToExtent()
 {
-  cerr << this << " PieceToExtent: " << this->Piece << " of " << this->NumberOfPieces << endl;
-  
-  cerr << "OriginalData: " << this->OriginalSource << endl;
-  cerr << "OriginalData is of type " << this->OriginalSource->GetClassName() << endl;
-  cerr << "OriginalSource: " << this->OriginalSource->GetSource() << endl;
-  cerr << "OriginalSource is of type: " << this->OriginalSource->GetSource()->GetClassName() << endl;
+  //cerr << this << " PieceToExtent: " << this->Piece << " of " << this->NumberOfPieces << endl;
+  //cerr << "OriginalData: " << this->OriginalSource << endl;
+  //cerr << "OriginalData is of type " << this->OriginalSource->GetClassName() << endl;
+  //cerr << "OriginalSource: " << this->OriginalSource->GetSource() << endl;
+  //cerr << "OriginalSource is of type: " << this->OriginalSource->GetSource()->GetClassName() << endl;
   
   
   if (this->OriginalSource == NULL)
@@ -92,28 +91,28 @@ int vtkPVExtentTranslator::PieceToExtent()
   this->OriginalSource->UpdateInformation();
   this->OriginalSource->GetWholeExtent(this->Extent);
 
-  cerr << this << "WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-       << this->Extent[2] << ", " << this->Extent[3] << ", " 
-       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  //cerr << this << "WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
+  //     << this->Extent[4] << ", " << this->Extent[5] << endl;
   
   if (this->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent) == 0)
     {
-    cerr << "Split thinks nothing is in the piece" << endl;
-    cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-	 << this->Extent[2] << ", " << this->Extent[3] << ", " 
-	 << this->Extent[4] << ", " << this->Extent[5] << endl;    
+    //cerr << "Split thinks nothing is in the piece" << endl;
+    //cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+    //   << this->Extent[2] << ", " << this->Extent[3] << ", "
+    //   << this->Extent[4] << ", " << this->Extent[5] << endl;    
     // Nothing in this piece.
     this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
     this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
-    cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-	 << this->Extent[2] << ", " << this->Extent[3] << ", " 
-	 << this->Extent[4] << ", " << this->Extent[5] << endl;    
+    //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+    //	 << this->Extent[2] << ", " << this->Extent[3] << ", " 
+    //	 << this->Extent[4] << ", " << this->Extent[5] << endl;    
     return 0;
     }
 
-  cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-       << this->Extent[2] << ", " << this->Extent[3] << ", " 
-       << this->Extent[4] << ", " << this->Extent[5] << endl;    
+  //cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
+  //     << this->Extent[4] << ", " << this->Extent[5] << endl;    
   
   // Clip with the whole extent passed in.
   if (this->Extent[0] < this->WholeExtent[0])
@@ -148,15 +147,15 @@ int vtkPVExtentTranslator::PieceToExtent()
     {
     this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
     this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
-    cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-	 << this->Extent[2] << ", " << this->Extent[3] << ", " 
-	 << this->Extent[4] << ", " << this->Extent[5] << endl;
+    //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+    //	 << this->Extent[2] << ", " << this->Extent[3] << ", " 
+    //	 << this->Extent[4] << ", " << this->Extent[5] << endl;
     return 0;
     }  
   
-  cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
-       << this->Extent[2] << ", " << this->Extent[3] << ", " 
-       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  //cerr << this << " Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", " 
+  //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
+  //     << this->Extent[4] << ", " << this->Extent[5] << endl;
   
   return 1;
 }

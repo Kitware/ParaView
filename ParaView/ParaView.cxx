@@ -139,7 +139,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // The slaves try to connect.  In the future, we may not want to initialize Tk.
     //putenv("DISPLAY=:0.0");
     //putenv("DISPLAY=www.kitware.com:2.0");
-    //vtkKWApplication::SetWidgetVisibility(0);
+    vtkKWApplication::SetWidgetVisibility(0);
     //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     Tcl_Interp *interp = vtkPVInitializeTcl();
     
@@ -158,9 +158,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       vtkGenericWarningMacro("Could not get application pointer.");
       return;
       }  
-    app->WidgetVisibilityOff();
     app->SetController(controller);
-    app->Script("wm withdraw .");
     controller->AddRMI(vtkPVSlaveScript, (void *)(app), VTK_PV_SLAVE_SCRIPT_RMI_TAG);
     controller->ProcessRMIs();
     }
