@@ -248,6 +248,8 @@ IF(BUILD_SHARED_LIBS)
 ENDIF(BUILD_SHARED_LIBS)
 SUBDIRS(Utilities/KWSys)
 
+SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${KWSYS_INCLUDE_DIR})
+
 #########################################################################
 # Configure Common
 SET(KWCOMMON_INCLUDE_DIR
