@@ -173,6 +173,11 @@ public:
   // Callback when key is pressed in the script editor.
   void MarkScriptEditorDirty();
 
+  // Description:
+  // Return 1 if the action is valid, so if there is script or there is some
+  // not none action.
+  int IsActionValid();
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();

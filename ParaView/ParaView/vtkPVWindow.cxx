@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.12");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.13");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2435,7 +2435,8 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   // We may want different questions if there is no animation.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && script[0] && this->AnimationInterface->GetScriptAvailable())
+  if (script && script[0] && this->AnimationInterface->GetScriptAvailable() && 
+    this->AnimationInterface->IsAnimationValid())
     {
     animationFlag = 1;
     }
