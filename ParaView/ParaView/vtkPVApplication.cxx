@@ -114,20 +114,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "direct.h"
 #endif
 
-#ifdef _MSC_VER
-#pragma warning (push, 2)
-#endif
-
-#include <vector>
-#include <string>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <vtkstd/vector>
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.186");
+vtkCxxRevisionMacro(vtkPVApplication, "1.187");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1439,7 +1431,8 @@ vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
   
   if (o == NULL)
     {
-    vtkErrorMacro("Could not get object from pointer.");
+    vtkErrorMacro("Could not get pointer from object \""
+                  << tclName << "\"");
     }
   
   return o;
