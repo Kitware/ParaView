@@ -26,7 +26,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.2");
 
 struct vtkSMSourceProxyInternals
 {
@@ -149,6 +149,29 @@ void vtkSMSourceProxy::UpdateInformation()
     {
     command << vtkClientServerStream::Invoke << this->GetID(i)
             << "UpdateInformation" << vtkClientServerStream::End;
+    }
+
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  cm->SendStreamToServers(&command, 
+                          this->GetNumberOfServerIDs(), 
+                          this->GetServerIDs());
+  
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::Update()
+{
+  int numIDs = this->GetNumberOfIDs();
+  if (numIDs <= 0)
+    {
+    return;
+    }
+
+  vtkClientServerStream command;
+  for(int i=0; i<numIDs; i++)
+    {
+    command << vtkClientServerStream::Invoke << this->GetID(i)
+            << "Update" << vtkClientServerStream::End;
     }
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
