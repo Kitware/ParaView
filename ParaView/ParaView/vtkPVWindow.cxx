@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.20");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.21");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1707,7 +1707,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
                   << vtkClientServerStream::End;
   pm->SendStreamToServer();
   int readable = 0;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, readable))
+  if(!pm->GetLastServerResult().GetArgument(0, 0, &readable))
     {
     vtkErrorMacro("Error checking whether file is readable on server.");
     }
