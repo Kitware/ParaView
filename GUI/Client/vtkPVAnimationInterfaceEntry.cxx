@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.31");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -96,6 +96,7 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 
   this->PVSource = 0;
   this->Script = 0;
+  this->CustomScript = 0;
   this->CurrentMethod = 0;
   this->TraceName = 0;
   this->TimeStart = 0;
