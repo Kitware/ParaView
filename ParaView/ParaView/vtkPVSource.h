@@ -313,6 +313,14 @@ public:
   vtkGetMacro(HideParametersPage, int);
   vtkBooleanMacro(HideParametersPage, int);
 
+  // Description:
+  // Raise the current source page.
+  void RaiseSourcePage();
+
+  // Description:
+  // Get notebook widget name.
+  const char* GetNotebookWidgetName();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();

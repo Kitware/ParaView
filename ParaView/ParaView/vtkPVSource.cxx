@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -929,31 +930,44 @@ void vtkPVSource::VTKSourceModifiedMethod()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateParameterWidgets()
 {
-  int i;
   vtkPVWidget *pvw;
-  
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  it->InitTraversal();
+  while( !it->IsDoneWithTraversal() )
     {
-    pvw = this->Widgets->GetNextPVWidget();
+    pvw = static_cast<vtkPVWidget*>(it->GetObject());
     pvw->ForceReset();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
+//----------------------------------------------------------------------------
+const char* vtkPVSource::GetNotebookWidgetName()
+{
+  return this->Notebook->GetWidgetName();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::RaiseSourcePage()
+{
+  this->Notebook->Raise("Source");
+}
 
 //----------------------------------------------------------------------------
 // This should be apart of AcceptCallbackInternal.
 void vtkPVSource::UpdateVTKSourceParameters()
 {
-  int i;
   vtkPVWidget *pvw;
-  
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  it->InitTraversal();
+  while( !it->IsDoneWithTraversal() )
     {
-    pvw = this->Widgets->GetNextPVWidget();
+    pvw = static_cast<vtkPVWidget*>(it->GetObject());
     pvw->Accept();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
