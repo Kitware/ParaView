@@ -1,0 +1,78 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
+
+# This test covers two bugs I fixed.
+# The first is that string entry could not handle strings with spaces.
+# The second was that the input list was not updated
+# when the fitler was selected.
+
+# This input list test is the first test that compares text files
+# instead of images.
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkConeSource]
+$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource vtkShrinkPolyData]
+$pv(vtkTemp167) AcceptCallback
+set pv(vtkTemp190) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+$pv(vtkTemp190) AcceptCallback
+set pv(vtkTemp234) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
+$pv(vtkTemp234) AcceptCallback
+set pv(vtkTemp270) [$pv(vtkTemp1) CreatePVSource vtkVectorText]
+set pv(vtkTemp282) [$pv(vtkTemp270) GetPVWidget {Text}]
+$pv(vtkTemp282) SetValue {Hello World}
+$pv(vtkTemp270) AcceptCallback
+$pv(vtkTemp1) ResetCameraCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp167)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp176) [$pv(vtkTemp167) GetPVWidget {Input}]
+
+# Here create a text files with the names of all of the inputs in the menu.
+# I wonder if there is a way to redirect the output to a file?
+# This might be more general.
+# out.txt is a special name
+if { [catch {set fp [open "out.txt" w]}] == 0 } {
+  set pvSources [$pv(vtkTemp176) GetSources]
+  $pvSources InitTraversal
+  set pvs [$pvSources GetNextItemAsObject]
+  while { $pvs != {} } {
+    set pvsName [$pvs GetVTKSourceTclName]
+    puts $fp $pvsName
+    set pvs [$pvSources GetNextItemAsObject]
+  }
+  close $fp
+
+  source $DataDir/Utility/rtText.tcl
+  pvFileTest $DataDir/Baseline/VectorTextSpace.txt
+  file delete -force out.txt
+}
+
+# Continue with the rest of the test.
+ 
+$pv(vtkTemp176) SetCurrentValue $pv(vtkTemp234)
+$pv(vtkTemp167) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/VectorTextSpace.png 10
+   
+Application Exit
+
+
+
+

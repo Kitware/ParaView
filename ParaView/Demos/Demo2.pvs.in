@@ -1,0 +1,501 @@
+if [info exists tmpPvDataDir] {
+    set DataDir "${tmpPvDataDir}"
+} else {
+    set DataDir "@PARAVIEW_DATA_ROOT@/Data/"
+}
+
+set FoundFiles 1
+set DataDirLocal 1
+
+if ![file exists $DataDir/contDeciFull.vtk] {
+    if ![file exists contDeciFull.vtk] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file contDeciFull.vtk.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+}  else {
+    set DataDirLocal 0
+}
+
+
+if ![file exists $DataDir/oceanFloorSmall.vtk] {
+    if ![file exists oceanFloorSmall.vtk] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file oceanFloorSmall.vtk.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    } 
+} else {
+    set DataDirLocal 0
+}
+
+if ![file exists $DataDir/small.pop] {
+    if ![file exists small.pop] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file small.pop\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+} else {
+    set DataDirLocal 0
+}
+
+if ![file exists $DataDir/Dat.pvtk] {
+    if ![file exists Dat.pvtk] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file Dat.pvtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+} else {
+    set DataDirLocal 0
+}
+
+if $DataDirLocal {
+    set DataDir "."
+}
+
+proc pvStopDemoAndExit {} {
+    global pvDemoShouldStop pvDemoShouldExit
+    set pvDemoShouldStop 1
+    set pvDemoShouldExit 1
+    set FoundFiles 0
+}
+
+wm protocol .paraview WM_DELETE_WINDOW {pvStopDemoAndExit}
+
+proc POPInit {} {
+    global DataDir
+    
+    # A hack to get the window and view.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    set pvView [$pvWindow GetMainView]
+
+
+    # Load the model of the continents.
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading continents.\n Continents were created by extracting the models surface at depth 0 and cliping with salinity value of 0.\nThe resulting model was decimated."
+    set pvCont [$pvWindow Open "$DataDir/contDeciFull.vtk"]
+    # set the color of the continent model.
+    set pvContOutput [$pvCont GetPVOutput]
+    [$pvContOutput GetColorMenu] SetValue {Property}
+    $pvContOutput ColorByProperty
+    $pvContOutput ChangeActorColor 0 [expr 197.0/255.0] 1.0
+
+
+    # Load the model of the ocean floor.
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading ocean floor.\nThe ocean floor was created by taking an salinity iso surface at value 0."
+    set pvFloor [$pvWindow Open "$DataDir/oceanFloorSmall.vtk"]
+    # set the color of the ocean floor model.
+    set pvFloorOutput [$pvFloor GetPVOutput]
+    [$pvFloorOutput GetColorMenu] SetValue {Property}
+    $pvFloorOutput ColorByProperty
+    $pvFloorOutput ChangeActorColor 0.5 0.4 0.4
+
+
+    # load the pop volume
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading POP data.\nThis POP data is a reduced resolution grid with dimensions 360x240x40"
+    set pvPOP [$pvWindow Open "$DataDir/small.pop"]
+    $pvPOP AcceptCallback
+
+
+    .control.main.info configure -text "We are creating an extract grid to show\nthe ocean at a constant depth."
+    set sInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
+    set pvExtractGrid [$sInt CreateCallback]
+    [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 0 0
+    $pvExtractGrid UpdateParameterWidgets
+    $pvExtractGrid AcceptCallback
+
+    # Setup color map to show temperature.
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
+    [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
+    $pvExtractGridOutput ColorByPointFieldComponent Temperature 0
+    [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
+    $pvExtractGridOutput ChangeColorMap
+
+    $pvExtractGrid SetVisibility 0
+
+    # Create an iso surface of Salinity and color it by temerature.
+    $pvWindow SetCurrentPVSource $pvPOP
+
+    .control.main.info configure -text "We are creating a contour of salinity.\nThe iso surface will be mapped to show temperature as color."
+    set pvContour [$pvWindow ContourCallback]
+    [$pvContour GetVTKSource] SetValue 0 0.035
+    [$pvContour GetVTKSource] ComputeScalarsOff
+    [$pvContour GetVTKSource] ComputeNormalsOff
+    $pvContour UpdateParameterWidgets
+
+    [$pvContour GetScalarOperationMenu] SetValue "Salinity"
+    $pvContour ChangeScalars
+    $pvContour AcceptCallback
+
+    # Setup color map to show temperature.
+    set pvContourOutput [$pvContour GetPVOutput]
+    [$pvContourOutput GetColorMenu] SetValue {Point Temperature}
+    $pvContourOutput ColorByPointFieldComponent Temperature 0
+    [$pvContourOutput GetColorMapMenu] SetValue {Blue to Red}
+    $pvContourOutput ChangeColorMap
+
+    $pvContourOutput SetVisibility 0	
+
+    return "$pvCont $pvFloor $pvExtractGrid $pvContour"
+}
+
+
+
+proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
+    global pvDemoShouldStop
+    set RotationStep 5
+    set DepthStep 2
+    set IsoStep 0.0003
+
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    set pvView [$pvWindow GetMainView]
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
+    set pvContourOutput [$pvContour GetPVOutput]
+    set pvContOutput [$pvCont GetPVOutput]
+    set pvFloorOutput [$pvFloor GetPVOutput]
+
+
+    # initial camera
+    set cam [Ren1 GetActiveCamera]
+    $cam SetPosition -79817 154654 342316
+    $cam SetFocalPoint 7564 -13269 29049
+    $cam SetClippingRange 201505 613837
+    $cam SetViewUp 0 1 0
+
+    # ------------------  Loop through depth showing salinity -------------
+
+    $pvCont SetVisibility 1
+    $pvFloor SetVisibility 1
+    $pvWindow SetCurrentPVSource $pvExtractGrid
+    $pvExtractGrid SetVisibility 1
+    update
+
+    # Turn on the cube-axis actor.
+    $pvExtractGridOutput SetCubeAxesVisibility 1
+
+    # Turn on scalar bar.
+    $pvExtractGridOutput SetScalarBarVisibility 1
+    $pvExtractGridOutput SetScalarBarOrientationToHorizontal
+
+    # Setup color map to show Salinity.
+    [$pvExtractGridOutput GetColorMenu] SetValue {Point Salinity}
+    $pvExtractGridOutput ColorByPointFieldComponent Salinity 0
+    [$pvExtractGridOutput GetColorMapMenu] SetValue {Red to Blue}
+    $pvExtractGridOutput ChangeColorMap
+    $pvExtractGridOutput SetScalarRange 0.03 0.04
+
+    # Change the color of the continents to match the scalar range.
+    $pvContOutput ChangeActorColor 1 0 0
+
+
+    # Loop over all of the depth values.
+    for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
+	.control.main.info configure -text "We are animating through depth levels\nshowing salinity mapped to color.\nCurrent depth is $i."
+	[$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
+	$pvExtractGrid UpdateParameterWidgets
+	$pvExtractGrid AcceptCallback
+	update
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    update
+
+    # ------------------  Loop through depth showing temperature -------------
+
+    $pvWindow SetCurrentPVSource $pvExtractGrid
+    $pvExtractGrid SetVisibility 1
+    update
+
+    # Setup color map to show temperature.
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
+    [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
+    $pvExtractGridOutput ColorByPointFieldComponent Temperature 0
+    $pvExtractGrid UpdateParameterWidgets
+    [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
+    $pvExtractGridOutput ChangeColorMap
+    $pvExtractGridOutput SetScalarRange -5.5 30.8804
+
+    update
+
+    # set the continent color to match the Temperature of 0.
+    $pvContOutput ChangeActorColor 0 [expr 170.0/255.0] 1.0
+
+
+    # Loop over all of the depth values.
+    for {set i 1} {$i < 30} {set i [expr $i + $DepthStep]} {
+	.control.main.info configure -text "We are animating through depth levels\nshowing temperature mapped to color.\nCurrent depth is $i."
+	[$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 $i $i
+	$pvExtractGrid UpdateParameterWidgets
+	$pvExtractGrid AcceptCallback
+	update
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+
+    # Turn off the cube-axis actor.
+    $pvExtractGridOutput SetCubeAxesVisibility 0
+
+
+
+    # ------------------  Rotate the globe showing temperature -------------
+
+    # No need for these to slow us down.
+    $pvCont SetVisibility 0
+    $pvFloor SetVisibility 0
+
+    [$pvExtractGrid GetVTKSource] SetVOI 0 360 0 239 1 1
+    $pvExtractGrid UpdateParameterWidgets
+    $pvExtractGrid AcceptCallback
+
+
+    #Rotate the camera
+    set cam [Ren1 GetActiveCamera]
+    $cam SetFocalPoint 0 0 0
+
+    for {set i 0} {$i < 360} { set i [expr $i + $RotationStep]} {
+	.control.main.info configure -text "We are rotating a model that shows the ocean\nsurface with temperature mapped to color.\n"
+	$cam Azimuth $RotationStep
+	RenWin1 Render
+	update
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    # --------------- Iterate through Salinity IsoSurfaces.----------
+
+    $pvFloor SetVisibility 1
+    $pvCont SetVisibility 1
+    $pvExtractGrid SetVisibility 0
+
+    $pvWindow SetCurrentPVSource $pvContour
+    $pvContour SetVisibility 1
+    # Turn on scalar bar.
+    $pvContourOutput SetScalarBarVisibility 1
+    $pvContourOutput SetScalarBarOrientationToHorizontal
+    update
+
+    for {set i 0.035} {$i <= 0.039} { set i [expr $i + $IsoStep]} {
+	.control.main.info configure -text "This is an animation of a salinity iso surface.\nThe color of the surface shows temperature.\nThe current salinity iso-surface value is $i"
+	[$pvContour GetVTKSource] SetValue 0 $i
+	$pvContour UpdateParameterWidgets
+	$pvContour AcceptCallback
+	update
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+}
+
+proc ParticleDemoInit {} {
+    global DataDir
+    
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    
+    # Load the model of the continents.
+    .control.main.info configure -text "Reading points"
+    set pvParticles [$pvWindow Open "$DataDir/Dat.pvtk"]
+
+    .control.main.info configure -text "Masking points"
+    set sInt [$pvWindow GetSourceInterface "vtkMaskPoints"]
+    set pvMask [$sInt CreateCallback]
+    [$pvMask GetVTKSource] SetOnRatio 20 
+    [$pvMask GetVTKSource] GenerateVerticesOn
+    $pvMask UpdateParameterWidgets
+    $pvMask AcceptCallback
+
+    .control.main.info configure -text "Cliping points"
+    set pvClip [$pvWindow ClipPlaneCallback]
+    [$pvClip GetVTKSource] SetNormal -1 0 0
+    [$pvClip GetVTKSource] SetOrigin 544.5 544.5 756
+    [$pvClip GetVTKSource] SetOffset -546
+    $pvClip UpdateParameterWidgets
+    $pvClip AcceptCallback
+
+    set pvClipOutput [$pvClip GetPVOutput]
+    $pvClipOutput SetPointSize 2
+    $pvClipOutput SetScalarRange 7 12
+
+    return "$pvParticles $pvClip $pvClipOutput"
+}
+
+proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
+
+    global ShouldStop
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    set pvView [$pvWindow GetMainView]
+    $pvWindow SetCurrentPVSource $pvClip
+    
+    .control.main.info configure -text "Particle dataset."
+
+    # Show whole data set.
+    [$pvClip GetVTKSource] SetOffset -546.0
+    $pvClip UpdateParameterWidgets
+    $pvClip AcceptCallback
+
+    $pvClipOutput SetCubeAxesVisibility 0
+
+    # Zoom out a little to leave room for diagonal.
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 6121 544.5 756
+    $camera SetFocalPoint 544.5 544.5 756
+    $camera SetClippingRange 4436 7024
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+    $camera Azimuth 30
+    $camera Elevation 30
+
+    $pvView EventuallyRender
+    update
+
+    $pvClipOutput SetScalarBarVisibility 1
+    $pvClipOutput SetScalarBarOrientationToHorizontal
+    $pvClipOutput SetVisibility 1
+
+    update
+    
+    for {set i 0} {$i < 30} {incr i 1} {
+	set camera [Ren1 GetActiveCamera]
+	$camera Azimuth 9
+	$pvView EventuallyRender
+	update
+
+	.control.main.info configure -text "This animation is rotating a lower resolution\nmodel of the particle data set.\nThe data set is subsampled with a ratio of 20 to 1 to get better performance.\nPoint size is set to 2 to fill in gaps between particles.\n Color of the points displays density\nRotation: $i."
+	if pvDemoShouldStop {
+	    $pvView EventuallyRender
+	    return
+	}
+    }
+    
+    # zoom out a little to leave room for diagonal.
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 4551 267 756
+    $camera SetFocalPoint 554 267 756
+    $camera SetClippingRange 2798 5517
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+
+    $pvView EventuallyRender
+    update
+
+    # Move the clip plane through the data.
+    $pvClipOutput SetCubeAxesVisibility 1
+    for {set offset -540} {$offset <= 540} {set offset [expr $offset +50.0]} {
+	[$pvClip GetVTKSource] SetOffset $offset
+	$pvClip UpdateParameterWidgets
+	$pvClip AcceptCallback
+
+	update
+	if pvDemoShouldStop {
+	    $pvView EventuallyRender
+	    return
+	}
+
+        .control.main.info configure -text "This animation uses a clip filter to remove layers\nof a particle data set.\nThe points are colored by density.\nDensity is measured by the number of nieghbors within a sphere around the particle.\nClip: %offset"
+    }
+
+    $pvClipOutput SetCubeAxesVisibility 0
+
+
+    # Show the high resolution data set.
+    $pvClipOutput SetVisibility 0
+    $pvParticles SetVisibility 1
+    $pvView EventuallyRender
+    update
+    after 2000
+    $pvParticles SetVisibility 0
+    $pvView EventuallyRender
+}
+
+
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+set pvDemoShouldExit 0
+set pvDemoStopNow 0
+
+if $FoundFiles {
+
+    $pvWindow DisableMenus
+
+    set pvMySources [$pvWindow GetSources]
+    $pvMySources InitTraversal
+    set pvNextSource [$pvMySources GetNextItemAsObject]
+    
+    while {$pvNextSource != ""} {
+	$pvNextSource VisibilityOff
+	set pvNextSource [$pvMySources GetNextItemAsObject]
+    }
+
+    #    set Demos { POP }
+    set Demos { ParticleDemo }
+    set length [llength $Demos]
+
+    if ![info exists pvDemoShouldStop] {
+	global pvDemoShouldStop
+	
+	toplevel .control
+	wm title .control "control panel"
+	frame .control.main -width 350 -height 200
+	label .control.main.info -text "ParaView demo initializing.\n Please wait."
+	button .control.main.stop -text "Stop Demo" -command {set pvDemoShouldStop 1}
+	pack .control.main
+	place .control.main.info -rely 0 -relx 0.5 -anchor n
+	place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+	
+	set pvDemoShouldStop 0
+	for {set i 0} {$i < $length} {incr i 1} {
+	    set TestName [lindex $Demos $i]
+	    set pvDemoRetVals($TestName) [eval ${TestName}Init]
+	}
+	if $pvDemoShouldStop { set pvDemoStopNow 1 }
+	
+    }
+    wm deiconify .control
+    if !$pvDemoStopNow {
+	set pvDemoShouldStop 0
+    }
+    
+    while 1 {
+	for {set i 0} {$i < $length} {incr i 1} {
+	    set TestName [lindex $Demos $i]
+	    eval ${TestName}Run $pvDemoRetVals($TestName)
+	    if $pvDemoShouldStop break;
+	}
+	if $pvDemoShouldStop break;
+	update
+    }
+
+    wm withdraw .control
+
+}
+
+wm protocol .paraview WM_DELETE_WINDOW { $pvWindow Exit }
+$pvWindow EnableMenus
+
+if $pvDemoShouldExit {
+    $pvWindow Exit
+}
+

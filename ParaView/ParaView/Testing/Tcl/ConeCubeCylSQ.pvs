@@ -1,0 +1,91 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+
+
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp118) [$pv(vtkTemp98) GetPVWidget {Theta Resolution}]
+$pv(vtkTemp118) SetValue 100
+set pv(vtkTemp127) [$pv(vtkTemp98) GetPVWidget {Phi Resolution}]
+$pv(vtkTemp127) SetValue 100
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
+$pv(vtkTemp110) SetValue 2 2 0
+$pv(vtkTemp98) AcceptCallback
+
+set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource vtkDecimatePro]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp180)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp194) [$pv(vtkTemp180) GetPVWidget {TargetReduction}]
+$pv(vtkTemp194) SetValue 0.99
+$pv(vtkTemp180) AcceptCallback
+
+
+set pv(vtkTemp212) [$pv(vtkTemp1) CreatePVSource vtkConeSource]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp212)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp212) AcceptCallback
+
+set pv(vtkTemp364) [$pv(vtkTemp1) CreatePVSource vtkExtractEdges]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp364)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp364) AcceptCallback
+
+set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp416)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp437) [$pv(vtkTemp416) GetPVWidget {Center}]
+$pv(vtkTemp437) SetValue 2 0 0
+set pv(vtkTemp428) [$pv(vtkTemp416) GetPVWidget {Resolution}]
+$pv(vtkTemp428) SetValue 30
+$pv(vtkTemp416) AcceptCallback
+
+set pv(vtkTemp452) [$pv(vtkTemp1) CreatePVSource vtkPLinearExtrusionFilter]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp452)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp466) [$pv(vtkTemp452) GetPVWidget {ScaleFactor}]
+$pv(vtkTemp466) SetValue .5
+$pv(vtkTemp452) AcceptCallback
+
+
+set pv(vtkTemp486) [$pv(vtkTemp1) CreatePVSource vtkSuperquadricSource]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp486)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp526) [$pv(vtkTemp486) GetPVWidget {Toroidal}]
+$pv(vtkTemp526) SetState 1
+set pv(vtkTemp498) [$pv(vtkTemp486) GetPVWidget {Center}]
+$pv(vtkTemp498) SetValue 0 2 0
+set pv(vtkTemp514) [$pv(vtkTemp486) GetPVWidget {Thickness}]
+$pv(vtkTemp514) SetValue 0.4
+$pv(vtkTemp486) AcceptCallback
+
+set pv(vtkTemp536) [$pv(vtkTemp1) CreatePVSource vtkOutlineCornerFilter]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp536)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp536) AcceptCallback
+
+[$pv(vtkTemp486) GetPVOutput] SetVisibility 1
+$pv(vtkTemp1) ResetCameraCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/ConeCubeCylSQ.png 10
+   
+Application Exit

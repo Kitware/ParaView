@@ -1,0 +1,518 @@
+if [info exists tmpPvDataDir] {
+    set DataDir "${tmpPvDataDir}"
+} else {
+    set DataDir "@PARAVIEW_DATA_ROOT@/Data/"
+}
+
+set FoundFiles 1
+set DataDirLocal 1
+
+if ![file exists $DataDir/combxyz.bin] {
+    if ![file exists combxyz.bin] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file combxyz.bin.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+}  else {
+    set DataDirLocal 0
+}
+
+
+if ![file exists $DataDir/combq.bin] {
+    if ![file exists combq.bin] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file combq.bin\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    } 
+} else {
+    set DataDirLocal 0
+}
+
+if ![file exists $DataDir/blow.vtk] {
+    if ![file exists blow.vtk] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file blow.vtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+} else {
+    set DataDirLocal 0
+}
+
+if $DataDirLocal {
+    set DataDir "."
+}
+
+proc pvStopDemoAndExit {} {
+    global pvDemoShouldStop pvDemoShouldExit
+    set pvDemoShouldStop 1
+    set pvDemoShouldExit 1
+    set FoundFiles 0
+}
+
+wm protocol .paraview WM_DELETE_WINDOW {pvStopDemoAndExit}
+
+proc SphereDemoInit {} {
+    
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+    
+    set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
+    set pvSphere [$sInt CreateCallback]
+    [$pvSphere GetVTKSource] SetThetaResolution 16
+    $pvSphere UpdateParameterWidgets
+    $pvSphere AcceptCallback
+    
+    set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
+    set pvShrink [$sInt2 CreateCallback]
+    [$pvShrink GetVTKSource] SetShrinkFactor 0.9
+    $pvShrink UpdateParameterWidgets
+    $pvShrink AcceptCallback
+
+    set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
+    set pvElevation [$eInt CreateCallback]
+    $pvElevation AcceptCallback
+
+    set eInt2 [$pvWindow GetSourceInterface "vtkExtractEdges"]
+    set pvExtract [$eInt2 CreateCallback]
+    $pvExtract AcceptCallback
+
+    set extractOutput [$pvExtract GetPVOutput]
+    $extractOutput ColorByProperty
+    $extractOutput SetVisibility 0
+
+    set elevOutput [$pvElevation GetPVOutput]
+    $elevOutput SetVisibility 0
+
+    return "$pvSphere $elevOutput $extractOutput"
+}
+
+proc SphereDemoRun { pvSphere elevOutput extractOutput } {
+
+    global pvDemoShouldStop
+
+    .control.main.info configure -text "Running Sphere Demo :\n This demo demonstrates\n the basic functionalities of ParaView.\n It generates an approximated sphere\n then shrinks each polygon by a factor of 10%.\n It then highlights the edges of polygons\n and colors them according to their distance\n to a radial plane." -justify left
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+
+    $pvWindow SetCurrentPVSource $pvSphere
+    
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 0 0 3.41078
+    $camera SetFocalPoint 0 0 0
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+    $camera SetClippingRange 2.38825 4.70618
+    
+    $elevOutput SetVisibility 1
+    $extractOutput SetVisibility 1
+    
+    for {set i 0} {$i < 100} {incr i 1} {
+	set camera [Ren1 GetActiveCamera]
+	$camera Azimuth 10
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+    
+    $elevOutput SetVisibility 0
+    $extractOutput SetVisibility 0
+    RenWin1 Render
+}
+
+proc CombustorDemoInit {} {
+    global DataDir
+
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+
+    # Create the reader
+    set pInt [$pvWindow GetSourceInterface "vtkPLOT3DReader"]
+    set pvPlot3D [$pInt CreateCallback]
+    [$pvPlot3D GetVTKSource] SetXYZFileName $DataDir/combxyz.bin
+    [$pvPlot3D GetVTKSource] SetQFileName $DataDir/combq.bin
+    $pvPlot3D UpdateParameterWidgets
+    $pvPlot3D AcceptCallback
+    
+    # Create the contour filter
+    set cInt [$pvWindow ContourCallback]
+    $cInt AcceptCallback
+
+    $pvWindow SetCurrentPVSource $pvPlot3D
+
+    set eInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
+    set pvExtract [$eInt CreateCallback]
+    
+    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
+    $pvExtract UpdateParameterWidgets
+    $pvExtract AcceptCallback
+    
+    [$pvExtract GetPVOutput] SetVisibility 0
+
+    set pvGlyph [$pvWindow GlyphCallback]
+    $pvGlyph AcceptCallback
+    
+    [$pvGlyph GetPVOutput] ColorByProperty
+    [$pvGlyph GetVTKSource] SetScaleFactor 3.0
+    $pvGlyph UpdateParameterWidgets
+    $pvGlyph AcceptCallback
+
+    [$pvGlyph GetPVOutput] SetVisibility 0
+
+    return "$cInt $pvPlot3D $pvExtract $pvGlyph"
+}
+
+proc AdjustContourValue { cnt val } {
+    set entry [$cnt GetPVWidget {Contour Values}]
+    $entry RemoveAllValues
+    $entry AddValue $val
+    $cnt AcceptCallback
+}
+
+
+proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
+
+    .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView." -justify left
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+
+    global pvDemoShouldStop
+
+    set cntOutput [$cInt GetPVOutput]
+
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition -29.1076 -40.3242 38.8874
+    $camera SetFocalPoint 8.255 0 29.7631
+    $camera SetViewUp -0.00809309 0.227813 0.973671
+    $camera SetViewAngle 30
+    $camera SetClippingRange 34.7159 82.3051
+
+    # Vary isosuface
+    $cntOutput SetVisibility 1
+    [$pvPlot3D GetPVOutput] SetVisibility 1
+    
+    .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n Generating density isosurfaces for values 0.2 through 0.7." -justify left
+    set start 0.2
+    set end 0.7
+    set num 30
+    set incr [expr ($end - $start)/$num]
+    for {set i 0} {$i < $num} {incr i 1} {
+	set val [expr $start + $i * $incr]
+	AdjustContourValue $cInt $val 
+	$pvWindow DisableMenus
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+    
+    # Rotate isosuface
+    AdjustContourValue $cInt 0.3
+    $pvWindow DisableMenus
+    
+    $cntOutput SetScalarBarVisibility 1
+    $cntOutput SetScalarBarOrientationToHorizontal
+    $cntOutput ColorByPointFieldComponent Momentum 0
+    $cInt UpdateParameterWidgets
+    $pvWindow DisableMenus
+    
+    .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Density isosurface colored by the first component\n of the momentum vector." -justify left
+    for {set i 0} {$i < 102} {incr i 1} {
+	$camera Azimuth 10
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    $cntOutput SetVisibility 0
+    $cntOutput SetScalarBarVisibility 0
+
+
+    $camera SetPosition -28.8139 1.07506 33.8794
+    $camera SetFocalPoint 26.5733 -0.117269 27.8723
+    $camera SetViewUp 0.10793 0.00506272 0.994146
+    $camera SetViewAngle 30
+    $camera SetClippingRange 18.5955 61.8423
+
+    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
+    $pvExtract UpdateParameterWidgets
+    $pvExtract AcceptCallback
+
+    [$pvExtract GetPVOutput] SetVisibility 1
+    
+
+    RenWin1 Render
+
+    .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Horizantal plane extracted." -justify left
+
+    for {set i 0} {$i < 24} {incr i 1} {
+	[$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
+	$pvExtract UpdateParameterWidgets
+	$pvExtract AcceptCallback
+	$pvWindow DisableMenus
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+    
+    for {set i 23} {$i >= 0} {incr i -1} {
+	[$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
+	$pvExtract UpdateParameterWidgets
+	$pvExtract AcceptCallback
+	$pvWindow DisableMenus
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    [$pvGlyph GetPVOutput] SetVisibility 1
+
+    $camera SetPosition 36.8437 -0.196199 53.7392
+    $camera SetFocalPoint -5.92921 -0.324064 18.022
+    $camera SetViewUp -0.639592 -0.0625532 0.766165
+    $camera SetViewAngle 30
+    $camera SetClippingRange 15.0904 64.6074
+
+    [$pvExtract GetVTKSource] SetVOI 0 0 0 32 3 20
+    RenWin1 Render
+    
+    .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Vertical plane extracted and glyphs oriented and\n scaled with momentum." -justify left
+
+    for {set i 1} {$i < 56} {incr i 1} {
+	[$pvExtract GetVTKSource] SetVOI $i $i 0 32 3 20
+	$pvExtract UpdateParameterWidgets
+	$pvExtract AcceptCallback
+	$pvWindow DisableMenus
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    [$pvGlyph GetPVOutput] SetVisibility 0
+    [$pvExtract GetPVOutput] SetVisibility 0
+
+    [$pvPlot3D GetPVOutput] SetVisibility 0
+    RenWin1 Render
+
+}
+
+proc BlowMoldingDemoInit {} {
+    global DataDir
+
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+
+    set reader [$pvWindow Open "$DataDir/blow.vtk"]
+
+    Ren1 ResetCamera
+    
+    set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
+    set pvWarp [$wInt CreateCallback]
+    $pvWarp UpdateParameterWidgets
+    $pvWarp AcceptCallback
+
+    set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
+    set pvSub [$lsInt CreateCallback] 
+    [$pvSub GetVTKSource] SetNumberOfSubdivisions 2
+    $pvSub UpdateParameterWidgets
+    $pvSub AcceptCallback
+
+    set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
+    set pvNormals [$nInt CreateCallback]
+    [$pvNormals GetVTKSource] SetFeatureAngle 60
+    $pvNormals UpdateParameterWidgets
+    $pvNormals AcceptCallback
+    
+    set warpOutput [$pvWarp GetPVOutput]
+    $warpOutput SetVisibility 0
+
+    set subOutput [$pvSub GetPVOutput]
+    $subOutput SetVisibility 0
+
+    set normalsOutput [$pvNormals GetPVOutput]
+    $normalsOutput SetVisibility 0
+
+    return "$pvWarp $pvSub $pvNormals"
+}
+
+proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow DisableMenus
+
+    global pvDemoShouldStop
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+    $pvWindow SetCurrentPVSource $pvWarp
+
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 143.632 4.67034 -39.8384
+    $camera SetFocalPoint 2 12 4.1578e-15
+    $camera SetViewUp 0.270701 -0.00149368 0.962662
+    $camera SetViewAngle 30
+    $camera SetClippingRange 127.006 167.567
+
+    set warpOutput [$pvWarp GetPVOutput]
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
+    $warpOutput ColorByPointFieldComponent thickness1 0
+
+    $warpOutput SetVisibility 1
+
+    .control.main.info configure -text "Running Blow Molding Demo :\n This demo demonstrates advanced capabilities\n of ParaView. It shows the deformation of a blow molded\n model as a function of time. This is accomplished\n by displacing the geometry using a displacement\n vector field.\n Actual grid." -justify left
+
+    for {set i 1} {$i <= 10} {incr i 1} {
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+	$pvWarp AcceptCallback
+	$warpOutput ColorByPointFieldComponent thickness$i 0
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    after 2000
+
+    $warpOutput SetVisibility 0
+    RenWin1 Render
+
+    .control.main.info configure -text "Running Blow Molding Demo :\n This demo demonstrates advanced capabilities\n of ParaView. It shows the deformation of a blow molded\n model as a function of time. This is accomplished\n by displacing the geometry using a displacement\n vector field.\n Grid smoothed by subdiving." -justify left
+    
+    set normalsOutput [$pvNormals GetPVOutput]
+    $normalsOutput SetVisibility 1
+
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
+    $normalsOutput ColorByPointFieldComponent thickness1 0
+    $pvWindow DisableMenus
+
+    for {set i 1} {$i <= 10} {incr i 1} {
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+	$pvWarp AcceptCallback
+	$normalsOutput ColorByPointFieldComponent thickness$i 0
+	RenWin1 Render
+	after 100
+	update
+
+	if $pvDemoShouldStop {
+	    RenWin1 Render
+	    return
+	}
+    }
+
+    $normalsOutput SetVisibility 0
+    RenWin1 Render
+}
+
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+set pvDemoShouldExit 0
+set pvDemoStopNow 0
+
+if $FoundFiles {
+
+    $pvWindow DisableMenus
+
+    set pvMySources [$pvWindow GetSources]
+    $pvMySources InitTraversal
+    set pvNextSource [$pvMySources GetNextItemAsObject]
+    
+    while {$pvNextSource != ""} {
+	$pvNextSource VisibilityOff
+	set pvNextSource [$pvMySources GetNextItemAsObject]
+    }
+
+    set Demos { SphereDemo CombustorDemo BlowMoldingDemo }
+    set length [llength $Demos]
+
+
+    if ![info exists pvDemoShouldStop] {
+	global pvDemoShouldStop
+	
+	toplevel .control
+	wm title .control "control panel"
+	frame .control.main -width 350 -height 200
+	label .control.main.info -text "ParaView demo initializing.\n Please wait."
+	button .control.main.stop -text "Stop Demo" -command {set pvDemoShouldStop 1}
+	pack .control.main
+	place .control.main.info -rely 0 -relx 0.5 -anchor n
+	place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+	
+	
+    }
+
+    set pvDemoShouldStop 0
+    for {set i 0} {$i < $length} {incr i 1} {
+	set TestName [lindex $Demos $i]
+	set pvDemoRetVals($TestName) [eval ${TestName}Init]
+    }
+    if $pvDemoShouldStop { set pvDemoStopNow 1 }
+    
+    wm deiconify .control
+    if !$pvDemoStopNow {
+	set pvDemoShouldStop 0
+    }
+    
+    while 1 {
+	for {set i 0} {$i < $length} {incr i 1} {
+	    set TestName [lindex $Demos $i]
+	    eval ${TestName}Run $pvDemoRetVals($TestName)
+	    if $pvDemoShouldStop break;
+	}
+	if $pvDemoShouldStop break;
+    }
+
+    wm withdraw .control
+
+}
+
+wm protocol .paraview WM_DELETE_WINDOW { $pvWindow Exit }
+$pvWindow EnableMenus
+
+if $pvDemoShouldExit {
+    $pvWindow Exit
+}

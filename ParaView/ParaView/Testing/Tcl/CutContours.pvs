@@ -1,0 +1,86 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
+    
+# Test the new feature of multiple cut values.
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
+$pv(vtkTemp110) SetValue 0 0 4
+$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp182) [$pv(vtkTemp1) ClipPlaneCallback]
+$pv(vtkTemp182) AcceptCallback
+set pv(vtkTemp191) [$pv(vtkTemp182) GetPVWidget {Plane}]
+set pv(vtkTemp193) [$pv(vtkTemp191) GetNormalEntry]
+$pv(vtkTemp193) SetValue 0.80121 0.53206 0.27383
+$pv(vtkTemp182) AcceptCallback
+set pv(vtkTemp192) [$pv(vtkTemp191) GetCenterEntry]
+$pv(vtkTemp192) SetValue 0 0 4.5
+$pv(vtkTemp182) AcceptCallback
+set pv(vtkTemp194) [$pv(vtkTemp182) GetPVWidget {Offset}]
+$pv(vtkTemp194) SetValue 0.5
+$pv(vtkTemp182) AcceptCallback
+$pv(vtkTemp194) SetValue -0.5
+$pv(vtkTemp182) AcceptCallback
+set pv(vtkTemp213) [$pv(vtkTemp1) CutPlaneCallback]
+set pv(vtkTemp222) [$pv(vtkTemp213) GetPVWidget {Plane}]
+set pv(vtkTemp224) [$pv(vtkTemp222) GetNormalEntry]
+$pv(vtkTemp224) SetValue -0.26920 0.86444 -0.42458
+set pv(vtkTemp227) [$pv(vtkTemp213) GetPVWidget {Cut Values}]
+$pv(vtkTemp227) RemoveAllValues
+$pv(vtkTemp227) AddValue 0.000000
+$pv(vtkTemp227) AddValue 0.100000
+$pv(vtkTemp227) AddValue 0.200000
+$pv(vtkTemp227) AddValue 0.300000
+$pv(vtkTemp213) AcceptCallback
+set pv(vtkTemp249) [$pv(vtkTemp1) CreatePVSource vtkTubeFilter]
+set pv(vtkTemp263) [$pv(vtkTemp249) GetPVWidget {NumberOfSides}]
+$pv(vtkTemp263) SetValue 8
+set pv(vtkTemp269) [$pv(vtkTemp249) GetPVWidget {Radius}]
+$pv(vtkTemp269) SetValue 0.01
+$pv(vtkTemp249) AcceptCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp193) SetValue -0.80121 -0.53206 -0.27383
+$pv(vtkTemp182) AcceptCallback
+$pv(vtkTemp194) SetValue -0.7
+$pv(vtkTemp182) AcceptCallback
+$pv(vtkTemp194) SetValue -0.2
+$pv(vtkTemp182) AcceptCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp213)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp249)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp283) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
+set pv(vtkTemp297) [$pv(vtkTemp283) GetPVWidget {LowPoint}]
+$pv(vtkTemp297) SetValue 0 -1 0
+set pv(vtkTemp302) [$pv(vtkTemp283) GetPVWidget {HighPoint}]
+$pv(vtkTemp302) SetValue 0 1 0
+$pv(vtkTemp283) AcceptCallback
+
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/CutContours.png 10
+   
+Application Exit
+
+
+
+
+

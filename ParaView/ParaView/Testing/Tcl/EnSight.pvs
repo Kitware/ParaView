@@ -1,0 +1,49 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+
+$pv(vtkTemp1) Open {$DataDir/Data/elements.case}
+set pv(vtkTemp104) [$pv(vtkTemp1) GetPreviousPVSource 1]
+set pv(vtkTemp145) [$pv(vtkTemp1) GetPreviousPVSource 0]
+
+$pv(vtkTemp1) ResetCameraCallback
+
+set pv(vtkTemp159) [$pv(vtkTemp1) ContourCallback]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp159)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp170) [$pv(vtkTemp159) GetPVWidget {Contour Values}]
+$pv(vtkTemp170) RemoveAllValues
+$pv(vtkTemp170) AddValue 110.000000
+$pv(vtkTemp170) AddValue 111.000000
+set pv(vtkTemp176) [$pv(vtkTemp159) GetPVWidget {Compute Normals}]
+$pv(vtkTemp176) SetState 0
+$pv(vtkTemp159) AcceptCallback
+
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp104)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp213) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp213)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp213) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/EnSight.png 10
+   
+Application Exit
