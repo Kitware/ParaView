@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14.4.2");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14.4.3");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -147,7 +147,7 @@ int vtkPVContainerWidget::GetModifiedFlag()
 
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::AcceptInternal(const char* sourceTclName)
+void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
   it->InitTraversal();
@@ -160,7 +160,7 @@ void vtkPVContainerWidget::AcceptInternal(const char* sourceTclName)
     {
     prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
     widget = prop->GetWidget();
-    widget->AcceptInternal(sourceTclName);
+    widget->AcceptInternal(sourceID);
     it->GoToNextItem();
     }
   it->Delete();

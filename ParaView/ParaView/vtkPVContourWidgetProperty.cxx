@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.5");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -91,7 +91,8 @@ void vtkPVContourWidgetProperty::AcceptInternal()
     this->Widget->GetPVApplication()->GetProcessModule();
   
   vtkPVClassNameInformation *cni = vtkPVClassNameInformation::New();
-  pm->GatherInformation(cni, this->VTKSourceTclName);
+  //******* FIX ME *******
+//  pm->GatherInformation(cni, this->VTKSourceID);
   if (!strcmp(cni->GetVTKClassName(), "vtkPVContourFilter") ||
       !strcmp(cni->GetVTKClassName(), "vtkPVKitwareContourFilter"))
     {

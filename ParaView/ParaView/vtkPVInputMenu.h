@@ -122,7 +122,7 @@ public:
   // Description:
   // Gets called when the accept button is pressed.
   // This method may add an entry to the trace file.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Gets called when the reset button is pressed.

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.3");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.4");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -206,13 +206,13 @@ vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
+void vtkPVFieldMenu::AcceptInternal(vtkClientServerID sourceID)
 {
-  if (sourceTclName &&
+  if (sourceID.ID &&
       (this->Value == vtkDataSet::POINT_DATA_FIELD ||
        this->Value == vtkDataSet::CELL_DATA_FIELD))
     {
-    this->Property->SetVTKSourceTclName(sourceTclName);
+    this->Property->SetVTKSourceID(sourceID);
     this->Property->SetIndex(this->Value);
     this->Property->AcceptInternal();
     }

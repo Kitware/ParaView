@@ -45,18 +45,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVWidgetProperty);
-vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.1.2.3");
 
 vtkPVWidgetProperty::vtkPVWidgetProperty()
 {
   this->Widget = NULL;
-  this->VTKSourceTclName = NULL;
+  this->VTKSourceID.ID = 0;
 }
 
 vtkPVWidgetProperty::~vtkPVWidgetProperty()
 {
   this->SetWidget(NULL);
-  this->SetVTKSourceTclName(NULL);
+  this->VTKSourceID.ID = 0;
 }
 
 void vtkPVWidgetProperty::Reset()
@@ -112,7 +112,6 @@ void vtkPVWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << indent << "VTKSourceTclName: " << (this->VTKSourceTclName ?
-                                           this->VTKSourceTclName : "(none)")
+  os << indent << "VTKSourceID: " << this->VTKSourceID
      << endl;
 }

@@ -111,7 +111,7 @@ public:
 
   // Description:
   // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Gets called when the reset button is pressed.

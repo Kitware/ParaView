@@ -123,8 +123,8 @@ public:
   // selected array gets changed in the menu.  It should have methods like:
   // SelectInputScalars and GetInputScalarsSelection.
   // Description:
-  vtkSetStringMacro(ObjectTclName);
-  vtkGetStringMacro(ObjectTclName);
+  vtkSetMacro(ObjectID,vtkClientServerID);
+  vtkGetMacro(ObjectID,vtkClientServerID);
 
   // Description:
   // This input menu supplies the data set.
@@ -196,7 +196,7 @@ protected:
   vtkPVDataSetAttributesInformation *GetFieldInformation();
 
   // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
@@ -220,7 +220,7 @@ protected:
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
   int         AttributeType;
-  char*       ObjectTclName;
+  vtkClientServerID ObjectID;
 
   // Subwidgets.
   vtkKWLabel *Label;

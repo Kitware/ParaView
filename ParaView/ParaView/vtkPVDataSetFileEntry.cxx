@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.9.4.1");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.9.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -67,7 +67,7 @@ vtkPVDataSetFileEntry::~vtkPVDataSetFileEntry()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetFileEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVDataSetFileEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   int newType;
 
@@ -93,7 +93,7 @@ void vtkPVDataSetFileEntry::AcceptInternal(const char* sourceTclName)
     return;
     }
 
-  this->vtkPVFileEntry::AcceptInternal(sourceTclName);
+  this->vtkPVFileEntry::AcceptInternal(sourceID);
 }
 
 

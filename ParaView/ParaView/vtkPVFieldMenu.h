@@ -113,7 +113,7 @@ public:
   // Description:
   // Called when the accept or reset button is pressed.
   // This internal version is passed VTK source name,
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
 
   virtual void SetProperty(vtkPVWidgetProperty *prop);

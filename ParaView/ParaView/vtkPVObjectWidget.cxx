@@ -48,29 +48,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
 {
-  this->ObjectTclName = NULL;
+  this->ObjectID.ID = 0;
   this->VariableName = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::~vtkPVObjectWidget()
 {
-  this->SetObjectTclName(NULL);
   this->SetVariableName(NULL);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVObjectWidget::SetObjectVariable(const char* objName, 
-                                          const char* varName)
-{
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
@@ -86,7 +78,7 @@ void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
 
   *file << "\t" << sourceTclName << " Set" << this->VariableName;
   this->Script("set tempValue [%s Get%s]", 
-               this->ObjectTclName, this->VariableName);
+               this->ObjectID.ID, this->VariableName);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
 }
@@ -109,7 +101,7 @@ void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone,
   if (pvow)
     {
     pvow->SetVariableName(this->VariableName);
-    pvow->SetObjectTclName(pvSource->GetVTKSourceTclName());
+    pvow->SetObjectID(pvSource->GetVTKSourceID());
     }
   else 
     {
@@ -135,7 +127,7 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVObjectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "ObjectTclName: " << (this->ObjectTclName?this->ObjectTclName:"none")
+  os << "ObjectID: " << (this->ObjectID.ID)
      << endl;
   os << "VariableName: " << (this->VariableName?this->VariableName:"none") 
      << endl;

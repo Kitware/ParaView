@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.1");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.2");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -258,9 +258,12 @@ void vtkPVSelectTimeSet::Accept()
                         this->Application->GetMainInterp()->result);
     }
 
-  pvApp->GetProcessModule()->ServerScript(
-    "%s SetTimeValue {%12.5e}", this->ObjectTclName, this->GetTimeValue());
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  char buf[1024];
+  sprintf(buf, "%12.5e", this->GetTimeValue());
+  pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID 
+                  << "SetTimeValue" <<  buf 
+                  << vtkClientServerStream::End;
   this->ModifiedFlag = 0;
 }
 

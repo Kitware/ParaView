@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.1");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.2");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -95,7 +95,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToRed");
-  this->FileEntry->SetObjectVariable(this->GetVTKSourceTclName(), "FileName");
+  this->FileEntry->SetVariableName("FileName");
   this->FileEntry->Create(this->GetPVApplication());
   if (this->AddFileEntry)
     {

@@ -74,7 +74,7 @@ public:
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK filter.
-  virtual void AcceptInternal(const char* vtkSourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // This method resets the widget values from the VTK filter.

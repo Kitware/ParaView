@@ -87,8 +87,8 @@ public:
 
   // Description:
   // This is the name of the VTK reader.
-  vtkSetStringMacro(VTKReaderTclName);
-  vtkGetStringMacro(VTKReaderTclName);
+//  vtkSetStringMacro(VTKReaderTclName);
+//  vtkGetStringMacro(VTKReaderTclName);
     
   // Description:
   // Callback for the AllOn and AllOff buttons.
@@ -132,6 +132,8 @@ protected:
   virtual void SetReaderSelectionsFromWidgets();
   
   char* AttributeName;
+  vtkClientServerID VTKReaderID;
+  
   char* VTKReaderTclName;
 
   vtkKWLabeledFrame* LabeledFrame;

@@ -55,9 +55,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.3");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.4");
 
 //===========================================================================
 //***************************************************************************
@@ -96,7 +97,7 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 1;
   this->ModifiedFlag = 1;
-  this->Widget3DTclName = 0;
+  this->Widget3DID.ID = 0;
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
@@ -106,12 +107,15 @@ vtkPV3DWidget::vtkPV3DWidget()
 //----------------------------------------------------------------------------
 vtkPV3DWidget::~vtkPV3DWidget()
 {
-  if (this->Widget3DTclName)
+  if (this->Widget3DID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    pvApp->BroadcastScript("%s EnabledOff", this->Widget3DTclName);
-    pvApp->BroadcastScript("%s Delete", this->Widget3DTclName);
-    this->SetWidget3DTclName(NULL);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                    << "EnabledOff" << vtkClientServerStream::End;
+    pm->DeleteStreamObject(this->Widget3DID);
+    pm->SendStreamToClientAndServer();
+    this->Widget3DID.ID = 0;
     }
   this->Observer->Delete();
   this->Visibility->Delete();
@@ -175,16 +179,21 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->ChildCreate(pvApp);
 
-  this->Widget3D = vtk3DWidget::SafeDownCast(pvApp->TclToVTKObject(this->Widget3DTclName));
+  this->Widget3D = 
+    vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
 
   // Only initialize observers on the UI process.
-  if (this->Widget3DTclName)
+  if (this->Widget3DID.ID  != 0)
     {
     // Default/dummy interactor for satelite procs.
-    pvApp->BroadcastScript(
-      "%s SetInteractor pvRenderWindowInteractor", this->Widget3DTclName);
-    this->Script("%s InitializeObservers %s", this->GetTclName(),
-                 this->Widget3DTclName);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
+                    << "SetInteractor" 
+                    << this->PVSource->GetPVWindow()->GetInteractorID()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
+    this->InitializeObservers(
+      vtk3DWidget::SafeDownCast(pm->GetObjectFromID(this->Widget3DID)));
     }
 
   this->PlaceWidget();
@@ -229,7 +238,7 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
 }
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::AcceptInternal(const char*)
+void vtkPV3DWidget::AcceptInternal(vtkClientServerID)
 {
   this->PlaceWidget();
   this->ModifiedFlag = 0;
@@ -265,9 +274,10 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     {
     this->PlaceWidget();
     }
-
-  pvApp->BroadcastScript(
-    "%s SetEnabled %d", this->Widget3DTclName, visibility);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetEnabled" << visibility << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
@@ -291,10 +301,11 @@ void vtkPV3DWidget::Deselect()
 
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
-{
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetEnabled %d", this->Widget3DTclName, visibility);
-  //is->Widget3D->SetEnabled(visibility);  
+{  
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetEnabled" << visibility << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -320,10 +331,13 @@ void vtkPV3DWidget::ActualPlaceWidget()
   float bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript(
-    "%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName, 
-    bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
-  //this->Widget3D->PlaceWidget(bounds);
+
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "PlaceWidget" 
+                  << bds[0] << bds[1] << bds[2] << bds[3] 
+                  << bds[4] << bds[5] << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -331,7 +345,7 @@ void vtkPV3DWidget::PlaceWidget()
 {
   // We should really check to see if the input has changed (modified).
 
-  if (!this->Placed && this->Widget3DTclName)
+  if (!this->Placed && this->Widget3DID.ID)
     {
     this->ActualPlaceWidget();
     this->Placed = 1;
@@ -388,8 +402,5 @@ void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Use Label: " << (this->UseLabel?"on":"off") << endl;
   os << indent << "3D Widget:" << endl;
-  if (this->Widget3DTclName)
-    {
-    os << indent << "3DWidgetTclName: " << this->Widget3DTclName << endl;
-    }
+  os << indent << "3DWidgetID: " << this->Widget3DID << endl;
 }

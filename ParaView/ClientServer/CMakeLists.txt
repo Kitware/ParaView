@@ -93,8 +93,25 @@ vtkArrowSource
 vtkExtentTranslator
 vtkOpenGLProperty
 vtkPointSet
+vtkPlane
+vtkImplicitFunction
+vtkImplicitPlaneWidget
+vtkPolyDataSourceWidget
+vtkSphereWidget
+vtkSphere
+vtkBoxWidget
+vtkPlanes
+vtkTransform
+vtkMatrix4x4
+vtkPlaneWidget
+vtkPointSource
+vtkPointWidget
 vtkCompositer
 vtkCompositeManager
+vtkLinearTransform
+vtkHomogeneousTransform
+vtkAbstractTransform
+
 # paraview classes
 vtkGenericRenderWindowInteractor
 vtkPVArrowSource
@@ -107,12 +124,19 @@ vtkClientCompositeManager
 vtkPVApplication
 vtkPVProcessModule
 vtkPVClientServerModule
+vtkPVClipDataSet
+vtkClipDataSet
+vtkDataSetToUnstructuredGridFilter
+vtkUnstructuredGridSource
 vtkPVMPIProcessModule
 vtkKWObject
 vtkKWApplication
 vtkPVTreeComposite
 vtkCompressCompositer
+vtkMultiDisplayManager
 )
+
+
 
 IF(VTK_USE_X)
   SET(ClientServer_WRAP_CLASSES ${ClientServer_WRAP_CLASSES}

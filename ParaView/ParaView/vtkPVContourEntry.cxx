@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.6");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.7");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -349,12 +349,12 @@ void vtkPVContourEntry::RemoveAllValues()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   int i;
   int numContours;
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     return;
     }
@@ -387,7 +387,7 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
     numScalars[i+1] = 2;
     }
   
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetVTKCommands(numContours+1, cmds, numScalars);
   this->Property->AcceptInternal();
   

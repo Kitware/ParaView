@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.4");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
@@ -63,15 +63,27 @@ vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
 
 void vtkPVStringWidgetProperty::AcceptInternal()
 {
+  int fixme;
+  vtkPVApplication *pvApp = this->GetWidget()->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
   if (this->String[0] != '[')
     {
-    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-      "%s %s {%s}", this->VTKSourceTclName, this->VTKCommand, this->String);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->VTKSourceID 
+                    << this->VTKCommand
+                    << this->String 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
   else
     {
-    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-      "%s %s %s", this->VTKSourceTclName, this->VTKCommand, this->String);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->VTKSourceID 
+                    << this->VTKCommand
+                    << this->String 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
 }
 

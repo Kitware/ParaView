@@ -70,9 +70,10 @@ public:
   // some objects state/ivars.  This is one way the object/variable
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
-  void SetObjectVariable(const char *objectTclName, const char *var);
-  vtkSetStringMacro(ObjectTclName);
-  vtkGetStringMacro(ObjectTclName);
+//  void SetObjectVariable(const char *objectTclName, const char *var);
+//  vtkSetStringMacro(ObjectTclName);
+//  vtkGetStringMacro(ObjectTclName);
+  vtkSetMacro(ObjectID,vtkClientServerID);
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);
 
@@ -90,7 +91,7 @@ protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
 
-  char *ObjectTclName;
+  vtkClientServerID ObjectID;
   char *VariableName;
 
   vtkPVObjectWidget(const vtkPVObjectWidget&); // Not implemented

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.2");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -69,26 +69,24 @@ vtkPVStringAndScalarListWidgetProperty::~vtkPVStringAndScalarListWidgetProperty(
 void vtkPVStringAndScalarListWidgetProperty::AcceptInternal()
 {
   int i, j, scalarCount = 0, stringCount = 0;
-  ostrstream cmd;
+  vtkPVProcessModule* pm = this->Widget->GetPVApplication()->GetProcessModule();
   for (i = 0; i < this->NumberOfCommands; i++)
     {
-    cmd << this->VTKSourceTclName << " " << this->VTKCommands[i];
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke << this->VTKSourceID << this->VTKCommands[i];
     for (j = 0; j < this->NumberOfStringsPerCommand[i]; j++)
       {
-      cmd << " " << this->Strings->GetString(stringCount);
+      pm->GetStream() << this->Strings->GetString(stringCount);
       stringCount++;
       }
     for (j = 0; j < this->NumberOfScalarsPerCommand[i]; j++)
       {
-      cmd << " " << this->Scalars[scalarCount];
+      pm->GetStream() << this->Scalars[scalarCount];
       scalarCount++;
       }
-    cmd << "; ";
+    pm->GetStream() << vtkClientServerStream::End;
     }
-  cmd << ends;
-  
-  this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(cmd.str());
-  cmd.rdbuf()->freeze(0);
+  pm->SendStreamToServer();
 }
 
 void vtkPVStringAndScalarListWidgetProperty::SetVTKCommands(

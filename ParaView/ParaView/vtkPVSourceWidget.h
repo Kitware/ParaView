@@ -58,11 +58,11 @@ public:
 
   // Description:
   // The Tcl name of the contained VTK source.
-  vtkGetStringMacro(SourceTclName);
+  vtkGetMacro(SourceID,vtkClientServerID);
 
   // Description:
   // The Tcl name of the output of the contained VTK source.
-  vtkGetStringMacro(OutputTclName);
+  vtkGetMacro(OutputID,vtkClientServerID);
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
@@ -72,11 +72,8 @@ protected:
   vtkPVSourceWidget();
   ~vtkPVSourceWidget();
 
-  char* SourceTclName;
-  vtkSetStringMacro(SourceTclName);
-
-  char* OutputTclName;
-  vtkSetStringMacro(OutputTclName);
+  vtkClientServerID SourceID;
+  vtkClientServerID OutputID;
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.

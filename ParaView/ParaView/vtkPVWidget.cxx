@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.6");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.7");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -140,7 +140,7 @@ void vtkPVWidget::Accept()
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    this->AcceptInternal(this->PVSource->GetVTKSourceTclName(idx));
+    this->AcceptInternal(this->PVSource->GetVTKSourceID(idx));
     }
 
   // I put this after the accept internal, because
@@ -162,7 +162,7 @@ void vtkPVWidget::Accept()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::AcceptInternal(const char*)
+void vtkPVWidget::AcceptInternal(vtkClientServerID)
 {
   // Get rid of this eventually.  Display widgets (label) do not really
   // need to implement this method.
@@ -283,8 +283,10 @@ void vtkPVWidget::SaveInBatchScript(ofstream *file)
   numSources = this->PVSource->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    this->SaveInBatchScriptForPart(file, 
-                  this->PVSource->GetVTKSourceTclName(sourceIdx));
+    ostrstream str;
+    str << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) << ends;
+    this->SaveInBatchScriptForPart(file, str.str());
+    delete [] str.str();
     }
 }
 

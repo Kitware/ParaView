@@ -157,7 +157,7 @@ public:
   // Description:
   // Called when accept button is pushed.
   // Sets the objects variable from UI.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Called when reset button is pushed.

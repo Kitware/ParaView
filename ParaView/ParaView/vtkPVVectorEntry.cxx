@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.5");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.6");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -292,7 +292,7 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVVectorEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkKWEntry *entry;
   float scalars[6];
@@ -306,7 +306,7 @@ void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
     count++;
     }
   this->Property->SetScalars(count, scalars);
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
   this->AcceptCalled = 1;

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.5");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.6");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -200,7 +200,7 @@ int vtkPVSelectWidget::GetModifiedFlag()
 }
   
 //-----------------------------------------------------------------------------
-void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
+void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -208,7 +208,7 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
   if (this->GetCurrentVTKValue())
     {
     this->Property->SetString(this->GetCurrentVTKValue());
-    this->Property->SetVTKSourceTclName(sourceTclName);
+    this->Property->SetVTKSourceID(sourceId);
     this->Property->AcceptInternal();
     }
 
@@ -216,7 +216,7 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
     {
     vtkPVWidgetProperty *pvwp;
     pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
-    pvwp->GetWidget()->AcceptInternal(sourceTclName);
+    pvwp->GetWidget()->AcceptInternal(sourceId);
     }
 
   this->AcceptCalled = 1;

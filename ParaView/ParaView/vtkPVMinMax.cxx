@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.4");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.5");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -310,13 +310,13 @@ void vtkPVMinMax::SetMaxValue(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
+void vtkPVMinMax::AcceptInternal(vtkClientServerID sourceID)
 {
   float scalars[2];
   scalars[0] = this->GetMinValue();
   scalars[1] = this->GetMaxValue();
   this->Property->SetScalars(2, scalars);
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWidgetProperty_h
 
 #include "vtkObject.h"
-
+#include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkPVWidget;
 
 class VTK_EXPORT vtkPVWidgetProperty : public vtkObject
@@ -63,16 +63,16 @@ public:
   virtual void Accept();
   virtual void AcceptInternal() {}
 
-  vtkSetStringMacro(VTKSourceTclName);
-
   virtual void SetAnimationTime(float time) {}
-  
+  // BTX
+  vtkSetMacro(VTKSourceID,vtkClientServerID);
+  // ETX
 protected:
   vtkPVWidgetProperty();
   ~vtkPVWidgetProperty();
 
   vtkPVWidget *Widget;
-  char *VTKSourceTclName;
+  vtkClientServerID VTKSourceID;
   
 private:
   vtkPVWidgetProperty(const vtkPVWidgetProperty&); // Not implemented

@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.4");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.5");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -778,7 +778,7 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
+void vtkPVCalculatorWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -872,7 +872,7 @@ void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
   this->Property->SetVTKCommands(cmdCount, cmds, numStrings, numScalars);
   this->Property->SetStrings(stringCount, strings);
   this->Property->SetScalars(scalarCount, scalars);
-  this->Property->SetVTKSourceTclName(vtkSourceTclName);
+  this->Property->SetVTKSourceID(vtkSourceID);
   this->Property->AcceptInternal();
   
   for (i = 0; i < cmdCount; i++)
@@ -927,7 +927,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
     // This suff is what should be in PVWidgets.
-    *file << "\t" << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+    *file << "\t" << this->PVSource->GetVTKSourceID(sourceIdx) 
           << " SetAttributeModeToUse";
     if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
       {
@@ -940,7 +940,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
   
     for (i = 0; i < this->NumberOfScalarVariables; i++)
       {
-      *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+      *file << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) 
             << " AddScalarVariable {"
             << this->ScalarVariableNames[i] << "} {"
             << this->ScalarArrayNames[i] 
@@ -949,7 +949,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
       }
     for (i = 0; i < this->NumberOfVectorVariables; i++)
       {
-      *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
+      *file << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) 
             << " AddVectorVariable {"
             << this->VectorVariableNames[i] << "} {"
             << this->VectorArrayNames[i]
@@ -958,7 +958,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
 
     if ( this->FunctionLabel->IsCreated() )
       {
-      *file << "\t" << this->PVSource->GetVTKSourceTclName(sourceIdx) << " SetFunction {"  
+      *file << "\t" << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) << " SetFunction {"  
             << this->FunctionLabel->GetLabel() << "}\n";
       }
     }

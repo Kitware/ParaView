@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.7");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.8");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -155,7 +155,7 @@ int vtkPVProcessModule::Start(int argc, char **argv)
     << this->GetApplicationID() << app
     << vtkClientServerStream::End;
   this->ClientInterpreter->ProcessStream(this->GetStream());
-
+  this->GetStream().Reset();
   app->Start(argc,argv);
 
 

@@ -77,7 +77,7 @@ protected:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   vtkPDataSetReader *TypeReader;
   int Type;

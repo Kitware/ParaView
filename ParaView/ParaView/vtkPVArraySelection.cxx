@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.1");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.2");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -78,7 +78,7 @@ vtkPVArraySelection::vtkPVArraySelection()
 {
   this->CommandFunction = vtkPVArraySelectionCommand;
   
-  this->VTKReaderTclName = NULL;
+  this->VTKReaderID.ID = 0;
   this->AttributeName = NULL;
   
   this->LabeledFrame = vtkKWLabeledFrame::New();
@@ -99,7 +99,6 @@ vtkPVArraySelection::vtkPVArraySelection()
 //----------------------------------------------------------------------------
 vtkPVArraySelection::~vtkPVArraySelection()
 {
-  this->SetVTKReaderTclName(NULL);
   this->SetAttributeName(NULL);
 
   this->LabeledFrame->Delete();
@@ -496,7 +495,7 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
   if (pvas)
     {
     pvas->SetAttributeName(this->AttributeName);
-    pvas->SetVTKReaderTclName(pvSource->GetVTKSourceTclName());
+    pvas->VTKReaderID = pvSource->GetVTKSourceID();
     }
   else 
     {

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.6");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.7");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2139,11 +2139,9 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
-#if 0
   float range[2];
   const char* scalarMode;
   char* result;
-  char* renTclName;
   vtkPVPart *part;
   int partIdx, numParts;
   int sourceCount;
@@ -2152,7 +2150,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   int numOutputs;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
-  renTclName = this->GetPVApplication()->GetRenderModule()->GetRendererTclName();
+  vtkClientServerID renID = this->GetPVApplication()->GetRenderModule()->GetRendererID();
   if (this->GetVisibility())
     {
     if (this->PVColorMap)
@@ -2255,7 +2253,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
               << "\n";
         }
 
-      *file << renTclName << " AddActor " << part->GetPartDisplay()->GetPropTclName() << "\n";
+      *file << "pvTemp" << renID.ID << " AddActor " << part->GetPartDisplay()->GetPropTclName() << "\n";
       }  
     }
 
@@ -2269,11 +2267,10 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     result = this->GetPVApplication()->GetMainInterp()->result;
     *file << result << "\n\t"
           << this->CubeAxesTclName << " SetCamera [";
-    *file << renTclName << " GetActiveCamera]\n\t"
+    *file << "pvTemp" << renID.ID << " GetActiveCamera]\n\t"
           << this->CubeAxesTclName << " SetInertia 20\n";
-    *file << renTclName << " AddProp " << this->CubeAxesTclName << "\n";
+    *file << "pvTemp" << renID.ID << " AddProp " << this->CubeAxesTclName << "\n";
     }
-#endif
 }
 
 //----------------------------------------------------------------------------

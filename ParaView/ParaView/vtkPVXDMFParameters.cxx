@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.2");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -263,7 +263,7 @@ void vtkPVXDMFParameters::AddXDMFParameter(const char* pname, int value, int min
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AcceptInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVXDMFParameters::AcceptInternal(vtkClientServerID)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.2");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.3");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -192,7 +192,7 @@ void vtkPVSelectCTHArrays::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectCTHArrays::AcceptInternal(const char* vtkSourceTclName)
+void vtkPVSelectCTHArrays::AcceptInternal(vtkClientServerID vtkSourceID)
 {
   int num, idx;
   const char* arrayName;
@@ -212,10 +212,11 @@ void vtkPVSelectCTHArrays::AcceptInternal(const char* vtkSourceTclName)
     this->Inactivate();
     }
 
-  // Start with no arrays selected.
-  pvApp->GetProcessModule()->ServerScript("%s RemoveAllVolumeArrayNames",
-                                          vtkSourceTclName);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  vtkSourceID
+                  << "RemoveAllVolumeArrayNames"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
@@ -223,9 +224,12 @@ void vtkPVSelectCTHArrays::AcceptInternal(const char* vtkSourceTclName)
     state = this->ArraySelectionList->GetSelectState(idx);
     if (state)
       {
-      arrayName = this->ArraySelectionList->GetItem(idx);    
-      pvApp->GetProcessModule()->ServerScript("%s AddVolumeArrayName {%s}",
-                                              vtkSourceTclName, arrayName);
+      arrayName = this->ArraySelectionList->GetItem(idx); 
+      pm->GetStream() << vtkClientServerStream::Invoke <<  vtkSourceID
+                      << "AddVolumeArrayName"
+                      << arrayName
+                      << vtkClientServerStream::End;   
+      pm->SendStreamToServer();
       }
     }
 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.4");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -196,12 +196,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
 
   
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVStringEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   this->ModifiedFlag = 0;
   
   this->Property->SetString(this->GetValue());
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   this->AcceptCalled = 1;
 }

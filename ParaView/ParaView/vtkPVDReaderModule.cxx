@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -93,10 +93,11 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
 {
   // Make sure the reader's file name is set.
   this->SetReaderFileName(fname);
+  int fixme;
   
   // Check whether the input file has a "timestep" attribute.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s UpdateAttributes", this->GetVTKSourceTclName());
+  pm->ServerScript("%s UpdateAttributes", this->GetVTKSourceID());
   pm->RootScript(
     "namespace eval ::paraview::vtkPVDReaderModule {\n"
     "  proc GetTimeAttributeIndex {reader} {\n"
@@ -129,8 +130,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     this->TimeScale->SetParent(this->GetParameterFrame()->GetFrame());
     this->TimeScale->SetModifiedCommand(this->GetTclName(), 
                                         "SetAcceptButtonColorToRed");
-    this->TimeScale->SetObjectVariable(this->GetVTKSourceTclName(),
-                                       "RestrictionAsIndex timestep");
+    this->TimeScale->SetVariableName("RestrictionAsIndex timestep");
     this->TimeScale->Create(this->GetPVApplication());
     this->TimeScale->DisplayEntry();
     this->TimeScale->SetDisplayEntryAndLabelOnTop(0);

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.3");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.4");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -189,7 +189,7 @@ void vtkPVExtractPartsWidget::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
+void vtkPVExtractPartsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 {
   int num, idx;
 
@@ -217,7 +217,7 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
     }
   this->Property->SetVTKCommands(num, cmds, numScalars);
   this->Property->SetScalars(num*2, scalars);
-  this->Property->SetVTKSourceTclName(vtkSourceTclName);
+  this->Property->SetVTKSourceID(vtkSourceID);
   this->Property->AcceptInternal();
   
   for (idx = 0; idx < num; idx++)
@@ -336,7 +336,7 @@ void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
   for (idx = 0; idx < num; ++idx)
     {
     state = this->PartSelectionList->GetSelectState(idx);  
-    *file << "\t" << this->PVSource->GetVTKSourceTclName(0) 
+    *file << "\t" << "pvTemp" << this->PVSource->GetVTKSourceID(0) 
           << " SetInputMask " << idx << " " << state << endl;  
     }
 }

@@ -44,43 +44,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.1");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
 {
-  this->SourceTclName = 0;
-  this->OutputTclName = 0;
+  this->SourceID.ID = 0;
+  this->OutputID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::~vtkPVSourceWidget()
 {
 
-  if (this->OutputTclName)
+  if (this->OutputID.ID)
     {
     vtkPVApplication* pvApp = 
       vtkPVApplication::SafeDownCast(this->Application);
     if (pvApp)
       {
-      pvApp->GetProcessModule()->ServerScript(
-        "%s Delete", this->OutputTclName);
+      pvApp->GetProcessModule()->DeleteStreamObject(this->OutputID);
+      pvApp->GetProcessModule()->SendStreamToServer();
       }
     }
 
-  if (this->SourceTclName)
+  if (this->SourceID.ID)
     {
     vtkPVApplication* pvApp = 
       vtkPVApplication::SafeDownCast(this->Application);
     if (pvApp)
-      {
-      pvApp->GetProcessModule()->ServerScript(
-        "%s Delete", this->SourceTclName);
+      {  
+      pvApp->GetProcessModule()->DeleteStreamObject(this->SourceID);
+      pvApp->GetProcessModule()->SendStreamToServer();
       }
     }
 
-  this->SetSourceTclName(0);
-  this->SetOutputTclName(0);
+  this->SourceID.ID = 0;
+  this->OutputID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -88,15 +88,19 @@ void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
 {
   char *result;
   
-  if (this->SourceTclName)
+  if (this->SourceID.ID)
     {
     return;
     } 
-
-  this->Script("%s GetClassName", this->SourceTclName);
-  result = this->Application->GetMainInterp()->result;
-  *file << result << " " << this->SourceTclName << "\n";
-
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID << "GetClassName" 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  const char* dataClassName;
+  if(pm->GetLastServerResult().GetArgument(0, 0, &dataClassName))
+    {
+    *file << dataClassName << " pvTemp" << this->SourceID.ID << "\n";
+    }
   // This will loop through all parts and call SaveInBatchScriptForPart.
   this->Superclass::SaveInBatchScript(file);
 }
@@ -111,15 +115,15 @@ void vtkPVSourceWidget::SaveInBatchScriptForPart(ofstream *file,
     } 
 
   *file << "\t" << sourceTclName << " Set" << this->VariableName
-        << " " << this->SourceTclName << endl;
+        << " pvTemp" << this->SourceID.ID << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "Source Tcl name: " << (this->SourceTclName?this->SourceTclName:"none")
+  os << "Source Tcl name: " << (this->SourceID)
      << endl;
-  os << "Output Tcl Name: " << (this->OutputTclName?this->OutputTclName:"none")
+  os << "Output Tcl Name: " << (this->OutputID)
      << endl;
 }

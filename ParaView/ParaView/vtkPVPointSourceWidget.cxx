@@ -47,12 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidgetProperty.h"
+#include "vtkPVProcessModule.h"
 
 int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.5");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.6");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -108,22 +109,22 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   float rad;
   float num;
   
-  if (this->SourceTclName == NULL || this->PointWidget == NULL)
+  if (this->SourceID.ID == 0 || this->PointWidget == NULL)
     {
     vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "vtkPointSource " << this->SourceTclName << "\n";
+  *file << "vtkPointSource " << "pvTemp" << this->SourceID.ID << "\n";
   this->PointWidget->GetPosition(pt);
-  *file << "\t" << this->SourceTclName << " SetCenter " 
+  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetCenter " 
         << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
 
   this->NumberOfPointsWidget->GetValue(&num, 1);
-  *file << "\t" << this->SourceTclName << " SetNumberOfPoints " 
+  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetNumberOfPoints " 
         << (int)(num) << endl; 
   this->RadiusWidget->GetValue(&rad, 1);
-  *file << "\t" << this->SourceTclName << " SetRadius " 
+  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetRadius " 
         << rad << endl; 
 }
 
@@ -148,32 +149,30 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
           vtkPVPointSourceWidget::InstanceCount++);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (pvApp)
     {
-    this->SetSourceTclName(name);
-
-    pvApp->BroadcastScript("vtkPointSource %s;"
-                           "%s SetNumberOfPoints 1;"
-                           "%s SetRadius 0.0;"
-                           "vtkPolyData %s;"
-                           "%s SetOutput %s;", 
-                           name,
-                           name,
-                           name,
-                           outputName,
-                           name, outputName);
-    //special for saving in tcl scripts.
-    sprintf(outputName, "[%s GetOutput]", name);
-    this->SetOutputTclName(outputName);
+    this->SourceID = pm->NewStreamObject("vtkPointSource");
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->SourceID << "SetNumberOfPoints" << 1 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->SourceID << "SetRadius" << 0.0 
+                    << vtkClientServerStream::End;
+    this->OutputID = pm->NewStreamObject("vtkPolyData");
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->SourceID << "SetOutput" << this->OutputID 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
-  this->PointWidget->SetObjectTclName(name);
+  this->PointWidget->SetObjectID(this->ObjectID);
   this->PointWidget->SetVariableName("Center");
   this->PointWidget->SetPVSource(this->GetPVSource());
   this->PointWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
                                        "SetAcceptButtonColorToRed");
   
-  this->RadiusWidget->SetObjectTclName(name);
+  this->RadiusWidget->SetObjectID(this->ObjectID);
   this->RadiusWidget->SetVariableName("Radius");
   this->RadiusWidget->SetPVSource(this->GetPVSource());
   this->RadiusWidget->SetLabel("Radius");
@@ -186,7 +185,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand true",
                this->RadiusWidget->GetWidgetName());
   
-  this->NumberOfPointsWidget->SetObjectTclName(name);
+  this->NumberOfPointsWidget->SetObjectID(this->ObjectID);
   this->NumberOfPointsWidget->SetVariableName("NumberOfPoints");
   this->NumberOfPointsWidget->SetPVSource(this->GetPVSource());
   this->NumberOfPointsWidget->SetLabel("Number of Points");
@@ -237,15 +236,15 @@ void vtkPVPointSourceWidget::ResetInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::AcceptInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVPointSourceWidget::AcceptInternal(vtkClientServerID)
 {
   // Ignore the source passed in.  We are updating our
   // own point source.
   if (this->GetModifiedFlag())
     {
-    this->PointWidget->AcceptInternal(this->SourceTclName);
-    this->RadiusWidget->AcceptInternal(this->SourceTclName);
-    this->NumberOfPointsWidget->AcceptInternal(this->SourceTclName);
+    this->PointWidget->AcceptInternal(this->SourceID);
+    this->RadiusWidget->AcceptInternal(this->SourceID);
+    this->NumberOfPointsWidget->AcceptInternal(this->SourceID);
     }
   this->ModifiedFlag = 0;
 }

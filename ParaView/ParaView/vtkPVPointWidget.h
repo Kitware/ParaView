@@ -98,7 +98,7 @@ public:
     
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
