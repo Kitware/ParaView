@@ -176,12 +176,57 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 
   input->GetDimensions( size );
 
-  // if at least two axes have more than 32 samples
-  if ((size[0] > 32) + (size[1] > 32) + (size[2] > 32) > 1)
+  // if there is an opportunity for a 1/16th size volume then do it
+  // we find the target volume size and then reduce it
+  int subSize[3];
+  int i;
+  for (i = 0; i < 3; i++)
     {
-    this->LowResMagnification[0] = 31.5 / (float)size[0];
-    this->LowResMagnification[1] = 31.5 / (float)size[1];
-    this->LowResMagnification[2] = 31.5 / (float)size[2];
+    subSize[i] = 2;
+    while (subSize[i] < size[i])
+      {
+      subSize[i] = subSize[i] * 2;
+      }
+    }
+  float ratio = 1.0;
+  float numVoxels = subSize[0]*subSize[1]*subSize[2];
+  float numTVoxels = numVoxels;
+  while ((ratio > 1/16.1 || numVoxels > 66000.0) && 
+         subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
+    {
+    // find the largest axis and divide it by 2
+    if (subSize[0] > subSize[1])
+      {
+      if (subSize[0] > subSize[2])
+        {
+        subSize[0] = subSize[0] / 2;
+        }
+      else
+        {
+        subSize[2] = subSize[2] / 2;
+        }
+      }
+    else
+      {
+      if (subSize[1] > subSize[2])
+        {
+        subSize[1] = subSize[1] / 2;
+        }
+      else
+        {
+        subSize[2] = subSize[2] / 2;
+        }
+      }
+    numVoxels = subSize[0]*subSize[1]*subSize[2];
+    ratio = numVoxels / numTVoxels;
+    }
+  // now we have a new volume at least 1 16th as small as the original, 
+  // the question is, is it large enough to bother with?
+  if (numVoxels > 32000)
+    {
+    this->LowResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
+    this->LowResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
+    this->LowResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
     this->LowResResampler->SetInput(input);
     this->LowResResampler->InterpolateOff();
     this->LowResResampler->
@@ -198,12 +243,55 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 			       this->VolumeProperty, 0.0 );
     }
 
-  if ( size[0] > 32 && size[1] > 32 && size[2] > 32 &&
-       ( size[0] > 64 || size[1] > 64 || size[2] > 64 ) )
+  // if there is an opportunity for a 1/4th size volume then do it
+  // we find the target volume size and then reduce it
+  for (i = 0; i < 3; i++)
     {
-    this->MedResMagnification[0] = 63.5 / (float)size[0];
-    this->MedResMagnification[1] = 63.5 / (float)size[1];
-    this->MedResMagnification[2] = 63.5 / (float)size[2];
+    subSize[i] = 2;
+    while (subSize[i] < size[i])
+      {
+      subSize[i] = subSize[i] * 2;
+      }
+    }
+  ratio = 1.0;
+  numVoxels = subSize[0]*subSize[1]*subSize[2];
+  numTVoxels = numVoxels;
+  while ((ratio > 1/4.01 || numVoxels > 263000.0 ) && 
+         subSize[0] > 1 && subSize[1] > 1 && subSize[2] > 1)
+    {
+    // find the largest axis and divide it by 2
+    if (subSize[0] > subSize[1])
+      {
+      if (subSize[0] > subSize[2])
+        {
+        subSize[0] = subSize[0] / 2;
+        }
+      else
+        {
+        subSize[2] = subSize[2] / 2;
+        }
+      }
+    else
+      {
+      if (subSize[1] > subSize[2])
+        {
+        subSize[1] = subSize[1] / 2;
+        }
+      else
+        {
+        subSize[2] = subSize[2] / 2;
+        }
+      }
+    numVoxels = subSize[0]*subSize[1]*subSize[2];
+    ratio = numVoxels / numTVoxels;
+    }
+  // now we have a new volume at least 1 4th as small as the original, 
+  // the question is, is it large enough to bother with?
+  if (numVoxels > 32000)
+    {
+    this->MedResMagnification[0] = (subSize[0] - 0.5) / (float)size[0];
+    this->MedResMagnification[1] = (subSize[1] - 0.5) / (float)size[1];
+    this->MedResMagnification[2] = (subSize[2] - 0.5) / (float)size[2];
     this->MedResResampler->SetInput(input);
     this->MedResResampler->InterpolateOff();
     this->MedResResampler->
@@ -255,5 +343,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.4 $");
+  this->ExtractRevision(os,"$Revision: 1.5 $");
 }
