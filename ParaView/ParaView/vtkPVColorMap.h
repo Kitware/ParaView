@@ -45,6 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // For the moment, I am keeping the minimal color map editor as
 // part of the data object.  Multiple data objects may point to and
 // edit this color map.
+// .SECTION Note
+// To remove actors fropm render view, please turn visilibty off before 
+// deleting this object.
 
 #ifndef __vtkPVColorMap_h
 #define __vtkPVColorMap_h
@@ -89,8 +92,15 @@ public:
   // Description:
   // The name of the color map serves as the label of the ScalarBar (e.g. Temperature).
   // Currently it also indicates the arrays mapped by this color map object.
-  void SetName(const char* Name);
-  const char* GetName() {return this->ParameterName;}
+  void SetScalarBarTitle(const char* Name);
+  void SetScalarBarTitleNoTrace(const char* Name);
+  const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
+
+  // Description:
+  // The single (for now) parameter that is handled by this map.
+  void SetArrayName(const char* name);
+  const char* GetArrayName() { return this->ArrayName;}
+  int MatchArrayName(const char* name);
 
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -159,14 +169,24 @@ public:
   void ScalarBarOrientationCallback();
   void ColorRangeEntryCallback();
 
+  // Description:
+  // This method returns the user to the source page.
+  // I would eventually like to replace this by 
+  // a more general back/forward ParaView navigation.
+  void BackButtonCallback();
+
+  // Description:
+  // This method is called when the user changes the name of the scalar bar.
+  void NameEntryCallback();
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
 
-  char* ParameterName;
-  vtkSetStringMacro(ParameterName);
+  char* ArrayName;
+  char* ScalarBarTitle;
     
-  // Here to create unique names.
+  // Here to create unique Tcl names.
   int InstanceCount;
 
   float ScalarRange[2];
@@ -187,7 +207,8 @@ protected:
   int ScalarBarOrientation;
 
   // User interaface.
-  vtkKWLabeledEntry* LabelEntry;
+  vtkKWLabeledEntry* ScalarBarTitleEntry;
+  vtkKWLabel*        ArrayNameLabel;
   vtkKWLabeledFrame* ScalarBarFrame;
   vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
@@ -202,6 +223,8 @@ protected:
   vtkKWLabel*        ColorMapMenuLabel;
   vtkKWOptionMenu*   ColorMapMenu;
   
+  vtkKWPushButton*   BackButton;
+
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented
 };

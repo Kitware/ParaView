@@ -58,19 +58,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.9");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.10");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
 //vtkCxxSetObjectMacro(vtkPVColorMap,PVRenderView,vtkPVRenderView);
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetPVRenderView(vtkPVRenderView *view)
+// No register count because of reference loop.
+void vtkPVColorMap::SetPVRenderView(vtkPVRenderView *rv)
 {
-  // No reference counting beacuse of reference loops.
-  this->PVRenderView = view;
+  this->PVRenderView = rv;
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVColorMap::vtkPVColorMap()
@@ -80,7 +79,8 @@ vtkPVColorMap::vtkPVColorMap()
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
 
-  this->ParameterName = NULL;
+  this->ScalarBarTitle = NULL;
+  this->ArrayName = NULL;
   this->ScalarBarVisibility = 0;
   this->ScalarBarOrientation = 1;
   this->ScalarRange[0] = 0.0;
@@ -102,7 +102,8 @@ vtkPVColorMap::vtkPVColorMap()
   // User interaface.
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
 
-  this->LabelEntry = vtkKWLabeledEntry::New();
+  this->ScalarBarTitleEntry = vtkKWLabeledEntry::New();
+  this->ArrayNameLabel = vtkKWLabel::New();
   this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
@@ -115,6 +116,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->ColorMapMenuLabel = vtkKWLabel::New();
   this->ColorMapMenu = vtkKWOptionMenu::New();
+
+  this->BackButton = vtkKWPushButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -123,12 +126,20 @@ vtkPVColorMap::~vtkPVColorMap()
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->SetScalarBarVisibility(0);
+  // To remove actors fropm render view, please turn visilibty off before 
+  // deleting this object.
+  // This line causes problems because we are not registering the PVRenderView.
+  //this->SetScalarBarVisibility(0);
 
-  if (this->ParameterName)
+  if (this->ArrayName)
     {
-    delete [] this->ParameterName;
-    this->ParameterName = NULL;
+    delete [] this->ArrayName;
+    this->ArrayName = NULL;
+    }
+  if (this->ScalarBarTitle)
+    {
+    delete [] this->ScalarBarTitle;
+    this->ScalarBarTitle = NULL;
     }
 
   this->SetPVRenderView(NULL);
@@ -155,8 +166,10 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ScalarBarFrame->Delete();
   this->ScalarBarFrame = NULL;
 
-  this->LabelEntry->Delete();
-  this->LabelEntry = NULL;
+  this->ScalarBarTitleEntry->Delete();
+  this->ScalarBarTitleEntry = NULL;
+  this->ArrayNameLabel->Delete();
+  this->ArrayNameLabel = NULL;
   this->ScalarBarCheckFrame->Delete();
   this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
@@ -178,6 +191,9 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ColorMapMenuLabel = NULL;
   this->ColorMapMenu->Delete();
   this->ColorMapMenu = NULL;
+
+  this->BackButton->Delete();
+  this->BackButton = NULL;
 }
 
 
@@ -210,6 +226,20 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarFrame->ShowHideFrameOff();
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
+
+  this->ScalarBarTitleEntry->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarTitleEntry->Create(this->Application);
+  this->ScalarBarTitleEntry->SetLabel("Title");
+  this->Script("bind %s <KeyPress-Return> {%s NameEntryCallback}",
+               this->ScalarBarTitleEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s NameEntryCallback}",
+               this->ScalarBarTitleEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName()); 
+
+  this->ArrayNameLabel->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ArrayNameLabel->Create(this->Application, "");
+  this->ArrayNameLabel->SetLabel("Parameter: ");
 
   this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
   this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
@@ -268,10 +298,15 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarOrientationCheck->SetCommand(this, 
                                               "ScalarBarOrientationCallback");
 
-
+  this->BackButton->SetParent(this);
+  this->BackButton->Create(this->Application, "-text {Back}");
+  this->BackButton->SetCommand(this, "BackButtonCallback");
 
   this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
-  this->Script("pack %s %s -side top -expand t -fill x",
+  this->Script("pack %s -fill x -padx 2 -pady 2", this->BackButton->GetWidgetName());
+  this->Script("pack %s %s %s %s -side top -expand t -fill x",
+               this->ScalarBarTitleEntry->GetWidgetName(),
+               this->ArrayNameLabel->GetWidgetName(),
                this->ScalarBarCheckFrame->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName());
   this->Script("pack %s %s %s %s -side left",
@@ -321,8 +356,100 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetName(const char* name)
+void vtkPVColorMap::BackButtonCallback()
 {
+  if (this->PVRenderView == NULL)
+    {
+    return;
+    }
+  this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetArrayName(const char* str)
+{
+  if ( this->ArrayName == NULL && str == NULL) 
+    { 
+    return;
+    }
+  if ( this->ArrayName && str && (!strcmp(this->ArrayName,str))) 
+    { 
+    return;
+    }
+  if (this->ArrayName)
+    {
+    delete [] this->ArrayName;
+    this->ArrayName = NULL;
+    }
+  if (str)
+    {
+    this->ArrayName = new char[strlen(str)+1];
+    strcpy(this->ArrayName,str);
+    }
+  if (str)
+    {
+    char *tmp;
+    tmp = new char[strlen(str)+128];
+    sprintf(tmp, "Parameter: %s", str);
+    this->ArrayNameLabel->SetLabel(tmp);
+    delete [] tmp;
+    }
+  this->ResetScalarRange();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVColorMap::MatchArrayName(const char* str)
+{
+  if (str == NULL || this->ArrayName == NULL)
+    {
+    return 0;
+    }
+  if (strcmp(str, this->ArrayName) == 0)
+    {
+    return 1;
+    }
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::NameEntryCallback()
+{
+  this->SetScalarBarTitle(this->ScalarBarTitleEntry->GetValue());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarTitle(const char* name)
+{
+  this->AddTraceEntry("$kw(%s) SetName {%s}", name);
+  this->SetScalarBarTitleNoTrace(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
+{
+  if ( this->ScalarBarTitle == NULL && name == NULL) 
+    { 
+    return;
+    }
+  if ( this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle,name))) 
+    { 
+    return;
+    }
+  if (this->ScalarBarTitle) 
+    { 
+    delete [] this->ScalarBarTitle; 
+    this->ScalarBarTitle = NULL;
+    }
+  if (name)
+    {
+    this->ScalarBarTitle = new char[strlen(name)+1];
+    strcpy(this->ScalarBarTitle,name);
+    } 
+
+
+  this->ScalarBarTitleEntry->SetValue(name);
   if (name != NULL)
     {
     char *str;
@@ -332,10 +459,7 @@ void vtkPVColorMap::SetName(const char* name)
     delete [] str;
     }
 
-  this->SetParameterName(name);
   this->UpdateScalarBarTitle();
-
-  this->ResetScalarRange();
 }
 
 //----------------------------------------------------------------------------
@@ -510,7 +634,7 @@ void vtkPVColorMap::ResetScalarRange()
     {
     pvd = pvs->GetPVOutput();
     // For point data ...
-    pvd->GetArrayComponentRange(tmp, 1, this->ParameterName, 0);
+    pvd->GetArrayComponentRange(tmp, 1, this->ArrayName, 0);
     if (tmp[0] < range[0])
       {
       range[0] = tmp[0];
@@ -520,7 +644,7 @@ void vtkPVColorMap::ResetScalarRange()
       range[1] = tmp[1];
       }
     // For cell data ...
-    pvd->GetArrayComponentRange(tmp, 0, this->ParameterName, 0);
+    pvd->GetArrayComponentRange(tmp, 0, this->ArrayName, 0);
     if (tmp[0] < range[0])
       {
       range[0] = tmp[0];
@@ -718,7 +842,7 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
           << this->ScalarBarTclName << " SetLookupTable "
           << this->LookupTableTclName << "\n\t"
           << this->ScalarBarTclName << " SetTitle {" 
-          << this->ParameterName << "}\n";
+          << this->ArrayName << "}\n";
     *file << renTclName << " AddProp " << this->ScalarBarTclName << "\n";
     }
 
@@ -729,7 +853,7 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateScalarBarTitle()
 {
-  if (this->ScalarBarTclName == NULL)
+  if (this->ScalarBarTclName == NULL || this->ScalarBarTitle == NULL)
     {
     return;
     }
@@ -739,30 +863,33 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     if (this->VectorComponent == 0)
       {
       this->Script("%s SetTitle {%s X}", this->ScalarBarTclName,
-                   this->ParameterName);
+                   this->ScalarBarTitle);
       }
     if (this->VectorComponent == 1)
       {
       this->Script("%s SetTitle {%s Y}", this->ScalarBarTclName,
-                   this->ParameterName);
+                   this->ScalarBarTitle);
       }
     if (this->VectorComponent == 2)
       {
       this->Script("%s SetTitle {%s Z}", this->ScalarBarTclName,
-                   this->ParameterName);
+                   this->ScalarBarTitle);
       }
-    return;
     }
-
-  if (this->NumberOfVectorComponents > 1)
+  else if (this->NumberOfVectorComponents > 1)
     {
     this->Script("%s SetTitle {%s %d}", this->ScalarBarTclName,
-                 this->ParameterName, this->VectorComponent);
-    return;
+                 this->ScalarBarTitle, this->VectorComponent);
     }
-
-  this->Script("%s SetTitle {%s}", this->ScalarBarTclName,
-               this->ParameterName);
+  else
+    {
+    this->Script("%s SetTitle {%s}", this->ScalarBarTclName,
+                 this->ScalarBarTitle);
+    }
+  if (this->PVRenderView)
+    {
+    this->PVRenderView->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -792,6 +919,8 @@ void vtkPVColorMap::ColorRangeEntryCallback()
 void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ScalarBarTitle: " << this->ScalarBarTitle << endl;
+  os << indent << "ArrayName: " << this->ArrayName << endl;
   os << indent << "VectorComponent: " << this->VectorComponent << endl;
   os << indent << "LookupTableTclName: " 
      << (this->LookupTableTclName ? this->LookupTableTclName : "none" )

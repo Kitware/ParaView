@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.353");
+vtkCxxRevisionMacro(vtkPVWindow, "1.354");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -341,8 +341,11 @@ vtkPVWindow::~vtkPVWindow()
   this->Writers->Delete();
   this->FileWriterList->Delete();
 
-  this->PVColorMaps->Delete();
-  this->PVColorMaps = NULL;
+  if (this->PVColorMaps)
+    {
+    this->PVColorMaps->Delete();
+    this->PVColorMaps = NULL;
+    }
 
   if (this->ToolbarSettingsFrame)
     {
@@ -388,6 +391,14 @@ void vtkPVWindow::CloseNoPrompt()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
+  // Color maps have circular references because they
+  // reference renderview.
+  if (this->PVColorMaps)
+    {
+    this->PVColorMaps->Delete();
+    this->PVColorMaps = NULL;
+    }
+
   if (this->CurrentPVData)
     {
     this->CurrentPVData->UnRegister(this);
@@ -3501,7 +3512,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   while ( !it->IsDoneWithTraversal() )
     {
     cm = static_cast<vtkPVColorMap*>(it->GetObject());
-    if (vtkString::Equals(parameterName, cm->GetName()))
+    if (cm->MatchArrayName(parameterName))
       {
       it->Delete();
       return cm;
@@ -3515,7 +3526,8 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   cm->SetPVRenderView(this->GetMainView());
   cm->Create(this->GetPVApplication());
   cm->SetTraceReferenceObject(this);
-  cm->SetName(parameterName);
+  cm->SetArrayName(parameterName);
+  cm->SetScalarBarTitle(parameterName);
 
 
   this->PVColorMaps->AddItem(cm);
@@ -3558,7 +3570,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.353 $");
+  this->ExtractRevision(os,"$Revision: 1.354 $");
 }
 
 //----------------------------------------------------------------------------

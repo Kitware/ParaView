@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.147");
+vtkCxxRevisionMacro(vtkPVData, "1.148");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2609,7 +2609,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   if (this->PVColorMap)
     {
-    os << indent << "PVColorMap: " << this->PVColorMap->GetName() << endl;
+    os << indent << "PVColorMap: " << this->PVColorMap->GetScalarBarTitle() << endl;
     }
   else
     {
@@ -2823,7 +2823,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.147 $");
+  this->ExtractRevision(os,"$Revision: 1.148 $");
 }
 
 //----------------------------------------------------------------------------
