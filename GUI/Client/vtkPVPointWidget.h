@@ -79,6 +79,10 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
+  // Description:
+  // Display hint about picking using the p key.
+  void SetVisibility(int v);  
+
 protected:
   vtkPVPointWidget();
   ~vtkPVPointWidget();
