@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
-#include "vtkKWEvent.h"
 #include "vtkKWEventMap.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
@@ -58,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.19");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {

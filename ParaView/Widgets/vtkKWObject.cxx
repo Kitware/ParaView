@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWEvent.h"
 #include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
@@ -53,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.29");
+vtkCxxRevisionMacro(vtkKWObject, "1.30");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -115,7 +114,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
