@@ -1178,9 +1178,9 @@ void vtkPVApplication::LogEndEvent(char* str)
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Controller: " << this->GetController();
-  os << indent << "MajorVersion: " << this->GetMajorVersion();
-  os << indent << "MinorVersion: " << this->GetMinorVersion();
+  os << indent << "Controller: " << this->Controller << endl;;
+  os << indent << "MajorVersion: " << this->MajorVersion << endl;
+  os << indent << "MinorVersion: " << this->MinorVersion << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
