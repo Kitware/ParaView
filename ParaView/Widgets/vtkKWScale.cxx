@@ -153,6 +153,10 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side bottom -fill x -expand yes",
                this->ScaleWidget->GetWidgetName());
 
+  this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
+               this->ScaleWidget->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
+               this->ScaleWidget->GetWidgetName(), this->GetTclName());
 }
 
 void vtkKWScale::SetRange(float min, float max)
@@ -173,10 +177,6 @@ void vtkKWScale::DisplayEntry()
   this->Entry->Create(this->Application,"-width 10");
   this->Script("bind %s <Return> {%s EntryValueChanged}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
-               this->ScaleWidget->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
-               this->ScaleWidget->GetWidgetName(), this->GetTclName());
   this->Script("pack %s -side right", this->Entry->GetWidgetName());
 }
 
