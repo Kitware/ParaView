@@ -43,14 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION Description
 // A button that can be pressed to select a color.
 
-
 #ifndef __vtkKWChangeColorButton_h
 #define __vtkKWChangeColorButton_h
 
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWFrame;
 class vtkKWLabel;
 
 class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidget
@@ -94,26 +92,52 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set or get enabled state.
+  virtual void SetEnabled(int);
+
+  // Description:
   // Access to the label
   vtkGetObjectMacro(Label, vtkKWLabel);
 
-  void        ChangeColor();
+  // Description:
+  // Set the label to be placed after the color button. Default is before.
+  virtual void SetLabelAfterColor(int);
+  vtkGetMacro(LabelAfterColor, int);
+  vtkBooleanMacro(LabelAfterColor, int);
+
+  // Description:
+  // Set the label to be outside the color button. Default is inside. This option
+  // has to be set before Create() is called.
+  vtkSetMacro(LabelOutsideButton, int);
+  vtkGetMacro(LabelOutsideButton, int);
+  vtkBooleanMacro(LabelOutsideButton, int);
+
+  // Description:
+  // Update the color
+  void ChangeColor();
 
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
 
-  vtkKWLabel *Label;
-  vtkKWFrame *ColorFrame;
+  vtkKWLabel  *Label;
+  vtkKWWidget *ColorButton;
+  vtkKWWidget *MainFrame;
+
   char        *Command;
   char        *Text;
   float       Color[3];
+  int         LabelAfterColor;
+  int         LabelOutsideButton;
+
+  void Bind();
+  void UnBind();
+  void UpdateColorButton();
+  void Pack();
+
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
   void operator=(const vtkKWChangeColorButton&); // Not implemented
 };
 
-
 #endif
-
-
