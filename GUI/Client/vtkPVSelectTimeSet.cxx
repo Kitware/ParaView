@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.43");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.44");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -503,7 +503,7 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   vtkClientServerStream timeSets;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &timeSets))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
     {
     vtkErrorMacro("Error getting time sets from server.");
     return;

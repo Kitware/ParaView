@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.18");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -123,7 +123,7 @@ void vtkSMDoubleVectorProperty::UpdateInformation( vtkClientServerID objectId )
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(vtkProcessModule::DATA_SERVER, str, 0);
 
-  const vtkClientServerStream& res = pm->GetLastServerResult();
+  const vtkClientServerStream& res = pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT);
 
   int numMsgs = res.GetNumberOfMessages();
   if (numMsgs < 1)

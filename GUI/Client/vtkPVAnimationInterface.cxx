@@ -182,7 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.136");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.137");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1579,7 +1579,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
                     << "GetErrorCode" 
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastServerResult().GetArgument(0, 0, &retVal);
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
       success = 0;
@@ -1601,7 +1601,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
                     << "GetErrorCode" 
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastServerResult().GetArgument(0, 0, &retVal);
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
       vtkKWMessageDialog::PopupMessage(

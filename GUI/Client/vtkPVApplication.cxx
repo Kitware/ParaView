@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.299");
+vtkCxxRevisionMacro(vtkPVApplication, "1.300");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2327,7 +2327,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
                   << pm->GetProcessModuleID() << "GetDemoPath"
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;
     }
@@ -2499,11 +2499,11 @@ int vtkPVApplication::SendStringToServerRoot(const char* str)
 //----------------------------------------------------------------------------
 const char* vtkPVApplication::GetStringFromServer()
 {
-  return this->ProcessModule->GetLastServerResult().StreamToString();
+  return this->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).StreamToString();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVApplication::GetStringFromClient()
 {
-  return this->ProcessModule->GetLastClientResult().StreamToString();
+  return this->ProcessModule->GetLastResult(vtkProcessModule::CLIENT).StreamToString();
 }

@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.4");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -1052,22 +1052,17 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
   this->Interpreter->ProcessStream(msg, len);
 }
 
+  
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
-{
-  return this->Superclass::GetLastServerResult();
-}
-
-//----------------------------------------------------------------------------
-const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
-{
+const vtkClientServerStream& vtkPVClientServerModule::GetLastDataServerResult()
+{ 
   if(!this->ClientMode)
     {
-    vtkErrorMacro("GetLastServerResult() should not be called on the server.");
+    vtkErrorMacro("GetLastDataServerResult() should not be called on the server.");
     this->LastServerResultStream->Reset();
     *this->LastServerResultStream
       << vtkClientServerStream::Error
-      << "vtkPVClientServerModule::GetLastServerResult() should not be called on the server."
+      << "vtkPVClientServerModule::GetLastDataServerResult() should not be called on the server."
       << vtkClientServerStream::End;
     return *this->LastServerResultStream;
     }
@@ -1079,7 +1074,7 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
     this->LastServerResultStream->Reset();
     *this->LastServerResultStream
       << vtkClientServerStream::Error
-      << "vtkPVClientServerModule::GetLastServerResult() received no data from the server."
+      << "vtkPVClientServerModule::GetLastDataServerResult() received no data from the server."
       << vtkClientServerStream::End;
     return *this->LastServerResultStream;
     }
@@ -1090,7 +1085,40 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
   return *this->LastServerResultStream;
 }
 
+  
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPVClientServerModule::GetLastRenderServerResult()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("GetLastRenderServerResult() should not be called on the server.");
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastRenderServerResult() should not be called on the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  int length;
+  this->RenderServerSocket->TriggerRMI(1, "", VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+  this->RenderServerSocket->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if(length <= 0)
+    {
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastRenderServerResult() received no data from the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  unsigned char* result = new unsigned char[length];
+  this->RenderServerSocket->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
+  this->LastServerResultStream->SetData(result, length);
+  delete [] result;
+  return *this->LastServerResultStream;
+}
 
+  
 vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
 {  
   vtkTypeUInt32 sendflag = 0;  

@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.586");
+vtkCxxRevisionMacro(vtkPVWindow, "1.587");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1752,7 +1752,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int readable = 0;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &readable))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &readable))
     {
     vtkErrorMacro("Error checking whether file is readable on server.");
     }

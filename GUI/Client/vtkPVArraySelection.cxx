@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.47");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.48");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -203,7 +203,7 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     vtkClientServerStream arrays;
-    if(pm->GetLastServerResult().GetArgument(0, 0, &arrays))
+    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &arrays))
       {
       int numArrays = arrays.GetNumberOfArguments(0)/2;
       for(int i=0; i < numArrays; ++i)

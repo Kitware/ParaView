@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.19");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.20");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -300,7 +300,7 @@ void vtkXDMFReaderModule::UpdateGrids()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int numGrids = 0;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &numGrids))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &numGrids))
     {
     vtkErrorMacro("Error getting number of grids.");
     }
@@ -314,7 +314,7 @@ void vtkXDMFReaderModule::UpdateGrids()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* gname;
-    if(pm->GetLastServerResult().GetArgument(0, 0, &gname))
+    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &gname))
       {
       this->GridSelection->InsertEntry(i, gname);
       }
@@ -353,7 +353,7 @@ void vtkXDMFReaderModule::UpdateDomains()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int numDomains = 0;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &numDomains))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &numDomains))
     {
     vtkErrorMacro("Error getting number of grids.");
     }
@@ -367,7 +367,7 @@ void vtkXDMFReaderModule::UpdateDomains()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* dname;
-    if(pm->GetLastServerResult().GetArgument(0, 0, &dname))
+    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &dname))
       {
       this->DomainMenu->AddEntryWithCommand(dname, this, "UpdateGrids");
 

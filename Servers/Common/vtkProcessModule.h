@@ -131,16 +131,14 @@ public:
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
   
   // Description:
-  // Return a message containing the result of the last SendMessages call.
-  // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream& GetLastServerResult();
-
-  // Description:
-  // Return a message containing the result of the last call made on
-  // the client.
-  virtual const vtkClientServerStream& GetLastClientResult();
+  // Return the last result for the specified server.
+  // In this case, the server should be one of the ServerFlags,
+  // and not a combination of servers.  This always returns from 
+  // the root node of an MPI server.  There is no connection to the
+  // individual nodes of a server.
+  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 server);
   
-   // Description:
+  // Description:
   // Send a vtkClientServerStream to the specified servers.
   // Servers are specified with a bit vector.   To send to more
   // than one server use the bitwise or operator to combine servers.
@@ -150,15 +148,7 @@ public:
   // if Reset is called on the stream after it is sent.
   int SendStream(vtkTypeUInt32 server);
   int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, int resetStream=1);
-//ETX
 
-  
-//BTX
-  virtual void SendStreamToServerTemp(vtkClientServerStream* stream);
-  virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);
-//ETX
-
-  //BTX
   // Description:
   // Get the interpreter used on the local process.
   virtual vtkClientServerInterpreter* GetInterpreter();
@@ -168,7 +158,7 @@ public:
   // vtkClientServerInterpreter.
   virtual void InitializeInterpreter();
   virtual void FinalizeInterpreter();
-  //ETX
+//ETX
 
   // Description:
   // Set/Get whether to report errors from the Interpreter.
@@ -245,6 +235,12 @@ protected:
   // send a stream to the render server root mpi process
   virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
 
+  // Description:
+  // Get the last result from the DataServer, RenderServer or Client.
+  // If these are MPI processes, only the root last result is returned.
+  virtual const vtkClientServerStream& GetLastDataServerResult();
+  virtual const vtkClientServerStream& GetLastRenderServerResult();
+  virtual const vtkClientServerStream& GetLastClientResult();
   
   
   static void InterpreterCallbackFunction(vtkObject* caller,

@@ -116,16 +116,6 @@ public:
   // Process a client server message on the server.
   void ProcessMessage(unsigned char* arg, size_t len);
   
-  //BTX
-  // Description:
-  // Return a message containing the result of the last SendMessages call.
-  // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream& GetLastServerResult();
-
-  // Description:
-  // Return a message containing the result of the last call made on
-  // the client.
-  virtual const vtkClientServerStream& GetLastClientResult();
   friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
   //ETX
 
@@ -151,7 +141,12 @@ protected:
   virtual int SendStreamToRenderServer(vtkClientServerStream&);
   // send a stream to the render server root mpi process
   virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
-  
+
+  // Description:
+  // Get the last result from the DataServer, RenderServer or Client.
+  // If these are MPI processes, only the root last result is returned.
+  virtual const vtkClientServerStream& GetLastDataServerResult();
+  virtual const vtkClientServerStream& GetLastRenderServerResult();
   
   // Description:
   // Send the last client server result to the client called from an RMI

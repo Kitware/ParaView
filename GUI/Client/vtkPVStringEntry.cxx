@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.37");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -227,7 +227,7 @@ void vtkPVStringEntry::ResetInternal()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* value;
-    if(pm->GetLastServerResult().GetArgument(0, 0, &value))
+    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &value))
       {
       this->SetValue(value);
       }

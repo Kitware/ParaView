@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.33");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.34");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -589,7 +589,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int isdir = 0;
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &isdir))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &isdir))
       {
       vtkErrorMacro("Error checking whether file is directory on server.");
       }
@@ -892,7 +892,7 @@ void vtkPVServerFileDialog::Update()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* cwd;
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
       {
       vtkErrorMacro("Error getting current working directory from server.");
       cwd = "";
@@ -911,7 +911,7 @@ void vtkPVServerFileDialog::Update()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* cwd;
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
       {
       vtkErrorMacro("Error getting current working directory from server.");
       cwd = "";

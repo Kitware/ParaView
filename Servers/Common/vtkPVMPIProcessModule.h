@@ -87,7 +87,7 @@ protected:
   virtual int SendStreamToRenderServer(vtkClientServerStream&);
   // send a stream to the render server root mpi process
   virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
-  
+
   // send a stream to a node of the mpi group
   virtual void SendStreamToServerNodeInternal(
     int remoteId, vtkClientServerStream& stream);

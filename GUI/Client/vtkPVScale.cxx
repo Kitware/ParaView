@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.46");
+vtkCxxRevisionMacro(vtkPVScale, "1.47");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -370,13 +370,13 @@ void vtkPVScale::ResetInternal()
     if (ivp)
       {
       int range[2] = { 0, 0 };
-      pm->GetLastServerResult().GetArgument(0,0, range, 2);
+      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
       this->Scale->SetRange(range[0], range[1]);
       }
     else if (dvp)
       {
       double range[2] = { 0, 0 };
-      pm->GetLastServerResult().GetArgument(0,0, range, 2);
+      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
       this->Scale->SetRange(range[0], range[1]);
       }
     }

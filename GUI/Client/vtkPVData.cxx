@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.294");
+vtkCxxRevisionMacro(vtkPVData, "1.295");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1995,7 +1995,7 @@ void vtkPVData::DrawWireframe()
          << "GetUseOutline" << vtkClientServerStream::End;
        pm->SendStream(vtkProcessModule::CLIENT);
        int useOutline;
-       pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+       pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &useOutline);
        if (useOutline)
          {
          pm->GetStream() 
@@ -2073,7 +2073,7 @@ void vtkPVData::DrawPoints()
         << "GetUseOutline" << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT);
       int useOutline;
-      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &useOutline);
       if (useOutline)
         { 
         pm->GetStream() 
@@ -2178,7 +2178,7 @@ void vtkPVData::DrawSurface()
         << "GetUseOutline" << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT);
       int useOutline;
-      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &useOutline);
       if (useOutline)
         { 
         pm->GetStream() 

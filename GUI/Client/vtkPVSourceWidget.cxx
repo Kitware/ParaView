@@ -18,7 +18,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -71,7 +71,7 @@ void vtkPVSourceWidget::SaveInBatchScript(ofstream *)
 //                   << vtkClientServerStream::End;
 //   pm->SendStream(vtkProcessModule::CLIENT);
 //   const char* dataClassName;
-//   if(pm->GetLastClientResult().GetArgument(0, 0, &dataClassName))
+//   if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &dataClassName))
 //     {
 //     *file << dataClassName << " pvTemp" << this->SourceID.ID << "\n";
 //     }
