@@ -329,6 +329,14 @@ SOURCE=.\vtkPVImageSourceTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVImageTextureFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageTextureFilterTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVImageToImageFilter.cxx
 # End Source File
 # Begin Source File
@@ -1075,6 +1083,26 @@ SOURCE=.\vtkPVImageSource.h
 # Begin Custom Build
 InputPath=.\vtkPVImageSource.h
 InputName=vtkPVImageSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageTextureFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImageTextureFilter.h
+InputName=vtkPVImageTextureFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

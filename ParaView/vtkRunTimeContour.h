@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataSource.h"
 #include "vtkStructuredPointsReader.h"
 #include "vtkSingleContourFilter.h"
+#include "vtkImageClip.h"
 #include "vtkKWScale.h"
 
 class VTK_EXPORT vtkRunTimeContour : public vtkPolyDataSource 
@@ -77,9 +78,30 @@ public:
   vtkGetVector2Macro(Range, float);
 
   // Description:
+  // Set/Get the slice values of the three planes.
+  vtkSetMacro(XSlice, int);
+  vtkGetMacro(XSlice, int);
+  vtkSetMacro(YSlice, int);
+  vtkGetMacro(YSlice, int);
+  vtkSetMacro(ZSlice, int);
+  vtkGetMacro(ZSlice, int);
+
+  // Description:
+  // Extra outputs for slices of the three planes.
+  vtkImageData *GetXSliceOutput();
+  void SetXSliceOutput(vtkImageData *output);
+  vtkImageData *GetYSliceOutput();
+  void SetYSliceOutput(vtkImageData *output);
+  vtkImageData *GetZSliceOutput();
+  void SetZSliceOutput(vtkImageData *output);
+
+  // Description:
   // Method to update the widgets this class contains
   void UpdateWidgets();
   
+  vtkSetObjectMacro(XScale, vtkKWScale);
+  vtkSetObjectMacro(YScale, vtkKWScale);
+  vtkSetObjectMacro(ZScale, vtkKWScale);
   vtkSetObjectMacro(ContourScale, vtkKWScale);
   
 protected:
@@ -91,8 +113,18 @@ protected:
   void Execute();
 
   vtkStructuredPointsReader *Reader;
+  vtkImageClip *XClip;
+  int XSlice;
+  vtkImageClip *YClip;
+  int YSlice;
+  vtkImageClip *ZClip;
+  int ZSlice;
   vtkSingleContourFilter *Contour;
   float Range[2];
+
+  vtkKWScale *XScale;
+  vtkKWScale *YScale;
+  vtkKWScale *ZScale;
   vtkKWScale *ContourScale;
 };
 

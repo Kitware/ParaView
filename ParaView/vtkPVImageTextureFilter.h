@@ -44,7 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkPVImageTextureFilter creates polydata and a texture image to 
 // Display a volume.  It uses assignement to determine what to display.
 // It only works for a 2D image for now, but in the future it could be extended 
-// to display the faces of a volume.
+// to display the faces of a volume.  I would rather use vtkImageActor, but
+// I need to switch between polydata and images.
 
 #ifndef __vtkPVImageTextureFilter_h
 #define __vtkPVImageTextureFilter_h

@@ -253,7 +253,7 @@ void vtkPVImageTextureFilter::Execute()
   w->SetInput(this->IntermediateImage);
   w->SetFileTypeToBinary();
   w->SetFileName("junkTexture.vtk");
-  w->Write();
+  //w->Write();
   w->Delete();
   
   // Determine which axis we are displaying.

@@ -210,7 +210,8 @@ void vtkPVImageData::SetData(vtkDataSet *data)
   ext = image->GetWholeExtent();
   if (ext[1]==ext[0] || ext[3]==ext[2] || ext[5]==ext[4])
     {
-    this->ActorComposite->SetModeToDataSet();
+    //this->ActorComposite->SetModeToDataSet();
+    this->ActorComposite->SetModeToImageTexture();
     // Sets the scalar range...
     this->ActorComposite->Initialize();
     }

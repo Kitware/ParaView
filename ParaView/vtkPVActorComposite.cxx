@@ -36,6 +36,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
+#include "vtkPVImageTextureFilter.h"
+#include "vtkTexture.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -529,8 +531,15 @@ void vtkPVActorComposite::SetMode(int mode)
       }
     if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
       {
-      // ???
-      vtkErrorMacro("Textures are not implemented yet.");
+      vtkPVImageTextureFilter *tf = vtkPVImageTextureFilter::New();
+      tf->SetInput((vtkImageData *)(this->DataSetInput));
+      this->vtkKWActorComposite::SetInput(tf->GetGeometryOutput());
+
+      vtkTexture *texture = vtkTexture::New();
+      texture->SetInput(tf->GetTextureOutput());
+      this->GetActor()->SetTexture(texture);
+      texture->Delete();
+      texture = NULL;
       return;
       }
     }

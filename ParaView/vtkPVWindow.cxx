@@ -307,10 +307,19 @@ vtkPVRunTimeContour *vtkPVWindow::CreateRunTimeContour()
   // Add some source specific widgets.
   // Normally these would be added in the create method.
   pvs->AddFileEntry("FileName:", "SetFileName", "GetFileName", "vtk");
+  rtc = vtkRunTimeContour::SafeDownCast(pvs->GetVTKSource());
   scale = pvs->AddScale("ContourValue:", "SetContourValue", "GetContourValue", 
 			0, 1, 0.1);
-  rtc = vtkRunTimeContour::SafeDownCast(pvs->GetVTKSource());
   rtc->SetContourScale(scale);
+  scale = pvs->AddScale("XSlice:", "SetXSlice", "GetXSlice", 
+			0, 100, 1);
+  rtc->SetXScale(scale);
+  scale = pvs->AddScale("YSlice:", "SetYSlice", "GetYSlice", 
+			0, 100, 1);
+  rtc->SetYScale(scale);
+  scale = pvs->AddScale("ZSlice:", "SetZSlice", "GetZSlice", 
+			0, 100, 1);
+  rtc->SetZScale(scale);
   pvs->UpdateParameterWidgets();
   
   pvs->GetWidgets()->AddItem(button);
