@@ -46,7 +46,7 @@ public:
   // Description:
   // Adds a display to the list of managed displays. This adds
   // the actor(s) to the renderer.
-  void AddDisplay(vtkSMDisplayerProxy* display);
+  void AddDisplayer(vtkSMDisplayerProxy* displayer);
 
   // Description:
   // Update all VTK objects. Including the ones managed by the

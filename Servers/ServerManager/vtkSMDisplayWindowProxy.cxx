@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
@@ -289,7 +289,7 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDisplayWindowProxy::AddDisplay(vtkSMDisplayerProxy* display)
+void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMDisplayerProxy* display)
 {
   this->CreateVTKObjects(1);
 
