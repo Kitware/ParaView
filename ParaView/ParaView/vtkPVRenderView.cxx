@@ -136,6 +136,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateFrame = vtkKWWidget::New();
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
+
+  this->RendererTclName     = 0;
+  this->CompositeTclName    = 0;
+  this->RenderWindowTclName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -152,21 +156,30 @@ vtkPVRenderView::~vtkPVRenderView()
   // Tree Composite
   if (this->Composite)
     {
-    pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
+      }
     this->SetCompositeTclName(NULL);
     this->Composite = NULL;
     }
 
   if (this->Renderer)
     {
-    pvApp->BroadcastScript("%s Delete", this->RendererTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->RendererTclName);
+      }
     this->SetRendererTclName(NULL);
     this->Renderer = NULL;
     }
 
   if (this->RenderWindow)
     {
-    pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
+      }
     this->SetRenderWindowTclName(NULL);
     this->RenderWindow = NULL;
     }
@@ -1295,7 +1308,8 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractiveCompositeTime: " << this->GetInteractiveCompositeTime() << endl;
   os << indent << "InteractiveRenderTime: " << this->GetInteractiveRenderTime() << endl;
   os << indent << "NavigationFrame: " << this->GetNavigationFrame() << endl;
-  os << indent << "RendererTclName: " << this->GetRendererTclName() << endl;
+  os << indent << "RendererTclName: " 
+     << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
   os << indent << "StillCompositeTime: " << this->GetStillCompositeTime() << endl;
   os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
   os << indent << "TriangleStripsCheck: " << this->GetTriangleStripsCheck() << endl;

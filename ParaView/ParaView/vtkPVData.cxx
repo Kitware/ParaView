@@ -259,37 +259,57 @@ vtkPVData::~vtkPVData()
   this->LineWidthScale = NULL;
   this->DisplayScalesFrame->Delete();
   this->DisplayScalesFrame = NULL;
-      
+
   if (this->ScalarBarTclName)
     {
-    pvApp->Script("%s Delete", this->ScalarBarTclName);
+    if ( pvApp )
+      {
+      pvApp->Script("%s Delete", this->ScalarBarTclName);
+      }
     this->SetScalarBarTclName(NULL);
     }
   
   if (this->CubeAxesTclName)
     {
-    pvApp->Script("%s Delete", this->CubeAxesTclName);
+    if ( pvApp )
+      {
+      pvApp->Script("%s Delete", this->CubeAxesTclName);
+      }
     this->SetCubeAxesTclName(NULL);
     }
-  
-  pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+  if ( pvApp )
+    {
+    pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+    }
   this->SetMapperTclName(NULL);
   this->Mapper = NULL;
   
-  pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
+  if ( pvApp )
+    {
+    pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
+    }
   this->SetLODMapperTclName(NULL);
-
-  pvApp->BroadcastScript("%s Delete", this->PropTclName);
+  
+  if ( pvApp )
+    {
+    pvApp->BroadcastScript("%s Delete", this->PropTclName);
+    }
   this->SetPropTclName(NULL);
   this->Prop = NULL;
-
-  pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+  
+  if ( pvApp )
+    {
+    pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+    }
   this->SetPropertyTclName(NULL);
   this->Property = NULL;
   
   if (this->LODDeciTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
+      }
     this->SetLODDeciTclName(NULL);
     }
   
@@ -308,18 +328,27 @@ vtkPVData::~vtkPVData()
   
   if (this->GeometryTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
+      }
     this->SetGeometryTclName(NULL);
     }
 
   if (this->CollectTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->CollectTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->CollectTclName);
+      }
     this->SetCollectTclName(NULL);
     }
   if (this->LODCollectTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->LODCollectTclName);
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->LODCollectTclName);
+      }
     this->SetLODCollectTclName(NULL);
     }
 
