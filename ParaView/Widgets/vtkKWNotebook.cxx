@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.48");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.49");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1437,7 +1437,7 @@ int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
     return 0;
     }
 
-  vtkIdType idx;
+  vtkIdType idx = 0;
   while (this->MostRecentPages->FindItem(page, idx) == VTK_OK)
     {
     this->MostRecentPages->RemoveItem(idx);
