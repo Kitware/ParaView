@@ -66,15 +66,6 @@ IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkBalancedRedistributePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
-    vtkBoxClipDataSet.cxx
-    vtkDistributedDataFilter.cxx
-    vtkExtractCells.cxx
-    vtkExtractUserDefinedPiece.cxx
-    vtkKdTree.cxx
-    vtkMergeCells.cxx
-    vtkPKdTree.cxx
-    vtkPlanesIntersection.cxx
-    vtkPointsProjectedHull.cxx
     vtkPVDuplicatePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
