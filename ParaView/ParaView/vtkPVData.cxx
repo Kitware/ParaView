@@ -88,7 +88,7 @@ vtkPVData::vtkPVData()
   this->NumberOfPVConsumers = 0;
   this->PVConsumers = 0;
 
-
+  this->PropertiesCreated = 0;
 
 
   // Used to be in vtkPVActorComposite
@@ -892,7 +892,23 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
 //----------------------------------------------------------------------------
 void vtkPVData::CreateProperties()
 {
-  this->Properties->SetParent(this->GetPVSource()->GetNotebook()->GetFrame("Display"));
+  if (this->PropertiesCreated)
+    {
+    return;
+    }
+  if (this->GetPVSource()->GetHideDisplayPage())
+    {
+    // We use the parameters frame as a bogus parent.
+    // This is not a problem since we never pack the
+    // properties frame in this case.
+    this->Properties->SetParent(
+      this->GetPVSource()->GetParametersParent());
+    }
+  else
+    {
+    this->Properties->SetParent(
+      this->GetPVSource()->GetNotebook()->GetFrame("Display"));
+    }
   this->Properties->Create(this->Application, 1);
 
   this->ScalarBarFrame->SetParent(this->Properties->GetFrame());
@@ -960,7 +976,8 @@ void vtkPVData::CreateProperties()
   this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
   this->ColorRangeFrame->Create(this->Application, "frame", "");
   this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
-  this->ColorRangeResetButton->Create(this->Application, "-text {Reset Range}");
+  this->ColorRangeResetButton->Create(this->Application, 
+				      "-text {Reset Range}");
   this->ColorRangeResetButton->SetCommand(this, "ResetColorRange");
   this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
   this->ColorRangeMinEntry->Create(this->Application);
@@ -983,7 +1000,8 @@ void vtkPVData::CreateProperties()
                this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
-  this->RepresentationMenuFrame->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->RepresentationMenuFrame->SetParent(
+    this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenuFrame->Create(this->Application, "frame", "");
   
   this->RepresentationMenuLabel->SetParent(this->RepresentationMenuFrame);
@@ -1040,14 +1058,16 @@ void vtkPVData::CreateProperties()
   
   this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
-  this->Application->Script("%s configure -command {%s ScalarBarCheckCallback}",
-                            this->ScalarBarCheck->GetWidgetName(),
-                            this->GetTclName());
+  this->Application->Script(
+    "%s configure -command {%s ScalarBarCheckCallback}",
+    this->ScalarBarCheck->GetWidgetName(),
+    this->GetTclName());
 
   this->ScalarBarOrientationCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
   this->ScalarBarOrientationCheck->SetState(1);
-  this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
+  this->ScalarBarOrientationCheck->SetCommand(this, 
+					      "ScalarBarOrientationCallback");
   
   this->CubeAxesCheck->SetParent(this->Properties->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
@@ -1056,9 +1076,10 @@ void vtkPVData::CreateProperties()
   this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
   this->VisibilityCheck->Create(this->Application, "-text Visibility");
   this->VisibilityCheck->SetState(1);
-  this->Application->Script("%s configure -command {%s VisibilityCheckCallback}",
-                            this->VisibilityCheck->GetWidgetName(),
-                            this->GetTclName());
+  this->Application->Script(
+    "%s configure -command {%s VisibilityCheckCallback}",
+    this->VisibilityCheck->GetWidgetName(),
+    this->GetTclName());
   this->VisibilityCheck->SetState(1);
 
   this->ResetCameraButton->SetParent(this->ViewFrame->GetFrame());
@@ -1073,7 +1094,8 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s %s -side left",
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
-  this->Script("pack %s -fill x -expand t", this->BoundsDisplay->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", 
+	       this->BoundsDisplay->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
@@ -1112,13 +1134,20 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
 
-  this->Script("pack %s -fill both -expand yes -side top",
-               this->Properties->GetWidgetName());
+  if (!this->GetPVSource()->GetHideDisplayPage())
+    {
+    this->Script("pack %s -fill both -expand yes -side top",
+		 this->Properties->GetWidgetName());
+    }
+
+  this->PropertiesCreated = 1;
+
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::UpdateProperties()
 {
+  
   char tmp[350], cmd[1024];
   float bounds[6];
   int i, j, numArrays, numComps;
@@ -1134,6 +1163,11 @@ void vtkPVData::UpdateProperties()
     return;
     }
   this->UpdateTime.Modified();
+
+  if (this->GetPVSource()->GetHideDisplayPage())
+    {
+    return;
+    }
 
   window = this->GetPVApplication()->GetMainWindow();
 
@@ -1153,6 +1187,7 @@ void vtkPVData::UpdateProperties()
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent("Create LOD");
+
 
   sprintf(tmp, "number of cells: %d", 
 	  this->GetNumberOfCells());
@@ -1251,6 +1286,7 @@ void vtkPVData::UpdateProperties()
     this->ColorMenu->SetValue("Property");
     this->ColorByPropertyInternal();
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1867,9 +1903,12 @@ void vtkPVData::SetVisibilityInternal(int v)
   pvApp = (vtkPVApplication*)(this->Application);
 
 
-  if (this->VisibilityCheck->GetState() != v)
+  if (this->VisibilityCheck->GetApplication())
     {
-    this->VisibilityCheck->SetState(v);
+    if (this->VisibilityCheck->GetState() != v)
+      {
+      this->VisibilityCheck->SetState(v);
+      }
     }
 
   if (this->PropTclName)

@@ -308,7 +308,9 @@ public:
   vtkGetObjectMacro(PropertiesParent, vtkKWWidget);
   vtkKWWidget *PropertiesParent;
 
-
+  // Description:
+  // Returns true if CreateProperties() has been called.
+  vtkGetMacro(PropertiesCreated, int);
 
 
 protected:
@@ -406,7 +408,10 @@ protected:
 
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
-  
+
+  // True if CreateProperties() has been called.
+  int PropertiesCreated;
+
   vtkKWWidget *ScalarBarCheckFrame;
   vtkKWCheckButton *ScalarBarCheck;
   vtkKWCheckButton *ScalarBarOrientationCheck;
