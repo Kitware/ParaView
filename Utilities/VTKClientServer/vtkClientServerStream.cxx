@@ -167,7 +167,7 @@ public:
 
   // Index into ValueOffsets where the last Command started.  Used to
   // detect valid message completion.
-  enum { InvalidStartIndex = 0xFFFFFFFF };
+  static const ValueOffsetsType::size_type InvalidStartIndex;
   ValueOffsetsType::size_type StartIndex;
 
   // Whether the stream has been constructed improperly.
@@ -184,6 +184,10 @@ public:
                                        int message, int value)
     { return css.GetValue(message, value); }
 };
+
+const vtkClientServerStreamInternals::ValueOffsetsType::size_type
+vtkClientServerStreamInternals::InvalidStartIndex =
+static_cast<vtkClientServerStreamInternals::ValueOffsetsType::size_type>(-1);
 
 //----------------------------------------------------------------------------
 vtkClientServerStream::vtkClientServerStream(vtkObjectBase* owner)
@@ -264,7 +268,7 @@ void vtkClientServerStream::Reset()
 
   // No message has yet been started.
   this->Internal->Invalid = 0;
-  this->Internal->StartIndex = (vtkClientServerStreamInternals::ValueOffsetsType::size_type)
+  this->Internal->StartIndex =
     vtkClientServerStreamInternals::InvalidStartIndex;
 
   // Store the byte order of data to come.
@@ -323,7 +327,7 @@ vtkClientServerStream::operator << (vtkClientServerStream::Types t)
     this->Internal->MessageIndexes.push_back(this->Internal->StartIndex);
 
     // No current Command is being constructed.
-    this->Internal->StartIndex = (vtkClientServerStreamInternals::ValueOffsetsType::size_type)
+    this->Internal->StartIndex =
       vtkClientServerStreamInternals::InvalidStartIndex;
     }
 
@@ -1315,8 +1319,8 @@ void vtkClientServerStream::ParseEnd()
 {
   // Record completed message.
   this->Internal->MessageIndexes.push_back(this->Internal->StartIndex);
-  this->Internal->StartIndex = 
-    (vtkClientServerStreamInternals::ValueOffsetsType::size_type)vtkClientServerStreamInternals::InvalidStartIndex;
+  this->Internal->StartIndex =
+    vtkClientServerStreamInternals::InvalidStartIndex;
 }
 
 //----------------------------------------------------------------------------
@@ -1479,7 +1483,7 @@ int vtkClientServerStream::GetNumberOfValues(int message) const
       return (this->Internal->MessageIndexes[message+1] -
               this->Internal->MessageIndexes[message]);
       }
-    else if(this->Internal->StartIndex != (vtkClientServerStreamInternals::ValueOffsetsType::size_type)
+    else if(this->Internal->StartIndex !=
             vtkClientServerStreamInternals::InvalidStartIndex)
       {
       // Requested message is the last completed message, but there is
