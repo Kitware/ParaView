@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.128");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.129");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1154,7 +1154,9 @@ void vtkPVAnimationInterface::UpdateSourceMenu(int idx)
     while ( (source = col->GetNextPVSource()) )
       {
       sprintf(methodAndArgString, "SetPVSource %s", source->GetTclName());
-      menu->AddCommand(source->GetName(), entry, methodAndArgString);
+      char* label = this->GetPVApplication()->GetTextRepresentation(source);
+      menu->AddCommand(label, entry, methodAndArgString);
+      delete[] label;
       if (entry->GetPVSource() == source)
         {
         sourceValid = 1;

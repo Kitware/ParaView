@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.33");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -260,7 +260,9 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   if (this->PVSource)
     {
-    this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
+    char* label=this->GetPVApplication()->GetTextRepresentation(this->PVSource);
+    this->SourceMenuButton->SetButtonText(label);
+    delete[] label;
     }
   else
     {
@@ -409,7 +411,9 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
     {
     //this->DeleteEventTag = this->PVSource->AddObserver(vtkCommand::DeleteEvent, this->Observer);
     //cout << "Add observer: " << this->DeleteEventTag << " (" << this->PVSource << ")" << endl;
-    button->SetButtonText(this->PVSource->GetName());
+    char* label=this->GetPVApplication()->GetTextRepresentation(this->PVSource);
+    button->SetButtonText(label);
+    delete[] label;
     //cout << "-- PV source was set to: " << (src?src->GetName():"<none>") << endl;
     if (this->PVSource->InitializeTrace(NULL))
       {
