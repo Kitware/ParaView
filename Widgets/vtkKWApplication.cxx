@@ -75,6 +75,9 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationVersionName = new char[strlen("Kitware10")+1];
   strcpy(this->ApplicationVersionName, "Kitware10" );
 
+  this->ApplicationReleaseName = new char[strlen("unknown")+1];
+  strcpy(this->ApplicationReleaseName, "unknown" );
+
   // setup tcl stuff
   this->MainInterp = vtkTclGetGlobalInterp();  
   this->Windows = vtkKWWindowCollection::New();  
@@ -118,6 +121,7 @@ vtkKWApplication::~vtkKWApplication()
 
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
+  this->SetApplicationReleaseName(NULL);
 }
 
 void vtkKWApplication::Script(const char *format, ...)
@@ -188,6 +192,29 @@ void vtkKWApplication::SetApplicationVersionName(const char *_arg)
    else 
     { 
     this->ApplicationVersionName = NULL; 
+    } 
+  this->Modified(); 
+}
+
+void vtkKWApplication::SetApplicationReleaseName(const char *_arg)
+{
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationReleaseName to " << _arg ); 
+  if ( this->ApplicationReleaseName && _arg && (!strcmp(this->ApplicationReleaseName,_arg)))
+    { 
+    return;
+    } 
+  if (this->ApplicationReleaseName) 
+    { 
+    delete [] this->ApplicationReleaseName; 
+    } 
+  if (_arg) 
+    { 
+    this->ApplicationReleaseName = new char[strlen(_arg)+1]; 
+    strcpy(this->ApplicationReleaseName,_arg); 
+    } 
+   else 
+    { 
+    this->ApplicationReleaseName = NULL; 
     } 
   this->Modified(); 
 }
@@ -314,9 +341,6 @@ void vtkKWApplication::Start(int argc, char *argv[])
   //Tk_MainLoop();
 }
 
-void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
-{
-}
 
 #ifdef _WIN32
 extern void ReadAValue(HKEY hKey,char *val,char *key, char *adefault);
@@ -351,6 +375,7 @@ void vtkKWApplication::DisplayHelp()
     "this application. You can view this help using a\n"
     "standard web browser by loading the Help.htm file.");
   dlg->Invoke();  
+  dlg->Delete();
 #endif
 }
 
@@ -491,4 +516,16 @@ void vtkKWApplication::SetWidgetVisibility(int v)
 int vtkKWApplication::GetWidgetVisibility() 
 {
   return vtkKWApplication::WidgetVisibility;
+}
+
+void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
+{
+  ostrstream str;
+  str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;
+
+  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->Create(this,"");
+  dlg->SetText(str.str());
+  dlg->Invoke();  
+  dlg->Delete();  
 }

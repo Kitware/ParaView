@@ -99,6 +99,11 @@ public:
   void SetApplicationVersionName(const char *);
   vtkGetStringMacro(ApplicationVersionName);
 
+  // Description:
+  // Set/Get the ApplicationReleaseName - this is the release of the 
+  // application version, typically beta 1, beta 2, final, patch 1, patch 2
+  void SetApplicationReleaseName(const char *);
+  vtkGetStringMacro(ApplicationReleaseName);
   
 //BTX
   // Description:
@@ -138,6 +143,7 @@ protected:
   vtkKWWindowCollection *Windows;
   char *ApplicationName;
   char *ApplicationVersionName;
+  char *ApplicationReleaseName;
 
   // For Balloon help
   vtkKWWidget *BalloonHelpWindow;
