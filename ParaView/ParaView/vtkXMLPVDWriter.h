@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkXMLPVCollectionWriter.h
+  Module:    vtkXMLPVDWriter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -15,24 +15,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPVCollectionWriter - Data writer for ParaView
+// .NAME vtkXMLPVDWriter - Data writer for ParaView
 // .SECTION Description
-// vtkXMLPVCollectionWriter is used to save all parts of a current
+// vtkXMLPVDWriter is used to save all parts of a current
 // source to a file with pieces spread across ther server processes.
 
-#ifndef __vtkXMLPVCollectionWriter_h
-#define __vtkXMLPVCollectionWriter_h
+#ifndef __vtkXMLPVDWriter_h
+#define __vtkXMLPVDWriter_h
 
 #include "vtkXMLWriter.h"
 
 class vtkCallbackCommand;
-class vtkXMLPVCollectionWriterInternals;
+class vtkXMLPVDWriterInternals;
 
-class VTK_EXPORT vtkXMLPVCollectionWriter : public vtkXMLWriter
+class VTK_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 {
 public:
-  static vtkXMLPVCollectionWriter* New();
-  vtkTypeRevisionMacro(vtkXMLPVCollectionWriter,vtkXMLWriter);
+  static vtkXMLPVDWriter* New();
+  vtkTypeRevisionMacro(vtkXMLPVDWriter,vtkXMLWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
   // Description:
@@ -66,27 +66,39 @@ public:
   vtkGetMacro(WriteCollectionFile, int);
   virtual void SetWriteCollectionFile(int flag);
 protected:
-  vtkXMLPVCollectionWriter();
-  ~vtkXMLPVCollectionWriter();
+  vtkXMLPVDWriter();
+  ~vtkXMLPVDWriter();
   
   // Override vtkProcessObject's AddInput method to prevent compiler
   // warnings.
   virtual void AddInput(vtkDataObject*);
-
+  
   // Replace vtkXMLWriter's writing driver method.
   virtual int WriteInternal();
   virtual int WriteData();
   virtual const char* GetDataSetName();
   
-  // Create the set of writers matching the set of inputs.
+  // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
+  vtkXMLWriter* GetWriter(int index);
   
-  // Split the prefix off the file name for use in creating other file
-  // names.
+  // Methods to help construct internal file names.
   void SplitFileName();
+  const char* GetFilePrefix();
+  const char* GetFilePath();
+
+  // Methods to construct the list of entries for the collection file.
+  void AppendEntry(const char* entry);
+  void DeleteAllEntries();
+  
+  // Write the collection file if it is requested.
+  int WriteCollectionFileIfRequested();
+  
+  // Make a directory.
+  void MakeDirectory(const char* name);
   
   // Internal implementation details.
-  vtkXMLPVCollectionWriterInternals* Internal;  
+  vtkXMLPVDWriterInternals* Internal;  
   
   // The piece number to write.
   int Piece;
@@ -111,8 +123,8 @@ protected:
   vtkCallbackCommand* ProgressObserver;  
   
 private:
-  vtkXMLPVCollectionWriter(const vtkXMLPVCollectionWriter&);  // Not implemented.
-  void operator=(const vtkXMLPVCollectionWriter&);  // Not implemented.
+  vtkXMLPVDWriter(const vtkXMLPVDWriter&);  // Not implemented.
+  void operator=(const vtkXMLPVDWriter&);  // Not implemented.
 };
 
 #endif

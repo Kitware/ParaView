@@ -360,6 +360,10 @@ public:
   // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
+  // Description:
+  // We need to get the data path for the demo on the server.
+  char* GetDemoPath();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -449,6 +453,9 @@ protected:
 
   int ShowSourcesLongHelp;
   int SourcesBrowserAlwaysShowName;
+
+  char* DemoPath;
+  vtkSetStringMacro(DemoPath);
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

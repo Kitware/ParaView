@@ -17,7 +17,8 @@ proc CheckForDemoFile { file } {
         return 0
     }
 
-    if ![file exists $DemoDir/$file] {
+    [$Application GetProcessModule] RootSimpleScript "file exists $DemoDir/$file"
+    if { ! [[$Application GetProcessModule] GetRootResult]} {
 	vtkKWMessageDialog _adialog
 	_adialog PopupMessage $Application [$Application GetMainWindow] Error "Could not find the data file $file. This usually means that ParaView was not installed properly. Please fix the problem and try again." 0
 	_adialog Delete
@@ -940,7 +941,6 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 53
     $extract(vtkTemp106) SetCurrentTime 54
     $extract(vtkTemp106) SetCurrentTime 55
-    $extract(vtkTemp106) SetCurrentTime 56
     $extract(vtkTemp1032) SetLabelAndScript {Y Axis} {$extract_tcl_name SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
     $extract(vtkTemp106) SetCurrentTime 0
     $extract(vtkTemp106) SetNumberOfFrames 32
@@ -977,7 +977,6 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 29
     $extract(vtkTemp106) SetCurrentTime 30
     $extract(vtkTemp106) SetCurrentTime 31
-    $extract(vtkTemp106) SetCurrentTime 32
     $extract(vtkTemp1032) SetLabelAndScript {Z Axis} {$extract_tcl_name SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
 
     if $pvDemoShouldStop {
@@ -1011,7 +1010,6 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 21
     $extract(vtkTemp106) SetCurrentTime 22
     $extract(vtkTemp106) SetCurrentTime 23
-    $extract(vtkTemp106) SetCurrentTime 24
     $extract(vtkTemp478) SetVisibility 0
     if $pvDemoShouldStop {
         return
@@ -1019,9 +1017,9 @@ proc extract_run {} {
 
     $extract(vtkTemp615) SetVisibility 0
     $extract(vtkTemp598) SetVisibility 1
-    $extract(vtkTemp106) SetNumberOfFrames 7
-    $extract(vtkTemp1032) SetTimeStart 0.0
-    $extract(vtkTemp1032) SetTimeEnd 7.0
+    $extract(vtkTemp106) SetNumberOfFrames 10
+    $extract(vtkTemp1032) SetTimeStart -1.0
+    $extract(vtkTemp1032) SetTimeEnd 3.0
     set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
     $extract(vtkTemp1032) SetPVSource $extract(vtkTemp598)
     $Application BroadcastSimpleScript "set cut_tcl_name [$extract(vtkTemp598) GetVTKSourceTclName]"
@@ -1039,7 +1037,13 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 5
     update
     $extract(vtkTemp106) SetCurrentTime 6
+    update
     $extract(vtkTemp106) SetCurrentTime 7
+    update
+    $extract(vtkTemp106) SetCurrentTime 8
+    update
+    $extract(vtkTemp106) SetCurrentTime 9
+    update
     if $pvDemoShouldStop {
         return
     }
@@ -1053,13 +1057,25 @@ proc extract_run {} {
     set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
     $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
     $extract(vtkTemp106) SetCurrentTime 0
+    update
     $extract(vtkTemp106) SetCurrentTime 1
+    update
     $extract(vtkTemp106) SetCurrentTime 2
+    update
     $extract(vtkTemp106) SetCurrentTime 3
+    update
     $extract(vtkTemp106) SetCurrentTime 4
+    update
     $extract(vtkTemp106) SetCurrentTime 5
+    update
     $extract(vtkTemp106) SetCurrentTime 6
+    update
     $extract(vtkTemp106) SetCurrentTime 7
+    update
+    $extract(vtkTemp106) SetCurrentTime 8
+    update
+    $extract(vtkTemp106) SetCurrentTime 9
+    update
     $extract(vtkTemp780) SetVisibility 0
 
     if $pvDemoShouldStop {
@@ -1508,7 +1524,7 @@ proc stream_run { } {
 
     $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
 
-    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators (currently, streamlines are not available in parallel, this feature is under development). The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
+    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators. The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
 
     # outline
     $streams(vtkTemp384) SetVisibility 1

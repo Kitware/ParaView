@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.18");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -63,6 +63,7 @@ struct vtkClientRenderWindowInfo
   int Size[2];
   int NumberOfRenderers;
   int ReductionFactor;
+  int SquirtLevel;
 };
 
 struct vtkClientRendererInfo 
@@ -98,7 +99,7 @@ struct vtkClientRendererInfo
 //-------------------------------------------------------------------------
 vtkClientCompositeManager::vtkClientCompositeManager()
 {
-  this->UseSquirt = 1;
+  this->SquirtLevel = 0;
   this->RenderWindow = NULL;
   this->CompositeController = vtkMultiProcessController::GetGlobalController();
   if (this->CompositeController)
@@ -112,6 +113,7 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->StartTag = 0;
   this->RenderView = NULL;
 
+  this->InternalReductionFactor = 2;
   this->ReductionFactor = 2;
   this->PDataSize[0] = this->PDataSize[1] = 0;
   this->MagnifiedPDataSize[0] = this->MagnifiedPDataSize[1] = 0;
@@ -134,7 +136,6 @@ vtkClientCompositeManager::vtkClientCompositeManager()
 
   this->BaseArray = NULL;
 
-  this->SquirtCompression = 0;
   this->UseCompositing = 0;
 }
 
@@ -350,13 +351,14 @@ void vtkClientCompositeManager::StartRender()
     return;
     }
 
-  if (updateRate > 2.0)
+  this->InternalReductionFactor = this->ReductionFactor;
+  if (this->InternalReductionFactor < 1)
     {
-    this->ReductionFactor = 2;
+    this->InternalReductionFactor = 1;
     }
-  else
+  if (updateRate <= 2.0)
     {
-    this->ReductionFactor = 1;
+    this->InternalReductionFactor = 1;
     }
   
   vtkDebugMacro("StartRender");
@@ -376,9 +378,10 @@ void vtkClientCompositeManager::StartRender()
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   size = this->RenderWindow->GetSize();
-  winInfo.Size[0] = size[0]/this->ReductionFactor;
-  winInfo.Size[1] = size[1]/this->ReductionFactor;
-  winInfo.ReductionFactor = this->ReductionFactor;
+  winInfo.Size[0] = size[0]/this->InternalReductionFactor;
+  winInfo.Size[1] = size[1]/this->InternalReductionFactor;
+  winInfo.ReductionFactor = this->InternalReductionFactor;
+  winInfo.SquirtLevel = this->SquirtLevel;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
   
@@ -389,7 +392,7 @@ void vtkClientCompositeManager::StartRender()
   //                 sizeof(vtkClientRenderWindowInfo), 1, 
   //                 vtkClientCompositeManager::WIN_INFO_TAG);
   // Let the socket controller deal with byte swapping.
-  controller->Send((int*)(&winInfo), 4, 1, 
+  controller->Send((int*)(&winInfo), 5, 1, 
                    vtkClientCompositeManager::WIN_INFO_TAG);
   
   // Make sure the satellite renderers have the same camera I do.
@@ -441,7 +444,7 @@ void vtkClientCompositeManager::StartRender()
 // Method executed only on client.
 void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
 {
-  if (this->UseChar && ! this->UseRGB && this->UseSquirt)
+  if (this->UseChar && ! this->UseRGB && this->SquirtLevel)
     {
     int length;
     this->ClientController->Receive(&length, 1, 1, 123450);
@@ -461,7 +464,7 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     }
  
   /*
-  if (this->ReductionFactor == 2)
+  if (this->InternalReductionFactor == 2)
     {
     vtkTimerLog::MarkStartEvent("Double Buffer");
     this->DoubleBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
@@ -477,7 +480,7 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     }
   else 
   */
-  if (this->ReductionFactor > 1)
+  if (this->InternalReductionFactor > 1)
     {
     vtkTimerLog::MarkStartEvent("Magnify Buffer");
     this->MagnifyBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
@@ -496,7 +499,7 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
   if (this->UseChar) 
     {
     vtkUnsignedCharArray* buf;
-    if (this->ReductionFactor > 1)
+    if (this->InternalReductionFactor > 1)
       {
       buf = static_cast<vtkUnsignedCharArray*>(this->MagnifiedPData);
       }
@@ -523,7 +526,7 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     } 
   else 
     {
-    if (this->ReductionFactor)
+    if (this->InternalReductionFactor)
       {
       vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
       this->RenderWindow->SetRGBAPixelData(0, 0, 
@@ -578,13 +581,13 @@ void vtkClientCompositeManager::MagnifyBuffer(vtkDataArray* localP,
       for (y = 0; y < yInDim; y++)
         {
         // Duplicate the row rowp N times.
-        for (yi = 0; yi < this->ReductionFactor; ++yi)
+        for (yi = 0; yi < this->InternalReductionFactor; ++yi)
           {
           pp1 = rowp;
           for (x = 0; x < xInDim; x++)
             {
             // Duplicate the pixel p11 N times.
-            for (xi = 0; xi < this->ReductionFactor; ++xi)
+            for (xi = 0; xi < this->InternalReductionFactor; ++xi)
               {
               *pp2++ = *pp1;
               }
@@ -604,13 +607,13 @@ void vtkClientCompositeManager::MagnifyBuffer(vtkDataArray* localP,
       for (y = 0; y < yInDim; y++)
         {
         // Duplicate the row rowp N times.
-        for (yi = 0; yi < this->ReductionFactor; ++yi)
+        for (yi = 0; yi < this->InternalReductionFactor; ++yi)
           {
           cpp1 = crowp;
           for (x = 0; x < xInDim; x++)
             {
             // Duplicate the pixel p11 N times.
-            for (xi = 0; xi < this->ReductionFactor; ++xi)
+            for (xi = 0; xi < this->InternalReductionFactor; ++xi)
               {
               csubp = cpp1;
               *cpp2++ = *csubp++;
@@ -633,13 +636,13 @@ void vtkClientCompositeManager::MagnifyBuffer(vtkDataArray* localP,
     for (y = 0; y < yInDim; y++)
       {
       // Duplicate the row rowp N times.
-      for (yi = 0; yi < this->ReductionFactor; ++yi)
+      for (yi = 0; yi < this->InternalReductionFactor; ++yi)
         {
         pp1 = rowp;
         for (x = 0; x < xInDim; x++)
           {
           // Duplicate the pixel p11 N times.
-          for (xi = 0; xi < this->ReductionFactor; ++xi)
+          for (xi = 0; xi < this->InternalReductionFactor; ++xi)
             {
             subp = pp1;
             if (numComp == 4)
@@ -679,7 +682,7 @@ void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP,
 
   outYInc = 2 * xInDim * 4;
 
-  if (this->ReductionFactor != 2)
+  if (this->InternalReductionFactor != 2)
     {
     vtkErrorMacro("double does not match reduction factor.");
     return;
@@ -818,7 +821,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
   //controller->Receive((char*)(&winInfo), 
   //                    sizeof(struct vtkClientRenderWindowInfo), 
   //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
-  controller->Receive((int*)(&winInfo), 4, otherId, 
+  controller->Receive((int*)(&winInfo), 5, otherId, 
                       vtkCompositeManager::WIN_INFO_TAG);
   if (myId == 0)
     {  // Relay info to server satellite processes.
@@ -827,7 +830,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
       //this->CompositeController->Send((char*)(&winInfo), 
       //                sizeof(struct vtkClientRenderWindowInfo), j,
       //                vtkCompositeManager::WIN_INFO_TAG);
-      this->CompositeController->Send((float*)(&winInfo), 22, j,
+      this->CompositeController->Send((float*)(&winInfo), 5, j,
                       vtkCompositeManager::WIN_INFO_TAG);
       }
     }
@@ -836,8 +839,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
   // This should be fixed.  Round off will cause window to resize. !!!!!
   renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
                   winInfo.Size[1] * winInfo.ReductionFactor);
-  this->ReductionFactor = winInfo.ReductionFactor;
-  this->SquirtCompression = 3 * (winInfo.ReductionFactor-1);
+  this->InternalReductionFactor = winInfo.ReductionFactor;
+  this->SquirtLevel = winInfo.SquirtLevel;
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
@@ -930,8 +933,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
         }
       ren->SetBackground(renInfo.Background);
       // Should not have reduction when using tiled display.
-      ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
-                       1.0/(float)this->ReductionFactor);
+      ren->SetViewport(0, 0, 1.0/(float)this->InternalReductionFactor, 
+                       1.0/(float)this->InternalReductionFactor);
       }
     }
   // This makes sure the arrays are large enough.
@@ -1004,11 +1007,11 @@ void vtkClientCompositeManager::SatelliteEndRender()
 
   if (myId == 0)
     {
-    if (this->UseChar && ! this->UseRGB && this->UseSquirt)
+    if (this->UseChar && ! this->UseRGB && this->SquirtLevel)
       {
       //this->DeltaEncode(static_cast<vtkUnsignedCharArray*>(this->PData));
       this->SquirtCompress(static_cast<vtkUnsignedCharArray*>(this->PData),
-                           this->SquirtArray, this->SquirtCompression);
+                           this->SquirtArray, this->SquirtLevel);
       int length = this->SquirtArray->GetMaxId() + 1;
       this->ClientController->Send(&length, 1, 1, 123450);
       this->ClientController->Send((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
@@ -1306,8 +1309,8 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
 
   this->PDataSize[0] = x;
   this->PDataSize[1] = y;
-  this->MagnifiedPDataSize[0] = x * this->ReductionFactor;
-  this->MagnifiedPDataSize[1] = y * this->ReductionFactor;
+  this->MagnifiedPDataSize[0] = x * this->InternalReductionFactor;
+  this->MagnifiedPDataSize[1] = y * this->InternalReductionFactor;
 
   if (x == 0 || y == 0)
     {
@@ -1508,17 +1511,17 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
   // switch statement is a bit lame
 #ifdef VTK_WORDS_BIGENDIAN
   switch (compress_level) {
-  case 0: compress_mask = 0xFFFFFF00;
+  case 1: compress_mask = 0xFFFFFF00;
       break;
-  case 1: compress_mask = 0xFEFFFE00;
+  case 2: compress_mask = 0xFEFFFE00;
       break;
-  case 2: compress_mask = 0xFCFEFC00;
+  case 3: compress_mask = 0xFCFEFC00;
       break;
-  case 3: compress_mask = 0xF8FCF800;
+  case 4: compress_mask = 0xF8FCF800;
       break;
-  case 4: compress_mask = 0xF0F8F000;
+  case 5: compress_mask = 0xF0F8F000;
       break;
-  case 5: compress_mask = 0xE0F0E000;
+  case 6: compress_mask = 0xE0F0E000;
       break;
   default: compress_mask = 0xE0F0E000;
       break;
@@ -1796,7 +1799,7 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
-  os << indent << "UseSquirt: " << this->UseSquirt << endl;
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
 
   os << indent << "Compositer: " << this->Compositer << endl;

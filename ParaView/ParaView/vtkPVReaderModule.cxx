@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.31");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -217,20 +217,8 @@ int vtkPVReaderModule::Initialize(const char*, vtkPVReaderModule*& clone)
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::ReadFileInformation(const char* fname)
 {
-  if (this->FileEntry)
-    {
-    this->FileEntry->SetValue(fname);
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->ServerScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
-                     this->FileEntry->GetVariableName(), fname);
-    
-    const char* ext = this->ExtractExtension(fname);
-    if (ext)
-      {
-      this->FileEntry->SetExtension(ext+1);
-      }
-    }
-
+  this->SetReaderFileName(fname);
+  
   const char* desc = this->RemovePath(fname);
   if (desc)
     {
@@ -350,6 +338,51 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
   sprintf(str, "GetPVWidget {%s}", fileEntry->GetTraceName());
   fileEntry->SetTraceReferenceCommand(str);
   fileEntry->Select();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVReaderModule::SetReaderFileName(const char* fname)
+{
+  if (this->FileEntry )
+    {
+    this->FileEntry->SetValue(fname);
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->ServerScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
+                     this->FileEntry->GetVariableName(), fname);
+    
+    const char* ext = this->ExtractExtension(fname);
+    if (ext)
+      {
+      this->FileEntry->SetExtension(ext+1);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVReaderModule::GetNumberOfTimeSteps()
+{
+  if ( !this->FileEntry )
+    {
+    return 0;
+    }
+  int range[2];
+  this->FileEntry->GetRange(range);
+  if(range[1] > range[0])
+    {
+    return range[1] - range[0] + 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVReaderModule::SetRequestedTimeStep(int step)
+{
+  int range[2];
+  this->FileEntry->GetRange(range);
+  this->FileEntry->SetTimeStep(range[0]+step);
+  this->AcceptCallback();
+  this->GetPVApplication()->GetMainView()->EventuallyRender();
+  this->Script("update");
 }
 
 //----------------------------------------------------------------------------

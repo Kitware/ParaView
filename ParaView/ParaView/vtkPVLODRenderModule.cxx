@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.5");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -66,7 +66,8 @@ vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4");
 //----------------------------------------------------------------------------
 vtkPVLODRenderModule::vtkPVLODRenderModule()
 {
-  this->LODThreshold = 2.0;
+  this->RenderInterruptsEnabled = 1;
+  this->LODThreshold = 5.0;
   this->LODResolution = 50;
 
   this->TotalVisibleGeometryMemorySize = 0;
@@ -93,10 +94,35 @@ void PVLODRenderModuleAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 }
 
 
+void vtkPVLODRenderModule::SetPVApplication(vtkPVApplication *pvApp)
+{
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->RemoveObservers(vtkCommand::AbortCheckEvent);
+    }
+
+  this->Superclass::SetPVApplication(pvApp);
+
+  if (this->RenderWindow)
+    {
+    vtkCallbackCommand* abc = vtkCallbackCommand::New();
+    abc->SetCallback(PVLODRenderModuleAbortCheck);
+    abc->SetClientData(this);
+    this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
+    abc->Delete();
+    }
+}
+
+
+
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
 {
-  return vtkPVLODPartDisplay::New();
+  vtkPVLODPartDisplay* pDisp;
+
+  pDisp = vtkPVLODPartDisplay::New();
+  pDisp->SetLODResolution(this->LODResolution);
+  return pDisp;
 }
 
 //----------------------------------------------------------------------------

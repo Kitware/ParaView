@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -328,28 +328,28 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
+  this->SetCurrentMethod(0);
+  this->SetLabel(0);
+  this->SetPVSource(0);
+  this->SetSaveStateObject(0);
+  this->SetSaveStateScript(0);
+  this->SetScript(0);
+  this->SetTimeEquation(0);
+
+  this->DummyFrame->Delete();
+  this->EndTimeEntry->Delete();
+  this->MethodLabel->Delete();
+  this->MethodMenuButton->Delete();
+  this->Observer->Delete();
   this->ScriptEditor->Delete();
   this->ScriptEditorFrame->Delete();
   this->ScriptEditorScroll->Delete();
-  this->DummyFrame->Delete();
-  this->TimeScriptEntryFrame->Delete();
-  this->SetPVSource(0);
-  this->Observer->Delete();
-  this->TimeRange->Delete();
-  this->SourceMethodFrame->Delete();
   this->SourceLabel->Delete();
   this->SourceMenuButton->Delete();
-  this->MethodLabel->Delete();
-  this->MethodMenuButton->Delete();
+  this->SourceMethodFrame->Delete();
   this->StartTimeEntry->Delete();
-  this->EndTimeEntry->Delete();
-  this->SetScript(0);
-  this->SetCurrentMethod(0);
-  this->SetTimeEquation(0);
-  this->SetLabel(0);
-
-  this->SetSaveStateObject(0);
-  this->SetSaveStateScript(0);
+  this->TimeRange->Delete();
+  this->TimeScriptEntryFrame->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -441,8 +441,6 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->SetCurrentMethod(0);
   this->SetScript(0);
   this->SetLabelAndScript(0, 0);
-  this->UpdateMethodMenu();
-  this->Parent->UpdateNewScript();
   this->SwitchScriptTime(-1);
 }
 

@@ -30,6 +30,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
 	       ExtractPart
                Glyph
 	       Group
+         Transform
                ImageReader
                Mandelbrot
                ProbeLine

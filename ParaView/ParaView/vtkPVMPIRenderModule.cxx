@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4");
 
 
 
@@ -64,9 +64,7 @@ vtkPVMPIRenderModule::vtkPVMPIRenderModule()
 //----------------------------------------------------------------------------
 vtkPVMPIRenderModule::~vtkPVMPIRenderModule()
 {
-
 }
-
 
 
 //----------------------------------------------------------------------------
@@ -144,6 +142,25 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   if ( pvApp->GetUseOffscreenRendering() )
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
+{
+  if (this->CompositeTclName)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if (val)
+      {
+      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
+      }
+    else
+      {
+      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
+      }
+    pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
+    pvApp->BroadcastScript("pvTemp Delete");
     }
 }
 

@@ -78,22 +78,36 @@ public:
   void CompositeWithRGBACallback(int val);
   void CompositeCompressionCallback();
   void CompositeCompressionCallback(int val);
-  
+
+  // Description:
+  // Tracing uses the method with the argument.
+  // A reduction value of 1 is equivalent to having the feature
+  // disabled.
+  void ReductionCheckCallback();
+  void ReductionFactorScaleCallback();
+  void SetReductionFactor(int val);
+
+  // Description:
+  // Squirt compression os a combination of run-length encoding
+  // and bit compression.  A level of 0 is the same as disabling
+  // squirt compression.
+  void SquirtCheckCallback();
+  void SquirtLevelScaleCallback();
+  void SetSquirtLevel(int val);
+
   // Description:
   // Threshold for collecting data to a single process (MBytes).
-  void CollectThresholdScaleCallback();
+  void CompositeCheckCallback();
+  void CompositeThresholdScaleCallback();
+  void SetCompositeThreshold(float val);
+  vtkGetMacro(CompositeThreshold, float);
+  // I should really put this in the composite module.
+  void SetCompositeThresholdInternal(float threshold);
 
   // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetCollectThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
-  vtkBooleanMacro(CollectThreshold, float);
+  // This is a hack to disable a feature that is 
+  // not working yet for tiled displays.
+  void SetCompositeOptionEnabled(int val);
 
 protected:
   vtkPVCompositeRenderModuleUI();
@@ -107,15 +121,29 @@ protected:
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
 
-  vtkKWLabel *CollectThresholdLabel;
-  vtkKWScale *CollectThresholdScale;
-  vtkKWLabel *CollectThresholdValue;
+  vtkKWLabel*       CompositeLabel;
+  vtkKWCheckButton* CompositeCheck;
+  vtkKWScale*       CompositeThresholdScale;
+  vtkKWLabel*       CompositeThresholdLabel;
+  float             CompositeThreshold;
 
-  float CollectThreshold;
+  vtkKWLabel*       ReductionLabel;
+  vtkKWCheckButton* ReductionCheck;
+  vtkKWScale*       ReductionFactorScale;
+  vtkKWLabel*       ReductionFactorLabel;
+  int               ReductionFactor;
+
+  vtkKWLabel*       SquirtLabel;
+  vtkKWCheckButton* SquirtCheck;
+  vtkKWScale*       SquirtLevelScale;      
+  vtkKWLabel*       SquirtLevelLabel;
+  int               SquirtLevel;
 
   int CompositeWithFloatFlag;
   int CompositeWithRGBAFlag;
   int CompositeCompressionFlag;
+
+  int CompositeOptionEnabled;
 
   vtkPVCompositeRenderModuleUI(const vtkPVCompositeRenderModuleUI&); // Not implemented
   void operator=(const vtkPVCompositeRenderModuleUI&); // Not implemented
@@ -123,3 +151,5 @@ protected:
 
 
 #endif
+
+

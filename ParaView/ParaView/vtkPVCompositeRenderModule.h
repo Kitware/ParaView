@@ -63,8 +63,8 @@ public:
   // Description:
   // This methods can be used from a script.  
   // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
+  void SetCompositeThreshold(float);
+  vtkGetMacro(CompositeThreshold, float);
 
   // Description:
   // Renders using Still/FullRes or interactive/LODs
@@ -73,15 +73,22 @@ public:
 
   // Description:
   // Set this flag to indicate whether to calculate the reduction factor for
-  // use in tree composite.
-  vtkSetMacro(UseReductionFactor, int);
-  vtkGetMacro(UseReductionFactor, int);
-  vtkBooleanMacro(UseReductionFactor, int);
+  // use in tree composite (or client server).
+  vtkSetMacro(ReductionFactor, int);
+  vtkGetMacro(ReductionFactor, int);
+
+  // Description:
+  // Squirt is a hybrid run length encoding and bit reduction compression
+  // algorithm that is used to compress images for transmition from the
+  // server to client.  Value of 0 disabled all compression.  Level zero is just
+  // run length compression with no bit compression (lossless).
+  vtkSetMacro(SquirtLevel, int);
+  vtkGetMacro(SquirtLevel, int);
 
   // Description:
   void SetUseCompositeWithFloat(int val);
   void SetUseCompositeWithRGBA(int val);
-  void SetUseCompositeCompression(int val);
+  virtual void SetUseCompositeCompression(int val);
   
   // Description:
   // The center of rotation picker needs the compositers zbuffer.
@@ -116,14 +123,15 @@ protected:
 
   // Computes the reduction factor to use in compositing.
   void ComputeReductionFactor();
+  int ReductionFactor;
+  int SquirtLevel;
 
   int LocalRender;
 
   int CollectionDecision;
   int LODCollectionDecision;
 
-  float CollectThreshold;
-  int UseReductionFactor;
+  float CompositeThreshold;
 
   vtkPVTreeComposite *Composite;
   char *CompositeTclName;

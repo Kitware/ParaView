@@ -66,6 +66,10 @@ public:
   virtual void InteractiveRender();
   virtual void StillRender();
 
+  // Description:
+  // Whether to use compression or not.
+  virtual void SetUseCompositeCompression(int val);
+
 protected:
   vtkPVMultiDisplayRenderModule();
   ~vtkPVMultiDisplayRenderModule();

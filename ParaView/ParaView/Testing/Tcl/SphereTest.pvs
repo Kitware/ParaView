@@ -18,7 +18,7 @@ set pvSphere [$pvWindow CreatePVSource SphereSource]
 [$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
 $pvSphere AcceptCallback
 
-set pvShrink [$pvWindow CreatePVSource ShrinkPolyData]
+set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
 [$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
 $pvShrink AcceptCallback
 

@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.83");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.84");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1125,7 +1125,8 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImagesCallback()
 {
-  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
@@ -1241,59 +1242,21 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveGeometryCallback()
 {
-  int numPartitions;
-
-  numPartitions = this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions();
-
-  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  int numPartitions = pm->GetNumberOfPartitions();
+  
+  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);
-  saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
+  saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Geometry");
-  if (numPartitions > 1)
-    {
-    saveDialog->SetDefaultExtension(".pvtp");
-    saveDialog->SetFileTypes("{{Parallel PolyData} {.pvtp}}");
-    }
-  else
-    {
-    saveDialog->SetDefaultExtension(".vtp");
-    saveDialog->SetFileTypes("{{VTK PolyData} {.vtp}}");
-    }
-  if ( saveDialog->Invoke() &&
-       strlen(saveDialog->GetFileName())>0 )
+  saveDialog->SetDefaultExtension(".pvd");
+  saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
+  if(saveDialog->Invoke() && (strlen(saveDialog->GetFileName()) > 0))
     {
     this->GetWindow()->SaveLastPath(saveDialog, "SaveGeometryFile");
-    const char* filename = saveDialog->GetFileName();  
-
-    // Split into root and extension.
-    char* fileRoot;
-    char* ptr;
-    char* ext = NULL;
-    fileRoot = new char[strlen(filename)+1];
-    strcpy(fileRoot, filename);
-    // Find extension (last .)
-    ptr = fileRoot;
-    while (*ptr != '\0')
-      {
-      if (*ptr == '.')
-        {
-        ext = ptr;
-        }
-      ++ptr;
-      }
-    if (ext != NULL)
-      {
-      // Separate the root from the extension.
-      *ext = '\0';
-      ++ext;
-      }
-
-    this->SaveGeometry(fileRoot, numPartitions);
-    delete [] fileRoot;
-    fileRoot = NULL;
-    ext = NULL;
+    this->SaveGeometry(saveDialog->GetFileName(), numPartitions);
     }
 
   saveDialog->Delete();
@@ -1302,127 +1265,110 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot, 
+void vtkPVAnimationInterface::SaveGeometry(const char* fileName, 
                                            int numPartitions) 
 {
-  vtkPVSource* source;
-  const char* sourceName;
-  int numParts, partIdx;
-  vtkPVPart* part;
-  char *fileName;
-  int timeCount;
-  int t;
-  vtkPVSourceCollection *sources;
-
-  sources = this->GetWindow()->GetSourceList("Sources");
-
-  if (numPartitions > 1)
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkPVSourceCollection* sources = this->GetWindow()->GetSourceList("Sources");
+  
+  // Create the animation writer pipeline.
+  pm->ServerScript(
+    "vtkXMLPVAnimationWriter pvAnimWriter\n"
+    "pvAnimWriter SetFileName {%s}\n"
+    "pvAnimWriter SetNumberOfPieces {%d}\n"
+    "pvAnimWriter SetPiece [[$Application GetProcessModule] GetPartitionId]\n",
+    fileName, numPartitions);
+  
+  if(numPartitions > 1)
     {
-    // Protect agains empty root partition.
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "vtkCompleteArrays pvAnimCompleteArrays"); 
-    // Writer has to be in tcl to connect to geometry filter. 
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "vtkXMLPPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetEndPiece [[$Application GetProcessModule] GetPartitionId]; pvAnimWriter SetStartPiece [[$Application GetProcessModule] GetPartitionId]", 
-            this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
-    }
-  else
-    {
-    // Writer has to be in tcl to connect to geometry filter. 
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "vtkXMLPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-            "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetWritePiece [[$Application GetProcessModule] GetPartitionId]", 
-            this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
-    }
-
-  fileName = new char[strlen(fileRoot) + 30];      
-
-  // Loop through all of the time steps.
-  t = this->GetGlobalStart();
-  timeCount = 0;
-  while (t <= this->GetGlobalEnd())
-    {
-    this->SetCurrentTime(t);
-    this->View->EventuallyRender();
-    this->Script("update");
-
-    // Loop through visible sources.
+    vtkPVSource* source;
     sources->InitTraversal();
-    while ( (source = sources->GetNextPVSource()) )
+    while((source = sources->GetNextPVSource()))
       {
-      if (source->GetVisibility())
+      if(source->GetVisibility())
         {
-        sourceName = source->GetName();
-        numParts = source->GetNumberOfParts();
-        for ( partIdx = 0; partIdx < numParts; ++partIdx)
+        const char* sourceName = source->GetName();
+        int numParts = source->GetNumberOfParts();
+        for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
-          part = source->GetPart(partIdx);
-          // Create a file name for this image.
-          if (numParts == 1)
-            { // Clean up these nested loops (stream). !!!!!!!!
-            if (numPartitions > 1)
-              {
-              sprintf(fileName, "%s%sT%04d.pvtp", 
-                      fileRoot, sourceName, timeCount);
-              }
-            else
-              {
-              sprintf(fileName, "%s%sT%04d.vtp", 
-                      fileRoot, sourceName, timeCount);
-              }
-            }
-          else
-            {
-            if (numPartitions > 1)
-              {
-              sprintf(fileName, "%s%sP%dT%04d.pvtp", 
-                      fileRoot, sourceName, partIdx, timeCount);
-              }
-            else
-              {
-              sprintf(fileName, "%s%sP%dT%04d.vtp", 
-                      fileRoot, sourceName, partIdx, timeCount);
-              }
-            }
-          if (numPartitions > 1)
-            {
-            this->GetPVApplication()->GetProcessModule()->ServerScript(
-                    "pvAnimCompleteArrays SetInput [%s GetInput]; "
-                    "pvAnimWriter SetInput [pvAnimCompleteArrays GetOutput]; "
-                    "pvAnimWriter SetFileName %s; pvAnimWriter Write", 
-                    part->GetPartDisplay()->GetMapperTclName(), fileName,
-                    this->GetPVApplication()->GetProcessModule()->GetPartitionId());
-            }
-          else
-            {
-            this->GetPVApplication()->GetProcessModule()->ServerScript(
-                    "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
-                    part->GetPartDisplay()->GetMapperTclName(), fileName,
-                    this->GetPVApplication()->GetProcessModule()->GetPartitionId());
-            }  
+          vtkPVPart* part = source->GetPart(partIdx);
+          pm->ServerScript(
+            "set pvAnimCompleteArrays {pvAnimCompleteArrays%s_%d}\n"
+            "vtkCompleteArrays ${pvAnimCompleteArrays}\n"
+            "${pvAnimCompleteArrays} SetInput [%s GetOutput]\n"
+            "pvAnimWriter AddInput [${pvAnimCompleteArrays} GetOutput] {%s}",
+            sourceName, partIdx, part->GetGeometryTclName(), sourceName);
           }
         }
       }
     
-    ++timeCount;
-    ++t;
+    // Only write the animation file once on each disk.
+    pm->ServerScript(
+      "vtkPVSummaryHelper pvAnimHelper\n"
+      "pvAnimHelper SetWriter pvAnimWriter\n"
+      "pvAnimHelper SetController [$Application GetController]\n"
+      "pvAnimHelper SynchronizeSummaryFiles\n"
+      "pvAnimHelper Delete");
     }
-
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
-                                                   "pvAnimWriter Delete");
-  if (numPartitions > 1)
+  else
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
-                                          "pvAnimCompleteArrays Delete");
-
+    vtkPVSource* source;
+    sources->InitTraversal();
+    while((source = sources->GetNextPVSource()))
+      {
+      if(source->GetVisibility())
+        {
+        const char* sourceName = source->GetName();
+        int numParts = source->GetNumberOfParts();
+        for(int partIdx = 0; partIdx < numParts; ++partIdx)
+          {
+          vtkPVPart* part = source->GetPart(partIdx);
+          pm->ServerScript("pvAnimWriter AddInput [%s GetOutput] {%s}",
+                           part->GetGeometryTclName(), sourceName);
+          }
+        }
+      }
     }
   
-
-  delete [] fileName;
-  fileName = NULL;
+  // Start the animation.
+  pm->ServerScript("pvAnimWriter Start");
+  
+  // Loop through all of the time steps.
+  for(int t = this->GetGlobalStart(); t <= this->GetGlobalEnd(); ++t)
+    {
+    // Update the animation to this time step.
+    this->SetCurrentTime(t);
+    this->View->EventuallyRender();
+    this->Script("update");
+    
+    // Write this time step.
+    pm->ServerScript("pvAnimWriter WriteTime {%d}", t);
+    }
+  
+  // Finish the animation.
+  pm->ServerScript("pvAnimWriter Finish");
+  
+  // Cleanup the writer pipeline.
+  pm->ServerScript("pvAnimWriter Delete");
+  
+  if(numPartitions > 1)
+    {
+    vtkPVSource* source;
+    sources->InitTraversal();
+    while((source = sources->GetNextPVSource()))
+      {
+      if(source->GetVisibility())
+        {
+        const char* sourceName = source->GetName();
+        int numParts = source->GetNumberOfParts();
+        for(int partIdx = 0; partIdx < numParts; ++partIdx)
+          {
+          pm->ServerScript("pvAnimCompleteArrays%s_%d Delete\n",
+                           sourceName, partIdx);
+          }
+        }
+      }
+    }  
 }
 
 

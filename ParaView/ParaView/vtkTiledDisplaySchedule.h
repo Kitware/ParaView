@@ -30,6 +30,7 @@
 
 #include "vtkObject.h"
 class vtkTiledDisplayProcess;
+class vtkTiledDisplayElement;
 
 class VTK_EXPORT vtkTiledDisplaySchedule : public vtkObject
 {
@@ -83,6 +84,10 @@ protected:
 
   int ShuffleLevel(int level, int numTiles, 
                    vtkTiledDisplaySchedule** tileSchedules);
+  int FindOtherElementIdx(vtkTiledDisplayProcess* p, 
+                          vtkTiledDisplayElement* e,
+                          int pId);
+
 
   int NumberOfProcesses; // User set.
   int NumberOfTiles;

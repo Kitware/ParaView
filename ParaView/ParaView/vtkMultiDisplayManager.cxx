@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.9");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -107,6 +107,7 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 
   this->ReductionFactor = 1;
   this->LODReductionFactor = 4;
+  this->UseCompositeCompression = 1;
 
   this->RenderWindow = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
@@ -130,6 +131,11 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
   this->CompositeUtilities = vtkPVCompositeUtilities::New();
 
   this->Schedule = vtkTiledDisplaySchedule::New();
+
+  this->TileBuffers = NULL;
+  this->TileBufferArrayLength = 0;
+
+
 
 }
 
@@ -155,6 +161,9 @@ vtkMultiDisplayManager::~vtkMultiDisplayManager()
 
   this->Schedule->Delete();
   this->Schedule = NULL;
+  
+  // Deletes buffers and array.
+  this->InitializeTileBuffers(0);
 }
 
 //==================== CallbackCommand and RMI functions ====================
@@ -313,7 +322,7 @@ void vtkMultiDisplayManager::ClientStartRender()
   // All this just gets information to send to the satellites.  
   if (updateRate > 2.0)
     {
-    this->ReductionFactor = 2;
+    this->ReductionFactor = this->LODReductionFactor;
     }
   else
     {
@@ -468,14 +477,16 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
       light->SetFocalPoint(info.LightFocalPoint);
       }
     ren->SetBackground(info.Background);
-    ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
-                     1.0/(float)this->ReductionFactor);
     }
 
   // Renders and composites
   this->Composite();
 
-  // Force swap buffers here.
+  // Synchronize here to have all procs swap buffers at the same time.
+  if (this->Controller)
+    {
+    this->Controller->Barrier();
+    }
   if (this->SocketController)
     {
     //this->SocketController->Barrier();
@@ -484,41 +495,149 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
     int dummyMessage = 10;
     this->SocketController->Send(&dummyMessage,1, 1, 12323);
     }
-  if (this->Controller)
-    {
-    this->Controller->Barrier();
-    }
+
+  // Force swap buffers here.
   renWin->SwapBuffersOn();  
   renWin->Frame();
 }
 
 
+//----------------------------------------------------------------------------
+void vtkMultiDisplayManager::SetTileBuffer(int tileIdx, 
+                                           vtkPVCompositeBuffer* buf)
+{
+  if (tileIdx < 0 || tileIdx >= this->TileBufferArrayLength)
+    {
+    vtkErrorMacro("Tile index out of range.");
+    return;
+    }
+  if (this->TileBuffers[tileIdx])
+    {
+    this->TileBuffers[tileIdx]->Delete();
+    this->TileBuffers[tileIdx] = NULL;
+    }
+  if (buf)
+    {
+    this->TileBuffers[tileIdx] = buf;
+    buf->Register(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiDisplayManager::InitializeTileBuffers(int length)
+{
+  int idx;
+  // Get rid of previous buffers / array.
+  for (idx = 0 ; idx < this->TileBufferArrayLength; ++idx)
+    {
+    if (this->TileBuffers[idx])
+      {
+      this->TileBuffers[idx]->Delete();
+      this->TileBuffers[idx] = NULL;
+      }
+    }
+  if (this->TileBuffers)
+    {
+    delete [] this->TileBuffers;
+    this->TileBuffers = NULL;
+    }
+
+  // Allocate a new empty array.
+  if (length > 0)
+    {
+    this->TileBuffers = new vtkPVCompositeBuffer* [length];
+    for (idx = 0; idx < length; ++idx)
+      {
+      this->TileBuffers[idx] = NULL;
+      }  
+    }
+  this->TileBufferArrayLength = length;
+}
 
 
 //----------------------------------------------------------------------------
-// Use the schedule to do the compositing.
-// Only Called on the satellites.
-void vtkMultiDisplayManager::Composite()
+// Gets the stored buffer.  Renders if necessary.
+vtkPVCompositeBuffer* vtkMultiDisplayManager::GetTileBuffer(int tileIdx)
 {
-  static int firstRender = 1;
-  int myId = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
-  int numberOfCompositeSteps = this->Schedule->GetNumberOfProcessElements(myId);
-  int i, x, y, idx;
-  int tileId = this->Schedule->GetProcessTileId(myId);
+  if (tileIdx < 0 || tileIdx >= this->TileBufferArrayLength)
+    {
+    vtkErrorMacro("Tile index out of range.");
+    return NULL;
+    }
+
+  if (this->TileBuffers[tileIdx])
+    {
+    return this->TileBuffers[tileIdx];
+    }
+
   vtkFloatArray*        zData;
   vtkUnsignedCharArray* pData;
   vtkPVCompositeBuffer* buf;
-  vtkPVCompositeBuffer* buf2;
-  vtkPVCompositeBuffer* buf3;
-  int length;
-  int size[2];
-  int *rws;
-  vtkPVCompositeBuffer** tileBuffers;
+  int                   front = 0;
+  int*                  rws;
+  int                   size[2];
+  static int            firstRender = 1;
+  int                   length;
+
+  // size is not valid until after the first render.
+  if (firstRender)
+    {
+    this->RenderWindow->Render();
+    firstRender = 0;
+    }
+  
+  rws = this->RenderWindow->GetSize();
+  size[0] = (int)((float)rws[0] / (float)(this->ReductionFactor));
+  size[1] = (int)((float)rws[1] / (float)(this->ReductionFactor));  
+
+
+  // Render to get the tile.....
+  // Figure out the tile indexes.
+  this->SetupCamera(tileIdx, this->ReductionFactor);
+  this->RenderWindow->Render();
+
+  // Get the color buffer (RGB).
+  pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+  this->RenderWindow->GetPixelData(
+           0,0,size[0]-1, size[1]-1, 
+           front,pData);
+  // Get the z buffer.
+  zData = this->CompositeUtilities->NewFloatArray(size[0]*size[1], 1);
+  this->RenderWindow->GetZbufferData(0,0, size[0]-1, size[1]-1,
+                                     zData);  
+  // Compress the buffer.
+  if (this->UseCompositeCompression)
+    {
+    length = vtkPVCompositeUtilities::GetCompressedLength(zData);
+    buf = this->CompositeUtilities->NewCompositeBuffer(length);
+    vtkPVCompositeUtilities::Compress(zData, pData, buf);
+    }
+  else
+    {
+    buf = this->CompositeUtilities->NewCompositeBuffer(pData, zData);
+    }
+
+  // Overhead of deleting these and getting them is low.
+  // Doing so may decrease total buffer count.
+  pData->Delete();
+  pData = NULL;
+  zData->Delete();
+  zData = NULL;
+  
+  this->TileBuffers[tileIdx] = buf;
+  buf->Register(this);
+  buf->Delete();
+  return buf;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkMultiDisplayManager::SetupCamera(int tileIdx, int reduction)
+{
   vtkCamera* cam;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
-  int  numberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
 
   rens = renWin->GetRenderers();
   rens->InitTraversal();
@@ -528,34 +647,44 @@ void vtkMultiDisplayManager::Composite()
     cam = ren->GetActiveCamera();
     }
 
+  int x, y;
+  y = tileIdx/this->TileDimensions[0];
+  x = tileIdx - y*this->TileDimensions[0];
+  // Setup the camera for this tile.
+  cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
+                       1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
+
+  ren->SetViewport(0, 0, 1.0/(float)reduction, 1.0/(float)reduction);
+ }
+ 
+//----------------------------------------------------------------------------
+// Use the schedule to do the compositing.
+// Only Called on the satellites.
+void vtkMultiDisplayManager::Composite()
+{
+  int myId = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
+  int numberOfCompositeSteps = this->Schedule->GetNumberOfProcessElements(myId);
+  int idx;
+  int tileId;
+  vtkPVCompositeBuffer* buf;
+  vtkPVCompositeBuffer* buf2;
+  vtkPVCompositeBuffer* buf3;
+  int length;
+  int size[2];
+  int *rws;
+  int  numberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
+
+
   // If this flag is set by the root, then skip compositing.
   if ( ! this->UseCompositing || numberOfCompositeSteps == 0)
-    { // Just set up this one tile and render.
+    { // Just set up this one tile and render
     // Figure out the tile indexes.
     // ZeroEmpty causes the -1?
-    i = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
-    y = i/this->TileDimensions[0];
-    x = i - y*this->TileDimensions[0];
-    cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
-                         1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
-    // Ignore reduction (only necessary for one tile).
-    ren->SetViewport(0, 0, 1.0, 1.0);
-    renWin->Render();
+    idx = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
+    this->SetupCamera(idx, 1);
+    this->RenderWindow->Render();
     return;
     }
-
-  int front = 0;
-
-  // size is not valid until after the first render.
-  if (firstRender)
-    {
-    renWin->Render();
-    firstRender = 0;
-    }
-  
-  rws = this->RenderWindow->GetSize();
-  size[0] = (int)((float)rws[0] / (float)(this->ReductionFactor));
-  size[1] = (int)((float)rws[1] / (float)(this->ReductionFactor));  
 
   // We allocated with special mpiPro new so we do not need to copy.
 #ifdef MPIPROALLOC
@@ -563,108 +692,32 @@ void vtkMultiDisplayManager::Composite()
 #endif
 
   // Allocate an array of buffers for the tiles (not all will be used.)
-  tileBuffers = new vtkPVCompositeBuffer* [numberOfTiles];
-  for (idx = 0; idx < numberOfTiles; ++idx)
-    {
-    tileBuffers[idx] = NULL;
-    }  
+  this->InitializeTileBuffers(numberOfTiles);
 
   // Sanity check
-  // Since we handle the first "numberOfTiles" steps separately.
+  // We should have at least as many steps as tiles.
   if (numberOfCompositeSteps < numberOfTiles)
     {
     vtkErrorMacro("Too few composites for algorithm.");
     }
 
-  // Intermix the first n (numTiles) compositing steps with rendering.
-  // Each of these stages is dedicated to one (corresponding) tile.
-  // Since half of these processes immediately send the buffer,
-  // It would be a waste to store the buffer and not reuse it.
-  // All this rendering will be done in the back buffer without any swaps.
-  for (idx = 0; idx < numberOfTiles; ++idx)
+  // The compositing steps.
+  // This renders as late as possible (when the buffer is first needed.
+  for (idx = 0; idx < numberOfCompositeSteps; idx++) 
     {
-    // Figure out the tile indexes.
-    y = idx/this->TileDimensions[0];
-    x = idx - y*this->TileDimensions[0];
-    // Setup the camera for this tile.
-    cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
-                         1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
-    renWin->Render();
-
-    // Get the color buffer (RGB).
-    pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
-    this->RenderWindow->GetPixelData(
-             0,0,size[0]-1, size[1]-1, 
-             front,pData);
-    // Get the z buffer.
-    zData = this->CompositeUtilities->NewFloatArray(size[0]*size[1], 1);
-    this->RenderWindow->GetZbufferData(0,0, size[0]-1, size[1]-1,
-                                       zData);  
-    // Compress the buffer.
-    length = vtkPVCompositeUtilities::GetCompressedLength(zData);
-    buf = this->CompositeUtilities->NewCompositeBuffer(length);
-    vtkPVCompositeUtilities::Compress(zData, pData, buf);
-
-    // Overhead of deleting these and getting them is low.
-    // Doing so may decrease total buffer count.
-    pData->Delete();
-    pData = NULL;
-    zData->Delete();
-    zData = NULL;
-  
-    // Sanity check that the schedule put the first N tiles as steps.
-    // We make this assumption by storing the tiles in tileBuffers
-    if (this->Schedule->GetElementTileId(myId,idx) != idx)
-      {
-      vtkErrorMacro("Wrong tile rendered!");
-      }
-
-    if ( ! this->Schedule->GetElementReceiveFlag(myId, idx) )
+    tileId = this->Schedule->GetElementTileId(myId, idx);
+    buf = this->GetTileBuffer(tileId);
+    if ( ! this->Schedule->GetElementReceiveFlag(myId, idx))
       {
       // Send and recycle the buffer.
-      vtkPVCompositeUtilities::SendBuffer(this->Controller, buf,
-                                  this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
-                                  98);
-      buf->Delete();
-      buf = NULL;          
-      }
-    else
-      {
-      // Receive a buffer.
-      buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
-               this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
-               98);
-      // This value is currently a conservative estimate.
-      length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
-      buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
-      vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
-      tileBuffers[idx] = buf3;
-      buf3 = NULL;
-      buf->Delete();
-      buf = NULL;
-      buf2->Delete();
-      buf2 = NULL;
-      }
-    }
-  
-  // Do the rest of the compositing steps.
-  for (i = numberOfTiles; i < numberOfCompositeSteps; i++) 
-    {
-    if ( ! this->Schedule->GetElementReceiveFlag(myId, i))
-      {
-      // Send and recycle the buffer.
-      buf = tileBuffers[this->Schedule->GetElementTileId(myId, i)];
-      tileBuffers[this->Schedule->GetElementTileId(myId, i)] = NULL;
       vtkPVCompositeUtilities::SendBuffer(this->Controller, buf, 
-        this->Schedule->GetElementOtherProcessId(myId, i)+this->ZeroEmpty, 
+        this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
         99);
-      buf->Delete();          
-      buf = NULL;
+      // We no longer need this buffer.
+      this->SetTileBuffer(tileId, NULL);
       }
     else
       {
-      buf = tileBuffers[this->Schedule->GetElementTileId(myId, i)];
-      tileBuffers[this->Schedule->GetElementTileId(myId, i)] = NULL;
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
                this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
@@ -673,10 +726,9 @@ void vtkMultiDisplayManager::Composite()
       length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
       buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
       vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
-      tileBuffers[this->Schedule->GetElementTileId(myId, i)] = buf3;
-      buf3 = NULL;
-      buf->Delete();
+      this->SetTileBuffer(tileId, buf3);
       buf2->Delete();
+      buf3->Delete();
       }
     }
 
@@ -684,18 +736,33 @@ void vtkMultiDisplayManager::Composite()
   vtkCommunicator::SetUseCopy(1);
 #endif
 
+  tileId = this->Schedule->GetProcessTileId(myId);
   if (tileId >= 0)
     { // Local process has a tile to display.
-    buf = tileBuffers[this->Schedule->GetProcessTileId(myId)];
-    tileBuffers[this->Schedule->GetProcessTileId(myId)] = NULL;
+    vtkUnsignedCharArray* pData;
 
-    // Recreate a buffer to hold the color data.
-    pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+    // Composited buffer.
+    buf = this->GetTileBuffer(tileId);
+    // A buffer to hold the color data.
+    // The number of pixels is stored in the buffer, but I can compute it easily.
+    rws = this->RenderWindow->GetSize();
+    size[0] = rws[0] / this->ReductionFactor;
+    size[1] = rws[1] / this->ReductionFactor;
 
-    // Now we want to decompress into the original buffers.
-    // Ignore z because it is not used by composite manager.
-    vtkPVCompositeUtilities::Uncompress(buf, pData);
-    buf->Delete();
+    // Now we want to decompress into the color buffer.
+    // Ignore z.
+    if (this->UseCompositeCompression)
+      {
+      pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+      vtkPVCompositeUtilities::Uncompress(buf, pData);
+      }
+    else
+      {
+      pData = buf->GetPData();
+      pData->Register(this);
+      }
+    // We no longer need the composite buffer.
+    this->SetTileBuffer(tileId, NULL);
     buf = NULL;
 
     if (this->ReductionFactor > 1)
@@ -728,16 +795,7 @@ void vtkMultiDisplayManager::Composite()
     }
   
   // They should all already be gone, but ...
-  for (idx = 0; idx < numberOfTiles; ++idx)
-    {
-    if (tileBuffers[idx])
-      {
-      vtkErrorMacro("Expecting all buffers to be deleted all ready.");
-      tileBuffers[idx]->Delete();
-      tileBuffers[idx] = NULL;
-      }
-    }
-  delete [] tileBuffers;
+  this->InitializeTileBuffers(0);
 }
 
 
@@ -879,8 +937,39 @@ void vtkMultiDisplayManager::InitializeRMIs()
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkMultiDisplayManager::SetMaximumMemoryUsage(unsigned long mem)
+{
+  if (this->CompositeUtilities == NULL)
+    {
+    vtkErrorMacro("Missing utilities object.");
+    return;
+    }
+  this->CompositeUtilities->SetMaximumMemoryUsage(mem);
+}
+
+//-------------------------------------------------------------------------
+unsigned long vtkMultiDisplayManager::GetMaximumMemoryUsage()
+{
+  if (this->CompositeUtilities == NULL)
+    {
+    vtkErrorMacro("Missing utilities object.");
+    return 0;
+    }
+  return this->CompositeUtilities->GetMaximumMemoryUsage();
+}
 
 
+//-------------------------------------------------------------------------
+unsigned long vtkMultiDisplayManager::GetTotalMemoryUsage()
+{
+  if (this->CompositeUtilities == NULL)
+    {
+    vtkErrorMacro("Missing utilities object.");
+    return 0;
+    }
+  return this->CompositeUtilities->GetTotalMemoryUsage();
+}
 
 
 //-------------------------------------------------------------------------
@@ -932,6 +1021,7 @@ void vtkMultiDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "RenderWindow: (none)\n";
     }
   os << indent << "UseCompositing: " << this->UseCompositing << "\n";
+  os << indent << "UseCompositeCompression: " << this->UseCompositeCompression << "\n";
   os << indent << "LODReductionFactor: " << this->LODReductionFactor << "\n";
 
   os << indent << "ZeroEmpty: " << this->ZeroEmpty << "\n";
@@ -949,9 +1039,14 @@ void vtkMultiDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
     this->Schedule->PrintSelf(os, indent);
     }
 
-  os << indent << "CompositeUtilities: \n";
-  vtkIndent i2 = indent.GetNextIndent();
-  this->CompositeUtilities->PrintSelf(os, i2);
+  //os << indent << "CompositeUtilities: \n";
+  //vtkIndent i2 = indent.GetNextIndent();
+  //this->CompositeUtilities->PrintSelf(os, i2);
+
+  os << indent << "MaximumMemoryUsage: " 
+     << this->GetMaximumMemoryUsage() << endl;
+  os << indent << "TotalMemoryUsage: " 
+     << this->GetTotalMemoryUsage() << endl;
 }
 
 

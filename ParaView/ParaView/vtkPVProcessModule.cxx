@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.23");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -94,7 +94,8 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Controller = NULL;
-  this->TemporaryInformation = NULL; 
+  this->TemporaryInformation = NULL;
+  this->RootResult = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +106,7 @@ vtkPVProcessModule::~vtkPVProcessModule()
     this->Controller->Delete();
     this->Controller = NULL;
     }
+  this->SetRootResult(NULL);
 }
 
 
@@ -153,7 +155,7 @@ int vtkPVProcessModule::GetPartitionId()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::BroadcastScript(char *format, ...)
+void vtkPVProcessModule::BroadcastScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -188,7 +190,7 @@ void vtkPVProcessModule::BroadcastScript(char *format, ...)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::ServerScript(char *format, ...)
+void vtkPVProcessModule::ServerScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -238,7 +240,7 @@ void vtkPVProcessModule::ServerSimpleScript(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::RemoteScript(int id, char *format, ...)
+void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -333,7 +335,7 @@ void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::RootScript(char *format, ...)
+void vtkPVProcessModule::RootScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -368,16 +370,13 @@ void vtkPVProcessModule::RootSimpleScript(const char *script)
 {
   // Default implementation just executes locally.
   this->Script(script);
+  this->SetRootResult(this->Application->GetMainInterp()->result);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVProcessModule::GetRootResult()
 {
-  if ( !this->Application || ! this->Application->GetMainInterp() )
-    {
-    return 0;
-    }
-  return this->Application->GetMainInterp()->result;
+  return this->RootResult;
 }
 
 //----------------------------------------------------------------------------
@@ -466,7 +465,7 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "    foreach f [lsort -dictionary $entries] {\n"
     "      if {[file isfile $f] && [file $perm $f]} {\n"
     "        lappend files $f\n"
-    "      } elseif {[file isdirectory $f] && [file $perm $f]} {\n"
+    "      } elseif {[file isdirectory $f] && [file readable $f]} {\n"
     "        lappend dirs $f\n"
     "      }\n"
     "    }\n"
@@ -514,5 +513,10 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Controller: " << this->Controller << endl;;
+  os << indent << "Controller: " << this->Controller << endl;
+  if (this->RootResult)
+    {
+    os << indent << "RootResult: " << this->RootResult << endl;
+    }
 }
+

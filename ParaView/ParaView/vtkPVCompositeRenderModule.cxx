@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7");
 
 
 
@@ -66,17 +66,18 @@ vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
 vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
 {
   this->LocalRender = 1;
-  this->CollectThreshold = 4.0;
+  this->CompositeThreshold = 20.0;
 
   this->Composite                = 0;
   this->CompositeTclName    = 0;
   this->InteractiveCompositeTime = 0;
   this->StillCompositeTime       = 0;
 
-  this->CollectionDecision = 1;
-  this->LODCollectionDecision = 1;
+  this->CollectionDecision = -1;
+  this->LODCollectionDecision = -1;
 
-  this->UseReductionFactor = 1;
+  this->ReductionFactor = 2;
+  this->SquirtLevel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +109,11 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 {
-  return vtkPVCompositePartDisplay::New();
+  vtkPVLODPartDisplay* pDisp;
+
+  pDisp = vtkPVCompositePartDisplay::New();
+  pDisp->SetLODResolution(this->LODResolution);
+  return pDisp;
 }
 
 
@@ -138,7 +143,7 @@ void vtkPVCompositeRenderModule::StillRender()
   // If using a RenderingGroup (i.e. vtkAllToNPolyData), do not do
   // local rendering
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+      (float)(totalMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -154,22 +159,38 @@ void vtkPVCompositeRenderModule::StillRender()
       }
     }
 
-  // Switch the compositer to local/composite mode.
-  if (this->LocalRender != localRender)
+  // No reduction for still render.
+  if (this->PVApplication && this->CompositeTclName)
     {
-    if (this->CompositeTclName)
+    this->PVApplication->Script("%s SetReductionFactor 1",
+                                this->CompositeTclName);
+    if (this->PVApplication->GetClientMode())
       {
-      if (localRender)
+      // No squirt if disabled, otherwise only lossless or still render.  
+      int squirtLevel = 0;
+      if (this->SquirtLevel)
         {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+        squirtLevel = 1;
         }
-      else
-        {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
-        }
-      this->LocalRender = localRender;
+      this->PVApplication->Script("%s SetSquirtLevel %d",
+                                  this->CompositeTclName, squirtLevel);
       }
     }
+
+  // Switch the compositer to local/composite mode.
+  if (this->CompositeTclName)
+    {
+    if (localRender)
+      {
+      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+      }
+    else
+      {
+      this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+      }
+    // Save this so we know where to get the z buffer.
+    this->LocalRender = localRender;
+   }
 
 
   // Still Render can get called some funky ways.
@@ -231,7 +252,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // MakeCollection Decision.
   localRender = 0;
   if (!this->PVApplication->GetUseRenderingGroup() &&
-      (float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+      (float)(tmpMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -255,20 +276,27 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->LocalRender != localRender)
+  if (this->CompositeTclName)
     {
-    if (this->CompositeTclName)
+    if (localRender)
       {
-      if (localRender)
-        {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
-        }
-      else
-        {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
-        }
-      this->LocalRender = localRender;
+      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
       }
+    else
+      {
+      this->PVApplication->Script("%s UseCompositingOn", 
+                                  this->CompositeTclName);
+      }
+    // Save this so we know where to get the z buffer.
+    this->LocalRender = localRender;
+    }
+
+  // Handle squirt compression.
+  if (this->PVApplication->GetClientMode())
+    {
+    this->PVApplication->Script("%s SetSquirtLevel %d", 
+                                this->CompositeTclName,
+                                this->SquirtLevel);
     }
 
   // Still Render can get called some funky ways.
@@ -282,7 +310,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // Compute reduction factor. 
-  if (this->Composite && ! localRender)
+  if (this->CompositeTclName && ! localRender)
     {
     this->ComputeReductionFactor();
     }
@@ -314,53 +342,61 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   float newReductionFactor;
   float maxReductionFactor;
   
-  // Tiled displays do not use pixel reduction LOD.
-  // This is not necessary because to caller already checks,
-  // but it clarifies the situation.
-  if (this->Composite == NULL)
+  newReductionFactor = 1;
+  if (this->ReductionFactor > 1)
     {
-    return;
-    }
+    // We have to come up with a more consistent way to compute reduction.
+    newReductionFactor = this->ReductionFactor;
+    if (this->Composite)
+      {
+      // Leave halve time for compositing.
+      renderTime = renderTime * 0.5;
+      // Try to factor in user preference.
+      renderTime = renderTime / (float)(this->ReductionFactor);
+      // Compute time for each pixel on the last render.
+      area = windowSize[0] * windowSize[1];
+      reductionFactor = this->Composite->GetReductionFactor();
+      reducedArea = area / (reductionFactor * reductionFactor);
+      getBuffersTime = this->Composite->GetGetBuffersTime();
+      setBuffersTime = this->Composite->GetSetBuffersTime();
+      transmitTime = this->Composite->GetCompositeTime();
 
-  if (!this->UseReductionFactor)
-    {
-    this->Composite->SetReductionFactor(1);
-    return;
-    }
+      // Do not consider SetBufferTime because 
+      //it is not dependent on reduction factor.,
+      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
+      newReductionFactor = sqrt(area * timePerPixel / renderTime);
   
-  // Do not let the width go below 150.
-  maxReductionFactor = windowSize[0] / 150.0;
+      // Do not let the width go below 150.
+      maxReductionFactor = windowSize[0] / 150.0;
+      if (maxReductionFactor > this->ReductionFactor)
+        {
+        maxReductionFactor = this->ReductionFactor;
+        }
 
-  renderTime *= 0.5;
-  area = windowSize[0] * windowSize[1];
-  reductionFactor = this->Composite->GetReductionFactor();
-  reducedArea = area / (reductionFactor * reductionFactor);
-  getBuffersTime = this->Composite->GetGetBuffersTime();
-  setBuffersTime = this->Composite->GetSetBuffersTime();
-  transmitTime = this->Composite->GetCompositeTime();
-
-  // Do not consider SetBufferTime because 
-  //it is not dependent on reduction factor.,
-  timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-  newReductionFactor = sqrt(area * timePerPixel / renderTime);
-  
-  if (newReductionFactor > maxReductionFactor)
-    {
-    newReductionFactor = maxReductionFactor;
+      if (newReductionFactor > maxReductionFactor)
+        {
+        newReductionFactor = maxReductionFactor;
+        }
+      if (newReductionFactor < 1.0)
+        {
+        newReductionFactor = 1.0;
+        }
+      }
     }
-  if (newReductionFactor < 1.0)
+  //this->Composite->SetReductionFactor((int)newReductionFactor);
+  if (this->PVApplication && this->CompositeTclName)
     {
-    newReductionFactor = 1.0;
+    this->PVApplication->Script("%s SetReductionFactor %d",
+                                this->CompositeTclName, 
+                                (int)(newReductionFactor));
     }
-  
-  this->Composite->SetReductionFactor((int)newReductionFactor);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModule::SetCollectThreshold(float threshold)
+void vtkPVCompositeRenderModule::SetCompositeThreshold(float threshold)
 {
-  this->CollectThreshold = threshold;
+  this->CompositeThreshold = threshold;
 
   // This will cause collection to be re evaluated.
   this->SetTotalVisibleMemorySizeValid(0);
@@ -409,32 +445,12 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModule::SetUseCompositeCompression(int val)
+void vtkPVCompositeRenderModule::SetUseCompositeCompression(int)
 {
-  if (this->Composite)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    if (val)
-      {
-      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
-      }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
-    pvApp->BroadcastScript("pvTemp Delete");
-    }
-
-  if (val)
-    {
-    vtkTimerLog::MarkEvent("--- Enable compression when compositing.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
-    }
+  vtkErrorMacro("SetUseCompositeCompression not "
+                "implemented for " << this->GetClassName());
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkPVCompositeRenderModule::MakeCollectionDecision()
@@ -453,7 +469,7 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
   this->SetTotalVisibleMemorySizeValid(1);
 
   if (this->TotalVisibleGeometryMemorySize > 
-      this->GetCollectThreshold()*1000)
+      this->GetCompositeThreshold()*1000)
     {
     decision = 0;
     }
@@ -493,7 +509,7 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
   this->ComputeTotalVisibleMemorySize();
   this->SetTotalVisibleMemorySizeValid(1);
   if (this->TotalVisibleLODMemorySize > 
-      this->GetCollectThreshold()*1000)
+      this->GetCompositeThreshold()*1000)
     {
     decision = 0;
     }
@@ -555,9 +571,8 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
+  os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
 
-  os << indent << "UseReductionFactor: " << this->UseReductionFactor << endl;
   if (this->CompositeTclName)
     {
     os << indent << "CompositeTclName: " << this->CompositeTclName << endl;
@@ -567,5 +582,8 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetInteractiveCompositeTime() << endl;
   os << indent << "StillCompositeTime: " 
      << this->GetStillCompositeTime() << endl;
+
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 }
 

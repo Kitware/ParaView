@@ -117,22 +117,28 @@ void vtkPVRootScript(void *localArg, void *remoteArg,
 {
   vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
   self->Script((char*)remoteArg);
+
+  // Save the result.
+  char* result = self->GetApplication()->GetMainInterp()->result;
+  self->SetRootResult(result);
 }
 
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
 void vtkPVRootResult(void *localArg, void* , 
-                            int vtkNotUsed(remoteArgLength),
-                            int vtkNotUsed(remoteProcessId))
+                     int vtkNotUsed(remoteArgLength),
+                     int vtkNotUsed(remoteProcessId))
 {
   vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
-  char* result = self->GetApplication()->GetMainInterp()->result;
+  const char* result = self->vtkPVProcessModule::GetRootResult();
   int length = static_cast<int>(strlen(result)) + 1;
 
-  self->GetSocketController()->Send(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  self->GetSocketController()->Send(&length, 1, 1, 
+                                    VTK_PV_ROOT_RESULT_LENGTH_TAG);
   if (length > 0)
     {
-    self->GetSocketController()->Send(result, length, 1, VTK_PV_ROOT_RESULT_TAG);  
+    self->GetSocketController()->Send((char*)(result), length, 1,
+                                      VTK_PV_ROOT_RESULT_TAG);  
     }
 }
 
@@ -211,7 +217,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -481,6 +487,7 @@ void vtkPVClientServerModule::Initialize()
     // Remote script is only really for debugging.
     this->SocketController->AddRMI(vtkPVRelayRemoteScript, (void *)(this), 
                                    VTK_PV_REMOTE_SCRIPT_RMI_TAG);
+    this->Controller->CreateOutputWindow();
     this->SocketController->ProcessRMIs();
     
     // Exiting.  Relay the break RMI to otehr processes.
@@ -494,6 +501,7 @@ void vtkPVClientServerModule::Initialize()
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
 
+    this->Controller->CreateOutputWindow();
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
     // Now we are exiting.

@@ -61,14 +61,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------
 vtkPVCompositePartDisplay::vtkPVCompositePartDisplay()
 {
-  this->CollectionDecision = 1;
-  this->LODCollectionDecision = 1;
+  // When created, collection is off.
+  // I set these to -1 to ensure the decision is propagated.
+  this->CollectionDecision = -1;
+  this->LODCollectionDecision = -1;
 
   this->CollectTclName = NULL;
   this->LODCollectTclName = NULL;
@@ -132,11 +134,13 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // I would like to get this condition into the subclass.
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript(
@@ -159,13 +163,15 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     { // This should be in subclass.
     //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     pvApp->BroadcastScript("%s InitializeSchedule %d", tclName,
                            dims[0]*dims[1]);
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -224,6 +230,7 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
   if ( ! this->GeometryIsValid)
     { // Update but with collection filter off.
     this->CollectionDecision = 0;
+    this->LODCollectionDecision = 0;
     pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate; " 
                            "%s SetPassThrough 1; %s ForceUpdate", 
                            this->CollectTclName,

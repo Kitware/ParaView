@@ -26,7 +26,6 @@
         short_help="Puts all input arrays into the single output.">
   <Filter class="vtkMergeArrays" >
     <Input name="Input" class="vtkDataSet" quantity="Multiple" > 
-      <ArrayRequirement /> 
       <GroupRequirement quantity="Multiple" /> 
     </Input> 
   </Filter>
@@ -638,6 +637,7 @@ help="Set the name of the array to hold the results of this computation"/>
   <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by"/>
 </Module>
 
+<!--
 <Module name="ShrinkPolyData" menu_name="Shrink (polygons)" root_name="ShrinkPD" module_type="Filter" 
         long_help="This filter shrinks each input cell so they pull away from their neighbors.  The output is always of type unstructured grid." 
         short_help="Shrink each input cell.">
@@ -648,6 +648,7 @@ help="Set the name of the array to hold the results of this computation"/>
              input_name="Input"/>
   <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by"/>
 </Module>
+-->
 
 <Module name="SmoothPolyDataFilter" menu_name="Smooth" root_name="Smooth" module_type="Filter" 
         long_help="This filter smooths a polygonal surface by iteratively moving points toward their neighbors." 

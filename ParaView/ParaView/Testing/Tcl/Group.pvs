@@ -94,7 +94,7 @@ $kw(vtkTemp1198) SetSelectState $kw(vtkTemp1056) 1
 $kw(vtkTemp1192) AcceptCallback
 set kw(vtkTemp1226) [$kw(vtkTemp1192) GetPVOutput]
 $kw(vtkTemp1) SetCurrentPVSource $kw(vtkTemp1192)
-set kw(vtkTemp1320) [$kw(vtkTemp1) CreatePVSource ShrinkPolyData]
+set kw(vtkTemp1320) [$kw(vtkTemp1) CreatePVSource ShrinkFilter]
 set kw(vtkTemp1329) [$kw(vtkTemp1320) GetPVWidget {Input}]
 $kw(vtkTemp1329) SetCurrentValue $kw(vtkTemp1192)
 set kw(vtkTemp1326) [$kw(vtkTemp1320) GetPVWidget {ShrinkFactor}]

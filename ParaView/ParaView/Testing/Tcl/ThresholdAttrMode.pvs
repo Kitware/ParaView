@@ -38,6 +38,7 @@ set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp164) [$pv(vtkTemp158) GetPVWidget {Input}]
 $pv(vtkTemp164) SetCurrentValue $pv(vtkTemp129)
 $pv(vtkTemp158) AcceptCallback
+$pv(vtkTemp158) SetVisibility 0
 
 # Retrace
 update

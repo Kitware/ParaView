@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.312");
+vtkCxxRevisionMacro(vtkPVSource, "1.313");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -175,6 +175,8 @@ vtkPVSource::vtkPVSource()
   this->Prototype = 0;
 
   this->UpdateSourceInBatch = 0;
+
+  this->LabelSetByUser = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -627,7 +629,7 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
                 tclName, this->GetTclName());
     
   pvApp->BroadcastScript(
-    "%s AddObserver EndEvent {$Application LogStartEvent {Execute %s}}", 
+    "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
     tclName, tclName);
 
   pvApp->BroadcastScript(
@@ -1084,8 +1086,19 @@ char* vtkPVSource::GetLabel()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSource::SetLabelOnce(const char* arg) 
+{
+  if (!this->LabelSetByUser)
+    {
+    this->SetLabelNoTrace(arg);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::SetLabel(const char* arg) 
 { 
+  this->LabelSetByUser = 1;
+
   this->SetLabelNoTrace(arg);
 
   if ( !this->Application )
@@ -1232,7 +1245,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     {
     return;
     } 
-  this->MarkSourcesForUpdate(1);
 
   window = this->GetPVWindow();
 
@@ -1244,7 +1256,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // about unspecified file names, etc., when ExecuteInformation is called on
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
-  
+
+  this->MarkSourcesForUpdate(1);
+
   // Moved from creation of the source. (InitializeClone)
   // Initialize the output if necessary.
   // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
@@ -1326,11 +1340,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       float bds[6];
       this->GetDataInformation()->GetBounds(bds);
-      window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
-                                  0.5*(bds[2]+bds[3]),
-                                  0.5*(bds[4]+bds[5]));
-      window->ResetCenterCallback();
-      window->GetMainView()->GetRenderer()->ResetCamera(bds);
+      if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
+        {
+        window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
+                                    0.5*(bds[2]+bds[3]),
+                                    0.5*(bds[4]+bds[5]));
+        window->ResetCenterCallback();
+        window->GetMainView()->GetRenderer()->ResetCamera(bds);
+        }
       }
 
     pvd->Initialize();

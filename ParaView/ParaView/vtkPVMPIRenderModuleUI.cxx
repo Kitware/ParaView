@@ -42,12 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVMPIRenderModuleUI.h"
 #include "vtkPVMPIRenderModule.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.1");
+vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.2");
 
 int vtkPVMPIRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -64,6 +65,7 @@ vtkPVMPIRenderModuleUI::vtkPVMPIRenderModuleUI()
 vtkPVMPIRenderModuleUI::~vtkPVMPIRenderModuleUI()
 {
 }
+
 
 
 //----------------------------------------------------------------------------

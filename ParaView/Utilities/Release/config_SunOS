@@ -7,8 +7,28 @@ export DISPLAY
 
 write_cache()
 {
+BINDIR=`pwd`
+
+cat > UserMakeRules.cmake <<EOF
+SET(CMAKE_DL_LIBS "")
+EOF
+
+mkdir -p VTK
+cat > VTK/LocalUserOptions.cmake <<\EOF
+SET(X11_LIBRARIES "-Bdynamic -lSM -lICE -lSM -lICE -Bstatic;/usr/openwin/lib/libX11.so;/usr/openwin/lib/libXext.so;-lsocket;-lnsl;/usr/openwin/lib/libX11.so;/usr/openwin/lib/libXext.so;-lsocket;-lnsl")
+SET(OPENGL_LIBRARIES ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY} ${X11_LIBRARIES})
+SET(OPENGL_LIBRARY "${OPENGL_LIBRARIES}")
+EOF
+
     write_standard_cache
     cat >> CMakeCache.txt <<EOF
+BUILD_TESTING:BOOL=OFF
+CMAKE_EXE_LINKER_FLAGS:STRING=-Bdynamic -ldl -Bstatic
+CMAKE_THREAD_LIBS:STRING=-Bdynamic -lthread -Bstatic
+CMAKE_USER_MAKE_RULES_OVERRIDE:STRING=${BINDIR}/UserMakeRules.cmake
+CMAKE_X_LIBS:STRING=-Bdynamic -lSM -lICE -Bstatic;/usr/openwin/lib/libX11.so;/usr/openwin/lib/libXext.so;-lsocket;-lnsl
+OPENGL_gl_LIBRARY:FILEPATH=-Bdynamic -lGL -Bstatic
+OPENGL_glu_LIBRARY:FILEPATH=-Bdynamic -lGLU -Bstatic
 VTK_USE_ANSI_STDLIB:BOOL=OFF
 EOF
 }

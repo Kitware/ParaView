@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCollectionWriter.h
+  Module:    vtkPVDReaderModule.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,42 +39,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCollectionWriter - Wraps a VTK file writer.
+// .NAME vtkPVDReaderModule - 
 // .SECTION Description
-// vtkPVCollectionWriter provides functionality for writers similar to that
-// provided by vtkPVReaderModule for readers.  An instance of this
-// class is configured by an XML ModuleInterface specification and
-// knows how to create and use a single VTK file writer object.
 
-#ifndef __vtkPVCollectionWriter_h
-#define __vtkPVCollectionWriter_h
+#ifndef __vtkPVDReaderModule_h
+#define __vtkPVDReaderModule_h
 
-#include "vtkPVWriter.h"
+#include "vtkPVAdvancedReaderModule.h"
 
-class VTK_EXPORT vtkPVCollectionWriter : public vtkPVWriter
+class vtkPVScale;
+
+class VTK_EXPORT vtkPVDReaderModule : public vtkPVAdvancedReaderModule
 {
 public:
-  static vtkPVCollectionWriter* New();
-  vtkTypeRevisionMacro(vtkPVCollectionWriter,vtkPVWriter);
+  static vtkPVDReaderModule* New();
+  vtkTypeRevisionMacro(vtkPVDReaderModule, vtkPVAdvancedReaderModule);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
   // Description:
-  // Check whether this writer supports the given VTK data set's type.
-  virtual int CanWriteData(vtkDataSet* data, int parallel, int numParts);
+  virtual int Finalize(const char* fname);
+  virtual int ReadFileInformation(const char* fname);
   
   // Description:
-  // Write the current source's data to the collection file with the
-  // given name.
-  void Write(const char* fileName, vtkPVSource* pvs, int numProcs,
-             int ghostLevel);
+  // Get the number of time steps that can be provided by this reader.
+  // Timesteps are available either from an animation file or from a
+  // time-series of files as detected by the file entry widget.
+  // Returns 0 if time steps are not available, and the number of
+  // timesteps otherwise.
+  virtual int GetNumberOfTimeSteps();
+  
+  // Description:
+  // Set the time step that should be provided by the reader.  This
+  // value is ignored unless GetNumberOfTimeSteps returns 1 or more.
+  virtual void SetRequestedTimeStep(int);
   
 protected:
-  vtkPVCollectionWriter();
-  ~vtkPVCollectionWriter();
+  vtkPVDReaderModule();
+  ~vtkPVDReaderModule();
+  
+  // Whether the input file has time.
+  int HaveTime;
+  
+  // Time selection slider.
+  vtkPVScale* TimeScale;
   
 private:
-  vtkPVCollectionWriter(const vtkPVCollectionWriter&); // Not implemented
-  void operator=(const vtkPVCollectionWriter&); // Not implemented
+  vtkPVDReaderModule(const vtkPVDReaderModule&); // Not implemented
+  void operator=(const vtkPVDReaderModule&); // Not implemented
 };
 
 #endif

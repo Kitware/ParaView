@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.38");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.39");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -499,7 +499,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.38 $");
+  this->ExtractRevision(os,"$Revision: 1.39 $");
 }
 
 //----------------------------------------------------------------------------
@@ -507,8 +507,13 @@ void vtkKWChangeColorButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Text: " << (this->Text?this->Text:"(none)") << endl;
-  os << indent << "DialogText: " << (this->DialogText?this->DialogText:"(none)") << endl;
+  os << indent << "Text: " 
+     << (this->GetText() ? this->GetText() : "(none)")
+     << endl;
+
+  os << indent << "DialogText: " 
+     << (this->GetDialogText() ? this->GetDialogText() : "(none)")
+     << endl;
 
   os << indent << "LabelAfterColor: " 
      << (this->LabelAfterColor ? "On\n" : "Off\n");

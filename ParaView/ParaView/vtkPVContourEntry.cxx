@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -319,7 +319,6 @@ void vtkPVContourEntry::AddValueInternal(float val)
   int num = this->ContourValues->GetNumberOfContours();
 
   this->ContourValues->SetValue(num, val);
-  this->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -434,7 +433,7 @@ void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
 
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
-  this->ContourValuesList->DeleteAll();
+  this->ContourValues->SetNumberOfContours(0);
   for (i = 0; i < numContours; i++)
     {
     this->Script("%s AddValueInternal [%s GetValue %d]", 

@@ -60,6 +60,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // In Addition to the superclass call, this method sets up
+  // abort check observer on the render widnow.
+  virtual void SetPVApplication(vtkPVApplication *pvApp);
+
+  // Description:
   // This method makes the descision on whether to use LOD for rendering.
   virtual void InteractiveRender();
 

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.7");
 
 #ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
@@ -533,7 +533,7 @@ static int vtkPVEnSightMasterServerReaderGetLineFromStream(
       }
 
     // The fail bit may be set.  Clear it.
-    is.clear(is.rdstate() & ~std::ios::failbit);
+    is.clear(is.rdstate() & ~ios::failbit);
     }
   return haveData;
 }

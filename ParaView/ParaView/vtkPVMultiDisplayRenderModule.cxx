@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6");
 
 
 
@@ -70,8 +70,6 @@ vtkPVMultiDisplayRenderModule::~vtkPVMultiDisplayRenderModule()
 {
 
 }
-
-
 
 
 //----------------------------------------------------------------------------
@@ -151,7 +149,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
   localRender = 0;
-  if ((float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+  if ((float)(totalMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -260,7 +258,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 
   // MakeCollection Decision.
   localRender = 0;
-  if ((float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+  if ((float)(tmpMemory)/1000.0 < this->GetCompositeThreshold())
     {
     localRender = 1;
     }
@@ -276,6 +274,11 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
     if (pDisp->GetVisibility())
       {
+      // I had to add this because the default for the
+      // Collection filter is not to collect 
+      // (in case of large data).  Accept was not performing
+      // the collection decision logic so was collecting ...
+      pDisp->SetLODCollectionDecision(1);
       // What we are really doing here is a little opaque.
       // First setting the part display's LODCollectionDescision
       // does nothing (the value is ignored).  The LOD
@@ -320,7 +323,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // Compute reduction factor. 
-  if (this->Composite && ! localRender)
+  if (! localRender)
     {
     this->ComputeReductionFactor();
     }
@@ -348,9 +351,16 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
+{
+  if (this->CompositeTclName)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s SetUseCompositeCompression %d", 
+                            this->CompositeTclName, val);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModule::PrintSelf(ostream& os, vtkIndent indent)

@@ -175,11 +175,8 @@ protected:
   int MultiProcessMode;
   int NumberOfProcesses;
 
-  vtkSetStringMacro(RootResult);
   vtkKWRemoteExecute* RemoteExecution;
   
-  // Result from last RootScript.
-  char* RootResult;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented
   void operator=(const vtkPVClientServerModule&); // Not implemented

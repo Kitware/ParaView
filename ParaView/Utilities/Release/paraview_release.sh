@@ -22,14 +22,16 @@
 # Run with no arguments for documentation.
 #
 
-PROJECT=paraview
-CVS_MODULE=ParaViewComplete
-
 # Release version number.
 TAG="HEAD"
 PARAVIEW_VERSION="1.1"
 VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
+
+# Project configuration.
+PROJECT="paraview"
+CVS_MODULE="ParaViewComplete"
+CVS_MODULE_DOCS="ParaViewReleaseDocs/${PARAVIEW_VERSION}"
 
 # CVSROOT setting used to check out ParaView.
 CVSROOT=":pserver:anonymous@www.paraview.org:/cvsroot/ParaView"
@@ -183,6 +185,13 @@ remote_copy_source()
 }
 
 #-----------------------------------------------------------------------------
+remote_copy_docs()
+{
+    check_host "$1" || return 1
+    remote_copy "$HOST" "${PROJECT}-docs-${VERSION}.tar*"
+}
+
+#-----------------------------------------------------------------------------
 remote_copy_binary()
 {
     check_host "$1" || return 1
@@ -201,6 +210,20 @@ remote_source()
     check_host "$1" || return 1
     remote "$HOST" source_tarball &&
     remote_copy_source "$HOST"
+}
+
+#-----------------------------------------------------------------------------
+# Create documentation tarballs on the specified host and copy them locally.
+#
+#  remote_docs <host>
+#
+# The <host> specification must be a valid ssh destination
+# with public key authentication and no password.
+remote_docs()
+{
+    check_host "$1" || return 1
+    remote "$HOST" docs_tarball &&
+    remote_copy_docs "$HOST"
 }
 
 #-----------------------------------------------------------------------------
@@ -278,7 +301,7 @@ utilities()
     cvs_login || return 1
     (
         if [ -d "${RELEASE_UTILITIES}/CVS" ]; then
-            cd ${RELEASE_UTILITIES} && cvs -z3 -q update -dAP
+            cd ${RELEASE_UTILITIES} && cvs -z3 -q update -dAP -r ${TAG}
         else
             rm -rf CheckoutTemp &&
             mkdir CheckoutTemp &&
@@ -325,6 +348,24 @@ checkout()
 }
 
 #-----------------------------------------------------------------------------
+checkout_docs()
+{
+    [ -z "${DONE_checkout_docs}" ] || return 0 ; DONE_checkout_docs="yes"
+    config || return 1
+    echo "Exporting ${CVS_MODULE_DOCS} from cvs ..." &&
+    (
+        rm -rf ${PROJECT}-docs-${VERSION} &&
+        rm -rf CheckoutTemp &&
+        mkdir CheckoutTemp &&
+        cd CheckoutTemp &&
+        cvs -q -z3 -d $CVSROOT export -r HEAD ${CVS_MODULE_DOCS} &&
+        mv ${CVS_MODULE_DOCS} ../${PROJECT}-docs-${VERSION} &&
+        cd .. &&
+        rm -rf CheckoutTemp
+    ) >Logs/checkout_docs.log 2>&1 || error_log Logs/checkout_docs.log
+}
+
+#-----------------------------------------------------------------------------
 # Create source tarballs.
 #
 #  source_tarball
@@ -340,8 +381,30 @@ source_tarball()
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar* &&
         tar cvf Tarballs/${PROJECT}-${VERSION}.tar ${PROJECT}-${VERSION} &&
         gzip -c Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.gz &&
-        compress Tarballs/${PROJECT}-${VERSION}.tar
+        compress -cf Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.Z &&
+        rm -rf Tarballs/${PROJECT}-${VERSION}.tar
     ) >Logs/source_tarball.log 2>&1 || error_log Logs/source_tarball.log
+}
+
+#-----------------------------------------------------------------------------
+# Create documentation tarballs.
+#
+#  docs_tarball
+#
+docs_tarball()
+{
+    [ -z "${DONE_docs_tarball}" ] || return 0 ; DONE_docs_tarball="yes"
+    config || return 1
+    [ -d "${PROJECT}-docs-${VERSION}" ] || checkout_docs || return 1
+    echo "Creating documentation tarballs ..." &&
+    (
+        mkdir -p Tarballs &&
+        rm -rf Tarballs/${PROJECT}-docs-${VERSION}.tar* &&
+        tar cvf Tarballs/${PROJECT}-docs-${VERSION}.tar ${PROJECT}-docs-${VERSION} &&
+        gzip -c Tarballs/${PROJECT}-docs-${VERSION}.tar >Tarballs/${PROJECT}-docs-${VERSION}.tar.gz &&
+        compress -cf Tarballs/${PROJECT}-docs-${VERSION}.tar >Tarballs/${PROJECT}-docs-${VERSION}.tar.Z &&
+        rm -rf Tarballs/${PROJECT}-docs-${VERSION}.tar
+    ) >Logs/docs_tarball.log 2>&1 || error_log Logs/docs_tarball.log
 }
 
 #-----------------------------------------------------------------------------
@@ -419,25 +482,11 @@ build()
 }
 
 #-----------------------------------------------------------------------------
-tests()
-{
-    [ -z "${DONE_tests}" ] || return 0 ; DONE_tests="yes"
-    config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
-    echo "Running tests ..." &&
-    (
-        cd "${PROJECT}-${VERSION}-${PLATFORM}/${TEST_SUBTREE}" &&
-        ${MAKE} test &&
-        touch "${PROJECT}-${VERSION}-${PLATFORM}/release.tests"
-    ) >Logs/tests.log 2>&1 || error_log Logs/tests.log
-}
-
-#-----------------------------------------------------------------------------
 install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/release.tests" ] || tests || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
@@ -518,7 +567,8 @@ binary_tarball()
         (
             cd Tarballs &&
             gzip -c ${PROJECT}-${VERSION}-${PLATFORM}.tar >${PROJECT}-${VERSION}-${PLATFORM}.tar.gz &&
-            compress ${PROJECT}-${VERSION}-${PLATFORM}.tar
+            compress -cf ${PROJECT}-${VERSION}-${PLATFORM}.tar >${PROJECT}-${VERSION}-${PLATFORM}.tar.Z &&
+            rm -rf ${PROJECT}-${VERSION}-${PLATFORM}.tar
         )
     ) >Logs/binary_tarball.log 2>&1 || error_log Logs/binary_tarball.log
 }

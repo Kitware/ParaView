@@ -83,7 +83,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
@@ -138,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.469");
+vtkCxxRevisionMacro(vtkPVWindow, "1.470");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -764,9 +763,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // Edit menu
 
-  this->GetMenuEdit()->InsertCommand(5, "Delete All Sources", this, 
+  this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
-                                     1, "Delete all sources currently created in ParaView");
+                                     1, "Delete all modules in ParaView");
 }
 
 //-----------------------------------------------------------------------------
@@ -1643,11 +1642,10 @@ void vtkPVWindow::PlayDemo()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo(int fromDashboard)
 {
-  int found=0;
+  const char* demoDataPath;
+  const char* demoScriptPath;
+  vtkPVApplication* pvApp = this->GetPVApplication();
 
-  char temp1[1024];
-
-  struct stat fs;
 
   this->Script("catch {unset pvDemoFromDashboard}");
   if (fromDashboard)
@@ -1655,65 +1653,22 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
     this->Script("set pvDemoFromDashboard 1");
     }
 
-#ifdef _WIN32  
+  // Server path
+  pvApp->GetProcessModule()->RootScript("$Application GetDemoPath");
+  demoDataPath = pvApp->GetProcessModule()->GetRootResult();
+  // Client path
+  demoScriptPath = pvApp->GetDemoPath();
 
-  vtkKWApplication *app = this->GetApplication();
-  if (app->GetApplicationInstallationDirectory())
+  if (demoDataPath && demoScriptPath)
     {
-    sprintf(temp1, 
-            "%s/Demos/Demo1.pvs", app->GetApplicationInstallationDirectory());
-    if (stat(temp1, &fs) == 0) 
-      {
-      this->Script("set DemoDir {%s/Demos}", 
-                   app->GetApplicationInstallationDirectory());
-      this->LoadScript(temp1);
-      found=1;
-      }
+    char temp1[1024];
+    sprintf(temp1, "%s/Demo1.pvs", 
+            demoScriptPath);
+
+    this->Script("set DemoDir {%s}", demoDataPath);
+    this->LoadScript(temp1);
     }
-
-#else
-
-  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
-  const char* selfPath = util->FindSelfPath(
-    this->GetPVApplication()->GetArgv0());
-  const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-  char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-  sprintf(newPath, "%s/%s", selfPath, relPath);
-
-  char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-  sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-  if (stat(demoFile, &fs) == 0) 
-    {
-    this->Script("set DemoDir {%s}", newPath);
-    this->LoadScript(demoFile);
-    found=1;
-    }
-
-  delete[] demoFile;
-  delete[] newPath;
-  util->Delete();
-
-#endif // _WIN32  
-
-  if (!found)
-    {
-    // Look in binary and installation directories
-    const char** dir;
-    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
-      {
-      sprintf(temp1, "%s/Demo1.pvs", *dir);
-      if (stat(temp1, &fs) == 0) 
-        {
-        this->Script("set DemoDir {%s}", *dir);
-        this->LoadScript(temp1);
-        found=1;
-        break;
-        }
-      }
-    }
-
-  if (!found)
+  else
     {
     if (this->UseMessageDialog)
       {
@@ -2062,7 +2017,8 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
+void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
+                               int timeSeries)
 {
   if(!this->CurrentPVSource)
     {
@@ -2116,7 +2072,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                        filename, ghostLevel);
   
   // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVSource(), numProcs, ghostLevel);
+  writer->Write(filename, this->GetCurrentPVSource(), numProcs, ghostLevel,
+                timeSeries);
 }
 
 //-----------------------------------------------------------------------------
@@ -2250,9 +2207,24 @@ void vtkPVWindow::WriteData()
   if ( saveDialog->Invoke() &&
        vtkString::Length(saveDialog->GetFileName())>0 )
     {
-    const char* filename = saveDialog->GetFileName();  
+    const char* filename = saveDialog->GetFileName();
     
-    // Write the file.
+    // If the current source is a reader and can provide time steps, ask
+    // the user whether to write the whole time series.
+    int timeSeries = 0;
+    vtkPVReaderModule* reader =
+      vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
+    if(reader && (reader->GetNumberOfTimeSteps() > 0) &&
+       vtkKWMessageDialog::PopupYesNo(
+         this->Application, this, "Timesteps",
+         "The current source provides multiple time steps.  "
+         "Do you want to save all time steps?", 0))
+      {
+      timeSeries = 1;
+      }
+    
+    // Choose ghost level.
+    int ghostLevel = 0;    
     if(parallel)
       {
       vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
@@ -2268,17 +2240,15 @@ void vtkPVWindow::WriteData()
         ghostLevel = dlg->GetGhostLevel();
         }
       dlg->Delete();
-      if (ghostLevel >= 0)
+      if(ghostLevel < 0)
         {
-        this->WriteVTKFile(filename, ghostLevel);
-        this->SaveLastPath(saveDialog, "SaveDataFile");
+        ghostLevel = 0;
         }
       }
-    else
-      {
-      this->WriteVTKFile(filename);  
-      this->SaveLastPath(saveDialog, "SaveDataFile");
-      }
+  
+    // Write the file.
+    this->WriteVTKFile(filename, ghostLevel, timeSeries);
+    this->SaveLastPath(saveDialog, "SaveDataFile");
     }
   saveDialog->Delete();
 }
@@ -3050,6 +3020,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 
   if (pvs == this->CurrentPVSource)
     {
+    this->ShowCurrentSourceProperties();
     return;
     }
 
@@ -3420,6 +3391,11 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   // Bring up the properties panel
   
   this->ShowProperties();
+
+  if ( !this->GetMenuView() )
+    {
+    return;
+    }
   
   // We need to update the view-menu radio button too!
 
@@ -4169,8 +4145,8 @@ void vtkPVWindow::DeleteAllSourcesCallback()
     }
   if ( vtkKWMessageDialog::PopupYesNo(
          this->Application, this, "DeleteAllTheSources",
-         "Delete All The Sources", 
-         "Are you sure you want to delete all the sources?", 
+         "Delete All Modules", 
+         "Are you sure you want to delete all the modules?", 
          vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
          vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
     {
@@ -4182,7 +4158,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
 void vtkPVWindow::DeleteAllSources()
 {
   vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
-  pvApp->AddTraceEntry("# User selected delete all sources");
+  pvApp->AddTraceEntry("# User selected delete all modules");
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )
     {

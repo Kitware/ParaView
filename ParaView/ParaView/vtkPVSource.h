@@ -158,6 +158,7 @@ public:
   virtual void SetLabelNoTrace(const char *label);
   virtual void SetLabel(const char *label);
   virtual char* GetLabel();
+  virtual void SetLabelOnce(const char *label);
 
   // Description:
   // Called when the description entry is changed.
@@ -580,6 +581,8 @@ protected:
   void SetInputsInBatchScript(ofstream *file);
 
   int UpdateSourceInBatch;
+
+  int LabelSetByUser;
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented

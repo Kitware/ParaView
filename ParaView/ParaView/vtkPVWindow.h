@@ -288,11 +288,14 @@ public:
   // Callback fronm the file menus "SaveData" entry.
   // It pops up a dialog to get the filename.
   void WriteData();
-
+  
   // Description:
   // Methods that can be used from scripts to save data to files.
-  void WriteVTKFile(const char* filename, int ghostLevel);
-  void WriteVTKFile(const char* filename) { this->WriteVTKFile(filename, 0); }
+  void WriteVTKFile(const char* filename, int ghostLevel, int timeSeries);
+  void WriteVTKFile(const char* filename, int ghostLevel)
+    { this->WriteVTKFile(filename, ghostLevel, 0); }
+  void WriteVTKFile(const char* filename)
+    { this->WriteVTKFile(filename, 0); }
 
   // Description:
   // These methods create a new data source/object given a name and a 

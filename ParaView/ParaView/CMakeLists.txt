@@ -24,6 +24,7 @@ SET( ParaView_SRCS
   vtkPVArrayInformation.cxx
   vtkPVArrayMenu.cxx 
   vtkPVArraySelection.cxx
+  vtkPVArrowSource.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
@@ -32,7 +33,6 @@ SET( ParaView_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVClientServerModule.cxx
   vtkPVClipDataSet.cxx
-  vtkPVCollectionWriter.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
@@ -45,6 +45,8 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
+  vtkPVDReaderModule.cxx
+  vtkPVDWriter.cxx
   vtkPVData.cxx 
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
@@ -115,6 +117,7 @@ SET( ParaView_SRCS
   vtkPVProbe.cxx
   vtkPVProcessModule.cxx
   vtkPVPushButton.cxx
+  vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
 #  vtkPVRenderGroupDialog.cxx
   vtkPVRenderModule.cxx
@@ -137,6 +140,7 @@ SET( ParaView_SRCS
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx
   vtkPVStringEntry.cxx
+  vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
   vtkPVTiledDisplayManager.cxx
   vtkPVTimerLogDisplay.cxx
@@ -163,13 +167,15 @@ SET( ParaView_SRCS
 #  vtkRedistributePolyData.cxx
   vtkSelectInputs.cxx
   vtkStringList.cxx 
+  vtkStructuredCacheFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
 #  vtkWeightedRedistributePolyData.cxx
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
-  vtkXMLPVCollectionWriter.cxx
+  vtkXMLPVAnimationWriter.cxx
+  vtkXMLPVDWriter.cxx
   )
 
 IF (PARAVIEW_USE_ICE_T)

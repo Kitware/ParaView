@@ -113,6 +113,8 @@ public:
 protected:
   vtkPVLODPartDisplay();
   ~vtkPVLODPartDisplay();
+
+  int LODResolution;
   
   char *LODMapperTclName;
   vtkSetStringMacro(LODMapperTclName);

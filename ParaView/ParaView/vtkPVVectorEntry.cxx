@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -142,7 +142,7 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
       strcpy(this->BalloonHelpString, str);
       }
     }
-  
+
   if ( this->Application && !this->BalloonHelpInitialized )
     {
     this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
@@ -169,17 +169,17 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   int i;
   vtkKWEntry* entry;
   vtkKWLabel* subLabel;
-  
+
   if (this->Application)
     {
     vtkErrorMacro("VectorEntry already created");
     return;
     }
-  
+
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+    (this->TraceNameState == vtkPVWidget::Uninitialized ||
+     this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName(this->EntryLabel);
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
@@ -190,7 +190,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
-  
+
   // Now a label
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
@@ -198,7 +198,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     this->LabelWidget->SetLabel(this->EntryLabel);
     this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
-    
+
   // Now the sublabels and entries
   const char* subLabelTxt;
   for (i = 0; i < this->VectorLength; i++)
@@ -214,7 +214,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
       this->SubLabels->AddItem(subLabel);
       subLabel->Delete();
       }
-    
+
     entry = vtkKWEntry::New();
     entry->SetParent(this);
     entry->Create(pvApp, "-width 2");
@@ -225,13 +225,13 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     else
       {
       this->Script("bind %s <KeyPress> {%s CheckModifiedCallback %K}",
-                   entry->GetWidgetName(), this->GetTclName());
+        entry->GetWidgetName(), this->GetTclName());
       this->Script("bind %s <FocusOut> {%s CheckModifiedCallback {}}",
-                   entry->GetWidgetName(), this->GetTclName());
+        entry->GetWidgetName(), this->GetTclName());
       }
     this->Script("pack %s -side left -fill x -expand t",
-                 entry->GetWidgetName());
-    
+      entry->GetWidgetName());
+
     this->Entries->AddItem(entry);
     entry->Delete();
     }
@@ -244,9 +244,9 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
   int found = 0;
   int cc;
   if ( vtkString::Equals(key, "Tab") ||
-       vtkString::Equals(key, "ISO_Left_Tab") ||
-       vtkString::Equals(key, "Return") ||
-       vtkString::Equals(key, "") )
+    vtkString::Equals(key, "ISO_Left_Tab") ||
+    vtkString::Equals(key, "Return") ||
+    vtkString::Equals(key, "") )
     {
     for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
       {
@@ -342,8 +342,8 @@ void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
   for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
     this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
-                 this->GetTclName(), count, sourceTclName, 
-                 this->VariableName, count); 
+      this->GetTclName(), count, sourceTclName, 
+      this->VariableName, count); 
     }
 
   this->ModifiedFlag = 0;
@@ -502,7 +502,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, 
-                                char *v3, char *v4, char *v5)
+  char *v3, char *v4, char *v5)
 {
   char* vals[6];
   vals[0] = v0;
@@ -516,24 +516,24 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
-                                                const char* sourceTclName)
+  const char* sourceTclName)
 {
   if (this->ScriptValue == NULL)
     {
     vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceTclName);
     return;
     }
-  
+
   *file << "\t" << sourceTclName << " Set" << this->VariableName;
   *file << " " << this->ScriptValue << "\n";
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                 vtkPVAnimationInterfaceEntry *ai)
+  vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
-  
+
   if (this->Entries->GetNumberOfItems() == 1)
     {
     sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
@@ -545,13 +545,13 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
-  
+
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-                        this->GetTclName(), ai->GetTclName());
+      this->GetTclName(), ai->GetTclName());
     }
-  
+
   if (this->Entries->GetNumberOfItems() == 1)
     {
     // I do not like setting the label like this but ...
@@ -586,7 +586,7 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DataType: " << this->GetDataType() << endl;
   os << indent << "Entries: " << this->GetEntries() << endl;
   os << indent << "ScriptValue: " 
-     << (this->ScriptValue?this->ScriptValue:"none") << endl;
+    << (this->ScriptValue?this->ScriptValue:"none") << endl;
   os << indent << "SubLabels: " << this->GetSubLabels() << endl;
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
   os << indent << "ReadOnly: " << this->ReadOnly << endl;
@@ -594,15 +594,15 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 vtkPVVectorEntry* vtkPVVectorEntry::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVVectorEntry::SafeDownCast(clone);
 }
 
 void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone, 
-                                      vtkPVSource* pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVVectorEntry* pvve = vtkPVVectorEntry::SafeDownCast(clone);
@@ -626,10 +626,10 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
 
 //-----------------------------------------------------------------------------
 int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
-                                        vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
-  
+
   // Setup the VectorLength.
   if(!element->GetScalarAttribute("length", &this->VectorLength))
     {
@@ -641,7 +641,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->ReadOnly = 0;
     }
-  
+
   // Setup the DataType.
   const char* type = element->GetAttribute("type");
   if(!type)
@@ -656,7 +656,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     vtkErrorMacro("Unknown type " << type);
     return 0;
     }
-  
+
   // Setup the Label.
   const char* label = element->GetAttribute("label");
   if(label)
@@ -667,7 +667,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetLabel(this->VariableName);
     }
-  
+
   // Setup the SubLabels.
   const char* sub_labels = element->GetAttribute("sub_labels");
   if(sub_labels)
@@ -675,7 +675,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     const char* start = sub_labels;
     const char* end = 0;
     int index = 0;
-    
+
     // Parse the semi-colon-separated list.
     while(*start)
       {
@@ -694,6 +694,6 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
       start = end;
       }
     }
-  
+
   return 1;
 }

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -225,14 +225,9 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 
     { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
     this->MasterWindow = win; 
     if (this->MasterWindow) 
       { 
-      this->MasterWindow->Register(this); 
       if (this->Application)
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
@@ -475,6 +470,53 @@ int vtkPVServerFileDialog::Invoke()
   // Side effect of UpdateExtensionsMenu is to Update.
   //this->Update();
 
+  int width, height;
+
+  int x, y;
+  int sw, sh;
+  sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
+         "%d %d", &sw, &sh);
+  
+  if (this->MasterWindow)
+    {
+    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+           &width, &height, &x, &y);
+    
+    x += width / 2;
+    y += height / 2;
+    
+    if (x > sw - 200)
+      {
+      x = sw / 2;
+      }
+    if (y > sh - 200)
+      {
+      y = sh / 2;
+      }
+    }
+  else
+    {
+    x = sw / 2;
+    y = sh / 2;
+    }
+
+  sscanf(this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]", 
+                      this->GetWidgetName(), this->GetWidgetName()), 
+         "%d %d", &width, &height);
+
+  if (x > width / 2)
+    {
+    x -= width / 2;
+    }
+  if (y > height / 2)
+    {
+    y -= height / 2;
+    }
+
+  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
+               x, y);
+
   this->Script("wm deiconify %s", this->GetWidgetName());
   this->Script("grab %s", this->GetWidgetName());
 
@@ -537,6 +579,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     this->ConvertLastPath();
     this->Update();
     newdir.rdbuf()->freeze(0);
+    this->SetSelectedDirectory(0);
     return;
     } 
 

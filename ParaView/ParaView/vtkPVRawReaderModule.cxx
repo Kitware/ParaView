@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCollectionWriter.cxx
+  Module:    vtkPVRawReaderModule.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,67 +39,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVCollectionWriter.h"
+#include "vtkPVRawReaderModule.h"
 
-#include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVPart.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVSource.h"
+#include "vtkPVFileEntry.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVCollectionWriter);
-vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.4");
+vtkStandardNewMacro(vtkPVRawReaderModule);
+vtkCxxRevisionMacro(vtkPVRawReaderModule, "1.2");
+
+int vtkPVRawReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
+                        int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVCollectionWriter::vtkPVCollectionWriter()
+vtkPVRawReaderModule::vtkPVRawReaderModule()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPVCollectionWriter::~vtkPVCollectionWriter()
+vtkPVRawReaderModule::~vtkPVRawReaderModule()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVRawReaderModule::CreateProperties()
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::CreateProperties();
+
+  this->FileEntry->SetLabel("File Prefix");
+  this->FileEntry->SetObjectVariable(this->GetVTKSourceTclName(), "FilePrefix");
 }
 
 //----------------------------------------------------------------------------
-int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int, int)
+void vtkPVRawReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
-  // We support all data types in both parallel and serial mode, and
-  // with any number of parts.
-  return data?1:0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCollectionWriter::Write(const char* fileName, vtkPVSource* pvs,
-                                  int numProcs, int ghostLevel)
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
-  int i;
-  pm->ServerScript(
-    "vtkXMLPVCollectionWriter writer\n"
-    "writer SetNumberOfPieces %d\n"
-    "writer SetGhostLevel %d\n"
-    "writer SetFileName {%s}",
-    numProcs, ghostLevel, fileName);
-  for(i=0; i < pvs->GetNumberOfParts(); ++i)
-    {
-    pm->ServerScript("writer AddInput \"%s\"",
-                     pvs->GetPart(i)->GetVTKDataTclName());
-    }
-  pm->RootScript("writer SetPiece 0");
-  for (i=1; i < numProcs; ++i)
-    {
-    pvApp->RemoteScript(i, "writer SetPiece %d", i);
-    }
-  pm->ServerScript("writer Write");
-  pm->ServerScript("writer Delete");
+  this->Superclass::PrintSelf(os, indent);
 }

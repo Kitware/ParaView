@@ -46,11 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.8");
+vtkCxxRevisionMacro(vtkPVWriter, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -110,42 +113,88 @@ vtkPVApplication* vtkPVWriter::GetPVApplication()
 
 //----------------------------------------------------------------------------
 void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
-                        int numProcs, int ghostLevel)
+                        int numProcs, int ghostLevel, int timeSeries)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
-  if(!this->Parallel)
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(pvs);
+  if(rm && timeSeries)
     {
-    pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);
-    pvApp->GetProcessModule()->ServerScript("writer SetFileName %s", fileName);
-    pvApp->GetProcessModule()->ServerScript("writer SetInput %s", dataTclName);
-    if (this->DataModeMethod)
+    vtkstd::string name = fileName;
+    vtkstd::string::size_type pos = name.find_last_of(".");
+    vtkstd::string base = name.substr(0, pos);
+    vtkstd::string ext = name.substr(pos);
+    int n = rm->GetNumberOfTimeSteps();
+    char buf[100];
+    for(int i=0; i < n; ++i)
       {
-      pvApp->GetProcessModule()->ServerScript("writer %s", this->DataModeMethod);
+      sprintf(buf, "T%03d", i);
+      name = base;
+      name += buf;
+      name += ext;
+      rm->SetRequestedTimeStep(i);
+      this->WriteOneFile(name.c_str(), pvs, numProcs, ghostLevel);
       }
-    pvApp->GetProcessModule()->ServerScript("writer Write");
-    pvApp->GetProcessModule()->ServerScript("writer Delete");
     }
   else
     {
-    pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);
-    pvApp->GetProcessModule()->ServerScript("writer SetFileName %s", fileName);
-    pvApp->GetProcessModule()->ServerScript("writer SetInput %s", dataTclName);
+    this->WriteOneFile(fileName, pvs, numProcs, ghostLevel);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
+                               int numProcs, int ghostLevel)
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
+  if(!this->Parallel)
+    {
+    // Create the writer and configure it.
+    pm->ServerScript("%s writer", this->WriterClassName);
+    pm->ServerScript("writer SetFileName %s", fileName);
+    pm->ServerScript("writer SetInput %s", dataTclName);
+    if (this->DataModeMethod)
+      {
+      pm->ServerScript("writer %s", this->DataModeMethod);
+      }
+    
+    // Write the data.
+    pm->ServerScript("writer Write");
+    
+    // Cleanup.
+    pm->ServerScript("writer Delete");
+    }
+  else
+    {    
+    // Create the writer and configure it.
+    pm->ServerScript("%s writer", this->WriterClassName);
+    pm->ServerScript("writer SetFileName %s", fileName);
+    pm->ServerScript("writer SetInput %s", dataTclName);
     if(this->DataModeMethod)
       {
-      pvApp->GetProcessModule()->ServerScript("writer %s", this->DataModeMethod);
+      pm->ServerScript("writer %s", this->DataModeMethod);
       }
-    pvApp->GetProcessModule()->ServerScript("writer SetNumberOfPieces %d", numProcs);
-    pvApp->GetProcessModule()->ServerScript("writer SetGhostLevel %d", ghostLevel);
-    pvApp->GetProcessModule()->RootScript("writer SetStartPiece 0");
-    pvApp->GetProcessModule()->RootScript("writer SetEndPiece 0");
-    int i;
-    for (i=1; i < numProcs; ++i)
-      {
-      pvApp->RemoteScript(i, "writer SetStartPiece %d", i);
-      pvApp->RemoteScript(i, "writer SetEndPiece %d", i);
-      }
-    pvApp->GetProcessModule()->ServerScript("writer Write");
-    pvApp->GetProcessModule()->ServerScript("writer Delete");
+    pm->ServerScript("writer SetNumberOfPieces %d", numProcs);
+    pm->ServerScript("writer SetGhostLevel %d", ghostLevel);    
+    pm->ServerScript(
+      "writer SetStartPiece [[$Application GetProcessModule] GetPartitionId]\n"
+      "writer SetEndPiece [[$Application GetProcessModule] GetPartitionId]");
+    
+    // Tell each process's writer whether it should write the summary
+    // file.  This assumes that the writer is a vtkXMLWriter.  When we
+    // add more writers, we will need a separate writer module.
+    pm->ServerScript(
+      "vtkPVSummaryHelper helper\n"
+      "helper SetWriter writer\n"
+      "helper SetController [$Application GetController]\n"
+      "helper SynchronizeSummaryFiles\n"
+      "helper Delete\n"
+      );
+    
+    // Write the data.
+    pm->ServerScript("writer Write");
+    
+    // Cleanup.
+    pm->ServerScript("writer Delete");
     }
 }

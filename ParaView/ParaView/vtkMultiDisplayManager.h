@@ -40,6 +40,7 @@ class vtkPVCompositeUtilities;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
 class vtkPVMultiDisplayInfo;
+class vtkPVCompositeBuffer;
 
 class VTK_EXPORT vtkMultiDisplayManager : public vtkObject
 {
@@ -86,6 +87,13 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
+  // Description:
+  // Convience methods for accessing buffer variables 
+  // in composite utilities object.
+  unsigned long GetMaximumMemoryUsage();
+  void SetMaximumMemoryUsage(unsigned long mem);
+  unsigned long GetTotalMemoryUsage();
+
 //BTX
   enum Tags {
     ROOT_RENDER_RMI_TAG=12721,
@@ -98,8 +106,13 @@ public:
   // New compositing methods.
 
   void InitializeSchedule();
-  int ShuffleLevel(int level, int numTiles, 
-                   vtkTiledDisplaySchedule** tileSchedules);
+
+  // Description:
+  // This enables and disables the 
+  // use of active pixel compression.
+  vtkSetMacro(UseCompositeCompression, int);
+  vtkGetMacro(UseCompositeCompression, int);
+  vtkBooleanMacro(UseCompositeCompression, int);
 
   // Description:
   // This flag is ignored (Not used at the moment).
@@ -114,6 +127,7 @@ public:
   // Reduction factor = 1 means normal (full sized) rendering
   // and compositing.  When ReductionFactor > 1, a small window
   // is rendered (subsampled) and composited.
+  void SetReductionFactor(int f) {this->SetLODReductionFactor(f);}
   vtkSetMacro(LODReductionFactor, int);
   vtkGetMacro(LODReductionFactor, int);
 
@@ -160,6 +174,20 @@ protected:
   // For managing buffers.
   vtkPVCompositeUtilities* CompositeUtilities;
 
+  // Abstracting buffer storage, so we can rander on demand
+  // and free buffers as soon as possible.
+  vtkPVCompositeBuffer** TileBuffers;
+  int TileBufferArrayLength;
+  // Gets the stored buffer.  Renders if necessary.
+  vtkPVCompositeBuffer* GetTileBuffer(int tileId);
+  // Does refernce counting properly.
+  void SetTileBuffer(int tileIdx, vtkPVCompositeBuffer* buf);
+  // Length 0 frees the array.
+  void InitializeTileBuffers(int length);
+
+  void SetupCamera(int tileIdx, int reduction);
+
+
   int ReductionFactor;
   int LODReductionFactor;
 
@@ -178,6 +206,8 @@ protected:
 
   // On: Composite, Off, assume geometry copied to all tile procs.
   int UseCompositing;
+
+  int UseCompositeCompression;
 
   void Composite();
 

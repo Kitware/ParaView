@@ -14,14 +14,20 @@ set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ImageReader]
-set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {FilePrefix}]
-$pv(vtkTemp110) SetValue $DataDir/Data/headsq/quarter
-set pv(vtkTemp120) [$pv(vtkTemp98) GetPVWidget {Extent}]
-$pv(vtkTemp120) SetValue 0 63 0 63 1 64
-set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {DataByteOrder}]
-$pv(vtkTemp129) SetCurrentValue {1}
-$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp603) [$pv(vtkTemp1) InitializeReadCustom "ImageReader" "$DataDir/Data/headsq/quarter.1"]
+$pv(vtkTemp1) ReadFileInformation $pv(vtkTemp603) "$DataDir/Data/headsq/quarter.1"
+$pv(vtkTemp1) FinalizeRead $pv(vtkTemp603) "$DataDir/Data/headsq/quarter.1"
+set pv(vtkTemp646) [$pv(vtkTemp603) GetPVWidget {Filename}]
+$pv(vtkTemp646) SetValue "$DataDir/Data/headsq/quarter"
+set pv(vtkTemp609) [$pv(vtkTemp603) GetPVWidget {FilePattern}]
+$pv(vtkTemp609) SetValue {%s.%d}
+set pv(vtkTemp617) [$pv(vtkTemp603) GetPVWidget {DataByteOrder}]
+$pv(vtkTemp617) SetCurrentValue {1}
+set pv(vtkTemp621) [$pv(vtkTemp603) GetPVWidget {Dimensionality}]
+$pv(vtkTemp621) SetCurrentValue {2}
+set pv(vtkTemp634) [$pv(vtkTemp603) GetPVWidget {Extent}]
+$pv(vtkTemp634) SetValue 0 63 0 63 1 64
+$pv(vtkTemp603) AcceptCallback
 
 set pv(vtkTemp187) [$pv(vtkTemp1) CreatePVSource Contour]
 set pv(vtkTemp198) [$pv(vtkTemp187) GetPVWidget {Contour Values}]
