@@ -131,7 +131,11 @@ public:
   // Description:
   // Callback from the contour button.
   void ContourCallback();
-  
+
+  // Description:
+  // Callback from the contour button.
+  void GlyphCallback();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -154,6 +158,7 @@ protected:
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
+  vtkKWPushButton *GlyphButton;
   
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

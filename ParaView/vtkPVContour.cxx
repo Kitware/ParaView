@@ -95,18 +95,18 @@ void vtkPVContour::CreateProperties()
     return;
     }
   
-  this->ContourValuesLabel->SetParent(this->GetParameterFrame());
+  this->ContourValuesLabel->SetParent(this->GetParameterFrame()->GetFrame());
   this->ContourValuesLabel->Create(pvApp, "");
   this->ContourValuesLabel->SetLabel("Contour Values");
   
-  this->ContourValuesList->SetParent(this->GetParameterFrame());
+  this->ContourValuesList->SetParent(this->GetParameterFrame()->GetFrame());
   this->ContourValuesList->Create(pvApp, "");
   this->ContourValuesList->SetHeight(5);
   
   this->AcceptCommands->AddString("%s ContourValuesCallback",
                                   this->GetTclName());
   
-  this->NewValueFrame->SetParent(this->GetParameterFrame());
+  this->NewValueFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->NewValueFrame->Create(pvApp, "frame", "");
   
   this->Script("pack %s %s %s", this->ContourValuesLabel->GetWidgetName(),
@@ -130,11 +130,11 @@ void vtkPVContour::CreateProperties()
                this->NewValueEntry->GetWidgetName(),
                this->AddValueButton->GetWidgetName());
   
-  this->DeleteValueButton->SetParent(this->GetParameterFrame());
+  this->DeleteValueButton->SetParent(this->GetParameterFrame()->GetFrame());
   this->DeleteValueButton->Create(pvApp, "-text \"Delete Value\"");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
   
-  this->ComputeNormalsCheck->SetParent(this->GetParameterFrame());
+  this->ComputeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeNormalsCheck->Create(pvApp, "-text \"Compute Normals\"");
   this->ComputeNormalsCheck->SetState(this->Contour->GetComputeNormals());
   
@@ -152,7 +152,7 @@ void vtkPVContour::CreateProperties()
                                   "SetComputeNormals",
                                   this->ComputeNormalsCheck->GetTclName());
 
-  this->ComputeGradientsCheck->SetParent(this->GetParameterFrame());
+  this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeGradientsCheck->Create(pvApp, "-text \"Compute Gradients\"");
   this->ComputeGradientsCheck->SetState(this->Contour->GetComputeGradients());
   
@@ -170,7 +170,7 @@ void vtkPVContour::CreateProperties()
                                   "SetComputeGradients",
                                   this->ComputeGradientsCheck->GetTclName());
 
-  this->ComputeScalarsCheck->SetParent(this->GetParameterFrame());
+  this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeScalarsCheck->Create(pvApp, "-text \"Compute Scalars\"");
   this->ComputeScalarsCheck->SetState(this->Contour->GetComputeScalars());
   

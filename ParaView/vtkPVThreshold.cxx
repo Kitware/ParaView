@@ -84,7 +84,7 @@ void vtkPVThreshold::CreateProperties()
     return;
     }
   
-  this->AttributeModeFrame->SetParent(this->GetParameterFrame());
+  this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
                this->AttributeModeFrame->GetWidgetName());
@@ -113,7 +113,7 @@ void vtkPVThreshold::CreateProperties()
     range[1] = 1;
     }
   
-  this->UpperValueScale->SetParent(this->GetParameterFrame());
+  this->UpperValueScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->UpperValueScale->Create(pvApp, "-showvalue 1");
   this->UpperValueScale->DisplayLabel("Upper Threshold");
   this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
@@ -127,7 +127,7 @@ void vtkPVThreshold::CreateProperties()
                                   this->GetVTKSourceTclName(),
                                   "GetUpperThreshold");
 
-  this->LowerValueScale->SetParent(this->GetParameterFrame());
+  this->LowerValueScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->LowerValueScale->Create(pvApp, "-showvalue 1");
   this->LowerValueScale->DisplayLabel("Lower Threshold");
   this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
@@ -150,7 +150,7 @@ void vtkPVThreshold::CreateProperties()
                                   this->LowerValueScale->GetTclName(),
                                   this->UpperValueScale->GetTclName());
 
-  this->AllScalarsCheck->SetParent(this->GetParameterFrame());
+  this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->AllScalarsCheck->Create(pvApp, "-text AllScalars");
   this->AllScalarsCheck->SetState(1);
   this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");

@@ -34,7 +34,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 
-
 #include "vtkInteractorStylePlaneSource.h"
 
 #include "vtkMath.h"
@@ -53,6 +52,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVThreshold.h"
 #include "vtkPVContour.h"
+#include "vtkPVGlyph3D.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -86,6 +86,7 @@ vtkPVWindow::vtkPVWindow()
   this->CalculatorButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
+  this->GlyphButton = vtkKWPushButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -124,6 +125,9 @@ vtkPVWindow::~vtkPVWindow()
   
   this->ContourButton->Delete();
   this->ContourButton = NULL;
+
+  this->GlyphButton->Delete();
+  this->GlyphButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -213,45 +217,45 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ResetCameraButton->SetParent(this->Toolbar);
   this->ResetCameraButton->Create(app, "-text ResetCamera");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->ResetCameraButton->GetWidgetName());
   
   this->SourceListButton->SetParent(this->Toolbar);
   this->SourceListButton->Create(app, "-text SourceList");
   this->SourceListButton->SetCommand(this, "ShowWindowProperties");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-	       this->SourceListButton->GetWidgetName());
 
   this->CurrentSourceButton->SetParent(this->Toolbar);
   this->CurrentSourceButton->Create(app, "-text Source");
   this->CurrentSourceButton->SetCommand(this, "ShowCurrentSourceProperties");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-	       this->CurrentSourceButton->GetWidgetName());
 
   this->CurrentActorButton->SetParent(this->Toolbar);
   this->CurrentActorButton->Create(app, "-text Actor");
   this->CurrentActorButton->SetCommand(this, "ShowCurrentActorProperties");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-	       this->CurrentActorButton->GetWidgetName());
   
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-text Calculator");
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->CalculatorButton->GetWidgetName());
   
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-text Threshold");
   this->ThresholdButton->SetCommand(this, "ThresholdCallback");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->ThresholdButton->GetWidgetName());
   
   this->ContourButton->SetParent(this->Toolbar);
   this->ContourButton->Create(app, "-text Contour");
   this->ContourButton->SetCommand(this, "ContourCallback");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->ContourButton->GetWidgetName());
-  
+
+  this->GlyphButton->SetParent(this->Toolbar);
+  this->GlyphButton->Create(app, "-text Glyph");
+  this->GlyphButton->SetCommand(this, "GlyphCallback");
+
+  this->Script("pack %s %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+               this->ResetCameraButton->GetWidgetName(),
+               this->SourceListButton->GetWidgetName(),
+               this->CurrentSourceButton->GetWidgetName(),
+               this->CurrentActorButton->GetWidgetName(),
+               this->CalculatorButton->GetWidgetName(),
+               this->ThresholdButton->GetWidgetName(),
+               this->ContourButton->GetWidgetName(),
+               this->GlyphButton->GetWidgetName());
+
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
 //  this->CameraStyleButton->SetParent(this->Toolbar);
@@ -693,6 +697,70 @@ void vtkPVWindow::ContourCallback()
 			 pvd->GetVTKDataTclName());
   
   contour->Delete();
+
+  ++instanceCount;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::GlyphCallback()
+{
+  static int instanceCount = 0;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVGlyph3D *glyph;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  vtkPVData *current;
+  const char* outputDataType;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot determine output type");
+    return;
+    }
+  outputDataType = "vtkPolyData";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "Glyph", instanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkGlyph3D", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  glyph = vtkPVGlyph3D::New();
+  glyph->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  glyph->SetApplication(pvApp);
+  glyph->SetVTKSource(s, tclName);
+  glyph->SetNthPVInput(0, this->GetCurrentPVData());
+  glyph->SetName(tclName);
+
+  this->GetMainView()->AddComposite(glyph);
+  glyph->CreateProperties();
+  glyph->CreateInputList("vtkDataSet");
+  this->SetCurrentPVSource(glyph);
+  this->GetMainView()->ShowSourceParent();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "Glyph", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  glyph->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", glyph->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  glyph->Delete();
 
   ++instanceCount;
 }

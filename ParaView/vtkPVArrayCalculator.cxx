@@ -201,7 +201,7 @@ void vtkPVArrayCalculator::CreateProperties()
     return;
     }
   
-  this->AttributeModeFrame->SetParent(this->GetParameterFrame());
+  this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
                this->AttributeModeFrame->GetWidgetName());
@@ -220,7 +220,7 @@ void vtkPVArrayCalculator::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  this->ArrayNameFrame->SetParent(this->GetParameterFrame());
+  this->ArrayNameFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ArrayNameFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
                this->ArrayNameFrame->GetWidgetName());
@@ -245,7 +245,7 @@ void vtkPVArrayCalculator::CreateProperties()
                                   "SetResultArrayName",
                                   this->ArrayNameEntry->GetTclName());
 
-  this->CalculatorFrame->SetParent(this->GetParameterFrame());
+  this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->CalculatorFrame->Create(pvApp);
   this->CalculatorFrame->SetLabel("Calculator");
   this->Script("pack %s -fill x -expand t -side top",
