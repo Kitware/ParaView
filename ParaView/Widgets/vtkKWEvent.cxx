@@ -62,6 +62,7 @@ static const char *vtkKWEventStrings[] = {
   "ContourAnnotationChangeSurfaceQualityEvent",
   "ContourAnnotationChangeSurfaceRepresentationEvent",
   "ContourAnnotationChangeSurfaceShineEvent",
+  "ContourAnnotationComputeStatisticsEvent",
   "ContourAnnotationRemoveEvent",
   "ControlLeftMouseOptionChangedEvent",
   "ControlMiddleMouseOptionChangedEvent",

@@ -71,6 +71,7 @@ class VTK_EXPORT vtkKWEvent
     ContourAnnotationChangeSurfaceQualityEvent,
     ContourAnnotationChangeSurfaceRepresentationEvent,
     ContourAnnotationChangeSurfaceShineEvent,
+    ContourAnnotationComputeStatisticsEvent,
     ContourAnnotationRemoveEvent,
     ControlLeftMouseOptionChangedEvent,
     ControlMiddleMouseOptionChangedEvent,
