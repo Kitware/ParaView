@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
@@ -191,7 +191,7 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
         << vtkClientServerStream::End;
     }
 
-  this->CompositeProxy->SetVTKClassName("vtkCompositeManager");
+  this->CompositeProxy->SetVTKClassName("vtkCompositeRenderManager");
   this->CompositeProxy->CreateVTKObjects(numObjects);
   for (i=0; i<numObjects; i++)
     {
