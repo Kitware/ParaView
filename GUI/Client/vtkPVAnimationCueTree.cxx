@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.6");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -523,6 +523,20 @@ void vtkPVAnimationCueTree::KeyFramePropertyChanges(double ntime, int onlyFocus)
     child_cue->KeyFramePropertyChanges(ntime ,onlyFocus); 
     } 
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCueTree::RemoveAllKeyFrames()
+{
+  vtkCollectionIterator* iter = this->Children->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkPVAnimationCue* child_cue = vtkPVAnimationCue::SafeDownCast(
+      iter->GetCurrentObject());
+    child_cue->RemoveAllKeyFrames();
+    } 
+  iter->Delete(); 
+  this->Superclass::RemoveAllKeyFrames();
 }
 
 //-----------------------------------------------------------------------------

@@ -74,7 +74,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.5");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.6");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -1078,6 +1078,14 @@ void vtkPVAnimationCue::KeyFramePropertyChanges(double ntime, int onlyFocus)
     {
     vtkErrorMacro("Failed to add new key frame");
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::RemoveAllKeyFrames()
+{
+  // Don;t directly remove the keyframes...instead pretend that 
+  // the timeline nodes are being deleted.
+  this->TimeLine->RemoveAll();
 }
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.6");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -209,6 +209,11 @@ void vtkPVHorizontalAnimationInterface::ResizeCallback()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVHorizontalAnimationInterface::RemoveAllKeyFrames()
+{
+  this->ParentTree->RemoveAllKeyFrames();
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

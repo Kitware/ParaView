@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.9");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.10");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1141,6 +1141,15 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForSource(
       }
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::RemoveAllKeyFrames()
+{
+  if (this->IsCreated())
+    {
+    this->HAnimationInterface->RemoveAllKeyFrames();
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -77,6 +77,10 @@ public:
   virtual void SaveWindowGeometry();
   virtual void RestoreWindowGeometry();
 
+  // Description:
+  // Remove All Key frames from this cue.
+  void RemoveAllKeyFrames();
+
 protected:
   vtkPVHorizontalAnimationInterface();
   ~vtkPVHorizontalAnimationInterface();

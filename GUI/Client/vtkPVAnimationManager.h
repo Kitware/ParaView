@@ -213,6 +213,9 @@ public:
   virtual void SaveWindowGeometry();
   virtual void RestoreWindowGeometry();
 
+  // Description:
+  // Remove all the keyframes in the animation.
+  void RemoveAllKeyFrames();
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();

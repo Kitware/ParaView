@@ -138,6 +138,11 @@ public:
   virtual void SaveState(ofstream* file);
 
   virtual void Zoom(double range[2]);
+
+  // Description:
+  // Remove All Key frames from this cue.
+  virtual void RemoveAllKeyFrames();
+
 protected:
   vtkPVAnimationCueTree();
   ~vtkPVAnimationCueTree();

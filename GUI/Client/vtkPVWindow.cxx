@@ -220,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.653");
+vtkCxxRevisionMacro(vtkPVWindow, "1.654");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1079,6 +1079,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
                                      1, "Delete all modules in ParaView");
+
+  this->GetMenuEdit()->InsertCommand(6, "Delete All Keyframes", this,
+    "DeleteAllKeyframesCallback", 11, "Delete all key frames in Animation");
 }
 
 //-----------------------------------------------------------------------------
@@ -5036,6 +5039,32 @@ void vtkPVWindow::DeleteAllSources()
       }
     this->DeleteSourceAndOutputs(source);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::DeleteAllKeyframesCallback()
+{
+  if (!this->AnimationManager || !this->AnimationManager->IsCreated())
+    {
+    return;
+    }
+
+  if ( vtkKWMessageDialog::PopupYesNo(
+      this->GetApplication(), this, "DeleteAllTheKeyFrames",
+      "Delete All Key Frames", 
+      "Are you sure you want to delete all the key frames in the animation?", 
+      vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
+      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
+    {
+    this->DeleteAllKeyframes();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::DeleteAllKeyframes()
+{
+  this->AnimationManager->RemoveAllKeyFrames(); 
+  this->AddTraceEntry("$kw(%s) DeleteAllKeyframes", this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------

@@ -105,6 +105,10 @@ public:
   int GetNumberOfKeyFrames();
 
   // Description:
+  // Remove All Key frames from this cue.
+  virtual void RemoveAllKeyFrames();
+
+  // Description:
   // Returns the time for the keyframe at the given id.
   // Time is normalized to the span of the cue [0,1].
   double GetKeyFrameTime(int id);

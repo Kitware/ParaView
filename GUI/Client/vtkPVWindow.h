@@ -148,6 +148,11 @@ public:
   void DeleteAllSourcesCallback();
   void DeleteAllSources();
   void DeleteSourceAndOutputs(vtkPVSource*);
+
+  // Description:
+  // This removes all the key frames from the animation.
+  void DeleteAllKeyframesCallback();
+  void DeleteAllKeyframes();
     
   // Description:
   // Find a data source with name "sourcename" in the source list called
