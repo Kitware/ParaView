@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.37");
+vtkCxxRevisionMacro(vtkKWScale, "1.38");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -885,5 +885,6 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
      << (this->PopupScale ? "On" : "Off") << endl;
   os << indent << "ExpandEntry: " 
      << (this->ExpandEntry ? "On" : "Off") << endl;
-  os << indent << "ShortLabel: " << this->ShortLabel << endl;
+  os << indent << "ShortLabel: " 
+     << ( this->ShortLabel ? this->ShortLabel : "(None)" ) << endl;
 }
