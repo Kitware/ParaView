@@ -201,6 +201,8 @@ vtkPVWindow::vtkPVWindow()
 
   // Frame used for animations.
   this->AnimationInterface = vtkPVAnimationInterface::New();
+  this->AnimationInterface->SetTraceReferenceObject(this);
+  this->AnimationInterface->SetTraceReferenceCommand("GetAnimationInterface");
 
   this->TimerLogDisplay = NULL;
   this->TclInteractor = NULL;
@@ -1092,7 +1094,8 @@ void vtkPVWindow::ResizeCenterActor()
     {
     this->CenterActor->SetScale(1, 1, 1);
     this->CenterActor->VisibilityOn();
-    this->ResetCameraCallback();
+    this->MainView->ResetCamera();
+    this->MainView->EventuallyRender();
     this->CenterActor->VisibilityOff();
     }
     
