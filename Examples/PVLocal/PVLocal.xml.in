@@ -9,7 +9,7 @@
          short_help="Create a 3D cone of a given radius and height">
   <Source class="vtkLocalConeSource"/>
   <Scale variable="Resolution" trace_name="Resolution" property="Resolution"
-         default_value="6" resolution="1" range="0 512"
+         default_value="6" resolution="1"
          display_entry="1" display_value="0" entry_and_label_on_top="0"
          help="Set the number of faces on this cone" />
   <ThumbWheel variable="Radius" trace_name="Radius" property="Radius"

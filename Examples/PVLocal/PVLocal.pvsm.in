@@ -6,7 +6,7 @@
          command="SetResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="0" max="512" />
+        <IntRangeDomain name="range" min="0" max="512" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -21,7 +21,7 @@
          command="SetHeight"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
      <IntVectorProperty 
