@@ -1263,7 +1263,7 @@ proc extract_run {} {
 
     $extract(vtkTemp956) SetValue 0 56 0 0 0 24
     $extract(vtkTemp478) AcceptCallback
-    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 1
+    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 2
 
     $extract(vtkTemp106) SetCurrentTime 0 1
     $extract(vtkTemp106) SetNumberOfFrames 32
@@ -1303,7 +1303,7 @@ proc extract_run {} {
 
     $extract(vtkTemp956) SetValue 0 56 0 32 0 0
     $extract(vtkTemp478) AcceptCallback
-    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 2
+    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 4
 
     if $pvDemoShouldStop {
         return
@@ -1535,6 +1535,11 @@ proc iso_run {} {
     if $pvDemoShouldStop {
         return
     }
+
+    $iso(vtkTemp457) RemoveAllValues
+    $iso(vtkTemp457) AddValue 0.000000
+    $iso(vtkTemp449) AcceptCallback
+
     #$iso(vtkTemp1) ShowAnimationProperties
     set iso(vtkTemp106) [$iso(vtkTemp1) GetAnimationInterface]
     set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
@@ -1628,6 +1633,7 @@ proc iso_run {} {
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
     $iso(vtkTemp449) AcceptCallback
+    $iso(vtkTemp24) ForceRender
     update
     if $pvDemoShouldStop {
         return
@@ -1637,6 +1643,7 @@ proc iso_run {} {
     $iso(vtkTemp457) AddValue 0.000000
     $iso(vtkTemp457) AddValue 0.200000
     $iso(vtkTemp449) AcceptCallback
+    $iso(vtkTemp24) ForceRender
     update
     if $pvDemoShouldStop {
         return
@@ -1647,6 +1654,7 @@ proc iso_run {} {
     $iso(vtkTemp457) AddValue 0.200000
     $iso(vtkTemp457) AddValue 0.300000
     $iso(vtkTemp449) AcceptCallback
+    $iso(vtkTemp24) ForceRender
     update
     if $pvDemoShouldStop {
         return
@@ -1658,6 +1666,7 @@ proc iso_run {} {
     $iso(vtkTemp457) AddValue 0.300000
     $iso(vtkTemp457) AddValue 0.600000
     $iso(vtkTemp449) AcceptCallback
+    $iso(vtkTemp24) ForceRender
     update
     if $pvDemoShouldStop {
         return
@@ -1676,10 +1685,13 @@ proc iso_run {} {
     }
 
 
+    $iso(vtkTemp756) SetValue 0 29 0 0 0 29 
+    $iso(vtkTemp739) AcceptCallback
+
     set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
     $iso(vtkTemp1032) SetPVSource $iso(vtkTemp739)
     set iso(vtkTemp958) [$iso(vtkTemp739) GetPVWidget {VOI}]
-    $iso(vtkTemp958) AnimationMenuCallback $iso(vtkTemp1032) 1
+    $iso(vtkTemp958) AnimationMenuCallback $iso(vtkTemp1032) 2
     $iso(vtkTemp106) SetNumberOfFrames 29
     $iso(vtkTemp1032) SetTimeStart 0.0
     $iso(vtkTemp1032) SetTimeEnd 29.0
