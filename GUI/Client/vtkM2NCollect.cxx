@@ -32,7 +32,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.3");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.4");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -88,6 +88,17 @@ void vtkM2NCollect::ComputeInputUpdateExtents(vtkDataObject *output)
 //-----------------------------------------------------------------------------
 void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
 {
+  if ( ! this->PassThrough)
+    {
+    if (this->RenderServerMode)
+      { // superclass handles this, and the render server does nothing.
+      return;
+      }
+    this->Superclass::ExecuteData(outData);
+    return;
+    }
+
+  // If no render server, handle compositing with super (which will do nothing).
   if (this->MPIMToNSocketConnection == NULL)
     {
     this->Superclass::ExecuteData(outData);
