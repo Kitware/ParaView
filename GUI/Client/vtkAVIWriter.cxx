@@ -19,7 +19,6 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "vtkWindows.h"
 #include "vtkAVIWriter.h"
 
 #include "vtkImageData.h"
@@ -39,7 +38,7 @@ public:
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAVIWriter);
-vtkCxxRevisionMacro(vtkAVIWriter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkAVIWriter, "1.1.2.2");
 
 vtkAVIWriter::vtkAVIWriter()
 {
