@@ -100,7 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.154");
+vtkCxxRevisionMacro(vtkPVApplication, "1.155");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -287,6 +287,7 @@ vtkPVApplication::vtkPVApplication()
 
   vtkKWLabeledFrame::AllowShowHideOn();
   vtkKWLabeledFrame::SetLabelCaseToLowercaseFirst();
+  vtkKWLabeledFrame::BoldLabelOn();
   
   // The following is necessary to make sure that the tcl object
   // created has the right command function. Without this,
