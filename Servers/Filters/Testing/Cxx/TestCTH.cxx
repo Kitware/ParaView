@@ -24,6 +24,10 @@
 int main()
 {
   vtkCTHFractal *fractal = vtkCTHFractal::New();
+  fractal->SetDimensions( 10 );
+  fractal->SetFractalValue( 9.5 );
+  fractal->SetMaximumLevel( 5 );
+  fractal->SetGhostLevels( 0 );
   
   vtkCTHExtractAMRPart *extract = vtkCTHExtractAMRPart::New();
   extract->SetInput( fractal->GetOutput());
@@ -34,14 +38,21 @@ int main()
   vtkCTHDataToPolyDataFilter *geometry = vtkCTHDataToPolyDataFilter::New();
   geometry->SetInput( fractal->GetOutput());
   
+  vtkPolyDataMapper *outlineMapper = vtkPolyDataMapper::New();
+  outlineMapper->SetInput( outline->GetOutput() );
+  
+  vtkActor *outlineActor = vtkActor::New();
+  outlineActor->SetMapper( outlineMapper );
+
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   mapper->SetInput( geometry->GetOutput() );
   
   vtkActor *actor = vtkActor::New();
   actor->SetMapper( mapper );
-  
+
   vtkRenderer *ren = vtkRenderer::New();
   ren->AddActor( actor );
+  ren->AddActor( outlineActor );
   
   vtkRenderWindow *renWin = vtkRenderWindow::New();
   renWin->AddRenderer( ren );
@@ -52,6 +63,8 @@ int main()
   extract->Delete();
   outline->Delete();
   geometry->Delete();
+  outlineMapper->Delete();
+  outlineActor->Delete();
   mapper->Delete();
   actor->Delete();
   ren->Delete();
