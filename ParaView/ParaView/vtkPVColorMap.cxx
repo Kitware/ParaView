@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.9");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.10");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -496,6 +496,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->TitleTextProperty->SetParent(this->ScalarBarTitleFrame);
   this->TitleTextProperty->SetTextProperty(
     this->ScalarBar->GetScalarBarActor()->GetTitleTextProperty());
+  this->TitleTextProperty->SetActor2D(
+    this->ScalarBar->GetScalarBarActor());
   this->TitleTextProperty->Create(this->Application);
   this->TitleTextProperty->SetOnChangeCommand(onchangecommand.str());
   this->TitleTextProperty->SetTraceReferenceObject(this);
@@ -536,6 +538,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->LabelTextProperty->SetParent(this->ScalarBarLabelFormatFrame);
   this->LabelTextProperty->SetTextProperty(
     this->ScalarBar->GetScalarBarActor()->GetLabelTextProperty());
+  this->LabelTextProperty->SetActor2D(
+    this->ScalarBar->GetScalarBarActor());
   this->LabelTextProperty->Create(this->Application);
   this->LabelTextProperty->SetOnChangeCommand(onchangecommand.str());
   this->LabelTextProperty->SetTraceReferenceObject(this);
@@ -616,9 +620,12 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->SetColorSchemeToRedBlue();
 
+  // Update some part of the interface
+
   if (this->ScalarBar && this->ScalarBar->GetScalarBarActor())
     {
-    this->SetScalarBarLabelFormat(this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
+    this->SetScalarBarLabelFormat(
+      this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
     }
 }
 
