@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.5");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.6");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -129,7 +129,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
                this->TitleBarRightSubframe->GetWidgetName());
   
   this->BodyFrame->Create(app, "frame", "");
-  this->Script("pack %s -side top -fill x -expand yes",
+  this->Script("pack %s -side top -fill x -expand no",
                this->TitleBar->GetWidgetName());
   this->Script("pack %s -side top -fill both -expand yes",
                this->BodyFrame->GetWidgetName());

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.17");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -219,7 +219,8 @@ void vtkKWRenderWidget::SetupBindings()
                wname, tname);
   
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-               wname, tname);
+               this->GetWidgetName(), tname);
+//               wname, tname);
   
   this->Script("bind %s <Enter> {%s Enter %%x %%y}",
                wname, tname);
@@ -320,9 +321,6 @@ void vtkKWRenderWidget::Exposed()
 
 void vtkKWRenderWidget::Configure(int width, int height)
 {
-  this->Script("%s configure -width %d -height %d",
-               this->VTKWidget->GetWidgetName(), width, height);
-  
   this->Interactor->UpdateSize(width, height);
   this->Interactor->ConfigureEvent();
 }
