@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.169");
+vtkCxxRevisionMacro(vtkKWWindow, "1.170");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1517,6 +1517,7 @@ void vtkKWWindow::UpdateToolbarAspect()
         {
         tb->SetFlatAspect(flat_frame);
         tb->SetWidgetsFlatAspect(flat_buttons);
+        tb->Update();
         }
       it->GoToNextItem();
       }
