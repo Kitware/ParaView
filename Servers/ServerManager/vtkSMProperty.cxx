@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.12");
+vtkCxxRevisionMacro(vtkSMProperty, "1.13");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 
@@ -134,26 +134,26 @@ vtkSMDomainIterator* vtkSMProperty::NewDomainIterator()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::AddDependant(vtkSMDomain* dom)
+void vtkSMProperty::AddDependent(vtkSMDomain* dom)
 {
-  this->PInternals->Dependants.push_back(dom);
+  this->PInternals->Dependents.push_back(dom);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::RemoveAllDependants()
+void vtkSMProperty::RemoveAllDependents()
 {
-  vtkSMPropertyInternals::DependantsVector::iterator iter =
-    this->PInternals->Dependants.begin();
-  for (; iter != this->PInternals->Dependants.end(); iter++)
+  vtkSMPropertyInternals::DependentsVector::iterator iter =
+    this->PInternals->Dependents.begin();
+  for (; iter != this->PInternals->Dependents.end(); iter++)
     {
     iter->GetPointer()->RemoveRequiredProperty(this);
     }
-  this->PInternals->Dependants.erase(
-    this->PInternals->Dependants.begin(), this->PInternals->Dependants.end());
+  this->PInternals->Dependents.erase(
+    this->PInternals->Dependents.begin(), this->PInternals->Dependents.end());
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::UpdateDependantDomains()
+void vtkSMProperty::UpdateDependentDomains()
 {
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
@@ -162,9 +162,9 @@ void vtkSMProperty::UpdateDependantDomains()
     this->DomainIterator->Next();
     }
 
-  vtkSMPropertyInternals::DependantsVector::iterator iter =
-    this->PInternals->Dependants.begin();
-  for (; iter != this->PInternals->Dependants.end(); iter++)
+  vtkSMPropertyInternals::DependentsVector::iterator iter =
+    this->PInternals->Dependents.begin();
+  for (; iter != this->PInternals->Dependents.end(); iter++)
     {
     iter->GetPointer()->Update(this);
     }

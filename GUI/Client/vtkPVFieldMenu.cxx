@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.15");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.16");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -240,7 +240,7 @@ void vtkPVFieldMenu::UpdateProperty()
   if (ivp)
     {
     ivp->SetUncheckedElement(0, this->Value);
-    ivp->UpdateDependantDomains();
+    ivp->UpdateDependentDomains();
     }
 }
 

@@ -96,7 +96,7 @@ public:
   // as well as all dependant domains. This is usually called
   // after SetUncheckedXXX() to tell all dependant domains to
   // update themselves according to the new value.
-  void UpdateDependantDomains();
+  void UpdateDependentDomains();
 
   // Description:
   static int GetCheckDomains();
@@ -162,10 +162,10 @@ protected:
   vtkSMProperty* NewProperty(const char* name);
 
   // Description:
-  void AddDependant(vtkSMDomain* dom);
+  void AddDependent(vtkSMDomain* dom);
 
   // Description:
-  void RemoveAllDependants();
+  void RemoveAllDependents();
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 

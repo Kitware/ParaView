@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.57");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -276,7 +276,7 @@ void vtkPVArrayMenu::UpdateProperty()
   if (svp)
     {
     svp->SetUncheckedElement(0, this->ArrayName);
-    svp->UpdateDependantDomains();
+    svp->UpdateDependentDomains();
     }
 
 }

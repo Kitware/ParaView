@@ -32,8 +32,8 @@ struct vtkSMPropertyInternals
   typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProperty> > PropertyMap;
   PropertyMap SubProperties;
 
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMDomain> > DependantsVector;
-  DependantsVector Dependants;
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;
+  DependentsVector Dependents;
 };
 
 #endif

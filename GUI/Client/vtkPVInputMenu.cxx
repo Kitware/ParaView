@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.61");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.62");
 
 
 //----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ void vtkPVInputMenu::Update()
       {
       ip->AddUncheckedProxy(this->CurrentValue->GetProxy());
       }
-    ip->UpdateDependantDomains();
+    ip->UpdateDependentDomains();
     }
   this->Superclass::Update();
 }

@@ -21,7 +21,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMDomain, "1.5");
 
 struct vtkSMDomainInternals
 {
@@ -102,7 +102,7 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
               vtkSMProperty* req = prop->NewProperty(name);
               if (req)
                 {
-                req->AddDependant(this);
+                req->AddDependent(this);
                 this->Internals->RequiredProperties[function] = req;
                 }
               }
