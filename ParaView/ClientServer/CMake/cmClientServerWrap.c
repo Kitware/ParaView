@@ -59,7 +59,7 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
     fprintf(fout,"vtkObjectBase *%sClientServerNewCommand();\n",concrete[i]);
     }
   
-  fprintf(fout,"\n\nvoid VTK_EXPORT %s_Initialize(vtkClientServerInterpreter *arlu)\n{\n",kitName);
+  fprintf(fout,"\n\nextern \"C\" void VTK_EXPORT %s_Initialize(vtkClientServerInterpreter *arlu)\n{\n",kitName);
   fprintf(fout,"\n  arlu->AddNewInstanceFunction( %s_NewInstance);\n", kitName);
   for (i = 0; i < numConcrete; i++)
     {

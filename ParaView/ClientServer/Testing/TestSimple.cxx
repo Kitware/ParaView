@@ -53,12 +53,12 @@ public:
 };
 
 // ClientServer wrapper initialization functions.
-extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 
 Server::Server()
 {

@@ -369,24 +369,24 @@ void ParaViewEnableMSVCDebugHook()
 
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
-extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 #ifdef VTK_USE_PATENTED
-extern void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
 #endif
-extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
 #ifdef PARAVIEW_LINK_XDMF
-extern void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 #endif
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
-extern void vtkPVDevelopmentCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkPVDevelopmentCS_Initialize(vtkClientServerInterpreter *);
 #endif
 
 //----------------------------------------------------------------------------
