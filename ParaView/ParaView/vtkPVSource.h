@@ -289,7 +289,7 @@ public:
 
   // Description:
   // Certain modules are not deletable (for example, glyph sources).
-  // Such modules should be marked as such (IsPermanent = 1)x.
+  // Such modules should be marked as such (IsPermanent = 1).
   vtkSetMacro(IsPermanent, int);
   vtkGetMacro(IsPermanent, int);
   vtkBooleanMacro(IsPermanent, int);
@@ -334,6 +334,15 @@ public:
   // Check whether the source has been initialized 
   // (Accept has been called at least one)
   vtkGetMacro(Initialized, int);
+
+  // Description:
+  // If ToolbarModule is true, the instances of this module
+  // can be created by using a button on the toolbar. This
+  // variable is used mainly to prevent the addition of such
+  // modules to Advanced->(Filter/Source) menus.
+  vtkSetMacro(ToolbarModule, int);
+  vtkGetMacro(ToolbarModule, int);
+  vtkBooleanMacro(ToolbarModule, int);
 
 protected:
   vtkPVSource();
@@ -436,6 +445,8 @@ protected:
   int SourceGrabbed;
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
+
+  int ToolbarModule;
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
