@@ -77,6 +77,8 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
+
+$kw(vtkTemp44) SetBackgroundColor 0 0 0
  
 Application Exit
 
