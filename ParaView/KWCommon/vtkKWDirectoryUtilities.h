@@ -128,6 +128,11 @@ public:
   static const char* LocateFileInDir(const char *filename, 
                                      const char *dir, char *try_fname);
 
+  // Description:
+  // Check if the file has a given signature (set of bytes).
+  static int FileHasSignature(const char *filename, 
+                              const char *signature, unsigned long offset = 0);
+  
 protected:
   vtkKWDirectoryUtilities();
   ~vtkKWDirectoryUtilities();
