@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWCheckButton;
 class vtkKWLabel;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {

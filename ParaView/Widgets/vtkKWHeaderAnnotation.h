@@ -47,6 +47,7 @@ class vtkKWLabeledPopupButton;
 class vtkKWRenderWidget;
 class vtkKWTextProperty;
 class vtkTextActor;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkKWHeaderAnnotation : public vtkKWPopupFrameCheckButton
 {

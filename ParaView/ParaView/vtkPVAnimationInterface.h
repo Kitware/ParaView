@@ -62,6 +62,7 @@ class vtkCollectionIterator;
 class vtkKWRange;
 class vtkPVAnimationInterfaceEntry;
 class vtkPVAnimationInterfaceObserver;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
