@@ -2,18 +2,57 @@
 <!-- TODO need input requirements -->
   <ProxyGroup name="filters">
    <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
+      <InputProperty
+         name="Input"
+         command="AddInput"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+         
    <!-- End AppendAttributes -->
    </SourceProxy>
 
    <SourceProxy name="AppendPolyData" class="vtkAppendPolyData">
+      <InputProperty
+         name="Input"
+         command="AddInput"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End AppendPolyData -->
    </SourceProxy>
 
    <SourceProxy name="Append" class="vtkAppendFilter">
+      <InputProperty
+         name="Input"
+         command="AddInput"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End AppendDataSet -->
    </SourceProxy>
 
    <SourceProxy name="CellCenters" class="vtkCellCenters">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
      <IntVectorProperty 
         name="VertexCells" 
         command="SetVertexCells" 
@@ -25,6 +64,14 @@
    </SourceProxy>
 
    <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
      <IntVectorProperty 
         name="PassCellData" 
         command="SetPassCellData" 
@@ -36,6 +83,14 @@
    </SourceProxy>
 
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
      <IntVectorProperty 
         name="PieceInvariant" 
         command="SetPieceInvariant" 
@@ -102,14 +157,38 @@
    </SourceProxy>
 
    <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End CleanUnstructuredGrid -->
    </SourceProxy>
 
    <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
 
    <SourceProxy name="ImageClip" class="vtkImageClip">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
      <IntVectorProperty 
         name="OutputWholeExtent" 
         command="SetOutputWholeExtent" 
@@ -119,6 +198,14 @@
    </SourceProxy>
 
    <SourceProxy name="Curvatures" class="vtkCurvatures">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
      <IntVectorProperty 
         name="InvertMeanCurvature" 
         command="SetInvertMeanCurvature" 
@@ -139,6 +226,15 @@
    </SourceProxy>
 
    <SourceProxy name="DecimatePro" class="vtkDecimatePro">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
       <DoubleVectorProperty
          name="TargetReduction"
          command="SetTargetReduction"
@@ -174,6 +270,15 @@
    </SourceProxy>
 
    <SourceProxy name="D3" class="vtkDistributedDataFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="BoundaryMode" 
         command="SetBoundaryMode" 
@@ -199,6 +304,15 @@
    </SourceProxy>
 
    <SourceProxy name="ElevationFilter" class="vtkElevationFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
       <DoubleVectorProperty
          name="ScalarRange"
          command="SetScalarRange"
@@ -223,7 +337,20 @@
    </SourceProxy>
 
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
-     <ProxyProperty name="ClipPlane" command="SetClipPlane"/>
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <ProxyProperty name="ClipPlane" command="SetClipPlane">
+           <ProxyGroupDomain>
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
 
      <StringVectorProperty 
         name="AddVolumeArrayName" 
@@ -235,10 +362,29 @@
    </SourceProxy>
 
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End ExtractEdges -->
    </SourceProxy>
 
    <SourceProxy name="ExtractParts" class="vtkSelectInputs">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="InputMask" 
         command="SetInputMask"
@@ -249,10 +395,27 @@
    </SourceProxy>
 
    <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
 
    <SourceProxy name="Calculator" class="vtkArrayCalculator">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="ResultArrayName" 
         command="SetResultArrayName" 
@@ -292,6 +455,15 @@
    </SourceProxy>
 
    <SourceProxy name="FeatureEdges" class="vtkFeatureEdges">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="BoundaryEdges" 
         command="SetBoundaryEdges" 
@@ -343,6 +515,15 @@
    </SourceProxy>
 
    <SourceProxy name="Gradient" class="vtkPVImageGradient">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -359,6 +540,15 @@
    </SourceProxy>
 
    <SourceProxy name="GradientMagnitude" class="vtkPVImageGradientMagnitude">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -375,10 +565,29 @@
    </SourceProxy>
 
    <SourceProxy name="GroupParts" class="vtkGroup">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End GroupParts -->
    </SourceProxy>
 
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <DoubleVectorProperty
         name="ScaleFactor"
         command="SetScaleFactor"
@@ -412,6 +621,15 @@
    </SourceProxy>
 
    <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="NumberOfSubdivisions" 
         command="SetNumberOfSubdivisions" 
@@ -423,6 +641,15 @@
    </SourceProxy>
 
    <SourceProxy name="MaskPoints" class="vtkMaskPoints">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="OnRatio" 
         command="SetOnRatio" 
@@ -466,10 +693,20 @@
    </SourceProxy>
 
    <SourceProxy name="Median" class="vtkPVImageMedian3D">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1" /> 
+
      <IntVectorProperty 
         name="KernelSize" 
         command="SetKernelSize" 
@@ -480,6 +717,15 @@
    </SourceProxy>
 
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <DoubleVectorProperty 
         name="FeatureAngle" 
         command="SetFeatureAngle" 
@@ -539,10 +785,27 @@
    </SourceProxy>
 
    <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End  OutlineFilter -->
    </SourceProxy>
 
    <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <DoubleVectorProperty
         name="CornerFactor"
         command="SetCornerFactor"
@@ -554,10 +817,29 @@
    </SourceProxy>
 
    <SourceProxy name="PartScalars" class="vtkColorByPart">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End  PartScalars -->
    </SourceProxy>
 
    <SourceProxy name="PieceScalars" class="vtkPieceScalars">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="RandomMode" 
         command="SetRandomMode" 
@@ -569,6 +851,15 @@
    </SourceProxy>
 
    <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="PassPointData" 
         command="SetPassPointData" 
@@ -580,6 +871,15 @@
    </SourceProxy>
 
    <SourceProxy name="QuadricClustering" class="vtkQuadricClustering">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="NumberOfDivisions" 
         command="SetNumberOfDivisions" 
@@ -621,6 +921,15 @@
    </SourceProxy>
 
    <SourceProxy name="BrownianPoints" class="vtkBrownianPoints">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <DoubleVectorProperty 
         name="MinimumSpeed" 
         command="SetMinimumSpeed" 
@@ -640,6 +949,15 @@
    </SourceProxy>
 
    <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="Plane" 
         command="SetPlane" 
@@ -659,6 +977,15 @@
    </SourceProxy>
 
    <SourceProxy name="RibbonFilter" class="vtkPVRibbonFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -711,6 +1038,15 @@
 
    <SourceProxy name="RotationalExtrusionFilter" 
                 class="vtkRotationalExtrusionFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="Resolution" 
         command="SetResolution" 
@@ -751,6 +1087,15 @@
    </SourceProxy>
 
    <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
       <DoubleVectorProperty
          name="ShrinkFactor"
          command="SetShrinkFactor"
@@ -762,6 +1107,15 @@
    </SourceProxy>
 
    <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="NumberOfIterations" 
         command="SetNumberOfIterations" 
@@ -781,6 +1135,15 @@
    </SourceProxy>
 
    <SourceProxy name="Stripper" class="vtkStripper">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="MaximumLength" 
         command="SetMaximumLength" 
@@ -792,6 +1155,15 @@
    </SourceProxy>
 
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="NumberOfSubdivisions" 
         command="SetNumberOfSubdivisions" 
@@ -803,19 +1175,57 @@
    </SourceProxy>
 
    <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
 
    <SourceProxy name="TransformFilter" class="vtkTransformFilter">
-     <ProxyProperty name="Transform" command="SetTransform"/>
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <ProxyProperty name="Transform" command="SetTransform">
+           <ProxyGroupDomain>
+              <Group name="transforms"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
    <!-- End TransformFilter -->
    </SourceProxy>
 
    <SourceProxy name="TriangleFilter" class="vtkTriangleFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End TriangleFilter -->
    </SourceProxy>
 
    <SourceProxy name="TubeFilter" class="vtkTubeFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="NumberOfSides" 
         command="SetNumberOfSides" 
@@ -858,6 +1268,15 @@
    </SourceProxy>
 
    <SourceProxy name="WarpScalar" class="vtkPVWarpScalar">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -896,6 +1315,15 @@
    </SourceProxy>
 
    <SourceProxy name="WarpVector" class="vtkPVWarpVector">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SelectInputVectors" 
@@ -912,7 +1340,20 @@
 
 
    <SourceProxy name="Cut" class="vtkCutter">
-     <ProxyProperty name="CutFunction" command="SetCutFunction"/>
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <ProxyProperty name="CutFunction" command="SetCutFunction">
+           <ProxyGroupDomain>
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
 
      <DoubleVectorProperty
         name="ContourValues"
@@ -927,7 +1368,21 @@
    </SourceProxy>
 
    <SourceProxy name="Clip" class="vtkPVClipDataSet">
-     <ProxyProperty name="ClipFunction" command="SetClipFunction"/>
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <ProxyProperty name="ClipFunction" command="SetClipFunction">
+           <ProxyGroupDomain>
+               <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
      <IntVectorProperty 
         name="InsideOut" 
         command="SetInsideOut" 
@@ -935,10 +1390,12 @@
         default_values="0" > 
        <BooleanDomain/>
      </IntVectorProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1" /> 
+
      <DoubleVectorProperty
         name="Value"
         command="SetValue"
@@ -949,6 +1406,15 @@
    </SourceProxy>
 
    <SourceProxy name="Threshold" class="vtkPVThresholdFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -978,6 +1444,15 @@
    </SourceProxy>
 
    <SourceProxy name="Contour" class="vtkPVContourFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -1021,6 +1496,23 @@
 
 
    <SourceProxy name="Glyph" class="vtkPVGlyphFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSource">
+           <ProxyGroupDomain>
+             <Group name="glyph_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
@@ -1081,6 +1573,14 @@
    </SourceProxy>
 
    <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="glyph_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
      <IntVectorProperty 
         name="VOI" 
         command="SetVOI"
@@ -1112,10 +1612,34 @@
    </SourceProxy>
 
    <SourceProxy name="Probe" class="vtkPProbeFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="glyph_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSource">
+           <ProxyGroupDomain>
+             <Group name="probe_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
    <!-- End Probe -->
    </SourceProxy>
 
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
+           <ProxyGroupDomain>
+             <Group name="glyph_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 

@@ -15,49 +15,18 @@
 #include "vtkSMProxy.h"
 
 #include "vtkClientServerInterpreter.h"
-#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMCommunicationModule.h"
-#include "vtkSMProperty.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMPropertyIterator.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include "vtkStdString.h"
+#include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.6");
-
-//---------------------------------------------------------------------------
-// Internal data structure for storing object IDs, server IDs and
-// properties. Each property has associated attributes: 
-// * ModifiedFlag : has the property been modified since last update (push)
-// * DoUpdate : should the propery be updated (pushed) during UpdateVTKObjects 
-// * ObserverTag : the tag returned by AddObserver(). Used to remove the
-// observer.
-struct vtkSMProxyInternals
-{
-  struct PropertyInfo
-  {
-    PropertyInfo() : ModifiedFlag(1), DoUpdate(1), ObserverTag(0) {};
-    vtkSmartPointer<vtkSMProperty> Property;
-    int ModifiedFlag;
-    int DoUpdate;
-    unsigned int ObserverTag;
-  };
-  vtkstd::vector<vtkClientServerID > IDs;
-  vtkstd::vector<int> ServerIDs;
-  // Note that the name of the property is the map key. That is the
-  // only place where name is stored
-  typedef vtkstd::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
-  PropertyInfoMap Properties;
-
-  typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
-  ProxyMap SubProxies;
-};
+vtkCxxRevisionMacro(vtkSMProxy, "1.7");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -147,6 +116,8 @@ vtkSMProxy::vtkSMProxy()
     pm->GetInterpreter()->ClearLastResult();
     }
 
+  this->XMLGroup = 0;
+  this->XMLName = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -159,6 +130,8 @@ vtkSMProxy::~vtkSMProxy()
   this->RemoveAllObservers();
   delete this->Internals;
   this->SetVTKClassName(0);
+  this->SetXMLGroup(0);
+  this->SetXMLName(0);
 }
 
 //---------------------------------------------------------------------------
@@ -344,22 +317,13 @@ void vtkSMProxy::RemoveAllObservers()
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 {
-  this->AddProperty(name, prop, 1, 1);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxy::AddProperty(
-  const char* name, vtkSMProperty* prop, int addObserver, int doUpdate)
-{
-  this->AddProperty(0, name, prop, addObserver, doUpdate);
+  this->AddProperty(0, name, prop);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddProperty(const char* subProxyName, 
                              const char* name, 
-                             vtkSMProperty* prop, 
-                             int addObserver, 
-                             int doUpdate)
+                             vtkSMProperty* prop)
 {
   if (!prop)
     {
@@ -380,11 +344,11 @@ void vtkSMProxy::AddProperty(const char* subProxyName,
       vtkSMProperty* oldprop = it2->second.GetPointer()->GetProperty(name);
       if (oldprop)
         {
-        it2->second.GetPointer()->AddProperty(name, prop, addObserver, doUpdate);
+        it2->second.GetPointer()->AddProperty(name, prop);
         return;
         }
       }
-    this->AddPropertyToSelf(name, prop, addObserver, doUpdate);
+    this->AddPropertyToSelf(name, prop);
     }
   else
     {
@@ -398,13 +362,13 @@ void vtkSMProxy::AddProperty(const char* subProxyName,
                       << ". Will not add property.");
       return;
       }
-    it->second.GetPointer()->AddProperty(name, prop, addObserver, doUpdate);
+    it->second.GetPointer()->AddProperty(name, prop);
     }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddPropertyToSelf(
-  const char* name, vtkSMProperty* prop, int addObserver, int doUpdate)
+  const char* name, vtkSMProperty* prop)
 {
   if (!prop)
     {
@@ -433,19 +397,15 @@ void vtkSMProxy::AddPropertyToSelf(
 
   unsigned int tag=0;
 
-  if (addObserver)
-    {
-    vtkSMProxyObserver* obs = vtkSMProxyObserver::New();
-    obs->SetProxy(this);
-    obs->SetPropertyName(name);
-    // We have to store the tag in order to be able to remove
-    // the observer later.
-    tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
-    obs->Delete();
-    }
+  vtkSMProxyObserver* obs = vtkSMProxyObserver::New();
+  obs->SetProxy(this);
+  obs->SetPropertyName(name);
+  // We have to store the tag in order to be able to remove
+  // the observer later.
+  tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
+  obs->Delete();
 
   vtkSMProxyInternals::PropertyInfo newEntry;
-  newEntry.DoUpdate = doUpdate;
   newEntry.Property = prop;
   newEntry.ObserverTag = tag;
   this->Internals->Properties[name] = newEntry;
@@ -485,6 +445,41 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
     return;
     }
   it->second.ModifiedFlag = flag;
+
+  vtkSMProperty* prop = it->second.Property.GetPointer();
+  if (flag && prop->GetImmediateUpdate())
+    {
+    // This special condition is necessary because VTK objects cannot
+    // be created before the input is set.
+    if (!vtkSMInputProperty::SafeDownCast(prop))
+      {
+      this->CreateVTKObjects(1);
+      }
+    if (prop->GetUpdateSelf())
+      {
+      this->PushProperty(it->first.c_str(), this->SelfID, 0);
+      }
+    else
+      {
+      int numObjects = this->Internals->IDs.size();
+      
+      vtkClientServerStream str;
+      
+      for (int i=0; i<numObjects; i++)
+        {
+        prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+        }
+      
+      if (str.GetNumberOfMessages() > 0)
+        {
+        vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+        cm->SendStreamToServers(&str, 
+                                this->GetNumberOfServerIDs(), 
+                                this->GetServerIDs());
+        }
+      }
+    it->second.ModifiedFlag = 0;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -505,11 +500,18 @@ void vtkSMProxy::UpdateVTKObjects()
        ++it)
     {
     vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (it->second.ModifiedFlag && it->second.DoUpdate)
+    if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
       {
-      for (int i=0; i<numObjects; i++)
+      if (prop->GetUpdateSelf())
         {
-        prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+        this->PushProperty(it->first.c_str(), this->SelfID, 0);
+        }
+      else
+        {
+        for (int i=0; i<numObjects; i++)
+          {
+          prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+          }
         }
       it->second.ModifiedFlag = 0;
       }
@@ -613,26 +615,28 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxy::SaveState(const char* name, ofstream* file, vtkIndent indent)
 {
-  vtkSMProxyInternals::ProxyMap::iterator it2 =
-    this->Internals->SubProxies.begin();
-  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+  *file << indent 
+        << this->XMLGroup << " : " 
+        << this->XMLName << " : "
+        << name << " : " << endl;
+
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+
+  while (!iter->IsAtEnd())
     {
-    ostrstream namestr;
-    namestr << name << "." << it2->first << ends;
-    it2->second.GetPointer()->SaveState(namestr.str(), file, indent);
-    delete[] namestr.str();
+    iter->GetProperty()->SaveState(iter->GetKey(), file, indent.GetNextIndent());
+    iter->Next();
     }
 
-  *file << indent << this->GetClassName() << " : " << name << " : " << endl;
+  iter->Delete();
+}
 
-  vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
-    {
-    it->second.Property.GetPointer()->SaveState(
-      it->first.c_str(), file, indent.GetNextIndent());
-    }
+//---------------------------------------------------------------------------
+vtkSMPropertyIterator* vtkSMProxy::NewPropertyIterator()
+{
+  vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
+  iter->SetProxy(this);
+  return iter;
 }
 
 //---------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.5");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.6");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -188,7 +188,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
       {
       if (numRead != numElems)
         {
-        vtkErrorMacro("The umber of default values does not match the number "
+        vtkErrorMacro("The number of default values does not match the number "
                       "of elements. Initialization failed.");
         delete[] initVal;
         return 0;
@@ -205,7 +205,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
 void vtkSMDoubleVectorProperty::SaveState(
   const char* name, ofstream* file, vtkIndent indent)
 {
-  *file << indent << this->GetClassName() << " : " << name << " : ";
+  *file << indent << name << " : ";
   unsigned int size = this->GetNumberOfElements();
   for (unsigned int i=0; i<size; i++)
     {

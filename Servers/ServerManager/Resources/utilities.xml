@@ -87,11 +87,15 @@
 
   <ProxyGroup name="transforms">
     <Proxy name="Transform" class="vtkTransform">
-      <ProxyProperty name="Matrix" command="SetMatrix"/>
+      <ProxyProperty name="Matrix" command="SetMatrix">
+           <ProxyGroupDomain>
+              <Group name="matrices"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
     </Proxy>
   </ProxyGroup>
 
-  <ProxyGroup name="math">
+  <ProxyGroup name="matrices">
     <Proxy name="Matrix4x4" class="vtkMatrix4x4">
       <DoubleVectorProperty
          name="DeepCopy"

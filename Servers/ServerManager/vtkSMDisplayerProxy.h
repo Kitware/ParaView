@@ -38,11 +38,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Update all VTK objects. Including the ones managed by the
-  // sub-proxies.
-  virtual void UpdateVTKObjects();
-
-  // Description:
   // Turn on/off scalar visibility as well as adjust some lighting
   // parameters: 0 specular for scalar visibility (avoid interference
   // with data), 0.1 specular, 100 specular power, 1,1,1 specular color

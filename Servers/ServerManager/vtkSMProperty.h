@@ -27,11 +27,16 @@
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
+class vtkSMDomain;
 class vtkSMXMLParser;
+//BTX
+struct vtkSMPropertyInternals;
+//ETX
 
 class VTK_EXPORT vtkSMProperty : public vtkSMObject
 {
 public:
+  static vtkSMProperty* New();
   vtkTypeRevisionMacro(vtkSMProperty, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -40,6 +45,14 @@ public:
   // For example: SetThetaResolution
   vtkSetStringMacro(Command);
   vtkGetStringMacro(Command);
+
+  // Description:
+  vtkSetMacro(ImmediateUpdate, int);
+  vtkGetMacro(ImmediateUpdate, int);
+
+  // Description:
+  vtkSetMacro(UpdateSelf, int);
+  vtkGetMacro(UpdateSelf, int);
 
 protected:
   vtkSMProperty();
@@ -54,7 +67,7 @@ protected:
   // The proxy objects create a stream by calling this method on all the
   // modified properties.
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId ) = 0;
+    vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
   // Description:
@@ -62,7 +75,21 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
+  // Description:
+  void AddDomain(vtkSMDomain* dom);
+
+  // Description:
+  vtkSMDomain* GetDomain(unsigned int idx);
+
+  // Description:
+  unsigned int GetNumberOfDomains();
+
   char* Command;
+
+  vtkSMPropertyInternals* PInternals;
+
+  int ImmediateUpdate;
+  int UpdateSelf;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

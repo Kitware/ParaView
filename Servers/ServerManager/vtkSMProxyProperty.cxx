@@ -16,11 +16,14 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMCommunicationModule.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.4");
+
+vtkCxxSetObjectMacro(vtkSMProxyProperty, Proxy, vtkSMProxy);
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::vtkSMProxyProperty()
@@ -34,22 +37,6 @@ vtkSMProxyProperty::~vtkSMProxyProperty()
   if (this->Proxy)
     {
     this->Proxy->Delete();
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyProperty::SetProxy(vtkSMProxy* proxy)
-{
-  if (this->Proxy != proxy)
-    {
-    if (this->Proxy != NULL) { this->Proxy->UnRegister(this); }
-    this->Proxy = proxy;
-    if (this->Proxy != NULL) 
-      { 
-      this->Proxy->Register(this); 
-      this->Proxy->CreateVTKObjects(1);
-      }
-    this->Modified();
     }
 }
 
@@ -83,9 +70,34 @@ void vtkSMProxyProperty::AppendCommandToStream(
 void vtkSMProxyProperty::SaveState(
   const char* name,  ofstream* file, vtkIndent indent)
 {
-  *file << indent << this->GetClassName() 
-        << " : " << name 
-        << " : " << this->Proxy << endl;
+  vtkSMProxyManager* pm = this->GetProxyManager();
+  if (!pm)
+    {
+    return;
+    }
+  for (unsigned int i=0; i<this->GetNumberOfDomains(); i++)
+    {
+    vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
+      this->GetDomain(i));
+    if (dom)
+      {
+      unsigned int numGroups = dom->GetNumberOfGroups();
+      for (unsigned int j=0; j<numGroups; j++)
+        {
+        const char* proxyname = pm->IsProxyInGroup(
+          this->Proxy, dom->GetGroup(j));
+        if (proxyname)
+          {
+          *file << indent 
+                << name 
+                << " : " <<  proxyname
+                << " : " << dom->GetGroup(j)
+                << endl;
+          return;
+          }
+        }
+      }
+    }
 }
 
 //---------------------------------------------------------------------------

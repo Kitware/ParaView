@@ -23,6 +23,9 @@
 
 class vtkSMProperty;
 class vtkSMProxy;
+//BTX
+struct vtkSMProxyGroupDomainInternals;
+//ETX
 
 class VTK_EXPORT vtkSMProxyGroupDomain : public vtkSMDomain
 {
@@ -32,20 +35,30 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  vtkSetStringMacro(ProxyGroup);
-  vtkGetStringMacro(ProxyGroup);
+  void AddGroup(const char* group);
 
   // Description:
   virtual int IsInDomain(vtkSMProperty* property);
   int IsInDomain(vtkSMProxy* proxy);
 
+  // Description:
+  unsigned int GetNumberOfGroups();
+
+  // Description:
+  const char* GetGroup(unsigned int idx);
+
 protected:
   vtkSMProxyGroupDomain();
   ~vtkSMProxyGroupDomain();
 
-  char* ProxyGroup;
-
   virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+
+  vtkSMProxyGroupDomainInternals* PGInternals;
 
 private:
   vtkSMProxyGroupDomain(const vtkSMProxyGroupDomain&); // Not implemented

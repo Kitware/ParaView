@@ -34,6 +34,7 @@
 struct vtkSMProxyInternals;
 //ETX
 class vtkSMProperty;
+class vtkSMPropertyIterator;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -67,6 +68,9 @@ public:
   // Description:
   virtual void UnRegister(vtkObjectBase* obj);
 
+  // Description:
+  vtkSMPropertyIterator* NewPropertyIterator();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -82,6 +86,7 @@ protected:
   friend class vtkSMDisplayWindowProxy;
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
+  friend class vtkSMPropertyIterator;
 //ETX
 
   // Description:
@@ -89,6 +94,12 @@ protected:
   // This is used only when creating the server objects. Once the server
   // object(s) have been created, changing this has no effect.
   vtkSetStringMacro(VTKClassName);
+
+  // Description:
+  vtkSetStringMacro(XMLName);
+
+  // Description:
+  vtkSetStringMacro(XMLGroup);
 
   // Description:
   // Given the number of objects (numObjects), class name (VTKClassName)
@@ -197,25 +208,11 @@ protected:
   // Changes the modified flag of a property. Used by the observers
   void SetPropertyModifiedFlag(const char* name, int flag);
 
-  // Description:
-  // Add a property. If addObserver is false, no observer will be added
-  // and the proxy will not be notified when the property changes.
-  // if doUpdate is false, the property will not be updated in UpdateVTKObjects()
-  void AddProperty(const char* name, 
-                   vtkSMProperty* prop, 
-                   int addObserver, 
-                   int doUpdate);
-
   void AddProperty(const char* subProxyName,
                    const char* name, 
-                   vtkSMProperty* prop, 
-                   int addObserver, 
-                   int doUpdate);
+                   vtkSMProperty* prop);
 
-  void AddPropertyToSelf(const char* name, 
-                         vtkSMProperty* prop, 
-                         int addObserver, 
-                         int doUpdate);
+  void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
 
   // Description:
   void AddSubProxy(const char* name, vtkSMProxy* proxy);
@@ -227,6 +224,8 @@ protected:
   vtkSMProxy* GetSubProxy(const char* name);
 
   char* VTKClassName;
+  char* XMLGroup;
+  char* XMLName;
   int ObjectsCreated;
 
   vtkClientServerID SelfID;

@@ -15,23 +15,35 @@
 #include "vtkSMProxyGroupDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
+
+#include <vtkstd/vector>
+
+#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.2");
+
+struct vtkSMProxyGroupDomainInternals
+{
+  vtkstd::vector<vtkStdString> Groups;
+};
 
 //---------------------------------------------------------------------------
 vtkSMProxyGroupDomain::vtkSMProxyGroupDomain()
 {
-  this->ProxyGroup = 0;
+  this->PGInternals = new vtkSMProxyGroupDomainInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyGroupDomain::~vtkSMProxyGroupDomain()
 {
-  this->SetProxyGroup(0);
+  delete this->PGInternals;
 }
 
 //---------------------------------------------------------------------------
@@ -42,17 +54,36 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
     return 0;
     }
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
-  if (!pp)
+  if (pp)
     {
-    return 0;
+    return this->IsInDomain(pp->GetProxy());
     }
-  return this->IsInDomain(pp->GetProxy());
+
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(property);
+  if (ip)
+    {
+    unsigned int numMatches = 0;
+    unsigned int numInputs = ip->GetNumberOfInputs();
+    for (unsigned int i=0; i<numInputs; i++)
+      {
+      if (this->IsInDomain(ip->GetInput(i)))
+        {
+        numMatches++;
+        }
+      }
+    if (numMatches == numInputs)
+      {
+      return 1;
+      }
+    }
+
+  return 0;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
 {
-  if (!proxy || !this->ProxyGroup)
+  if (!proxy)
     {
     return 0;
     }
@@ -60,13 +91,68 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
   vtkSMProxyManager* pm = this->GetProxyManager();
   if (pm)
     {
-    return pm->IsProxyInGroup(proxy, this->ProxyGroup);
+    vtkstd::vector<vtkStdString>::iterator it = 
+      this->PGInternals->Groups.begin();
+    for (; it != this->PGInternals->Groups.end(); it++)
+      {
+      if (pm->IsProxyInGroup(proxy, it->c_str()))
+        {
+        return 1;
+        }
+      }
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyGroupDomain::AddGroup(const char* group)
+{
+  this->PGInternals->Groups.push_back(group);
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxyGroupDomain::GetNumberOfGroups()
+{
+  return this->PGInternals->Groups.size();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyGroupDomain::GetGroup(unsigned int idx)
+{
+  return this->PGInternals->Groups[idx].c_str();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyGroupDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+{
+  int found=0;
+  for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* groupElement = element->GetNestedElement(i);
+    if (strcmp(groupElement->GetName(), "Group")==0)
+      {
+      const char* name = groupElement->GetAttribute("name");
+      if (name)
+        {
+        this->AddGroup(name);
+        found = 1;
+        }
+      }
+    }
+    
+  if (!found)
+    {
+    vtkErrorMacro("Required element \"Group\" (with a name attribute) "
+                  "was not found.");
+    return 0;
+    }
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyGroupDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
 }

@@ -3,6 +3,15 @@
   <ProxyGroup name="rendering">
   
    <DisplayerProxy name="DefaultDisplayer" class="vtkPVGeometryFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+     </InputProperty>
+
      <IntVectorProperty
         name="DisplayAsOutline"
         command="SetUseOutline"
@@ -38,7 +47,11 @@
              command="SelectColorArray" 
             number_of_elements="1" /> 
 
-         <ProxyProperty name="LookupTable" command="SetLookupTable"/>
+         <ProxyProperty name="LookupTable" command="SetLookupTable">
+           <ProxyGroupDomain>
+            <Group name="lookup_tables"/>
+           </ProxyGroupDomain>
+         </ProxyProperty>
        </Proxy>
      </SubProxy>
 
@@ -138,6 +151,11 @@
 
      <SubProxy>
        <Proxy name="renderer" class="vtkRenderer">
+          <Property
+             name="ResetCamera"
+             command="ResetCamera"
+             immediate_update="1">
+          </Property>
           <DoubleVectorProperty
              name="BackgroundColor"
              command="SetBackground"

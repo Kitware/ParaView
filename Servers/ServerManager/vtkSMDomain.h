@@ -22,6 +22,7 @@
 #include "vtkSMObject.h"
 
 class vtkSMProperty;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkSMDomain : public vtkSMObject
 {
@@ -35,6 +36,15 @@ public:
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
+
+//BTX
+  friend class vtkSMProperty;
+//ETX
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkPVXMLElement*) {return 1;};
 
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented

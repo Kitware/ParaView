@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.9");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -45,47 +45,30 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
   intVec->SetCommand("SetScalarVisibility");
   intVec->SetNumberOfElements(1);
   intVec->SetElement(0, 0);
-  this->AddProperty("ScalarVisibility", intVec, 1, 0);
+  intVec->SetUpdateSelf(1);
+  this->AddProperty("ScalarVisibility", intVec);
   intVec->Delete();
 
   doubleVec = vtkSMDoubleVectorProperty::New();
   doubleVec->SetCommand("SetColor");
   doubleVec->SetNumberOfElements(3);
   doubleVec->SetElements(ones);
-  this->AddProperty("Color", doubleVec, 1, 0);
+  doubleVec->SetUpdateSelf(1);
+  this->AddProperty("Color", doubleVec);
   doubleVec->Delete();
 
   intVec = vtkSMIntVectorProperty::New();
   intVec->SetCommand("SetRepresentation");
   intVec->SetNumberOfElements(1);
   intVec->SetElement(0, 2);
-  this->AddProperty("Representation", intVec, 1, 0);
+  intVec->SetUpdateSelf(1);
+  this->AddProperty("Representation", intVec);
   intVec->Delete();
 }
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::~vtkSMDisplayerProxy()
 {
-}
-
-//---------------------------------------------------------------------------
-// We overwrite this method to make sure that it is forwarded to the
-// sub-proxies as well.
-void vtkSMDisplayerProxy::UpdateVTKObjects()
-{
-  this->Superclass::UpdateVTKObjects();
-
-  // Make these property push their values on this object.
-  // This is a nice way for implementing more complicated functionality
-  // than properties can handle.  
-  this->PushProperty("ScalarVisibility", this->SelfID, 0);
-  this->SetPropertyModifiedFlag("ScalarVisibility", 0);
-  
-  this->PushProperty("Representation", this->SelfID, 0);
-  this->SetPropertyModifiedFlag("Representation", 0);
-
-  this->PushProperty("Color", this->SelfID, 0);
-  this->SetPropertyModifiedFlag("Color", 0);
 }
 
 //---------------------------------------------------------------------------

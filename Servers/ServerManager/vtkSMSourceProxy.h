@@ -40,6 +40,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Calls UpdateInformation() on all sources. In future, this
+  // will also populate some information properties.
+  void UpdateInformation();
+
+  // Description:
+  // Calls Update() on all sources.  In future, this will also 
+  // populate some information properties.
+  void Update();
+
+  // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
   // created, this will create it. If hasMultipleInputs is
   // true,  only one filter is created, even if the input has
@@ -51,30 +61,21 @@ public:
   // whereas the other one is not, SetInput() should be called with
   // the multi-block input first. Otherwise, it will create only
   // on filter and can not apply to the multi-block input.
-  void SetInput(int idx, 
-                vtkSMSourceProxy* input, 
+  void AddInput(vtkSMSourceProxy* input, 
                 const char* method,
                 int hasMultipleInputs);
 
   // Description:
-  // Calls SetInput(int, vtkSMSourceProxy*, const char*, int)
-  // with idx, input, "SetInput", 0.
-  void SetInput(int idx, vtkSMSourceProxy* input);
-
-
-  // Description:
-  // Calls UpdateInformation() on all sources. In future, this
-  // will also populate some information properties.
-  void UpdateInformation();
-
-  // Description:
-  // Calls Update() on all sources.  In future, this will also 
-  // populate some information properties.
-  void Update();
+  void CleanInputs(const char* method);
 
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
+
+//BTX
+  friend class vtkSMInputProperty;
+//ETX
+
 
   // Description:
   // Create n parts where n is the number of filters. Each part
@@ -84,24 +85,16 @@ protected:
   int GetNumberOfParts();
   vtkSMPart* GetPart(int idx);
 
-  // Description:
-  // Connectivity methods. Manage inputs and consumers. These methods
-  // do not invoke anything on the managed sources.
-  // Consumer info is not used yet.
-  void AddConsumer(vtkSMSourceProxy *c);
-  void RemoveConsumer(vtkSMSourceProxy *c);
-  int IsConsumer(vtkSMSourceProxy *c);
-  vtkSMSourceProxy *GetConsumer(int i);
-  void SetNumberOfInputs(int num);
-  void SetNthInput(int idx, vtkSMSourceProxy *sp);
+//   // Description:
+//   // Connectivity methods. Manage inputs and consumers. These methods
+//   // do not invoke anything on the managed sources.
+//   // Consumer info is not used yet.
+//   void AddConsumer(vtkSMSourceProxy *c);
+//   void RemoveConsumer(vtkSMSourceProxy *c);
+//   int IsConsumer(vtkSMSourceProxy *c);
+//   vtkSMSourceProxy *GetConsumer(int i);
 
   int PartsCreated;
-
-  vtkSMSourceProxy **Inputs;
-  int NumberOfInputs; 
-
-  vtkSMSourceProxy **Consumers;
-  int NumberOfConsumers;
 
 private:
   vtkSMSourceProxyInternals* PInternals;

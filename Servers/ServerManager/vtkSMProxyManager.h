@@ -67,7 +67,10 @@ public:
   vtkSMProxy* GetProxy(const char* name);
 
   // Description:
-  int IsProxyInGroup(vtkSMProxy* proxy, const char* groupname);
+  // Is the proxy is in the given group, return it's name, otherwise
+  // return null. NOTE: Any following call to proxy manager might make
+  // the returned pointer invalid.
+  const char* IsProxyInGroup(vtkSMProxy* proxy, const char* groupname);
 
   // Description:
   // Given its name, unregisters a proxy and remove it from the list
@@ -104,7 +107,7 @@ protected:
 
   // Description:
   // Given an XML element create a proxy and all of it's properties.
-  vtkSMProxy* NewProxy(vtkPVXMLElement* element);
+  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname);
 
 //BTX
   friend class vtkSMXMLParser;
