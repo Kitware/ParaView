@@ -11,9 +11,6 @@ ClientData vtkCutPlaneNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
-int vtkFastGeometryFilterCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkFastGeometryFilterNewCommand();
 int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkImageOutlineFilterNewCommand();
@@ -167,8 +164,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
-  vtkTclCreateNew(interp,(char *) "vtkFastGeometryFilter", vtkFastGeometryFilterNewCommand,
-                  vtkFastGeometryFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractor", vtkInteractorNewCommand,
