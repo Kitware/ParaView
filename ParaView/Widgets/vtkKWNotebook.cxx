@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.53");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.54");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -123,6 +123,30 @@ void vtkKWNotebook::Page::Delete()
     {
     this->Icon->Delete();
     this->Icon = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::Page::SetEnabled(int s)
+{
+  if (this->Frame)
+    {
+    this->Frame->SetEnabled(s);
+    }
+
+  if (this->TabFrame)
+    {
+    this->TabFrame->SetEnabled(s);
+    }
+
+  if (this->Label)
+    {
+    this->Label->SetEnabled(s);
+    }
+
+  if (this->ImageLabel)
+    {
+    this->ImageLabel->SetEnabled(s);
     }
 }
 
@@ -672,15 +696,7 @@ int vtkKWNotebook::AddPage(const char *title,
     }
 
   cmd << "pack " << page->Label->GetWidgetName() 
-      << " -side left -fill both -expand y -anchor c" << endl
-      << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
-      << this->GetTclName() << " Raise " << page->Id << "}" << endl
-      << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " TogglePagePinned " << page->Id << "}" << endl
-      << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
-      << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
-      << " %%X %%Y}" 
-      << endl;
+      << " -side left -fill both -expand y -anchor c" << endl;
 
   // Create the icon if any. We want to keep both the icon and the image label
   // since the icon is required to recreate the label when its background
@@ -699,9 +715,6 @@ int vtkKWNotebook::AddPage(const char *title,
     page->ImageLabel->Create(this->Application, "");
     page->ImageLabel->SetImageOption(page->Icon);
 
-    cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
-        << this->GetTclName() << " Raise " << page->Id << "}" << endl;
-
     if (this->ShowIcons)
       {
       cmd << "pack " << page->ImageLabel->GetWidgetName() 
@@ -713,6 +726,8 @@ int vtkKWNotebook::AddPage(const char *title,
   cmd << ends;
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
+
+  this->BindPage(page);
 
   // Show the page. Set Visibility to Off first. If this page can really
   // be shown, Visibility will be set to On automatically.
@@ -728,6 +743,60 @@ int vtkKWNotebook::AddPage(const char *title,
     }
 
   return page->Id;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
+{
+  if (!page || !this->IsCreated())
+    {
+    return;
+    }
+
+  ostrstream cmd;
+
+  cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
+      << this->GetTclName() << " Raise " << page->Id << "}" << endl
+      << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
+      << this->GetTclName() << " TogglePagePinned " << page->Id << "}" << endl
+      << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
+      << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
+      << " %%X %%Y}" 
+      << endl;
+
+  if (page->ImageLabel)
+    {
+    cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
+        << this->GetTclName() << " Raise " << page->Id << "}" << endl;
+    }
+
+  cmd << ends;
+  this->Script(cmd.str());
+  cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::UnBindPage(vtkKWNotebook::Page *page)
+{
+  if (!page || !this->IsCreated())
+    {
+    return;
+    }
+
+  ostrstream cmd;
+
+  cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {}\n"
+      << "bind " << page->Label->GetWidgetName() << " <Double-1> {}\n"
+      << "bind " << page->Label->GetWidgetName() << " <Button-3> {}\n";
+
+  if (page->ImageLabel)
+    {
+    cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {}\n";
+    }
+
+  cmd << ends;
+  this->Script(cmd.str());
+  cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -2344,6 +2413,52 @@ int vtkKWNotebook::GetPageIdContainingCoordinatesInTab(int x, int y)
   it->Delete();
 
   return found;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->TabsFrame)
+    {
+    this->TabsFrame->SetEnabled(this->Enabled);
+    }
+
+  if (this->Body)
+    {
+    this->Body->SetEnabled(this->Enabled);
+    }
+
+  if (this->Mask)
+    {
+    this->Mask->SetEnabled(this->Enabled);
+    }
+
+  if (this->Pages)
+    {
+    vtkKWNotebook::Page *page = NULL;
+    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(page) == VTK_OK)
+        {
+        page->SetEnabled(this->Enabled);
+        if (this->Enabled)
+          {
+          this->BindPage(page);
+          }
+        else
+          {
+          this->UnBindPage(page);
+          }
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

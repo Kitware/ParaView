@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.159");
+vtkCxxRevisionMacro(vtkKWWindow, "1.160");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1597,6 +1597,11 @@ void vtkKWWindow::UpdateEnableState()
       it->GoToNextItem();
       }
     it->Delete();
+    }
+
+  if (this->Notebook)
+    {
+    this->Notebook->SetEnabled(this->Enabled);
     }
 }
 

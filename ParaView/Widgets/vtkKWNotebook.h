@@ -318,6 +318,7 @@ protected:
   {
   public:
     void Delete();
+    void SetEnabled(int);
 
     int             Id;
     int             Visibility;
@@ -374,6 +375,8 @@ protected:
   int  GetPageTag(Page*);
   int  GetPagePinned(Page*);
   char* GetPageTitle(Page*);
+  void BindPage(Page*);
+  void UnBindPage(Page*);
 
   int AddToMostRecentPages(Page*);
   int RemoveFromMostRecentPages(Page*);
@@ -404,6 +407,10 @@ protected:
   // ShowOnlyMostRecentPages
 
   void ConstrainVisiblePages();
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented
