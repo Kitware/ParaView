@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.181");
+vtkCxxRevisionMacro(vtkPVApplication, "1.182");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1241,6 +1241,13 @@ void vtkPVApplication::Exit()
 
   this->ProcessModule->Exit();
 
+  // This is a normal exit.  Close trace file here and delete it.
+  if (this->TraceFile)
+    {
+    this->TraceFile->close();
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
   if (this->TraceFileName)
     {
     unlink(this->TraceFileName);
