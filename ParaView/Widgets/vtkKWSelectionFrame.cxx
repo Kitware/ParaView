@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.14");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -125,14 +125,18 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->SelectionList->IndicatorOff();
   this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
 
+  this->Script("pack %s -side left -anchor w -fill y -padx 1 -pady 1",
+               this->SelectionList->GetWidgetName());
+
+  //cout << this->SelectionList->GetTclName() << endl;
+
   // The title itself
 
   this->Title->SetParent(this->TitleBar);
   this->Title->Create(app, "");
   this->Title->SetLabel("<Click to Select>");
   
-  this->Script("pack %s %s -side left -anchor w -fill y",
-               this->SelectionList->GetWidgetName(),
+  this->Script("pack %s -side left -anchor w -fill y",
                this->Title->GetWidgetName());
   
   // The subframe on the right
@@ -320,7 +324,7 @@ void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
 {
   if (this->SelectCommand)
     {
-    this->Script("eval %s {%s} %s",
+    this->Script("eval {%s {%s} %s}",
                  this->SelectCommand, menuItem, this->GetTclName());
     }
 }
