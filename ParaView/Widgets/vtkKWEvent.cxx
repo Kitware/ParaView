@@ -138,6 +138,7 @@ static const char *vtkKWEventStrings[] = {
   "ScalarColorFunctionChangedEvent",
   "ScalarColorFunctionPresetApplyEvent",
   "ScalarComponentWeightChangedEvent",
+  "ScalarComponentWeightChangingEvent",
   "ScalarOpacityFunctionChangedEvent",
   "ScalarOpacityFunctionPresetApplyEvent",
   "ScaleBarVisibilityChangedEvent",

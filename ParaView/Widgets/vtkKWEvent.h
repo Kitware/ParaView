@@ -147,6 +147,7 @@ class VTK_EXPORT vtkKWEvent
     ScalarColorFunctionChangedEvent,
     ScalarColorFunctionPresetApplyEvent,
     ScalarComponentWeightChangedEvent,
+    ScalarComponentWeightChangingEvent,
     ScalarOpacityFunctionChangedEvent,
     ScalarOpacityFunctionPresetApplyEvent,
     ScaleBarVisibilityChangedEvent,
