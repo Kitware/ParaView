@@ -9,6 +9,7 @@ IF ( VTK_BINARY_DIR )
                                 BUILD_TESTING
                                 LIBRARY_OUTPUT_PATH
                                 EXECUTABLE_OUTPUT_PATH
+                                MAKECOMMAND
                                INCLUDE_INTERNALS
                                 VTK_BINARY_PATH
                                 VTK_LIBRARY_PATH)
