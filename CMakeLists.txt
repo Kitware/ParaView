@@ -369,7 +369,11 @@ FOREACH(external EXODUS SAF LOOKMARKS)
       ${external}ParaViewImport.cmake
       ../vtkSNL/IO
       ../../vtkSNL/IO
-      ../../../vtkSNL/IO)
+      ../../../vtkSNL/IO
+      ../vtkSNL/Common/Lookmarks
+      ../../vtkSNL/Common/Lookmarks
+      ../../../vtkSNL/Common/Lookmarks
+      )
 
     IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
       INCLUDE(${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
