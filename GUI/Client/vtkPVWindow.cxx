@@ -142,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.668");
+vtkCxxRevisionMacro(vtkPVWindow, "1.669");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -798,7 +798,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->GetMenuView()->AddRadioButton(
     VTK_PV_ANIMATION_MENU_INDEX + 1,
-    "Keyframe Animation",
+    " Keyframe Animation",
     rbv,
     this,
     "ShowAnimationPanes",
