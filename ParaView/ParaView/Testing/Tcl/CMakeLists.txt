@@ -1,9 +1,3 @@
-IF (EXECUTABLE_OUTPUT_PATH)
-  SET (VTK_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/vtk)
-ELSE (EXECUTABLE_OUTPUT_PATH)
-  SET (VTK_EXECUTABLE ${VTK_BINARY_DIR}/Wrapping/Tcl/${CMAKE_CFG_INTDIR}/vtk)
-ENDIF (EXECUTABLE_OUTPUT_PATH)
-
 SET(TEST_PATH "ParaView")
 SET(RUN_WITH_MPI 0)
 IF (VTK_USE_MPI)
@@ -70,19 +64,19 @@ FOREACH (tfile ${PROJECT_TESTS})
 ENDFOREACH (tfile)
 
 ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
-         ${VTK_SOURCE_DIR}/Common/Testing/Tcl/PrintSelfCheck.tcl  
+         ${PARAVIEW_SOURCE_DIR}/KWCommon/Testing/Tcl/PrintSelfCheck.tcl  
          ${PARAVIEW_SOURCE_DIR}/${TEST_PATH})
 
 ADD_TEST(TestSetObjectMacro-${TEST_PATH} ${TCL_TCLSH}
-         ${VTK_SOURCE_DIR}/Common/Testing/Tcl/FindString.tcl
+         ${PARAVIEW_SOURCE_DIR}/KWCommon/Testing/Tcl/FindString.tcl
          "${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/vtk\\\\*.h"
          "vtkSetObjectMacro")
 
 ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/otherPrint.pvs
-         -A ${VTK_SOURCE_DIR}/Wrapping/Tcl)
+         -A  ${VTK_TCL_HOME})
 
 ADD_TEST(OtherTests ${PARAVIEW_EXECUTABLE} --start-empty
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Other.pvs
          -D ${PARAVIEW_SOURCE_DIR}/Data 
-         -A ${VTK_SOURCE_DIR}/Wrapping/Tcl)
+         -A ${VTK_TCL_HOME})
