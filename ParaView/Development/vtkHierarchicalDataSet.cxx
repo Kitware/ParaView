@@ -22,7 +22,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalDataSet, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalDataSet, "1.2");
 
 //----------------------------------------------------------------------------
 vtkHierarchicalDataSet::vtkHierarchicalDataSet()
@@ -277,8 +277,13 @@ vtkDataObject* vtkHierarchicalDataSet::GetDataSet(unsigned int level,
 //----------------------------------------------------------------------------
 void vtkHierarchicalDataSet::ShallowCopy(vtkDataObject *src)
 {
+  if (src == this)
+    {
+    return;
+    }
   this->InitializeDataSets();
   this->Superclass::ShallowCopy(src);
+  this->Modified();
 
   vtkHierarchicalDataSet* from = vtkHierarchicalDataSet::SafeDownCast(src);
   if (from)
@@ -300,8 +305,13 @@ void vtkHierarchicalDataSet::ShallowCopy(vtkDataObject *src)
 //----------------------------------------------------------------------------
 void vtkHierarchicalDataSet::DeepCopy(vtkDataObject *src)
 {
+  if (src == this)
+    {
+    return;
+    }
   this->InitializeDataSets();
   this->Superclass::ShallowCopy(src);
+  this->Modified();
 
   vtkHierarchicalDataSet* from = vtkHierarchicalDataSet::SafeDownCast(src);
   if (from)
