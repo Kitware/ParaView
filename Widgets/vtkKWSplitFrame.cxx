@@ -62,11 +62,13 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame2->SetParent(this);
 
   this->Frame1Width = 100;
-  this->Frame2Width = 100;
+  this->Frame2Width = 700;
   this->Frame1MinimumWidth = 50;
   this->Frame2MinimumWidth = 50;
 
-  this->Width = 106;
+  this->SeparatorWidth = 6;
+
+  this->Width = 806;
 }
 
 vtkKWSplitFrame::~vtkKWSplitFrame()
@@ -131,7 +133,8 @@ void vtkKWSplitFrame::ConfigureCallback()
   vtkErrorMacro("configure " << width);
 
   // First check to see if we have to make the window larger.
-  tmp = this->Frame1MinimumWidth + this->Frame2MinimumWidth + 6;
+  tmp = this->Frame1MinimumWidth + this->Frame2MinimumWidth 
+          + this->SeparatorWidth;
   if (width < tmp)
     {
     this->Frame1Width = this->Frame1MinimumWidth;
@@ -144,13 +147,13 @@ void vtkKWSplitFrame::ConfigureCallback()
 
   // Width of second frame
   this->Width = width;
-  tmp = width - this->Frame1Width - 6;
+  tmp = width - this->Frame1Width - this->SeparatorWidth;
 
   // Do we have to adjust the first frame width?
   if (tmp < this->Frame2MinimumWidth)
     {
     this->Frame2Width = this->Frame2MinimumWidth;
-    this->Frame1Width = width - this->Frame2Width - 6;
+    this->Frame1Width = width - this->Frame2Width - this->SeparatorWidth;
     this->Update();
     return;
     }
@@ -166,6 +169,10 @@ void vtkKWSplitFrame::ConfigureCallback()
 void vtkKWSplitFrame::DragCallback()
 {
   int width, x, xmin, tmp;
+  int h1, h2;
+
+  h1 = this->SeparatorWidth/2;
+  h2 = this->SeparatorWidth-h1;
 
   this->Script( "winfo width %s", this->GetWidgetName());
   width = vtkKWObject::GetIntegerResult(this->Application); 
@@ -184,19 +191,19 @@ void vtkKWSplitFrame::DragCallback()
   x = x - xmin;
 
   // Constraints on the window.
-  tmp = this->Frame1MinimumWidth + 3;
+  tmp = this->Frame1MinimumWidth + h1;
   if (x < tmp)
     {
     x = tmp;
     }
-  tmp = width - this->Frame2MinimumWidth - 3;
+  tmp = width - this->Frame2MinimumWidth - h2;
   if (x > tmp)
     {
     x = tmp;
     }
 
-  this->Frame1Width = x-3;
-  this->Frame2Width = width-x-3;
+  this->Frame1Width = x-h1;
+  this->Frame2Width = width-x-h2;
   this->Update();
 }
 
@@ -214,12 +221,12 @@ void vtkKWSplitFrame::SetFrame1MinimumWidth(int minWidth)
     {
     this->Frame1Width = minWidth;
     // Shrink frame2 if possible.
-    this->Frame2Width = this->Width - this->Frame1Width - 6;
+    this->Frame2Width = this->Width - this->Frame1Width - this->SeparatorWidth;
     // Will the top frame actually grow because of this (configure).
     if (this->Frame2Width < this->Frame2MinimumWidth)
       {
       this->Frame2Width = this->Frame2MinimumWidth;
-      this->Width = this->Frame1Width + this->Frame2Width + 6;
+      this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
       this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
       }
     this->Update();
@@ -239,12 +246,12 @@ void vtkKWSplitFrame::SetFrame2MinimumWidth(int minWidth)
     {
     this->Frame2Width = minWidth;
     // Shrink frame1 if possible.
-    this->Frame1Width = this->Width - this->Frame1Width - 6;
+    this->Frame1Width = this->Width - this->Frame1Width - this->SeparatorWidth;
     // Will the top frame actually grow because of this (configure).
     if (this->Frame1Width < this->Frame1MinimumWidth)
       {
       this->Frame1Width = this->Frame1MinimumWidth;
-      this->Width = this->Frame1Width + this->Frame2Width + 6;
+      this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
       this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
       }
     this->Update();
@@ -253,25 +260,33 @@ void vtkKWSplitFrame::SetFrame2MinimumWidth(int minWidth)
 
 void vtkKWSplitFrame::SetFrame1Width(int width)
 {
-  if (width < this->Frame1MinimumWidth)
-    {
-    width = this->Frame1MinimumWidth;
-    }
-
   if (this->Frame1Width == width)
     {
     return;
     }
 
   this->Frame1Width = width;
-  this->Frame2Width = this->Width - this->Frame1Width - 6;
+  this->Frame2Width = this->Width - this->Frame1Width - this->SeparatorWidth;
   if (this->Frame2Width < this->Frame2MinimumWidth)
     {
     this->Frame2Width = this->Frame2MinimumWidth;
-    this->Width = this->Frame1Width + this->Frame2Width + 6;
+    this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
     this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
     }
   this->Update();
+}
+
+void vtkKWSplitFrame::SetSeparatorWidth(int width)
+{
+
+  if (this->SeparatorWidth == width)
+    {
+    return;
+    }
+
+  this->SeparatorWidth = width;
+  // Update the frame sizes.
+  this->SetFrame1Width(this->Frame1Width);
 }
 
 
@@ -281,9 +296,10 @@ void vtkKWSplitFrame::Update()
 
   this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
                this->Frame1->GetWidgetName(), this->Frame1Width);
-  this->Script("place %s -x %d -rely 0 -width 6 -relheight 1.0",
-               this->Separator->GetWidgetName(), this->Frame1Width);
   this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
-               this->Frame2->GetWidgetName(), this->Frame1Width+6, 
-               this->Frame2Width);
+               this->Separator->GetWidgetName(), this->Frame1Width,
+               this->SeparatorWidth);
+  this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+               this->Frame2->GetWidgetName(), 
+               this->Frame1Width+this->SeparatorWidth, this->Frame2Width);
 }

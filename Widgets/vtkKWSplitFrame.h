@@ -70,6 +70,12 @@ public:
   vtkGetMacro(Frame2Width, int);
   void SetFrame1Width(int minWidth);
 
+  // Description:
+  // This sets the separator width.  if the width is 0, then
+  // the two frames cannot be adjusted by the user.
+  void SetSeparatorWidth(int width);
+  vtkGetMacro(SeparatorWidth, int);
+
   // Callbacks used internally to adjust the widths,
   void DragCallback();
   void ConfigureCallback();
@@ -87,6 +93,7 @@ protected:
   int Width;
   int Frame1Width;
   int Frame2Width;
+  int SeparatorWidth;
 
   int Frame1MinimumWidth;
   int Frame2MinimumWidth;
