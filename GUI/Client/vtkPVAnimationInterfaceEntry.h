@@ -32,6 +32,9 @@ class vtkKWRange;
 class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
 class vtkPVWidgetProperty;
+class vtkKWLabeledRadioButtonSet;
+class vtkKWScale;
+class vtkKWThumbWheel;
 
 class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWWidget
 {
@@ -77,6 +80,21 @@ public:
 
   vtkGetMacro(TimeStart, float);
   vtkGetMacro(TimeEnd, float);
+
+  void SetTimeEquationStyle( int s );
+  void SetTimeEquationPhase( float p );
+  void SetTimeEquationFrequency( float f );
+
+  void UpdateTimeEquationValuesToEntry();
+  void UpdateTimeEquationValuesFromEntry();
+
+  int GetTimeEquationStyleValue();
+  float GetTimeEquationPhaseValue();
+  float GetTimeEquationFrequencyValue();
+
+  vtkGetMacro(TimeEquationStyle,int);
+  vtkGetMacro(TimeEquationPhase,float);
+  vtkGetMacro(TimeEquationFrequency,float);
 
   const char* GetTimeEquation(float vtkNotUsed(tmax));
 
@@ -187,6 +205,9 @@ protected:
   vtkKWFrame *TimeScriptEntryFrame;
   vtkKWLabeledEntry *StartTimeEntry;
   vtkKWLabeledEntry *EndTimeEntry;
+  vtkKWLabeledRadioButtonSet *TimeEquationStyleEntry;
+  vtkKWScale *TimeEquationPhaseEntry;
+  vtkKWThumbWheel *TimeEquationFrequencyEntry;
 
   // Menu Showing all of the possible methods of the selected source.
   vtkKWLabel*        MethodLabel;
@@ -216,6 +237,10 @@ protected:
   
   float TimeStart;
   float TimeEnd;
+
+  int TimeEquationStyle;
+  float TimeEquationPhase;
+  float TimeEquationFrequency;
 
   int TypeIsInt;
   int CurrentIndex;

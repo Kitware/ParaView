@@ -32,6 +32,11 @@
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
+#include "vtkKWThumbWheel.h"
+#include "vtkKWScale.h"
+#include "vtkKWLabeledRadioButtonSet.h"
+#include "vtkKWRadioButtonSet.h"
+
 
 #include <vtkstd/string>
 
@@ -68,7 +73,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -88,6 +93,9 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->MethodMenuButton = vtkKWMenuButton::New();
   this->StartTimeEntry = vtkKWLabeledEntry::New();
   this->EndTimeEntry = vtkKWLabeledEntry::New();
+  this->TimeEquationStyleEntry = vtkKWLabeledRadioButtonSet::New();
+  this->TimeEquationPhaseEntry = vtkKWScale::New();
+  this->TimeEquationFrequencyEntry = vtkKWThumbWheel::New();
   this->TimeRange = vtkKWRange::New();
   this->ScriptEditorFrame = vtkKWFrame::New();
   this->ScriptEditorScroll = vtkKWWidget::New();
@@ -228,6 +236,44 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->TimeRange->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->DummyFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
 
+  this->TimeEquationStyleEntry->SetLabel( "Parameter's waveform in time:" );
+  this->TimeEquationStyleEntry->PackHorizontallyOn();
+  this->TimeEquationStyleEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->TimeEquationStyleEntry->Create( pvApp, 0 );
+  this->TimeEquationStyleEntry->GetRadioButtonSet()->AddButton( 0, "Ramp",
+    this, "UpdateTimeEquationValuesFromEntry",
+    "Vary the parameter linearly with time, from start value to end value" );
+  this->TimeEquationStyleEntry->GetRadioButtonSet()->AddButton( 1, "Triangle",
+    this, "UpdateTimeEquationValuesFromEntry",
+    "Vary the parameter from start value to end value and back, linearly" );
+  this->TimeEquationStyleEntry->GetRadioButtonSet()->AddButton( 2, "Sinusoid",
+    this, "UpdateTimeEquationValuesFromEntry",
+    "Vary the parameter sinusoidally between start and end values" );
+
+  this->TimeEquationPhaseEntry->PopupScaleOn();
+  this->TimeEquationPhaseEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->TimeEquationPhaseEntry->Create( pvApp, 0 );
+  this->TimeEquationPhaseEntry->SmartResizeOn();
+  this->TimeEquationPhaseEntry->SetRange( 0., 360. );
+  this->TimeEquationPhaseEntry->SetValue( 0. );
+  this->TimeEquationPhaseEntry->SetResolution( 1. );
+  this->TimeEquationPhaseEntry->DisplayEntry();
+  this->TimeEquationPhaseEntry->DisplayLabel( "Phase [degrees]" );
+  this->TimeEquationPhaseEntry->SetEndCommand( this, "UpdateTimeEquationValuesFromEntry" );
+  this->TimeEquationPhaseEntry->SetEntryCommand( this, "UpdateTimeEquationValuesFromEntry" );
+
+  this->TimeEquationFrequencyEntry->PopupModeOn();
+  this->TimeEquationFrequencyEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->TimeEquationFrequencyEntry->Create( pvApp, 0 );
+  this->TimeEquationFrequencyEntry->SetValue( 1. );
+  this->TimeEquationFrequencyEntry->SetMinimumValue( 0. );
+  this->TimeEquationFrequencyEntry->SetResolution( 0.5 );
+  this->TimeEquationFrequencyEntry->DisplayEntryOn();
+  this->TimeEquationFrequencyEntry->DisplayLabelOn();
+  this->TimeEquationFrequencyEntry->SetLabel( "Frequency" );
+  this->TimeEquationFrequencyEntry->SetEndCommand( this, "UpdateTimeEquationValuesFromEntry" );
+  this->TimeEquationFrequencyEntry->SetEntryCommand( this, "UpdateTimeEquationValuesFromEntry" );
+
   this->ScriptEditorFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->ScriptEditorFrame->Create(pvApp, 0);
 
@@ -257,15 +303,18 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->SourceMenuButton->SetBalloonHelpString(
     "Select the filter/source which will be modified by the current action.");
   this->MethodMenuButton->SetBalloonHelpString(
-    "Select the property of the selected filter/source to be modified.");
+    "Select the property of the selected filter/source to be modified with time.");
   this->StartTimeEntry->SetBalloonHelpString(
-    "This is the value of the property for frame 0. "
-    "The value of the selected property is linearly interpolated "
-    "between the first and the last frame.");
+    "This is the value of the property taken on by the waveform when the "
+    "phase is zero. ");
   this->EndTimeEntry->SetBalloonHelpString(
-    "This is the value of the property for the last frame."
-    "The value of the selected property is linearly interpolated "
-    "between the first and the last frame.");
+    "This is the value of the property at the waveform peak or trough, "
+    "depending on whether it is higher or lower than the value given "
+    "for a phase of zero.");
+  this->TimeEquationPhaseEntry->SetBalloonHelpString(
+    "The phase of the parameter's time waveform, in degrees" );
+  this->TimeEquationFrequencyEntry->SetBalloonHelpString(
+    "The number of waveform cycles in the animation" );
 
   if (this->PVSource)
     {
@@ -329,6 +378,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   this->SetLabelAndScript("None", 0, 0);
   this->SwitchScriptTime(-1);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -345,6 +395,9 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 
   this->DummyFrame->Delete();
   this->EndTimeEntry->Delete();
+  this->TimeEquationStyleEntry->Delete();
+  this->TimeEquationPhaseEntry->Delete();
+  this->TimeEquationFrequencyEntry->Delete();
   this->MethodLabel->Delete();
   this->MethodMenuButton->Delete();
   this->Observer->Delete();
@@ -365,14 +418,24 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
 {
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
-  pvApp->Script("pack forget %s %s %s %s",
+  pvApp->Script("pack forget %s %s %s %s %s %s %s",
     this->DummyFrame->GetWidgetName(),
     this->ScriptEditorFrame->GetWidgetName(),
     this->StartTimeEntry->GetWidgetName(),
-    this->EndTimeEntry->GetWidgetName());
+    this->EndTimeEntry->GetWidgetName(),
+    this->TimeEquationStyleEntry->GetWidgetName(),
+    this->TimeEquationPhaseEntry->GetWidgetName(),
+    this->TimeEquationFrequencyEntry->GetWidgetName()
+    );
   this->CustomScript = 0;
   if ( i > 0)
     {
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->TimeEquationStyleEntry->GetWidgetName());
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->TimeEquationFrequencyEntry->GetWidgetName());
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->TimeEquationPhaseEntry->GetWidgetName());
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->StartTimeEntry->GetWidgetName());
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
@@ -495,6 +558,9 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
 
   this->StartTimeEntry->EnabledOff();
   this->EndTimeEntry->EnabledOff();
+  this->TimeEquationStyleEntry->EnabledOff();
+  this->TimeEquationPhaseEntry->EnabledOff();
+  this->TimeEquationFrequencyEntry->EnabledOff();
   if ( !samesource )
     {
     this->SetCurrentMethod(0);
@@ -523,6 +589,9 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     this->GetMethodMenuButton()->SetButtonText(this->GetCurrentMethod());
     this->StartTimeEntry->EnabledOn();
     this->EndTimeEntry->EnabledOn();
+    this->TimeEquationStyleEntry->EnabledOn();
+    this->TimeEquationPhaseEntry->EnabledOn();
+    this->TimeEquationFrequencyEntry->EnabledOn();
     }
   this->Parent->ShowEntryInFrame(this, -1);
 }
@@ -630,12 +699,173 @@ float vtkPVAnimationInterfaceEntry::GetTimeEndValue()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetTimeEquationStyle(int s)
+{
+  //cout << "Set Time equation style to: " << s << endl;
+  if ( this->TimeEquationStyle == s )
+    {
+    return;
+    }
+  this->TimeEquationStyle = s;
+  this->UpdateTimeEquationValuesToEntry();
+  if ( !this->TimeEquationStyleEntry->IsCreated() ||
+       !this->TimeEquationPhaseEntry->IsCreated() ||
+       !this->TimeEquationFrequencyEntry->IsCreated() )
+    {
+    return;
+    } 
+  this->AddTraceEntry("$kw(%s) SetTimeEquationStyle %d", 
+    this->GetTclName(), s);
+  //cout << __LINE__ << " Dirty" << endl;
+  this->Dirty = 1;
+  this->Parent->UpdateNewScript();
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetTimeEquationPhase(float p)
+{
+  //cout << "Set Time equation phase to: " << p << endl;
+  if ( this->TimeEquationPhase == p )
+    {
+    return;
+    }
+  this->TimeEquationPhase = p;
+  this->UpdateTimeEquationValuesToEntry();
+  if ( !this->TimeEquationStyleEntry->IsCreated() ||
+       !this->TimeEquationPhaseEntry->IsCreated() ||
+       !this->TimeEquationFrequencyEntry->IsCreated() )
+    {
+    return;
+    } 
+  this->AddTraceEntry("$kw(%s) SetTimeEquationPhase %f", 
+    this->GetTclName(), p);
+  //cout << __LINE__ << " Dirty" << endl;
+  this->Dirty = 1;
+  this->Parent->UpdateNewScript();
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetTimeEquationFrequency(float f)
+{
+  //cout << "Set Time equation style to: " << s << endl;
+  if ( this->TimeEquationFrequency == f )
+    {
+    return;
+    }
+  this->TimeEquationFrequency = f;
+  this->UpdateTimeEquationValuesToEntry();
+  if ( !this->TimeEquationStyleEntry->IsCreated() ||
+       !this->TimeEquationPhaseEntry->IsCreated() ||
+       !this->TimeEquationFrequencyEntry->IsCreated() )
+    {
+    return;
+    } 
+  this->AddTraceEntry("$kw(%s) SetTimeEquationFrequency %f", 
+    this->GetTclName(), f);
+  //cout << __LINE__ << " Dirty" << endl;
+  this->Dirty = 1;
+  this->Parent->UpdateNewScript(); // ??? FIXME: Is this required?
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::UpdateTimeEquationValuesFromEntry()
+{
+  //cout << "UpdateTimeEquationValuesFromEntry" << endl;
+  if (this->UpdatingEntries)
+    {
+    return;
+    }
+  this->UpdatingEntries = 1;
+  if ( !this->TimeEquationStyleEntry->IsCreated() ||
+       !this->TimeEquationPhaseEntry->IsCreated() ||
+       !this->TimeEquationFrequencyEntry->IsCreated() )
+    {
+    return;
+    }
+  int style;
+  if ( this->TimeEquationStyleEntry->GetRadioButtonSet()->IsButtonSelected( 1 ) )
+    {
+    style = 1;
+    }
+  else if ( this->TimeEquationStyleEntry->GetRadioButtonSet()->IsButtonSelected( 2 ) )
+    {
+    style = 2;
+    }
+  else
+    { // default to linear interpolation
+    style = 0;
+    }
+  if ( this->TimeEquationStyle != style )
+    {
+    this->SetTimeEquationStyle( style );
+    }
+  if ( this->TimeEquationPhase != this->TimeEquationPhaseEntry->GetValue() )
+    {
+    this->SetTimeEquationPhase( this->TimeEquationPhaseEntry->GetValue() );
+    }
+  if ( this->TimeEquationFrequency != this->TimeEquationFrequencyEntry->GetValue() )
+    {
+    this->SetTimeEquationFrequency( this->TimeEquationFrequencyEntry->GetValue() );
+    }
+  this->UpdatingEntries = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::UpdateTimeEquationValuesToEntry()
+{
+  this->TimeEquationStyleEntry->GetRadioButtonSet()->SelectButton( this->TimeEquationStyle );
+  this->TimeEquationPhaseEntry->SetValue( this->TimeEquationPhase );
+  this->TimeEquationFrequencyEntry->SetValue( this->TimeEquationFrequency );
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterfaceEntry::GetTimeEquationStyleValue()
+{
+  this->UpdateTimeEquationValuesFromEntry();
+  return this->GetTimeEquationStyle();
+}
+
+//-----------------------------------------------------------------------------
+float vtkPVAnimationInterfaceEntry::GetTimeEquationPhaseValue()
+{
+  this->UpdateTimeEquationValuesFromEntry();
+  return this->GetTimeEquationPhase();
+}
+
+//-----------------------------------------------------------------------------
+float vtkPVAnimationInterfaceEntry::GetTimeEquationFrequencyValue()
+{
+  this->UpdateTimeEquationValuesFromEntry();
+  return this->GetTimeEquationFrequency();
+}
+
+
+//-----------------------------------------------------------------------------
 const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax))
 {
   if ( this->Dirty )
     {
     //cout << "GetTimeEquation; type is: " << this->TypeIsInt << endl;
     this->UpdateStartEndValueFromEntry();
+    this->UpdateTimeEquationValuesFromEntry();
     float cmax = this->TimeEnd;
     float cmin = this->TimeStart;
     float range = vtkABS(cmax - cmin);
@@ -648,21 +878,44 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
       {
       str << "round";
       }
-    str << "(((";
-    if ( cmax < cmin )
+    switch ( this->TimeEquationStyle )
       {
-      str << "1 - ";
+    case 0: // Linear ramp (sawtooth wave)
+      str << "(((";
+      if ( cmax < cmin )
+        {
+        str << "1 - ";
+        }
+      str << "$globalPVTime) * " << range << ") + ";
+      if ( cmax < cmin )
+        {
+        str << cmax;
+        }
+      else
+        {
+        str << cmin;
+        }
+      str << " )";
+      break;
+
+    case 1: // Triangle wave
+      // ( start*|2*t-1| + end*(1-|2*t-1|) )
+      // this form is used because it _exactly_ interpolates
+      // the start and end values.
+      str << "("
+          << cmin << " * abs(2*$globalPVTime - 1) + "
+          << cmax << " * (1 - abs(2*$globalPVTime - 1)))";
+      break;
+
+    case 2: // Sinusoidal wave
+      // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) )/2 )
+      str << "("
+          << cmin << " + (" << cmax << " - " << cmin << ") * sin( 8*atan(1)* ("
+          << this->TimeEquationFrequency << "*$globalPVTime + "
+          << this->TimeEquationPhase << "/360.))/2.)";
+      break;
       }
-    str << "$globalPVTime) * " << range << ") + ";
-    if ( cmax < cmin )
-      {
-      str << cmax;
-      }
-    else
-      {
-      str << cmin;
-      }
-    str << " ) ]";
+    str << " ]";
     // add deug? ; puts $pvTime";
     str << ends;
     this->SetTimeEquation(str.str());
@@ -679,6 +932,10 @@ void vtkPVAnimationInterfaceEntry::RemoveBinds()
   this->StartTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
   this->EndTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
   this->EndTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->TimeEquationPhaseEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->TimeEquationPhaseEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->TimeEquationFrequencyEntry->GetEntry()->UnsetBind("<FocusOut>");
+  this->TimeEquationFrequencyEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
   this->ScriptEditor->UnsetBind("<FocusOut>");
   this->ScriptEditor->UnsetBind("<KeyPress>");
 }
@@ -694,6 +951,14 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
     "UpdateStartEndValueFromEntry");
   this->EndTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
     "UpdateStartEndValueFromEntry"); 
+  this->TimeEquationPhaseEntry->GetEntry()->SetBind(this, "<FocusOut>",
+    "UpdateTimeEquationValuesFromEntry");
+  this->TimeEquationPhaseEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+    "UpdateTimeEquationValuesFromEntry");
+  this->TimeEquationFrequencyEntry->GetEntry()->SetBind(this, "<FocusOut>",
+    "UpdateTimeEquationValuesFromEntry");
+  this->TimeEquationFrequencyEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+    "UpdateTimeEquationValuesFromEntry");
   this->ScriptEditor->SetBind(this, "<FocusOut>",
     "ScriptEditorCallback");
   this->ScriptEditor->SetBind(this, "<KeyPress-Return>",
@@ -840,6 +1105,9 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
       //<< this->GetTraceName() << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeEquationStyle " << this->TimeEquationStyle << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeEquationPhase " << this->TimeEquationPhase << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeEquationFrequency " << this->TimeEquationFrequency << endl;
       *file << "$kw(" << this->GetTclName() << ") Update" << endl;
       if ( this->SaveStateScript  && this->SaveStateObject )
         {
@@ -903,6 +1171,9 @@ void vtkPVAnimationInterfaceEntry::UpdateEnableState()
   this->PropagateEnableState(this->TimeScriptEntryFrame);
   this->PropagateEnableState(this->StartTimeEntry);
   this->PropagateEnableState(this->EndTimeEntry);
+  this->PropagateEnableState(this->TimeEquationStyleEntry);
+  this->PropagateEnableState(this->TimeEquationPhaseEntry);
+  this->PropagateEnableState(this->TimeEquationFrequencyEntry);
   this->PropagateEnableState(this->MethodLabel);
   this->PropagateEnableState(this->MethodMenuButton);
   this->PropagateEnableState(this->TimeRange);
@@ -924,11 +1195,31 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
     << (this->TimeEquation?this->TimeEquation:"(none)") << endl;
   os << indent << "TimeStart: " << this->TimeStart << endl;
   os << indent << "TimeEnd: " << this->TimeEnd<< endl;
+  os << indent << "TimeEquationStyle: ";
+  switch ( this->TimeEquationStyle )
+    {
+  case 0:
+    os << "Ramp" << endl;
+    break;
+  case 1:
+    os << "Triangle" << endl;
+    break;
+  case 2:
+    os << "Sinusiod" << endl;
+    break;
+  default:
+    os << "(Unknown! Danger Will Robinson!)" << endl;
+    }
+  os << indent << "TimeEquationPhase: " << this->TimeEquationPhase << endl;
+  os << indent << "TimeEquationFrequency: " << this->TimeEquationFrequency << endl;
   os << indent << "Dirty: " << this->Dirty<< endl;
 
   os << indent << "SourceMenuButton: " << this->SourceMenuButton << endl;
   os << indent << "MethodMenuButton: " << this->MethodMenuButton << endl;
   os << indent << "PVSource: " << this->PVSource<< endl;
+  os << indent << "TimeEquationStyleEntry: " << this->TimeEquationStyleEntry << endl;
+  os << indent << "TimeEquationPhaseEntry: " << this->TimeEquationPhaseEntry << endl;
+  os << indent << "TimeEquationFrequencyEntry: " << this->TimeEquationFrequencyEntry << endl;
 
   os << indent << "SaveStateScript: " 
     << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
