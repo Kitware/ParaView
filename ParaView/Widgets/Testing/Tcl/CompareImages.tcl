@@ -21,7 +21,7 @@ proc CompareImage { view } {
    
    # current directory
    if {$validImageFound == 0} {
-      return;
+      return 1
    }
    vtkWindowToImageFilter rt_w2if
    rt_w2if SetInput [$view GetVTKWindow]
@@ -41,7 +41,7 @@ proc CompareImage { view } {
       } else {
          puts "Unable to find valid image:${validImage}"
          rt_w2if Delete
-         return
+         return 1
       }
    }
    
@@ -179,7 +179,7 @@ proc CompareImage { view } {
          
          rt_id Delete
          rt_png Delete
-         return
+         return 1
       }
    }
      
@@ -197,4 +197,5 @@ proc CompareImage { view } {
    }
    rt_id Delete
    rt_png Delete
+   return 0
 }
