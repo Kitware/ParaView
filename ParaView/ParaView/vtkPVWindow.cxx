@@ -525,9 +525,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
+  this->MenuFile->InsertCommand(4, "Load Tcl Interactor", this,
+                                "LoadInteractor");
+  
   // Log stuff (not traced)
-  this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
-  this->MenuFile->InsertCommand(5, "Close Log File", this, "StopLog");
+  this->MenuFile->InsertCommand(5, "Open Log File", this, "StartLog");
+  this->MenuFile->InsertCommand(6, "Close Log File", this, "StopLog");
 
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
@@ -2318,6 +2321,88 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char *className)
   return pvs;
 }
 
+const char* vtkPVWindow::InteractorScript=
+"catch {unset vtkInteract.bold}\n"
+"catch {unset vtkInteract.normal}\n"
+"catch {unset vtkInteract.tagcount}\n"
+"set vtkInteractBold {-background #43ce80 -foreground #221133 -relief raised -borderwidth 1}\n"
+"set vtkInteractNormal {-background #dddddd -foreground #221133 -relief flat}\n"
+"set vtkInteractTagcount 1\n"
+"set vtkInteractCommandList {}\n"
+"set vtkInteractCommandIndex 0\n"
+"proc vtkInteract {} {\n"
+"    global vtkInteractCommandList vtkInteractCommandIndex\n"
+"    global vtkInteractTagcount\n"
+"    proc dovtk {s w} {\n"
+"	global vtkInteractBold vtkInteractNormal vtkInteractTagcount \n"
+"	global vtkInteractCommandList vtkInteractCommandIndex\n"
+"	set tag [append tagnum $vtkInteractTagcount]\n"
+"       set vtkInteractCommandIndex $vtkInteractTagcount\n"
+"	incr vtkInteractTagcount 1\n"
+"	.vtkInteract.display.text configure -state normal\n"
+"	.vtkInteract.display.text insert end $s $tag\n"
+"	set vtkInteractCommandList [linsert $vtkInteractCommandList end $s]\n"
+"	eval .vtkInteract.display.text tag configure $tag $vtkInteractNormal\n"
+"	.vtkInteract.display.text tag bind $tag <Any-Enter> {.vtkInteract.display.text tag configure $tag $vtkInteractBold}\n"
+"	.vtkInteract.display.text tag bind $tag <Any-Leave> {.vtkInteract.display.text tag configure $tag $vtkInteractNormal}\n"
+"	.vtkInteract.display.text tag bind $tag <1> {dovtk [list $s] .vtkInteract}\n"
+"	.vtkInteract.display.text insert end \\n;\n"
+"	.vtkInteract.display.text insert end [uplevel 1 $s]\n"
+"	.vtkInteract.display.text insert end \\n\\n\n"
+"	.vtkInteract.display.text configure -state disabled\n"
+"	.vtkInteract.display.text yview end\n"
+"    }\n"
+"    catch {destroy .vtkInteract}\n"
+"    toplevel .vtkInteract -bg #bbbbbb\n"
+"    wm title .vtkInteract {vtk Interactor}\n"
+"    wm iconname .vtkInteract {vtk}\n"
+"    frame .vtkInteract.buttons -bg #bbbbbb\n"
+"    pack  .vtkInteract.buttons -side bottom -fill both -expand 0 -pady 2m\n"
+"    button .vtkInteract.buttons.dismiss -text Dismiss -command {wm withdraw .vtkInteract} -bg #bbbbbb -fg #221133 -activebackground #cccccc -activeforeground #221133\n"
+"    pack .vtkInteract.buttons.dismiss -side left -expand 1 -fill x\n"
+"    frame .vtkInteract.file -bg #bbbbbb\n"
+"    label .vtkInteract.file.label -text {Command:} -width 10 -anchor w -bg #bbbbbb -fg #221133\n"
+"    entry .vtkInteract.file.entry -width 40 -bg #dddddd -fg #221133 -highlightthickness 1 -highlightcolor #221133\n"
+"    bind .vtkInteract.file.entry <Return> {\n"
+"	dovtk [%W get] .vtkInteract; %W delete 0 end}\n"
+"    pack .vtkInteract.file.label -side left\n"
+"    pack .vtkInteract.file.entry -side left -expand 1 -fill x\n"
+"    frame .vtkInteract.display -bg #bbbbbb\n"
+"    text .vtkInteract.display.text -yscrollcommand {.vtkInteract.display.scroll set} -setgrid true -width 60 -height 8 -wrap word -bg #dddddd -fg #331144 -state disabled\n"
+"    scrollbar .vtkInteract.display.scroll -command {.vtkInteract.display.text yview} -bg #bbbbbb -troughcolor #bbbbbb -activebackground #cccccc -highlightthickness 0\n"
+"    pack .vtkInteract.display.text -side left -expand 1 -fill both\n"
+"    pack .vtkInteract.display.scroll -side left -expand 0 -fill y\n"
+"    pack .vtkInteract.display -side bottom -expand 1 -fill both\n"
+"    pack .vtkInteract.file -pady 3m -padx 2m -side bottom -fill x\n"
+"    set vtkInteractCommandIndex 0\n"
+"    bind .vtkInteract <Down> {\n"
+"      if { $vtkInteractCommandIndex < [expr $vtkInteractTagcount - 1] } {\n"
+"        incr vtkInteractCommandIndex\n"
+"        set command_string [lindex $vtkInteractCommandList $vtkInteractCommandIndex]\n"
+"        .vtkInteract.file.entry delete 0 end\n"
+"        .vtkInteract.file.entry insert end $command_string\n"
+"      } elseif { $vtkInteractCommandIndex == [expr $vtkInteractTagcount - 1] } {\n"
+"        .vtkInteract.file.entry delete 0 end\n"
+"      }\n"
+"    }\n"
+"    bind .vtkInteract <Up> {\n"
+"      if { $vtkInteractCommandIndex > 0 } {\n"
+"        set vtkInteractCommandIndex [expr $vtkInteractCommandIndex - 1]\n"
+"        set command_string [lindex $vtkInteractCommandList $vtkInteractCommandIndex]\n"
+"        .vtkInteract.file.entry delete 0 end\n"
+"        .vtkInteract.file.entry insert end $command_string\n"
+"      }\n"
+"    }\n"
+"    wm withdraw .vtkInteract\n"
+"}\n"
+"vtkInteract\n"
+"wm deiconify .vtkInteract\n";
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::LoadInteractor()
+{
+  this->GetPVApplication()->SimpleScript(this->InteractorScript);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ReadSourceInterfaces()

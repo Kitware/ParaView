@@ -250,6 +250,10 @@ public:
   void DisableFilterButtons();
   void EnableFilterButtons();
 
+  // Description:
+  // Load the tcl interactor
+  void LoadInteractor();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -322,6 +326,7 @@ protected:
 private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
+  static const char* InteractorScript;
 };
 
 
