@@ -66,6 +66,11 @@ public:
   // Access to the menu
   vtkKWMenu* GetMenu();
   
+  // Description
+  // Set the indicator On/Off. To be called after creation.
+  void IndicatorOn();
+  void IndicatorOff();
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
