@@ -29,9 +29,13 @@ long int modified_time(const char *filename)
 
 const char* name(const char *filename)
 {
-  char *forward = strrchr(filename, '/') + 1;
-  char *backward = strrchr(filename, '\\') + 1;
-  return (forward > backward) ? forward : backward;
+  char *forward = strrchr(filename, '/');
+  char *backward = strrchr(filename, '\\');
+  if (forward || backward)
+    {
+    return ((forward > backward) ? forward : backward) + 1;
+    }
+  return filename;
 }
 
 int main(int argc, char **argv)
