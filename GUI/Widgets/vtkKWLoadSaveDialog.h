@@ -42,55 +42,37 @@ public:
   // Description:
   // Returns 0 if the dialog is active e.g. displayed
   // 1 if it was Canceled 2 if it was OK.
-  int GetStatus() 
-    { return this->Done; };
+  int GetStatus() { return this->Done; };
 
   // Description:
-  // Set the file types the dialog will open or save
+  // Set/Get the file types the dialog will open or save
   // Should be in TK format
   vtkSetStringMacro(FileTypes);
   vtkGetStringMacro(FileTypes);
 
   // Description:
-  // Retrieve the file path that the user selected
+  // Set/Get the file path that the user selected
   vtkGetStringMacro(FileName);
-
-  // Description:
-  // Set the file path that the user selected
   vtkSetStringMacro(FileName);
 
   // Description:
-  // Set default extension.
-  virtual void SetDefaultExt(const char *)
-    {
-      vtkErrorMacro("This method is deprecated use SetDefaultExtension");
-    }
-  const char *GetDefaultExt()
-    {
-      vtkErrorMacro("This method is deprecated use GetDefaultExtension");
-      return NULL;
-    }
-  
-  // Description:
-  // Set default extension.
+  // Set/Get default extension.
   vtkSetStringMacro(DefaultExtension);
   vtkGetStringMacro(DefaultExtension);
   
   // Description:
-  // Set a filename to be displayed in the dialog when it pops up
+  // Set /Geta filename to be displayed in the dialog when it pops up
   vtkSetStringMacro(InitialFileName);
   vtkGetStringMacro(InitialFileName);
 
   // Description:
-  // Set or reset the SaveDialog. If set, the dialog will be
-  // save file dialog. If reset, the dialog will be load 
-  // dialog
+  // If set, the dialog will be a save file dialog, otherwise a load dialog
   vtkSetClampMacro(SaveDialog, int, 0, 1);
   vtkBooleanMacro(SaveDialog, int);
   vtkGetMacro(SaveDialog, int);
 
   // Description:
-  // Set or reset the ChooseDirectory ivar.
+  // Set/Get the ChooseDirectory ivar.
   // If set to 1, the dialog will ask the user for a directory, not a file
   // If set to 0, the usual file dialog is displayed (default)
   vtkSetClampMacro(ChooseDirectory, int, 0, 1);
