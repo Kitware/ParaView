@@ -82,9 +82,9 @@ int main(int argc, char* argv[])
   // Execute the server and then the client.
   kwsysProcess_Execute(server);
 #ifdef _WIN32
-  Sleep(1000);
+  Sleep(2000);
 #else
-  sleep(1);
+  sleep(2);
 #endif
   kwsysProcess_Execute(client);
 
