@@ -150,7 +150,6 @@ int main(int argc, char* argv[])
   vtkProcessModule* pm = vtkPVCreateProcessModule::CreateProcessModule(options);
 
   vtkPVProcessModuleBatchHelper* helper = vtkPVProcessModuleBatchHelper::New();
-  helper->SetOptions(options);
   helper->SetProcessModule(pm);
   pm->SetGUIHelper(helper);
   helper->Delete();

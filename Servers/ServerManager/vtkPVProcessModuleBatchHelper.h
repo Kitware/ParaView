@@ -22,7 +22,6 @@
 
 #include "vtkProcessModuleGUIHelper.h"
 
-class vtkPVBatchOptions;
 class vtkPVProcessModule;
 class vtkSMApplication;
 
@@ -50,17 +49,12 @@ public:
   // Exit the application
   virtual void ExitApplication();
   
-  void SetOptions(vtkPVBatchOptions* op)
-    {
-    this->Options = op;
-    }
 protected:
   vtkPVProcessModuleBatchHelper();
   virtual ~vtkPVProcessModuleBatchHelper();
 
   vtkSMApplication* SMApplication;
 private:
-  vtkPVBatchOptions* Options;
 
   vtkPVProcessModuleBatchHelper(const vtkPVProcessModuleBatchHelper&); // Not implemented
   void operator=(const vtkPVProcessModuleBatchHelper&); // Not implemented
