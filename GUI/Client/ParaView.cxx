@@ -233,21 +233,31 @@ int MyMain(int argc, char *argv[])
   pm->SetApplication(app);
   app->SetProcessModule(pm);
   pm->InitializeInterpreter();
+  bool needLog = false;
   if(getenv("VTK_CLIENT_SERVER_LOG"))
     {
+    needLog = true;
     if(app->GetClientMode())
       {
+      needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewClient.log");
       }
     if(serverMode)
       {
+      needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewServer.log");
       }
     if(renderServerMode)
       {
+      needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
       }
+    } 
+  if(needLog)
+    {
+    pm->GetInterpreter()->SetLogFile("paraview.log");
     }
+  
   ParaViewInitializeInterpreter(pm);
   
   // Start the application's event loop.  This will enable
