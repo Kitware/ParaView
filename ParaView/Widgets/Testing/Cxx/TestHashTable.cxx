@@ -5,7 +5,8 @@
 int main()
 {
   int res = 0;
-  int cc;
+  int error = 0;
+  int cc;  
   char names[][10] = {
     "Andy",
     "Amy",
@@ -20,7 +21,7 @@ int main()
     "Will"
   };
 
-  cout << "Testing KW Hash Table" << endl;
+  //cout << "Testing KW Hash Table" << endl;
 
   vtkKWHashTable *ht = vtkKWHashTable::New();
 
@@ -28,8 +29,12 @@ int main()
     {
     unsigned long key = vtkKWHashTable::HashString( names[cc] );
     int res = ht->Insert( names[cc], (void *)names[cc] );
-    cout << "Insert: " << names[cc] << " at key: " << key 
-	 << (res ? " ok" : " problem") << endl;
+    if ( !res )
+      {
+      cout << "Insert: " << names[cc] << " at key: " << key 
+	   << (res ? " ok" : " problem") << endl;
+      error = 1;
+      }
     }
 
   for ( cc =0 ; cc< 10; cc++ )
@@ -38,11 +43,12 @@ int main()
     char *name = ( char * )ht->Lookup( names[cc] );
     if ( name ) 
       {
-      cout << key << ": " << name << endl;
+      // cout << key << ": " << name << endl;
       }
     else
-      {
+      {      
       cout << key << ": does not exist" << endl;
+      error = 1;
       }
     }
 
@@ -55,17 +61,21 @@ int main()
     {
     unsigned long key = vtkKWHashTable::HashString( names[cc] );
     int res = ht->Insert( names[cc], (void *)names[cc] );
-    cout << "Insert: " << names[cc] << " at key: " << key 
-	 << (res ? " ok" : " problem") << endl;
+    if ( !res )
+      {
+      cout << "Insert: " << names[cc] << " at key: " << key 
+	   << (res ? " ok" : " problem") << endl;
+      error = 1;
+      }
     }
 
   vtkKWHashTableIterator *it = ht->Iterator();
-  cout << "Traverse hash table:" << endl;
+  //cout << "Traverse hash table:" << endl;
   if ( !it )
     {
     cout << "Cannot get the pointer. This is strange, since I just"
       "inserted something..." << endl;
-    res = 1;
+    error = 1;
     }
   while ( it )
     {
@@ -73,8 +83,12 @@ int main()
       {      
       unsigned long key = it->GetKey();
       void *value = it->GetData();
-      cout << "Key: " << key << " store element: " << value 
-	   << " (" << static_cast<char *>(value) << ")" << endl;
+      if ( !value )
+	{
+	cout << "Key: " << key << " store element: " << value 
+	     << " (" << static_cast<char *>(value) << ")" << endl;
+	error = 1;
+	}
       }
     if ( !it->Next() )
       {
@@ -88,6 +102,6 @@ int main()
 
   ht->Delete();
 
-  return res;
+  return error;
 }
 
