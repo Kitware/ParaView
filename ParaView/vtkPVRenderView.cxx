@@ -127,7 +127,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // Create the compositer.
   str = getenv("PV_ENABLE_COMPOSITE_INTERRUPTS");
     {
-    if ( str != NULL && strcmp(str, "TRUE"))
+    if ( str != NULL)
       {
       this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
       }
