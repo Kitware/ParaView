@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImage.h
+  Module:    vtkPVImageSlice.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,38 +26,48 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVImage_h
-#define __vtkPVImage_h
+#ifndef __vtkPVImageSlice_h
+#define __vtkPVImageSlice_h
 
-#include "vtkKWWidget.h"
-#include "vtkProp.h"
-#include "vtkImageData.h"
-#include "vtkOutlineSource.h"
-#include "vtkPVData.h"
+#include "vtkImageClip.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWRadioButton.h"
+#include "vtkPVSource.h"
 
-class vtkPVComposite;
-
-class VTK_EXPORT vtkPVImage : public vtkPVData
+class VTK_EXPORT vtkPVImageSlice : public vtkPVSource
 {
 public:
-  static vtkPVImage* New();
-  vtkTypeMacro(vtkPVImage,vtkKWWidget);
-  
+  static vtkPVImageSlice* New();
+  vtkTypeMacro(vtkPVImageSlice, vtkPVSource);
+
   void Create(vtkKWApplication *app, char *args);
   
-  void SetImageData(vtkImageData *data);
-  vtkImageData *GetImageData();
+  void SliceChanged();
+  void SelectX();
+  void SelectY();
+  void SelectZ();
+
+  vtkGetObjectMacro(Slice, vtkImageClip);
   
-  void Clip();
-  void Slice();
+  void SetDimensions(int dim[6]);
+  int *GetDimensions();
   
 protected:
-  vtkPVImage();
-  ~vtkPVImage();
-  vtkPVImage(const vtkPVImage&) {};
-  void operator=(const vtkPVImage&) {};
+  vtkPVImageSlice();
+  ~vtkPVImageSlice();
+  vtkPVImageSlice(const vtkPVImageSlice&) {};
+  void operator=(const vtkPVImageSlice&) {};
   
-  vtkSetObjectMacro(Data, vtkDataSet);
+  vtkKWWidget *Accept;
+  vtkKWEntry *SliceEntry;
+  vtkKWLabel *SliceLabel;
+  vtkKWRadioButton *XDimension;
+  vtkKWRadioButton *YDimension;
+  vtkKWRadioButton *ZDimension;
+  
+  vtkImageClip  *Slice;
+  int Dimensions[6];
 };
 
 #endif

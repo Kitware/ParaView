@@ -197,6 +197,14 @@ SOURCE=.\vtkPVContourFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVData.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVElevationFilter.cxx
 # End Source File
 # Begin Source File
@@ -205,11 +213,35 @@ SOURCE=.\vtkPVElevationFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVImage.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageClip.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageClipTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVImageReader.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkPVImageReaderTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageSlice.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageSliceTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -534,6 +566,26 @@ InputName=vtkPVContourFilter
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVData.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVData.h
+InputName=vtkPVData
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVElevationFilter.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -554,7 +606,83 @@ InputName=vtkPVElevationFilter
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVImage.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImage.h
+InputName=vtkPVImage
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageClip.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImageClip.h
+InputName=vtkPVImageClip
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVImageReader.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImageReader.h
+InputName=vtkPVImageReader
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageSlice.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVImageSlice.h
+InputName=vtkPVImageSlice
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
