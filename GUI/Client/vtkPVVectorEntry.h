@@ -48,10 +48,8 @@ public:
   // out how to get the vectors value in Tcl with any number of componenets.
   vtkGetObjectMacro(LabelWidget, vtkKWLabel);
   //BTX
-  vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
   //ETX
-  vtkKWLabel* GetSubLabel(int idx);
   vtkKWEntry* GetEntry(int idx);
 
   // Description:
@@ -111,19 +109,8 @@ public:
   vtkGetMacro(VectorLength, int);
 
   // Description:
-  // Sets one of the sub-labels. This has to be done
-  // before create.
-  void SetSubLabel(int i, const char* sublabl);
-
-  // Description:
   // Set the entry value.
   void SetEntryValue(int index, const char* value);
-
-  // Description:
-  // Set or get whether the entry is read only or not.
-  vtkSetClampMacro(ReadOnly, int, 0, 1);
-  vtkBooleanMacro(ReadOnly, int);
-  vtkGetMacro(ReadOnly, int);
 
 //BTX
   // Description:
@@ -162,7 +149,6 @@ protected:
   ~vtkPVVectorEntry();
   
   vtkKWLabel *LabelWidget;
-  vtkKWWidgetCollection *SubLabels;
   vtkKWWidgetCollection *Entries;
 
   vtkSetStringMacro(EntryLabel);
@@ -172,10 +158,6 @@ protected:
   int DataType;
   int VectorLength;
 
-  // Description
-  // Set this to 1 to be read only
-  int ReadOnly;
-
   char *ScriptValue;
 
   // Description:
@@ -184,8 +166,6 @@ protected:
 
   vtkPVVectorEntry(const vtkPVVectorEntry&); // Not implemented
   void operator=(const vtkPVVectorEntry&); // Not implemented
-
-  vtkStringList* SubLabelTxts;
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

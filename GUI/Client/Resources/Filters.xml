@@ -259,8 +259,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
     <SelectionList property="CurvatureType"
                    label="Curvature type"
                    trace_name="CurvatureType"
-                   help="Select the curvature type."
-                   default_value="0">
+                   help="Select the curvature type.">
       <Item name="Gaussian" value="0"/>
       <Item name="Mean" value="1"/>
     </SelectionList>
@@ -323,7 +322,6 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
                input_name="Input"/>
     <SelectionList label="Boundary Cells" property="BoundaryMode"
                    trace_name="BoundaryMode"
-                   default_value="0"
                    help="Select how to handle boundary cells. Isosurfacing works well when cells are uniquely assigned to processes. Dividing cells along processor boundaries is useful for volume rendering.">
       <Item name="Assign cells uniquely" value="0"/>
       <Item name="Duplicate cells" value="1"/>
@@ -630,12 +628,11 @@ This filter operates on polygonal data and produces polygonal output.
     <ArrayMenu input_name="Input" property="SelectInputScalars"
                attribute_type="Scalars" label="Scalars"
                trace_name="ArrayMenu"
-               input_menu="im" number_of_components="1"
+               input_menu="im"
                help="Select the input scalars to process."/>
     <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
                    label="Dimensionality"
-                   default_value="3"
                    help="Select whether to perform a 2d or 3d gradient">
       <Item name="2"
             value="2"/>
@@ -668,7 +665,6 @@ The Gradient filter computes the gradient vector at each point in an image or vo
     <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
                    label="Dimensionality"
-                   default_value="3"
                    help="Select whether to perform a 2d or 3d gradient magnitude">
       <Item name="2"
             value="2"/>
@@ -819,7 +815,6 @@ The Input menu allows the user to select the data set to which this filter will 
                label="Scalars"
                trace_name="Scalars"
                input_menu="im"
-               number_of_components="1"
                help="Select the input scalars to process."/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Kernel Size"
@@ -1113,8 +1108,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
     <SelectionList property="Plane"
                    trace_name="Plane"
                    label="Plane"
-                   help="Select which plane of the bounding box to reflect across"
-                   default_value="0">
+                   help="Select which plane of the bounding box to reflect across">
       <Item name="X"
             value="6"/>
       <Item name="Y"
@@ -1169,14 +1163,12 @@ The Reflection filter reflects the input data set across the specified plane. If
                attribute_type="Vectors"
                label="Vectors"
                input_menu="im"
-               number_of_components="3"
                help="Select the input normals to process."/>
     <ArrayMenu input_name="Input" property="SelectInputScalars"
                trace_name="Scalars"
                attribute_type="Scalars"
                label="Scalars"
                input_menu="im"
-               number_of_components="1"
                help="Select the input scalars to process."/>
     <ScaleFactorEntry label="Width"
                       property="Width"
@@ -1407,7 +1399,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
                  help="The maximum chord error allowed at any edge midpoint in the output tessellation."
                  />
     <TempTessellatorEntry label="Max Field Error" trace_name="FieldError2"
-                      variable="FieldError2" type="float"
+                      variable="FieldError2"
                       help="The maximum field error allowed at any edge midpoint in the output tessellation."
                       input_menu_id="tess_source_select"
                       set_criterion_command="SetFieldCriterion"
@@ -1525,8 +1517,7 @@ The Transform filter allows you to specify the position, size, and orientation o
     <SelectionList label="Vary radius"
                    trace_name="VaryRadius"
                    property="VaryRadius"
-                   help="Select whether/how to vary the radius of the tube"
-                   default_value="0">
+                   help="Select whether/how to vary the radius of the tube">
       <Item name="Off"
             value="0"/>
       <Item name="By Scalar"
@@ -1618,7 +1609,6 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
                trace_name="Vectors"
                label="Vectors"
                input_menu="im"
-               number_of_components="3"
                help="Select the input vectors to process."/>
     <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Scale factor"
@@ -1679,7 +1669,6 @@ The Warp (vector) filter translates the points of the input data set using a spe
     </SelectWidget>
     <CutEntry label="Cut Offset Values"
               trace_name="Cut Values"
-              initial_value="0"
               input_menu="im1" property="ContourValues"
               help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."
               set_number_command="SetNumberOfContours"
@@ -1853,7 +1842,6 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                label="Scalars"
                trace_name="Scalars"
                input_menu="im"
-               number_of_components="1"
                help="Choose which scalar array you want to contour."/>
     <ScalarRangeLabel id="srl"
                       property="ContourValues"
@@ -1862,8 +1850,6 @@ The Threshold filter extracts the portions of the input data set whose scalars l
     <ContourEntry label="Contour Values"
                   trace_name="Contour Values"
                   array_menu="am" property="ContourValues"
-                  set_number_command="SetNumberOfContours"
-                  set_contour_command="SetValue"
                   help="List of current contour values." />
     <LabeledToggle label="Compute Normals"
                    property="ComputeNormals"
@@ -1959,8 +1945,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
     <SelectionList property="PickCell"
                    label="Pick Type"
                    trace_name="PickType"
-                   help="Select whether to pick cells or points."
-                   default_value="1">
+                   help="Select whether to pick cells or points.">
       <Item name="Point" value="0"/>
       <Item name="Cell" value="1"/>
     </SelectionList>
@@ -2033,7 +2018,6 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                trace_name="Vectors"
                label="Vectors"
                input_menu="im"
-               number_of_components="3"
                help="Select the input vectors to use."/>
     <SelectWidget type="object"
                   trace_name="Seed"
@@ -2059,8 +2043,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                        trace_name="MaximumPropagationUnit"
                        label="Max. Propagation"
                        option_width="15"
-                       help="Maximum propagation"
-                       default_value="1">
+                       help="Maximum propagation">
           <Item name="Time"
                 value="0"/>
           <Item name="Length"
@@ -2083,8 +2066,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                        property="InitialIntegrationStepUnit"
                        label="Init. Step Len."
                        option_width="15"
-                       help="Initial step length"
-                       default_value="2">
+                       help="Initial step length">
           <Item name="Time"
                 value="0"/>
           <Item name="Length"
@@ -2104,8 +2086,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <SelectionList trace_name="IntegrationDirection"
                    property="IntegrationDirection"
                    label="Integration Direction"
-                   option_width="15"
-                   default_value="2">
+                   option_width="15">
       <Item name="FORWARD"
             value="0"/>
       <Item name="BACKWARD"
@@ -2131,8 +2112,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                            trace_name="MinimumIntegrationStepUnit"
                            label="Min. Step Len."
                            option_width="15"
-                           help="Minimum step length used in the integation"
-                           default_value="2">
+                           help="Minimum step length used in the integation">
               <Item name="Time"
                     value="0"/>
               <Item name="Length"
@@ -2157,8 +2137,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                            trace_name="MaximumIntegrationStepUnit"
                            label="Max. Step Len."
                            option_width="15"
-                           help="Maximum step length used in the integration"
-                           default_value="2">
+                           help="Maximum step length used in the integration">
               <Item name="Time"
                     value="0"/>
               <Item name="Length"

@@ -173,8 +173,7 @@
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
                    property="ByteOrder"
-                   help="Select the byte order of the binary file"
-                   default_value="0">
+                   help="Select the byte order of the binary file">
       <Item name="big endian" value="0"/>
       <Item name="little endian" value="1"/>
     </SelectionList>
@@ -271,8 +270,7 @@
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
                    property="ByteOrder"
-                   help="Select the byte order of the binary file"
-                   default_value="0">
+                   help="Select the byte order of the binary file">
       <Item name="big endian"
             value="0"/>
       <Item name="little endian"
@@ -352,7 +350,7 @@
                  help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"/>
     <SelectionList label="Data type"
                    trace_name="DataScalarType"
-                   property="DataScalarType" default_value="4"
+                   property="DataScalarType"
                    help="Select the pixel type in the file: short, int, float ...">
       <Item name="char" value="2"/>
       <Item name="unsigned char" value="3"/>
@@ -369,8 +367,7 @@
                    trace_name="DataByteOrder"
                    property="DataByteOrder"
                    help="Select the byte order of the binary file"
-                   suppress_reset="1"
-                   default_value="0">
+                   suppress_reset="1">
       <Item name="big endian"
             value="0"/>
       <Item name="little endian"
@@ -379,8 +376,7 @@
     <SelectionList label="File Dimensionality"
                    trace_name="Dimensionality"
                    property="FileDimensionality"
-                   help="The number of dimensions stored in a file."
-                   default_value="3">
+                   help="The number of dimensions stored in a file.">
       <Item name="2"
             value="2"/>
       <Item name="3"
@@ -426,7 +422,7 @@
                  trace_name="stride" property="Stride" type="int"
                  length="3"
                  help="Set the number of steps to skip between each point (structured data only)."/>
-    <XDMFParameters trace_name="xdmf_parameters" variable="ParameterIndex"
+    <XDMFParameters trace_name="xdmf_parameters"
                     property="ParameterIndex" label="Parameters" />
   </Module>
 #endif
@@ -465,8 +461,7 @@
 
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
-           help="Set the current timestep."
-           range_source="TimeStepRange" />
+           help="Set the current timestep."/>
 
     <ArraySelection trace_name="cell_array_sel"
                     property="CellArrayStatus"
@@ -479,8 +474,7 @@
 
     <SelectWidget type="int" 
                   variable="DisplayType"
-                  trace_name="DisplayType"
-                  default_value="1">
+                  trace_name="DisplayType">
       <Item label="Blocks" value="1">
         <ArraySelection trace_name="block_sel"
                         attribute_name="Block"

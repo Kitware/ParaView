@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.31");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -268,7 +268,7 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->Label->SetLabel(this->VariableName);
+    this->Label->SetLabel(this->TraceName);
     }
 
   return 1;

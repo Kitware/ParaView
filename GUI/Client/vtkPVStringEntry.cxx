@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.39");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -284,7 +284,7 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->SetLabel(this->VariableName);
+    this->SetLabel(this->TraceName);
     }
 
   return 1;

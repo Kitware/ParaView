@@ -1006,7 +1006,7 @@
         name="FileDimensionality"
         command="SetFileDimensionality"
         number_of_elements="1" 
-        default_values="2" />
+        default_values="3" />
 
       <DoubleVectorProperty
          name="DataOrigin"

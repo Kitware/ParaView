@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.92");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.93");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -843,7 +843,7 @@ int vtkPVFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->SetLabel(this->VariableName);
+    this->SetLabel("File Name");
     }
   
   // Setup the Extension.

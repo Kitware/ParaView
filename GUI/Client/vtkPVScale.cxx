@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.49");
+vtkCxxRevisionMacro(vtkPVScale, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -454,7 +454,7 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* label = element->GetAttribute("label");
   if(!label)
     {
-    label = element->GetAttribute("variable");
+    label = element->GetAttribute("trace_name");
     if (!label )
       {
       vtkErrorMacro("No label attribute.");

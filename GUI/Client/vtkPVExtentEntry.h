@@ -106,11 +106,6 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // Set/get which axis to animate.
-  vtkSetMacro(AnimationAxis, int);
-  vtkGetMacro(AnimationAxis, int);
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -143,9 +138,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  int AnimationAxis;
-  int UseCellExtent;
-  
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
   void operator=(const vtkPVExtentEntry&); // Not implemented

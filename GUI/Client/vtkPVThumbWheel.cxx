@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.8");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -375,7 +375,7 @@ int vtkPVThumbWheel::ReadXMLAttributes(vtkPVXMLElement *element,
   const char *label = element->GetAttribute("label");
   if (!label)
     {
-    label = element->GetAttribute("variable");
+    label = element->GetAttribute("trace_name");
     
     if (!label)
       {
