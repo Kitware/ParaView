@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -74,6 +74,9 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->Property = NULL;
   
   this->ArrayMenu = NULL;
+  
+  this->SetNumberCommand = NULL;
+  this->SetContourCommand = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +84,8 @@ vtkPVContourEntry::~vtkPVContourEntry()
 {
   this->SetProperty(NULL);
   this->SetArrayMenu(NULL);
+  this->SetSetNumberCommand(NULL);
+  this->SetSetContourCommand(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,13 +128,13 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
   this->UpdateProperty();
   
   cmds[0] = new char[20];
-  sprintf(cmds[0], "SetNumberOfContours");
+  sprintf(cmds[0], this->SetNumberCommand);
   numScalars[0] = 1;
   
   for (i = 0; i < numContours; i++)
     {
     cmds[i+1] = new char[9];
-    sprintf(cmds[i+1], "SetValue");
+    sprintf(cmds[i+1], this->SetContourCommand);
     numScalars[i+1] = 2;
     }
   
@@ -233,6 +238,8 @@ void vtkPVContourEntry::CopyProperties(
       pvce->SetArrayMenu(am);
       am->Delete();
       }
+    pvce->SetSetNumberCommand(this->SetNumberCommand);
+    pvce->SetSetContourCommand(this->SetContourCommand);
     }
   else 
     {
@@ -268,6 +275,9 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetArrayMenu(amw);
     amw->Delete();  
     }
+
+  this->SetSetNumberCommand(element->GetAttribute("set_number_command"));
+  this->SetSetContourCommand(element->GetAttribute("set_contour_command"));
   
   return 1;
 }

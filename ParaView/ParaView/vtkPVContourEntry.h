@@ -91,6 +91,11 @@ public:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
+  // Description:
+  // Get the VTK commands.
+  vtkSetStringMacro(SetNumberCommand);
+  vtkSetStringMacro(SetContourCommand);
+  
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
@@ -100,6 +105,9 @@ protected:
   int AcceptCalled;
   void UpdateProperty();
   vtkPVContourWidgetProperty *Property;
+
+  char *SetNumberCommand;
+  char *SetContourCommand;
   
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented
