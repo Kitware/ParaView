@@ -32,7 +32,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.10");
+vtkCxxRevisionMacro(vtkPickFilter, "1.11");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -185,7 +185,8 @@ void vtkPickFilter::PointExecute()
   if ( ! this->CompareProcesses(bestDistance2) && numPts > 0)
     {
     // Only one point in map.
-    this->InitializePointMap(1);
+    this->InitializePointMap(
+          this->GetInput(this->BestInputIndex)->GetNumberOfPoints());
     this->InsertIdInPointMap(bestId);
     }
 
@@ -369,8 +370,9 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
   vtkUnstructuredGrid* output = this->GetOutput();
   double pt[3];
   // Preserve the original Ids.
-  vtkIdTypeArray* cellIds = vtkIdTypeArray::New();
-  vtkIdTypeArray* ptIds = vtkIdTypeArray::New();
+  // Us int here because mapper has a problem with vtkIdTypeArray.
+  vtkIntArray* cellIds = vtkIntArray::New();
+  vtkIntArray* ptIds = vtkIntArray::New();
 
   // First copy the points.
   vtkPoints* newPoints = vtkPoints::New();
@@ -382,7 +384,7 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
   for (outId = 0; outId < numPts; ++outId)
     {
     inId = this->RegionPointIds->GetId(outId);
-    ptIds->InsertNextValue(inId);
+    ptIds->InsertNextValue((int)inId);
     input->GetPoint(inId, pt);
     newPoints->InsertNextPoint(pt[0], pt[1], pt[2]);
     output->GetPointData()->CopyData(input->GetPointData(), inId, outId);
@@ -402,7 +404,7 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
   for (outId = 0; outId < numCells; ++outId)
     {
     inId = regionCellIds->GetId(outId);
-    cellIds->InsertNextValue(inId);
+    cellIds->InsertNextValue((int)(inId));
     input->GetCellPoints(inId, inCellPtIds);
     // Translate the cell to output point ids.
     num = inCellPtIds->GetNumberOfIds();
@@ -427,6 +429,43 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
   output->GetPointData()->AddArray(ptIds);
   ptIds->Delete();
   ptIds = NULL;
+  
+  // Add an array that shows which part this point comes from.
+  if (this->GetNumberOfInputs() > 1)
+    {
+    if (this->PickCell)
+      {
+      vtkIntArray* partArray = vtkIntArray::New();
+      // There should only be one cell, but ...
+      vtkIdType num, id;
+      num = output->GetNumberOfCells();
+      partArray->SetNumberOfTuples(num);
+      for (id = 0; id < num; ++id)
+        {
+        partArray->SetComponent(id, 0, this->BestInputIndex);
+        }
+      partArray->SetName("PartIndex");
+      this->GetOutput()->GetCellData()->AddArray(partArray);
+      partArray->Delete();
+      partArray = 0;
+      }
+    else
+      {
+      vtkIntArray* partArray = vtkIntArray::New();
+      // There should only be one cell, but ...
+      vtkIdType num, id;
+      num = output->GetNumberOfPoints();
+      partArray->SetNumberOfTuples(num);
+      for (id = 0; id < num; ++id)
+        {
+        partArray->SetComponent(id, 0, this->BestInputIndex);
+        }
+      partArray->SetName("PartIndex");
+      this->GetOutput()->GetPointData()->AddArray(partArray);
+      partArray->Delete();
+      partArray = 0;
+      }
+    }
 }
 
 
