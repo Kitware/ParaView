@@ -86,8 +86,6 @@ $view StandardViewCallback 0 -1 0
 $view StandardViewCallback 0 0 1
 $view StandardViewCallback 0 0 -1
 
-$view FrameRateScaleCallback
-$view ReductionCheckCallback
 $view TriangleStripsCallback
 $view ImmediateModeCallback
 $view LODResolutionScaleCallback
