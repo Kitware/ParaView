@@ -34,6 +34,8 @@
 
 #include <GL/ice-t_mpi.h>
 
+#include <vtkstd/algorithm>
+
 //******************************************************************
 // Hidden structures.
 //******************************************************************
@@ -48,7 +50,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.21");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.22");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -269,16 +271,30 @@ void vtkIceTRenderManager::UpdateIceTContext()
 
     if (this->UseCompositing)
       {
-      icetDataReplicationGroup(this->DataReplicationGroup->GetNumberOfTuples(),
-                               this->DataReplicationGroup->GetPointer(0));
+      // Compiler, optimize this away.
+      if (sizeof(int) == sizeof(GLint))
+        {
+        icetDataReplicationGroup(
+                      this->DataReplicationGroup->GetNumberOfTuples(),
+                      (const GLint *)this->DataReplicationGroup->GetPointer(0));
+        }
+      else
+        {
+        vtkIdType numtuples = this->DataReplicationGroup->GetNumberOfTuples();
+        const int *original_data = this->DataReplicationGroup->GetPointer(0);
+        GLint *new_data = new GLint[numtuples];
+        vtkstd::copy(original_data, original_data + numtuples, new_data);
+        icetDataReplicationGroup(numtuples, new_data);
+        delete new_data;
+        }
       }
     else
       {
       // If we're not compositing, tell ICE-T that all processes have
       // duplicated data.  ICE-T will just have each process render to its
       // local tile instead.
-      int *drg = new int[this->Controller->GetNumberOfProcesses()];
-      for (int i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
+      GLint *drg = new GLint[this->Controller->GetNumberOfProcesses()];
+      for (GLint i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
         {
         drg[i] = i;
         }
@@ -487,10 +503,21 @@ void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
 
   vtkIntArray *drg = vtkIntArray::New();
   drg->SetNumberOfComponents(1);
-  int size;
+  GLint size;
   icetGetIntegerv(ICET_DATA_REPLICATION_GROUP_SIZE, &size);
   drg->SetNumberOfTuples(size);
-  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, drg->GetPointer(0));
+  // Compiler, optimize away.
+  if (sizeof(int) == sizeof(GLint))
+    {
+    icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, (GLint *)drg->GetPointer(0));
+    }
+  else
+    {
+    GLint *tmparray = new GLint[size];
+    icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, tmparray);
+    vtkstd::copy(tmparray, tmparray+size, drg->GetPointer(0));
+    delete[] tmparray;
+    }
 
   this->SetDataReplicationGroup(drg);
   drg->Delete();
@@ -723,7 +750,19 @@ void vtkIceTRenderManager::PreRenderProcessing()
       // Order all the regions.
       this->SortingKdTree->DepthOrderAllProcesses(icetRen->GetActiveCamera(),
                                                   orderedProcessIds);
-      icetCompositeOrder(orderedProcessIds->GetPointer(0));
+      // Compiler, optimize away.
+      if (sizeof(int) == sizeof(GLint))
+        {
+        icetCompositeOrder((GLint *)orderedProcessIds->GetPointer(0));
+        }
+      else
+        {
+        vtkIdType numprocs = orderedProcessIds->GetNumberOfTuples();
+        GLint *tmparray = new GLint[numprocs];
+        const int *opiarray = orderedProcessIds->GetPointer(0);
+        vtkstd::copy(opiarray, opiarray+numprocs, tmparray);
+        delete[] tmparray;
+        }
       orderedProcessIds->Delete();
       }
     else
