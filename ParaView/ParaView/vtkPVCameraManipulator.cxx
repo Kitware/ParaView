@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.5");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkKWApplication);
@@ -118,6 +118,8 @@ void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "ManipulatorName: " 
+     << (this->ManipulatorName?this->ManipulatorName:"none") << endl;
   os << indent << "Button: " << this->Button << endl;
   os << indent << "Shift: " << this->Shift << endl;
   os << indent << "Control: " << this->Control << endl;

@@ -41,12 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkPVCameraManipulator - Abstraction of style away from button.
 // .SECTION Description
-// vtkPVCameraManipulator is a superclass for actions inside an interactor 
-// style and associated with a single button.  An example might be
-// rubber-band bounding-box zoom.  This abstraction allows a camera 
-// manipulator to be assigned to any button.  This super class
-// might become a subclass of vtkInteractorObserver in the future. 
-
+// vtkPVCameraManipulator is a superclass foractions inside an
+// interactor style and associated with a single button. An example
+// might be rubber-band bounding-box zoom. This abstraction allows a
+// camera manipulator to be assigned to any button.  This super class
+// might become a subclass of vtkInteractorObserver in the future.
 
 #ifndef __vtkPVCameraManipulator_h
 #define __vtkPVCameraManipulator_h

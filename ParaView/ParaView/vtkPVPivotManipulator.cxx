@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.2");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.3");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
@@ -185,6 +185,9 @@ void vtkPVPivotManipulator::SetResetCenterOfRotation()
 void vtkPVPivotManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Center of rotation: " << this->CenterOfRotation[0] 
+     << ", " << this->CenterOfRotation[1] << ", " << this->CenterOfRotation[2]
+     << endl;
 }
 
 

@@ -54,6 +54,7 @@ class VTK_EXPORT vtkPVPushButton : public vtkPVObjectWidget
 public:
   static vtkPVPushButton* New();
   vtkTypeMacro(vtkPVPushButton, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);
   
