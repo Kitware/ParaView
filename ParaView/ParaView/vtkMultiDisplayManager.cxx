@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.2");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.3");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -180,6 +180,7 @@ void vtkMultiDisplayManagerRootStartRender(vtkObject *caller,
                                  unsigned long vtkNotUsed(event), 
                                  void *clientData, void *)
 {
+  (void)caller;
   vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)clientData;
   vtkMultiProcessController *controller = self->GetSocketController();
   vtkPVMultiDisplayInfo info;  
@@ -307,8 +308,6 @@ void vtkMultiDisplayManager::ClientStartRender()
   this->RenderWindow->SwapBuffersOff();
 
   // All this just gets information to send to the satellites.  
-  vtkRenderWindow* renWin = this->RenderWindow;
-  vtkMultiProcessController *controller = this->Controller;
   if (updateRate > 2.0)
     {
     this->ReductionFactor = 2;
@@ -408,7 +407,6 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
   vtkLightCollection *lc;
   vtkLight *light;
   vtkRenderWindow* renWin = this->RenderWindow;
-  vtkMultiProcessController *controller = this->Controller;
 
   // Delay swapping buffers untill all processes are finished.
   if (this->Controller)
@@ -418,8 +416,8 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
 
   // Synchronize
   //renWin->SetDesiredUpdateRate(info.DesiredUpdateRate);
-  this->ReductionFactor = info.ReductionFactor;
-  this->UseCompositing = info.UseCompositing;
+  this->ReductionFactor = static_cast<int>(info.ReductionFactor);
+  this->UseCompositing = static_cast<int>(info.UseCompositing);
   rens = renWin->GetRenderers();
   rens->InitTraversal();
   // NOTE:  We are now receiving first!!!!!  
