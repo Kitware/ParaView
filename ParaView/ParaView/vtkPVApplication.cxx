@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.1");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -187,7 +187,7 @@ public:
          this->Windows->GetLastKWWindow() )
       {
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
-      char buffer[1024];      
+      char buffer[4096];      
       const char *message = strstr(t, "): ");
       char type[1024], file[1024];
       int line;
