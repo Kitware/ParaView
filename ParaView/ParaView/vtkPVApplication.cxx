@@ -784,7 +784,7 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
   Tk_PhotoImageBlock block;
 
   this->Script("image create photo %s -height %d -width %d", 
-               name, width, height);
+               name, height, width);
   block.width = width;
   block.height = height;
   block.pixelSize = 3;
