@@ -100,6 +100,9 @@ IF (try_file)
   # correctly, so if it's the case, let's change the location on their
   # behalf to the new location. That code should be removed in a week
   # or so (mid january)
+  FIND_PATH(TK_INTERNAL_PATH tkWinInt.h
+    ${TCLTK_POSSIBLE_INCLUDE_PATHS}
+  )
   SET (TK_INTERNAL_PATH_LEGACY 
        "${VTK_SOURCE_DIR}/Rendering/tkInternals/tk${TCL_TK_VERSION}")
   SET (TK_INTERNAL_PATH_TRY 
