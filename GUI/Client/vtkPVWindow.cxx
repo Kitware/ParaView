@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.5");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3008,8 +3008,7 @@ void vtkPVWindow::UpdateFilterMenu()
         {
         // Check if this is an appropriate filter by comparing
         // it's input type with the current data object's type.
-        if (proto && proto->GetInputProperty(0) &&
-            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto))
+        if (proto && proto->GetInputProperty(0) )
           {
           it->GetKey(key);
           const char* menuName = proto->GetMenuName();
