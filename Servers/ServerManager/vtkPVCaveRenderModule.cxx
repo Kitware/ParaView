@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.7");
 
 
 
@@ -59,47 +59,46 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkProcessModule *pm)
     }
   int numDisplays;
 
+  vtkClientServerStream stream;
+
   // We had trouble with SGI/aliasing with compositing.
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (this->ProcessModule->GetNumberOfPartitions() > 1))
     {
-    this->ProcessModule->GetStream() << vtkClientServerStream::Invoke
-                    << this->RenderWindowID 
-                    << "SetMultiSamples" << 0 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->RenderWindowID << "SetMultiSamples" << 0 
+           << vtkClientServerStream::End;
     }
 
   this->Composite = NULL;
-  this->CompositeID = this->ProcessModule->NewStreamObject("vtkCaveRenderManager");
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->CompositeID = pm->NewStreamObject("vtkCaveRenderManager", stream);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   if (this->ProcessModule->GetOptions()->GetClientMode())
     {
-    this->ProcessModule->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetClientFlag" << 1
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetClientFlag" << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
 
-    this->ProcessModule->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->ProcessModule->GetProcessModuleID() << "GetRenderServerSocketController"
-      << vtkClientServerStream::End;
-    this->ProcessModule->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetSocketController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->ProcessModule->GetProcessModuleID() << "GetRenderServerSocketController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetSocketController" << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
     // Timing of this set is important for server.
     // It has to be after the SocketController has been set,
     // but before the Desplays are defined.
-    this->ProcessModule->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "InitializeRMIs"
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "InitializeRMIs"
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
     // Setup the tiles.
     // We need a better way to retreive the number of processes
@@ -119,20 +118,18 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkProcessModule *pm)
     }
   else
     { // Timing of this set is important for server.
-    this->ProcessModule->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "InitializeRMIs"
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "InitializeRMIs"
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 
-  this->ProcessModule->GetStream() 
-    << vtkClientServerStream::Invoke
-    <<  this->CompositeID 
-    << "SetRenderWindow"
-    << this->RenderWindowID
-    << vtkClientServerStream::End;
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  stream<< vtkClientServerStream::Invoke
+        <<  this->CompositeID << "SetRenderWindow" << this->RenderWindowID
+        << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -221,7 +218,6 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 vtkSMPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 {
   vtkSMMultiDisplayPartDisplay* pDisp = vtkSMMultiDisplayPartDisplay::New();
-  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   return pDisp;
 }
 

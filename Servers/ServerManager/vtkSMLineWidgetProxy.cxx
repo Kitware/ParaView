@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
@@ -72,7 +72,7 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers,str);
     }
 }
 
@@ -87,12 +87,13 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
   this->Superclass::CreateVTKObjects(numObjects);
   //now do additional initialization on the streamobjects
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
   for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke <<  id
-                    << "SetAlignToNone" << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    stream << vtkClientServerStream::Invoke <<  id
+           << "SetAlignToNone" << vtkClientServerStream::End;
+    pm->SendStream(this->GetServers(), stream);
     }
 }
 

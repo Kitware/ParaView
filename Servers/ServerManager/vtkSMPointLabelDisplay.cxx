@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.4");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
 {
   vtkPVProcessModule* pm;
   pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   if (num != 1)
     {
@@ -116,100 +116,94 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToClient"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToClient"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
     }
   // pm->ClientMode is only set when there is a server.
   if(pm->GetClientMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToDataServer"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToDataServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   // if running in render server mode
   if(pm->GetOptions()->GetRenderServerMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToRenderServer"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToRenderServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }  
 
   // Handle collection setup with client server.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetSocketController"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetClientDataServerSocketController"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetSocketController"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) 
+         << "SetClientDataServerSocketController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetMPIMToNSocketConnection" 
-    << pm->GetMPIMToNSocketConnectionID()
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) << "SetMPIMToNSocketConnection" 
+         << pm->GetMPIMToNSocketConnectionID()
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
 
   stream << vtkClientServerStream::Invoke << this->DuplicateProxy->GetID(0) 
          << "SetMoveModeToClone" << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
 
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->PointLabelActorProxy->GetID(0) << "SetMapper" 
-    << this->PointLabelMapperProxy->GetID(0)
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke 
-    << this->UpdateSuppressorProxy->GetID(0) << "GetUnstructuredGridOutput"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke 
-    << this->PointLabelMapperProxy->GetID(0)
-    << "SetInput" << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->PointLabelActorProxy->GetID(0) << "SetMapper" 
+         << this->PointLabelMapperProxy->GetID(0)
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0) << "GetUnstructuredGridOutput"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke 
+         << this->PointLabelMapperProxy->GetID(0)
+         << "SetInput" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
-  pm->GetStream()
-    << vtkClientServerStream::Invoke 
-    << this->DuplicateProxy->GetID(0) << "GetUnstructuredGridOutput"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke 
-    << this->UpdateSuppressorProxy->GetID(0)
-    << "SetInput" << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  stream << vtkClientServerStream::Invoke 
+         << this->DuplicateProxy->GetID(0) << "GetUnstructuredGridOutput"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0)
+         << "SetInput" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // Tell the update suppressor to produce the correct partition.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetNumberOfPartitions"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->UpdateSuppressorProxy->GetID(0) << "SetUpdateNumberOfPieces"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetPartitionId"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->UpdateSuppressorProxy->GetID(0) << "SetUpdatePiece"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID(0) << "SetUpdateNumberOfPieces"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetPartitionId"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID(0) << "SetUpdatePiece"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 
@@ -228,67 +222,78 @@ void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)
       }
     input->AddConsumer(0, this);
 
+    vtkClientServerStream stream;
     // Set vtkData as input to duplicate filter.
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->DuplicateProxy->GetID(0) 
-                    << "SetInput" << input->GetPart(0)->GetID(0) 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->DuplicateProxy->GetID(0) 
+           << "SetInput" << input->GetPart(0)->GetID(0) 
+           << vtkClientServerStream::End;
     // Only the server has data.
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPointLabelDisplay::AddToRenderer(vtkClientServerID rendererID)
+void vtkSMPointLabelDisplay::AddToRenderer(vtkPVRenderModule* rm)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  if (pm == 0 || pm->GetRenderModule() == 0)
-    { // I had a crash on exit because render module was NULL.
+  if (!rm)
+    {
     return;
-    }  
+    }
 
+  vtkPVProcessModule *pm = this->GetProcessModule();
+
+  vtkClientServerID rendererID = rm->GetRendererID();
+
+  // There will be only one, but this is more general and protects
+  // against the user calling this method before "MakeVTKObjects".
+  int i, num;
+  num = this->PointLabelActorProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
+  for (i = 0; i < num; ++i)
+    {
+    stream << vtkClientServerStream::Invoke 
+           << this->PointLabelMapperProxy->GetID(i)
+           << "GetLabelTextProperty" 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult << "SetFontSize" << 24
+           << vtkClientServerStream::End;    
+    stream << vtkClientServerStream::Invoke
+           << rendererID << "AddViewProp" << this->PointLabelActorProxy->GetID(i)
+           << vtkClientServerStream::End;
+    }
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPointLabelDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
+{
+  if (!rm)
+    {
+    return;
+    }
+
+  vtkPVProcessModule *pm = this->GetProcessModule();
+
+  vtkClientServerID rendererID = rm->GetRendererID();
+
+  vtkClientServerStream stream;
   // There will be only one, but this is more general and protects
   // against the user calling this method before "MakeVTKObjects".
   int i, num;
   num = this->PointLabelActorProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke << this->PointLabelMapperProxy->GetID(i)
-      << "GetLabelTextProperty" << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult << "SetFontSize" << 24
-      << vtkClientServerStream::End;    
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << rendererID << "AddViewProp"
-      << this->PointLabelActorProxy->GetID(i) << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << rendererID 
+           << "RemoveViewProp" 
+           << this->PointLabelActorProxy->GetID(i) 
+           << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPointLabelDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
-{
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  if (pm == 0 || pm->GetRenderModule() == 0)
-    { // I had a crash on exit because render module was NULL.
-    return;
-    }  
-
-  // There will be only one, but this is more general and protects
-  // against the user calling this method before "MakeVTKObjects".
-  int i, num;
-  num = this->PointLabelActorProxy->GetNumberOfIDs();
-  for (i = 0; i < num; ++i)
-    {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << rendererID << "RemoveViewProp"
-      << this->PointLabelActorProxy->GetID(i) << vtkClientServerStream::End;
-    }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 
@@ -309,11 +314,14 @@ void vtkSMPointLabelDisplay::SetVisibility(int v)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->PointLabelActorProxy->GetNumberOfIDs() > 0)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->PointLabelActorProxy->GetID(0) 
-      << "SetVisibility" << v << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->PointLabelActorProxy->GetID(0) 
+           << "SetVisibility" 
+           << v 
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -333,10 +341,12 @@ void vtkSMPointLabelDisplay::Update()
     if(this->UpdateSuppressorProxy->GetNumberOfIDs()>0)
       {
       vtkPVProcessModule *pm = this->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0) 
-             << "ForceUpdate" << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke 
+             << this->UpdateSuppressorProxy->GetID(0) 
+             << "ForceUpdate" 
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
       }
     this->GeometryIsValid = 1;
     }
@@ -369,11 +379,11 @@ void vtkSMPointLabelDisplay::SetProcessModule(vtkPVProcessModule *pm)
 void vtkSMPointLabelDisplay::RemoveAllCaches()
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 
@@ -383,11 +393,14 @@ void vtkSMPointLabelDisplay::RemoveAllCaches()
 void vtkSMPointLabelDisplay::CacheUpdate(int idx, int total)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) 
-         << "CacheUpdate" << idx << total << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+         << "CacheUpdate" 
+         << idx 
+         << total 
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 

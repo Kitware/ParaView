@@ -24,7 +24,7 @@
 #include "vtkKWEvent.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.7");
 
 //===========================================================================
 //***************************************************************************
@@ -153,13 +153,15 @@ void vtkSMInteractorObserverProxy::CreateVTKObjects(int numObjects)
 void vtkSMInteractorObserverProxy::SetCurrentRenderer(vtkClientServerID rendererID)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
   for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
-                    << "SetCurrentRenderer" 
-                    << rendererID
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke << this->GetID(cc)
+           << "SetCurrentRenderer" 
+           << rendererID
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
     }
   this->RendererInitialized = (rendererID.ID) ? 1 : 0;    
 }
@@ -168,13 +170,15 @@ void vtkSMInteractorObserverProxy::SetCurrentRenderer(vtkClientServerID renderer
 void vtkSMInteractorObserverProxy::SetInteractor(vtkClientServerID interactorID)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
   for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
-      << "SetInteractor" 
-      << interactorID
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke << this->GetID(cc)
+           << "SetInteractor" 
+           << interactorID
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 1);
     } 
   this->InteractorInitialized = (interactorID.ID)? 1 : 0;
 }

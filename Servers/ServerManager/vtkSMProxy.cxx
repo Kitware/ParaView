@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.31");
+vtkCxxRevisionMacro(vtkSMProxy, "1.32");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -117,7 +117,7 @@ vtkSMProxy::vtkSMProxy()
   initStream << vtkClientServerStream::Assign 
              << this->SelfID << this
              << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT, initStream, 0);
+  pm->SendStream(vtkProcessModule::CLIENT, initStream);
   // This is done to make the last result message release it's reference 
   // count. Otherwise the object has a reference count of 3.
   if (pm)
@@ -165,7 +165,7 @@ void vtkSMProxy::UnRegisterVTKObjects()
     {
     pm->DeleteStreamObject(*it, stream);
     }
-  pm->SendStream(this->Servers, stream, 0);
+  pm->SendStream(this->Servers, stream);
 
   this->Internals->IDs.clear();
 
@@ -192,7 +192,7 @@ void vtkSMProxy::UnRegister(vtkObjectBase* obj)
         deleteStream << vtkClientServerStream::Delete 
                      << selfid
                      << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::CLIENT, deleteStream, 0);
+        pm->SendStream(vtkProcessModule::CLIENT, deleteStream);
         }
       }
     }
@@ -438,7 +438,7 @@ void vtkSMProxy::PushProperty(
     vtkClientServerStream str;
     it->second.Property.GetPointer()->AppendCommandToStream(this, &str, id);
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(servers, str, 0);
+    pm->SendStream(servers, str);
     }
 }
 
@@ -490,7 +490,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       if (str.GetNumberOfMessages() > 0)
         {
         vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-        pm->SendStream(this->Servers, str, 0);
+        pm->SendStream(this->Servers, str);
         }
       }
     it->second.ModifiedFlag = 0;
@@ -614,7 +614,7 @@ void vtkSMProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str, 0);
+    pm->SendStream(this->Servers, str);
     }
   pm->SendCleanupPendingProgress();
 
@@ -677,7 +677,7 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =

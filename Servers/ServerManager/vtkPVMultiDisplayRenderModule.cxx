@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModule::vtkPVMultiDisplayRenderModule()
@@ -53,74 +53,71 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkProcessModule *pm)
     return;
     }
 
+  vtkClientServerStream stream;
+
   // We had trouble with SGI/aliasing with compositing.
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pm->GetNumberOfPartitions() > 1))
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->RenderWindowID 
-                    << "SetMultiSamples" << 0 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->RenderWindowID 
+           << "SetMultiSamples" << 0 
+           << vtkClientServerStream::End;
     }
 
   this->Composite = NULL;
-  this->CompositeID = pm->NewStreamObject("vtkMultiDisplayManager");
+  this->CompositeID = pm->NewStreamObject("vtkMultiDisplayManager", stream);
   int *tileDim = this->ProcessModule->GetOptions()->GetTileDimensions();
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->CompositeID << "SetTileDimensions"
-    << tileDim[0] << tileDim[1]
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->CompositeID << "SetTileDimensions"
+         << tileDim[0] << tileDim[1]
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   if (this->ProcessModule->GetOptions()->GetClientMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetClientFlag" << 1
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetClientFlag" << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
 
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetRenderServerSocketController"
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetSocketController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetZeroEmpty" << 0
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetRenderServerSocketController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetSocketController"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetZeroEmpty" << 0
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
   else
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetZeroEmpty" << 1
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetZeroEmpty" << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 
   // Have to initialize after ZeroEmpty, and tile dimensions have been set.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->CompositeID << "InitializeSchedule"
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->CompositeID << "InitializeRMIs"
-    << vtkClientServerStream::End;
-  pm->GetStream() 
-    << vtkClientServerStream::Invoke
-    <<  this->CompositeID 
-    << "SetRenderWindow"
-    << this->RenderWindowID
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->CompositeID << "InitializeSchedule"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->CompositeID << "InitializeRMIs"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         <<  this->CompositeID 
+         << "SetRenderWindow"
+         << this->RenderWindowID
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 #ifdef DUPLICATE_CODE
@@ -129,7 +126,6 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkProcessModule *pm)
 vtkSMPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
 {
   vtkSMPartDisplay* pDisp = vtkSMMultiDisplayPartDisplay::New();
-  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   return pDisp;
 }
 
@@ -180,14 +176,15 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
 
+  vtkClientServerStream stream;
+
   // No reduction for still render.
   if (pm && this->CompositeID.ID)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetImageReductionFactor" << 1
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetImageReductionFactor" << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
     }
 
   // Switch the compositer to local/composite mode.
@@ -196,19 +193,17 @@ void vtkPVMultiDisplayRenderModule::StillRender()
     {
     if (localRender)
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOff"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOff"
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
       }
     else
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOn"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOn"
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
       }
     // Save this so we know where to get the z buffer (for picking?).
     this->LocalRender = localRender;
@@ -338,6 +333,8 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
       }
     }
 
+  vtkClientServerStream stream;
+
   // Switch the compositer to local/composite mode.
   if (this->LocalRender != localRender)
     {
@@ -345,19 +342,17 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
       {
       if (localRender)
         {
-        pm->GetStream()
-          << vtkClientServerStream::Invoke
-          << this->CompositeID << "UseCompositingOff"
-          << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::CLIENT);
+        stream << vtkClientServerStream::Invoke
+               << this->CompositeID << "UseCompositingOff"
+               << vtkClientServerStream::End;
+        pm->SendStream(vtkProcessModule::CLIENT, stream);
         }
       else
         {
-        pm->GetStream()
-          << vtkClientServerStream::Invoke
-          << this->CompositeID << "UseCompositingOn"
-          << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::CLIENT);
+        stream << vtkClientServerStream::Invoke
+               << this->CompositeID << "UseCompositingOn"
+               << vtkClientServerStream::End;
+        pm->SendStream(vtkProcessModule::CLIENT, stream);
         }
       // Save this so we know where to get the z buffer.
       this->LocalRender = localRender;
@@ -415,11 +410,12 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
     if (this->CompositeID.ID)
       {
       vtkPVProcessModule* pm = this->ProcessModule;
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "SetUseCompositeCompression" << val
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "SetUseCompositeCompression" << val
+             << vtkClientServerStream::End;
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     }
 }

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplay);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.3");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -71,13 +71,15 @@ void vtkSMCubeAxesDisplay::CreateVTKObjects(int num)
     }  
     
   this->CubeAxesProxy->CreateVTKObjects(1);
-  pm->GetStream() << vtkClientServerStream::Invoke
-    << this->CubeAxesProxy->GetID(0) << "SetFlyModeToOuterEdges"
-    << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke
+  vtkClientServerStream stream; 
+  stream  << vtkClientServerStream::Invoke
+          << this->CubeAxesProxy->GetID(0) << "SetFlyModeToOuterEdges"
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
     << this->CubeAxesProxy->GetID(0) << "SetInertia" << 20
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -91,45 +93,49 @@ void vtkSMCubeAxesDisplay::SetInput(vtkSMSourceProxy* input)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplay::AddToRenderer(vtkClientServerID rendererID)
+void vtkSMCubeAxesDisplay::AddToRenderer(vtkPVRenderModule* rm)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm == 0 || pm->GetRenderModule() == 0)
+  if (!rm)
     {
     return;
     }  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  vtkClientServerID rendererID = rm->GetRendererID();
 
   // There will be only one, but this is more general and protects
   // against the user calling this method before "MakeVTKObjects".
   int i, num;
   num = this->CubeAxesProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << rendererID << "AddViewProp"
-      << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << rendererID << "GetActiveCamera"
-      << vtkClientServerStream::End;    
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CubeAxesProxy->GetID(i) << "SetCamera"
-      << vtkClientServerStream::LastResult 
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << rendererID << "AddViewProp"
+           << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << rendererID << "GetActiveCamera"
+           << vtkClientServerStream::End;    
+    stream << vtkClientServerStream::Invoke
+           << this->CubeAxesProxy->GetID(i) << "SetCamera"
+           << vtkClientServerStream::LastResult 
+           << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
+void vtkSMCubeAxesDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  if (pm == 0 || pm->GetRenderModule() == 0)
-    { // I had a crash on exit because render module was NULL.
+  if (!rm)
+    {
     return;
-    }  
+    }
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  vtkClientServerID rendererID = rm->GetRendererID();
 
   // There will be only one, but this is more general and protects
   // against the user calling this method before "MakeVTKObjects".
@@ -137,19 +143,19 @@ void vtkSMCubeAxesDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
   nullId.ID = 0;
   int i, num;
   num = this->CubeAxesProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << rendererID << "RemoveViewProp"
-      << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CubeAxesProxy->GetID(i) << "SetCamera"
-      << nullId 
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+          << rendererID << "RemoveViewProp"
+           << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->CubeAxesProxy->GetID(i) << "SetCamera"
+           << nullId 
+           << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -169,11 +175,12 @@ void vtkSMCubeAxesDisplay::SetVisibility(int v)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->CubeAxesProxy->GetNumberOfIDs() > 0)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CubeAxesProxy->GetID(0) 
-      << "SetVisibility" << v << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CubeAxesProxy->GetID(0) 
+           << "SetVisibility" << v << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -194,7 +201,7 @@ void vtkSMCubeAxesDisplay::Update()
   double bounds[6];
   vtkPVProcessModule *pm;
   pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
   vtkPVRenderModule* rm = pm->GetRenderModule();
   float rgb[3];
   float background[3];
@@ -246,7 +253,8 @@ void vtkSMCubeAxesDisplay::Update()
            << rgb[0] << rgb[1] << rgb[2]
            << vtkClientServerStream::End;  
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
   this->GeometryIsValid = 1;
 }
 
@@ -299,17 +307,18 @@ void vtkSMCubeAxesDisplay::CacheUpdate(int idx, int total)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int num;
   num = this->CubeAxesProxy->GetNumberOfIDs();
+  vtkClientServerStream stream; 
   for (i = 0; i < num; ++i)
     {
-    pm->GetStream()
-           << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
            << this->CubeAxesProxy->GetID(i) << "SetBounds"
            << this->Caches[idx][0] << this->Caches[idx][1] 
            << this->Caches[idx][2] << this->Caches[idx][3] 
            << this->Caches[idx][4] << this->Caches[idx][5]
            << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------

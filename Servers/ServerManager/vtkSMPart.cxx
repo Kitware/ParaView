@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.14");
+vtkCxxRevisionMacro(vtkSMPart, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -182,11 +182,11 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     stream << vtkClientServerStream::Invoke 
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 1);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     stream << vtkClientServerStream::Invoke 
                     << this->GetID(0) << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     int num =0;
     pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
     if (num != 1)
@@ -235,11 +235,11 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     stream << vtkClientServerStream::Invoke 
            << this->GetID(0) << "UpdateInformation"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 1);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     stream << vtkClientServerStream::Invoke 
                     << this->GetID(0) << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     int num =0;
     pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
     if (num != 1)
@@ -299,7 +299,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
                   << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
   pm->DeleteStreamObject(tempDataPiece, stream);
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 0);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -340,7 +340,7 @@ void vtkSMPart::CreateTranslatorIfNecessary()
            << vtkClientServerStream::LastResult
            << "GetClassName"
            << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     char* classname = 0;
     if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&classname))
       {
@@ -360,7 +360,7 @@ void vtkSMPart::CreateTranslatorIfNecessary()
              << this->GetID(0)
              << vtkClientServerStream::End;
       pm->DeleteStreamObject(translatorID, stream);
-      pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 0);
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       }
    }
 
@@ -376,22 +376,22 @@ void vtkSMPart::Update()
   if (this->UpdateNeeded)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetID(0) << "UpdateInformation"
-                    << vtkClientServerStream::End;
-    pm->GetStream()    
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->GetID(0) << "SetUpdateExtent"
-      << vtkClientServerStream::LastResult 
-      << pm->GetNumberOfPartitions() << 0
-      << vtkClientServerStream::End;    
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetID(0) << "Update"
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->GetID(0) << "UpdateInformation"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetID(0) << "SetUpdateExtent"
+           << vtkClientServerStream::LastResult 
+           << pm->GetNumberOfPartitions() << 0
+           << vtkClientServerStream::End;    
+    stream << vtkClientServerStream::Invoke 
+           << this->GetID(0) << "Update"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     this->UpdateNeeded = 0;
     }
 }

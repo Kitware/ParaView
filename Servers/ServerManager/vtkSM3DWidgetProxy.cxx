@@ -23,7 +23,7 @@
 #include "vtkInteractorObserver.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -61,14 +61,15 @@ void vtkSM3DWidgetProxy::UpdateVTKObjects()
     // changed (achieved by the this->Placed flag).
     unsigned int cc;
     vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
     for(cc=0; cc < this->GetNumberOfIDs(); cc++)
       {
-      pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
-        << "PlaceWidget" 
-        << this->Bounds[0] << this->Bounds[1] << this->Bounds[2] 
-        << this->Bounds[3] 
-        << this->Bounds[4] << this->Bounds[5] << vtkClientServerStream::End;
-      pm->SendStream(this->Servers);
+      stream << vtkClientServerStream::Invoke << this->GetID(cc)
+             << "PlaceWidget" 
+             << this->Bounds[0] << this->Bounds[1] << this->Bounds[2] 
+             << this->Bounds[3] 
+             << this->Bounds[4] << this->Bounds[5] << vtkClientServerStream::End;
+      pm->SendStream(this->Servers, stream);
       } 
     this->Placed = 1;
     }
@@ -114,18 +115,19 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
     this->SetCurrentRenderer(rendererID);
     this->SetInteractor(interactorID);
     }
+  vtkClientServerStream stream;
   for (unsigned int cc=0; cc <this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-      << "SetPlaceFactor" << 1.0
-      << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << id 
-      << "PlaceWidget"
-      << 0 << 1 << 0 << 1 << 0 << 1 
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << id
+           << "SetPlaceFactor" << 1.0
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << id 
+           << "PlaceWidget"
+           << 0 << 1 << 0 << 1 << 0 << 1 
+           << vtkClientServerStream::End;
     // this->Bounds have already been initialized to 0,1,0,1,0,1
-    pm->SendStream(this->GetServers());
+    pm->SendStream(this->GetServers(), stream);
     }
 }
 

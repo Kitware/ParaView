@@ -22,7 +22,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -61,7 +61,7 @@ void vtkSMSphereWidgetProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers,str);
     }
 }
 

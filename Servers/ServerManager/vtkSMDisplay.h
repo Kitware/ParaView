@@ -24,6 +24,7 @@
 
 #include "vtkSMProxy.h"
 
+class vtkPVRenderModule;
 class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMDisplay : public vtkSMProxy
@@ -35,8 +36,8 @@ public:
 //BTX
   // Description:
   // This may have to change when 3D widgets need to be added to the interactor.
-  virtual void AddToRenderer(vtkClientServerID rendererID) = 0;
-  virtual void RemoveFromRenderer(vtkClientServerID rendererID) = 0;
+  virtual void AddToRenderer(vtkPVRenderModule*) = 0;
+  virtual void RemoveFromRenderer(vtkPVRenderModule*) = 0;
 //ETX
 
   // Description:

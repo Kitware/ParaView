@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSimpleRenderModule);
-vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,6 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
 vtkSMPartDisplay* vtkPVSimpleRenderModule::CreatePartDisplay()
 {
   vtkSMPartDisplay* pDisp = vtkSMPartDisplay::New();
-  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   return pDisp;
 }
 //----------------------------------------------------------------------------
@@ -125,7 +124,7 @@ void vtkPVSimpleRenderModule::AddDisplay(vtkSMDisplay* disp)
     return;
     }
   this->Displays->AddItem(disp);
-  disp->AddToRenderer(this->RendererID);
+  disp->AddToRenderer(this);
 }
 
 //----------------------------------------------------------------------------
@@ -135,7 +134,7 @@ void vtkPVSimpleRenderModule::RemoveDisplay(vtkSMDisplay* disp)
     {
     return;
     }
-  disp->RemoveFromRenderer(this->RendererID);
+  disp->RemoveFromRenderer(this);
   this->Displays->RemoveItem(disp);
 }
 

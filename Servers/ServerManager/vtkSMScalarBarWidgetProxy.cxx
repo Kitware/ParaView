@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -119,7 +119,7 @@ void vtkSMScalarBarWidgetProxy::UpdateVTKObjects()
 
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers,str);
     }
   // Build the lookuptable
   /*
@@ -161,7 +161,7 @@ void vtkSMScalarBarWidgetProxy::SetLookupTable(vtkSMProxy *lut)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -185,7 +185,7 @@ void vtkSMScalarBarWidgetProxy::SetTitle(const char* title)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -209,7 +209,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormat(const char* format)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -237,7 +237,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatColor(double color[3])
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -265,7 +265,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatColor(double color[3])
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -293,7 +293,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatOpacity(double opacity)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -321,7 +321,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatOpacity(double opacity)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }
 }
 
@@ -349,7 +349,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatFont(int font)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -377,7 +377,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatFont(int font)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -405,7 +405,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatBold(int bold)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -433,7 +433,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatBold(int bold)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -461,7 +461,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatItalic(int italic)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -489,7 +489,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatItalic(int italic)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -517,7 +517,7 @@ void vtkSMScalarBarWidgetProxy::SetTitleFormatShadow(int shadow)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 
@@ -545,7 +545,7 @@ void vtkSMScalarBarWidgetProxy::SetLabelFormatShadow(int shadow)
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers,str,0);
+    pm->SendStream(this->Servers, str);
     }  
 }
 

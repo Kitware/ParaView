@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkSMMultiDisplayPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMMultiDisplayPartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -60,42 +60,37 @@ void vtkSMMultiDisplayPartDisplay::CreateVTKObjects(int num)
   pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   int i;
   
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
     // This little hack causes collect mode to be iditical to clone mode.
     // This allows the superclass to treat tiled display like normal compositing.
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "DefineCollectAsCloneOn"
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->LODCollectProxy->GetID(i) << "DefineCollectAsCloneOn"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID(i) << "DefineCollectAsCloneOn"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->LODCollectProxy->GetID(i) << "DefineCollectAsCloneOn"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     if(pm->GetClientMode())
       {
       // We need this because the socket controller has no way of distinguishing
       // between processes.
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToClient"
-        << vtkClientServerStream::End;
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->LODCollectProxy->GetID(i) << "SetServerToClient"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToDataServer"
-        << vtkClientServerStream::End;
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->LODCollectProxy->GetID(i) << "SetServerToDataServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      stream << vtkClientServerStream::Invoke
+             << this->CollectProxy->GetID(i) << "SetServerToClient"
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << this->LODCollectProxy->GetID(i) << "SetServerToClient"
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      stream << vtkClientServerStream::Invoke
+             << this->CollectProxy->GetID(i) << "SetServerToDataServer"
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << this->LODCollectProxy->GetID(i) << "SetServerToDataServer"
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       }
     else
       {
@@ -105,15 +100,13 @@ void vtkSMMultiDisplayPartDisplay::CreateVTKObjects(int num)
     // if running in render server mode
     if(pm->GetOptions()->GetRenderServerMode())
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
-        << vtkClientServerStream::End;
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->LODCollectProxy->GetID(i) << "SetServerToRenderServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::RENDER_SERVER);
+      stream << vtkClientServerStream::Invoke
+             << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << this->LODCollectProxy->GetID(i) << "SetServerToRenderServer"
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
       }  
     }
 }

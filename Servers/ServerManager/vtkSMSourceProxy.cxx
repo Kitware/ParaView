@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.24");
 
 struct vtkSMSourceProxyInternals
 {
@@ -91,7 +91,7 @@ void vtkSMSourceProxy::UpdateInformation()
     }
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->Servers, command, 0);
+  pm->SendStream(this->Servers, command);
   
   this->Superclass::UpdateInformation();
 }
@@ -124,7 +124,7 @@ void vtkSMSourceProxy::UpdatePipeline()
       command << vtkClientServerStream::Invoke << this->GetID(i)
               << "Update" << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, command, 0);
+    pm->SendStream(this->Servers, command);
     return;
     }
     
@@ -162,7 +162,7 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
 
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
 }
 
@@ -225,7 +225,7 @@ void vtkSMSourceProxy::CreateParts()
     }
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
   info->Delete();
 
@@ -258,7 +258,7 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 
   if (stream.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
 }
 
@@ -301,7 +301,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
         }
       stream << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
   else
     {
@@ -333,7 +333,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
         }
       stream << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
 }
 

@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.2");
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
 {
   vtkPVProcessModule* pm;
   pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   if (num != 1)
     {
@@ -119,43 +119,39 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
   this->XYPlotActorProxy->CreateVTKObjects(num);
 
   // We always duplicate because all processes render the plot.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetMoveModeToClone"
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetMPIMToNSocketConnection" 
-    << pm->GetMPIMToNSocketConnectionID()
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) << "SetMoveModeToClone"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  stream << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) << "SetMPIMToNSocketConnection" 
+         << pm->GetMPIMToNSocketConnectionID()
+         << vtkClientServerStream::End;
   // create, SetPassThrough, and set the mToN connection
   // object on all servers and client
-  pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
+  pm->SendStream(
+    vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
   // always set client mode
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetServerToClient"
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT);
+  stream << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) << "SetServerToClient"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT, stream);
   // if running in client mode
   // then set the server to be servermode
   if(pm->GetClientMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToDataServer"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToDataServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   // if running in render server mode
   if (pm->GetOptions()->GetRenderServerMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToRenderServer"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToRenderServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }  
     
   if(pm->GetClientMode())
@@ -163,22 +159,21 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
     // We need this because the socket controller has no way of distinguishing
     // between processes.
     //law int fixme;  // This is called twice!  Fix it.
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->DuplicateProxy->GetID(0) << "SetServerToClient"
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->DuplicateProxy->GetID(0) << "SetServerToClient"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
     }
   // Handle collection setup with client server.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetSocketController"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->DuplicateProxy->GetID(0) << "SetSocketController"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetSocketController"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->DuplicateProxy->GetID(0) << "SetSocketController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
@@ -189,67 +184,68 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) << "SetInput" 
          << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // We cannot hook up the XY-plot until we know array names.
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->XYPlotActorProxy->GetID(0) 
-                  << "GetPositionCoordinate" 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << vtkClientServerStream::LastResult 
-                  << "SetValue" << 0.05 << 0.05 << 0
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->XYPlotActorProxy->GetID(0)
-                  << "GetPosition2Coordinate" 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
+         << this->XYPlotActorProxy->GetID(0) 
+         << "GetPositionCoordinate" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << vtkClientServerStream::LastResult 
+         << "SetValue" << 0.05 << 0.05 << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->XYPlotActorProxy->GetID(0)
+         << "GetPosition2Coordinate" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
                   << vtkClientServerStream::LastResult 
                   << "SetValue" << 0.8 << 0.3 << 0
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0)
                   << "SetNumberOfLabels" << 5 
                   << vtkClientServerStream::End;
   // This is stupid and has to change! (Line division label is meaningless.
   //int fixme;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "SetXTitle" << "Line Divisions" 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "PlotPointsOn" 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0)
                   << "GetProperty" 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << vtkClientServerStream::LastResult 
                   << "SetColor" << 1 << 0.8 << 0.8
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "GetProperty" 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << vtkClientServerStream::LastResult 
                   << "SetPointSize" << 2
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "SetLegendPosition" << 0.4 << 0.6 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0)
                   << "SetLegendPosition2" << 0.5 << 0.25 
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   // Tell the update suppressor to produce the correct partition.
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << pm->GetProcessModuleID() << "GetNumberOfPartitions"
     << vtkClientServerStream::End
@@ -257,7 +253,7 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
     << this->UpdateSuppressorProxy->GetID(0) << "SetUpdateNumberOfPieces"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << pm->GetProcessModuleID() << "GetPartitionId"
     << vtkClientServerStream::End
@@ -265,7 +261,7 @@ void vtkSMPlotDisplay::CreateVTKObjects(int num)
     << this->UpdateSuppressorProxy->GetID(0) << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -277,6 +273,8 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
   vtkPVArrayInformation* arrayInfo;
   const char* arrayName = 0;
 
+  vtkClientServerStream stream;
+
   if (this->DuplicateProxy->GetNumberOfIDs() == 0)
     {
     this->CreateVTKObjects(1);
@@ -287,23 +285,24 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
   pm = this->GetProcessModule();  
 
   // Set vtkData as input to duplicate filter.
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->DuplicateProxy->GetID(0) 
                   << "SetInput" << input->GetPart(0)->GetID(0) 
                   << vtkClientServerStream::End;
   // Only the server has data.
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
   // Clear previous plots.
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "RemoveAllInputs" 
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke 
                   << this->XYPlotActorProxy->GetID(0) 
                   << "SetYTitle" << ""
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   int numArrays = dataInfo->GetPointDataInformation()->GetNumberOfArrays();
   float cstep = 1.0 / numArrays;
@@ -315,21 +314,21 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
     arrayName = arrayInfo->GetName();
     if (arrayInfo->GetNumberOfComponents() == 1)
       {
-      pm->GetStream() << vtkClientServerStream::Invoke 
+      stream << vtkClientServerStream::Invoke 
                       << this->UpdateSuppressorProxy->GetID(0) << "GetOutput"
                       << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke 
+      stream << vtkClientServerStream::Invoke 
                       << this->XYPlotActorProxy->GetID(0) 
                       << "AddInput" << vtkClientServerStream::LastResult 
                       << arrayName << 0
                       << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke 
+      stream << vtkClientServerStream::Invoke 
                       << this->XYPlotActorProxy->GetID(0) 
                       << "SetPlotLabel" << i << arrayName 
                       << vtkClientServerStream::End;
       float r, g, b;
       this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
-      pm->GetStream() << vtkClientServerStream::Invoke 
+      stream << vtkClientServerStream::Invoke 
                       << this->XYPlotActorProxy->GetID(0) 
                       << "SetPlotColor" << i << r << g << b 
                       << vtkClientServerStream::End;
@@ -339,33 +338,35 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
     }  
   if ( arrayCount > 1 )
     {
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
                     << this->XYPlotActorProxy->GetID(0) 
                     << "LegendOn"
                     << vtkClientServerStream::End;
     }
   else 
     {
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
                     << this->XYPlotActorProxy->GetID(0) 
                     << "LegendOff"
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
                     << this->XYPlotActorProxy->GetID(0) 
                     << "SetYTitle" << arrayName
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
                     << this->XYPlotActorProxy->GetID(0) 
                     << "SetPlotColor" << 0 << 1 << 1 << 1
                     << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPlotDisplay::AddToRenderer(vtkClientServerID rendererID)
+void vtkSMPlotDisplay::AddToRenderer(vtkPVRenderModule* rm)
 {
-  //law int fixme; // This used to be renderer2D.  Resolve API to handle 2D actors.
+  vtkClientServerID rendererID = rm->GetRenderer2DID();
+
   vtkPVProcessModule *pm = this->GetProcessModule();
   if (pm == 0 || pm->GetRenderModule() == 0)
     { // I had a crash on exit because render module was NULL.
@@ -376,21 +377,24 @@ void vtkSMPlotDisplay::AddToRenderer(vtkClientServerID rendererID)
   // against the user calling this method before "MakeVTKObjects".
   int i, num;
   num = this->XYPlotActorProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
     // Enable XYPlotActor on server for tiled display.
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << rendererID
-                    << "AddActor"
-                    << this->XYPlotActorProxy->GetID(i) 
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke 
+           << rendererID
+           << "AddActor"
+           << this->XYPlotActorProxy->GetID(i) 
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPlotDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
+void vtkSMPlotDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
 {
+  vtkClientServerID rendererID = rm->GetRenderer2DID();
+
   vtkPVProcessModule *pm = this->GetProcessModule();
   if (pm == 0 || pm->GetRenderModule() == 0)
     { // I had a crash on exit because render module was NULL.
@@ -401,15 +405,16 @@ void vtkSMPlotDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
   // against the user calling this method before "MakeVTKObjects".
   int i, num;
   num = this->XYPlotActorProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
     // Enable XYPlotActor on server for tiled display.
-    pm->GetStream() << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke 
                     << rendererID
                     << "RemoveActor"
                     << this->XYPlotActorProxy->GetID(i) 
                     << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -508,12 +513,15 @@ void vtkSMPlotDisplay::SetVisibility(int v)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->XYPlotActorProxy->GetNumberOfIDs() > 0)
     {
-    pm->GetStream()
+    vtkClientServerStream stream;
+    stream
       << vtkClientServerStream::Invoke
       << this->XYPlotActorProxy->GetID(0) 
       << "SetVisibility" << v << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }}
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkSMPlotDisplay::InvalidateGeometry()
@@ -528,16 +536,18 @@ void vtkSMPlotDisplay::Update()
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy != 0 )
     {
     vtkPVProcessModule *pm = this->GetProcessModule();
-    vtkClientServerStream& stream = pm->GetStream();
-    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0) 
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->UpdateSuppressorProxy->GetID(0) 
            << "ForceUpdate" << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
     // We need to tell the plot to regenerate.
     stream << vtkClientServerStream::Invoke 
            << this->XYPlotActorProxy->GetID(0)
            << "Modified" << vtkClientServerStream::End;
     this->GeometryIsValid = 1;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -568,11 +578,11 @@ void vtkSMPlotDisplay::SetProcessModule(vtkPVProcessModule *pm)
 void vtkSMPlotDisplay::RemoveAllCaches()
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 
@@ -582,7 +592,7 @@ void vtkSMPlotDisplay::RemoveAllCaches()
 void vtkSMPlotDisplay::CacheUpdate(int idx, int total)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) 
          << "CacheUpdate" << idx << total << vtkClientServerStream::End;
@@ -590,7 +600,7 @@ void vtkSMPlotDisplay::CacheUpdate(int idx, int total)
   // remapped through the lookup table, and this causes that to happen.
   //stream << vtkClientServerStream::Invoke << this->MapperID << "Modified"
   //       << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -57,31 +57,32 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
     opacity = .25;
     }
   
+  vtkClientServerStream stream;
   for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                    << "OutlineTranslationOff"
+    stream << vtkClientServerStream::Invoke << id
+           << "OutlineTranslationOff"
+           << vtkClientServerStream::End;
+    pm->SendStream(this->GetServers(), stream, 1);
+    stream << vtkClientServerStream::Invoke << id
+           << "GetPlaneProperty"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke 
+           << vtkClientServerStream::LastResult 
+           << "SetOpacity" 
+           << opacity 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << id
+           << "GetSelectedPlaneProperty" 
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke 
+           << vtkClientServerStream::LastResult 
+           << "SetOpacity" 
+           << opacity 
                     << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                    << "GetPlaneProperty"
-                    << vtkClientServerStream::End
-                    << vtkClientServerStream::Invoke 
-                    << vtkClientServerStream::LastResult 
-                    << "SetOpacity" 
-                    << opacity 
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                    << "GetSelectedPlaneProperty" 
-                    << vtkClientServerStream::End
-                    << vtkClientServerStream::Invoke 
-                    << vtkClientServerStream::LastResult 
-                    << "SetOpacity" 
-                    << opacity 
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    pm->SendStream(this->GetServers(), stream, 1);
     }
   this->SetDrawPlane(0);
 }

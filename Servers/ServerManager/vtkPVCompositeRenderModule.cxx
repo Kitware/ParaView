@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -63,8 +63,10 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
   // Tree Composite
   if (this->CompositeID.ID && pm)
     {
-    pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerStream stream;
+    pm->DeleteStreamObject(this->CompositeID, stream);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     this->CompositeID.ID = 0;
     this->Composite = NULL;
     }
@@ -82,7 +84,6 @@ vtkSMPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
   vtkSMLODPartDisplay* pDisp;
 
   pDisp = vtkSMCompositePartDisplay::New();
-  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
@@ -137,14 +138,14 @@ void vtkPVCompositeRenderModule::StillRender()
       }
     }
 
+  vtkClientServerStream stream;
+
   // No reduction for still render.
   if (pm && this->CompositeID.ID)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetImageReductionFactor" << 1
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetImageReductionFactor" << 1
+           << vtkClientServerStream::End;
     if (pm->GetOptions()->GetClientMode() &&
       !pm->GetOptions()->GetTileDimensions()[0] )
       {
@@ -154,11 +155,9 @@ void vtkPVCompositeRenderModule::StillRender()
         {
         squirtLevel = 1;
         }
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "SetSquirtLevel" << squirtLevel
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "SetSquirtLevel" << squirtLevel
+             << vtkClientServerStream::End;
       }
     }
 
@@ -168,23 +167,21 @@ void vtkPVCompositeRenderModule::StillRender()
     {
     if (localRender)
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOff"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOff"
+             << vtkClientServerStream::End;
       }
     else
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOn"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOn"
+             << vtkClientServerStream::End;
       }
     // Save this so we know where to get the z buffer (for picking?).
     this->LocalRender = localRender;
     }
+
+  pm->SendStream(vtkProcessModule::CLIENT, stream);
 
   // This was to fix a clipping range bug. Still Render can get called some 
   // funky ways.  Some do not reset the clipping range.
@@ -290,24 +287,22 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       }
     }
 
+  vtkClientServerStream stream;
+
   // Switch the compositer to local/composite mode.
   if (this->CompositeID.ID)
     {
     if (localRender)
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOff"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOff"
+             << vtkClientServerStream::End;
       }
     else
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CompositeID << "UseCompositingOn"
-        << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT);
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "UseCompositingOn"
+             << vtkClientServerStream::End;
       }
     // Save this so we know where to get the z buffer.
     this->LocalRender = localRender;
@@ -317,11 +312,9 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   if (pm->GetOptions()->GetClientMode() &&
     !pm->GetOptions()->GetTileDimensions()[0] )
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetSquirtLevel" << this->SquirtLevel
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetSquirtLevel" << this->SquirtLevel
+           << vtkClientServerStream::End;
     }
 
   // Still Render can get called some funky ways.
@@ -340,6 +333,8 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     {
     this->ComputeReductionFactor();
     }
+
+  pm->SendStream(vtkProcessModule::CLIENT, stream);
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
@@ -415,12 +410,11 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   if (this->ProcessModule && this->CompositeID.ID)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetImageReductionFactor"
-      << int(newReductionFactor)
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetImageReductionFactor" << int(newReductionFactor)
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
     }
 }
 
@@ -440,11 +434,12 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
   if (this->Composite)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetUseChar" << (val?0:1)
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetUseChar" << (val?0:1)
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 
   if (val)
@@ -464,11 +459,12 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
   if (this->Composite)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetUseRGB" << (val?0:1)
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "SetUseRGB" << (val?0:1)
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
 
   if (val)
@@ -590,11 +586,11 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
   vtkPVProcessModule* pm = this->ProcessModule;
   if (pm->GetOptions()->GetClientMode())
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "GetZBufferValue" << x << y
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "GetZBufferValue" << x << y
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
     float z = 0;
     if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
       {

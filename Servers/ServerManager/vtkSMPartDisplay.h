@@ -28,6 +28,7 @@
 
 #include "vtkSMDisplay.h"
 
+class vtkClientServerStream;
 class vtkSMProxy;
 class vtkDataSet;
 class vtkPVDataInformation;
@@ -50,14 +51,6 @@ public:
   static vtkSMPartDisplay* New();
   vtkTypeRevisionMacro(vtkSMPartDisplay, vtkSMDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-//BTX
-  // Description:
-  // This also creates the vtk objects for the composite.
-  // (actor, mapper, ...)
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
-  vtkGetObjectMacro(ProcessModule,vtkPVProcessModule);
-//ETX
 
   // Description:
   // Connect the VTK data object to the display pipeline.
@@ -193,9 +186,10 @@ public:
   // Description:
   // Temporary solution to write geometry from animation editor.
   void ConnectGeometryForWriting(vtkClientServerID consumerID,
-                                 const char* methodName);
-  void AddToRenderer(vtkClientServerID rendererID);
-  void RemoveFromRenderer(vtkClientServerID rendererID);
+                                 const char* methodName,
+                                 vtkClientServerStream* stream);
+  void AddToRenderer(vtkPVRenderModule*);
+  void RemoveFromRenderer(vtkPVRenderModule*);
                                                     
   // Description:
   // Get data information from the geometry filters output.
@@ -226,11 +220,10 @@ protected:
 
   // Description:
   // Sends the current stream to the client and server. 
-  void SendForceUpdate();
+  void SendForceUpdate(vtkClientServerStream* str);
 
   vtkSMSourceProxy* Source;
   vtkSMProxy* ColorMap;
-  vtkPVProcessModule *ProcessModule;
   
   vtkSMIntVectorProperty* ScalarVisibilityProperty;
   vtkSMIntVectorProperty* DirectColorFlagProperty;

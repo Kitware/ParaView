@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.9");
 
 
 
@@ -45,19 +45,21 @@ vtkPVDeskTopRenderModule::~vtkPVDeskTopRenderModule()
 {
   vtkPVProcessModule * pm = this->ProcessModule;
 
+  vtkClientServerStream stream;
+
   // Tree Composite
   if (this->DisplayManagerID.ID && pm)
     {
-    pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStream(vtkProcessModule::RENDER_SERVER); 
+    pm->DeleteStreamObject(this->DisplayManagerID, stream);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream); 
     this->DisplayManagerID.ID = 0;
     }
   if (this->CompositeID.ID && pm)
     {
-    pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStream(vtkProcessModule::CLIENT);
-    pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+    pm->DeleteStreamObject(this->CompositeID, stream);
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    pm->DeleteStreamObject(this->CompositeID, stream);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
     this->CompositeID.ID = 0;
     }
 }
@@ -84,22 +86,23 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
     return;
     }  
 
-  vtkClientServerStream& stream = pvm->GetStream();
+  vtkClientServerStream stream;
   // Maybe I should not reference count this object to avoid
   // a circular reference.
   this->ProcessModule = pvm;
   this->ProcessModule->Register(this);
 
   // Make an ICE-T renderer on the server and a regular renderer on the client.
-  this->RendererID = pvm->NewStreamObject("vtkIceTRenderer");
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+  this->RendererID = pvm->NewStreamObject("vtkIceTRenderer", stream);
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
   stream << vtkClientServerStream::New << "vtkRenderer" << this->RendererID
          << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::CLIENT);
+  pvm->SendStream(vtkProcessModule::CLIENT, stream);
 
-  this->Renderer2DID = pvm->NewStreamObject("vtkRenderer");
-  this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow");
-  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->Renderer2DID = pvm->NewStreamObject("vtkRenderer", stream);
+  this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow", stream);
+  pvm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pvm->GetObjectFromID(this->RendererID));
@@ -114,11 +117,10 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pm->GetNumberOfPartitions() > 1))
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->RenderWindowID << "SetMultiSamples" << 0
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke
+           << this->RenderWindowID << "SetMultiSamples" << 0
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 
   if (pvm->GetOptions()->GetUseStereoRendering())
@@ -143,9 +145,11 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pvm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
-  this->DisplayManagerID = pvm->NewStreamObject("vtkIceTRenderManager");
+  this->DisplayManagerID = 
+    pvm->NewStreamObject("vtkIceTRenderManager", stream);
 
   stream << vtkClientServerStream::Invoke
                   << this->DisplayManagerID
@@ -169,18 +173,18 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
                   << this->DisplayManagerID 
                   << "InitializeRMIs"
                   << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
   // **********************************************************
 
   // create a vtkDesktopDeliveryClient on the client
-  this->CompositeID = pvm->NewStreamObject("vtkDesktopDeliveryClient");
-  pvm->SendStream(vtkProcessModule::CLIENT);
+  this->CompositeID = pvm->NewStreamObject("vtkDesktopDeliveryClient", stream);
+  pvm->SendStream(vtkProcessModule::CLIENT, stream);
   // create a vtkDesktopDeliveryServer on the server, but use
   // the same id
   stream << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
                   <<  this->CompositeID <<  vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
@@ -190,41 +194,41 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetController" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  pvm->SendStream(  vtkProcessModule::CLIENT
-                  | vtkProcessModule::RENDER_SERVER_ROOT);
+  pvm->SendStream( 
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT, stream);
   
 
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "SetParallelRenderManager" << this->DisplayManagerID
-                  << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+         << "SetParallelRenderManager" << this->DisplayManagerID
+         << vtkClientServerStream::End;
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "SetRenderWindow"
-                  << this->RenderWindowID
-                  << vtkClientServerStream::End;
+         << "SetRenderWindow"
+         << this->RenderWindowID
+         << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "InitializeRMIs"
-                  << vtkClientServerStream::End;
+         << "InitializeRMIs"
+         << vtkClientServerStream::End;
   // Default to off so that the render window does not show up until necessary. 
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "UseCompositingOff"
-                  << vtkClientServerStream::End;
-  pvm->SendStream(  vtkProcessModule::CLIENT
-                  | vtkProcessModule::RENDER_SERVER_ROOT);
+         << "UseCompositingOff"
+         << vtkClientServerStream::End;
+  pvm->SendStream(  
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
   if ( this->ProcessModule->GetOptions()->GetUseOffscreenRendering() )
     {
     stream
       << vtkClientServerStream::Invoke << this->DisplayManagerID
       << "InitializeOffScreen" << vtkClientServerStream::End;
-    pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+    pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
     stream
       << vtkClientServerStream::Invoke << this->CompositeID
       << "InitializeOffScreen" << vtkClientServerStream::End;
-    pvm->SendStream(  vtkProcessModule::CLIENT
-                    | vtkProcessModule::RENDER_SERVER_ROOT);
+    pvm->SendStream(  
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT, stream);
     }
 
   this->InitializeObservers();

@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleDoubleInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleDoubleInformationHelper::vtkSMSimpleDoubleInformationHelper()
@@ -56,7 +56,7 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
       << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
 
   // Get the result
   const vtkClientServerStream& res =     

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModule::vtkPVLODRenderModule()
@@ -89,7 +89,6 @@ vtkSMPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
   vtkSMLODPartDisplay* pDisp;
 
   pDisp = vtkSMLODPartDisplay::New();
-  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }

@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleStringInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleStringInformationHelper::vtkSMSimpleStringInformationHelper()
@@ -56,7 +56,7 @@ void vtkSMSimpleStringInformationHelper::UpdateProperty(
       << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
 
   // Get the result
   const vtkClientServerStream& res =     

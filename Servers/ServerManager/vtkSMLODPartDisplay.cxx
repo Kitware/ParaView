@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.9");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ vtkPVLODPartDisplayInformation* vtkSMLODPartDisplay::GetLODInformation()
     {
     return this->LODInformation;
     }
-  if ( ! this->GetProcessModule() )
+  if ( ! vtkProcessModule::GetProcessModule() )
     {
     return 0;
     }
@@ -100,8 +100,8 @@ vtkPVLODPartDisplayInformation* vtkSMLODPartDisplay::GetLODInformation()
   this->LODInformation->CopyFromObject(0); // Clear information.
   if (this->LODDeciProxy->GetNumberOfIDs() > 0)
     {
-    this->GetProcessModule()->GatherInformation(
-                   this->LODInformation, this->LODDeciProxy->GetID(0));
+    vtkProcessModule::GetProcessModule()->GatherInformation(
+      this->LODInformation, this->LODDeciProxy->GetID(0));
     }
   this->LODInformationIsValid = 1;
 
@@ -114,7 +114,8 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
 {
   int i;
   // hack until input uses proxy input.
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm = static_cast<vtkPVProcessModule*>(
+    vtkProcessModule::GetProcessModule());
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -153,6 +154,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
 
   this->LODVolumeMapperProxy->CreateVTKObjects(num);
 
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
     // Keep track of how long each decimation filter takes to execute.
@@ -160,7 +162,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Decimate"
         << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "AddObserver" << "StartEvent" << cmd
       << vtkClientServerStream::End;
@@ -168,24 +170,24 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     cmd << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Decimate"
         << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
       << vtkClientServerStream::End;
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke 
       << pm->GetProcessModuleID() << "RegisterProgressEvent"
       << this->LODDeciProxy->GetID(i) << this->LODDeciProxy->GetID(i).ID
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "CopyCellDataOn"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "UseInputPointsOn"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "UseInternalTrianglesOff"
       << vtkClientServerStream::End;
@@ -194,57 +196,58 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     //pm->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
     // This should be changed to origin and spacing determined globally.
     int res[3] = {this->LODResolution,this->LODResolution,this->LODResolution};
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(i) << "SetNumberOfDivisions"
       << vtkClientServerStream::InsertArray(res, 3)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke << this->LODDeciProxy->GetID(i) << "GetOutput"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke << this->LODUpdateSuppressorProxy->GetID(i)
       << "SetInput" << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke 
       << this->LODMapperProxy->GetID(i) << "InterpolateScalarsBeforeMappingOn" 
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODMapperProxy->GetID(i) << "UseLookupTableScalarRangeOn"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput"
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->LODMapperProxy->GetID(i) << "SetInput" << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODMapperProxy->GetID(i) << "SetImmediateModeRendering"
       << pm->GetUseImmediateMode()
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->PropProxy->GetID(i) << "SetLODMapper" << this->LODMapperProxy->GetID(i)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke 
       << this->LODVolumeMapperProxy->GetID(i)
       << "InterpolateScalarsBeforeMappingOn" 
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODVolumeMapperProxy->GetID(i) << "UseLookupTableScalarRangeOn"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput"
       << vtkClientServerStream::End
@@ -252,20 +255,21 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
       << this->LODVolumeMapperProxy->GetID(i) << "SetInput"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODVolumeMapperProxy->GetID(i) << "SetImmediateModeRendering"
       << pm->GetUseImmediateMode()
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->VolumeProxy->GetID(i) << "SetLODMapper"
       << this->LODVolumeMapperProxy->GetID(i)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
     // Broadcast for subclasses.
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetNumberOfPartitions"
       << vtkClientServerStream::End
@@ -273,7 +277,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
       << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetPartitionId"
       << vtkClientServerStream::End
@@ -281,16 +285,16 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
       << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     // Now that geometry in in this object, we must
     // connect LOD filter to geometry as part of initialization.
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryProxy->GetID(i)
+    stream << vtkClientServerStream::Invoke << this->GeometryProxy->GetID(i)
       << "GetOutput" << vtkClientServerStream::End;
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke << this->LODDeciProxy->GetID(i) << "SetInput" 
       << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
 }
 
@@ -298,7 +302,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
 void vtkSMLODPartDisplay::ColorByArray(vtkSMProxy* colorMap,
                                        int field)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   this->SetScalarVisibility(1);
 
@@ -314,38 +318,39 @@ void vtkSMLODPartDisplay::ColorByArray(vtkSMProxy* colorMap,
     this->ColorMap->Register(this);
     }
 
+  vtkClientServerStream stream;
   int num, i;
   num = this->MapperProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
     // Turn off the specular so it does not interfere with data.
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->PropertyProxy->GetID(i) << "SetSpecular" << 0.0
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->MapperProxy->GetID(i) << "SetLookupTable" 
       << colorMap->GetID(0)
       << vtkClientServerStream::End;
     if (field == vtkDataSet::CELL_DATA_FIELD)
       {
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->MapperProxy->GetID(i) << "SetScalarModeToUseCellFieldData"
         << vtkClientServerStream::End;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->LODMapperProxy->GetID(i) << "SetScalarModeToUseCellFieldData"
         << vtkClientServerStream::End;
       }
     else if (field == vtkDataSet::POINT_DATA_FIELD)
       {
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->MapperProxy->GetID(i) << "SetScalarModeToUsePointFieldData"
         << vtkClientServerStream::End;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->LODMapperProxy->GetID(i) << "SetScalarModeToUsePointFieldData"
         << vtkClientServerStream::End;
@@ -359,22 +364,23 @@ void vtkSMLODPartDisplay::ColorByArray(vtkSMProxy* colorMap,
       colorMap->GetProperty("ArrayName"));
     if (svp)
       {
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->MapperProxy->GetID(i) << "SelectColorArray" << svp->GetElement(0)
         << vtkClientServerStream::End;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->LODMapperProxy->GetID(i) << "SetLookupTable" 
         << colorMap->GetID(0)
         << vtkClientServerStream::End;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->LODMapperProxy->GetID(i) << "SelectColorArray" << svp->GetElement(0)
         << vtkClientServerStream::End;
       }
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 
@@ -391,31 +397,35 @@ void vtkSMLODPartDisplay::SetScalarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::SetUseImmediateMode(int val)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   this->Superclass::SetUseImmediateMode(val);
   if (this->LODMapperProxy)
     {
-    pm->GetStream()
+    vtkClientServerStream stream;
+    stream
       << vtkClientServerStream::Invoke
       << this->LODMapperProxy->GetID(0) << "SetImmediateModeRendering" << val
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
   if (this->LODVolumeMapperProxy)
     {
-    pm->GetStream()
+    vtkClientServerStream stream;
+    stream
       << vtkClientServerStream::Invoke
       << this->LODVolumeMapperProxy->GetID(0) << "SetImmediateModeRendering"
       << val << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER,stream);
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::VolumeRenderPointField(const char *name)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -423,7 +433,7 @@ void vtkSMLODPartDisplay::VolumeRenderPointField(const char *name)
     }
   this->Superclass::VolumeRenderPointField(name);
 
-  vtkClientServerStream &stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   int i, num;
   num = this->LODVolumeMapperProxy->GetNumberOfIDs();
@@ -437,13 +447,13 @@ void vtkSMLODPartDisplay::VolumeRenderPointField(const char *name)
            << this->LODVolumeMapperProxy->GetID(i)
            << "SelectColorArray" << name << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::VolumeRenderCellField(const char *name)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -451,7 +461,7 @@ void vtkSMLODPartDisplay::VolumeRenderCellField(const char *name)
     }
   this->Superclass::VolumeRenderCellField(name);
 
-  vtkClientServerStream &stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   int i, num;
   num = this->LODVolumeMapperProxy->GetNumberOfIDs();
@@ -465,7 +475,7 @@ void vtkSMLODPartDisplay::VolumeRenderCellField(const char *name)
            << this->LODVolumeMapperProxy->GetID(i)
            << "SelectColorArray" << name << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -477,16 +487,17 @@ void vtkSMLODPartDisplay::SetLODResolution(int res)
     }
   this->LODResolution = res;
 
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (this->LODDeciProxy)
     {
     int r[3] = {res, res, res};
-    pm->GetStream()
+    vtkClientServerStream stream;
+    stream
       << vtkClientServerStream::Invoke
       << this->LODDeciProxy->GetID(0) << "SetNumberOfDivisions" 
       << vtkClientServerStream::InsertArray(r, 3)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   this->InvalidateGeometry();
 }
@@ -496,21 +507,24 @@ void vtkSMLODPartDisplay::SetLODResolution(int res)
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::Update()
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = static_cast<vtkPVProcessModule*>(
+    vtkProcessModule::GetProcessModule());
 
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy )
     {
+    vtkClientServerStream stream;
+
     int i, num;
     num = this->UpdateSuppressorProxy->GetNumberOfIDs();
     for (i = 0; i < num; ++i)
       {
       this->GeometryInformationIsValid = 0;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->UpdateSuppressorProxy->GetID(i) << "ForceUpdate"
         << vtkClientServerStream::End;
       }
-    this->SendForceUpdate();
+    this->SendForceUpdate(&stream);
     this->GeometryIsValid = 1;
     }
 
@@ -518,17 +532,19 @@ void vtkSMLODPartDisplay::Update()
   if ( ! this->LODGeometryIsValid && pm->GetGlobalLODFlag() && 
        this->LODUpdateSuppressorProxy )
     {
+    vtkClientServerStream stream;
+
     int i, num;
     num = this->UpdateSuppressorProxy->GetNumberOfIDs();
     for (i = 0; i < num; ++i)
       {
       this->LODInformationIsValid = 0;
-      pm->GetStream()
+      stream
         << vtkClientServerStream::Invoke
         << this->LODUpdateSuppressorProxy->GetID(i) << "ForceUpdate"
         << vtkClientServerStream::End;
       }
-    this->SendForceUpdate();
+    this->SendForceUpdate(&stream);
     this->LODGeometryIsValid = 1;
     }
 }
@@ -547,16 +563,17 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
 {
   if (this->UpdateSuppressorProxy)
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
-    pm->GetStream()
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
 }
 
@@ -566,27 +583,29 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
 // This is like the ForceUpdate method, but uses cached values if possible.
 void vtkSMLODPartDisplay::CacheUpdate(int idx, int total)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  pm->GetStream()
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream
     << vtkClientServerStream::Invoke
     << this->UpdateSuppressorProxy->GetID(0) << "CacheUpdate" << idx << total
     << vtkClientServerStream::End;
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << this->LODUpdateSuppressorProxy->GetID(0) << "CacheUpdate" << idx << total
     << vtkClientServerStream::End; 
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << this->MapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << this->LODMapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 

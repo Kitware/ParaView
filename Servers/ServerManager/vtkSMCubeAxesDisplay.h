@@ -42,8 +42,8 @@ public:
 //BTX
   // Description:
   // Not implemented yet.  Client still does this.
-  virtual void AddToRenderer(vtkClientServerID rendererID);
-  virtual void RemoveFromRenderer(vtkClientServerID rendererID);
+  virtual void AddToRenderer(vtkPVRenderModule*);
+  virtual void RemoveFromRenderer(vtkPVRenderModule*);
 //ETX
 
   // Description:

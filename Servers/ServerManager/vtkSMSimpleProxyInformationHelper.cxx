@@ -21,7 +21,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleProxyInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleProxyInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleProxyInformationHelper, "1.2");
 
 
 //---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void vtkSMSimpleProxyInformationHelper::UpdateProperty(
       << vtkClientServerStream::End;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
 
   // Get the result
   const vtkClientServerStream& res = 

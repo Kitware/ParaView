@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMXDMFInformationHelper);
-vtkCxxRevisionMacro(vtkSMXDMFInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMXDMFInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMXDMFInformationHelper::vtkSMXDMFInformationHelper()
@@ -56,14 +56,14 @@ void vtkSMXDMFInformationHelper::UpdateProperty(
   str << vtkClientServerStream::Invoke
       << serverSideID << "GetParameters" << objectId
       << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 1);
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
 
   vtkClientServerStream parameters;
   int retVal = 
     pm->GetLastResult(vtkProcessModule::GetRootId(serverIds)).GetArgument(0, 0, &parameters);
 
   pm->DeleteStreamObject(serverSideID, str);
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str);
 
   if(!retVal)
     {

@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.5");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -65,20 +65,21 @@ void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
   this->Superclass::CreateVTKObjects(numObjects);
     
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  
+
+  vtkClientServerStream stream;
   for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     
-    pm->GetStream() << vtkClientServerStream::Invoke << id 
-                    << "SetPlaceFactor" << 1.0 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << id 
+           << "SetPlaceFactor" << 1.0 
+           << vtkClientServerStream::End;
     
-    pm->GetStream() << vtkClientServerStream::Invoke << id
-                    << "PlaceWidget"
-                    << 0 << 1 << 0 << 1 << 0 << 1
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    stream << vtkClientServerStream::Invoke << id
+           << "PlaceWidget"
+           << 0 << 1 << 0 << 1 << 0 << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(this->GetServers(), stream, 1);
     }
   
   vtkSMProxy* transformProxy = this->GetSubProxy("transform");
@@ -148,11 +149,12 @@ void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerID transformid = transformProxy->GetID(0);
+  vtkClientServerStream stream;
   for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
-    pm->GetStream()<< vtkClientServerStream::Invoke << this->GetID(cc)
-      << "SetTransform" << transformid << vtkClientServerStream::End;
-    pm->SendStream(this->GetServers());
+    stream << vtkClientServerStream::Invoke << this->GetID(cc)
+           << "SetTransform" << transformid << vtkClientServerStream::End;
+    pm->SendStream(this->GetServers(), stream, 1);
     }
 }
 

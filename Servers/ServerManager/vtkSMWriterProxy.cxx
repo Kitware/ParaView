@@ -53,7 +53,7 @@ void vtkSMWriterProxy::AddInput(vtkSMSourceProxy *input,
              << sourceID << method << part->GetID(0) 
              << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
   else
     {
@@ -76,7 +76,7 @@ void vtkSMWriterProxy::AddInput(vtkSMSourceProxy *input,
              << sourceID << method << part->GetID(0) 
              << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream, 0);
+    pm->SendStream(this->Servers, stream);
     }
 }
 
@@ -97,7 +97,7 @@ void vtkSMWriterProxy::UpdateVTKObjects()
 
   if (str.GetNumberOfMessages() > 0)
     {
-    pm->SendStream(this->Servers, str, 0);
+    pm->SendStream(this->Servers, str);
     }
 }
 

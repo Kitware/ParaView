@@ -39,19 +39,16 @@
 #include "vtkUnstructuredGridVolumeRayCastMapper.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVGeometryInformation.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.19");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.20");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
 {
-  this->ProcessModule = NULL;
-  
   this->GeometryInformation = vtkPVGeometryInformation::New();
   this->GeometryInformationIsValid = 0;
   
@@ -279,7 +276,6 @@ vtkSMPartDisplay::~vtkSMPartDisplay()
     }
   
   this->SetSource(0);
-  this->SetProcessModule(0);
   this->SetVolumeRenderField(0);
 }
 
@@ -302,7 +298,7 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     vtkErrorMacro("Set the ProcessModule before you connect.");
     return;
     }
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   // just create the proxys here.
 
@@ -413,19 +409,20 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
         << "LogEndEvent" << "Execute Geometry" 
         << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GeometryProxy->GetID(i) 
-                    << "AddObserver"
-                    << "StartEvent"
-                    << start
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GeometryProxy->GetID(i) 
-                    << "AddObserver"
-                    << "EndEvent"
-                    << end
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->GeometryProxy->GetID(i) 
+           << "AddObserver"
+           << "StartEvent"
+           << start
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->GeometryProxy->GetID(i) 
+           << "AddObserver"
+           << "EndEvent"
+           << end
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
     // Now create the update supressors which keep the renderers/mappers
     // from updating the pipeline.  These are here to ensure that all
@@ -437,7 +434,7 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
           << "GetOutput" << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(i) << "SetInput" 
           << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
     // Now create the mapper.
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) 
@@ -451,7 +448,8 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
           << "SetImmediateModeRendering" 
           << pm->GetUseImmediateMode() << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       
     // I used to use ambient 0.15 and diffuse 0.85, but VTK did not
     // handle it correctly.
@@ -469,9 +467,10 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
            << "SetProperty" << this->PropertyProxy->GetID(i) << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->PropProxy->GetID(i)
            << "SetMapper" << this->MapperProxy->GetID(i)  << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetNumberOfPartitions"
       << vtkClientServerStream::End
@@ -479,7 +478,7 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetPartitionId"
       << vtkClientServerStream::End
@@ -487,7 +486,7 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
     
     stream << vtkClientServerStream::Invoke << this->VolumeProxy->GetID(i) 
           << "VisibilityOff" << vtkClientServerStream::End;
@@ -514,7 +513,8 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     stream << vtkClientServerStream::Invoke << this->VolumeOpacityProxy->GetID(i)
           << "RemoveAllPoints" << vtkClientServerStream::End;
     
-    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
     }
     
   //int fixme; //GetRid of these ivars
@@ -562,7 +562,7 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
     vtkErrorMacro("Set the ProcessModule before you connect.");
     return;
     }
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   // Now that we know how many server objects to create, finish
   // creating them and setting them up.
@@ -579,7 +579,7 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
            << this->GeometryProxy->GetID(i) <<  "SetInput" 
            << input->GetPart(i)->GetID(0) << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
   for (i = 0; i < num; ++i)
     {
@@ -599,9 +599,9 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
              << "SetInput" <<  vtkClientServerStream::LastResult 
              << vtkClientServerStream::End;
 
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
     }
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -669,8 +669,8 @@ void vtkSMPartDisplay::SetColor(float r, float g, float b)
     }
   this->PropertyProxy->UpdateVTKObjects();
 
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
 
   // I do not want to create properties for specular, ambient and diffuse.
   int i, num;
@@ -684,7 +684,8 @@ void vtkSMPartDisplay::SetColor(float r, float g, float b)
     stream << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
           << "SetSpecularColor" << 1.0 << 1.0 << 1.0 << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }  
 
 //----------------------------------------------------------------------------
@@ -693,47 +694,24 @@ void vtkSMPartDisplay::Update()
   // Current problem is that there is no input for the UpdateSuppressor object
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy != 0 )
     {
-    vtkPVProcessModule *pm = this->GetProcessModule();
-    vtkClientServerStream& stream = pm->GetStream();
-    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0)
-           << "ForceUpdate" << vtkClientServerStream::End;
-    this->SendForceUpdate();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->UpdateSuppressorProxy->GetID(0) << "ForceUpdate" 
+           << vtkClientServerStream::End;
+    this->SendForceUpdate(&stream);
     this->GeometryIsValid = 1;
     this->GeometryInformationIsValid = 0;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPartDisplay::SetProcessModule(vtkPVProcessModule* pm)
-{
-  if (pm == 0)
-    {
-    if (this->ProcessModule)
-      {
-      this->ProcessModule->UnRegister(this);
-      this->ProcessModule = 0;
-      }
-    return;
-    }
-
-  if (this->ProcessModule)
-    {
-    vtkErrorMacro("ProcessModule already set and part has been initialized.");
-    return;
-    }
-
-  this->ProcessModule = pm;
-  this->ProcessModule->Register(this);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMPartDisplay::RemoveAllCaches()
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0)
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -741,15 +719,20 @@ void vtkSMPartDisplay::RemoveAllCaches()
 // This is like the ForceUpdate method, but uses cached values if possible.
 void vtkSMPartDisplay::CacheUpdate(int idx, int total)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0)
-         << "CacheUpdate" << idx << total << vtkClientServerStream::End;
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0)
+         << "CacheUpdate" 
+         << idx 
+         << total 
+         << vtkClientServerStream::End;
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
-  stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(0) << "Modified"
+  stream << vtkClientServerStream::Invoke 
+         << this->MapperProxy->GetID(0) << "Modified"
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -883,8 +866,8 @@ int vtkSMPartDisplay::GetInterpolation()
 void vtkSMPartDisplay::ColorByArray(vtkSMProxy* colorMap,
                                     int field)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
 
   this->ColorField = field;
   if (this->ColorMap)
@@ -933,6 +916,8 @@ void vtkSMPartDisplay::ColorByArray(vtkSMProxy* colorMap,
       vtkErrorMacro("Only point or cell field please.");
       }
     }
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,stream);
 }
 
 //----------------------------------------------------------------------------
@@ -1198,8 +1183,8 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
     }
   this->OpacityUnitDistance = unitDistance;
   
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
   
   stream << vtkClientServerStream::Invoke << this->VolumeOpacityProxy->GetID(0)
          << "RemoveAllPoints" << vtkClientServerStream::End;
@@ -1224,19 +1209,20 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
   stream << vtkClientServerStream::Invoke << this->VolumePropertyProxy->GetID(0)
          << "SetScalarOpacityUnitDistance" << unitDistance << vtkClientServerStream::End;
   
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::VolumeRenderPointField(const char *name)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
     return;
     }
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   this->ColorField = vtkDataSet::POINT_DATA_FIELD;
 
@@ -1250,20 +1236,20 @@ void vtkSMPartDisplay::VolumeRenderPointField(const char *name)
     stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
            << "SelectScalarArray" << name << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::VolumeRenderCellField(const char *name)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
     return;
     }
-  vtkClientServerStream& stream = pm->GetStream();
+  vtkClientServerStream stream;
 
   this->ColorField = vtkDataSet::CELL_DATA_FIELD;
 
@@ -1277,7 +1263,7 @@ void vtkSMPartDisplay::VolumeRenderCellField(const char *name)
     stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
            << "SelectScalarArray" << name << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
 }
 
@@ -1306,28 +1292,30 @@ void vtkSMPartDisplay::SetRepresentation(int rep)
     }
   this->VolumeRenderModeOff();
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+
   int num, i;
   num = this->GeometryProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
     // Geometry filter handles outline representation (not property).
-    vtkProcessModule* pm = this->GetProcessModule();
     if ( this->Representation == VTK_OUTLINE)
       { // Changing from outline.
-      pm->GetStream() 
+      stream 
           << vtkClientServerStream::Invoke
           << this->GeometryProxy->GetID(i)
           << "SetUseOutline" << 0 << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       this->InvalidateGeometry();
       }
     if (rep == VTK_OUTLINE)
       { // Moving to outline
-      pm->GetStream() 
+      stream 
           << vtkClientServerStream::Invoke
           << this->GeometryProxy->GetID(i)
           << "SetUseOutline" << 1 << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       this->InvalidateGeometry();
       }
     // Handle specularity and lighting. All but surface turns shading off.
@@ -1345,25 +1333,25 @@ void vtkSMPartDisplay::SetRepresentation(int rep)
         specularity = 0.1;
         }
       }
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
       << "SetAmbient" << ambient << vtkClientServerStream::End;
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
       << "SetDiffuse" << diffuse << vtkClientServerStream::End;
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
       << "SetSpecular" << specularity << vtkClientServerStream::End;
         
     // Surface 
-    pm->GetStream() 
+    stream 
       << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
       << "SetRepresentationToSurface" << vtkClientServerStream::End;
 
     // Wireframe
     if (rep == VTK_WIREFRAME)
       {
-      pm->GetStream() 
+      stream 
         << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
         << "SetRepresentationToWireframe" << vtkClientServerStream::End;
       }
@@ -1371,16 +1359,18 @@ void vtkSMPartDisplay::SetRepresentation(int rep)
     // Points
     if (rep == VTK_POINTS)
       {
-      pm->GetStream() 
+      stream 
         << vtkClientServerStream::Invoke 
         << this->PropertyProxy->GetID(i)
         << "SetRepresentationToPoints" << vtkClientServerStream::End;
       }
       
     // All the changes to property get sent to render server and client.  
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
   
+
   // At the end on purpose.  Eliminates unecessary sends.
   this->Representation = rep;
 }
@@ -1494,46 +1484,52 @@ void vtkSMPartDisplay::GetOrigin(double *origin)
 
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::ConnectGeometryForWriting(vtkClientServerID consumerID,
-                                                 const char* methodName)
+                                                 const char* methodName,
+                                                 vtkClientServerStream* stream)
 {
-  //law int fixme;  // We need to write all the parts! Create a special SM object to do this.
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->GeometryProxy->GetID(0)
-                  << "GetOutput"
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << consumerID
-                  << methodName
-                  << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
+  //law int fixme;  
+  // We need to write all the parts! Create a special SM object to do this.
+  *stream << vtkClientServerStream::Invoke 
+          << this->GeometryProxy->GetID(0)
+          << "GetOutput"
+         << vtkClientServerStream::End;
+  *stream << vtkClientServerStream::Invoke << consumerID
+          << methodName
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPartDisplay::AddToRenderer(vtkClientServerID rendererID)
+void vtkSMPartDisplay::AddToRenderer(vtkPVRenderModule* rm)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkClientServerID rendererID = rm->GetRendererID();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int num, i; 
   num = this->PropProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
-    vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << rendererID << "AddViewProp"
             << this->PropProxy->GetID(i) << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << rendererID << "AddViewProp"
             << this->VolumeProxy->GetID(i) << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPartDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
+void vtkSMPartDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkClientServerID rendererID = rm->GetRendererID();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int num, i; 
   num = this->PropProxy->GetNumberOfIDs();
+  vtkClientServerStream stream;
   for (i = 0; i < num; ++i)
     {
-    vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << rendererID 
            << "RemoveViewProp"
            << this->PropProxy->GetID(i) << vtkClientServerStream::End;
@@ -1541,14 +1537,15 @@ void vtkSMPartDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
            << "RemoveViewProp"
            << this->VolumeProxy->GetID(i) << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPartDisplay::SendForceUpdate()
+void vtkSMPartDisplay::SendForceUpdate(vtkClientServerStream* stream)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, *stream);
 }
 
 
@@ -1667,7 +1664,6 @@ void vtkSMPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
      << this->ColorProperty->GetElement(1) << ", " 
      << this->ColorProperty->GetElement(2) << endl;
   
-  os << indent << "ProcessModule: "    << this->ProcessModule         << endl;
   os << indent << "ColorField: " << this->ColorField << endl;
   os << indent << "DirectColorFlag: "  << this->GetDirectColorFlag()       << endl;
   os << indent << "InterpolateColorsFlag: " << this->GetInterpolateColorsFlag() << endl;
