@@ -498,7 +498,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                this->VTKWidget->GetWidgetName(), this->GetTclName());
   
   // Expose.
-  this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName());
+  this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
+	       this->GetTclName());
   
   // The start and end methods merge the processes renderers.
   // Start and End methods are used to swap buffers correctly.
