@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.8");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.9");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2267,9 +2267,6 @@ void vtkPVWindow::WriteData()
       dlg->Create(this->Application, "");
       dlg->SetMasterWindow(this);
       dlg->SetTitle("Select ghost levels");
-
-      // See if the user wants to save any ghost levels.
-      int ghostLevel = 0;
 
       if ( dlg->Invoke() )
         {
