@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -32,7 +32,7 @@ vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
   int idx;
 
   this->ArrayInformation = vtkCollection::New();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -69,7 +69,7 @@ void vtkPVDataSetAttributesInformation::Initialize()
   int idx;
 
   this->ArrayInformation->RemoveAllItems();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -97,7 +97,7 @@ vtkPVDataSetAttributesInformation
     newArrayInfo = NULL;
     }
   // Now the default attributes.
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = dataInfo->AttributeIndices[idx];
     }
@@ -116,7 +116,7 @@ vtkPVDataSetAttributesInformation
 
   // Clear array information.
   this->ArrayInformation->RemoveAllItems();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -152,6 +152,12 @@ vtkPVDataSetAttributesInformation
   int idx1, idx2;
   int num1 = this->GetNumberOfArrays();
   int num2 = info->GetNumberOfArrays();
+  short  newAttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+
+  for (idx1 = 0; idx1 < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx1)
+    {
+    newAttributeIndices[idx1] = -1;
+    }
 
   // First add ranges from all common arrays
   for (idx1 = 0; idx1 < num1; ++idx1)
@@ -166,6 +172,13 @@ vtkPVDataSetAttributesInformation
         // Take union of range.
         ai1->AddRanges(ai2);
         found = 1;
+        // Record default attributes.
+        int attribute1 = this->IsArrayAnAttribute(idx1);
+        int attribute2 = info->IsArrayAnAttribute(idx2);
+        if (attribute1 > -1 && attribute1 == attribute2)
+          {
+          newAttributeIndices[attribute1] = idx1;
+          }
         break;
         }
       }
@@ -173,6 +186,11 @@ vtkPVDataSetAttributesInformation
       {
       ai1->SetIsPartial(1);
       }
+    }
+
+  for (idx1 = 0; idx1 < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx1)
+    {
+    this->AttributeIndices[idx1] = newAttributeIndices[idx1];
     }
 
   // Now add arrays that don't exist
@@ -231,7 +249,7 @@ int vtkPVDataSetAttributesInformation::IsArrayAnAttribute(int arrayIndex)
 {
   int i;
 
-  for (i = 0; i < 5; ++i)
+  for (i = 0; i < vtkDataSetAttributes::NUM_ATTRIBUTES; ++i)
     {
     if (this->AttributeIndices[i] == arrayIndex)
       {
@@ -298,7 +316,7 @@ vtkPVDataSetAttributesInformation
   *css << vtkClientServerStream::Reply;
 
   // Default attributes.
-  *css << vtkClientServerStream::InsertArray(this->AttributeIndices, 5);
+  *css << vtkClientServerStream::InsertArray(this->AttributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES);
 
   // Number of arrays.
   *css << this->GetNumberOfArrays();
@@ -326,7 +344,7 @@ vtkPVDataSetAttributesInformation
   this->ArrayInformation->RemoveAllItems();
 
   // Default attributes.
-  if(!css->GetArgument(0, 0, this->AttributeIndices, 5))
+  if(!css->GetArgument(0, 0, this->AttributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES))
     {
     vtkErrorMacro("Error parsing default attributes from message.");
     return;
