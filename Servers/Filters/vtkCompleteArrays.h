@@ -43,7 +43,7 @@ public:
   // Description:
   // The user can set the controller used for inter-process communication.
   void SetController(vtkMultiProcessController *controller);
-  vtkMultiProcessController* GetController() { return this->Controller;}
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
 protected:
   vtkCompleteArrays();

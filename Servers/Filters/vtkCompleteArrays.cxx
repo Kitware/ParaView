@@ -36,9 +36,8 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.4");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.5");
 vtkStandardNewMacro(vtkCompleteArrays);
-
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
 
@@ -76,7 +75,7 @@ void vtkCompleteArrays::Execute()
 
   // Initialize
   //
-  vtkDebugMacro(<<"Generating elevation scalars!");
+  vtkDebugMacro(<<"Completing array");
 
   this->GetOutput()->CopyStructure( input );
   this->GetOutput()->GetPointData()->PassData(input->GetPointData());
@@ -229,5 +228,9 @@ void vtkCompleteArrays::PrintSelf(ostream& os, vtkIndent indent)
   if (this->Controller)
     {
     os << indent << "Controller: " << this->Controller << endl;
+    }
+  else
+    {
+    os << indent << "Controller: (none)\n";
     }
 }
