@@ -352,6 +352,9 @@ void vtkPVWindow::PrepareForDelete()
   
   if (this->MainView)
     {
+    this->SaveColor(2, "RenderViewBG", 
+		    this->MainView->GetBackgroundColor());
+    
     this->MainView->Delete();
     this->MainView = NULL;
     }
@@ -804,6 +807,14 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
   this->MainView->AddBindings(); // additional bindings in PV not in KW
+  
+  float rgb[3];
+  this->RetrieveColor(2, "RenderViewBG", rgb); 
+  if (rgb[0] == -1)
+    {
+    rgb[0] = rgb[1] = rgb[2] = 0;
+    }
+  this->MainView->SetBackgroundColor(rgb);
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 

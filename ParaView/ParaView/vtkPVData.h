@@ -289,6 +289,7 @@ public:
   // Description:
   // Get the tcl name of the mapper
   vtkGetStringMacro(MapperTclName);
+  vtkGetStringMacro(LODMapperTclName);
   
   // I shall want to get rid of this.
   vtkSetObjectMacro(View, vtkKWView);

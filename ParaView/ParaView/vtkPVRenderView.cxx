@@ -282,7 +282,22 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 // Here we are going to change only the satellite procs.
 void vtkPVRenderView::PrepareForDelete()
-{  
+{
+  vtkPVWindow* pvwindow = this->GetPVWindow();
+  if (pvwindow)
+    {
+    pvwindow->SetRegisteryValue(2, "RunTime", "UseStrips", "%d",
+				this->TriangleStripsCheck->GetState());
+    pvwindow->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
+				this->ImmediateModeCheck->GetState());
+#ifdef VTK_USE_MPI
+    pvwindow->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
+				this->InterruptRenderCheck->GetState());
+    pvwindow->SetRegisteryValue(2, "RunTime", "UseCharInComposite", "%d",
+				this->UseCharCheck->GetState());
+#endif
+    }
+
   // Circular reference.
   if (this->Composite)
     {
@@ -410,6 +425,8 @@ void vtkPVRenderView::CreateViewProperties()
 {
   this->vtkKWView::CreateViewProperties();
 
+  vtkPVWindow* pvwindow = this->GetPVWindow();
+
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -417,13 +434,30 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->TriangleStripsCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
-  this->TriangleStripsCheck->SetState(0);
+  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
+    {
+    this->TriangleStripsCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseStrips"));
+    }
+  else
+    {
+    this->TriangleStripsCheck->SetState(0);
+    }
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
   this->TriangleStripsCheck->SetBalloonHelpString("Toggle the use of triangle strips when rendering polygonal data");
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, "-text \"Use Immediate Mode Rendering\"");
-  this->ImmediateModeCheck->SetState(0);
+  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
+					      "UseImmediateMode", 0))
+    {
+    this->ImmediateModeCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseImmediateMode"));
+    }
+  else
+    {
+    this->ImmediateModeCheck->SetState(0);
+    }
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   this->ImmediateModeCheck->SetBalloonHelpString("Toggle the use of immediate mode rendering (when off, display lists are used)");
   
@@ -431,13 +465,34 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
-  this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
+
+  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
+					      "InterruptRender", 0))
+    {
+    this->InterruptRenderCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
+    this->InterruptRenderCallback();
+    }
+  else
+    {
+    this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
+    }
   this->InterruptRenderCheck->SetBalloonHelpString("Toggle the use of asynchronous MPI calls to interrupt renders. When off, renders can not be interrupted.");
   
   this->UseCharCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->UseCharCheck->Create(this->Application, "-text \"Use char Pixel Values\"");
+  this->UseCharCheck->Create(this->Application, "-text \"Use char Values in Compositing\"");
   this->UseCharCheck->SetCommand(this, "UseCharCallback");
-  this->UseCharCheck->SetState(1);
+  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
+						 "UseCharInComposite", 0))
+    {
+    this->UseCharCheck->SetState(pvwindow->GetIntRegisteryValue(
+      2, "RunTime", "UseCharInComposite"));
+    this->UseCharCallback();
+    }
+  else
+    {
+    this->UseCharCheck->SetState(1);
+    }
   this->UseCharCheck->SetBalloonHelpString("Toggle the use of char data when compositing. If rendering defects occur, try turning this off.");
   
   this->Script("pack %s %s %s %s -side top -anchor w",
@@ -894,6 +949,9 @@ void vtkPVRenderView::ImmediateModeCallback()
     pvd = pvs->GetPVOutput();
     pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
                            pvd->GetMapperTclName(),
+                           this->ImmediateModeCheck->GetState());
+    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                           pvd->GetLODMapperTclName(),
                            this->ImmediateModeCheck->GetState());
     }
 }

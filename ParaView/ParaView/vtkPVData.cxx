@@ -365,9 +365,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn",
-                         this->MapperTclName);
-  
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->GeometryTclName);
   
@@ -402,7 +399,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
 
   this->Script("%s SetLookupTable [%s GetLookupTable]",
                this->GetScalarBarTclName(), this->MapperTclName);
@@ -1735,11 +1731,18 @@ void vtkPVData::Initialize()
       this->GetVTKData()->IsA("vtkUnstructuredGrid"))
     {
     pvApp->BroadcastScript("%s SetUseStrips %d", this->GeometryTclName,
-                           ((vtkPVRenderView*)this->GetView())->GetTriangleStripsCheck()->GetState());
+                           static_cast<vtkPVRenderView*>(
+			     this->GetView())->GetTriangleStripsCheck()->GetState());
     }
   pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
                          this->MapperTclName,
-                         ((vtkPVRenderView*)this->GetView())->GetImmediateModeCheck()->GetState());
+                         static_cast<vtkPVRenderView*>(
+			   this->GetView())->GetImmediateModeCheck()->GetState());
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", 
+			 this->LODMapperTclName,
+			 static_cast<vtkPVRenderView*>(
+			   this->GetView())->GetImmediateModeCheck()->GetState());
+
 }
 
 
