@@ -48,7 +48,7 @@ public:
 
   // Description:
   // Set/Get the value of the Text.
-  void SetValue(char *);
+  void SetValue(const char *);
   char *GetValue();
 
 protected:

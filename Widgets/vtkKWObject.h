@@ -84,7 +84,7 @@ public:
   virtual const char *GetVersion(const char *);
   virtual void AddVersion(const char *cname, const char *version);
   void ExtractRevision(ostream& os,const char *revIn);
-  
+  int CompareVersions(const char *v1, const char *v2);
   
 //BTX
   // Description:
@@ -105,7 +105,8 @@ protected:
 
   char **Versions;
   int   NumberOfVersions;
-
+  int   VersionsLoaded;
+  
   // this instance variable holds the command functions for this class.
   int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
 //ETX

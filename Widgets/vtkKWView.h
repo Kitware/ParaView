@@ -45,6 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkKWApplication;
 class vtkKWWindow;
 class vtkViewport;
+class vtkKWCornerAnnotation;
 #include "vtkWindow.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWEntry.h"
@@ -199,16 +200,11 @@ public:
   virtual void HeaderChanged();
   virtual void OnDisplayHeader();
 
-  virtual void CornerChanged();
-  virtual void OnDisplayCorner();
-  virtual void CornerSelected(int c);
-  
   // Description:
   // Allow access to the UI components of interest
   vtkGetObjectMacro(HeaderButton,vtkKWCheckButton);
   vtkGetObjectMacro(HeaderEntry,vtkKWEntry);
-  vtkGetObjectMacro(CornerButton,vtkKWCheckButton);
-  vtkGetObjectMacro(CornerText,vtkKWText);
+  vtkGetObjectMacro(CornerAnnotation,vtkKWCornerAnnotation);
 
   vtkSetMacro( InteractiveUpdateRate, float );
   vtkGetMacro( InteractiveUpdateRate, float );
@@ -243,7 +239,6 @@ public:
   // Description:
   // Change the color of the annotation text
   void SetHeaderTextColor( float r, float g, float b );
-  void SetCornerTextColor( float r, float g, float b );
 
 protected:
   vtkKWView();
@@ -251,6 +246,8 @@ protected:
   vtkKWView(const vtkKWView&) {};
   void operator=(const vtkKWView&) {};
 
+  vtkKWCornerAnnotation *CornerAnnotation;
+  
   vtkKWNotebook *Notebook;
   int InExpose;
   int SharedPropertiesParent;
@@ -278,18 +275,6 @@ protected:
   vtkScaledTextActor     *HeaderProp;
   vtkTextMapper          *HeaderMapper;
 
-  vtkKWGenericComposite  *CornerComposite;
-  vtkKWLabeledFrame      *CornerFrame;
-  vtkKWWidget            *CornerDisplayFrame;
-  vtkKWChangeColorButton *CornerColor;
-  vtkKWCheckButton       *CornerButton;
-  vtkKWWidget            *CornerLabel;
-  vtkKWText              *CornerText;
-  vtkScaledTextActor     *CornerProp;
-  vtkTextMapper          *CornerMapper;
-  vtkKWWidget            *CornerOptionsFrame;
-  vtkKWWidget            *CornerOptionsLabel;
-  vtkKWOptionMenu        *CornerOptions;
 
   int              PropertiesCreated;
 

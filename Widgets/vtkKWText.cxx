@@ -53,7 +53,7 @@ char *vtkKWText::GetValue()
   return this->Application->GetMainInterp()->result;
 }
 
-void vtkKWText::SetValue(char *s)
+void vtkKWText::SetValue(const char *s)
 {
   this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)

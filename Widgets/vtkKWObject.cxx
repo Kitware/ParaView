@@ -58,6 +58,7 @@ vtkKWObject::vtkKWObject()
   this->CommandFunction = vtkKWObjectCommand;
   this->NumberOfVersions = 0;
   this->Versions = NULL;
+  this->VersionsLoaded = 0;
 }
 
 vtkKWObject::~vtkKWObject()
@@ -82,7 +83,10 @@ void vtkKWObject::Serialize(ostream& os, vtkIndent indent)
 {
   os << this->GetClassName() << endl;
   os << indent << "  {\n";
-  this->SerializeRevision(os, indent.GetNextIndent());
+  os << indent << "  Versions\n";
+  os << indent << "    {\n";
+  this->SerializeRevision(os, indent.GetNextIndent().GetNextIndent());
+  os << indent << "    }\n";
   this->SerializeSelf(os, indent.GetNextIndent());
   os << indent << "  }\n";
 }
@@ -97,13 +101,16 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.4 $");
+  this->ExtractRevision(os,"$Revision: 1.5 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
 {
   char token[1024];
+  char tmp[1024];
+
   // get the class name
+  this->VersionsLoaded = 0;
   vtkKWSerializer::GetNextToken(&is,token);
   if (strcmp(token,this->GetClassName()))
     {
@@ -121,6 +128,23 @@ void vtkKWObject::Serialize(istream& is)
       }
     else
       {
+      // get the version istory first
+      if (!strcmp(token,"Versions"))
+        {
+        vtkKWSerializer::GetNextToken(&is,token);
+        do
+          {
+          if (token[0] != '{')
+            {
+            vtkKWSerializer::GetNextToken(&is,tmp);
+            this->AddVersion(token,tmp);
+            }
+          vtkKWSerializer::GetNextToken(&is,token);
+          }
+        while (token[0] != '}');
+        this->VersionsLoaded = 1;
+        vtkKWSerializer::GetNextToken(&is,token);
+        }
       this->SerializeToken(is,token);
       }
     }
@@ -129,14 +153,6 @@ void vtkKWObject::Serialize(istream& is)
 
 void vtkKWObject::SerializeToken(istream& is, const char token[1024])
 {
-  char tmp[1024];
-  
-  if (!strcmp(token,"vtkKWObject"))
-    {
-    vtkKWSerializer::GetNextToken(&is,tmp);
-    this->AddVersion("vtkKWObject",tmp);
-    return;
-    }
 }
 
 const char *vtkKWObject::GetTclName()
@@ -242,6 +258,56 @@ void vtkKWObject::AddVersion(const char *cname, const char *version)
   sprintf(revision,"%s",version);
   this->Versions[this->NumberOfVersions*2+1] = revision;
   this->NumberOfVersions++;
+}
+
+int vtkKWObject::CompareVersions(const char *v1, const char *v2)
+{
+  if (!v1 && !v2)
+    {
+    return 0;
+    }
+  if (!v1)
+    {
+    return -1;
+    }
+  if (!v2)
+    {
+    return 1;
+    }
+  // both v1 and v2 are non NULL
+  int nVer1 = 0;
+  int nVer2 = 0;
+  int ver1[7];
+  int ver2[7];
+  nVer1 = sscanf(v1,"%i.%i.%i.%i.%i.%i.%i", ver1, ver1+1, ver1+2,
+                 ver1+3, ver1+4, ver1+5, ver1+6);
+  nVer2 = sscanf(v2,"%i.%i.%i.%i.%i.%i.%i", ver2, ver2+1, ver2+2,
+                 ver2+3, ver2+4, ver2+5, ver2+6);
+
+  int pos = 0;
+  // compare revisions
+  while (pos < nVer1 && pos < nVer2)
+    {
+    if (ver1[pos] < ver2[pos])
+      {
+      return -1;
+      }
+    if (ver1[pos] > ver2[pos])
+      {
+      return 1;
+      }    
+    }
+  // revisions match but maybe one has more .2.3.4.2
+  if (nVer1 < nVer2)
+    {
+    return -1;
+    }
+  if (nVer1 > nVer2)
+    {
+    return 1;
+    }
+  // They are identical in every way
+  return 0;
 }
 
 const char *vtkKWObject::GetVersion(const char *cname)

@@ -148,7 +148,6 @@ void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
   
   while (balance && vtkKWSerializer::GetNextToken(is,token))
     {
-    res = vtkKWSerializer::GetNextToken(is,token);
     if (token[0] == '{')
       {
       balance++;
