@@ -13,7 +13,7 @@ ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 
 IF(TCL_TCLSH)
   IF(VTK_PRINT_SELF_CHECK_TCL)
-    FOREACH(part Common Filters ServerManager StreamInterpreter)
+    FOREACH(part Common Filters ServerManager)
       ADD_TEST(PrintSelf-PVServer-${part} ${TCL_TCLSH}
         ${VTK_PRINT_SELF_CHECK_TCL}
         ${PVServer_SOURCE_DIR}/${part})
@@ -21,7 +21,7 @@ IF(TCL_TCLSH)
   ENDIF(VTK_PRINT_SELF_CHECK_TCL)
 
   IF(VTK_FIND_STRING_TCL)
-    FOREACH(part Common Filters ServerManager StreamInterpreter)
+    FOREACH(part Common Filters ServerManager)
       ADD_TEST(TestSetObjectMacro-PVServer-${part} ${TCL_TCLSH}
         ${VTK_FIND_STRING_TCL}
         "${PVServer_SOURCE_DIR}/${part}/vtk\\\\*.h"
