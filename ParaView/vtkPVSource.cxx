@@ -561,6 +561,84 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
   return check;
 }  
 //----------------------------------------------------------------------------
+vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
+                                      char *ext, vtkKWObject *o)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *entry;
+  vtkKWPushButton *browseButton;
+
+  // Find the Tcl name of the object whose methods will be called.
+  const char *tclName = this->GetVTKSourceTclName();
+  if (o)
+    {
+    tclName = o->GetTclName();
+    }
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
+
+  // Now a label
+  if (label && label[0] != '\0')
+    {  
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
+  entry = vtkKWEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(frame);
+  entry->Create(this->Application, "");
+  this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
+
+
+  browseButton = vtkKWPushButton::New();
+  this->Widgets->AddItem(browseButton);
+  browseButton->SetParent(frame);
+  browseButton->Create(this->Application, "");
+  browseButton->SetLabel("Browse");
+  this->Script("pack %s -side left", browseButton->GetWidgetName());
+  if (ext)
+    {
+    char str[1000];
+    sprintf(str, "SetValue [tk_getOpenFile -filetypes {{{} {.%s}}}]", ext);
+    browseButton->SetCommand(entry, str);
+    }
+  else
+    {
+    browseButton->SetCommand(entry, "SetValue [tk_getOpenFile]");
+    }
+  browseButton->Delete();
+  browseButton = NULL;
+
+  // Command to update the UI.
+  this->CancelCommands->AddCommand("%s SetValue [%s %s]",
+             entry->GetTclName(), tclName, getCmd); 
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects do not yet have to have the same Tcl name!
+  this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s [%s GetValue]",
+             this->GetTclName(), tclName, setCmd, entry->GetTclName());
+
+  frame->Delete();
+  entry->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  // We need to change this into a PVWidget.
+  return entry;
+}
+
+//----------------------------------------------------------------------------
 vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
                                          vtkKWObject *o)
 {

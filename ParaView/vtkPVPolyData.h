@@ -77,14 +77,13 @@ public:
   void LoopSubdivision();
   void Clean();
   void Triangulate();
+  void Decimate();
+  void QuadricClustering();
 
   void GetGhostCells();
   void PolyDataNormals();
   void TubeFilter();
-  void ParallelDecimate();
-
-  void Decimate();
-  
+  void ParallelDecimate();  
   
 protected:
   vtkPVPolyData();

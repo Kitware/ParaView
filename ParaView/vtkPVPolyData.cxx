@@ -76,20 +76,17 @@ vtkPVPolyData* vtkPVPolyData::New()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Shrink%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Link the PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkShrinkPolyData",name);
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkShrinkPolyData", "Shrink", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
   // Add the new Source to the View, and make it current.
@@ -97,7 +94,7 @@ void vtkPVPolyData::Shrink()
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddScale("Shrink Factor:", "SetShrinkFactor", "GetShrinkFactor",
 		  0.0, 1.0, 0.01);
   f->UpdateParameterWidgets();
@@ -109,20 +106,17 @@ void vtkPVPolyData::Shrink()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::TubeFilter()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Tube%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkTubeFilter",name);
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkTubeFilter", "Tuber", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
   // Add the new Source to the View, and make it current.
@@ -130,7 +124,7 @@ void vtkPVPolyData::TubeFilter()
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
   f->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
   f->UpdateParameterWidgets();
@@ -142,20 +136,17 @@ void vtkPVPolyData::TubeFilter()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PolyDataNormals()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Normals%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkPolyDataNormals",name);
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkPolyDataNormals", "Normals", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
   // Add the new Source to the View, and make it current.
@@ -163,7 +154,7 @@ void vtkPVPolyData::PolyDataNormals()
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddLabeledEntry("FeatureAngle:", "SetFeatureAngle", "GetFeatureAngle");
   f->AddLabeledToggle("Splitting:", "SetSplitting", "GetSplitting");
   f->AddLabeledToggle("Consistency:", "SetConsistency", "GetConsistency");
@@ -200,20 +191,18 @@ void vtkPVPolyData::Glyph()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::LoopSubdivision()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "LoopSubdiv%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkLoopSubdivisionFilter",name);
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkLoopSubDivisionFilter", 
+                              "Subdiv", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
   // Add the new Source to the View, and make it current.
@@ -221,7 +210,7 @@ void vtkPVPolyData::LoopSubdivision()
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddLabeledEntry("NumberOfSubdivisions:", "SetNumberOfSubdivisions", "GetNumberOfSubdivisions");
   f->UpdateParameterWidgets();
 
@@ -232,28 +221,25 @@ void vtkPVPolyData::LoopSubdivision()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Clean()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "CleanPD%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkCleanPolyData",name);
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkCleanPolyData", "Clean", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
-  
+ 
   // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddScale("Tolerance:","SetTolerance","GetTolerance",0,1,0.01);
   f->UpdateParameterWidgets();
 
@@ -264,20 +250,18 @@ void vtkPVPolyData::Clean()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Triangulate()
 {
-  static count = 0;
-  char name[200];
+  static instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Triangulate%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::New();
-  pvApp->SetupPVPolyDataSource(f,"vtkTriangleFilter",name);
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkTriangleFilter", 
+                              "Triangulate", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
   // Add the new Source to the View, and make it current.
@@ -285,9 +269,84 @@ void vtkPVPolyData::Triangulate()
   window->SetCurrentSource(f);
 
   // Add some source specific widgets.
-  // Normally these would be added in the create method.
+  // Normally these would be added in the CreateProperties method.
   f->AddLabeledToggle("Pass Verts:","SetPassVerts","GetPassVerts");
   f->AddLabeledToggle("Pass Lines:","SetPassLines","GetPassLines");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::Decimate()
+{
+  static instanceCount = 0;
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkDecimatePro", 
+                              "Decimate", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
+  
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddScale("TargetReduction:","SetTargetReduction","GetTargetReduction",
+              0.0,1.0,0.01);
+  f->AddLabeledToggle("PreserveTopology:","SetPreserveTopology","GetPreserveTopology");
+  f->AddScale("FeatureAngle:","SetFeatureAngle","GetFeatureAngle", 0.0, 180.0, 1.0);
+  f->AddLabeledToggle("Splitting:","SetSplitting","GetSplitting");
+  f->AddScale("SplitAngle:","SetSplitAngle","GetSplitAngle", 0.0, 180.0, 1.0);
+  f->AddLabeledToggle("PreSplit Mesh:","SetPreSplitMesh","GetPreSplitMesh");
+  f->AddLabeledToggle("AccumulateError:","SetAccumulateError","GetAccumulateError");
+  f->AddLabeledEntry("MaximumError","SetMaximumError","GetMaximumError");
+  f->AddLabeledToggle("ErrorIsAbsolute:","SetErrorIsAbsolute","GetErrorIsAbsolute");
+  f->AddLabeledEntry("AbsoluteError","SetAbsoluteError","GetAbsoluteError");
+  f->AddLabeledToggle("BoundaryVertexDeletion:","SetBoundaryVertexDeletion","GetBoundaryVertexDeletion");
+  f->AddScale("Degree:","SetDegree","GetDegree", 25, VTK_CELL_SIZE, 1.0);
+  f->AddLabeledEntry("InflectionPointRatio:","SetInflectionPointRatio","GetInflectionPointRatio");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkPVPolyData::QuadricClustering()
+{
+  static instanceCount = 0;
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkQuadricClustering", 
+                              "QuadCluster", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
+  
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddLabeledEntry("XDivisions","SetNumberOfXDivisions","GetNumberOfXDivisions");
+  f->AddLabeledEntry("YDivisions","SetNumberOfYDivisions","GetNumberOfYDivisions");
+  f->AddLabeledEntry("ZDivisions","SetNumberOfZDivisions","GetNumberOfZDivisions");
+  f->AddLabeledToggle("UseInputPoints:","SetUseInputPoints","GetUseInputPoints");
   f->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
@@ -352,6 +411,8 @@ int vtkPVPolyData::Create(char *args)
 				      "LoopSubdivision");
   this->FiltersMenuButton->AddCommand("Clean", this, "Clean");
   this->FiltersMenuButton->AddCommand("Triangulate", this, "Triangulate");
+  this->FiltersMenuButton->AddCommand("Decimate", this, "Decimate");
+  this->FiltersMenuButton->AddCommand("QuadricClustering", this, "QuadricClustering");
   this->FiltersMenuButton->AddCommand("GetRemoteGhostCells", this,
 				      "GetGhostCells");
   this->FiltersMenuButton->AddCommand("PolyDataNormals", this,
@@ -369,37 +430,6 @@ int vtkPVPolyData::Create(char *args)
   return 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVPolyData::Decimate()
-{
-  vtkMultiProcessController *controller;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  controller = pvApp->GetController();
-  
-  if (controller == NULL)
-    {
-    vtkErrorMacro("You must have a controller to do a parallel decimate.");
-    return;
-    }
-  
-  vtkPVParallelDecimate *decimate;
-  vtkPVPolyData *output = vtkPVPolyData::New();
-  
-  output->Clone(pvApp);
-  output->SetAssignment(this->GetAssignment());
-  
-  decimate = vtkPVParallelDecimate::New();
-  decimate->Clone(pvApp);
-  
-  decimate->SetInput(this);
-  decimate->SetPVOutput(output);
-    
-  this->SetLocalRepresentation(output);
-
-  output->Delete();
-  decimate->Delete();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::SetData(vtkDataSet *data)

@@ -128,6 +128,11 @@ public:
   void UpdateParameterWidgets();
   
   // Description:
+  // Create an entry for a filename.
+  vtkKWEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
+                           char *ext, vtkKWObject *o = NULL);
+
+  // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,

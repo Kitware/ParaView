@@ -234,20 +234,25 @@ void vtkPVApplication::Exit()
 //============================================================================
 
 //----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVApplication::MakePVPolyDataSource(
-                                          const char *className,
-                                          const char *tclName)
+vtkPVSource *vtkPVApplication::MakePVSource(const char *pvsClassName,
+                                            const char *sClassName,
+                                            const char *tclRoot,
+                                            int instanceNum)
 {
+  char pvsName[1000];
+  char *sName;
   vtkSource *s;
-  int error;
+  vtkPVSource *pvs;
+
+  // Format the names.
+  sprintf(pvsName, "pv%s%d", tclRoot, instanceNum);
+  sName = pvsName + 2;
 
   // Create the vtkSource.
-  this->Script("%s %s", className, tclName);
-  this->BroadcastScript("%s %s", className, tclName); 
+  s = (vtkSource *)(this->MakeTclObject(sClassName, sName));
+  // on the other processes as well
+  this->BroadcastScript("%s %s", sClassName, sName); 
 
-  // Get the pointer for the Tcl object.
-  s = (vtkSource *)(vtkTclGetPointerFromObject(tclName,
-                                  "vtkSource", this->GetMainInterp(), error));
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -255,44 +260,31 @@ vtkPVPolyDataSource *vtkPVApplication::MakePVPolyDataSource(
     }
 
   // Create and initialize the PVSource.
-  vtkPVPolyDataSource *pds = vtkPVPolyDataSource::New();
-  pds->Clone(this);
-  pds->SetVTKSource(s);
-  pds->SetVTKSourceTclName(tclName);
-  pds->SetName(tclName);
-  this->BroadcastScript("%s SetVTKSource %s", pds->GetTclName(), tclName); 
+  pvs = (vtkPVSource *)(this->MakeTclObject(pvsClassName, pvsName));
+  pvs->Clone(this);
+  pvs->SetVTKSource(s);
+  pvs->SetVTKSourceTclName(sName);
+  pvs->SetName(sName);
+  this->BroadcastScript("%s SetVTKSource %s", pvsName, sName); 
 
-  return pds;
+  s->Delete();
+  // How do we clean up on the other processes?
+
+  return pvs;
 }
+
 
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SetupPVPolyDataSource(vtkPVSource *pvs,
-                                             const char *className,
-                                             const char *tclName)
+vtkObject *vtkPVApplication::MakeTclObject(const char *className,
+                                           const char *tclName)
 {
-  vtkSource *s;
+  vtkObject *o;
   int error;
 
-  // Create the vtkSource.
   this->Script("%s %s", className, tclName);
-  this->BroadcastScript("%s %s", className, tclName); 
-
-  // Get the pointer for the Tcl object.
-  s = (vtkSource *)(vtkTclGetPointerFromObject(tclName,
-                                  "vtkSource", this->GetMainInterp(), error));
-  if (s == NULL)
-    {
-    vtkErrorMacro("Could not get pointer from object.");
-    return;
-    }
-
-  // Initialize the PVSource.
-  pvs->Clone(this);
-  pvs->SetVTKSource(s);
-  pvs->SetVTKSourceTclName(tclName);
-  pvs->SetName(tclName);
-  this->BroadcastScript("%s SetVTKSource %s", pvs->GetTclName(), tclName); 
+  o = (vtkObject *)(vtkTclGetPointerFromObject(tclName,
+                                  "vtkObject", this->GetMainInterp(), error));
+  
+  return o;
 }
-
-

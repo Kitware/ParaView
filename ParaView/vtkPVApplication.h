@@ -46,7 +46,6 @@ class vtkPVSource;
 #define VTK_PV_SLAVE_SCRIPT_RESULT_TAG 1140
 
 
-
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
 public:
@@ -101,17 +100,16 @@ public:
   // You pass in the class name and tclName (instance name) of the
   // vtkSource.  This method creates the vtk object and PV objects
   // for all processes.
-  vtkPVPolyDataSource *MakePVPolyDataSource(const char *className,
-                                            const char *tclName);
+  vtkPVSource *MakePVSource(const char *pvsClassName,
+                            const char *sClassName,
+                            const char *tclRoot, int instanceNum);
 
-  // Description:
-  // This is an alternative version of the previous method.
-  // The poly date source (uncloned) is passed in.  This allows
-  // any subclass (i.e. vtkPVPolyDataToPolyDataFilter) to be setup.
-  void SetupPVPolyDataSource(vtkPVSource *pvs,
-                             const char *className,
-                             const char *tclName);
-
+  // This constructs a vtk object (type specified by class name)
+  // and uses the tclName for the tcl instance command.
+  // The user must cast to the correct type, and is responsible
+  // for deleting the object.
+  vtkObject *MakeTclObject(const char *className,
+                           const char *tclName);
 
 protected:
   vtkPVApplication();

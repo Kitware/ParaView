@@ -248,390 +248,340 @@ void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Cone%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkConeSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkConeSource",
+                            "Cone", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pds->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
-  pds->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pds->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
+  pvs->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
+  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  pvs->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Sphere%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkSphereSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSphereSource",
+                            "Sphere",++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pds->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
-  pds->AddLabeledEntry("Phi Resolution:", "SetPhiResolution", "GetPhiResolution");
-  pds->AddLabeledEntry("Theta Resolution:", "SetThetaResolution", "GetThetaResolution");
-  pds->AddLabeledEntry("Start Theta:", "SetStartTheta", "GetStartTheta");
-  pds->AddLabeledEntry("End Theta:", "SetEndTheta", "GetEndTheta");
-  pds->AddLabeledEntry("Start Phi:", "SetStartPhi", "GetStartPhi");
-  pds->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  pvs->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
+  pvs->AddLabeledEntry("Phi Resolution:", "SetPhiResolution", "GetPhiResolution");
+  pvs->AddLabeledEntry("Theta Resolution:", "SetThetaResolution", "GetThetaResolution");
+  pvs->AddLabeledEntry("Start Theta:", "SetStartTheta", "GetStartTheta");
+  pvs->AddLabeledEntry("End Theta:", "SetEndTheta", "GetEndTheta");
+  pvs->AddLabeledEntry("Start Phi:", "SetStartPhi", "GetStartPhi");
+  pvs->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Axes%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkAxes",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkAxes",
+                            "Axes", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("Scale:", "SetScaleFactor", "GetScaleFactor");
-  pds->AddVector3Entry("Origin", "X","Y","Z", "SetOrigin", "GetOrigin");
-  pds->AddLabeledToggle("Symmetric:", "SetSymmetric", "GetSymmetric");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("Scale:", "SetScaleFactor", "GetScaleFactor");
+  pvs->AddVector3Entry("Origin", "X","Y","Z", "SetOrigin", "GetOrigin");
+  pvs->AddLabeledToggle("Symmetric:", "SetSymmetric", "GetSymmetric");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
-} 
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
+}
+ 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCube()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Cube%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkCubeSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkCubeSource",
+                            "Cube", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("X Length:", "SetXLength", "GetXLength");
-  pds->AddLabeledEntry("Y Length:", "SetYLength", "GetYLength");
-  pds->AddLabeledEntry("Z Length:", "SetZLength", "GetZLength");
-  pds->AddLabeledEntry("Center:", "SetCenter", "GetCenter");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("X Length:", "SetXLength", "GetXLength");
+  pvs->AddLabeledEntry("Y Length:", "SetYLength", "GetYLength");
+  pvs->AddLabeledEntry("Z Length:", "SetZLength", "GetZLength");
+  pvs->AddLabeledEntry("Center:", "SetCenter", "GetCenter");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Cylinder%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkCylinderSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkCylinderSource",
+                            "Cylinder", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
-  pds->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pds->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pds->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
-  pds->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
+  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
+  pvs->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
+  pvs->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Disk%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkDiskSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkDiskSource",
+                            "Disk", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("InnerRadius:", "SetInnerRadius", "GetInnerRadius");
-  pds->AddLabeledEntry("OuterRadius:", "SetOuterRadius", "GetOuterRadius");
-  pds->AddLabeledEntry("Radial Res:", "SetRadialResolution", "GetRadialResolution");
-  pds->AddLabeledEntry("Circumference Res:", "SetCircumferentialResolution", "GetCircumferentialResolution");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("InnerRadius:", "SetInnerRadius", "GetInnerRadius");
+  pvs->AddLabeledEntry("OuterRadius:", "SetOuterRadius", "GetOuterRadius");
+  pvs->AddLabeledEntry("Radial Res:", "SetRadialResolution", "GetRadialResolution");
+  pvs->AddLabeledEntry("Circumference Res:", "SetCircumferentialResolution", "GetCircumferentialResolution");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateLine()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Line%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkLineSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkLineSource",
+                            "Line", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddVector3Entry("Point1:", "X","Y","Z", "SetPoint1", "GetPoint1");
-  pds->AddVector3Entry("Point2:", "X","Y","Z", "SetPoint2", "GetPoint2");
-  pds->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pds->UpdateParameterWidgets();
+  pvs->AddVector3Entry("Point1:", "X","Y","Z", "SetPoint1", "GetPoint1");
+  pvs->AddVector3Entry("Point2:", "X","Y","Z", "SetPoint2", "GetPoint2");
+  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Plane%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkPlaneSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkPlaneSource",
+                            "Plane", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("X Resolution:", "SetXResolution", "GetXResolution");
-  pds->AddLabeledEntry("Y Resolution:", "SetYResolution", "GetYResolution");
-  pds->AddVector3Entry("Origin:","X","Y","Z", "SetOrigin", "GetOrigin");
-  pds->AddVector3Entry("Point1:","X","Y","Z", "SetPoint1", "GetPoint1");
-  pds->AddVector3Entry("Point2:","X","Y","Z", "SetPoint2", "GetPoint2");
+  pvs->AddLabeledEntry("X Resolution:", "SetXResolution", "GetXResolution");
+  pvs->AddLabeledEntry("Y Resolution:", "SetYResolution", "GetYResolution");
+  pvs->AddVector3Entry("Origin:","X","Y","Z", "SetOrigin", "GetOrigin");
+  pvs->AddVector3Entry("Point1:","X","Y","Z", "SetPoint1", "GetPoint1");
+  pvs->AddVector3Entry("Point2:","X","Y","Z", "SetPoint2", "GetPoint2");
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Points%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkPointSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkPointSource",
+                            "Points", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("NumberOfPoints:", "SetNumberOfPoints", "GetNumberOfPoints");
-  pds->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pds->AddVector3Entry("Center:", "X","Y","Z", "SetCenter", "GetCenter");
-  pds->AddModeList("Distribution:", "SetDistribution", "GetDistribution");
-  pds->AddModeListItem("Shell", 0);
-  pds->AddModeListItem("Uniform", 1);
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("NumberOfPoints:", "SetNumberOfPoints", "GetNumberOfPoints");
+  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  pvs->AddVector3Entry("Center:", "X","Y","Z", "SetCenter", "GetCenter");
+  pvs->AddModeList("Distribution:", "SetDistribution", "GetDistribution");
+  pvs->AddModeListItem("Shell", 0);
+  pvs->AddModeListItem("Uniform", 1);
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "STL%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkSTLReader",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSTLReader",
+                            "STL", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
+  // Set the default file name
+  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{} {.stl}}}]",
+                pvs->GetVTKSourceTclName());
+
   // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledEntry("FileName:", "SetFileName", "GetFileName");
-  pds->UpdateParameterWidgets();
+  pvs->AddFileEntry("FileName:", "SetFileName", "GetFileName", "stl");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
 {
-  static count = 0;
-  char name[200];
-  vtkPVPolyDataSource *pds;
+  static instanceCount = 0;
+  vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Generate a unique name.
-  ++count;
-  sprintf(name, "Superquadric%d", count);
-
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = vtkPVPolyDataSource::New();
-  pvApp->SetupPVPolyDataSource(pds,"vtkSuperquadricSource",name);
-  if (pds == NULL) {return NULL;}
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSuperquadricSource",
+                            "Superquadric", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
   // Add the new Source to the View and make it current.
-  this->MainView->AddComposite(pds);
-  this->SetCurrentSource(pds);
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
 
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pds->AddLabeledToggle("Toroidal:","SetToroidal","GetToroidal");
-  pds->AddVector3Entry("Center:","X","Y","Z","SetCenter","GetCenter");
-  pds->AddVector3Entry("Scale:","X","Y","Z","SetScale","GetScale");
-  pds->AddLabeledEntry("ThetaResolution:","SetThetaResolution","GetThetaResolution");
-  pds->AddLabeledEntry("PhiResolution:","SetPhiResolution","GetPhiResolution");
-  pds->AddScale("Thickness:","SetThickness","GetThickness",
+  pvs->AddLabeledToggle("Toroidal:","SetToroidal","GetToroidal");
+  pvs->AddVector3Entry("Center:","X","Y","Z","SetCenter","GetCenter");
+  pvs->AddVector3Entry("Scale:","X","Y","Z","SetScale","GetScale");
+  pvs->AddLabeledEntry("ThetaResolution:","SetThetaResolution","GetThetaResolution");
+  pvs->AddLabeledEntry("PhiResolution:","SetPhiResolution","GetPhiResolution");
+  pvs->AddScale("Thickness:","SetThickness","GetThickness",
                 VTK_MIN_SUPERQUADRIC_THICKNESS, 1.0, 0.05);
-  pds->AddScale("ThetaRoundness:","SetThetaRoundness","GetThetaRoundness",
+  pvs->AddScale("ThetaRoundness:","SetThetaRoundness","GetThetaRoundness",
                 0.0, 1.0, 0.05);
-  pds->AddScale("PhiRoundness:","SetPhiRoundness","GetPhiRoundness",
+  pvs->AddScale("PhiRoundness:","SetPhiRoundness","GetPhiRoundness",
                 0.0, 1.0, 0.05);
-  pds->AddLabeledEntry("Size:","SetSize","GetSize");
-  pds->UpdateParameterWidgets();
+  pvs->AddLabeledEntry("Size:","SetSize","GetSize");
+  pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
-  pds->Delete();
-  return pds;
+  pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
 
 //----------------------------------------------------------------------------
