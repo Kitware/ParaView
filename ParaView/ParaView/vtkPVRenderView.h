@@ -239,7 +239,14 @@ public:
   // Description:
   // Callback for frame rate slider
   void FrameRateScaleCallback();
-  
+
+  // Description:
+  // Used to temporarily disable rendering. Useful for collecting a few
+  // renders and flusing them out at the end with one render
+  vtkSetMacro(DisableRenderingFlag, int);
+  vtkGetMacro(DisableRenderingFlag, int);
+  vtkBooleanMacro(DisableRenderingFlag, int);
+    
 protected:
 
   vtkPVRenderView();
@@ -291,6 +298,8 @@ protected:
 
   // For the renderer in a separate toplevel window.
   vtkKWWidget *TopLevelRenderWindow;
+
+  int DisableRenderingFlag;
 
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

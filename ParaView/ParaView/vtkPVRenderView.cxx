@@ -148,6 +148,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->StillRenderTime          = 0;
   this->StillCompositeTime       = 0;
   this->Composite                = 0;
+
+  this->DisableRenderingFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1009,6 +1011,11 @@ void vtkPVRenderView::Render()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
+  if (this->DisableRenderingFlag)
+    {
+    return;
+    }
+
   if (this->EventuallyRenderFlag)
     {
     return;
