@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkMultiProcessController.h"
 
-#define VTK_VALID_POINT_TAG  10
+#define VTK_CELL_ID_TAG      10
 #define VTK_POINT_COORDS_TAG 20
 #define VTK_NUM_POINTS_TAG   30
 #define VTK_NUM_CELLS_TAG    40

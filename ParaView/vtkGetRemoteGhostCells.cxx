@@ -70,20 +70,23 @@ vtkGetRemoteGhostCells::~vtkGetRemoteGhostCells()
 
 void vtkGetRemoteGhostCells::Execute()
 {
-  int validFlag, procId, numProcs, numPoints, pointId, *pointIds;
+  int validFlag, myId, numProcs, numPoints, pointId, *pointIds;
   float point[3];
   int numCells, numCellPoints;
-  int morePoints = 1;
+//  int morePoints = 1;
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
-  int i = 0, j, k, l;
-  int id, insertCell = 1;
+  int i = 0, j, k, l, id;
   vtkPoints *points = vtkPoints::New();
   vtkPoints *cellPoints;
   vtkCellArray *polys;
   vtkIdList *cellIds = vtkIdList::New();
   vtkGenericCell *cell = vtkGenericCell::New();
   vtkGhostLevels *ghostLevels = vtkGhostLevels::New();
+  float *myPoints, *remotePoints;
+  int *numRemotePoints;
+  vtkIdList **insertedCells;
+  int cellId, remoteCellId;
   
   if (!this->Controller)
     {
@@ -93,16 +96,29 @@ void vtkGetRemoteGhostCells::Execute()
   
   this->Locator->InitPointInsertion(vtkPoints::New(), input->GetBounds());
   
-  procId = this->Controller->GetLocalProcessId();
+  myId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
   numPoints = input->GetNumberOfPoints();
   polys = input->GetPolys();
+  
+  myPoints = new float[numPoints*3];
+  numRemotePoints = new int[numProcs];
+  insertedCells = (vtkIdList**)malloc(numProcs * sizeof(vtkIdList));
+  
+  for (j = 0; j < numProcs; j++)
+    {
+    insertedCells[j] = vtkIdList::New();
+    }
   
   for (j = 0; j < numPoints; j++)
     {
     input->GetPoint(j, point);
     this->Locator->InsertNextPoint(point);
     points->InsertNextPoint(point);
+    for (k = 0; k < 3; k++)
+      {
+      myPoints[j*3+k] = point[k];
+      }
     }
   
   for (j = 0; j < polys->GetNumberOfCells(); j++)
@@ -113,86 +129,113 @@ void vtkGetRemoteGhostCells::Execute()
   output->SetPoints(points);
   output->SetPolys(polys);
   
-  while (morePoints)
-    {
-    morePoints = 0;
-    for (id = 0; id < numProcs; id++)
-      {
-      if (id != procId)
-	{
-	if (i < numPoints)
-	  {
-	  morePoints = 1;
-	  validFlag = 1;
-	  input->GetPoint(i, point);
-	  this->Controller->Send((int*)(&validFlag), 1, id,
-				 VTK_VALID_POINT_TAG);
-	  this->Controller->Send(point, 3, id, VTK_POINT_COORDS_TAG);
-	  }
-	else
-	  {
-	  validFlag = 0;
-	  this->Controller->Send((int*)(&validFlag), 1, id,
-				 VTK_VALID_POINT_TAG);
-	  }
-	} // if not my process
-      } // for all processes (send next point)
+//  while (morePoints)
+//    {
+//    morePoints = 0;
+//    for (id = 0; id < numProcs; id++)
+//      {
+//      if (id != myId)
+//	{
+//	if (i < numPoints)
+//	  {
+//	  morePoints = 1;
+//	  validFlag = 1;
+//	  input->GetPoint(i, point);
+//	  this->Controller->Send((int*)(&validFlag), 1, id,
+//				 VTK_VALID_POINT_TAG);
+//	  this->Controller->Send(point, 3, id, VTK_POINT_COORDS_TAG);
+//	  }
+//	else
+//	  {
+//	  validFlag = 0;
+//	  this->Controller->Send((int*)(&validFlag), 1, id,
+//				 VTK_VALID_POINT_TAG);
+//	  }
+//	} // if not my process
+//    } // for all processes (send next point)
 
-    for (id = 0; id < numProcs; id++)
+  for (id = 0; id < numProcs; id++)
+    {
+    if (id != myId)
       {
-      if (id != procId)
+      this->Controller->Send((int*)(&numPoints), 1, id, VTK_NUM_POINTS_TAG);
+      this->Controller->Send(myPoints, numPoints*3, id, VTK_POINT_COORDS_TAG);
+      }
+    }
+  
+  for (id = 0; id < numProcs; id++)
+    {
+    if (id != myId)
+      {
+//      this->Controller->Receive((int*)(&validFlag), 1, id,
+//				VTK_VALID_POINT_TAG);
+//      if (validFlag)
+//	{
+//	morePoints = 1;
+//	this->Controller->Receive(point, 3, id, VTK_POINT_COORDS_TAG);
+      this->Controller->Receive((int*)(&numRemotePoints[id]), 1, id,
+				VTK_NUM_POINTS_TAG);
+      remotePoints = new float[numRemotePoints[id]*3];
+      this->Controller->Receive(remotePoints, numRemotePoints[id]*3, id,
+				VTK_POINT_COORDS_TAG);
+      for (i = 0; i < numRemotePoints[id]; i++)
 	{
-	this->Controller->Receive((int*)(&validFlag), 1, id,
-				  VTK_VALID_POINT_TAG);
-	if (validFlag)
+	point[0] = remotePoints[i*3];
+	point[1] = remotePoints[i*3+1];
+	point[2] = remotePoints[i*3+2];
+	if ((pointId = this->Locator->IsInsertedPoint(point)) >= 0)
 	  {
-	  morePoints = 1;
-	  this->Controller->Receive(point, 3, id, VTK_POINT_COORDS_TAG);
-	  if ((pointId = this->Locator->IsInsertedPoint(point)) >= 0)
+	  output->GetPointCells(pointId, cellIds);
+	  numCells = cellIds->GetNumberOfIds();
+	  
+	  this->Controller->Send((int*)(&numCells), 1, id,
+				 VTK_NUM_CELLS_TAG);
+	  for (j = 0; j < numCells; j++)
 	    {
-	    output->GetPointCells(pointId, cellIds);
-	    numCells = cellIds->GetNumberOfIds();
-	    
-	    this->Controller->Send((int*)(&numCells), 1, id,
-				   VTK_NUM_CELLS_TAG);
-	    for (j = 0; j < numCells; j++)
+	    cellId = cellIds->GetId(j);
+	    output->GetCell(cellId, cell);
+	    numCellPoints = cell->GetNumberOfPoints();
+	    this->Controller->Send((int*)(&cellId), 1, id, VTK_CELL_ID_TAG);
+	    this->Controller->Send((int*)(&numCellPoints), 1, id,
+				   VTK_NUM_POINTS_TAG);
+	    cellPoints = cell->GetPoints();
+	    for (k = 0; k < numCellPoints; k++)
 	      {
-	      output->GetCell(cellIds->GetId(j), cell);
-	      numCellPoints = cell->GetNumberOfPoints();
-	      this->Controller->Send((int*)(&numCellPoints), 1, id,
-				     VTK_NUM_POINTS_TAG);
-	      cellPoints = cell->GetPoints();
-	      for (k = 0; k < numCellPoints; k++)
-		{
-		cellPoints->GetPoint(k, point);
-		this->Controller->Send(point, 3, id, VTK_POINT_COORDS_TAG);
-		} // for all points in this cell (send coords)
-	      } // for all point cells (send points)
-	    } // if point in my data
-	  else
-	    {
-	    numCells = 0;
-	    this->Controller->Send((int*)(&numCells), 1, id,
-				   VTK_NUM_CELLS_TAG);
-	    } // point not in my data (no cells to send)
-	  } // if valid point
+	      cellPoints->GetPoint(k, point);
+	      this->Controller->Send(point, 3, id, VTK_POINT_COORDS_TAG);
+	      } // for all points in this cell (send coords)
+	    } // for all point cells (send points)
+	  } // if point in my data
 	else
 	  {
 	  numCells = 0;
 	  this->Controller->Send((int*)(&numCells), 1, id,
 				 VTK_NUM_CELLS_TAG);
-	  } // not valid point (need to send numCells = 0 anyway)
-	} // if not my process
-      } // for all processes (receive point; look for point cells)
-    
-    for (id = 0; id < numProcs; id++)
+	  } // point not in my data (no cells to send)
+	} // for all points received from this process
+//	} // if valid point
+//      else
+//	{
+//	numCells = 0;
+//	this->Controller->Send((int*)(&numCells), 1, id,
+//			       VTK_NUM_CELLS_TAG);
+//	} // not valid point (need to send numCells = 0 anyway)
+      delete [] remotePoints;
+      } // if not my process
+    } // for all processes (find point cells)
+  
+  for (id = 0; id < numProcs; id++)
+    {
+    if (id != myId)
       {
-      if (id != procId)
+      for (i = 0; i < numRemotePoints[id]; i++)
 	{
 	this->Controller->Receive((int*)(&numCells), 1, id,
 				  VTK_NUM_CELLS_TAG);
 	for (j = 0; j < numCells; j++)
 	  {
+	  this->Controller->Receive((int*)(&remoteCellId), 1, id,
+				    VTK_CELL_ID_TAG);
 	  this->Controller->Receive((int*)(&numCellPoints), 1, id,
 				    VTK_NUM_POINTS_TAG);
 	  pointIds = new int[numCellPoints];
@@ -204,15 +247,13 @@ void vtkGetRemoteGhostCells::Execute()
 	      pointIds[k] = this->Locator->InsertNextPoint(point);
 	      points->InsertPoint(pointIds[k], point);
 	      } // point not in my data already
-	    if (pointIds[k] < i)
-	      {
-	      insertCell = 0;
-	      }
 	    } // for all points in this cell
 	  output->SetPoints(points);
-	  if (insertCell)
+	  if (insertedCells[id]->IsId(remoteCellId) == -1)
 	    {
+	    insertedCells[id]->InsertNextId(remoteCellId);
 	    polys->InsertNextCell(numCellPoints, pointIds);
+	    if (myId == 0) cerr << "cell: "<<pointIds[0]<<" "<<pointIds[1]<<" "<<pointIds[2]<<endl;
 	    output->SetPolys(polys);
 	    ghostLevels->InsertNextGhostLevel(1);
 	    }
@@ -220,13 +261,14 @@ void vtkGetRemoteGhostCells::Execute()
 	  output->BuildLinks();
 	  delete [] pointIds;
 	  } // for all cells sent by this process
-	} // if not my process
-      } // for all processes
-    i++;
-    } // while more points
+	} // for all points in this process
+      } // if not my process
+    } // for all processes
+//    i++;
+//    } // while more points
   
   output->GetCellData()->SetGhostLevels(ghostLevels);
-
+  
   points->Delete();
   points = NULL;
   cellIds->Delete();
@@ -235,6 +277,8 @@ void vtkGetRemoteGhostCells::Execute()
   cell = NULL;
   ghostLevels->Delete();
   ghostLevels = NULL;
+  delete [] myPoints;
+  free(insertedCells);
 }
 
 void vtkGetRemoteGhostCells::PrintSelf(ostream& os, vtkIndent indent)
