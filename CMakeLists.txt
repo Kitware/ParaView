@@ -12,7 +12,12 @@ OPTION (VTK_USE_HYBRID "Build the hybrid directory classes" ON)
 OPTION (VTK_USE_PARALLEL "Build the parallel directory classes" ON)
 OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
-OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.3.2" ON)
+OPTION(BUILD_SHARED_LIBS "Build VTK with shared libraries." OFF)
+IF(NOT BUILD_SHARED_LIBS)
+  SET(TCL_TK_STATIC 1)
+ENDIF(NOT BUILD_SHARED_LIBS)
+
+OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.4.5" ON)
 
 OPTION (PARAVIEW_LINK_XDMF "Build ParaView complete using included Xdmf library" OFF)
 IF(PARAVIEW_LINK_XDMF)
@@ -81,49 +86,49 @@ IF(USE_INCLUDED_TCLTK)
     ENDIF (CMAKE_ESCAPES_SC)
   
   ELSE(UNIX)
-    SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tcl83.lib
+    SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/lib/tcl84.lib
         CACHE FILEPATH "Path to tcl library")
     SET(TCL_STUB_LIBRARY 
-       ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tclstub83.lib
+       ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/lib/tclstub84.lib
        CACHE FILEPATH "Path to tcl stub library")
-    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
+    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/include 
         CACHE PATH "Path to tcl include")
-    SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tk83.lib 
+    SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/lib/tk84.lib 
        CACHE FILEPATH "Path to tk library")
     SET(TK_STUB_LIBRARY 
-       ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tkstub83.lib 
+       ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/lib/tkstub84.lib 
        CACHE FILEPATH "Path to tk stub library")
-    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
+    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/include 
         CACHE PATH "Path to tcl include")
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/tcl83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/tcl84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tcl83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tcl84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tcl83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tcl84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl83.dll
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl84.dll
                     COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/tk83.dll COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk83.dll COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tk83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/tk84.dll COPYONLY)
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk84.dll COPYONLY)
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tk84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tk83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tk84.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk83.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk84.dll 
                    COPYONLY)
   ENDIF(UNIX)
 ENDIF(USE_INCLUDED_TCLTK)
