@@ -1350,6 +1350,37 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- Clip Scalars ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkClipPolyData");
+  sInt->SetRootName("ClipScalars");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Value");
+  mInt->SetSetCommand("SetValue");
+  mInt->SetGetCommand("GetValue");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("InsideOut");
+  mInt->SetSetCommand("SetInsideOut");
+  mInt->SetGetCommand("GetInsideOut");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- Shrink ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -1520,6 +1551,36 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt = NULL;
 
 
+  // StructuredGrid to PolyData Filters
+  
+  // ---- Geometry ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkStructuredGridGeometryFilter");
+  sInt->SetRootName("ExtractGeom");
+  sInt->SetInputClassName("vtkStructuredGrid");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Extent");
+  mInt->SetSetCommand("SetExtent");
+  mInt->SetGetCommand("GetExtent");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  
   // DataSet to DataSet Filters
   
   // ---- PieceScalars ----.
@@ -1623,4 +1684,39 @@ void vtkPVWindow::ReadSourceInterfaces()
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
+
+  // Structured grid sources
+
+  // ---- POP Reader ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPOPReader");
+  sInt->SetRootName("POPReader");
+  sInt->SetOutputClassName("vtkStructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FileName");
+  mInt->SetSetCommand("SetFileName");
+  mInt->SetGetCommand("GetFileName");
+  mInt->SetWidgetTypeToFile();
+  mInt->SetFileExtension("pop");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
 }
