@@ -129,8 +129,18 @@ void return_result(FILE *fp)
       break;
     case 109:
     case 309:
-      fprintf(fp,
-              "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
+      /* Handle some objects of known type.  */
+      if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
+        {
+        fprintf(fp,
+                "      resultStream << vtkClientServerStream::Reply << *temp%i << vtkClientServerStream::End;\n",
+                MAX_ARGS);
+        }
+      else
+        {
+        fprintf(fp,
+                "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
+        }
       break;
 
     /* handle functions returning vectors */
