@@ -179,7 +179,9 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Add/Get/Remove the composites.
   virtual void AddComposite(vtkKWComposite *c);
+  virtual void Add2DComposite(vtkKWComposite *) {}
   virtual void RemoveComposite(vtkKWComposite *c);
+  virtual void Remove2DComposite(vtkKWComposite *c) {}
   virtual int HasComposite(vtkKWComposite *c);
   vtkKWCompositeCollection *GetComposites() {return this->Composites;};
   
@@ -360,6 +362,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkGetObjectMacro( ControlFrame, vtkKWWidget );
   
   vtkGetObjectMacro(Renderer, vtkRenderer);
+  virtual vtkRenderer* GetRenderer2D() { return NULL; }
   
   // Description:
   // Get the render window used by this widget
