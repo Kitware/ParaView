@@ -20,7 +20,7 @@
 #include "vtkQuadricClustering.h"
 
 vtkStandardNewMacro(vtkPVLODPartDisplayInformation);
-vtkCxxRevisionMacro(vtkPVLODPartDisplayInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVLODPartDisplayInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVLODPartDisplayInformation::vtkPVLODPartDisplayInformation()
@@ -61,20 +61,8 @@ void vtkPVLODPartDisplayInformation::CopyFromObject(vtkObject* obj)
   // Get the data object form the decimate filter.  This is a bit of a
   // hack. Maybe we should have a PVPart object on all processes.
   // Sanity checks to avoid slim chance of segfault.
-  vtkDataObject** inputs = deci->GetInputs();
-  vtkDataObject** outputs = deci->GetOutputs();
-  if(!outputs || !outputs[0])
-    {
-    vtkErrorMacro("Could not get deci output.");
-    return;
-    }
-  if(!inputs || !inputs[0])
-    {
-    vtkErrorMacro("Could not get deci input.");
-    return;
-    }
-  vtkDataObject* geoData = inputs[0];
-  vtkDataObject* deciData = outputs[0];
+  vtkDataObject* geoData = deci->GetInput();
+  vtkDataObject* deciData = deci->GetOutput();
 
   this->GeometryMemorySize = geoData->GetActualMemorySize();
   this->LODGeometryMemorySize = deciData->GetActualMemorySize();
