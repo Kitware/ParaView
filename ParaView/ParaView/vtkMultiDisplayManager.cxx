@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.3");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.4");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -58,7 +58,7 @@ class vtkPVMultiDisplayInfo
 public:
   vtkPVMultiDisplayInfo();
   float UseCompositing;
-  float ReductionFactor;
+  float ImageReductionFactor;
   float CameraPosition[3];
   float CameraFocalPoint[3];
   float CameraViewUp[3];
@@ -73,7 +73,7 @@ public:
 vtkPVMultiDisplayInfo::vtkPVMultiDisplayInfo()
 {
   this->UseCompositing = 0.0;
-  this->ReductionFactor = 1.0;
+  this->ImageReductionFactor = 1.0;
   this->CameraPosition[0] = 0.0;               
   this->CameraPosition[1] = 0.0;               
   this->CameraPosition[2] = 0.0;               
@@ -105,7 +105,7 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 {
   this->ClientFlag = 0;
 
-  this->ReductionFactor = 1;
+  this->ImageReductionFactor = 1;
   this->LODReductionFactor = 4;
   this->UseCompositeCompression = 1;
 
@@ -322,11 +322,11 @@ void vtkMultiDisplayManager::ClientStartRender()
   // All this just gets information to send to the satellites.  
   if (updateRate > 2.0)
     {
-    this->ReductionFactor = this->LODReductionFactor;
+    this->ImageReductionFactor = this->LODReductionFactor;
     }
   else
     {
-    this->ReductionFactor = 1;
+    this->ImageReductionFactor = 1;
     }
   rens = this->RenderWindow->GetRenderers();
   numProcs = this->Controller->GetNumberOfProcesses();
@@ -334,11 +334,11 @@ void vtkMultiDisplayManager::ClientStartRender()
   if (this->RenderWindow->GetDesiredUpdateRate() > 2.0 &&
       this->UseCompositing)
     {
-    info.ReductionFactor = this->LODReductionFactor;
+    info.ImageReductionFactor = this->LODReductionFactor;
     }
   else
     {  
-    info.ReductionFactor = 1;
+    info.ImageReductionFactor = 1;
     }
   // Make sure the satellite renderers have the same camera I do.
   // Note: This will lockup unless every process has the same number
@@ -435,7 +435,7 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
 
   // Synchronize
   //renWin->SetDesiredUpdateRate(info.DesiredUpdateRate);
-  this->ReductionFactor = static_cast<int>(info.ReductionFactor);
+  this->ImageReductionFactor = static_cast<int>(info.ImageReductionFactor);
   this->UseCompositing = static_cast<int>(info.UseCompositing);
   rens = renWin->GetRenderers();
   rens->InitTraversal();
@@ -587,13 +587,13 @@ vtkPVCompositeBuffer* vtkMultiDisplayManager::GetTileBuffer(int tileIdx)
     }
   
   rws = this->RenderWindow->GetSize();
-  size[0] = (int)((float)rws[0] / (float)(this->ReductionFactor));
-  size[1] = (int)((float)rws[1] / (float)(this->ReductionFactor));  
+  size[0] = (int)((float)rws[0] / (float)(this->ImageReductionFactor));
+  size[1] = (int)((float)rws[1] / (float)(this->ImageReductionFactor));  
 
 
   // Render to get the tile.....
   // Figure out the tile indexes.
-  this->SetupCamera(tileIdx, this->ReductionFactor);
+  this->SetupCamera(tileIdx, this->ImageReductionFactor);
   this->RenderWindow->Render();
 
   // Get the color buffer (RGB).
@@ -748,8 +748,8 @@ void vtkMultiDisplayManager::Composite()
     // A buffer to hold the color data.
     // The number of pixels is stored in the buffer, but I can compute it easily.
     rws = this->RenderWindow->GetSize();
-    size[0] = rws[0] / this->ReductionFactor;
-    size[1] = rws[1] / this->ReductionFactor;
+    size[0] = rws[0] / this->ImageReductionFactor;
+    size[1] = rws[1] / this->ImageReductionFactor;
 
     // Now we want to decompress into the color buffer.
     // Ignore z.
@@ -767,7 +767,7 @@ void vtkMultiDisplayManager::Composite()
     this->SetTileBuffer(tileId, NULL);
     buf = NULL;
 
-    if (this->ReductionFactor > 1)
+    if (this->ImageReductionFactor > 1)
       {
       vtkUnsignedCharArray* pData2;
       pData2 = pData;
@@ -775,7 +775,7 @@ void vtkMultiDisplayManager::Composite()
 
       vtkTimerLog::MarkStartEvent("Magnify Buffer");
       vtkPVCompositeUtilities::MagnifyBuffer(pData2, pData, size, 
-                                             this->ReductionFactor);
+                                             this->ImageReductionFactor);
       vtkTimerLog::MarkEndEvent("Magnify Buffer");
       pData2->Delete();
       pData2 = NULL;

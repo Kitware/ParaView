@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.6");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.7");
 
 
 
@@ -162,7 +162,7 @@ void vtkPVCompositeRenderModule::StillRender()
   // No reduction for still render.
   if (this->PVApplication && this->CompositeTclName)
     {
-    this->PVApplication->Script("%s SetReductionFactor 1",
+    this->PVApplication->Script("%s SetImageReductionFactor 1",
                                 this->CompositeTclName);
     if (this->PVApplication->GetClientMode())
       {
@@ -172,7 +172,8 @@ void vtkPVCompositeRenderModule::StillRender()
         {
         squirtLevel = 1;
         }
-      this->PVApplication->Script("%s SetSquirtLevel %d",
+      // Catch because IceTDesktopdeliveryClient does not have Squirt yet. !!!!
+      this->PVApplication->Script("catch {%s SetSquirtLevel %d}",
                                   this->CompositeTclName, squirtLevel);
       }
     }
@@ -294,7 +295,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // Handle squirt compression.
   if (this->PVApplication->GetClientMode())
     {
-    this->PVApplication->Script("%s SetSquirtLevel %d", 
+    this->PVApplication->Script("catch {%s SetSquirtLevel %d}", 
                                 this->CompositeTclName,
                                 this->SquirtLevel);
     }
@@ -386,7 +387,7 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   //this->Composite->SetReductionFactor((int)newReductionFactor);
   if (this->PVApplication && this->CompositeTclName)
     {
-    this->PVApplication->Script("%s SetReductionFactor %d",
+    this->PVApplication->Script("%s SetImageReductionFactor %d",
                                 this->CompositeTclName, 
                                 (int)(newReductionFactor));
     }

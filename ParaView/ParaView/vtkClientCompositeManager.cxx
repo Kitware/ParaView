@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17.2.2");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17.2.3");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -62,7 +62,7 @@ struct vtkClientRenderWindowInfo
 {
   int Size[2];
   int NumberOfRenderers;
-  int ReductionFactor;
+  int ImageReductionFactor;
   int SquirtLevel;
 };
 
@@ -114,7 +114,7 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->RenderView = NULL;
 
   this->InternalReductionFactor = 2;
-  this->ReductionFactor = 2;
+  this->ImageReductionFactor = 2;
   this->PDataSize[0] = this->PDataSize[1] = 0;
   this->MagnifiedPDataSize[0] = this->MagnifiedPDataSize[1] = 0;
   this->PData = NULL;
@@ -351,7 +351,7 @@ void vtkClientCompositeManager::StartRender()
     return;
     }
 
-  this->InternalReductionFactor = this->ReductionFactor;
+  this->InternalReductionFactor = this->ImageReductionFactor;
   if (this->InternalReductionFactor < 1)
     {
     this->InternalReductionFactor = 1;
@@ -380,7 +380,7 @@ void vtkClientCompositeManager::StartRender()
   size = this->RenderWindow->GetSize();
   winInfo.Size[0] = size[0]/this->InternalReductionFactor;
   winInfo.Size[1] = size[1]/this->InternalReductionFactor;
-  winInfo.ReductionFactor = this->InternalReductionFactor;
+  winInfo.ImageReductionFactor = this->InternalReductionFactor;
   winInfo.SquirtLevel = this->SquirtLevel;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
@@ -837,9 +837,9 @@ void vtkClientCompositeManager::SatelliteStartRender()
 
 
   // This should be fixed.  Round off will cause window to resize. !!!!!
-  renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
-                  winInfo.Size[1] * winInfo.ReductionFactor);
-  this->InternalReductionFactor = winInfo.ReductionFactor;
+  renWin->SetSize(winInfo.Size[0] * winInfo.ImageReductionFactor,
+                  winInfo.Size[1] * winInfo.ImageReductionFactor);
+  this->InternalReductionFactor = winInfo.ImageReductionFactor;
   this->SquirtLevel = winInfo.SquirtLevel;
 
   // Synchronize the renderers.
@@ -1785,9 +1785,11 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "RenderWindow: (none)\n";
     }
-  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "ImageReductionFactor: " 
+     << this->ImageReductionFactor << endl;
   
-  os << indent << "CompositeController: (" << this->CompositeController << ")\n"; 
+  os << indent << "CompositeController: (" 
+     << this->CompositeController << ")\n"; 
   os << indent << "ClientController: (" << this->ClientController << ")\n"; 
 
   if (this->Tiled)

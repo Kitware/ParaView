@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.4");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.5");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -61,7 +61,7 @@ struct vtkClientRenderWindowInfo
 {
   int Size[2];
   int NumberOfRenderers;
-  int ReductionFactor;
+  int ImageReductionFactor;
   int UseCompositing;
 };
 
@@ -106,7 +106,7 @@ vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
   this->StartTag = 0;
   this->RenderView = NULL;
 
-  this->ReductionFactor = 2;
+  this->ImageReductionFactor = 2;
   this->RenderView = NULL;
 
   this->Tiled = 1;
@@ -251,9 +251,9 @@ void vtkIceTClientCompositeManager::StartRender()
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   size = this->RenderWindow->GetSize();
-  winInfo.Size[0] = size[0]/this->ReductionFactor;
-  winInfo.Size[1] = size[1]/this->ReductionFactor;
-  winInfo.ReductionFactor = this->ReductionFactor;
+  winInfo.Size[0] = size[0]/this->ImageReductionFactor;
+  winInfo.Size[1] = size[1]/this->ImageReductionFactor;
+  winInfo.ImageReductionFactor = this->ImageReductionFactor;
   winInfo.UseCompositing = this->UseCompositing;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   
@@ -368,11 +368,11 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
   controller->Receive((int*)(&winInfo), 5, otherId, 
                       vtkCompositeManager::WIN_INFO_TAG);
 
-  this->ReductionFactor = winInfo.ReductionFactor;
+  this->ImageReductionFactor = winInfo.ImageReductionFactor;
   this->UseCompositing = winInfo.UseCompositing;
   if (this->IceTManager)
     {
-    this->IceTManager->SetImageReductionFactor(this->ReductionFactor);
+    this->IceTManager->SetImageReductionFactor(this->ImageReductionFactor);
     this->IceTManager->SetUseCompositing(this->UseCompositing);
     }
 
@@ -587,7 +587,8 @@ void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "RenderWindow: (none)\n";
     }
-  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "ImageReductionFactor: " 
+     << this->ImageReductionFactor << endl;
   
   os << indent << "CompositeController: (" << this->CompositeController << ")\n"; 
   os << indent << "ClientController: (" << this->ClientController << ")\n"; 

@@ -90,8 +90,8 @@ public:
   // Description:
   // For values larger than 1, render a smaller image and display the
   // result using pixel replication.
-  vtkSetMacro(ReductionFactor, int);
-  vtkGetMacro(ReductionFactor, int);
+  vtkSetMacro(ImageReductionFactor, int);
+  vtkGetMacro(ImageReductionFactor, int);
 
   // Description:
   // Methods that are not used at the moment.
@@ -163,7 +163,7 @@ protected:
   virtual void SatelliteEndRender();
 
   vtkObject *RenderView;
-  int ReductionFactor;
+  int ImageReductionFactor;
 
   int UseCompositing;
   int UseCompositeCompression;

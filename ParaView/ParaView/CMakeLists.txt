@@ -3,6 +3,8 @@ SET( ParaView_SRCS
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
+  vtkDesktopDeliveryClient.cxx
+  vtkDesktopDeliveryServer.cxx
   vtkExtractCTHPart.cxx
   vtkGroup.cxx
   vtkKWBoundsDisplay.cxx
@@ -43,6 +45,8 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
+  vtkPVDeskTopRenderModule.cxx
+  vtkPVDeskTopRenderModuleUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
