@@ -17,6 +17,7 @@ SET( ParaViewServer_SRCS
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
   vtkExtractCTHPart.cxx
+  vtkMultiDisplayManager.cxx
   vtkPVDReader.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
@@ -29,12 +30,6 @@ SET( ParaViewServer_SRCS
   vtkXMLPVAnimationWriter.cxx
   )
 
-IF(VTK_USE_MPI)
-  SET( ParaViewServer_SRCS
-    ${ParaViewServer_SRCS}
-    vtkMultiDisplayManager.cxx
-    )
-ENDIF(VTK_USE_MPI)
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   SET( ParaViewServer_SRCS
     ${ParaViewServer_SRCS}

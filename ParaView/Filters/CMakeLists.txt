@@ -27,6 +27,7 @@ SET(Filters_SRCS
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
   vtkStructuredCacheFilter.cxx
+  vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
   )
@@ -46,7 +47,6 @@ IF(VTK_USE_MPI)
       vtkPointsProjectedHull.cxx
       vtkPVDuplicatePolyData.cxx
       vtkRedistributePolyData.cxx
-      vtkTiledDisplaySchedule.cxx
       vtkWeightedRedistributePolyData.cxx
     )
 ENDIF(VTK_USE_MPI)
