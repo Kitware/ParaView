@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.1");
+vtkCxxRevisionMacro(vtkPickFilter, "1.2");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -149,10 +149,11 @@ void vtkPickFilter::CellExecute()
     cell = input->GetCell(cellId);
     inside = cell->EvaluatePosition(this->WorldPoint, closestPoint, 
                                     subId, pcoords, dist2, weights);
-    if (inside)
-      {
-      dist2= 0.0;
-      }
+    // Inside does not work the way I thought for 2D cells.
+    //if (inside)
+    //  {
+    //  dist2= 0.0;
+    //  }
     if (dist2 < bestDist2)
       {
       bestId = cellId;
