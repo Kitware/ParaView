@@ -931,7 +931,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     // Create the sources that can be used for glyphing.
     // ===== Arrow
     pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0);
-    pvs->IsDeletableOff();
+    pvs->IsPermanentOn();
+    pvs->HideDisplayPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -943,7 +944,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     
     // ===== Cone
     pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0);
-    pvs->IsDeletableOff();
+    pvs->IsPermanentOn();
+    pvs->HideDisplayPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -955,7 +957,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     
     // ===== Sphere
     pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0);
-    pvs->IsDeletableOff();
+    pvs->IsPermanentOn();
+    pvs->HideDisplayPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -2001,7 +2004,7 @@ void vtkPVWindow::UpdateFilterMenu()
   this->FilterMenu->DeleteAllMenuItems();
 
   if (this->CurrentPVData && this->CurrentPVSource &&
-      this->CurrentPVSource->GetIsDeletable())
+      !this->CurrentPVSource->GetIsPermanent())
     {
     // Add all the appropriate filters to the filter menu.
     vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
