@@ -27,13 +27,14 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.5");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.6");
+
+class vtkSMProxyManagerElementMapType:
+  public vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> > {};
 
 struct vtkSMProxyManagerInternals
 {
-  typedef vtkstd::map<vtkStdString, 
-                      vtkSmartPointer<vtkPVXMLElement> > ElementMapType;
-  typedef vtkstd::map<vtkStdString, ElementMapType> GroupMapType;
+  typedef vtkstd::map<vtkStdString, vtkSMProxyManagerElementMapType> GroupMapType;
 
   GroupMapType GroupMap;
 
@@ -59,7 +60,7 @@ void vtkSMProxyManager::AddElement(const char* groupName,
                                    const char* name,
                                    vtkPVXMLElement* element)
 {
-  vtkSMProxyManagerInternals::ElementMapType& elementMap = 
+  vtkSMProxyManagerElementMapType& elementMap = 
     this->Internals->GroupMap[groupName];
   elementMap[name] = element;
 }
@@ -93,7 +94,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     this->Internals->GroupMap.find(groupName);
   if (it != this->Internals->GroupMap.end())
     {
-    vtkSMProxyManagerInternals::ElementMapType::iterator it2 =
+    vtkSMProxyManagerElementMapType::iterator it2 =
       it->second.find(proxyName);
 
     if (it2 != it->second.end())
