@@ -41,7 +41,7 @@ public:
   // Description:
   // Multiple inputs for multiblock.
   void AddInput(vtkDataSet* input);
-  void AddInput(vtkDataObject* o){vtkErrorMacro("NotDefined");}
+  void AddInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
   vtkDataSet* GetInput(int idx);
   void RemoveAllInputs();
 
