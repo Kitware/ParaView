@@ -173,6 +173,13 @@ IF (WIN32)
     )
 ENDIF (WIN32)
 
+IF(BUILD_TESTING)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    vtkKWTesting.cxx
+    )
+  SUBDIRS(Testing)
+ENDIF(BUILD_TESTING)
+
 IF(VTK_WRAP_TCL)
   VTK_WRAP_TCL2(vtkKWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
 ELSE(VTK_WRAP_TCL)
@@ -180,13 +187,6 @@ ELSE(VTK_WRAP_TCL)
   INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
   VTK_WRAP_TCL3(vtkKWWidgetsTCL KWWidgetsTCL_SRCS "${KWWidgets_SRCS}" "")
 ENDIF(VTK_WRAP_TCL)
-
-IF(BUILD_TESTING)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    vtkKWTesting.cxx
-    )
-  SUBDIRS(Testing)
-ENDIF(BUILD_TESTING)
 
 ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
