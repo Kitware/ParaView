@@ -193,6 +193,12 @@ public:
   void LogStartEvent(char* str);
   void LogEndEvent(char* str);
 
+  // Description:
+  // Flag showing whether the commands are being executed from
+  // a ParaView script.
+  vtkSetMacro(RunningParaViewScript, int);
+  vtkGetMacro(RunningParaViewScript, int);
+
   //BTX
   static const char* const LoadComponentProc;
   //ETX

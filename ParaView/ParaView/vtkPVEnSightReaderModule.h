@@ -88,6 +88,8 @@ public:
   // master server files are only supported when ParaView is compiled
   // with MPI support)
   virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
+  virtual int ReadFile(const char* fname, float timeValue,
+		       vtkPVApplication* pvApp, vtkPVWindow* window);
 
   // Description:
   // The EnSight reader can actually be used to check a file to see if it
@@ -113,12 +115,13 @@ protected:
 			   vtkGenericEnSightReader* reader, float& time);
 
   // Make sure that all case files in the master file are compatible.
-  vtkEnSightReader* VerifyMasterFile(const char* tclName, 
+  vtkEnSightReader* VerifyMasterFile(vtkPVApplication* app,
+				     const char* tclName, 
 				     const char* filename);
   // Make sure that all time steps are compatible.
-  void VerifyTimeSets(const char* filename);
+  void VerifyTimeSets(vtkPVApplication* app, const char* filename);
   // Make sure that all parts are compatible.
-  int  VerifyParts(const char* filename);
+  int  VerifyParts(vtkPVApplication* app, const char* filename);
 
   void DeleteVerifier();
   void DisplayErrorMessage(const char* message, int warning);

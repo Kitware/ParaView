@@ -2691,6 +2691,16 @@ void vtkPVWindow::DisplayCommandPrompt()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::LoadScript(const char *name)
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+
+  pvApp->SetRunningParaViewScript(1);
+  this->vtkKWWindow::LoadScript(name);
+  pvApp->SetRunningParaViewScript(0);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVWindow::OpenPackage()
 {
 

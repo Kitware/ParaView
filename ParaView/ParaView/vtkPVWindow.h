@@ -337,6 +337,9 @@ public:
   int OpenPackage();
   int OpenPackage(const char* fileName);
 
+  // Description:
+  // Load in a Tcl based script to drive the application.
+  virtual void LoadScript(const char *name);
 
   // Description:
   // Callbacks for generic render window interactor

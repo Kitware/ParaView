@@ -136,7 +136,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  //this->SetTraceName(this->EntryLabel);
+  this->SetTraceName("SelectTimeSet");
   
   this->SetApplication(pvApp);
   
@@ -251,8 +251,10 @@ void vtkPVSelectTimeSet::Accept()
 
   if (this->ModifiedFlag)
     {
-//  this->AddTraceEntry("$kw(%s) SetValue {%s}", this->GetTclName(), 
-//                       this->GetValue());
+    this->Script("%s selection get", this->Tree->GetWidgetName());
+    this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
+			this->GetTclName(), 
+			this->Application->GetMainInterp()->result);
     }
 
   pvApp->BroadcastScript("%s SetTimeValue {%12.5e}",
@@ -362,10 +364,10 @@ void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone,
 			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
-  vtkPVSelectTimeSet* pvse = vtkPVSelectTimeSet::SafeDownCast(clone);
-  if (pvse)
+  vtkPVSelectTimeSet* pvts = vtkPVSelectTimeSet::SafeDownCast(clone);
+  if (pvts)
     {
-    //pvse->SetLabel(this->EntryLabel);
+    pvts->SetLabel(this->FrameLabel);
     }
   else 
     {
@@ -380,16 +382,12 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
   
-//    // Setup the Label.
-//    const char* label = element->GetAttribute("label");
-//    if(label)
-//      {
-//      this->SetLabel(label);
-//      }
-//    else
-//      {
-//      this->SetLabel(this->VariableName);
-//      }
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);
+    }
   
   return 1;
 }

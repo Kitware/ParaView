@@ -101,8 +101,8 @@ public:
   // Description:
   // Load in a Tcl based script to drive the application. If called
   // without an argument it will open a file dialog.
-  void LoadScript();
-  void LoadScript(const char *name);
+  virtual void LoadScript();
+  virtual void LoadScript(const char *name);
 
   // Description:
   // Popup the vtk warning message

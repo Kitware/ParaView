@@ -296,7 +296,6 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
   
   if (pvApp == NULL)
     {
-    vtkErrorMacro("Set the application before you set the VTKDataTclName.");
     return;
     }
   
