@@ -830,7 +830,7 @@ void vtkPVRenderView::StartRender()
   //cerr << "GetBufTime: " << getBuffersTime << ", SetBufTime: " << setBuffersTime
   //     << ", transTime: " << transmitTime << endl;
   
-  this->GetComposite()->SetReductionFactor(newReductionFactor);
+  this->GetComposite()->SetReductionFactor((int)newReductionFactor);
 }
 
 //----------------------------------------------------------------------------

@@ -393,9 +393,9 @@ void vtkPVAnimationInterface::EntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::EntryUpdate()
 {
-  this->TimeStartEntry->SetValue(this->TimeStart);
-  this->TimeEndEntry->SetValue(this->TimeEnd);
-  this->TimeStepEntry->SetValue(this->TimeStep);
+  this->TimeStartEntry->SetValue(this->TimeStart, 2);
+  this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+  this->TimeStepEntry->SetValue(this->TimeStep, 2);
 
   this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
   this->TimeScale->SetResolution(this->TimeStep);
