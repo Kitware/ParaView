@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.12");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.13");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1624,9 +1624,12 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   char temp[1024];
   char loc[1024];
   vtkKWRegisteryUtilities *reg = this->GetRegistery();
-  sprintf(temp, "%i", this->GetApplicationKey());
-  reg->SetTopLevel(temp);
-  if (reg->ReadValue("Inst", "Loc", loc))
+  if (!this->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
+    {
+    this->GetRegistery()->SetGlobalScope(1);
+    }
+
+  if (this->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
     {
     sprintf(temp,"%s/%s.chm::/UsersGuide/index.html",
             loc,this->ApplicationName);
@@ -1635,6 +1638,7 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
     {
     sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
     }
+  this->GetRegistery()->SetGlobalScope(0);
   if ( HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
     {
     return;
