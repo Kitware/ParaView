@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.405");
+vtkCxxRevisionMacro(vtkPVWindow, "1.406");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -614,7 +614,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     VTK_PV_APPSETTINGS_MENU_LABEL, 
     rbv, 
     this, 
-    "ShowWindowProperties", 
+    "ShowApplicationSettingsInterface", 
     1,
     "Display the application settings");
   delete [] rbv;
@@ -3832,7 +3832,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.405 $");
+  this->ExtractRevision(os,"$Revision: 1.406 $");
 }
 
 //----------------------------------------------------------------------------

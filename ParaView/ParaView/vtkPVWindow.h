@@ -493,11 +493,11 @@ public:
   vtkBooleanMacro(ShowSourcesLongHelp, int);
 
   // Description:
-  // Get the user interface manager.
+  // Get the User Interface Manager.
   virtual vtkKWUserInterfaceManager* GetUserInterfaceManager();
 
   // Description:
-  // Get the application settings interface. 
+  // Get the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
   // Callback: update the toolbar aspects once toolbar settings have been changed
