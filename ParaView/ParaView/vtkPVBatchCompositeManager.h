@@ -37,7 +37,7 @@ class vtkRenderer;
 class vtkCompositer;
 class vtkUnsignedCharArray;
 
-class VTK_PARALLEL_EXPORT vtkPVBatchCompositeManager : public vtkImageSource
+class VTK_EXPORT vtkPVBatchCompositeManager : public vtkImageSource
 {
 public:
   static vtkPVBatchCompositeManager *New();
