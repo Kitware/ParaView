@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.537");
+vtkCxxRevisionMacro(vtkPVWindow, "1.538");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -302,7 +302,7 @@ vtkPVWindow::~vtkPVWindow()
     stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
            << 0 << vtkClientServerStream::End;
     pm->DeleteStreamObject(this->InteractorID);
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
     }
@@ -409,20 +409,20 @@ void vtkPVWindow::PrepareForDelete()
   if (pvApp && this->CenterSourceID.ID)
     {
     pm->DeleteStreamObject(this->CenterSourceID);
-    pm->SendStreamToClientAndServerRoot();
+    pm->SendStreamToClientAndRenderServerRoot();
     }
   this->CenterSourceID.ID = 0;
   if (pvApp && this->CenterMapperID.ID)
     {
     pm->DeleteStreamObject(this->CenterMapperID);
-    pm->SendStreamToClientAndServerRoot();
+    pm->SendStreamToClientAndRenderServerRoot();
     }
   this->CenterMapperID.ID = 0;
 
   if (pvApp && this->CenterActorID.ID)
     {
     pm->DeleteStreamObject(this->CenterActorID);
-    pm->SendStreamToClientAndServerRoot();
+    pm->SendStreamToClientAndRenderServerRoot();
     }
   this->CenterActorID.ID = 0;
 
@@ -586,10 +586,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->GlyphMenu->Delete();
     this->GlyphMenu = NULL;
-    }
-  if(pm)
-    {
-    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -928,7 +924,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->InteractorID 
          << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->SetInteractor(
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
@@ -998,7 +994,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServerRoot();
+  pm->SendStreamToClientAndRenderServerRoot();
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -1061,7 +1057,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                   << pvApp->GetRenderModule()->GetRendererID()
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServerRoot();
+  pm->SendStreamToClientAndRenderServerRoot();
 
   this->Interactor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1132,7 +1128,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     vtkPVSource *pvs=0;
     // Create the sources that can be used for glyphing.
     // ===== Arrow
-
     pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
@@ -1313,7 +1308,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "SetPosition" << x << y << z
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServerRoot();
+  pm->SendStreamToClientAndRenderServerRoot();
   this->MainView->EventuallyRender();
 }
 
@@ -1329,7 +1324,7 @@ void vtkPVWindow::HideCenterActor()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServerRoot();
+  pm->SendStreamToClientAndRenderServerRoot();
 }
 
 //-----------------------------------------------------------------------------
@@ -1346,7 +1341,7 @@ void vtkPVWindow::ShowCenterActor()
     pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                     << "VisibilityOn"
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServerRoot();
+    pm->SendStreamToClientAndRenderServerRoot();
     }
 }
 
@@ -1459,7 +1454,7 @@ void vtkPVWindow::ResizeCenterActor()
                     << vtkClientServerStream::End;
     this->MainView->ResetCamera();
     }
-  pm->SendStreamToClientAndServerRoot();
+  pm->SendStreamToClientAndRenderServerRoot();
 }
 
 //-----------------------------------------------------------------------------

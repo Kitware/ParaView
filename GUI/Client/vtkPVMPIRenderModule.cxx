@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.10");
 
 
 
@@ -59,7 +59,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->RenderWindowID << "SetMultiSamples" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   if (pvApp->GetClientMode() || pvApp->GetServerMode())
@@ -71,7 +71,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     // How can we syncronize the process modules and render modules?
     pm->GetStream()
       << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-      << "GetSocketController" << vtkClientServerStream::End;
+      << "GetRenderServerSocketController" << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID
       << "SetClientController" << vtkClientServerStream::LastResult
@@ -82,13 +82,13 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID << "SetClientFlag"
       << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
   else
     {
     // Create the compositer.
     this->CompositeID = pm->NewStreamObject("vtkPVTreeComposite");
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     this->Composite = vtkPVTreeComposite::SafeDownCast(
       pm->GetObjectFromID(this->CompositeID));
 
@@ -110,7 +110,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pm->GetStream()
       << vtkClientServerStream::Delete << tmp
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
 
     // If we are using SGI pipes, create a new Controller/Communicator/Group
     // to use for compositing.
@@ -122,7 +122,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       pm->GetStream()
         << vtkClientServerStream::Invoke << this->CompositeID
         << "SetNumberOfProcesses" << numPipes << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
 
@@ -147,7 +147,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke << this->CompositeID
       << "InitializeOffScreen" << vtkClientServerStream::End;
     }
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 }
 
 //----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
         << this->CompositeID << "SetCompositer" << tmp
         << vtkClientServerStream::End;
       pm->DeleteStreamObject(tmp);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
 }

@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.66");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.67");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -208,6 +208,17 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
 }
 
 
+//----------------------------------------------------------------------------
+vtkSocketController* vtkPVClientServerModule::GetRenderServerSocketController()
+{
+  if(!this->RenderServerSocket)
+    {
+    return this->SocketController;
+    }
+  return this->RenderServerSocket;
+}
+
+  
 
 
 
@@ -607,6 +618,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   // Create a vtkMPIMToNSocketConnection object on both the 
   // data and render servers
   vtkClientServerID id = this->NewStreamObject("vtkMPIMToNSocketConnection");
+  this->MPIMToNSocketConnectionID = id;
   this->SendStreamToRenderServerAndServer();
   
   // now tell the render server to find out what ports it is going

@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.27");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.28");
 
 //===========================================================================
 //***************************************************************************
@@ -155,7 +155,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
     }
   if(pm)
     {
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
   
   this->Observer->Delete();
@@ -254,7 +254,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->RendererID = pm->NewStreamObject("vtkRenderer");
   this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
@@ -288,7 +288,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
     
   // the 2d renderer must be kept in sync with the main renderer
   this->Renderer->AddObserver(
@@ -331,7 +331,7 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
          << r << g << b << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -448,7 +448,7 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
              << pDisp->GetPropID() << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
              << pDisp->GetVolumeID() << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     pDisp->Delete();
     }
@@ -481,7 +481,7 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
         vtkClientServerStream& stream = pm->GetStream();
         stream << vtkClientServerStream::Invoke << this->RendererID << "RemoveProp"
                << pDisp->GetPropID() << vtkClientServerStream::End;
-        pm->SendStreamToClientAndServer();
+        pm->SendStreamToClientAndRenderServer();
         }
       part->SetPartDisplay(NULL);
       }
@@ -558,7 +558,7 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
       vtkClientServerStream& stream = pm->GetStream();
       stream << vtkClientServerStream::Invoke << pDisp->GetGeometryID()
              <<  "SetUseStrips" << val << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
 

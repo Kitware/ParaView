@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.3");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.4");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -219,6 +219,10 @@ void vtkPVProgressHandler::LocalDisplayProgress(
   if ( !filter )
     {
     abort();
+    }
+  if(!app->GetMainWindow())
+    {
+    return;
     }
   app->GetMainWindow()->SetProgress(filter, progress);
 }

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.19");
 
 
 
@@ -69,7 +69,7 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
     {
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     this->CompositeID.ID = 0;
     this->Composite = NULL;
     }
@@ -204,27 +204,7 @@ void vtkPVCompositeRenderModule::StillRender()
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
 
-  // This special case seems really stupid.
-  // I forget why Amy did this, but i am going to try and remove it.
-  // Actually amy did this to use the image actor I think.
-  // fixme
-  //pm->GetStream() << vtkClientServerStream::Invoke
-  //                << this->CompositeID << "IsA" << "vtkClientCompositeManager"
-  //                << vtkClientServerStream::End;
-  //pm->SendStreamToClient();
-  //int result = 0;
-  //pm->GetLastClientResult().GetArgument(0, 0, &result);
-  //if(result)
-  //  {
-  //  pm->GetStream() << vtkClientServerStream::Invoke
-  //                  << this->CompositeID << "StartRender"
-  //                  << vtkClientServerStream::End;
-  //  pm->SendStreamToClient();
-  //  }
-  //else
-  //  {
-    this->RenderWindow->Render();
-  //  }
+  this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Still Render");
   this->PVApplication->SendCleanupPendingProgress();
 }
@@ -351,23 +331,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
-  //pm->GetStream() << vtkClientServerStream::Invoke
-  //                << this->CompositeID << "IsA" << "vtkClientCompositeManager"
-  //                << vtkClientServerStream::End;
-  //pm->SendStreamToClient();
-  //int result = 0;
-  //pm->GetLastClientResult().GetArgument(0, 0, &result);
-  //if(result)
-  //  {
-  //  pm->GetStream() << vtkClientServerStream::Invoke
-   //                 << this->CompositeID << "StartRender"
-  //                  << vtkClientServerStream::End;
-  //  pm->SendStreamToClient();
-  //  }
-  //else
-  //  {
-    this->RenderWindow->Render();
-  //  }
+  this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
 
   // These times are used to determine reduction factor.
@@ -468,7 +432,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseChar" << (val?0:1)
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   if (val)
@@ -492,7 +456,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseRGB" << (val?0:1)
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   if (val)

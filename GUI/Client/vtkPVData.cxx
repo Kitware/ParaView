@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.257");
+vtkCxxRevisionMacro(vtkPVData, "1.258");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1690,7 +1690,7 @@ void vtkPVData::DrawWireframe()
         << vtkClientServerStream::Invoke
         << part->GetPartDisplay()->GetVolumeID()
         << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
@@ -1717,7 +1717,7 @@ void vtkPVData::DrawWireframe()
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropertyID()
         << "SetRepresentationToWireframe" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       {
@@ -1777,7 +1777,7 @@ void vtkPVData::DrawPoints()
         << vtkClientServerStream::Invoke
         << part->GetPartDisplay()->GetVolumeID()
         << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -1804,7 +1804,7 @@ void vtkPVData::DrawPoints()
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropertyID()
         << "SetRepresentationToPoints" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       {
@@ -1864,7 +1864,7 @@ void vtkPVData::DrawVolume()
         << vtkClientServerStream::Invoke
         << part->GetPartDisplay()->GetVolumeID()
         << "VisibilityOn" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
   
@@ -1909,7 +1909,7 @@ void vtkPVData::DrawSurface()
         << vtkClientServerStream::Invoke
         << part->GetPartDisplay()->GetVolumeID()
         << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -1931,7 +1931,7 @@ void vtkPVData::DrawSurface()
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
           << "SetRepresentationToSurface" << vtkClientServerStream::End;
-        pm->SendStreamToClientAndServer();
+        pm->SendStreamToClientAndRenderServer();
         }
       }
     if (part->GetPartDisplay()->GetGeometryID().ID != 0)
@@ -1994,7 +1994,7 @@ void vtkPVData::DrawOutline()
         << vtkClientServerStream::Invoke
         << part->GetPartDisplay()->GetVolumeID()
         << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -2021,7 +2021,7 @@ void vtkPVData::DrawOutline()
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropertyID()
         << "SetRepresentationToSurface" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       { 
@@ -2081,7 +2081,7 @@ void vtkPVData::SetInterpolationToFlat()
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropertyID()
         << "SetInterpolationToFlat" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     if ( this->GetPVRenderView() )
       {
@@ -2113,7 +2113,7 @@ void vtkPVData::SetInterpolationToGouraud()
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropertyID()
         << "SetInterpolationToGouraud" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
   
@@ -2500,7 +2500,7 @@ void vtkPVData::ChangePointSize()
         << part->GetPartDisplay()->GetPropertyID()
         << "SetPointSize" << this->PointSizeThumbWheel->GetValue()
         << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
  
@@ -2553,7 +2553,7 @@ void vtkPVData::ChangeLineWidth()
         << part->GetPartDisplay()->GetPropertyID()
         << "SetLineWidth" << this->LineWidthThumbWheel->GetValue()
         << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
 
@@ -2932,7 +2932,7 @@ void vtkPVData::OpacityChangedCallback()
       << vtkClientServerStream::LastResult 
       << "SetOpacity" << this->OpacityScale->GetValue()
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   if ( this->GetPVRenderView() )
@@ -2988,7 +2988,7 @@ void vtkPVData::SetActorTranslateNoTrace(double x, double y, double z)
       << part->GetPartDisplay()->GetPropID()
       << "SetPosition" << x << y << z
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -3077,7 +3077,7 @@ void vtkPVData::SetActorScaleNoTrace(double x, double y, double z)
         << part->GetPartDisplay()->GetPropID()
         << "SetScale" << x << y << z 
         << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -3167,7 +3167,7 @@ void vtkPVData::SetActorOrientationNoTrace(double x, double y, double z)
         << part->GetPartDisplay()->GetPropID()
         << "SetOrientation" << x << y << z 
         << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -3256,7 +3256,7 @@ void vtkPVData::SetActorOriginNoTrace(double x, double y, double z)
         << part->GetPartDisplay()->GetPropID()
         << "SetOrigin" << x << y << z 
         << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   // Do not render here (do it in the callback, since it could be either

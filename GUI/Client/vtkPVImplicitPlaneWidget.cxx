@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -88,7 +88,7 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
     if (pm && this->PlaneID.ID != 0)
       {
       pm->DeleteStreamObject(this->PlaneID);
-      pm->SendStreamToServer();
+      pm->SendStreamToRenderServerClientAndServer();
       this->PlaneID.ID = 0;
       }
     }
@@ -209,7 +209,7 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "SetDrawPlane" << 0
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->SetCenter(this->LastAcceptedCenter);
   this->SetNormal(this->LastAcceptedNormal);
 
@@ -242,7 +242,19 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "SetDrawPlane" << 0
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
+  // This should be done in the initialization.
+  // There must be a more general way of hooking up the plane object.
+  // ExtractCTH uses this varible, General Clipping uses the select widget.
+  if (this->VariableName && sourceID.ID != 0)
+    {
+    ostrstream str;
+    str << "Set" << this->VariableName << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str() << this->PlaneID << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    delete [] str.str();
+    }
   if ( this->PlaneID.ID != 0 )
     {
     double val[3];
@@ -262,7 +274,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
     this->SetNormalInternal(val[0], val[1], val[2]);
     pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetNormal"
                     << val[0] << val[1] <<  val[2] << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     this->SetLastAcceptedNormal(val);
     }
 
@@ -441,7 +453,8 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
   this->PlaneID = pm->NewStreamObject("vtkPlane");
-
+  // create the plane on all servers and client
+  pm->SendStreamToRenderServerClientAndServer();
   // Create the 3D widget on each process.
   // This is for tiled display and client server.
   // This may decrease compresion durring compositing.
@@ -455,7 +468,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
                   << 0 << 1 << 0 << 1 << 0 << 1
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 
   this->SetFrameLabel("Plane Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -616,7 +629,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
                   << "SetOpacity" 
                   << opacity 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->SetBalloonHelpString(this->BalloonHelpString);
 
 }
@@ -638,7 +651,7 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
       pm->GetStream() << vtkClientServerStream::Invoke 
                       << this->Widget3DID << "SetDrawPlane" << 1
                       << vtkClientServerStream::End;
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
@@ -692,7 +705,16 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->Widget3DID << "SetOrigin" << x << y << z
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
+    }
+  if ( this->PlaneID.ID )
+    { 
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->PlaneID << "SetOrigin" << x << y << z
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
 }
 
@@ -716,7 +738,16 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->Widget3DID << "SetNormal" << x << y << z
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
+    } 
+  if ( this->PlaneID.ID )
+    { 
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->PlaneID << "SetNormal" << x << y << z
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
 }
 
