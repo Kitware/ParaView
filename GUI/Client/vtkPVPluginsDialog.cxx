@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.2");
 
 int vtkPVPluginsDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -136,15 +136,18 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side right -expand true -fill x",this->HelpButton->GetWidgetName());
 
   // THE FOLLOWING LINES ARE FAKE
-
+#if 0
   const char *FooFilename="libfoo.so";
   const int FooType=1; // 1 means filter
   const int FooIsLoaded=1; // boolean
   const int FooAutoLoad=1; // boolean
   const char *FooPath="/usr/local/paraview/plugins";
 
+  const char *PluginTypeTextFilter="Filter";
+  const char *PluginTypeTextDataSetAdaptor="DataSetAdaptor";
+
   int PluginIndex=1;
-  char *PluginTypeText=0;
+  const char *PluginTypeText=0;
 
   vtkKWLabel *PluginName=vtkKWLabel::New();
   PluginName->SetParent(this->PluginsFrame->GetFrame());
@@ -158,10 +161,10 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
   switch(FooType)
     {
     case 1:
-      PluginTypeText="Filter";
+      PluginTypeText=PluginTypeTextFilter;
       break;
     case 2:
-      PluginTypeText="DataSetAdaptor";
+      PluginTypeText=PluginTypeTextDataSetAdaptor;
       break;
     default:
       ;// error
@@ -191,6 +194,7 @@ void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
   PluginInfo->SetParent(this->PluginsFrame->GetFrame());
   PluginInfo->Create(app,"-bitmap info -foreground #0a0");
   this->Script("grid config %s -column 5 -row %d -columnspan 1 -rowspan 1 -sticky \"news\"",PluginInfo->GetWidgetName(),PluginIndex);
+#endif
 }
 
 //----------------------------------------------------------------------------
