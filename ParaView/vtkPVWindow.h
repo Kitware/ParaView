@@ -127,6 +127,10 @@ public:
   // Description:
   // Callback from the threshold button.
   void ThresholdCallback();
+
+  // Description:
+  // Callback from the contour button.
+  void ContourCallback();
   
 protected:
   vtkPVWindow();
@@ -149,6 +153,7 @@ protected:
 
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *ThresholdButton;
+  vtkKWPushButton *ContourButton;
   
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

@@ -52,6 +52,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVThreshold.h"
+#include "vtkPVContour.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -84,6 +85,7 @@ vtkPVWindow::vtkPVWindow()
 
   this->CalculatorButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
+  this->ContourButton = vtkKWPushButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -119,6 +121,9 @@ vtkPVWindow::~vtkPVWindow()
   
   this->ThresholdButton->Delete();
   this->ThresholdButton = NULL;
+  
+  this->ContourButton->Delete();
+  this->ContourButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -240,6 +245,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ThresholdButton->SetCommand(this, "ThresholdCallback");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->ThresholdButton->GetWidgetName());
+  
+  this->ContourButton->SetParent(this->Toolbar);
+  this->ContourButton->Create(app, "-text Contour");
+  this->ContourButton->SetCommand(this, "ContourCallback");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->ContourButton->GetWidgetName());
   
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
@@ -622,6 +633,69 @@ void vtkPVWindow::ThresholdCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::ContourCallback()
+{
+  static int instanceCount = 0;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVContour *contour;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  vtkPVData *current;
+  const char* outputDataType;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot determine output type");
+    return;
+    }
+  outputDataType = "vtkPolyData";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "Contour", instanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkKitwareContourFilter", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  contour = vtkPVContour::New();
+  contour->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  contour->SetApplication(pvApp);
+  contour->SetVTKSource(s, tclName);
+  contour->SetNthPVInput(0, this->GetCurrentPVData());
+  contour->CreateProperties();
+  contour->SetName(tclName);
+
+  this->GetMainView()->AddComposite(contour);
+  this->SetCurrentPVSource(contour);
+  this->GetMainView()->ShowSourceParent();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "Contour", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  contour->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", contour->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  contour->Delete();
+
+  ++instanceCount;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::ShowWindowProperties()
 {
   this->ShowProperties();
@@ -998,7 +1072,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkSingleContourFilter");
-  sInt->SetRootName("Contour");
+  sInt->SetRootName("SingleContour");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
