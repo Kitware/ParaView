@@ -45,8 +45,6 @@ MACRO(VTK_WRAP_TCL3 TARGET SRC_LIST_NAME SOURCES COMMANDS)
         SET(${SRC_LIST_NAME} ${${SRC_LIST_NAME}} 
           ${TMP_FILENAME}Tcl.cxx)
 
-        MESSAGE("TMP_FILENAME: ${TMP_FILENAME}")
-        
         # add custom command to output
         ADD_CUSTOM_COMMAND(
           OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}Tcl.cxx

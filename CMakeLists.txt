@@ -69,11 +69,24 @@ ENDIF(EXISTS "${VTK_DIR}/VTKConfig.cmake")
 
 #########################################################################
 # Configure HDF5
+SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
 SUBDIRS(Utilities/hdf5)
 
 #########################################################################
 # Configure Xdmf
 SUBDIRS(Utilities/Xdmf)
+
+#########################################################################
+# Configure KWsys
+SET(KWSYS_NAMESPACE kwsys)
+SET(KWSYS_USE_Process 1)
+SET(KWSYS_USE_SystemTools 1)
+SET(KWSYS_USE_RegularExpression 1)
+SET(KWSYS_HEADER_ROOT ${ParaView_BINARY_DIR}/Utilities/KWSys)
+IF(NOT VTK_USE_ANSI_STDLIB)
+  SET(KWSYS_FORCE_OLD_STREAMS 1)
+ENDIF(NOT VTK_USE_ANSI_STDLIB)
+SUBDIRS(Utilities/KWSys)
 
 #########################################################################
 # Configure Xdmf
@@ -86,4 +99,8 @@ SUBDIRS(Utilities/VTKClientServer)
 #########################################################################
 # Configure Tcl wrapping
 SUBDIRS(Utilities/VTKTclWrapping)
+
+#########################################################################
+# Configure Server
+SUBDIRS(Servers)
 
