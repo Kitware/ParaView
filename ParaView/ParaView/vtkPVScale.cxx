@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.12");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.13");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -288,9 +288,10 @@ void vtkPVScale::ResetInternal()
     pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
                     << str.str() << vtkClientServerStream::End;
     pm->SendStreamToServerRoot();
-    float range = 0.0;
-    pm->GetLastServerResult().GetArgument(0,0, &range);
-    this->Script("eval %s SetRange %f", this->Scale->GetTclName(), range);
+    int range[2] = { 0.0, 0.0 };
+    pm->GetLastServerResult().GetArgument(0,0, range, 2);
+    this->Script("eval %s SetRange %i %i", this->Scale->GetTclName(), 
+      range[0], range[1]);
     }
 
   this->ModifiedFlag = 0;
