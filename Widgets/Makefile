@@ -29,6 +29,7 @@ vtkKWEventNotifier \
 vtkKWExtent \
 vtkKWGenericComposite \
 vtkKWLabel \
+vtkKWLabeledEntry \
 vtkKWLabeledFrame \
 vtkKWListBox \
 vtkKWMenu \
