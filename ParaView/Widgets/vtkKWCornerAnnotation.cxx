@@ -216,7 +216,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 {
   this->SetTextColorNoPropagate( r, g, b );
-  this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
+  this->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0 ); // ANDY Problems
 }
 
 void vtkKWCornerAnnotation::SetTextColorNoPropagate( float r, float g, float b )
@@ -228,7 +228,7 @@ void vtkKWCornerAnnotation::SetTextColorNoPropagate( float r, float g, float b )
 void vtkKWCornerAnnotation::OnDisplayCorner() 
 {
   this->OnDisplayCornerNoPropagate();
-  this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
+  this->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
 }
  
 void vtkKWCornerAnnotation::OnDisplayCornerNoPropagate() 
@@ -278,7 +278,7 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
 void vtkKWCornerAnnotation::CornerChanged(int i) 
 {
   this->CornerChangedNoPropagate( i );
-  this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
+  this->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
 }
 
 void vtkKWCornerAnnotation::CornerChangedNoPropagate(int i) 
@@ -386,6 +386,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.16 $");
+  this->ExtractRevision(os,"$Revision: 1.17 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
