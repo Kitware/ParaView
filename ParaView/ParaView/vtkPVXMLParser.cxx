@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.5");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.6");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void vtkPVXMLParser::PushOpenElement(vtkPVXMLElement* element)
     this->OpenElements = newOpenElements;
     this->OpenElementsSize = newSize;
     }
-  
+
   unsigned int pos = this->NumberOfOpenElements++;
   this->OpenElements[pos] = element;
 }
@@ -131,7 +131,7 @@ void vtkPVXMLParser::PrintXML(ostream& os)
 }
 
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVXMLParser::GetRootElement() 
+vtkPVXMLElement* vtkPVXMLParser::GetRootElement()
 {
   return this->RootElement;
 }

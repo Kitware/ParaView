@@ -29,42 +29,42 @@ public:
   vtkTypeRevisionMacro(vtkPVXMLParser,vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVXMLParser* New();
-  
+
   // Description:
   // Write the parsed XML into the output stream.
   void PrintXML(ostream& os);
-  
+
   // Description:
   // Get the root element from the XML document.
   vtkPVXMLElement* GetRootElement();
-  
+
   // Description:
   // Get/Set the file from which to read the configuration.
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  
+
 protected:
   vtkPVXMLParser();
   ~vtkPVXMLParser();
-  
+
   void StartElement(const char* name, const char** atts);
   void EndElement(const char* name);
-  
+
   void AddElement(vtkPVXMLElement* element);
   void PushOpenElement(vtkPVXMLElement* element);
   vtkPVXMLElement* PopOpenElement();
-  
+
   // The root XML element.
   vtkPVXMLElement* RootElement;
-  
+
   // The stack of elements currently being parsed.
   vtkPVXMLElement** OpenElements;
   unsigned int NumberOfOpenElements;
   unsigned int OpenElementsSize;
-  
+
   // Counter to assign unique element ids to those that don't have any.
-  unsigned int ElementIdIndex;  
-  
+  unsigned int ElementIdIndex;
+
 private:
   vtkPVXMLParser(const vtkPVXMLParser&);  // Not implemented.
   void operator=(const vtkPVXMLParser&);  // Not implemented.

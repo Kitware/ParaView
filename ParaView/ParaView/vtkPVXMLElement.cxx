@@ -15,7 +15,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.6");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.7");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 //----------------------------------------------------------------------------
@@ -24,12 +24,12 @@ vtkPVXMLElement::vtkPVXMLElement()
   this->Name = 0;
   this->Id = 0;
   this->Parent = 0;
-  
+
   this->NumberOfAttributes = 0;
   this->AttributesSize = 5;
   this->AttributeNames = new char*[this->AttributesSize];
   this->AttributeValues = new char*[this->AttributesSize];
-  
+
   this->NumberOfNestedElements = 0;
   this->NestedElementsSize = 10;
   this->NestedElements = new vtkPVXMLElement*[this->NestedElementsSize];
@@ -83,22 +83,22 @@ void vtkPVXMLElement::ReadXMLAttributes(const char** atts)
     while(*attsIter++) { ++count; }
     this->NumberOfAttributes = count/2;
     this->AttributesSize = this->NumberOfAttributes;
-    
+
     delete [] this->AttributeNames;
     delete [] this->AttributeValues;
     this->AttributeNames = new char* [this->AttributesSize];
     this->AttributeValues = new char* [this->AttributesSize];
-    
+
     unsigned int i;
     for(i=0;i < this->NumberOfAttributes; ++i)
       {
       this->AttributeNames[i] = new char[strlen(atts[i*2])+1];
       strcpy(this->AttributeNames[i], atts[i*2]);
-      
+
       this->AttributeValues[i] = new char[strlen(atts[i*2+1])+1];
       strcpy(this->AttributeValues[i], atts[i*2+1]);
       }
-    }  
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element)
     this->NestedElements = newNestedElements;
     this->NestedElementsSize = newSize;
     }
-  
+
   unsigned int index = this->NumberOfNestedElements++;
   this->NestedElements[index] = element;
   element->Register(this);
@@ -181,7 +181,7 @@ unsigned int vtkPVXMLElement::GetNumberOfNestedElements()
 {
   return this->NumberOfNestedElements;
 }
-  
+
 //----------------------------------------------------------------------------
 vtkPVXMLElement* vtkPVXMLElement::GetNestedElement(unsigned int index)
 {
@@ -223,15 +223,15 @@ vtkPVXMLElement* vtkPVXMLElement::LookupElementInScope(const char* id)
   char* name = new char[len+1];
   strncpy(name, id, len);
   name[len] = '\0';
-  
+
   // Find the qualifier in this scope.
-  vtkPVXMLElement* next = this->FindNestedElement(name);  
+  vtkPVXMLElement* next = this->FindNestedElement(name);
   if(next && (*end == '.'))
     {
     // Lookup rest of qualifiers in nested scope.
     next = next->LookupElementInScope(end+1);
     }
-  
+
   delete [] name;
   return next;
 }
@@ -246,7 +246,7 @@ vtkPVXMLElement* vtkPVXMLElement::LookupElementUpScope(const char* id)
   char* name = new char[len+1];
   strncpy(name, id, len);
   name[len] = '\0';
-  
+
   // Find most closely nested occurrence of first qualifier.
   vtkPVXMLElement* curScope = this;
   vtkPVXMLElement* start = 0;
@@ -259,7 +259,7 @@ vtkPVXMLElement* vtkPVXMLElement::LookupElementUpScope(const char* id)
     {
     start = start->LookupElementInScope(end+1);
     }
-  
+
   delete [] name;
   return start;
 }
@@ -282,7 +282,7 @@ int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
 {
   if(!str || !length) { return 0; }
   strstream vstr;
-  vstr << str << ends;  
+  vstr << str << ends;
   int i;
   for(i=0;i < length;++i)
     {

@@ -34,7 +34,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.29");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.30");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -70,7 +70,7 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
   name << "vtkPV" << element->GetName() << ends;
   object = vtkInstantiator::CreateInstance(name.str());
   name.rdbuf()->freeze(0);
-  
+
   // Make sure we got a widget.
   vtkPVWidget* pvWidget = vtkPVWidget::SafeDownCast(object);
   if(!pvWidget)
@@ -79,7 +79,7 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
     vtkErrorMacro("Error creating " << element->GetName());
     return 0;
     }
-  
+
   // Set the widget's trace name.  This is the reverse of the scoped
   // id.
   ostrstream tname;
@@ -107,7 +107,7 @@ vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
   name << "vtkPVInput" << element->GetName() << ends;
   object = vtkInstantiator::CreateInstance(name.str());
   name.rdbuf()->freeze(0);
-  
+
   // Make sure we got a widget.
   vtkPVInputRequirement* pvir = vtkPVInputRequirement::SafeDownCast(object);
   if(!pvir)
@@ -116,7 +116,7 @@ vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
     vtkErrorMacro("Error creating " << element->GetName());
     return 0;
     }
-  
+
   return pvir;
 }
 
@@ -135,13 +135,13 @@ vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element,
 
     // Needed for debugging
     pvWidget->SetPVSource(pvm);
-    
+
     // Add it to the map.
     if ( store )
       {
       this->WidgetMap->SetItem(element, pvWidget);
       }
-    
+
     // Now initialize it.  Must be done after adding to map to avoid
     // loops on circular references.
     if(!pvWidget->ReadXMLAttributes(element, this))
@@ -188,7 +188,7 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
     vtkErrorMacro("Must parse a configuration before storing it.");
     return;
     }
-  
+
   // Loop over the top-level elements.
   unsigned int i;
   for(i=0; i < root->GetNumberOfNestedElements(); ++i)
@@ -281,13 +281,13 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
     {
     pvm = vtkPVReaderModule::New();
     }
-  
+
   const char* extensions = me->GetAttribute("extensions");
   if(extensions)
     {
     const char* start = extensions;
     const char* end = 0;
-    
+
     // Parse the space-separated list.
     while(*start)
       {
@@ -312,14 +312,14 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
     pvm->Delete();
     return;
     }
-  
-  const char* file_description = me->GetAttribute("file_description");  
+
+  const char* file_description = me->GetAttribute("file_description");
   if(!file_description)
     {
     vtkErrorMacro("Reader Module has no file_description attribute.");
     pvm->Delete();
     return;
-    }  
+    }
 
   // Setup the standard module parts.
   if(!this->CreateModule(me, pvm))
@@ -327,7 +327,7 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
     pvm->Delete();
     return;
     }
-  
+
   // Add this reader for its extensions instead of as a prototype.
   int i;
   pvm->SetLabelNoTrace(file_description);
@@ -335,7 +335,7 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
     {
     this->Window->AddFileType(file_description, pvm->GetExtension(i), pvm);
     }
-  
+
   pvm->Delete();
 }
 
@@ -362,7 +362,7 @@ void vtkPVXMLPackageParser::CreateSourceModule(vtkPVXMLElement* me)
     {
     pvm = vtkPVSource::New();
     }
-  
+
   // Get the name of the module.
   const char* name = me->GetAttribute("name");
   if(!name)
@@ -371,14 +371,14 @@ void vtkPVXMLPackageParser::CreateSourceModule(vtkPVXMLElement* me)
     pvm->Delete();
     return;
     }
-  
+
   // Setup the standard module parts.
   if(!this->CreateModule(me, pvm))
     {
     pvm->Delete();
     return;
     }
-  
+
   // Add the source prototype.
   pvm->InitializePrototype();
   this->Window->AddPrototype(name, pvm);
@@ -408,7 +408,7 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     {
     pvm = vtkPVSource::New();
     }
-  
+
   // Determines whether the input of this filter will remain
   // visible
   int replace_input;
@@ -425,14 +425,14 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     pvm->Delete();
     return;
     }
-  
+
   // Setup the standard module parts.
   if(!this->CreateModule(me, pvm))
     {
     pvm->Delete();
     return;
     }
-  
+
   // Add the source prototype.
   pvm->InitializePrototype();
   this->Window->AddPrototype(name, pvm);
@@ -449,7 +449,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 
   const char* menu_name = me->GetAttribute("menu_name");
   if(menu_name) { pvm->SetMenuName(menu_name); }
-  
+
   const char* root_name = me->GetAttribute("root_name");
   if(root_name) { pvm->SetName(root_name); }
   else
@@ -465,8 +465,8 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
   if(long_help) { pvm->SetLongHelp(long_help); }
 
   const char* multiprocess_support = me->GetAttribute("multiprocess_support");
-  if(multiprocess_support) 
-    { 
+  if(multiprocess_support)
+    {
     if (strcmp(multiprocess_support, "single_process") == 0)
       {
       if ( pvApp->GetProcessModule()->GetNumberOfPartitions() > 1)
@@ -479,7 +479,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
       if ( pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
         {
         return 0;
-        } 
+        }
       }
     else if (strcmp(multiprocess_support, "both") != 0)
       {
@@ -487,7 +487,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
                     << multiprocess_support << ".");
       }
     }
-  
+
   const char* name = me->GetAttribute("name");
   if (name)
     {
@@ -495,7 +495,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     }
 
   const char* button_image = me->GetAttribute("button_image");
-  if(name && button_image) 
+  if(name && button_image)
     {
     const char* button_image_file = me->GetAttribute("button_image_file");
 
@@ -507,7 +507,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     command.rdbuf()->freeze(0);
     pvm->SetToolbarModule(1);
     }
-  
+
   // Loop over the elements describing the module.
   unsigned int i;
   for(i=0; i < me->GetNumberOfNestedElements(); ++i)
@@ -517,13 +517,13 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     if(strcmp(name, "Source") == 0)
       {  // Item describing a VTK source.
       classAttr = element->GetAttribute("class");
-      if (classAttr) 
-        { 
-        pvm->SetSourceClassName(classAttr); 
+      if (classAttr)
+        {
+        pvm->SetSourceClassName(classAttr);
         }
       else
         {
-        vtkErrorMacro(<< "Source missing class (" 
+        vtkErrorMacro(<< "Source missing class ("
                       << (menu_name ? menu_name : "null") << ")");
         return 0;
         }
@@ -559,7 +559,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 
 //----------------------------------------------------------------------------
 // Parses information about a VTK source and inputs.
-int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement, 
+int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
                                           vtkPVSource* pvm)
 {
   vtkPVXMLElement* inputElement;
@@ -569,9 +569,9 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
   const char* quantityAttr;
 
   classAttr = filterElement->GetAttribute("class");
-  if (classAttr) 
-    { 
-    pvm->SetSourceClassName(classAttr); 
+  if (classAttr)
+    {
+    pvm->SetSourceClassName(classAttr);
     }
   else
     {
@@ -589,8 +589,8 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
       { // Item describing a VTK filter input.
       // Get name (used for set/add method) of input from attribute.
       const char* inputName = inputElement->GetAttribute("name");
-      if (inputName == NULL) 
-        { 
+      if (inputName == NULL)
+        {
         vtkErrorMacro("Input missing name. " << classAttr);
         return 0;
         }
@@ -607,18 +607,18 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
 
       // Attribute that tells whether the filter uses AddInput.
       quantityAttr = inputElement->GetAttribute("quantity");
-      if (quantityAttr) 
+      if (quantityAttr)
         {
-        if (strcmp(quantityAttr, "Multiple") == 0 || 
+        if (strcmp(quantityAttr, "Multiple") == 0 ||
             strcmp(quantityAttr, "multiple") == 0)
-          { 
+          {
           pvm->SetVTKMultipleInputsFlag(1);
           }
-        } 
+        }
 
       // We allow only one input with quantity "Multiple".
       // Let the user know of a violation.
-      if (pvm->GetVTKMultipleInputsFlag() && 
+      if (pvm->GetVTKMultipleInputsFlag() &&
           pvm->GetNumberOfInputProperties() > 1)
         {
         vtkWarningMacro("Only one 'multiple' input is allowed. " << classAttr);
@@ -639,17 +639,17 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
           pvir = 0;
           }
         prop->AddRequirement(pvir);
-        pvir->Delete();      
+        pvir->Delete();
         }
       }
     else
       { // Only input elements inside filter element.
-      vtkWarningMacro("UnKnown XML element (" << inputElementName 
+      vtkWarningMacro("UnKnown XML element (" << inputElementName
                       << ") in filter: " << classAttr);
       }
     }
   return 1;
-}  
+}
 
 //----------------------------------------------------------------------------
 int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
@@ -763,7 +763,7 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     {
     pwm = vtkPVWriter::New();
     }
-  
+
   // Setup the writer's input type.
   const char* input = we->GetAttribute("input");
   if(!input)
@@ -772,7 +772,7 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     return;
     }
   pwm->SetInputClassName(input);
-  
+
   // Setup the writer's type.
   const char* writer = we->GetAttribute("writer");
   if(!writer)
@@ -781,7 +781,7 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     return;
     }
   pwm->SetWriterClassName(writer);
-  
+
   // Setup the writer's file extension.
   const char* extension = we->GetAttribute("extension");
   if(!extension)
@@ -790,7 +790,7 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     return;
     }
   pwm->SetExtension(extension);
-  
+
   // Setup the writer's file description.
   const char* file_description = we->GetAttribute("file_description");
   if(!file_description)
@@ -798,25 +798,25 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
     vtkErrorMacro("Writer missing file_description attribute.");
     return;
     }
-  pwm->SetDescription(file_description);  
-  
+  pwm->SetDescription(file_description);
+
   // Check whether the writer is for parallel formats.
   const char* parallel = we->GetAttribute("parallel");
   if(parallel && (strcmp(parallel, "1") == 0))
     {
     pwm->SetParallel(1);
     }
-  
+
   // Check for the data mode method attribute.
   const char* data_mode_method = we->GetAttribute("data_mode_method");
   if(data_mode_method)
     {
     pwm->SetDataModeMethod(data_mode_method);
     }
-  
+
   // Add the writer.
   this->Window->AddFileWriter(pwm);
-  
+
   pwm->Delete();
 }
 

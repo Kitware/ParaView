@@ -37,7 +37,7 @@ public:
   vtkTypeRevisionMacro(vtkPVXMLPackageParser,vtkPVXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVXMLPackageParser* New();
-  
+
   // Description:
   // Create widget prototypes from parsed configuration and store them
   // in the given window.  Should be called after a Parse() method.
@@ -46,13 +46,13 @@ public:
 protected:
   vtkPVXMLPackageParser();
   ~vtkPVXMLPackageParser();
-  
+
   // Get the vtkPVWidget corresponding to the given vtkPVXMLElement.
   vtkPVWidget* GetPVWidget(vtkPVXMLElement* element, vtkPVSource* pvm, int store);
-  
+
   // Get the vtkPVWindow currently being stored.
   vtkPVWindow* GetPVWindow();
-  
+
   void ProcessConfiguration();
   void CreateReaderModule(vtkPVXMLElement* me);
   void CreateSourceModule(vtkPVXMLElement* me);
@@ -61,25 +61,25 @@ protected:
   void CreateWriter(vtkPVXMLElement* ma);
   int CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm);
   int LoadLibrary(vtkPVXMLElement* le);
-  int ParseVTKFilter(vtkPVXMLElement* filterElement, 
+  int ParseVTKFilter(vtkPVXMLElement* filterElement,
                      vtkPVSource* pvm);
-  
+
   //BTX
   typedef vtkArrayMap<vtkPVXMLElement*, vtkPVWidget*> InternalWidgetMap;
   //ETX
-  
+
   // Map of XML element representation to widget.
   InternalWidgetMap* WidgetMap;
-  
+
   // The window into which the modules will be stored.
   vtkPVWindow* Window;
-  
+
   //BTX
   friend class vtkPVXMLElement;
   friend class vtkPVWidget;
   //ETX
-  
-private:  
+
+private:
   // Used by GetPVWidget.  Do not call directly.
   vtkPVWidget* CreatePVWidget(vtkPVXMLElement* element);
   vtkPVInputRequirement* CreatePVInputRequirement(vtkPVXMLElement* element);
