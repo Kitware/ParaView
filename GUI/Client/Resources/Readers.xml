@@ -208,6 +208,13 @@
           file_description="VRML 2 Files">
     <Source class="vtkVRMLSource"/>
   </Module>
+  <Module name="spcthreader"
+          class="vtkPVReaderModule" root_name="SPCTH"
+          module_type="Reader"
+          extensions=".0 .spcth"
+          file_description="SpyPlot CTH AMR dataset">
+    <Source class="vtkAMRSpyPlotReader"/>
+  </Module>
   <Module name="plyreader"
           class="vtkPVReaderModule" root_name="PLY"
           module_type="Reader"

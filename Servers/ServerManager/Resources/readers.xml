@@ -693,6 +693,16 @@
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
 
+   <SourceProxy name="spcthreader" class="vtkAMRSpyPlotReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End spcthreader-->
+   </SourceProxy>
+
    <SourceProxy name="vrmlreader" class="vtkVRMLSource">
      <StringVectorProperty
         name="FileName"
