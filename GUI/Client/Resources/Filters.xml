@@ -311,7 +311,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
           menu_name="D3" root_name="D3"
           module_type="Filter"
           multiprocess_support="multiple_processes"
-          long_help="Repartition a data set into load-balanced spatially convex regions."
+          long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
           short_help="Repartition a data set.">
     <Filter class="vtkDistributedDataFilter">
       <Input name="Input"
