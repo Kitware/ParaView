@@ -82,7 +82,6 @@ public:
   int FileIsDirectory(const char* name);
   
   //BTX
-  
   // Description:
   // Get the system path from the PATH environment variable.  Returns
   // an array of pointers to each path entry.  The list is terminated
@@ -104,6 +103,12 @@ public:
   // Find the location of the executable from the value of argv[0].
   const char* FindSelfPath(const char* argv0);
   
+  // Description:
+  // Extract the path to a given filename (i.e. its directory path) and 
+  // write it to 'path'.
+  // Return a pointer to the path (i.e. 'path').
+  static const char* GetFilenamePath(const char *filename, char *path);
+
 protected:
   vtkKWDirectoryUtilities();
   ~vtkKWDirectoryUtilities();

@@ -106,12 +106,6 @@ public:
   // Return the number of occurence of a char.
   static unsigned int CountChar(char* str, char c);
 
-  // Description:
-  // Find the path to a given filename (i.e. its directory path) and 
-  // write it to 'path'.
-  // Return a pointer to the path (i.e. 'path').
-  static const char* GetFilenamePath(const char *filename, char *path);
-
 protected:
   vtkString() {};
   ~vtkString() {};

@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.2");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.3");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -493,4 +493,23 @@ const char* vtkKWDirectoryUtilities::FindSelfPath(const char* argv0)
   this->SelfPath = vtkString::Duplicate(this->ConvertToUnixSlashes(selfPath));
   delete [] selfPath;
   return this->SelfPath;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, char *path)
+{
+  const char *ptr = filename + strlen(filename) - 1;
+  while (ptr > filename && *ptr != '/' && *ptr != '\\')
+    {
+    ptr--;
+    }
+
+  size_t length = ptr - filename;
+  if (length)
+    {
+    strncpy(path, filename, length);
+    }
+  path[length] = '\0';
+  
+  return path;
 }
