@@ -60,11 +60,7 @@ public:
   // Rounds a float to the nearest integer.
   //BTX
   static float Round(float f) {
-#ifdef __hpux
     return (f >= 0 ? (float)floor((double)f + 0.5) : ceil((double)f - 0.5)); }
-#else
-    return (f >= 0 ? floorf(f + 0.5) : ceilf(f - 0.5)); }
-#endif
   static double Round(double f) {
     return (f >= 0 ? floor(f + 0.5) : ceil(f - 0.5)); }
   //ETX
