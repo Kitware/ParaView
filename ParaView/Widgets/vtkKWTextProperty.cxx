@@ -118,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.6");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.7");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -668,7 +668,7 @@ void vtkKWTextProperty::FontFamilyOptionMenuCallback()
 {
   if (this->FontFamilyOptionMenu->IsCreated())
     {
-    char *value = this->FontFamilyOptionMenu->GetValue();
+    const char *value = this->FontFamilyOptionMenu->GetValue();
     if (!strcmp(value, VTK_KW_TEXT_PROP_ARIAL))
       {
       this->SetFontFamily(VTK_ARIAL);

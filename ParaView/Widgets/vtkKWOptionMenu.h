@@ -64,7 +64,7 @@ public:
   // Description:
   // Set/Get the state of the option menu
   void SetValue(const char *);
-  char *GetValue();
+  const char *GetValue();
 
   // Description:
   // Get the menu.
