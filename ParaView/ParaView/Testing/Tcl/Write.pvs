@@ -20,7 +20,7 @@ set kw(vtkTemp1000) [$Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
 set ext "vtk"
-if {$nprocs > 1} { set ext "pvtk" }
+if {$nprocs > 1} { set ext "pvtp" }
 
 $pvWindow Open "$DataDir/Data/blow.vtk"
 if { [catch {
@@ -42,8 +42,8 @@ if { [catch {
   if {$nprocs > 1} {
     # Delete the temporary file's pieces.
     for {set i 0} { $i < $nprocs } { incr i } {
-      catch { file delete -force "vtkParaViewWriteTest.$i.vtk" }
-      catch { file delete -force "vtkParaViewWriteTestGhost.$i.vtk" }
+      catch { file delete -force "vtkParaViewWriteTest.$i.vtp" }
+      catch { file delete -force "vtkParaViewWriteTestGhost.$i.vtp" }
     }
   }
 
