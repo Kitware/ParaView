@@ -54,6 +54,10 @@ class vtkKWImageLabel;
 class vtkKWApplication;
 class vtkKWIcon;
 
+#define VTK_KW_LABEL_CASE_USER_SPECIFIED 0
+#define VTK_KW_LABEL_CASE_UPPERCASE_FIRST 1
+#define VTK_KW_LABEL_CASE_LOWERCASE_FIRST 2
+
 class VTK_EXPORT vtkKWLabeledFrame : public vtkKWWidget
 {
 public:
@@ -97,10 +101,22 @@ public:
   static void AllowShowHideOff();
 
   // Description:
-  // Set / get ShowHide for this object.
+  // Set/Get ShowHide for this object.
   vtkSetMacro(ShowHideFrame, int);
   vtkBooleanMacro(ShowHideFrame, int);
   vtkGetMacro(ShowHideFrame, int);
+
+  // Description:
+  // Globally override the case of the label to ensure GUI consistency.
+  // This will change the label when SetLabel() is called.
+  static void SetLabelCase(int v);
+  static int GetLabelCase();
+  static void SetLabelCaseToUserSpecified() 
+    { vtkKWLabeledFrame::SetLabelCase(VTK_KW_LABEL_CASE_USER_SPECIFIED);};
+  static void SetLabelCaseToUppercaseFirst() 
+    {vtkKWLabeledFrame::SetLabelCase(VTK_KW_LABEL_CASE_UPPERCASE_FIRST);};
+  static void SetLabelCaseToLowercaseFirst() 
+    {vtkKWLabeledFrame::SetLabelCase(VTK_KW_LABEL_CASE_LOWERCASE_FIRST);};
 
 protected:
   vtkKWLabeledFrame();
@@ -116,13 +132,11 @@ protected:
   vtkKWIcon       *IconData;
   int Displayed;
   static int AllowShowHide;
+  static int LabelCase;
   int ShowHideFrame;
 private:
   vtkKWLabeledFrame(const vtkKWLabeledFrame&); // Not implemented
   void operator=(const vtkKWLabeledFrame&); // Not implemented
 };
 
-
 #endif
-
-

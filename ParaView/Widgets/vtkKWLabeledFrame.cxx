@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.13");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.14");
 
 
 
@@ -93,8 +93,51 @@ vtkKWLabeledFrame::~vtkKWLabeledFrame()
 
 void vtkKWLabeledFrame::SetLabel(const char *text)
 {
-  this->Script("%s configure -text {%s}",
-               this->Label->GetWidgetName(),text);  
+  if (!text)
+    {
+    return;
+    }
+
+  const char *ptr;
+  char *buffer;
+
+  if (vtkKWLabeledFrame::LabelCase == VTK_KW_LABEL_CASE_USER_SPECIFIED)
+    {
+    ptr = text;
+    }
+  else
+    {
+    int length = strlen(text);
+    buffer = new char [length + 1];
+    strcpy(buffer, text);
+    char *convert = buffer + 1;
+    const char *convert_end = buffer + length - 1;
+    while (convert < convert_end)
+      {
+      if (isspace(convert[0]) && isalpha(convert[1]))
+        {
+        switch (vtkKWLabeledFrame::LabelCase)
+          {
+          case VTK_KW_LABEL_CASE_UPPERCASE_FIRST:
+            convert[1] = toupper(convert[1]);
+            break;
+          case VTK_KW_LABEL_CASE_LOWERCASE_FIRST:
+            convert[1] = tolower(convert[1]);
+            break;
+          }
+        convert++;
+        }
+      convert++;
+      }
+    ptr = buffer;
+    }
+
+  this->Script("%s configure -text {%s}", this->Label->GetWidgetName(), ptr);
+
+  if (vtkKWLabeledFrame::LabelCase != VTK_KW_LABEL_CASE_USER_SPECIFIED)
+    {
+    delete [] buffer;
+    }
 }
 
 void vtkKWLabeledFrame::SetMargin(int m)
@@ -184,6 +227,7 @@ void vtkKWLabeledFrame::PerformShowHideFrame()
   this->Icon->SetImageData(this->IconData);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWLabeledFrame::AllowShowHide = 0;
 
 void vtkKWLabeledFrame::AllowShowHideOn() 
@@ -193,6 +237,19 @@ void vtkKWLabeledFrame::AllowShowHideOn()
 void vtkKWLabeledFrame::AllowShowHideOff() 
 { 
   vtkKWLabeledFrame::AllowShowHide = 0; 
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabeledFrame::LabelCase = 0;
+
+void vtkKWLabeledFrame::SetLabelCase(int v) 
+{ 
+  vtkKWLabeledFrame::LabelCase = v;
+}
+
+int vtkKWLabeledFrame::GetLabelCase() 
+{ 
+  return vtkKWLabeledFrame::LabelCase;
 }
 
 //----------------------------------------------------------------------------
