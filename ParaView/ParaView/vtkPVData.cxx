@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.171");
+vtkCxxRevisionMacro(vtkPVData, "1.172");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -539,6 +539,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
     pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
                            pvApp->GetNumberOfPipes());
+    }
+  else if (pvApp->GetUseTiledDisplay())
+    {
+    pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
     }
   else
     {
@@ -3027,7 +3031,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.171 $");
+  this->ExtractRevision(os,"$Revision: 1.172 $");
 }
 
 //----------------------------------------------------------------------------
