@@ -92,12 +92,12 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
-  void ConfirmExitCallback();
-  void SaveGeometryCallback();
-  void ShowSplashScreenCallback();
-  void ShowBalloonHelpCallback();
-  void FlatFrameCallback();
-  void FlatButtonsCallback();
+  virtual void ConfirmExitCallback();
+  virtual void SaveGeometryCallback();
+  virtual void ShowSplashScreenCallback();
+  virtual void ShowBalloonHelpCallback();
+  virtual void FlatFrameCallback();
+  virtual void FlatButtonsCallback();
 
 protected:
   vtkKWApplicationSettingsInterface();
