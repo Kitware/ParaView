@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.33");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.34");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -211,8 +211,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->VisitedFlag = 0;
 
-  this->TitleTextProperty = vtkKWTextProperty::New();
-  this->LabelTextProperty = vtkKWTextProperty::New();
+  this->TitleTextPropertyWidget = vtkKWTextProperty::New();
+  this->LabelTextPropertyWidget = vtkKWTextProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -339,11 +339,11 @@ vtkPVColorMap::~vtkPVColorMap()
     this->PresetsMenuButton->Delete();
     }
 
-  this->TitleTextProperty->Delete();
-  this->TitleTextProperty = NULL;
+  this->TitleTextPropertyWidget->Delete();
+  this->TitleTextPropertyWidget = NULL;
 
-  this->LabelTextProperty->Delete();
-  this->LabelTextProperty = NULL;
+  this->LabelTextPropertyWidget->Delete();
+  this->LabelTextPropertyWidget = NULL;
 }
 
 
@@ -600,15 +600,16 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->ScalarBarVectorTitleEntry->GetWidgetName(),
                this->GetTclName()); 
 
-  this->TitleTextProperty->SetParent(this->ScalarBarTitleFrame);
-  this->TitleTextProperty->SetTextProperty(
+  this->TitleTextPropertyWidget->SetParent(this->ScalarBarTitleFrame);
+  this->TitleTextPropertyWidget->SetTextProperty(
     this->ScalarBar->GetScalarBarActor()->GetTitleTextProperty());
-  this->TitleTextProperty->SetActor2D(
+  this->TitleTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
-  this->TitleTextProperty->Create(this->Application);
-  this->TitleTextProperty->SetOnChangeCommand(onchangecommand.str());
-  this->TitleTextProperty->SetTraceReferenceObject(this);
-  this->TitleTextProperty->SetTraceReferenceCommand("GetTitleTextProperty");
+  this->TitleTextPropertyWidget->Create(this->Application);
+  this->TitleTextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
+  this->TitleTextPropertyWidget->SetTraceReferenceObject(this);
+  this->TitleTextPropertyWidget->SetTraceReferenceCommand(
+    "GetTitleTextPropertyWidget");
 
   this->Script("grid %s -row 0 -column 0 -sticky nws %s",
                this->ScalarBarTitleLabel->GetWidgetName(),
@@ -619,7 +620,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                grid_settings);
 
   this->Script("grid %s -row 1 -column 1 -columnspan 2 -sticky nws %s",
-               this->TitleTextProperty->GetWidgetName(),
+               this->TitleTextPropertyWidget->GetWidgetName(),
                grid_settings);
 
   if (this->NumberOfVectorComponents > 1)
@@ -656,15 +657,16 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->SetScalarBarLabelFormat(
     this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
 
-  this->LabelTextProperty->SetParent(this->ScalarBarLabelFormatFrame);
-  this->LabelTextProperty->SetTextProperty(
+  this->LabelTextPropertyWidget->SetParent(this->ScalarBarLabelFormatFrame);
+  this->LabelTextPropertyWidget->SetTextProperty(
     this->ScalarBar->GetScalarBarActor()->GetLabelTextProperty());
-  this->LabelTextProperty->SetActor2D(
+  this->LabelTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
-  this->LabelTextProperty->Create(this->Application);
-  this->LabelTextProperty->SetOnChangeCommand(onchangecommand.str());
-  this->LabelTextProperty->SetTraceReferenceObject(this);
-  this->LabelTextProperty->SetTraceReferenceCommand("GetLabelTextProperty");
+  this->LabelTextPropertyWidget->Create(this->Application);
+  this->LabelTextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
+  this->LabelTextPropertyWidget->SetTraceReferenceObject(this);
+  this->LabelTextPropertyWidget->SetTraceReferenceCommand(
+    "GetLabelTextPropertyWidget");
 
   this->Script("grid %s -row 0 -column 0 -sticky nws %s",
                this->ScalarBarLabelFormatLabel->GetWidgetName(),
@@ -675,27 +677,27 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                grid_settings);
 
   this->Script("grid %s -row 1 -column 1 -sticky nws %s",
-               this->LabelTextProperty->GetWidgetName(),
+               this->LabelTextPropertyWidget->GetWidgetName(),
                grid_settings);
 
   // Scalar bar : enable copy between text property widgets
 
-  this->TitleTextProperty->ShowCopyOn();
-  this->TitleTextProperty->GetCopyButton()->SetBalloonHelpString(
+  this->TitleTextPropertyWidget->ShowCopyOn();
+  this->TitleTextPropertyWidget->GetCopyButton()->SetBalloonHelpString(
     "Copy the labels text properties to the title text properties.");
   ostrstream copy1;
-  copy1 << "CopyValuesFrom " << this->LabelTextProperty->GetTclName() << ends;
-  this->TitleTextProperty->GetCopyButton()->SetCommand(
-    this->TitleTextProperty, copy1.str());
+  copy1 << "CopyValuesFrom " << this->LabelTextPropertyWidget->GetTclName() << ends;
+  this->TitleTextPropertyWidget->GetCopyButton()->SetCommand(
+    this->TitleTextPropertyWidget, copy1.str());
   copy1.rdbuf()->freeze(0);
 
-  this->LabelTextProperty->ShowCopyOn();
-  this->LabelTextProperty->GetCopyButton()->SetBalloonHelpString(
+  this->LabelTextPropertyWidget->ShowCopyOn();
+  this->LabelTextPropertyWidget->GetCopyButton()->SetBalloonHelpString(
     "Copy the title text properties to the labels text properties.");
   ostrstream copy2;
-  copy2 << "CopyValuesFrom " << this->TitleTextProperty->GetTclName() << ends;
-  this->LabelTextProperty->GetCopyButton()->SetCommand(
-    this->LabelTextProperty, copy2.str());
+  copy2 << "CopyValuesFrom " << this->TitleTextPropertyWidget->GetTclName() << ends;
+  this->LabelTextPropertyWidget->GetCopyButton()->SetCommand(
+    this->LabelTextPropertyWidget, copy2.str());
   copy2.rdbuf()->freeze(0);
 
   // Scalar bar: synchronize all those grids to have them aligned
@@ -1589,11 +1591,11 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
 
     ostrstream ttprop, tlprop;
     ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
-    this->TitleTextProperty->SaveInTclScript(file, ttprop.str());
+    this->TitleTextPropertyWidget->SaveInTclScript(file, ttprop.str());
     ttprop.rdbuf()->freeze(0);
 
     tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
-    this->LabelTextProperty->SaveInTclScript(file, tlprop.str());
+    this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
     tlprop.rdbuf()->freeze(0);
 
     if (interactiveFlag && vtkFlag)
@@ -1914,8 +1916,8 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "ScalarBar: " << this->ScalarBar << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
-  os << indent << "TitleTextProperty: " << this->TitleTextProperty << endl;
-  os << indent << "LabelTextProperty: " << this->LabelTextProperty << endl;
+  os << indent << "TitleTextPropertyWidget: " << this->TitleTextPropertyWidget << endl;
+  os << indent << "LabelTextPropertyWidget: " << this->LabelTextPropertyWidget << endl;
   
   os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
 
