@@ -52,7 +52,8 @@ class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
 {
 public:
   static vtkPVGlyph3D* New();
-  vtkTypeMacro(vtkPVGlyph3D, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVGlyph3D, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source

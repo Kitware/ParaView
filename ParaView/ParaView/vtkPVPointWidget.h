@@ -61,7 +61,7 @@ class VTK_EXPORT vtkPVPointWidget : public vtkPV3DWidget
 {
 public:
   static vtkPVPointWidget* New();
-  vtkTypeMacro(vtkPVPointWidget, vtkPV3DWidget);
+  vtkTypeRevisionMacro(vtkPVPointWidget, vtkPV3DWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
     

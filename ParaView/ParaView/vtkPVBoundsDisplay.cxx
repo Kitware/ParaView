@@ -53,13 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 int vtkPVBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
-			     int argc, char *argv[]);
+                             int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVBoundsDisplay::vtkPVBoundsDisplay()
@@ -156,14 +157,14 @@ void vtkPVBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 vtkPVBoundsDisplay* vtkPVBoundsDisplay::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVBoundsDisplay::SafeDownCast(clone);
 }
 
 vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
-				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if a clone of this widget has already been created
@@ -207,8 +208,8 @@ vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
 }
 
 void vtkPVBoundsDisplay::CopyProperties(vtkPVWidget* clone, 
-					vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                        vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVBoundsDisplay* pvbd = vtkPVBoundsDisplay::SafeDownCast(clone);

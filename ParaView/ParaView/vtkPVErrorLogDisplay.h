@@ -65,7 +65,7 @@ class VTK_EXPORT vtkPVErrorLogDisplay : public vtkPVTimerLogDisplay
 {
 public:
   static vtkPVErrorLogDisplay* New();
-  vtkTypeMacro(vtkPVErrorLogDisplay, vtkPVTimerLogDisplay);
+  vtkTypeRevisionMacro(vtkPVErrorLogDisplay, vtkPVTimerLogDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

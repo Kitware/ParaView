@@ -80,7 +80,7 @@ class vtkMultiProcessController;
 class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
 {
 public:
-  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkRedistributePolyData *New();
 
@@ -161,7 +161,7 @@ protected:
                   int, vtkIdType&, vtkIdType&, vtkIdType*); 
   void ReceiveCells (vtkIdType, vtkIdType, vtkPolyData*, int, 
                      vtkIdType, vtkIdType, vtkIdType, 
-		     vtkIdType);
+                     vtkIdType);
 
   void FindMemReq (vtkIdType, vtkPolyData*, vtkIdType&, vtkIdType&);
 
@@ -182,10 +182,10 @@ protected:
                         int); 
 
   void SendDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
-		       vtkIdType, int, vtkIdType*, int); 
+                       vtkIdType, int, vtkIdType*, int); 
 
   void SendCellBlockDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
-				vtkIdType, int, vtkIdType*, vtkIdType); 
+                                vtkIdType, int, vtkIdType*, vtkIdType); 
 
   void SendArrays (vtkDataArray*, vtkIdType, int,  vtkIdType*, int, int); 
 

@@ -58,7 +58,8 @@ class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
 public:
   static vtkPVContourEntry* New();
-  vtkTypeMacro(vtkPVContourEntry, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVContourEntry, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create the widget.
@@ -96,7 +97,7 @@ public:
   // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-					 vtkPVAnimationInterface *ai);
+                                         vtkPVAnimationInterface *ai);
 
 //BTX
   // Description:
@@ -105,7 +106,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVContourEntry* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -126,7 +127,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,      

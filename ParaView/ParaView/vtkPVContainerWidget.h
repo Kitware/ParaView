@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVContainerWidget : public vtkPVWidget
 {
 public:
   static vtkPVContainerWidget* New();
-  vtkTypeMacro(vtkPVContainerWidget, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVContainerWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:

@@ -42,7 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVAnimationInterface_h
 #define __vtkPVAnimationInterface_h
 
-#include "vtkPVWidget.h"
+#include "vtkKWWidget.h"
 
 class vtkKWCheckButton;
 class vtkKWLabel;
@@ -55,12 +55,13 @@ class vtkKWText;
 class vtkPVRenderView;
 class vtkPVSource;
 class vtkPVWindow;
+class vtkPVWidget;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
 public:
   static vtkPVAnimationInterface* New();
-  vtkTypeMacro(vtkPVAnimationInterface, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationInterface, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -149,7 +150,7 @@ public:
   // Description:
   // Make the tcl script save the images of the animation.
   void SaveInTclScript(ofstream *file, const char *fileRoot,
-		       const char* extension, const char* writerName);
+                       const char* extension, const char* writerName);
 
   // Description:
   // If the animation is controlling a specific PVWidget, then

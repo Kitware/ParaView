@@ -57,7 +57,7 @@ class VTK_EXPORT vtkPVWorldPointPicker : public vtkWorldPointPicker
 {
 public:
   static vtkPVWorldPointPicker *New();
-  vtkTypeMacro(vtkPVWorldPointPicker,vtkWorldPointPicker);
+  vtkTypeRevisionMacro(vtkPVWorldPointPicker,vtkWorldPointPicker);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -68,7 +68,7 @@ public:
   // Description:
   // A pick method that uses composited zbuffer.
   int Pick(float selectionX, float selectionY, 
-	   float selectionZ, vtkRenderer *renderer);
+           float selectionZ, vtkRenderer *renderer);
   
 protected:
   vtkPVWorldPointPicker();

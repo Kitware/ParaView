@@ -50,9 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
+vtkCxxRevisionMacro(vtkPVColorMap, "1.6");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
-		     int argc, char *argv[]);
+                     int argc, char *argv[]);
 
 vtkCxxSetObjectMacro(vtkPVColorMap,PVRenderView,vtkPVRenderView);
 

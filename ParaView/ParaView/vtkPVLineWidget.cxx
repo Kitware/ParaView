@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -504,4 +505,10 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
                this->ResolutionEntry->GetWidgetName(),
                this->GetTclName());
   
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

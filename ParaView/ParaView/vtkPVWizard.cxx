@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVWizard );
+vtkCxxRevisionMacro(vtkPVWizard, "1.10");
 
 vtkCxxSetObjectMacro(vtkPVWizard,Data, vtkRectilinearGrid);
 
@@ -162,7 +163,7 @@ void vtkPVWizard::Create(vtkKWApplication *app, const char *args)
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
-		this->MasterWindow->GetWidgetName());
+                this->MasterWindow->GetWidgetName());
     }
 
   this->ButtonFrame->SetParent(this);
@@ -727,7 +728,7 @@ void vtkPVWizard::SetTitle( const char* title )
   if (this->Application)
     {
     this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
-		 title);
+                 title);
     }
   else
     {

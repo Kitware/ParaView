@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.6");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -174,7 +175,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
-		 this->MasterWindow->GetWidgetName());
+                 this->MasterWindow->GetWidgetName());
     }
   
   this->ButtonFrame->SetParent(this);
@@ -408,7 +409,7 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
     }
 
   this->Script("%s insert end {%s%c}",
-	       this->DisplayText->GetWidgetName(), msg, '\n');
+               this->DisplayText->GetWidgetName(), msg, '\n');
   if ( !w )
     {
     this->DisableWrite();
@@ -464,7 +465,7 @@ void vtkPVTimerLogDisplay::Update()
         // Set it to an end of string.
         *end = '\0';
         // Add the string.
-	this->Append(start);
+        this->Append(start);
         // Initialize the search for the next string.
         start = end+1;
         end = start;

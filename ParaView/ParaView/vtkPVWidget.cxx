@@ -67,6 +67,9 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkPVWidget, "1.25");
+
+//----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
   this->ModifiedCommandObjectTclName = NULL;
@@ -334,7 +337,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.24 $");
+  this->ExtractRevision(os,"$Revision: 1.25 $");
 }
 
 //----------------------------------------------------------------------------

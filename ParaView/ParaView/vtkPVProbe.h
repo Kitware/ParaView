@@ -62,7 +62,7 @@ class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
 public:
   static vtkPVProbe* New();
-  vtkTypeMacro(vtkPVProbe, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVProbe, vtkPVSource);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:

@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.3");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -111,8 +112,8 @@ void vtkPVErrorLogDisplay::Create(vtkKWApplication *app)
   this->Script("pack forget  %s %s %s %s",
                this->ThresholdLabel->GetWidgetName(),
                this->ThresholdMenu->GetWidgetName(),
-	       this->EnableLabel->GetWidgetName(),
-	       this->EnableCheck->GetWidgetName());
+               this->EnableLabel->GetWidgetName(),
+               this->EnableCheck->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -127,9 +128,9 @@ void vtkPVErrorLogDisplay::Update()
       {
       const char* item = 0;
       if ( this->ErrorMessages->GetItem(cc, item) == VTK_OK && item )
-	{
-	this->Append(item);
-	}
+        {
+        this->Append(item);
+        }
       }
     }
   else

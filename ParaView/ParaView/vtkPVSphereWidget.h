@@ -61,7 +61,7 @@ class VTK_EXPORT vtkPVSphereWidget : public vtkPV3DWidget
 {
 public:
   static vtkPVSphereWidget* New();
-  vtkTypeMacro(vtkPVSphereWidget, vtkPV3DWidget);
+  vtkTypeRevisionMacro(vtkPVSphereWidget, vtkPV3DWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
     
@@ -97,7 +97,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVSphereWidget* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
   void SetCenter();

@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
+vtkCxxRevisionMacro(vtkPVContour, "1.51");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -291,4 +292,10 @@ void vtkPVContour::InitializePrototype()
 int vtkPVContour::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 {
   return this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContour::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

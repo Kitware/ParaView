@@ -51,6 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.3");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);

@@ -94,6 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.6");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessController);
 

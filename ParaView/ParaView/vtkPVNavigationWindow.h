@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVNavigationWindow : public vtkPVSourcesNavigationWindow
 {
 public:
   static vtkPVNavigationWindow* New();
-  vtkTypeMacro(vtkPVNavigationWindow,vtkPVSourcesNavigationWindow);
+  vtkTypeRevisionMacro(vtkPVNavigationWindow,vtkPVSourcesNavigationWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

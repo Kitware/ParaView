@@ -56,7 +56,7 @@ class VTK_EXPORT vtkPVLineSourceWidget : public vtkPVSourceWidget
 {
 public:
   static vtkPVLineSourceWidget* New();
-  vtkTypeMacro(vtkPVLineSourceWidget, vtkPVSourceWidget);
+  vtkTypeRevisionMacro(vtkPVLineSourceWidget, vtkPVSourceWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

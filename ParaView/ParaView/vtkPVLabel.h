@@ -54,7 +54,8 @@ class VTK_EXPORT vtkPVLabel : public vtkPVObjectWidget
 {
 public:
   static vtkPVLabel* New();
-  vtkTypeMacro(vtkPVLabel, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVLabel, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Setting the label also sets the name.
@@ -87,7 +88,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVLabel* ClonePrototype(vtkPVSource* pvSource,
-			     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                             vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -101,7 +102,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

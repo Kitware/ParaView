@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9");
 
 //---------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
@@ -117,9 +118,9 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
   if (this->PVSource && this->PVSource->GetPVInput() && this->VariableName )
     {
     this->Script("eval %s Set%s [%s GetWholeExtent]",
-		 this->PVSource->GetVTKSourceTclName(), 
-		 this->GetVariableName(),
-		 this->PVSource->GetPVInput()->GetVTKDataTclName());
+                 this->PVSource->GetVTKSourceTclName(), 
+                 this->GetVariableName(),
+                 this->PVSource->GetPVInput()->GetVTKDataTclName());
     }
 
   // create the top level
@@ -259,7 +260,7 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   cascadeMenu->SetParent(menu);
   cascadeMenu->Create(this->Application, "-tearoff 0");
   menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
-		             "Choose a plane of the extent to animate.");  
+                             "Choose a plane of the extent to animate.");  
   // X
   sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName());
   cascadeMenu->AddCommand("X Axis", this, methodAndArgs, 0, "");
@@ -328,15 +329,15 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
 }
 
 vtkPVExtentEntry* vtkPVExtentEntry::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVExtentEntry::SafeDownCast(clone);
 }
 
 void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone, 
-				      vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                      vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVExtentEntry* pvee = vtkPVExtentEntry::SafeDownCast(clone);
@@ -368,4 +369,10 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -60,7 +60,7 @@ class VTK_EXPORT vtkPVFileEntry : public vtkPVObjectWidget
 {
 public:
   static vtkPVFileEntry* New();
-  vtkTypeMacro(vtkPVFileEntry, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVFileEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -108,7 +108,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVFileEntry* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -126,7 +126,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

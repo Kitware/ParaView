@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -183,15 +184,15 @@ void vtkPVLabeledToggle::Reset()
 }
 
 vtkPVLabeledToggle* vtkPVLabeledToggle::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVLabeledToggle::SafeDownCast(clone);
 }
 
 void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone, 
-					vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                        vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVLabeledToggle* pvlt = vtkPVLabeledToggle::SafeDownCast(clone);
@@ -242,4 +243,10 @@ const char* vtkPVLabeledToggle::GetLabel()
 int vtkPVLabeledToggle::GetState() 
 { 
   return this->CheckButton->GetState(); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

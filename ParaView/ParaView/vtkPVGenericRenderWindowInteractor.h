@@ -53,7 +53,7 @@ class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkGenericRenderWin
 {
 public:
   static vtkPVGenericRenderWindowInteractor *New();
-  vtkTypeMacro(vtkPVGenericRenderWindowInteractor, vtkGenericRenderWindowInteractor);
+  vtkTypeRevisionMacro(vtkPVGenericRenderWindowInteractor, vtkGenericRenderWindowInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   void SetPVRenderView(vtkPVRenderView *view);
@@ -72,8 +72,8 @@ protected:
   vtkPVRenderView *PVRenderView;
 
 private:
-  vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&);
-  void operator=(const vtkPVGenericRenderWindowInteractor&);
+  vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented
+  void operator=(const vtkPVGenericRenderWindowInteractor&); // Not implemented
 };
 
 #endif

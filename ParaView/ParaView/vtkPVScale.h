@@ -54,7 +54,8 @@ class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
 public:
   static vtkPVScale* New();
-  vtkTypeMacro(vtkPVScale, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVScale, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);
   

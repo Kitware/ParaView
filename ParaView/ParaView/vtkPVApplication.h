@@ -68,7 +68,7 @@ class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
 public:
   static vtkPVApplication* New();
-  vtkTypeMacro(vtkPVApplication,vtkKWApplication);
+  vtkTypeRevisionMacro(vtkPVApplication,vtkKWApplication);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

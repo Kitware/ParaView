@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
+vtkCxxRevisionMacro(vtkPVScale, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -288,4 +289,10 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
 
   return 1;
   
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkPVSourceCollection );
+vtkCxxRevisionMacro(vtkPVSourceCollection, "1.5");
 
 vtkPVSource *vtkPVSourceCollection::GetNextPVSource() 
 { 
@@ -76,4 +77,10 @@ void vtkPVSourceCollection::RemoveItem(vtkPVSource *a)
 int vtkPVSourceCollection::IsItemPresent(vtkPVSource *a) 
 {
   return this->vtkCollection::IsItemPresent(static_cast<vtkObject *>(a));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceCollection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

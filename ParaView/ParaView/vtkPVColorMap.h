@@ -60,7 +60,7 @@ class VTK_EXPORT vtkPVColorMap : public vtkKWObject
 {
 public:
   static vtkPVColorMap* New();
-  vtkTypeMacro(vtkPVColorMap, vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVColorMap, vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

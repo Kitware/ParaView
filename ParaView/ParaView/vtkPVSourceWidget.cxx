@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.3");
+
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
 {

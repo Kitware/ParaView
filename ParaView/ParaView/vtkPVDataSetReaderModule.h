@@ -52,7 +52,8 @@ class VTK_EXPORT vtkPVDataSetReaderModule : public vtkPVReaderModule
 {
 public:
   static vtkPVDataSetReaderModule* New();
-  vtkTypeMacro(vtkPVDataSetReaderModule, vtkPVReaderModule);
+  vtkTypeRevisionMacro(vtkPVDataSetReaderModule, vtkPVReaderModule);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source

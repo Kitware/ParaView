@@ -72,7 +72,7 @@ class vtkLinkedList;
 class VTK_EXPORT vtkPVWidget : public vtkKWWidget
 {
 public:
-  vtkTypeMacro(vtkPVWidget, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

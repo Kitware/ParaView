@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAllToNRedistributePolyData);
+vtkCxxRevisionMacro(vtkAllToNRedistributePolyData, "1.4");
 
 //----------------------------------------------------------------------------
 vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()

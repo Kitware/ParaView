@@ -71,7 +71,7 @@ class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 {
 public:
   static vtkPVSelectWidget* New();
-  vtkTypeMacro(vtkPVSelectWidget, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVSelectWidget, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -142,8 +142,8 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVSelectWidget* ClonePrototype(vtkPVSource* pvSource,
-				    vtkArrayMap<vtkPVWidget*, 
-				    vtkPVWidget*>* map);
+                                    vtkArrayMap<vtkPVWidget*, 
+                                    vtkPVWidget*>* map);
 //ETX
 
   // Description:
@@ -185,9 +185,9 @@ protected:
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

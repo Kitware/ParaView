@@ -78,11 +78,10 @@ class vtkMultiProcessController;
 
 //*******************************************************************
 
-class VTK_EXPORT vtkAllToNRedistributePolyData : 
-  public vtkWeightedRedistributePolyData
+class VTK_EXPORT vtkAllToNRedistributePolyData : public vtkWeightedRedistributePolyData
 {
 public:
-  vtkTypeMacro(vtkAllToNRedistributePolyData, vtkWeightedRedistributePolyData);
+  vtkTypeRevisionMacro(vtkAllToNRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

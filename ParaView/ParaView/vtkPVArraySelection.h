@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
 public:
   static vtkPVArraySelection* New();
-  vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVArraySelection, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

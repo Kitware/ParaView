@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.73");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -197,4 +198,8 @@ void vtkPVGlyph3D::InitializePrototype()
   entry->Delete();
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

@@ -81,7 +81,7 @@ class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
 public:
   static vtkPVSource* New();
-  vtkTypeMacro(vtkPVSource,vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVSource,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

@@ -61,7 +61,7 @@ class VTK_EXPORT vtkPVImplicitPlaneWidget : public vtkPV3DWidget
 {
 public:
   static vtkPVImplicitPlaneWidget* New();
-  vtkTypeMacro(vtkPVImplicitPlaneWidget, vtkPV3DWidget);
+  vtkTypeRevisionMacro(vtkPVImplicitPlaneWidget, vtkPV3DWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
     

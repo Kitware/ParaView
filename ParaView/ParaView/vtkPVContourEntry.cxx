@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.16");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -346,15 +347,15 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 
 //----------------------------------------------------------------------------
 vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVContourEntry::SafeDownCast(clone);
 }
 
 void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone, 
-				       vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                       vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVContourEntry* pvce = vtkPVContourEntry::SafeDownCast(clone);
@@ -389,4 +390,10 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 const char* vtkPVContourEntry::GetLabel() 
 {
   return this->ContourValuesLabel->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

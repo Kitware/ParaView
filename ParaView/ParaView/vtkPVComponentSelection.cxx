@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.7");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -102,7 +103,7 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
     button->SetText(compId);
     this->CheckButtons->AddItem(button);
     pvApp->BroadcastScript("%s Set%s %d %d", this->ObjectTclName, 
-			   this->VariableName, i, i);
+                           this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
     }
@@ -197,8 +198,8 @@ vtkPVComponentSelection* vtkPVComponentSelection::ClonePrototype(
 }
 
 void vtkPVComponentSelection::CopyProperties(vtkPVWidget* clone, 
-					     vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                             vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVComponentSelection* pvcs = vtkPVComponentSelection::SafeDownCast(clone);

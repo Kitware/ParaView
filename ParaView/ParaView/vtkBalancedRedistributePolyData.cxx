@@ -76,6 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkBalancedRedistributePolyData);
+vtkCxxRevisionMacro(vtkBalancedRedistributePolyData, "1.3");
 
 //----------------------------------------------------------------------------
 vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData()

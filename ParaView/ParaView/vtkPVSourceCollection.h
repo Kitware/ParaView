@@ -54,7 +54,8 @@ class VTK_EXPORT vtkPVSourceCollection : public vtkCollection
 {
 public:
   static vtkPVSourceCollection *New();
-  vtkTypeMacro(vtkPVSourceCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkPVSourceCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an PVSource to the list.

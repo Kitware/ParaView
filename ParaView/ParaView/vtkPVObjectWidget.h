@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class VTK_EXPORT vtkPVObjectWidget : public vtkPVWidget
 {
 public:
-  vtkTypeMacro(vtkPVObjectWidget, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVObjectWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

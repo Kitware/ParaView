@@ -70,6 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.20");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -1030,4 +1031,10 @@ void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
   strcpy(this->RequestedCellVariables[size], variableName);
   
   this->NumberOfRequestedCellVariables++;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightReaderModule::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVSourcesNavigationWindow : public vtkKWWidget
 {
 public:
   static vtkPVSourcesNavigationWindow* New();
-  vtkTypeMacro(vtkPVSourcesNavigationWindow,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVSourcesNavigationWindow,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -59,7 +59,7 @@ class vtkMapper;
 class VTK_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
-  vtkTypeMacro(vtkPVLODActor,vtkActor);
+  vtkTypeRevisionMacro(vtkPVLODActor,vtkActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPVLODActor *New();
@@ -111,8 +111,6 @@ public:
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();
-  vtkPVLODActor(const vtkPVLODActor&);
-  void operator=(const vtkPVLODActor&);
 
   vtkActor            *Device;
   vtkMapper           *LODMapper;
@@ -120,6 +118,10 @@ protected:
   vtkMapper *SelectMapper();
 
   int EnableLOD;
+
+private:
+  vtkPVLODActor(const vtkPVLODActor&); // Not implemented.
+  void operator=(const vtkPVLODActor&); // Not implemented.
 };
 
 #endif

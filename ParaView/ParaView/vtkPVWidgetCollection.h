@@ -54,7 +54,8 @@ class VTK_EXPORT vtkPVWidgetCollection : public vtkCollection
 {
 public:
   static vtkPVWidgetCollection *New();
-  vtkTypeMacro(vtkPVWidgetCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkPVWidgetCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an PVWidget to the list.

@@ -53,7 +53,8 @@ class VTK_EXPORT vtkPVContour : public vtkPVSource
 {
 public:
   static vtkPVContour* New();
-  vtkTypeMacro(vtkPVContour, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVContour, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source

@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVObjectWidget
 {
 public:
   static vtkPVSelectTimeSet* New();
-  vtkTypeMacro(vtkPVSelectTimeSet, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVSelectTimeSet, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);

@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabel);
+vtkCxxRevisionMacro(vtkPVLabel, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()
@@ -142,14 +143,14 @@ void vtkPVLabel::Reset()
 }
 
 vtkPVLabel* vtkPVLabel::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVLabel::SafeDownCast(clone);
 }
 
 void vtkPVLabel::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVLabel* pvl = vtkPVLabel::SafeDownCast(clone);
@@ -193,4 +194,10 @@ void vtkPVLabel::SetLabel(const char *str)
 const char* vtkPVLabel::GetLabel()
 { 
   return this->Label->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabel::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
+vtkCxxRevisionMacro(vtkStringList, "1.6");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()

@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVScalarRangeLabel : public vtkPVWidget
 {
 public:
   static vtkPVScalarRangeLabel* New();
-  vtkTypeMacro(vtkPVScalarRangeLabel, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVScalarRangeLabel, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -85,7 +85,7 @@ public:
   // instance of the same type as the current object using
   // NewInstance() and then copy some necessary state parameters.
   vtkPVScalarRangeLabel* ClonePrototype(vtkPVSource* pvSource,
-					vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                        vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -100,7 +100,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

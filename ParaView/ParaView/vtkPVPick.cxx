@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
+vtkCxxRevisionMacro(vtkPVPick, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVPick, InputMenu, vtkPVInputMenu);
 

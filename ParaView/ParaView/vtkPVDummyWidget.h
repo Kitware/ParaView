@@ -53,7 +53,7 @@ class VTK_EXPORT vtkPVDummyWidget : public vtkPVWidget
 {
 public:
   static vtkPVDummyWidget* New();
-  vtkTypeMacro(vtkPVDummyWidget, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVDummyWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

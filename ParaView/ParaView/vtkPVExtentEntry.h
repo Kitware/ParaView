@@ -58,7 +58,8 @@ class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
 public:
   static vtkPVExtentEntry* New();
-  vtkTypeMacro(vtkPVExtentEntry, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVExtentEntry, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);
   
@@ -81,7 +82,7 @@ public:
   // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-					 vtkPVAnimationInterface *ai);
+                                         vtkPVAnimationInterface *ai);
 
   // Description:
   // This method gets called when the user selects this widget to animate.
@@ -99,7 +100,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVExtentEntry* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -122,7 +123,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

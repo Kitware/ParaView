@@ -58,7 +58,7 @@ class VTK_EXPORT vtkPVWriter : public vtkKWObject
 {
 public:
   static vtkPVWriter* New();
-  vtkTypeMacro(vtkPVWriter,vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVWriter,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
   // Description:

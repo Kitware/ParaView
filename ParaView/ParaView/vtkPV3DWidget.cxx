@@ -54,6 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkKWFrame.h"
 
+//----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.21");
+
 //===========================================================================
 //***************************************************************************
 class vtkPV3DWidgetObserver : public vtkCommand

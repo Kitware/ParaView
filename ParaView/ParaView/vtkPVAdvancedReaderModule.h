@@ -65,7 +65,8 @@ class VTK_EXPORT vtkPVAdvancedReaderModule : public vtkPVReaderModule
 {
 public:
   static vtkPVAdvancedReaderModule* New();
-  vtkTypeMacro(vtkPVAdvancedReaderModule, vtkPVReaderModule);
+  vtkTypeRevisionMacro(vtkPVAdvancedReaderModule, vtkPVReaderModule);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Tries to read a given file. Return VTK_OK on success, VTK_ERROR

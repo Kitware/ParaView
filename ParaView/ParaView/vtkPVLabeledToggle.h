@@ -55,7 +55,8 @@ class VTK_EXPORT vtkPVLabeledToggle : public vtkPVObjectWidget
 {
 public:
   static vtkPVLabeledToggle* New();
-  vtkTypeMacro(vtkPVLabeledToggle, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVLabeledToggle, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Setting the label also sets the name.
@@ -93,7 +94,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVLabeledToggle* ClonePrototype(vtkPVSource* pvSource,
-				     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -108,7 +109,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

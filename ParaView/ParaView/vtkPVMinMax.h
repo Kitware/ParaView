@@ -54,7 +54,7 @@ class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 {
 public:
   static vtkPVMinMax* New();
-  vtkTypeMacro(vtkPVMinMax, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVMinMax, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);
@@ -126,7 +126,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVMinMax* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -151,7 +151,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
 

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPushButton);
+vtkCxxRevisionMacro(vtkPVPushButton, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVPushButton::vtkPVPushButton()

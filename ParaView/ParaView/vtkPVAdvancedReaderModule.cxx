@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.4");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -69,7 +70,7 @@ vtkPVAdvancedReaderModule::~vtkPVAdvancedReaderModule()
 
 //----------------------------------------------------------------------------
 int vtkPVAdvancedReaderModule::ReadFile(const char* fname, 
-					vtkPVReaderModule*& clone)
+                                        vtkPVReaderModule*& clone)
 {
   int retVal = this->Superclass::ReadFile(fname, clone);
   if (retVal != VTK_OK)
@@ -78,7 +79,7 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
     }
 
   this->Script("%s UpdateInformation", 
-	       clone->GetPVOutput()->GetVTKDataTclName());
+               clone->GetPVOutput()->GetVTKDataTclName());
 
   // We called UpdateInformation, we need to update the widgets.
   vtkPVWidget *pvw;
@@ -97,3 +98,9 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
   return VTK_OK;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVAdvancedReaderModule::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

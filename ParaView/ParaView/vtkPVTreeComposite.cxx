@@ -55,10 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkPVRenderView.h"
 
-vtkCxxSetObjectMacro(vtkPVTreeComposite, RenderView, vtkPVRenderView);
-
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.35");
+
+vtkCxxSetObjectMacro(vtkPVTreeComposite, RenderView, vtkPVRenderView);
 
 //=========================================================================
 // Stuff to avoid compositing if there is no data on statlite processes.

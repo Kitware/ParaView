@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkInhibitPoints);
+vtkCxxRevisionMacro(vtkInhibitPoints, "1.6");
 
 //----------------------------------------------------------------------------
 vtkInhibitPoints::vtkInhibitPoints()

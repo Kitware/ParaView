@@ -58,7 +58,7 @@ class VTK_EXPORT vtkInhibitPoints : public vtkDataSetToPolyDataFilter
 {
 public:
   static vtkInhibitPoints *New();
-  vtkTypeMacro(vtkInhibitPoints,vtkDataSetToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkInhibitPoints,vtkDataSetToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -91,8 +91,6 @@ public:
 protected:
   vtkInhibitPoints();
   ~vtkInhibitPoints() {};
-  vtkInhibitPoints(const vtkInhibitPoints&) {};
-  void operator=(const vtkInhibitPoints&) {};
 
   void Execute();
 
@@ -104,6 +102,9 @@ protected:
   float MagnitudeThreshold;
 
   int GenerateVertices; //generate polydata verts
+private:
+  vtkInhibitPoints(const vtkInhibitPoints&); // Not implemented
+  void operator=(const vtkInhibitPoints&); // Not implemented
 };
 
 #endif

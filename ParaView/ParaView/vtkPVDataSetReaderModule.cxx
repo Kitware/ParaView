@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -252,3 +253,9 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   return VTK_OK;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetReaderModule::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

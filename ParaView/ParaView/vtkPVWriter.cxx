@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
+vtkCxxRevisionMacro(vtkPVWriter, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()

@@ -53,7 +53,8 @@ class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
 {
 public:
   static vtkPVCutPlane* New();
-  vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVCutPlane, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Decription:
   // VTKSource must be set before this is called.

@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -107,4 +108,10 @@ int vtkPVDataSetFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetFileEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

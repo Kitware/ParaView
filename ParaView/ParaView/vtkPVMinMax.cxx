@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
+vtkCxxRevisionMacro(vtkPVMinMax, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()

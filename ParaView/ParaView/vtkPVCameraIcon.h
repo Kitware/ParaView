@@ -55,7 +55,7 @@ class VTK_EXPORT vtkPVCameraIcon : public vtkKWImageLabel
 {
 public:
   static vtkPVCameraIcon* New();
-  vtkTypeMacro(vtkPVCameraIcon, vtkKWImageLabel);
+  vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWImageLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);

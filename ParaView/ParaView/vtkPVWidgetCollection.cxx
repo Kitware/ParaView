@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkPVWidgetCollection );
+vtkCxxRevisionMacro(vtkPVWidgetCollection, "1.2");
 
 vtkPVWidget *vtkPVWidgetCollection::GetNextPVWidget() 
 { 
@@ -76,4 +77,10 @@ void vtkPVWidgetCollection::RemoveItem(vtkPVWidget *a)
 int vtkPVWidgetCollection::IsItemPresent(vtkPVWidget *a) 
 {
   return this->vtkCollection::IsItemPresent(static_cast<vtkObject *>(a));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidgetCollection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

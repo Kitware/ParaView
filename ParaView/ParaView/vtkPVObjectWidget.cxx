@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.8");
+
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
 {
@@ -126,7 +128,7 @@ void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.7 $");
+  this->ExtractRevision(os,"$Revision: 1.8 $");
 }
 
 //----------------------------------------------------------------------------

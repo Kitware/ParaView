@@ -64,7 +64,7 @@ class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
 {
 public:
   static vtkPVArrayMenu* New();
-  vtkTypeMacro(vtkPVArrayMenu, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVArrayMenu, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -193,7 +193,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVArrayMenu* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 
@@ -234,9 +234,9 @@ protected:
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
   vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented

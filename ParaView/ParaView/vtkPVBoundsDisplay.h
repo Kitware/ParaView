@@ -58,7 +58,7 @@ class VTK_EXPORT vtkPVBoundsDisplay : public vtkPVWidget
 {
 public:
   static vtkPVBoundsDisplay* New();
-  vtkTypeMacro(vtkPVBoundsDisplay, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVBoundsDisplay, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -98,7 +98,7 @@ public:
   // parameters.
   vtkPVBoundsDisplay* 
     ClonePrototype(vtkPVSource* pvSource,
-		   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -119,7 +119,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
   vtkPVWidget* ClonePrototypeInternal(
     vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX

@@ -62,7 +62,7 @@ class VTK_EXPORT vtkPVPick : public vtkPVSource
 {
 public:
   static vtkPVPick* New();
-  vtkTypeMacro(vtkPVPick, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVPick, vtkPVSource);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:

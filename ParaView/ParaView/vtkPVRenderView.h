@@ -80,7 +80,7 @@ class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
 public:
   static vtkPVRenderView* New();
-  vtkTypeMacro(vtkPVRenderView,vtkKWView);
+  vtkTypeRevisionMacro(vtkPVRenderView,vtkKWView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

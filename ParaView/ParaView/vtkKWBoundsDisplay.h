@@ -57,7 +57,7 @@ class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWLabeledFrame
 {
 public:
   static vtkKWBoundsDisplay* New();
-  vtkTypeMacro(vtkKWBoundsDisplay, vtkKWLabeledFrame);
+  vtkTypeRevisionMacro(vtkKWBoundsDisplay, vtkKWLabeledFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

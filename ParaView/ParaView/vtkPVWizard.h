@@ -61,7 +61,7 @@ class VTK_EXPORT vtkPVWizard : public vtkKWWidget
 {
 public:
   static vtkPVWizard* New();
-  vtkTypeMacro(vtkPVWizard,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVWizard,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

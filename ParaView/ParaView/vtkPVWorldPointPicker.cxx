@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWorldPointPicker);
+vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVWorldPointPicker, Composite, vtkPVTreeComposite);
 

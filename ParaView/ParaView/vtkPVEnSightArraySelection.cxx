@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightArraySelection);
+vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.3");
 
 //-------------------------------------------------------------------------
 int vtkPVEnSightArraySelectionCommand(ClientData cd, Tcl_Interp *interp,

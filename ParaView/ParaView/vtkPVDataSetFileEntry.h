@@ -56,7 +56,8 @@ class VTK_EXPORT vtkPVDataSetFileEntry : public vtkPVFileEntry
 {
 public:
   static vtkPVDataSetFileEntry* New();
-  vtkTypeMacro(vtkPVDataSetFileEntry, vtkPVFileEntry);
+  vtkTypeRevisionMacro(vtkPVDataSetFileEntry, vtkPVFileEntry);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Called when accept button is pushed.  
@@ -71,8 +72,8 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVDataSetFileEntry* ClonePrototype(vtkPVSource* pvSource,
-					vtkArrayMap<vtkPVWidget*, 
-					vtkPVWidget*>* map);
+                                        vtkArrayMap<vtkPVWidget*, 
+                                        vtkPVWidget*>* map);
 //ETX
 
 protected:

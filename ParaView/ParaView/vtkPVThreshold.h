@@ -59,7 +59,7 @@ class VTK_EXPORT vtkPVThreshold : public vtkPVSource
 {
 public:
   static vtkPVThreshold* New();
-  vtkTypeMacro(vtkPVThreshold, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVThreshold, vtkPVSource);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:

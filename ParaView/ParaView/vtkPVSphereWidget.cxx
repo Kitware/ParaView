@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.13");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -87,7 +88,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
   if (this->SphereTclName)
     {
     this->GetPVApplication()->BroadcastScript("%s Delete", 
-					      this->SphereTclName);
+                                              this->SphereTclName);
     this->SetSphereTclName(NULL);
     }
   int i;
@@ -121,8 +122,8 @@ void vtkPVSphereWidget::CenterResetCallback()
     }
   input->GetBounds(bds);
   this->SetCenter(0.5*(bds[0]+bds[1]),
-		  0.5*(bds[2]+bds[3]),
-		  0.5*(bds[4]+bds[5]));
+                  0.5*(bds[2]+bds[3]),
+                  0.5*(bds[4]+bds[5]));
 
   this->SetCenter();
 }
@@ -138,9 +139,9 @@ void vtkPVSphereWidget::Reset()
   if ( this->SphereTclName )
     {
     this->Script("eval %s SetCenter [ %s GetCenter ]", 
-		 this->GetTclName(), this->SphereTclName);
+                 this->GetTclName(), this->SphereTclName);
     this->Script("eval %s SetRadius [ %s GetRadius ]", 
-		 this->GetTclName(), this->SphereTclName);
+                 this->GetTclName(), this->SphereTclName);
     }
   this->Superclass::Reset();
 }
@@ -165,13 +166,13 @@ void vtkPVSphereWidget::Accept()
       }
     float rad = atof(this->RadiusEntry->GetValue());
     pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
-			   val[0], val[1], val[2]);
+                           val[0], val[1], val[2]);
     this->AddTraceEntry("$kw(%s) SetCenter %f %f %f", 
-			this->GetTclName(), val[0], val[1], val[2]);
+                        this->GetTclName(), val[0], val[1], val[2]);
     pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
-			   rad);
+                           rad);
     this->AddTraceEntry("$kw(%s) SetRadius %f", 
-			this->GetTclName(), rad);
+                        this->GetTclName(), rad);
     }
   this->Superclass::Accept();
 }
@@ -199,7 +200,7 @@ void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 vtkPVSphereWidget* vtkPVSphereWidget::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVSphereWidget::SafeDownCast(clone);
@@ -243,57 +244,57 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->RadiusEntry->Create(pvApp, "");
 
   this->Script("grid propagate %s 1",
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-	       this->CoordinateLabel[0]->GetWidgetName(),
-	       this->CoordinateLabel[1]->GetWidgetName(),
-	       this->CoordinateLabel[2]->GetWidgetName());
+               this->CoordinateLabel[0]->GetWidgetName(),
+               this->CoordinateLabel[1]->GetWidgetName(),
+               this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-	       this->Labels[0]->GetWidgetName(),
-	       this->CenterEntry[0]->GetWidgetName(),
-	       this->CenterEntry[1]->GetWidgetName(),
-	       this->CenterEntry[2]->GetWidgetName());
+               this->Labels[0]->GetWidgetName(),
+               this->CenterEntry[0]->GetWidgetName(),
+               this->CenterEntry[1]->GetWidgetName(),
+               this->CenterEntry[2]->GetWidgetName());
   this->Script("grid %s %s - - -sticky ew",
-	       this->Labels[1]->GetWidgetName(),
-	       this->RadiusEntry->GetWidgetName());
+               this->Labels[1]->GetWidgetName(),
+               this->RadiusEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-		 this->CenterEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->CenterEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetCenter}",
-		 this->CenterEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->CenterEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetCenter}",
-		 this->CenterEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->CenterEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     }
   this->Script("bind %s <Key> {%s SetValueChanged}",
-	       this->RadiusEntry->GetWidgetName(),
-	       this->GetTclName());
+               this->RadiusEntry->GetWidgetName(),
+               this->GetTclName());
   this->Script("bind %s <FocusOut> {%s SetRadius}",
-	       this->RadiusEntry->GetWidgetName(),
-		 this->GetTclName());
+               this->RadiusEntry->GetWidgetName(),
+                 this->GetTclName());
   this->Script("bind %s <KeyPress-Return> {%s SetRadius}",
-	       this->RadiusEntry->GetWidgetName(),
-	       this->GetTclName());
+               this->RadiusEntry->GetWidgetName(),
+               this->GetTclName());
   this->CenterResetButton->SetParent(this->Frame->GetFrame());
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetLabel("Set Sphere Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
-	       this->CenterResetButton->GetWidgetName());
+               this->CenterResetButton->GetWidgetName());
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
     {

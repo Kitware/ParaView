@@ -109,6 +109,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVApplication);
+vtkCxxRevisionMacro(vtkPVApplication, "1.125");
+
+int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
+                            int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
@@ -243,12 +251,6 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   
   return interp;
 }
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVApplication);
-
-int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()

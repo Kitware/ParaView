@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -209,15 +210,15 @@ void vtkPVStringEntry::Reset()
 }
 
 vtkPVStringEntry* vtkPVStringEntry::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVStringEntry::SafeDownCast(clone);
 }
 
 void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone, 
-				      vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                      vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVStringEntry* pvse = vtkPVStringEntry::SafeDownCast(clone);
@@ -255,4 +256,10 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 const char* vtkPVStringEntry::GetValue() 
 {
   return this->Entry->GetValue();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -64,6 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.46");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -745,4 +746,10 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
   *file << "\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayCalculator::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

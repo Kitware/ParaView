@@ -52,14 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkPVXMLElement.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVScalarRangeLabel);
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.10");
+
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVScalarRangeLabel);
-
-//----------------------------------------------------------------------------
 int vtkPVScalarRangeLabelCommand(ClientData cd, Tcl_Interp *interp,
-			     int argc, char *argv[]);
+                             int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVScalarRangeLabel::vtkPVScalarRangeLabel()
@@ -200,8 +201,8 @@ vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::ClonePrototype(
 }
 
 void vtkPVScalarRangeLabel::CopyProperties(vtkPVWidget* clone, 
-					   vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                           vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVScalarRangeLabel* pvsrl = vtkPVScalarRangeLabel::SafeDownCast(clone);

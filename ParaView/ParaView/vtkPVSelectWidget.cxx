@@ -52,9 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.13");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
-		     int argc, char *argv[]);
+                     int argc, char *argv[]);
 
 
 //----------------------------------------------------------------------------
@@ -178,9 +179,9 @@ void vtkPVSelectWidget::Accept()
   if (this->GetCurrentVTKValue())
     {
     pvApp->BroadcastScript("%s Set%s {%s}",
-			   this->ObjectTclName,
-			   this->VariableName,
-			   this->GetCurrentVTKValue()); 
+                           this->ObjectTclName,
+                           this->VariableName,
+                           this->GetCurrentVTKValue()); 
     }
 
   if (this->CurrentIndex >= 0)
@@ -213,10 +214,10 @@ void vtkPVSelectWidget::Reset()
       {
       value = this->GetVTKValue(i);
       if (value && currentValue && strcmp(value, currentValue) == 0)
-	{
-	index = i;
-	break;
-	}
+        {
+        index = i;
+        break;
+        }
       }
     if ( index >= 0 )
       {
@@ -270,14 +271,14 @@ const char* vtkPVSelectWidget::GetVTKValue(int index)
     if (pvw)
       {
       if (res && res[0] != '\0')
-	{
-	this->Script("%s %s", pvw->GetTclName(), res);
-	return Tcl_GetStringResult(this->Application->GetMainInterp());
-	}
+        {
+        this->Script("%s %s", pvw->GetTclName(), res);
+        return Tcl_GetStringResult(this->Application->GetMainInterp());
+        }
       else
-	{
-	return 0;
-	}
+        {
+        return 0;
+        }
       }
     }
   else
@@ -430,14 +431,14 @@ void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
 }
 
 vtkPVSelectWidget* vtkPVSelectWidget::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVSelectWidget::SafeDownCast(clone);
 }
 
 vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
-				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if a clone of this widget has already been created
@@ -489,8 +490,8 @@ vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
 }
 
 void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone, 
-				       vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                       vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVSelectWidget* pvse = vtkPVSelectWidget::SafeDownCast(clone);

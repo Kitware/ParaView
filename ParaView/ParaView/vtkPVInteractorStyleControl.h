@@ -73,7 +73,7 @@ class VTK_EXPORT vtkPVInteractorStyleControl : public vtkKWWidget
 {  
 public:
   static vtkPVInteractorStyleControl* New();
-  vtkTypeMacro(vtkPVInteractorStyleControl,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVInteractorStyleControl,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -62,7 +62,7 @@ class vtkKWFrame;
 class VTK_EXPORT vtkPV3DWidget : public vtkPVObjectWidget
 {
 public:
-  vtkTypeMacro(vtkPV3DWidget, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPV3DWidget, vtkPVObjectWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 

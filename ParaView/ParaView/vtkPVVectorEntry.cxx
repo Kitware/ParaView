@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.26");
 
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()

@@ -134,7 +134,7 @@ class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
 public:
   static vtkPVWindow* New();
-  vtkTypeMacro(vtkPVWindow,vtkKWWindow);
+  vtkTypeRevisionMacro(vtkPVWindow,vtkKWWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

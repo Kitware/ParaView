@@ -57,7 +57,7 @@ class VTK_EXPORT vtkPVSourceList : public vtkPVSourcesNavigationWindow
 {
 public:
   static vtkPVSourceList* New();
-  vtkTypeMacro(vtkPVSourceList,vtkPVSourcesNavigationWindow);
+  vtkTypeRevisionMacro(vtkPVSourceList,vtkPVSourcesNavigationWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

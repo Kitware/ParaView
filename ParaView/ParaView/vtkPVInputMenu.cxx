@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()

@@ -55,16 +55,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.16");
 
+//------------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
 {
 }
 
+//------------------------------------------------------------------------------
 vtkPVNavigationWindow::~vtkPVNavigationWindow()
 {
 }
 
 
+//------------------------------------------------------------------------------
 void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
 {
   vtkPVSource *source;

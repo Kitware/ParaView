@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDummyWidget);
+vtkCxxRevisionMacro(vtkPVDummyWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVDummyWidget::vtkPVDummyWidget()

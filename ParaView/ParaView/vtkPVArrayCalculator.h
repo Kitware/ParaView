@@ -60,7 +60,8 @@ class VTK_EXPORT vtkPVArrayCalculator : public vtkPVSource
 {
 public:
   static vtkPVArrayCalculator* New();
-  vtkTypeMacro(vtkPVArrayCalculator, vtkPVSource);
+  vtkTypeRevisionMacro(vtkPVArrayCalculator, vtkPVSource);
+  void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source
