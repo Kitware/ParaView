@@ -29,7 +29,6 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
 class vtkCollection;
-class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVExtractPartsWidget : public vtkPVWidget
 {
@@ -61,24 +60,15 @@ public:
 
   //BTX
   // Description:
-  // Called when the Accept button is pressed.  It moves the widget values to the 
-  // VTK calculator filter.
-  virtual void AcceptInternal(vtkClientServerID);
+  // Called when the Accept button is pressed. It moves the widget state to
+  // the SM property.
+  virtual void Accept();
   //ETX
 
   // Description:
   // This method resets the widget values from the VTK filter.
   virtual void ResetInternal();
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -103,8 +93,6 @@ protected:
   // Called to inactivate widget (after accept is called).
   void Inactivate();
 
-  vtkPVScalarListWidgetProperty *Property;
-  
   vtkPVExtractPartsWidget(const vtkPVExtractPartsWidget&); // Not implemented
   void operator=(const vtkPVExtractPartsWidget&); // Not implemented
 };

@@ -475,6 +475,7 @@ The Extract Edges filter produces a wireframe version of the input data set by e
       </Input>
     </Filter>
     <ExtractPartsWidget trace_name="parts"
+                        property="InputMask"
                         help="Choose the parts to extract."/>
     <Documentation>
 The Extract Parts filter operates on any type of data, but its input reader/source/filter must have created multiple parts. The output type of this filter depends on the output type of the selected part(s). This filter is useful for operating on only a subset of the parts available from a reader, source, or filter.
