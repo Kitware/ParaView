@@ -40,7 +40,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.1");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.2");
 
 //===========================================================================
 //***************************************************************************
@@ -356,17 +356,17 @@ void vtkPV3DWidget::ExecuteEvent(vtkObject* obj, unsigned long event, void*calld
     {
     if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
       {
-      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
+//      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
       }
     else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
       {
-      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
+//      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
       }
     else
       {
       this->ModifiedCallback();
       }
-    this->Render();
+//    this->Render();
     }
   this->Superclass::ExecuteEvent(obj, event, calldata);
 }

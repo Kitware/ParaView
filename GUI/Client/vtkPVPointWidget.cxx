@@ -36,7 +36,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.1");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -330,7 +330,6 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     this->PositionEntry[0]->SetValue(pos[0]);
     this->PositionEntry[1]->SetValue(pos[1]);
     this->PositionEntry[2]->SetValue(pos[2]);
-    this->Render();
     }
  this->Superclass::ExecuteEvent(wdg, l, p);
 }

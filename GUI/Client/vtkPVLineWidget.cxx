@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.1");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -718,7 +718,6 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     res = this->GetResolutionInternal();
     this->ResolutionEntry->SetValue(res);
 
-    this->Render();
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }

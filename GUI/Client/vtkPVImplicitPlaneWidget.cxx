@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.52.2.1");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -733,7 +733,6 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
       this->NormalEntry[1]->SetValue(normal[1]);
       this->NormalEntry[2]->SetValue(normal[2]);
 
-      this->Render();
       this->ModifiedCallback();
       this->ValueChanged = 0;
       }

@@ -19,11 +19,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
-#include "vtkSMDisplayWindowProxy.h"
 #include "vtkClientServerID.h"
-
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.1");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.2");
 
 //===========================================================================
 //***************************************************************************
@@ -106,13 +106,22 @@ void vtkSMInteractorObserverProxy::SetEnabled(int e)
 void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent);
+  vtkPVGenericRenderWindowInteractor* iren;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  
   if ( event == vtkCommand::StartInteractionEvent )
     {
-    this->InvokeEvent(vtkCommand::StartInteractionEvent);
+    iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      pm->GetObjectFromID( 
+      this->CurrentRenderModuleProxy->GetInteractorProxy()->GetID(0)));
+    iren->InteractiveRenderEnabledOn();
     }
   else if ( event == vtkCommand::EndInteractionEvent )
     {
-    this->InvokeEvent(vtkCommand::EndInteractionEvent);
+    iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      pm->GetObjectFromID( 
+      this->CurrentRenderModuleProxy->GetInteractorProxy()->GetID(0)));
+    iren->InteractiveRenderEnabledOff();
     }
   else if ( event == vtkCommand::PlaceWidgetEvent )
     {
