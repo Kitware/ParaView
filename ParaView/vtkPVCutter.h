@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWCheckButton.h"
 #include "vtkPVSource.h"
 #include "vtkInteractorStylePlane.h"
 
@@ -86,6 +87,17 @@ public:
   vtkGetObjectMacro(NormalYEntry, vtkKWEntry);
   vtkGetObjectMacro(NormalZEntry, vtkKWEntry);
   
+  // Description:
+  // need to pack/unpack the plane interactor style button depending on
+  // whether we are selecting or deselecting this source
+  virtual void Select(vtkKWView *view);
+  virtual void Deselect(vtkKWView *view);
+  
+  // Description:
+  // Callback for checkbutton to determine whether to display the crosshair
+  // that shows where the plane is
+  void CrosshairDisplay();
+  
 protected:
   vtkPVCutter();
   ~vtkPVCutter();
@@ -109,11 +121,15 @@ protected:
   vtkKWEntry *NormalXEntry;
   vtkKWEntry *NormalYEntry;
   vtkKWEntry *NormalZEntry;
+  vtkKWCheckButton *ShowCrosshairButton;
 
   vtkKWPushButton *PlaneStyleButton;
   
   vtkCutter  *Cutter;
   vtkInteractorStylePlane *PlaneStyle;
+
+  int PlaneStyleCreated;
+  int PlaneStyleUsed;
 };
 
 #endif

@@ -106,8 +106,11 @@ public:
   // Description:
   // The CallbackMethod
   void DefaultCallback(char *type);
-
-  vtkGetObjectMacro(Test, vtkPolyData);
+  
+  // Description:
+  // Show / hide the crosshair actor
+  void ShowCrosshair();
+  void HideCrosshair();
   
 protected:
   vtkInteractorStylePlane();
@@ -115,10 +118,6 @@ protected:
   vtkInteractorStylePlane(const vtkInteractorStylePlane&) {};
   void operator=(const vtkInteractorStylePlane&) {};
 
-//  vtkSphereSource    *SphereSource;
-//  vtkPolyDataMapper  *SphereMapper;
-//  vtkActor           *SphereActor;
-  
   vtkCursor3D        *CrossHair;
   vtkPolyDataMapper  *CrossHairMapper;
   vtkActor           *CrossHairActor;
@@ -147,8 +146,6 @@ protected:
   void RotateXY(int dx, int dy);
 
   void HandleIndicator(int x, int y);
-
-  vtkPolyData *Test;
 };
 
 #endif

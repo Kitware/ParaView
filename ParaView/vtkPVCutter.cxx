@@ -63,10 +63,13 @@ vtkPVCutter::vtkPVCutter()
   this->NormalXEntry = vtkKWEntry::New();
   this->NormalYEntry = vtkKWEntry::New();
   this->NormalZEntry = vtkKWEntry::New();
+  this->ShowCrosshairButton = vtkKWCheckButton::New();
+  this->ShowCrosshairButton->SetParent(this->Properties);
 
-  this->PlaneStyleButton = vtkKWPushButton::New();
-  
+  this->PlaneStyleButton = vtkKWPushButton::New();  
   this->PlaneStyle = vtkInteractorStylePlane::New();
+  this->PlaneStyleCreated = 0;
+  this->PlaneStyleUsed = 0;
   
   this->Cutter = vtkCutter::New();  
 }
@@ -108,6 +111,8 @@ vtkPVCutter::~vtkPVCutter()
   this->OriginFrame = NULL;
   this->NormalFrame->Delete();
   this->NormalFrame = NULL;
+  this->ShowCrosshairButton->Delete();
+  this->ShowCrosshairButton = NULL;
   
   this->PlaneStyleButton->Delete();
   this->PlaneStyleButton = NULL;
@@ -202,18 +207,21 @@ void vtkPVCutter::CreateProperties()
 	       this->NormalZLabel->GetWidgetName(),
 	       this->NormalZEntry->GetWidgetName());
   
-  this->PlaneStyleButton->SetParent(this->GetWindow()->GetToolbar());
-  this->PlaneStyleButton->Create(this->Application, "");
-  this->PlaneStyleButton->SetLabel("Plane");
-  this->PlaneStyleButton->SetCommand(this, "UsePlaneStyle");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-	       this->PlaneStyleButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCutter::UsePlaneStyle()
 {
   this->GetWindow()->GetMainView()->SetInteractorStyle(this->PlaneStyle);
+  if (!this->PlaneStyleUsed)
+    {
+    this->PlaneStyleUsed = 1;
+    this->ShowCrosshairButton->Create(this->Application,
+				      "-text ShowCrosshair");
+    this->ShowCrosshairButton->SetState(0);
+    this->ShowCrosshairButton->SetCommand(this, "CrosshairDisplay");
+    this->Script("pack %s", this->ShowCrosshairButton->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -280,6 +288,8 @@ void PlaneCallback(void *arg)
 {
   vtkPVCutter *me = (vtkPVCutter*)arg;
   float orig[3], norm[3];
+  vtkPVApplication *pvApp = me->GetPVApplication();
+  
   me->GetPlaneStyle()->GetPlane()->GetOrigin(orig);
   me->GetPlaneStyle()->GetPlane()->GetNormal(norm);
   
@@ -289,6 +299,15 @@ void PlaneCallback(void *arg)
   me->GetNormalXEntry()->SetValue(norm[0], 4);
   me->GetNormalYEntry()->SetValue(norm[1], 4);
   me->GetNormalZEntry()->SetValue(norm[2], 4);
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetCutPlane %f %f %f %f %f %f",
+			   me->GetTclName(), orig[0], orig[1], orig[2],
+			   norm[0], norm[1], norm[2]);
+    }
+  // We don't have to call SetCutPlane in process 0 because it already has the
+  // updated plane.
 }
 
 //----------------------------------------------------------------------------
@@ -322,9 +341,20 @@ void vtkPVCutter::CutterChanged()
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
-//    this->GetPlaneStyle()->GetCrossHair()->SetModelBounds(this->GetInput()->GetData()->GetBounds());
     }
   window->GetMainView()->SetSelectedComposite(this);
+  
+  if (!this->PlaneStyleCreated)
+    {
+    this->PlaneStyleCreated = 1;
+    this->PlaneStyleButton->SetParent(this->GetWindow()->GetToolbar());
+    this->PlaneStyleButton->Create(this->Application, "");
+    this->PlaneStyleButton->SetLabel("Plane");
+    this->PlaneStyleButton->SetCommand(this, "UsePlaneStyle");
+    this->Script("pack %s -side left -pady 0 -fill none -expand no",
+		 this->PlaneStyleButton->GetWidgetName());    
+    }
+  
   this->GetView()->Render();
 }
 
@@ -355,4 +385,36 @@ void vtkPVCutter::GetSource()
   this->GetInput()->GetActorComposite()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::Select(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Select(view);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::Deselect(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Deselect(view);
+  
+  // unpack plane style button and reset interactor style to trackball camera
+  this->Script("pack forget %s", this->PlaneStyleButton->GetWidgetName());
+  this->GetWindow()->UseCameraStyle();
+  this->GetPlaneStyle()->HideCrosshair();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::CrosshairDisplay()
+{
+  if (this->ShowCrosshairButton->GetState())
+    {
+    this->GetPlaneStyle()->ShowCrosshair();
+    }
+  else
+    {
+    this->GetPlaneStyle()->HideCrosshair();
+    }
 }

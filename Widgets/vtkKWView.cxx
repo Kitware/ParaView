@@ -41,7 +41,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkRenderWindow.h"
+
+#ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
+#endif
 
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1059,7 +1062,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.30 $");
+  this->ExtractRevision(os,"$Revision: 1.31 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

@@ -60,7 +60,6 @@ vtkInteractorStylePlane *vtkInteractorStylePlane::New()
   return new vtkInteractorStylePlane;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlaneCallback(void *arg)
 {
@@ -68,8 +67,6 @@ void vtkInteractorStylePlaneCallback(void *arg)
 
   self->DefaultCallback(self->GetCallbackType());
 }
-
-
 
 //----------------------------------------------------------------------------
 vtkInteractorStylePlane::vtkInteractorStylePlane() 
@@ -196,7 +193,6 @@ void vtkInteractorStylePlane::OnMouseMove(int vtkNotUsed(ctrl),
   this->LastPos[1] = y;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::RotateXY(int dx, int dy)
 {
@@ -242,7 +238,6 @@ void vtkInteractorStylePlane::RotateXY(int dx, int dy)
     }  
 }
 
-
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::TranslateXY(int dx, int dy)
 {
@@ -275,8 +270,6 @@ void vtkInteractorStylePlane::TranslateXY(int dx, int dy)
     (*this->CallbackMethod)(this->CallbackMethodArg);
     }  
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::TranslateZ(int vtkNotUsed(dx), int dy)
@@ -316,29 +309,20 @@ void vtkInteractorStylePlane::TranslateZ(int vtkNotUsed(dx), int dy)
     }  
 }
 
-
 //----------------------------------------------------------------------------
 // This method handles display of active parameters.
 // When the mouse is passively being moved over objects, this will
 // highlight an object to indicate that it can be manipulated with the mouse.
 void vtkInteractorStylePlane::HandleIndicator(int x, int y) 
 {
-  int *size;
-  float display[3], point[4];
-  float crossHairCx, crossHairCy, crossHairCz;
-  float temp, centerDistDisplay, rad;
-  int renderFlag = 0;
-
   this->FindPokedRenderer(x, y);
-  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
-      {
-      this->CurrentRenderer->AddActor(this->CrossHairActor);
-      }
+//  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
+//      {
+//      this->CurrentRenderer->AddActor(this->CrossHairActor);
+//      }
   
   return;
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::OnLeftButtonDown(int ctrl, int shift, 
@@ -388,6 +372,7 @@ void vtkInteractorStylePlane::OnMiddleButtonDown(int ctrl, int shift,
 
   this->Button = 1;
 }
+
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::OnMiddleButtonUp(int ctrl, int shift, 
 					       int x, int y) 
@@ -442,14 +427,22 @@ void vtkInteractorStylePlane::PrintSelf(ostream& os, vtkIndent indent)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkInteractorStylePlane::ShowCrosshair()
+{
+  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
+      {
+      this->CurrentRenderer->AddActor(this->CrossHairActor);
+      }
+  this->CurrentRenderer->Render();
+}
 
-
-
-
-
-
-
-
-
-
-
+//----------------------------------------------------------------------------
+void vtkInteractorStylePlane::HideCrosshair()
+{
+  if (this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
+      {
+      this->CurrentRenderer->RemoveActor(this->CrossHairActor);
+      }
+  this->CurrentRenderer->Render();
+}
