@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRenderWidget.h"
 
 #include "vtkCamera.h"
+#include "vtkCommand.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEventMap.h"
@@ -57,7 +58,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.20");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.21");
+
+//----------------------------------------------------------------------------
+class vtkKWRenderWidgetObserver : public vtkCommand
+{
+public:
+  static vtkKWRenderWidgetObserver *New() 
+    {return new vtkKWRenderWidgetObserver;};
+
+  vtkKWRenderWidgetObserver()
+    {
+      this->KWRenderWidget = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->KWRenderWidget )
+        {
+        this->KWRenderWidget->ExecuteEvent(wdg, event, calldata);
+        this->AbortFlagOn();
+        }
+    }
+
+  vtkKWRenderWidget* KWRenderWidget;
+};
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -95,6 +121,12 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->ScalarScale = 1;  
 
   this->CollapsingRenders = 0;
+  
+  this->Observer = vtkKWRenderWidgetObserver::New();
+  this->Observer->KWRenderWidget = this;
+  
+  this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent,
+                                  this->Observer);
 }
 
 //----------------------------------------------------------------------------
@@ -117,6 +149,9 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     }
   
   this->SetUnits(NULL);
+  
+  this->Observer->Delete();
+  this->Observer = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -221,9 +256,10 @@ void vtkKWRenderWidget::SetupBindings()
   this->Script("bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0}", 
                wname, tname);
   
+  this->Script("bind %s <Motion> {%s MouseMove %%b %%x %%y}", wname, tname);
+
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
                this->GetWidgetName(), tname);
-//               wname, tname);
   
   this->Script("bind %s <Enter> {%s Enter %%x %%y}",
                wname, tname);
@@ -570,6 +606,65 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
       this->Render();
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ExecuteEvent(vtkObject*, unsigned long event,
+                                       void *par)
+{
+  if ( event == vtkCommand::CursorChangedEvent )
+    {
+    int val = *(static_cast<int*>(par));
+    const char* image = "left_ptr";
+    switch ( val ) 
+      {
+      case VTK_CURSOR_ARROW:
+        image = "arrow";
+        break;
+      case VTK_CURSOR_SIZENE:
+#ifdef _WIN32
+        image = "size_ne_sw";
+#else
+        image = "top_right_corner";
+#endif
+        break;
+      case VTK_CURSOR_SIZENW:
+#ifdef _WIN32
+        image = "size_nw_se";
+#else
+        image = "top_left_corner";
+#endif
+        break;
+      case VTK_CURSOR_SIZESW:
+#ifdef _WIN32
+        image = "size_ne_sw";
+#else
+        image = "bottom_left_corner";
+#endif
+        break;
+      case VTK_CURSOR_SIZESE:
+#ifdef _WIN32
+        image = "size_nw_se";
+#else
+        image = "bottom_right_corner";
+#endif
+        break;
+      case VTK_CURSOR_SIZENS:
+        image = "sb_v_double_arrow";
+        break;
+      case VTK_CURSOR_SIZEWE:
+        image = "sb_h_double_arrow";
+        break;
+      case VTK_CURSOR_SIZEALL:
+        image = "fleur";
+        break;
+      case VTK_CURSOR_HAND:
+        image = "hand2";
+        break;
+      }
+    this->Script("%s config -cursor %s", 
+                 this->GetParentWindow()->GetWidgetName(), image);
+    } 
 }
 
 //----------------------------------------------------------------------------

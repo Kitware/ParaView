@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkCamera;
 class vtkKWEventMap;
 class vtkKWGenericRenderWindowInteractor;
+class vtkKWRenderWidgetObserver;
 class vtkKWWindow;
 class vtkCornerAnnotation;
 class vtkProp;
@@ -199,6 +200,8 @@ public:
   virtual void ResumeScreenRendering();
   virtual void* GetMemoryDC();
   
+  virtual void ExecuteEvent(vtkObject *wdg, unsigned long event, void *calldata);
+
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -229,6 +232,8 @@ protected:
 
   int CollapsingRenders;
   int CollapsingRendersCount;
+
+  vtkKWRenderWidgetObserver *Observer;
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
