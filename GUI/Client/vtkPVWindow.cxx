@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.545");
+vtkCxxRevisionMacro(vtkPVWindow, "1.546");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4435,11 +4435,12 @@ void vtkPVWindow::UpdateMenuState()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SetProgress(const char* text, int val)
 {
+  double lastprog = vtkTimerLog::GetCurrentTime();
   if ( !this->ExpectProgress )
     {
+    this->LastProgress = lastprog;
     return;
     }
-  double lastprog = vtkTimerLog::GetCurrentTime();
   if ( lastprog - this->LastProgress < .5 )
     {
     return;
@@ -4469,6 +4470,7 @@ void vtkPVWindow::EndProgress(int enabled)
   this->ExpectProgress = 0;
   this->GetProgressGauge()->SetValue(100);
   this->GetProgressGauge()->SetValue(0);
+  this->LastProgress = vtkTimerLog::GetCurrentTime();
   this->SetStatusText("");
 
   this->MainView->EndBlockingRender();
