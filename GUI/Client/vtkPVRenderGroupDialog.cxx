@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.5");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -122,7 +122,7 @@ void vtkPVRenderGroupDialog::SetMasterWindow(vtkKWWindow* win)
     if (this->MasterWindow) 
       { 
       this->MasterWindow->Register(this); 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -136,17 +136,16 @@ void vtkPVRenderGroupDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  int idx;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Interactor already created");
     return;
     }
   
   this->SetApplication(app);
+  
+  const char *wname;
+  int idx;
   
   // create the top level
   wname = this->GetWidgetName();
@@ -345,9 +344,9 @@ void vtkPVRenderGroupDialog::SetNumberOfProcessesInGroup(int num)
       {
       tmp[idx] = vtkKWEntry::New();
       tmp[idx]->SetParent(this->DisplayFrame);
-      if (this->Application)
+      if (this->IsCreated())
         {
-        tmp[idx]->Create(this->Application, "");
+        tmp[idx]->Create(this->GetApplication(), "");
         }
       }
       if (this->DisplayEntries)
@@ -478,7 +477,7 @@ const char* vtkPVRenderGroupDialog::GetDisplayString(int idx)
 //----------------------------------------------------------------------------
 void vtkPVRenderGroupDialog::Update()
 {
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return;
     }
