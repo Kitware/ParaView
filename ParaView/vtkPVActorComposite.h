@@ -173,13 +173,6 @@ public:
   // Callback for the ResetColorRange button.
   void ResetColorRange();
   
-  // Description:
-  // Turn tree compositing on/off.
-  void SetComposite(int val);
-  vtkGetMacro(Composite, int)
-  vtkBooleanMacro(Composite, int);
-  void CompositeCheckCallback();
-
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
   void ScalarBarOrientationCallback();
@@ -187,10 +180,6 @@ public:
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
   
-  // Description:
-  // Temporary intoerface for seting the compositing reduction.
-  void ReductionCallback();
-
   // Description:
   // Save out the mapper and actor to a file.
   void Save(ofstream *file, const char *sourceName);
@@ -240,8 +229,6 @@ protected:
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWOptionMenu *InterpolationMenu;
 
-  vtkKWCheckButton *CompositeCheck;
-
   vtkKWCheckButton *VisibilityCheck;
   
   // I merged the PVData object and the PVActorComposite.  
@@ -251,9 +238,6 @@ protected:
   
   //vtkPVImageTextureFilter *TextureFilter;
   
-  // An experiment with compositing.
-  int Composite;
-
   // How to convert data set to polydata.
   int Mode;
   // Super class stores a vtkPolyDataInput, this is a more general input.
@@ -289,8 +273,6 @@ protected:
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
   
-  vtkKWEntry *ReductionEntry;
-
   vtkKWCheckButton *ScalarBarCheck;
   vtkScalarBarActor *ScalarBar;
   vtkKWCheckButton *ScalarBarOrientationCheck;

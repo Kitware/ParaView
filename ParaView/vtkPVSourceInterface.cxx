@@ -36,7 +36,12 @@ int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVSourceInterface::vtkPVSourceInterface()
 {
+  static int instanceCount = 0;
+  
   this->InstanceCount = 1;
+  ++instanceCount;
+  this->ExtentTranslatorInstanceCount = instanceCount;
+  
   this->SourceClassName = NULL;
   this->RootName = NULL;
   this->InputClassName = NULL;
@@ -150,7 +155,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 //      strcmp(this->SourceClassName, "vtkImageReader") == 0)
   if (!this->InputClassName)
     {
-    sprintf(extentTclName, "Translator%d", this->InstanceCount);
+    sprintf(extentTclName, "Translator%d",
+	    this->ExtentTranslatorInstanceCount);
     pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
 			   extentTclName, pvs->GetVTKSourceTclName());

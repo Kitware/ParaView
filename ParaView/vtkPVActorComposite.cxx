@@ -103,11 +103,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWOptionMenu::New();
   
-  this->CompositeCheck = vtkKWCheckButton::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
-  this->ReductionEntry = vtkKWEntry::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
   
@@ -115,8 +113,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
-  this->Composite = 1;
-
   //this->TextureFilter = NULL;
   
   this->ActorTclName = NULL;
@@ -293,9 +289,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
     this->SetAppendPolyDataTclName(NULL);
     }
   
-  this->CompositeCheck->Delete();
-  this->CompositeCheck = NULL;
-  
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;
   
@@ -304,9 +297,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
-  
-  this->ReductionEntry->Delete();
-  this->ReductionEntry = NULL;
   
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
@@ -427,13 +417,6 @@ void vtkPVActorComposite::CreateProperties()
 					       "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
   
-  this->CompositeCheck->SetParent(this->Properties);
-  this->CompositeCheck->Create(this->Application, "-text Composite");
-  this->CompositeCheck->SetState(1);
-  this->Application->Script("%s configure -command {%s CompositeCheckCallback}",
-                            this->CompositeCheck->GetWidgetName(),
-                            this->GetTclName());
-
   this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
   this->Application->Script("%s configure -command {%s ScalarBarCheckCallback}",
@@ -449,13 +432,6 @@ void vtkPVActorComposite::CreateProperties()
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
   
-  this->ReductionEntry->SetParent(this->Properties);
-  this->ReductionEntry->Create(this->Application, "-text CompositeReduction");
-  this->ReductionEntry->SetValue(1);
-  this->Application->Script("bind %s <KeyPress-Return> {%s ReductionCallback}",
-                            this->ReductionEntry->GetWidgetName(),
-                            this->GetTclName());
-
   this->VisibilityCheck->SetParent(this->Properties);
   this->VisibilityCheck->Create(this->Application, "-text Visibility");
   this->Application->Script("%s configure -command {%s VisibilityCheckCallback}",
@@ -493,11 +469,7 @@ void vtkPVActorComposite::CreateProperties()
                this->InterpolationMenuLabel->GetWidgetName(),
                this->InterpolationMenu->GetWidgetName());
   this->Script("pack %s",
-               this->CompositeCheck->GetWidgetName());
-  this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
-  this->Script("pack %s",
-               this->ReductionEntry->GetWidgetName());
   this->Script("pack %s",
                this->VisibilityCheck->GetWidgetName());
 }
@@ -1189,100 +1161,6 @@ void vtkPVActorComposite::SetMode(int mode)
   
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::CompositeCheckCallback()
-{
-  this->SetComposite(this->CompositeCheck->GetState());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::SetComposite(int val)
-{
-  int i, numProcs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char outPortName[256];
-  char inPortName[256];
-  char appendName[256];
-  
-  if (val > 1)
-    {
-    val = 1;
-    }
-  if (val < 0)
-    {
-    val = 0;
-    }
-  if (val == this->Composite)
-    {
-    return;
-    }
-  
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("No application set.");
-    }
-
-  if (val)
-    {
-    this->SetMode(this->Mode);
-    numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    this->Script("%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
-    this->Script("%s SetPiece 0", this->MapperTclName);
-    }
-  else
-    {
-    sprintf(outPortName, "outputPort%d", this->InstanceCount);
-    pvApp->MakeTclObject("vtkOutputPort", outPortName);
-    this->SetOutputPortTclName(outPortName);
-    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-			   this->OutputPortTclName,
-			   this->MapperTclName);
-    pvApp->BroadcastScript("%s SetTag 1234", this->OutputPortTclName);
-    sprintf(appendName, "appendPD%d", this->InstanceCount);
-    this->SetAppendPolyDataTclName(appendName);
-    this->Script("vtkAppendPolyData %s", this->AppendPolyDataTclName);
-    this->Script("%s ParallelStreamingOn", this->AppendPolyDataTclName);
-    numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    for (i = 1; i < numProcs; i++)
-      {
-      sprintf(inPortName, "inputPort%d", i);
-      this->Script("vtkInputPort %s", inPortName);
-      this->Script("%s SetRemoteProcessId %d", inPortName, i);
-      this->Script("%s SetTag %d", inPortName, 1234);
-      this->Script("%s AddInput [%s GetPolyDataOutput]",
-		   this->AppendPolyDataTclName,
-		   inPortName);
-      this->Script("%s Delete", inPortName);
-      }
-    this->Script("%s SetInput [%s GetOutput]",
-		 this->MapperTclName,
-		 this->AppendPolyDataTclName);
-    this->Script("%s SetNumberOfPieces 1", this->MapperTclName);
-    this->Script("%s SetPiece 0", this->MapperTclName);
-    this->Script("%s SetNumberOfPieces 1", this->LODMapperTclName);
-    this->Script("%s SetPiece 0", this->LODMapperTclName);
-    }
-  
-  ((vtkPVRenderView*)this->GetPVRenderView())->GetComposite()->SetUseCompositing(val);
-
-  this->Composite = val;
-}
-
-#include "vtkPVWindow.h"
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ReductionCallback()
-{
-  int factor;
-  
-  
-  factor = this->ReductionEntry->GetValueAsInt();
-
-  vtkDebugMacro( << "Setting reduction factor to " << factor);
-  this->PVData->GetPVSource()->GetWindow()->GetMainView()->GetComposite()->SetReductionFactor(factor);
-}
-
-  
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetScalarBarVisibility(int val)
 {
