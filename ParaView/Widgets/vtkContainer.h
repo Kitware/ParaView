@@ -21,7 +21,7 @@
 
 #include "vtkObject.h"
 
-class VTK_COMMON_EXPORT vtkContainer
+class VTK_EXPORT vtkContainer
 {
 public:
   // Description:
