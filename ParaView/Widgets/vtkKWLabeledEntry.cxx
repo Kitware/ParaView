@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledEntry);
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.15");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.16");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -121,48 +121,6 @@ void vtkKWLabeledEntry::Pack()
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLabeledEntry::SetValue(const char *value)
-{
-  this->Entry->SetValue(value);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLabeledEntry::SetValue(int a)
-{
-  this->Entry->SetValue(a);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLabeledEntry::SetValue(float a)
-{
-  this->Entry->SetValue(a);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLabeledEntry::SetValue(float f,int size)
-{
-  this->Entry->SetValue(f, size);
-}
-
-//----------------------------------------------------------------------------
-char *vtkKWLabeledEntry::GetValue()
-{
-  return this->Entry->GetValue();
-}
-
-//----------------------------------------------------------------------------
-int vtkKWLabeledEntry::GetValueAsInt()
-{
-  return this->Entry->GetValueAsInt();
-}
-
-//----------------------------------------------------------------------------
-float vtkKWLabeledEntry::GetValueAsFloat()
-{
-  return this->Entry->GetValueAsFloat();
 }
 
 //----------------------------------------------------------------------------
