@@ -137,6 +137,10 @@ public:
   // creation of the panel to be delayed until it is really needed.
   virtual void Show();
 
+  // Description:
+  // Refresh the interface.
+  virtual void Update() {};
+
 protected:
   vtkKWUserInterfacePanel();
   ~vtkKWUserInterfacePanel();
