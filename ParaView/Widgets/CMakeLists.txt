@@ -8,6 +8,7 @@ vtkKWApplicationSettingsInterface.cxx
 vtkKWBWidgets.cxx
 vtkKWChangeColorButton.cxx 
 vtkKWCheckButton.cxx 
+vtkKWCheckButtonSet.cxx 
 vtkKWComposite.cxx 
 vtkKWCompositeCollection.cxx 
 vtkKWCornerAnnotation.cxx 
@@ -19,6 +20,7 @@ vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
 vtkKWImageLabel.cxx
 vtkKWLabel.cxx
+vtkKWLabeledCheckButtonSet.cxx 
 vtkKWLabeledEntry.cxx 
 vtkKWLabeledFrame.cxx 
 vtkKWLabeledLabel.cxx 
