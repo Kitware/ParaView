@@ -39,6 +39,10 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVGroupButton.h PVGroupButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVUngroupButton.h PVUngroupButton.png %OPTIONS%
 
+%CONVERTIMAGE% vtkPVAMRPartButton.h PVAMRPartButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVAMROutlineButton.h PVAMROutlineButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVAMRSurfaceButton.h PVAMRSurfaceButton.png %OPTIONS%
+
 %CONVERTIMAGE% vtkPVLockButton.h PVUnlockedButton.png PVLockedButton.png %OPTIONS%
 
 

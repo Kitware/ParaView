@@ -1,5 +1,105 @@
 <ModuleInterfaces>
 
+  <Module name="TexturePlane"
+          menu_name="TexturePlane"
+          root_name="TexturePlane"
+          module_type="Filter"
+          long_help="Create texture coordinates."
+          short_help="Create texture coordinates.">
+    <Filter class="vtkTextureMapToPlane">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+
+    <VectorEntry label="Origin"
+                 trace_name="Origin"
+                 property="Origin"
+                 type="float" length="3"
+                 help="Origin of plane." />
+    <VectorEntry label="Point1"
+                 trace_name="Point1"
+                 property="Point1"
+                 type="float" length="3"
+                 help="First corner of plane" />
+    <VectorEntry label="Point2"
+                 trace_name="Point2"
+                 property="Point2"
+                 type="float" length="3"
+                 help="Second corner of plane" />
+    <VectorEntry label="Normal"
+                 trace_name="Normal"
+                 property="Normal"
+                 type="float" length="3"
+                 help="Alternative way to specify a plane." />
+    <VectorEntry label="T range"
+                 trace_name="TRange"
+                 property="TRange"
+                 type="float" length="2"
+                 help="Range of t coordinate" />
+    <VectorEntry label="S range"
+                 trace_name="SRange"
+                 property="SRange"
+                 type="float" length="2"
+                 help="Range of s coordinate" />
+    <LabeledToggle label="AutomaticPlaneGeneration"
+                   property="AutomaticPlaneGeneration"
+                   trace_name="AutomaticPlaneGeneration"
+                   help="Alternative algorithm" />
+    <Documentation>
+Create texture coordinates.
+    </Documentation>
+  </Module>
+
+  <Module name="ProjectedTexture"
+          menu_name="ProjectedTexture"
+          root_name="PTexture"
+          module_type="Filter"
+          long_help="Create texture coordinates."
+          short_help="Create texture coordinates.">
+    <Filter class="vtkProjectedTexture">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <LineWidget trace_name="Line"
+                point1_variable="Position"
+                point2_variable="FocalPoint"
+                point1_label="Position"
+                point2_label="FocalPoint"
+                use_label="1"
+                show_resolution="0"
+                help="Set the minimum and maximum point for elevation"/>
+    <VectorEntry label="Up"
+                 trace_name="Up"
+                 property="Up"
+                 type="float" length="3"
+                 help="Up vector" />
+    <VectorEntry label="AspectRatio"
+                 trace_name="AspectRatio"
+                 property="AspectRatio"
+                 type="float" length="3"
+                 help="Z is distance from projection" />
+    <VectorEntry label="T range"
+                 trace_name="TRange"
+                 property="TRange"
+                 type="float" length="2"
+                 help="Range of t coordinate" />
+    <VectorEntry label="S range"
+                 trace_name="SRange"
+                 property="SRange"
+                 type="float" length="2"
+                 help="Range of s coordinate" />
+    <Documentation>
+Create texture coordinates.
+    </Documentation>
+  </Module>
+
+
   <Module name="ImageShrink"
           menu_name="ImageShrink"
           root_name="ImageShrink"
@@ -33,8 +133,7 @@ No documentation now.
           module_type="Filter"
           long_help="This filter constrains vectors to lie on a surface."
           short_help="This filter constrains vectors o lie on a surface.">
-    <Filter class="vtkSurfaceVectors">
-      <Input name="Input"
+    <Filter class="vtkSurfaceVectors">      <Input name="Input"
              class="vtkDataSet">
         <ArrayRequirement attribute="Point" components="3"/>
       </Input>
@@ -114,51 +213,26 @@ Integrates point and cell data over lines and surfaces.  It also computes length
 The flow integration fitler  integrates the dot product of a point flow vector field and surface normal.  It computes the net flow across the 2D surface..
     </Documentation>
   </Module>  
+
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
-  <Module name="ProjectedTexture"
-          menu_name="ProjectedTexture"
-          root_name="PTexture"
+  <Module name="CTHAMRBlockIdScalars"
+          root_name="CTHAMRBlockIdScalars"
+          menu_name="CTH AMR BlockId"
           module_type="Filter"
-          long_help="Create texture coordinates."
-          short_help="Create texture coordinates.">
-    <Filter class="vtkProjectedTexture">
+          replace_input="0"
+          long_help="Create a cell attribute array that contains the block Id."
+          short_help="Create a block id scalar array.">
+    <Filter class="vtkCTHAMRBlockIdScalars">
       <Input name="Input"
-             class="vtkDataSet"/>
+             class="vtkCTHData" />
     </Filter>
-    <InputMenu trace_name="Input" label="Input" property="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <LineWidget trace_name="Line"
-                point1_variable="Position"
-                point2_variable="FocalPoint"
-                point1_label="Position"
-                point2_label="FocalPoint"
-                use_label="1"
-                show_resolution="0"
-                help="Set the minimum and maximum point for elevation"/>
-    <VectorEntry label="Up"
-                 trace_name="Up"
-                 property="Up"
-                 type="float" length="3"
-                 help="Up vector" />
-    <VectorEntry label="AspectRatio"
-                 trace_name="AspectRatio"
-                 property="AspectRatio"
-                 type="float" length="3"
-                 help="Z is distance from projection" />
-    <VectorEntry label="T range"
-                 trace_name="TRange"
-                 property="TRange"
-                 type="float" length="2"
-                 help="Range of t coordinate" />
-    <VectorEntry label="S range"
-                 trace_name="SRange"
-                 property="SRange"
-                 type="float" length="2"
-                 help="Range of s coordinate" />
-    <Documentation>
-Create texture coordinates.
-    </Documentation>
+
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               input_name="Input"
+               property="Input"
+               help="Set the input to this filter." />
   </Module>
 
   <Module name="CTHAMRCellToPointData"
@@ -240,6 +314,9 @@ Create texture coordinates.
   <Module name="CTHAMROutline"
           menu_name="CTH AMR Outline"
           root_name="CTHAMROutline"
+          button_image="PVAMROutlineButton"
+          button_help="Show outlines of all AMR blocks."
+          button_visibility="0"
           module_type="Filter">
     <Filter class="vtkCTHOutlineFilter">
       <Input name="Input"
@@ -253,6 +330,9 @@ Create texture coordinates.
   <Module name="CTHAMRSurface"
           root_name="CTHAMRSurface"
           menu_name="CTH AMR Surface"
+          button_image="PVAMRSurfaceButton"
+          button_help="Extract the outer surface from an AMR dataset."
+          button_visibility="0"
           module_type="Filter"
           replace_input="1"
           long_help="Show the outer surface of the AMR data set."
@@ -776,10 +856,13 @@ The line can be specified interactively using the 3D line widget. See section 7.
   <Module name="CTHAMRPart"
           menu_name="CTH AMR Extract Parts"
           root_name="CTHAMRPart"
+          button_image="PVAMRPartButton"
+          button_help="Extract a surface from AMR volume fractions."
+          button_visibility="0"
           module_type="Filter"
           long_help="Create a surface from a CTH AMR volume fraction."
           short_help="Extract a part from a CTH AMR dataset.">
-    <Filter class="vtkCTHExtractAMRPart">
+    <Filter class="vtkCTHAMRExtractPart">
       <Input name="Input"
              class="vtkCTHData">
         <ArrayRequirement attribute="Cell" components="1"/>
@@ -1421,6 +1504,24 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
                    help="Select whether to use random colors for the various pieces"/>
     <Documentation>
 The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. It is useful for determining whether your data is load-balanced across the processors being used. The output data set type is the same as that of the input.
+    </Documentation>
+  </Module>
+  <Module name="CellIdAttribute"
+          menu_name="Cell Id Scalars"
+          root_name="CellId"
+          module_type="Filter"
+          long_help="This filter uses colors to show the cell id."
+          short_help="Generate cell scalars from cell id.">
+    <Filter class="vtkCellIdAttribute">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+This cell id attribute filters create a new cell attribute array that contains the cell id.  Since this new array will be copied by filters it is useful for determining which input cell is the origin of an output cell. 
     </Documentation>
   </Module>
   <Module name="PointDataToCellData"
