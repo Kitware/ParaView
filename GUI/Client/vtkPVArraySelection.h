@@ -57,6 +57,12 @@ public:
   vtkGetStringMacro(AttributeName);
 
   // Description:
+  // Used to change the label of the widget. If not specified,
+  // the label is constructed using the AttributeName
+  vtkSetStringMacro(LabelText);
+  vtkGetStringMacro(LabelText);
+
+  // Description:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app);
 
@@ -108,7 +114,8 @@ protected:
   virtual void SetWidgetSelectionsFromLocal();
   virtual void SetLocalSelectionsFromReader();
   virtual void SetReaderSelectionsFromWidgets();
-  
+
+  char* LabelText;
   char* AttributeName;
   vtkClientServerID VTKReaderID;
   

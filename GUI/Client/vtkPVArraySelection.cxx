@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.45");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.46");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -52,7 +52,8 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->CommandFunction = vtkPVArraySelectionCommand;
   
   this->VTKReaderID.ID = 0;
-  this->AttributeName = NULL;
+  this->AttributeName = 0;
+  this->LabelText = 0;
   
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->ButtonFrame = vtkKWWidget::New();
@@ -72,7 +73,8 @@ vtkPVArraySelection::vtkPVArraySelection()
 //----------------------------------------------------------------------------
 vtkPVArraySelection::~vtkPVArraySelection()
 {
-  this->SetAttributeName(NULL);
+  this->SetAttributeName(0);
+  this->SetLabelText(0);
 
   this->LabeledFrame->Delete();
   this->LabeledFrame = NULL;
@@ -121,28 +123,35 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app, 0);
-  if (strcmp(this->AttributeName, "Point") == 0)
+  if (this->LabelText)
     {
-    this->LabeledFrame->SetLabel("Point Arrays");
+    this->LabeledFrame->SetLabel(this->LabelText);
     }
-  else if (strcmp(this->AttributeName, "Cell") == 0)
+  else
     {
-    this->LabeledFrame->SetLabel("Cell Arrays");
-    }
-  else 
-    {
-    ostrstream str;
-    if ( this->AttributeName && this->AttributeName[0] )
+    if (strcmp(this->AttributeName, "Point") == 0)
       {
-    str << this->AttributeName;
+      this->LabeledFrame->SetLabel("Point Arrays");
       }
-    else
+    else if (strcmp(this->AttributeName, "Cell") == 0)
       {
-      str << "Unnamed";
+      this->LabeledFrame->SetLabel("Cell Arrays");
       }
-    str << " Arrays" << ends;
-    this->LabeledFrame->SetLabel(str.str());
-    str.rdbuf()->freeze(0);
+    else 
+      {
+      ostrstream str;
+      if ( this->AttributeName && this->AttributeName[0] )
+        {
+        str << this->AttributeName;
+        }
+      else
+        {
+        str << "Unnamed";
+        }
+      str << " Arrays" << ends;
+      this->LabeledFrame->SetLabel(str.str());
+      str.rdbuf()->freeze(0);
+      }
     }
   app->Script("pack %s -fill x -expand t -side top",
               this->LabeledFrame->GetWidgetName());
@@ -496,6 +505,7 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
   if (pvas)
     {
     pvas->SetAttributeName(this->AttributeName);
+    pvas->SetLabelText(this->LabelText);
     // It is assumed that there is only one VTK source id.
     // Since this is a source object (reader probably), this
     // is a reasonable assumption.
@@ -522,6 +532,12 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     vtkErrorMacro("No attribute_name specified.");
     return 0;
+    }
+
+  const char* label_text = element->GetAttribute("label_text");
+  if(label_text)
+    {
+    this->SetLabelText(label_text);
     }
   
   return 1;
