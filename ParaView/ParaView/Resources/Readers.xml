@@ -478,7 +478,7 @@
   <Module name="SAFReader"
           root_name="SAFReader"
           output="vtkUnstructuredGrid"
-          class="vtkPVAdvancedReaderModule"
+          class="vtkPVSAFReaderModule"
           module_type="Reader" extensions=".saf"
           file_description="SAF Reader">
     <Source class="vtkSAFPVReader"/>

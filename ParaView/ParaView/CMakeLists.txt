@@ -234,6 +234,10 @@ IF (PARAVIEW_USE_ICE_T)
     )
 ENDIF (PARAVIEW_USE_ICE_T)
 
+
+
+
+
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
   vtkPVWindowResources
@@ -305,6 +309,11 @@ IF(PARAVIEW_USE_SAF)
   ELSE(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
     MESSAGE(SEND_ERROR "Cannot find SAF sources directory")
   ENDIF(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
+
+  SET( ParaViewClient_SRCS
+    ${ParaViewClient_SRCS}
+    ${SAF_SOURCE_DIR}/vtkPVSAFReaderModule.cxx )
+                                                                                                                                             
 ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
