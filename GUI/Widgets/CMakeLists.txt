@@ -153,8 +153,6 @@ FOREACH (WidgetType
     ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx)
 ENDFOREACH (WidgetType)
 
-# ParaView stuff, should be moved to ParaView
-
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
@@ -249,6 +247,10 @@ ADD_LIBRARY(KWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 TARGET_LINK_LIBRARIES (KWWidgetsTCL
   ${KWCommon_LIBRARIES}
   )
+
+IF(KWSYS_NAMESPACE)
+  TARGET_LINK_LIBRARIES (KWWidgetsTCL ${KWSYS_NAMESPACE})
+ENDIF(KWSYS_NAMESPACE)
 
 IF(VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES (KWWidgetsTCL
