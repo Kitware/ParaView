@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -127,22 +127,23 @@ void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Reconfigure()
 {
-  this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
   int bbox[4];
   this->CalculateBBox(this->Canvas, "all", bbox);
   int height = atoi(this->Script("winfo height %s", 
                                  this->Canvas->GetWidgetName()));
-  if ( height > 1 && (bbox[3] - bbox[1]) > height )
+  if (height > 1 && (bbox[3] - bbox[1]) > height)
     {
-    this->Script("pack %s -fill both -side right", 
+    this->Script("grid %s -row 0 -column 1 -sticky news", 
                  this->ScrollBar->GetWidgetName());
     }
-
+  else
+    {
+    this->Script("grid remove %s", this->ScrollBar->GetWidgetName());
+    }
   this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
                this->Canvas->GetWidgetName(), 
-               0, bbox[1], 341, bbox[3]);
+               bbox[0], bbox[1], bbox[2], bbox[3]);
   this->PostChildUpdate();
-  
 }
 
 
@@ -164,8 +165,8 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, (args?args:""));
 
+  this->Script("frame %s %s", wname, (args?args:""));
   if (this->Width > 0 && this->Height > 0)
     {
     opts << " -width " << this->Width << " -height " << this->Height;
@@ -201,8 +202,10 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
 
   this->Canvas->SetBind(this, "<Configure>", "Reconfigure");
 
-  this->Script("pack %s -fill both -expand t -side left", 
+  this->Script("grid %s -row 0 -column 0 -sticky news", 
                this->Canvas->GetWidgetName());
+  this->Script("grid columnconfig %s 0 -weight 1", wname);
+  this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
   this->PopupMenu->Create(this->Application, "-tearoff 0");
   this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
@@ -236,7 +239,7 @@ void vtkPVSourcesNavigationWindow::SetWidth(int width)
   if (this->Application != NULL)
     {
     this->Script("%s configure -width %d", this->Canvas->GetWidgetName(), 
-                 width);
+                    width);
     }
 }
 
