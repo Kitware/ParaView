@@ -94,8 +94,8 @@ public:
       {
       p->Value = p->Max;
       }
-    cout << "Add XDMF Parameter: " << pname 
-      << " = " << p->Value << " (" << p->Min << ", " << p->Step << ", " << p->Max << ")" << endl;
+    //cout << "Add XDMF Parameter: " << pname 
+    //  << " = " << p->Value << " (" << p->Min << ", " << p->Step << ", " << p->Max << ")" << endl;
     }
 
   void Update(vtkPVXDMFParameters* parent)
@@ -115,6 +115,8 @@ public:
       scale->SetRange(p->Min, p->Max);
       scale->SetResolution(1);
       scale->Create(parent->GetApplication(), 0);
+      scale->DisplayRangeOn();
+      scale->DisplayEntry();
       scale->SetValue(p->Value);
       scale->DisplayLabel(name->c_str());
       scale->SetCommand(parent, "ModifiedCallback");
@@ -161,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.2");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -228,9 +230,9 @@ void vtkPVXDMFParameters::UpdateFromReader()
     pm->RootScript(
       "namespace eval ::paraview::vtkPVXDMFParameters {\n"
       "  proc GetParameters { reader } {\n"
-      "    puts \"GetParameters\"\n"
+//      "    puts \"GetParameters\"\n"
       "    set n [$reader GetNumberOfParameters]\n"
-      "    puts \"Number of parameters: $n\"\n"
+//      "    puts \"Number of parameters: $n\"\n"
       "    set settings {}\n"
       "    for {set i 0} {$i < $n} {incr i} {\n"
       "      set name [$reader GetParameterName $i]\n"
@@ -244,10 +246,10 @@ void vtkPVXDMFParameters::UpdateFromReader()
       "}\n",
       this->VTKReaderTclName);
     vtkstd::string parameters = pm->GetRootResult();
-    cout << "Parameters: " << parameters.c_str() << endl;
+    //cout << "Parameters: " << parameters.c_str() << endl;
     this->Script(
       "foreach a { %s } {\n"
-      "  puts \"- $a\"\n"
+//      "  puts \"- $a\"\n"
       "  eval %s AddXDMFParameter $a\n"
       "}\n", parameters.c_str(), this->GetTclName());
     this->Internals->Update(this);
@@ -274,14 +276,14 @@ void vtkPVXDMFParameters::AcceptInternal(const char* sourceTclName)
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
-    cout << "Looking at scale: " << label << endl;
+    //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* pm = this->Internals->GetParameter(label);
     pm->Value = static_cast<int>(scale->GetValue());
     str << " {" << label << "} " << pm->Value;
     some = 1;
     }
   str << " }" << ends;
-  cout << "List: " << str.str() << endl;
+  //cout << "List: " << str.str() << endl;
   if ( some )
     {
     pm->BroadcastScript(
@@ -289,7 +291,7 @@ void vtkPVXDMFParameters::AcceptInternal(const char* sourceTclName)
       "  proc SetParameters { reader parameters } {\n"
       "    foreach { array value } $parameters {\n"
       "      $reader SetParameterIndex $array $value\n"
-      "      puts \"Parameter: [ $reader GetParameterIndex $array ]\"\n"
+//      "      puts \"Parameter: [ $reader GetParameterIndex $array ]\"\n"
       "    }\n" 
       "  }\n" 
       "  SetParameters %s %s\n"
@@ -316,7 +318,7 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
-    cout << "Looking at scale: " << label << endl;
+    //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
     *file << "$kw(" << this->VTKReaderTclName << ") SetParameterIndex {" << label << "} "
         << p->Value << endl;
@@ -453,7 +455,7 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
-    cout << "Looking at scale: " << label << endl;
+    //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
     *file << "\t" << this->VTKReaderTclName << " SetParameterIndex {" << label << "} "
       << p->Value << endl;
