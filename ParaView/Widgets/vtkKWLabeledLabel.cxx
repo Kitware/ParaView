@@ -42,12 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledLabel.h"
 
-#include "vtkKWLabel.h"
+#include "vtkKWImageLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.8");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.9");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -58,6 +58,7 @@ vtkKWLabeledLabel::vtkKWLabeledLabel()
   this->CommandFunction = vtkKWLabeledLabelCommand;
 
   this->PackHorizontally = 1;
+  this->ExpandLabel2 = 0;
 
   this->Label2 = vtkKWLabel::New();
 }
@@ -125,7 +126,8 @@ void vtkKWLabeledLabel::Pack()
              << " -side left -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->Label2->GetWidgetName() 
-           << " -side left -anchor nw" << endl;
+           << " -side left -anchor nw -fill both -expand " 
+           << (this->ExpandLabel2 ? "y" : "n") << endl;
     }
   else
     {
@@ -135,7 +137,8 @@ void vtkKWLabeledLabel::Pack()
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->Label2->GetWidgetName() 
-           << " -side top -anchor nw -padx 10" << endl;
+           << " -side top -anchor nw -padx 10 -fill both -expand "
+           << (this->ExpandLabel2 ? "y" : "n") << endl;
     }
   
   tk_cmd << ends;
@@ -151,6 +154,19 @@ void vtkKWLabeledLabel::SetPackHorizontally(int _arg)
     return;
     }
   this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetExpandLabel2(int _arg)
+{
+  if (this->ExpandLabel2 == _arg)
+    {
+    return;
+    }
+  this->ExpandLabel2 = _arg;
   this->Modified();
 
   this->Pack();
@@ -204,6 +220,10 @@ void vtkKWLabeledLabel::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Label2: " << this->Label2 << endl;
+
   os << indent << "PackHorizontally: " 
      << (this->PackHorizontally ? "On" : "Off") << endl;
+
+  os << indent << "ExpandLabel2: " 
+     << (this->ExpandLabel2 ? "On" : "Off") << endl;
 }

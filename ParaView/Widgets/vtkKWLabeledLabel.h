@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledWidget.h"
 
+class vtkKWLabel;
+
 class VTK_EXPORT vtkKWLabeledLabel : public vtkKWLabeledWidget
 {
 public:
@@ -76,6 +78,12 @@ public:
   vtkGetMacro(PackHorizontally, int);
 
   // Description:
+  // Set the 2nd label to auto-expand (does not by default).
+  virtual void SetExpandLabel2(int);
+  vtkBooleanMacro(ExpandLabel2, int);
+  vtkGetMacro(ExpandLabel2, int);
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -86,6 +94,7 @@ protected:
   ~vtkKWLabeledLabel();
 
   int PackHorizontally;
+  int ExpandLabel2;
 
   vtkKWLabel *Label2;
 
