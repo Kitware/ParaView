@@ -121,6 +121,7 @@ public:
                        const char* MethodAndArgString);
   void SetEntryCommand(const char* item, vtkKWObject* object, 
                        const char* method);
+  void SetEntryCommand(int item, const char* method);
   void SetEntryCommand(const char* item, const char* method);
 
   // Description: 
@@ -174,6 +175,11 @@ public:
   // Description:
   // Returns the integer index of the menu item by string
   int GetIndex(const char* item);
+
+  // Description:
+  // Get the command for the entry at index. This is what is returned by
+  // Script, so you should make a copy if you want to use it in Tcl.
+  const char* GetItemCommand(int idx);
 
   // Description:
   // Copies the label of the item at the given position

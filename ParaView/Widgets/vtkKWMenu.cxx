@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.39");
+vtkCxxRevisionMacro(vtkKWMenu, "1.40");
 
 
 
@@ -81,7 +81,7 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
                this->GetWidgetName(), this->GetTclName());
 
   // Update enable state
-
+  //
   this->UpdateEnableState();
 }
 
@@ -836,6 +836,20 @@ void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMenu::SetEntryCommand(int idx, const char* MethodAndArgString)
+{
+  if ( !this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems() )
+    {
+    return;
+    }
+  ostrstream str;
+  str << this->GetWidgetName() << " entryconfigure "
+      << idx << " -command {" << MethodAndArgString << "}" << ends;
+  this->Script(str.str());
+  str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString)
 {
   if ( !this->HasItem(item) )
@@ -906,20 +920,26 @@ void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* state)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemOption(int position, const char *option)
+const char* vtkKWMenu::GetItemOption(int idx, const char *option)
 {
-  if (this->IsCreated())
+  if ( !this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems() )
     {
-    return this->Script("%s entrycget %d %s", 
-                        this->GetWidgetName(), position, option);
+    return 0;
     }
-  return 0;
+  return this->Script("%s entrycget %d %s", 
+    this->GetWidgetName(), idx, option);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
 {
   return this->GetItemOption(this->GetIndex(item), option);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemCommand(int idx)
+{
+  return this->GetItemOption(idx, "-command");
 }
 
 //----------------------------------------------------------------------------
