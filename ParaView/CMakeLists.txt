@@ -2,6 +2,25 @@ CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
 PROJECT(PARAVIEW) 
 INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
+# load the ClientServer command
+IF (COMMAND VTK_WRAP_ClientServer)
+ELSE (COMMAND VTK_WRAP_ClientServer)
+    TRY_COMPILE(COMPILE_OK 
+         ${PARAVIEW_BINARY_DIR}/ClientServer/CMake 
+         ${PARAVIEW_SOURCE_DIR}/ClientServer/CMake 
+         ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
+    IF (COMPILE_OK)
+         LOAD_COMMAND(VTK_WRAP_ClientServer
+            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
+            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake/Debug)
+    ELSE (COMPILE_OK)
+         MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
+    ENDIF (COMPILE_OK)
+ENDIF (COMMAND VTK_WRAP_ClientServer)
+UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer ClientServer/Wrapping vtkWrapClientServer.c)
+MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
+
+SUBDIRS(ClientServer/Wrapping)
 #-----------------------------------------------------------------------------
 # ParaView version number.  An even minor number corresponds to releases.
 SET(PARAVIEW_VERSION_MAJOR 1)
@@ -185,7 +204,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(KWCommon Widgets Utilities ParaView Demos)
+ SUBDIRS(KWCommon Widgets Utilities ClientServer ParaView Demos)
 
  SUBDIRS(Packages)
 
@@ -220,6 +239,7 @@ IF (PARAVIEW_CAN_BUILD)
  INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR} 
                      ${PARAVIEW_SOURCE_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
+                     ${PARAVIEW_SOURCE_DIR}/ClientServer
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
  LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCommon
@@ -239,7 +259,7 @@ IF(BUILD_TESTING)
   ENDIF(PARAVIEW_HAVE_XDMF)
 
   ENABLE_TESTING()
-  SUBDIRS(ParaView/Testing)
+  SUBDIRS(ParaView/Testing ClientServer/Testing)
   SUBDIR_DEPENDS(ParaView/Testing ParaView)
 ENDIF(BUILD_TESTING)
 

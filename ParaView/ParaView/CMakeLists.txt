@@ -241,7 +241,7 @@ ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
   vtkKWWidgetsTCL 
-  vtkParallel)
+  vtkParallel vtkParaViewCSWrapped vtkClientServer)
 IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
 ENDIF(XDMF_FOUND)

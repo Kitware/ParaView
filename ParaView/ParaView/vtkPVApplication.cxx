@@ -101,6 +101,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
+
 // #include "vtkPVRenderGroupDialog.h"
 
 #include <sys/stat.h>
@@ -123,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.1");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.2");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1434,7 +1437,22 @@ void vtkPVApplication::Start(int argc, char*argv[])
     ui->LoadScript(open_files[cc].c_str());
     this->RunningParaViewScript = 0;
     }
-
+  
+  //********
+  // Simple test for Client/Server wrapper of vtkObject
+  vtkClientServerStream& stream = this->ProcessModule->GetStream();
+  vtkClientServerID instance_id = stream.GetUniqueID();
+  stream << vtkClientServerStream::New << "vtkObject" 
+         << instance_id << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << instance_id
+         << "DebugOn" << vtkClientServerStream::End;
+  this->ProcessModule->SendMessages();
+  stream.Reset();
+  stream << vtkClientServerStream::Delete << instance_id 
+         << vtkClientServerStream::End;
+  //********
+  
+  
   if (this->PlayDemo)
     {
     this->Script("set pvDemoCommandLine 1");

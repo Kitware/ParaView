@@ -68,6 +68,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
 
 #include <vtkstd/string>
 
@@ -84,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.1");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -95,7 +97,9 @@ vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
-  this->RootResult = NULL;
+  this->RootResult = NULL; 
+  this->ClientServerStream = 0;
+  this->ClientServerInterpreter = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +111,11 @@ vtkPVProcessModule::~vtkPVProcessModule()
     this->Controller = NULL;
     }
   this->SetRootResult(NULL);
+  if(this->ClientServerInterpreter)
+    {
+    this->ClientServerInterpreter->Delete();
+    }
+  delete this->ClientServerStream;
 }
 
 
@@ -508,6 +517,12 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
   return 1;
 
 }
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendMessages()
+{
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)

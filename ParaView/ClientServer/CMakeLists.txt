@@ -1,0 +1,87 @@
+
+SET(ClientServer_SRCS 
+  vtkClientServerMessage.cxx
+  vtkClientServerMessage.h
+  vtkClientServerArrayInformation.h 
+  vtkClientServerStream.cxx
+  vtkClientServerInterpreter.cxx 
+  vtkClientServerStream.h
+  vtkClientServerInterpreter.h)
+
+ADD_LIBRARY(vtkClientServer ${ClientServer_SRCS})
+TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL vtkCommon)
+
+INCLUDE_DIRECTORIES(${PARAVIEW_SOURCE_DIR}/ClientServer)
+
+SET (ClientServer_WRAP_CLASSES
+#
+ vtkObjectBase
+ vtkObject
+#
+ vtkSource
+ vtkProcessObject
+ vtkPolyDataSource
+ vtkSphereSource
+#
+ vtkActor2D
+ vtkProp
+#
+ vtkPolyDataToPolyDataFilter
+ vtkShrinkPolyData
+#
+ vtkDecimatePro
+#
+ vtkDataSetSource
+ vtkDataSetToDataSetFilter
+ vtkPieceScalars
+#
+ vtkGraphicsFactory
+#
+ vtkDataSetReader
+ vtkDataReader
+#
+ vtkStreamTracer
+ vtkDataSetToPolyDataFilter
+#
+ vtkExtractGrid
+ vtkStructuredGridToStructuredGridFilter
+ vtkStructuredGridSource 
+#
+ vtkStructuredGridOutlineFilter
+ vtkStructuredGridToPolyDataFilter
+#
+ vtkGeometryFilter
+#
+ vtkLineSource
+#
+ vtkTubeFilter
+#
+ vtkLineWidget
+ vtk3DWidget
+ vtkInteractorObserver
+)
+
+FIND_FILE(VTK_WRAP_HINTS hints 
+          ${VTK_DIR}/../VTK/Wrapping
+          ${VTK_DIR}/../vtknew/Wrapping )
+
+
+#
+# Find where the header files are located
+#
+FOREACH(CLASS ${ClientServer_WRAP_CLASSES})
+  SET(ClientServer_CLASS_FOUND 0)
+  FOREACH(DIR ${VTK_INCLUDE_DIRS})
+    IF (NOT ClientServer_CLASS_FOUND)
+      IF (EXISTS ${DIR}/${CLASS}.h)
+        SET(ClientServer_RESOLVED_CLASSES ${ClientServer_RESOLVED_CLASSES} ${DIR}/${CLASS}.h)
+        SET(ClientServer_CLASS_FOUND 1)
+      ENDIF (EXISTS ${DIR}/${CLASS}.h)
+    ENDIF (NOT ClientServer_CLASS_FOUND)
+  ENDFOREACH(DIR)
+ENDFOREACH(CLASS)
+
+VTK_WRAP_ClientServer(vtkParaViewCSWrapped vtkClientServerWrappedList ${ClientServer_RESOLVED_CLASSES})
+
+ADD_LIBRARY(vtkParaViewCSWrapped ${vtkClientServerWrappedList})
+TARGET_LINK_LIBRARIES (vtkParaViewCSWrapped vtkClientServer vtkHybrid vtkParallel)

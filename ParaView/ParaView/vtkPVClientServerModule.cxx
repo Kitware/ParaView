@@ -93,6 +93,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
+
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -101,6 +104,8 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG 838428
 #define VTK_PV_SATELLITE_SCRIPT              838431
 
+#define VTK_PV_CLIENTSERVER_RMI_TAG          938531
+
 #define VTK_PV_ROOT_SCRIPT_RMI_TAG           838485
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
@@ -108,7 +113,35 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 
 #define VTK_PV_SEND_DATA_OBJECT_TAG          838489
 #define VTK_PV_DATA_OBJECT_TAG               923857
-    
+
+
+
+
+void vtkPVClientServerMPIRMI(void *localArg, void *remoteArg, 
+                                int remoteArgLength,
+                                int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  self->ProcessMessage((unsigned char*)remoteArg, remoteArgLength);
+  // do something with result here??
+}
+
+//----------------------------------------------------------------------------
+// This RMI is used for 
+void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg, 
+                                int remoteArgLength,
+                                int remoteProcessId)
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  vtkMultiProcessController* controler = self->GetController();
+  for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+    {
+    controler->TriggerRMI(i, remoteArg, remoteArgLength, VTK_PV_CLIENTSERVER_RMI_TAG);
+    }
+  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+}
+
+
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
 void vtkPVRootScript(void *localArg, void *remoteArg, 
@@ -217,7 +250,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.1");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -226,6 +259,9 @@ int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::vtkPVClientServerModule()
 {
+  this->ClientServerInterpreter = 0;
+  this->ClientServerStream = 0;
+
   this->Controller = NULL;
   this->SocketController = NULL;
   this->ClientMode = 1;
@@ -288,6 +324,9 @@ void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller),
 {
   cout << (char*)calldata << endl;
 }
+// Declare the initialization function as external
+// this is defined in the PackageInit file
+extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
 // This method is a bit long, we should probably break it up 
@@ -304,7 +343,17 @@ void vtkPVClientServerModule::Initialize()
 #endif
 
   this->ClientMode = pvApp->GetClientMode();
-
+  if(this->ClientMode)
+    {
+    // move up to vtkPVProcessModule
+    this->ClientServerStream = new vtkClientServerStream;
+    }
+  else
+    {
+    this->ClientServerInterpreter = vtkClientServerInterpreter::New();
+    Vtkparaviewcswrapped_Initialize(this->ClientServerInterpreter);
+    }
+  
   if (this->ClientMode)
     {
     vtkSocketController* dummy = vtkSocketController::New();
@@ -456,7 +505,7 @@ void vtkPVClientServerModule::Initialize()
 
 
 
-   if (!comm->WaitForConnection(port))
+    if (!comm->WaitForConnection(port))
       {
       vtkErrorMacro("Server error: Wait timed out or could not initialize socket.");
       comm->Delete();
@@ -470,6 +519,10 @@ void vtkPVClientServerModule::Initialize()
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
+    // 
+    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this), 
+                                   VTK_PV_CLIENTSERVER_RMI_TAG);
+    
     // For root script: Execute script only on process 0 of server.
     this->SocketController->AddRMI(vtkPVRootScript, (void *)(this), 
                                    VTK_PV_ROOT_SCRIPT_RMI_TAG);
@@ -500,6 +553,10 @@ void vtkPVClientServerModule::Initialize()
     { // Sattelite processes of server.
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
+    
+    this->Controller->AddRMI(vtkPVClientServerMPIRMI, (void *)(this), 
+                             VTK_PV_CLIENTSERVER_RMI_TAG);
+    
 
     this->Controller->CreateOutputWindow();
     // Process rmis until the application exits.
@@ -1014,4 +1071,31 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
     }
   this->SocketController->Receive(out, 1, VTK_PV_DATA_OBJECT_TAG);
   return 1;
+}
+
+
+
+
+
+
+
+
+
+
+void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
+{
+  this->ClientServerInterpreter->ProcessMessage(msg, len);
+}
+
+
+
+
+//----------------------------------------------------------------------------
+// This sends the current stream to the server
+void vtkPVClientServerModule::SendMessages()
+{
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len, VTK_PV_CLIENTSERVER_RMI_TAG);
 }

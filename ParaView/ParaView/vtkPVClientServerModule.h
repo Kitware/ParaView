@@ -153,7 +153,8 @@ public:
 //ETX
   
   static void ErrorCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-  
+  void ProcessMessage(unsigned char* arg, size_t len);
+  virtual void SendMessages();
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
@@ -176,7 +177,6 @@ protected:
   int NumberOfProcesses;
 
   vtkKWRemoteExecute* RemoteExecution;
-  
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented
   void operator=(const vtkPVClientServerModule&); // Not implemented
