@@ -32,7 +32,6 @@ vtkPVCompositeBuffer.cxx
 vtkPVCompositeUtilities.cxx
 vtkPVConnectivityFilter.cxx
 vtkPVContainerWidget.cxx
-vtkPVContour.cxx 
 vtkPVContourEntry.cxx 
 vtkPVContourFilter.cxx
 vtkPVData.cxx 
