@@ -205,8 +205,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   if (!this->InputClassName)
     {
-    pvd->InsertExtractPiecesIfNecessary();
-
     sprintf(extentTclName, "%s%dTranslator", this->RootName,
 	    this->InstanceCount);
     pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);

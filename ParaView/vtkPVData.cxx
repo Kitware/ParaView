@@ -357,12 +357,29 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
   // The vtkData object will be moved to the output of the piece filter.
   if (this->VTKData->IsA("vtkPolyData"))
     {
-    //pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
-    pvApp->BroadcastSimpleScript("vtkTransmitPolyDataPiece pvTemp");
+    // Transmit is more efficient, but has the possiblity of hanging.
+    // It will hang if all procs do not  call execute.
+    if (getenv("PV_DEADLOCK_PROTECTION") != NULL)
+      {
+      pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
+      }
+    else
+      {
+      pvApp->BroadcastSimpleScript("vtkTransmitPolyDataPiece pvTemp");
+      }
     }
   else if (this->VTKData->IsA("vtkUnstructuredGrid"))
     {
-    pvApp->BroadcastSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+    // Transmit is more efficient, but has the possiblity of hanging.
+    // It will hang if all procs do not  call execute.
+    if (getenv("PV_DEADLOCK_PROTECTION") != NULL)
+      {
+      pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
+      }
+    else
+      {
+      pvApp->BroadcastSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+      }
     }
   else
     {
