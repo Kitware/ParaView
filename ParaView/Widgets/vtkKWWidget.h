@@ -171,6 +171,10 @@ public:
   int HasConfigurationOption(const char* option);
   
   // Description:
+  // Query if widget is packed
+  int IsPacked();
+  
+  // Description:
   // Adjusts the placement of the baloon help
   vtkSetMacro(BalloonHelpJustification,int);
   vtkGetMacro(BalloonHelpJustification,int);  
