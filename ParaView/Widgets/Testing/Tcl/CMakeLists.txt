@@ -9,6 +9,6 @@ ADD_TEST(PrintSelf-Widgets ${TCL_TCLSH}
          ${Widgets_SOURCE_DIR})
 
 ADD_TEST(TestSetObjectMacro-Widgets ${TCL_TCLSH}
-         ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
+         ${VTK_SOURCE_DIR}/Common/Testing/Tcl/FindString.tcl
 	 "${Widgets_SOURCE_DIR}/vtk\\\\*.h"
 	 "vtkSetObjectMacro")

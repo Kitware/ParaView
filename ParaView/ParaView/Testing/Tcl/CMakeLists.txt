@@ -74,7 +74,7 @@ ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
          ${PARAVIEW_SOURCE_DIR}/${TEST_PATH})
 
 ADD_TEST(TestSetObjectMacro-${TEST_PATH} ${TCL_TCLSH}
-         ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
+         ${VTK_SOURCE_DIR}/Common/Testing/Tcl/FindString.tcl
          "${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/vtk\\\\*.h"
          "vtkSetObjectMacro")
 
