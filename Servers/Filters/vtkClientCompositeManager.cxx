@@ -55,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.39");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.40");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -81,6 +81,7 @@ struct vtkClientCompositeDoubleInfo
   double Background[3];
   double ParallelScale;
   double CameraViewAngle;
+  double WindowCenter[2];
 };
 
 #define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
@@ -96,6 +97,8 @@ struct vtkClientCompositeDoubleInfo
   vtkInitializeVector3(r.Background);                    \
   r.ParallelScale = 0.0;                                 \
   r.CameraViewAngle = 0.0;                               \
+  r.WindowCenter[0] = 0.0;                               \
+  r.WindowCenter[1] = 0.0;                               \
   }
   
 
@@ -402,6 +405,7 @@ void vtkClientCompositeManager::StartRender()
   cam->GetViewUp(doubleInfo.CameraViewUp);
   cam->GetClippingRange(doubleInfo.CameraClippingRange);
   doubleInfo.CameraViewAngle = cam->GetViewAngle();
+  cam->GetWindowCenter(doubleInfo.WindowCenter);
   if (cam->GetParallelProjection())
     {
     doubleInfo.ParallelScale = cam->GetParallelScale();
@@ -499,6 +503,10 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
   this->SavedCamera->SetParallelProjection(cam->GetParallelProjection());
   this->SavedCamera->SetParallelScale(cam->GetParallelScale());
   this->SavedCamera->SetClippingRange(cam->GetClippingRange());
+  this->SavedCamera->SetViewAngle(cam->GetViewAngle());
+  double* tmp = cam->GetWindowCenter();
+  this->SavedCamera->SetWindowCenter(tmp[0], tmp[1]);
+
   cam->ParallelProjectionOn();
   cam->SetParallelScale(
     (this->PDataSize[1]-1.0)*0.5);
@@ -508,6 +516,8 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
                      (this->PDataSize[1]-1.0)*0.5, 0.0);
   cam->SetViewUp(0.0, 1.0, 0.0);
   cam->SetClippingRange(9.0, 11.0);
+  cam->SetViewAngle(30.0);
+  cam->SetWindowCenter(0.0, 0.0);
 }
 
 void vtkClientCompositeManager::EndRender()
@@ -531,6 +541,9 @@ void vtkClientCompositeManager::EndRender()
     cam->SetParallelProjection(this->SavedCamera->GetParallelProjection());
     cam->SetParallelScale(this->SavedCamera->GetParallelScale());
     cam->SetClippingRange(this->SavedCamera->GetClippingRange());
+    cam->SetViewAngle(this->SavedCamera->GetViewAngle());
+    double* tmp = this->SavedCamera->GetWindowCenter();
+    cam->SetWindowCenter(tmp[0], tmp[1]);
     }
 }
 
@@ -702,6 +715,9 @@ void vtkClientCompositeManager::SatelliteStartRender()
     cam->SetFocalPoint(doubleInfo.CameraFocalPoint);
     cam->SetViewUp(doubleInfo.CameraViewUp);
     cam->SetClippingRange(doubleInfo.CameraClippingRange);
+    cam->SetWindowCenter(doubleInfo.WindowCenter[0],
+                         doubleInfo.WindowCenter[1]);
+    cam->SetViewAngle(doubleInfo.CameraViewAngle);
     if (doubleInfo.ParallelScale != 0.0)
       {
       cam->ParallelProjectionOn();
