@@ -887,19 +887,19 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <Shift-B2-Motion> {}", wname);
   this->Script("bind %s <Shift-B3-Motion> {}", wname);
   
-  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y}",
+  this->Script("bind %s <Any-ButtonPress> {%s MouseAction 0 %%b %%x %%y 0 0}",
                wname, tname);
-  this->Script("bind %s <Shift-Any-ButtonPress> {%s AShiftButtonPress %%b %%x %%y}",
+  this->Script("bind %s <Shift-Any-ButtonPress> {%s MouseAction 0 %%b %%x %%y 1 0}",
                wname, tname);
-  this->Script("bind %s <Control-Any-ButtonPress> {%s AControlButtonPress %%b %%x %%y}",
+  this->Script("bind %s <Control-Any-ButtonPress> {%s MouseAction 0 %%b %%x %%y 0 1}",
                wname, tname);
-  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+  this->Script("bind %s <Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 0 0}",
                wname, tname);
-  this->Script("bind %s <Control-Any-ButtonRelease> {%s AControlButtonRelease %%b %%x %%y}",
+  this->Script("bind %s <Shift-Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 1 0}",
                wname, tname);
-  this->Script("bind %s <Shift-Any-ButtonRelease> {%s AShiftButtonRelease %%b %%x %%y}",
+  this->Script("bind %s <Control-Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 0 1}",
                wname, tname);
-  this->Script("bind %s <Motion> {%s MouseMotion %%x %%y}",
+  this->Script("bind %s <Motion> {%s MouseAction 2 0 %%x %%y 0 0}",
                wname, tname);
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
                wname, tname);
@@ -1192,136 +1192,50 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::AButtonPress(int button, int x, int y)
+void vtkPVWindow::MouseAction(int action,int button, 
+                              int x,int y, int shift,int control)
 {
-  // not binding middle button
-  if (button == 1)
+  if ( action == 0 )
+    {
+    if (button == 1)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->LeftButtonPressEvent();
+      }
+    else if (button == 2)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->MiddleButtonPressEvent();
+      }
+    else if (button == 3)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->RightButtonPressEvent();
+      }    
+    }
+  else if ( action == 1 )
+    {
+    if (button == 1)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->LeftButtonReleaseEvent();
+      }
+    else if (button == 2)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->MiddleButtonReleaseEvent();
+      }
+    else if (button == 3)
+      {
+      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
+      this->GenericInteractor->RightButtonReleaseEvent();
+      }    
+    }
+  else
     {
     this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->LeftButtonPressEvent();
+    this->GenericInteractor->MouseMoveEvent();
     }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->MiddleButtonPressEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->RightButtonPressEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::AShiftButtonPress(int button, int x, int y)
-{
-  // not binding middle button
-  if (button == 1)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->LeftButtonPressEvent();
-    }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->MiddleButtonPressEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->RightButtonPressEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::AControlButtonPress(int button, int x, int y)
-{
-  // not binding middle button
-  if (button == 1)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->LeftButtonPressEvent();
-    }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->MiddleButtonPressEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->RightButtonPressEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::AButtonRelease(int button, int x, int y)
-{
-  // not binding middle button
-  if (button == 1)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->LeftButtonReleaseEvent();
-    }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->MiddleButtonReleaseEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y);
-    this->GenericInteractor->RightButtonReleaseEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::AShiftButtonRelease(int button, int x, int y)
-{
-  // not binding middle button
-  if (button == 1)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->LeftButtonReleaseEvent();
-    }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->MiddleButtonReleaseEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
-    this->GenericInteractor->RightButtonReleaseEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::AControlButtonRelease(int button, int x, int y)
-{
-  // not binding middle button
-  if (button == 1)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->LeftButtonReleaseEvent();
-    }
-  else if (button == 2)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->MiddleButtonReleaseEvent();
-    }
-  else if (button == 3)
-    {
-    this->GenericInteractor->SetEventInformationFlipY(x, y, 1, 0);
-    this->GenericInteractor->RightButtonReleaseEvent();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::MouseMotion(int x, int y)
-{
-  this->GenericInteractor->SetEventInformationFlipY(x, y);
-  this->GenericInteractor->MouseMoveEvent();
 }
 
 //----------------------------------------------------------------------------

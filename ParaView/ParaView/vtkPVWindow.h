@@ -350,13 +350,7 @@ public:
 
   // Description:
   // Callbacks for generic render window interactor
-  void AButtonPress(int button, int x, int y);
-  void AShiftButtonPress(int button, int x, int y);
-  void AControlButtonPress(int button, int x, int y);
-  void AButtonRelease(int button, int x, int y);
-  void AControlButtonRelease(int button, int x, int y);
-  void AShiftButtonRelease(int button, int x, int y);
-  void MouseMotion(int x, int y);
+  void MouseAction(int action,int button, int x,int y, int shift,int control);
   void Configure(int width, int height);
   
   // Description:
