@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.507");
+vtkCxxRevisionMacro(vtkPVWindow, "1.508");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3426,31 +3426,6 @@ void vtkPVWindow::EnableToolbarButtons()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVSource *vtkPVWindow::ExtractGridCallback()
-{
-  if (this->CurrentPVSource == NULL)
-    { // This should not be able to happen but ...
-    return NULL;
-    }
-
-  int type = this->CurrentPVSource->GetDataInformation()->GetDataSetType();
-  if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS)
-    {
-    return this->CreatePVSource("ExtractVOI"); 
-    }
-  if (type == VTK_STRUCTURED_GRID)
-    {
-    return this->CreatePVSource("ExtractGrid");
-    }
-  if (type == VTK_RECTILINEAR_GRID)
-    {
-    return this->CreatePVSource("ExtractRectilinearGrid");
-    }
-  vtkErrorMacro("Unknown data type.");
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 {
   this->GetPVApplication()->AddTraceEntry(
@@ -3836,17 +3811,6 @@ void vtkPVWindow::ReadSourceInterfaces()
     // Don't complain for now.  We can choose desired behavior later.
     // vtkWarningMacro("Could not find any directories for standard interface files.");
     }
-
-  // Create the extract grid button
-  vtkPVSource* extract = 0;
-  if (this->Prototypes->GetItem("ExtractGrid", extract) == VTK_OK)
-    {
-    extract->SetToolbarModule(1);
-    this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
-                           "ExtractGridCallback",
-                           "Extract a subgrid from a structured data set.");
-    }
-
 
   char* str = getenv("PV_INTERFACE_PATH");
   if (str)

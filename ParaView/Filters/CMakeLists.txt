@@ -18,6 +18,7 @@ SET(Filters_SRCS
   vtkPVContourFilter.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
+  vtkPVExtractVOI.cxx
   vtkPVGlyphFilter.cxx
   vtkPVImageContinuousDilate3D.cxx
   vtkPVImageContinuousErode3D.cxx

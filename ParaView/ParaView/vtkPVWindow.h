@@ -250,11 +250,6 @@ public:
   void PlayDemo(int fromDashboard);
 
   // Description:
-  // Callback from the ExtractGrid button.
-  vtkPVSource *ExtractGridCallback();
-
-  // Description:
-
   // Stuff for creating a log file for times.
   void ShowTimerLog();
   void ShowErrorLog();

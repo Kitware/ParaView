@@ -128,7 +128,7 @@ $kw(vtkTemp1292) AcceptCallback
 set kw(vtkTemp1310) [$kw(vtkTemp1292) GetPVOutput]
 $kw(vtkTemp1310) ColorByPointField {RTData} 1
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1292)
-set kw(vtkTemp1404) [$kw(vtkTemp1) CreatePVSource ExtractVOI]
+set kw(vtkTemp1404) [$kw(vtkTemp1) CreatePVSource ExtractGrid]
 set kw(vtkTemp1427) [$kw(vtkTemp1404) GetPVWidget {Input}]
 $kw(vtkTemp1427) SetCurrentValue $kw(vtkTemp1292)
 set kw(vtkTemp1415) [$kw(vtkTemp1404) GetPVWidget {VOI}]

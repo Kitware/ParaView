@@ -180,26 +180,6 @@
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
-<Module name="ExtractGrid" root_name="ExtractGrid" module_type="Filter" 
-        replace_input="0" 
-        long_help="Extract a subgrid from a curvilinear grid with the option of setting subsample strides." 
-        short_help="Extract a subgrid or subsample.">
-  <Filter class="vtkExtractGrid">
-    <Input name="Input" class="vtkStructuredData"/>
-  </Filter>
-  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
-             input_name="Input"/>
-  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" 
-               help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-<!-- keeping vector entries with length > 1 -->
-  <VectorEntry label="Sample rate" trace_name="SampleRate" 
-               variable="SampleRate" type="int" length="3" 
-               default_value="1 1 1"
-               help="Set the sampling rate for each dimension" />
-  <LabeledToggle label="Include boundary" variable="IncludeBoundary"
-                 trace_name="IncludeBoundary" default_value="0" 
-                 help="Select whether to always include the boundary of the grid in the output"/>
-</Module>
 <Module name="ExtractParts" menu_name="Extract Parts" root_name="ExtractParts" module_type="Filter" long_help="Extract a subset of parts from a group." short_help="Extract a subset of parts from a group.">
   <Filter class="vtkSelectInputs">
     <Input name="Input" class="vtkDataSet" quantity="Multiple">
@@ -207,25 +187,6 @@
     </Input>
   </Filter>
   <ExtractPartsWidget  trace_name="parts" help="Choose the parts to extract."/>
-</Module>
-<Module name="ExtractVOI" root_name="ExtractVOI" module_type="Filter" replace_input="0" long_help="Extract a subgrid from a volume/image with the option of setting subsample strides." short_help="Extract a subvolume or subsample.">
-  <Filter class="vtkExtractVOI">
-    <Input name="Input" class="vtkImageData"/>
-  </Filter>
-  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-<!-- keeping vector entries with length > 1 -->
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
-</Module>
-<Module name="ExtractRectilinearGrid" menu_name="Extract Grid" root_name="ExtractRGrid" module_type="Filter" replace_input="0" long_help="Extract a subgrid from a rectilinear grid with the option of setting subsample strides." short_help="Extract a subgrid or subsample.">
-  <Filter class="vtkExtractRectilinearGrid">
-    <Input name="Input" class="vtkRectilinearGrid"/>
-  </Filter>
-  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-<!-- keeping vector entries with length > 1 -->
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
-  <LabeledToggle label="Include boundary" variable="IncludeBoundary" trace_name="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output" default_value="0"/>
 </Module>
 <Module name="DataSetSurfaceFilter" menu_name="Extract Surface" root_name="Surface" module_type="Filter" long_help="Extract a 2-d boundary surface using neighbor relations to eliminate internal faces." short_help="Extract 2-d boundary surface.">
   <Filter class="vtkDataSetSurfaceFilter">
@@ -848,5 +809,25 @@
   </SelectWidget>
   <VectorEntry label="Max. Steps" trace_name="MaximumNumberOfSteps" variable="MaximumNumberOfSteps" type="int" help="Maximum number of steps." default_value="2000"/>
   <VectorEntry label="Term. Speed" trace_name="TerminalSpeed" variable="TerminalSpeed" type="float" help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold" default_value="0.000000000001"/>
+</Module>
+<Module name="ExtractGrid" root_name="ExtractGrid" module_type="Filter" 
+        button_image="PVExtractGridButton" replace_input="0"
+        long_help="Extract a subgrid from a structured grid with the option of setting subsample strides." 
+        short_help="Extract a subgrid or subsample.">
+  <Filter class="vtkPVExtractVOI">
+    <Input name="Input" class="vtkStructuredData"/>
+  </Filter>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" 
+               help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
+<!-- keeping vector entries with length > 1 -->
+  <VectorEntry label="Sample rate" trace_name="SampleRate" 
+               variable="SampleRate" type="int" length="3" 
+               default_value="1 1 1"
+               help="Set the sampling rate for each dimension" />
+  <LabeledToggle label="Include boundary" variable="IncludeBoundary"
+                 trace_name="IncludeBoundary" default_value="0" 
+                 help="Select whether to always include the boundary of the grid in the output"/>
 </Module>
 </ModuleInterfaces>

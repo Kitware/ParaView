@@ -1138,7 +1138,7 @@ proc iso_init {} {
         return
     }
     $iso(vtkTemp1) SetCurrentPVSourceCallback $iso(vtkTemp384)
-    set iso(vtkTemp739) [$iso(vtkTemp1) CreatePVSource ExtractVOI]
+    set iso(vtkTemp739) [$iso(vtkTemp1) CreatePVSource ExtractGrid]
     set iso(vtkTemp756) [$iso(vtkTemp739) GetPVWidget {VOI}]
     $iso(vtkTemp756) SetValue 0 29 0 0 0 29 
     $iso(vtkTemp739) AcceptCallback
