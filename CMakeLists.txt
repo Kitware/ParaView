@@ -1,11 +1,23 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 1.8)
 PROJECT(ParaView)
 
+#########################################################################
+# Common settings
+#
+# ParaView version number.  An even minor number corresponds to releases.
+SET(PARAVIEW_VERSION_MAJOR 1)
+SET(PARAVIEW_VERSION_MINOR 3)
+SET(PARAVIEW_VERSION_PATCH 0)
+SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 SET(CMAKE_MODULE_PATH ${ParaView_SOURCE_DIR}/CMake)
 SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
+
+# No XML IO
+SET(DO_NOT_BUILD_XML_RW 1)
 
 #########################################################################
 # Configure Testing
@@ -103,4 +115,8 @@ SUBDIRS(Utilities/VTKTclWrapping)
 #########################################################################
 # Configure Server
 SUBDIRS(Servers)
+
+#########################################################################
+# Configure GUI
+SUBDIRS(GUI)
 
