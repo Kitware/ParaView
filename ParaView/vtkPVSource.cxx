@@ -585,7 +585,9 @@ void vtkPVSource::AcceptCallback()
     this->Initialized = 1;
     }
 
-  window->GetMainView()->SetSelectedComposite(this);  
+  window->GetMainView()->SetSelectedComposite(this);
+  window->GetMenuProperties()->CheckRadioButton(
+    window->GetMenuProperties(), "Radio", 2);
   this->UpdateProperties();
   this->GetView()->Render();
   window->GetSourceList()->Update();
