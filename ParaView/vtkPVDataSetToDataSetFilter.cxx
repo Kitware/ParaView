@@ -134,6 +134,10 @@ void vtkPVDataSetToDataSetFilter::SetInput(vtkPVData *pvData)
   f->SetInput(pvData->GetData());
 
   this->vtkPVSource::SetNthInput(0, pvData);
+  if (pvData)
+    {
+    this->Inputs[0]->AddPVSourceToUsers(this);
+    }
 }
 
 //----------------------------------------------------------------------------

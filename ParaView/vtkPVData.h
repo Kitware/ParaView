@@ -156,7 +156,7 @@ protected:
   vtkPVSource *PVSource;
   vtkPVAssignment *Assignment;
 
-    // Keep a list of sources that are using this data.
+  // Keep a list of sources that are using this data.
   // We may want to have a list that does not reference
   // count the sources.
   vtkPVSourceCollection *PVSourceCollection;

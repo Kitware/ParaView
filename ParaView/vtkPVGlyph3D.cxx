@@ -91,6 +91,10 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
   f->SetSource(pvData->GetPolyData());
   
   this->vtkPVSource::SetNthInput(1, pvData);
+  if (pvData)
+    {
+    this->Inputs[1]->AddPVSourceToUsers(this);
+    }
 }
 
 

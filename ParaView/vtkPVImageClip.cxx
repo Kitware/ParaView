@@ -162,6 +162,10 @@ void vtkPVImageClip::SetInput(vtkPVImageData *pvi)
 {
   this->GetImageClip()->SetInput(pvi->GetImageData());
   this->vtkPVSource::SetNthInput(0, pvi);
+  if (pvi)
+    {
+    this->Inputs[0]->AddPVSourceToUsers(this);
+    }
 }
 
 //----------------------------------------------------------------------------

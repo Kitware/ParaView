@@ -56,6 +56,10 @@ void vtkPVPolyDataToPolyDataFilter::SetInput(vtkPVPolyData *pvData)
   f->SetInput(pvData->GetPolyData());
 
   this->vtkPVSource::SetNthInput(0, pvData);
+  if (pvData)
+    {
+    this->Inputs[0]->AddPVSourceToUsers(this);
+    }
 }
 
 
