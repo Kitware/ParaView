@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.30");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -292,7 +292,7 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         << " $pvTemp" << this->BoxTransformID.ID << endl;
   *file << " $pvTemp" << this->BoxTransformID.ID << " UnRegister {}" << endl;
   *file << "  [$pvTemp" << this->BoxTransformID.ID
-        << " GetProperty Matrix] SetProxy $pvTemp" << this->BoxMatrixID.ID
+        << " GetProperty Matrix] AddProxy $pvTemp" << this->BoxMatrixID.ID
         << endl;
   *file << "  $pvTemp" << this->BoxTransformID.ID
         << " UpdateVTKObjects"  << endl;

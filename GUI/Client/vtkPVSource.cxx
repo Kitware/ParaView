@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.358");
+vtkCxxRevisionMacro(vtkPVSource, "1.359");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2040,7 +2040,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 
     *file << "  [$pvTemp" <<  this->GetVTKSourceID(0) 
           << " GetProperty " << inputName << "]"
-          << " AddInput $pvTemp" << pvs->GetVTKSourceID(0)
+          << " AddProxy $pvTemp" << pvs->GetVTKSourceID(0)
           << endl;
     }
 

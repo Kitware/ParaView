@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.46");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -200,7 +200,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
       {
       *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
             << " GetProperty " << this->VariableName
-            << "] AddInput ";
+            << "] AddProxy ";
       if (ow)
         {
         vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
@@ -214,7 +214,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     else
       {
       *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-            <<  " GetProperty " << this->VariableName << "] SetProxy ";
+            <<  " GetProperty " << this->VariableName << "] AddProxy ";
       if (ow)
         {
         vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());

@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.282");
+vtkCxxRevisionMacro(vtkPVData, "1.283");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2843,10 +2843,10 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     *file << "  $pvTemp" << partD->GetGeometryID() << " UnRegister {}" << endl;
 
     *file << "  [$pvTemp" <<  partD->GetGeometryID() << " GetProperty Input] "
-          << " AddInput $pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
+          << " AddProxy $pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
           << endl;
 
-    *file << "  $Ren1 AddDisplayer $pvTemp" << partD->GetGeometryID() << endl;
+    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp" << partD->GetGeometryID() << endl;
     
     if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
                            VTK_PV_OUTLINE_LABEL) )
@@ -2937,7 +2937,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     if (this->PVColorMap)
       {
       *file << "  [$pvTemp" << partD->GetGeometryID() 
-            << " GetProperty LookupTable] SetProxy $pvTemp" 
+            << " GetProperty LookupTable] AddProxy $pvTemp" 
             << this->PVColorMap->GetLookupTableID() << endl;
       }
     *file << "  [$pvTemp" << partD->GetGeometryID() 
