@@ -35,7 +35,7 @@
 #include "vtkKWEvent.h"
 #include "vtkRM3DWidget.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.54");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.55");
 
 //===========================================================================
 //***************************************************************************
@@ -235,8 +235,6 @@ void vtkPV3DWidget::SetVisibility()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibility(int visibility)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if ( visibility )
     {
     this->PlaceWidget();

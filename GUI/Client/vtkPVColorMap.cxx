@@ -53,7 +53,7 @@
 #include "vtkKWEvent.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.96");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.97");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -193,7 +193,6 @@ vtkPVColorMap::vtkPVColorMap()
 vtkPVColorMap::~vtkPVColorMap()
 {
   // Used to be in vtkPVActorComposite........
-  vtkPVApplication *pvApp = this->GetPVApplication();
   this->RMScalarBarWidget->Delete();
 
   this->SetPVRenderView(NULL);
@@ -1266,8 +1265,6 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     {
     return;
     }
-  
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
   if (rm == NULL)
     {

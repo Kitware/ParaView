@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -382,8 +382,6 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
 void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   static int instanceCount = 0;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-
   ++instanceCount;
 
   // Now that the 3D widget is on each process,
@@ -664,7 +662,6 @@ void vtkPVImplicitPlaneWidget::SetNormal()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Update()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVSource *input;
   double bds[6];
 

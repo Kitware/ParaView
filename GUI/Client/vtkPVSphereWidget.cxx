@@ -38,7 +38,7 @@
 #include "vtkRMSphereWidget.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.41");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -530,8 +530,6 @@ void vtkPVSphereWidget::SetRadius(double r)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   double val;
   val = atof(this->RadiusEntry->GetValue());
   this->SetRadiusInternal(val);
