@@ -133,6 +133,10 @@ public:
 
   void NoMethodCallback();
 
+  // Description:
+  // This method saves state of animation entry.
+  void SaveState(ofstream *file);
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -150,7 +154,9 @@ protected:
   vtkPVSource*       PVSource;
 
   vtkKWRange*        TimeRange;
-  
+
+
+  char*              SaveStateScript;
   char*              Script;
   char*              CurrentMethod;
   char*              TimeEquation;

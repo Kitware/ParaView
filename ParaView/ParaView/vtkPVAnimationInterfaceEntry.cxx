@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -565,7 +565,8 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
   if ( this->Dirty )
     {
     this->SetTypeToFloat();
-    this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", this->GetTclName(), label, script);
+    //this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
+    //  this->GetTclName(), label, script);
     }
   this->Parent->UpdateNewScript();
 }
@@ -576,6 +577,24 @@ void vtkPVAnimationInterfaceEntry::Update()
   //cout << "Type is: " << this->TypeIsInt << endl;
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
+{
+  if ( this->GetPVSource() )
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetPVSource $kw(" 
+          << this->GetPVSource()->GetTclName() << ")" << endl;
+    if ( this->CurrentMethod )
+      {
+      *file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {" << this->CurrentMethod 
+        << "} {" 
+        << this->Script << "}" << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -126,6 +126,7 @@ public:
   void SaveInBatchScript(ofstream *file, 
                          const char *imageFileName, 
                          const char* geometryFileName);
+  void SaveState(ofstream *file);
 
   // Description:
   // If the animation is controlling a specific PVWidget, then
@@ -183,7 +184,7 @@ public:
 
   // Description:
   // Add an empty source item
-  void AddEmptySourceItem();
+  vtkPVAnimationInterfaceEntry* AddEmptySourceItem();
   void UpdateEntries();
   void DeleteSourceItem(int item);
   void UpdateSourceMenu(int idx);
@@ -197,6 +198,10 @@ public:
   int GetSourceEntryIndex(vtkPVAnimationInterfaceEntry* entry);
 
   void PrepareForDelete();
+
+  // Description:
+  // This method is called when the source is deleted.
+  void DeleteSource(vtkPVSource* src);
 
 protected:
   vtkPVAnimationInterface();
