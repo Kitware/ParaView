@@ -28,13 +28,16 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMPart.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkCollection.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.22");
+
+vtkCxxSetObjectMacro(vtkSMSourceProxy, PartDisplay, vtkSMPartDisplay);
 
 struct vtkSMSourceProxyInternals
 {
@@ -49,6 +52,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
+  this->PartDisplay = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -57,6 +61,7 @@ vtkSMSourceProxy::~vtkSMSourceProxy()
   delete this->PInternals;
 
   this->DataInformation->Delete();
+  this->SetPartDisplay(0);
 }
 
 //---------------------------------------------------------------------------
@@ -81,14 +86,14 @@ void vtkSMSourceProxy::UpdateInformation()
     {
     return;
     }
-
+  
   vtkClientServerStream command;
   for(int i=0; i<numIDs; i++)
     {
     command << vtkClientServerStream::Invoke << this->GetID(i)
             << "UpdateInformation" << vtkClientServerStream::End;
     }
-
+  
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->Servers, command, 0);
   
@@ -136,6 +141,38 @@ void vtkSMSourceProxy::UpdatePipeline()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  this->Superclass::CreateVTKObjects(numObjects);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  int numIDs = this->GetNumberOfIDs();
+  vtkClientServerStream stream;
+  for (int i=0; i<numIDs; i++)
+    {
+    vtkClientServerID execId = pm->NewStreamObject(
+      "vtkCompositeDataPipeline", stream);
+    vtkClientServerID sourceID = this->GetID(i);
+    stream << vtkClientServerStream::Invoke << sourceID
+           << "SetExecutive" << execId <<  vtkClientServerStream::End;
+    }
+
+
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers, stream, 0);
+    }
+}
+
+
+
+//---------------------------------------------------------------------------
 void vtkSMSourceProxy::CreateParts()
 {
   if (this->PartsCreated)
@@ -154,8 +191,9 @@ void vtkSMSourceProxy::CreateParts()
 
   int numIDs = this->GetNumberOfIDs();
 
-  vtkPVNumberOfOutputsInformation* info = vtkPVNumberOfOutputsInformation::New();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  vtkPVNumberOfOutputsInformation* info = vtkPVNumberOfOutputsInformation::New();
 
   // Create one part each output of each filter
   vtkClientServerStream stream;
@@ -174,16 +212,25 @@ void vtkSMSourceProxy::CreateParts()
       stream << vtkClientServerStream::Assign << dataID
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << sourceID
+             << "GetOutputPort" << j <<  vtkClientServerStream::End;
+      vtkClientServerID portID = pm->GetUniqueID();
+      stream << vtkClientServerStream::Assign << portID
+             << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
 
       vtkSMPart* part = vtkSMPart::New();
       part->CreateVTKObjects(0);
       part->SetID(0, dataID);
+      part->SetID(1, portID);
       this->PInternals->Parts.push_back(part);
       part->Delete();
       }
     }
-  pm->SendStream(this->Servers, stream, 0);
-  stream.Reset();
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers, stream, 0);
+    }
   info->Delete();
 
   vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
@@ -220,8 +267,10 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::AddInput(
-  vtkSMSourceProxy *input, const char* method, int hasMultipleInputs)
+void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input, 
+                                const char* method, 
+                                int portIdx, 
+                                int hasMultipleInputs)
 {
 
   if (!input)
@@ -244,8 +293,17 @@ void vtkSMSourceProxy::AddInput(
       {
       vtkSMPart* part = input->GetPart(partIdx);
       stream << vtkClientServerStream::Invoke 
-             << sourceID << method << part->GetID(0) 
-             << vtkClientServerStream::End;
+             << sourceID << method;
+      if (portIdx >= 0)
+        {
+        stream << portIdx;
+        stream << part->GetID(1);
+        }
+      else
+        {
+        stream << part->GetID(0);
+        }
+      stream << vtkClientServerStream::End;
       }
     pm->SendStream(this->Servers, stream, 0);
     }
@@ -267,8 +325,17 @@ void vtkSMSourceProxy::AddInput(
       int partIdx = sourceIdx % numInputs;
       vtkSMPart* part = input->GetPart(partIdx);
       stream << vtkClientServerStream::Invoke 
-             << sourceID << method << part->GetID(0) 
-             << vtkClientServerStream::End;
+             << sourceID << method; 
+      if (portIdx >= 0)
+        {
+        stream << portIdx;
+        stream << part->GetID(1);
+        }
+      else
+        {
+        stream << part->GetID(0);
+        }
+      stream << vtkClientServerStream::End;
       }
     pm->SendStream(this->Servers, stream, 0);
     }
@@ -339,6 +406,10 @@ void vtkSMSourceProxy::GatherDataInformation()
 {
   this->DataInformation->Initialize();
 
+  if (this->PartDisplay)
+    {
+    this->PartDisplay->Update();
+    }
   vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
     this->PInternals->Parts.begin();
   for (; it != this->PInternals->Parts.end(); it++)
@@ -571,4 +642,6 @@ void vtkSMSourceProxy::ConvertArrayInformationToProperty(
 void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "PartDisplay: " << this->PartDisplay << endl;
 }

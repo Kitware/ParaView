@@ -39,6 +39,7 @@ class vtkPVDataSetAttributesInformation;
 struct vtkSMSourceProxyInternals;
 //ETX
 class vtkSMPart;
+class vtkSMPartDisplay;
 class vtkSMProperty;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
@@ -68,9 +69,10 @@ public:
   // created. If the filter has two inputs and one is multi-block
   // whereas the other one is not, SetInput() should be called with
   // the multi-block input first. Otherwise, it will create only
-  // on filter and can not apply to the multi-block input.
+  // one filter and can not apply to the multi-block input.
   void AddInput(vtkSMSourceProxy* input, 
                 const char* method,
+                int portIdx,
                 int hasMultipleInputs);
 
   // Description:
@@ -124,7 +126,10 @@ public:
     {
       return this->Superclass::GetProperty(name);
     }
-  
+
+  void SetPartDisplay(vtkSMPartDisplay* pd);
+  vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -163,6 +168,13 @@ protected:
 
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
+
+  vtkSMPartDisplay* PartDisplay;
+
+  // Description:
+  // Call superclass' and then assigns a new executive 
+  // (vtkCompositeDataPipeline)
+  virtual void CreateVTKObjects(int numObjects);
 
 private:
   vtkSMSourceProxyInternals* PInternals;
