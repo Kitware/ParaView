@@ -14,13 +14,21 @@
 #include "vtkPVCornerAnnotation.h"
 
 #include "vtkCornerAnnotation.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWLabeledText.h"
+#include "vtkKWScale.h"
+#include "vtkKWText.h"
 #include "vtkKWTextProperty.h"
-#include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVRenderView.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyAdaptor.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotation );
-vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.2");
+vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.3");
 
 int vtkPVCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -31,6 +39,7 @@ vtkPVCornerAnnotation::vtkPVCornerAnnotation()
   this->InternalCornerAnnotation = NULL;
 
   this->View= NULL;
+
 }
 
 //----------------------------------------------------------------------------
@@ -43,6 +52,7 @@ vtkPVCornerAnnotation::~vtkPVCornerAnnotation()
     this->InternalCornerAnnotation->Delete();
     this->InternalCornerAnnotation = NULL;
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -139,6 +149,108 @@ void vtkPVCornerAnnotation::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCornerAnnotation::UpdateCornerText() 
+{
+  if (this->IsCreated())
+    {
+    for (int i = 0; i < 4; i++)
+      {
+      if (this->CornerText[i])
+        {
+        this->SetCornerTextInternal(
+          this->CornerText[i]->GetText()->GetValue(), i);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCornerAnnotation::SetCornerTextInternal(const char* text, int corner) 
+{
+  if (this->CornerAnnotation &&
+      (!this->GetCornerText(corner) ||
+       strcmp(this->GetCornerText(corner), text)))
+    {
+    this->CornerAnnotation->SetText(
+      corner, this->Script("%s \"%s\"", "set pvCATemp", text));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCornerAnnotation::CornerTextCallback(int i) 
+{
+  if (this->IsCreated() && this->CornerText[i])
+    {
+    char* text = this->CornerText[i]->GetText()->GetValue();
+    this->SetCornerTextInternal(text, i);
+
+    this->Update();
+
+    if (this->GetVisibility())
+      {
+      this->Render();
+      }
+
+    this->SendChangedEvent();
+
+    this->AddTraceEntry("$kw(%s) SetCornerText {%s} %d", 
+                        this->GetTclName(), text, i);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCornerAnnotation::SetCornerText(const char *text, int corner) 
+{
+  char* oldValue = this->CornerText[corner]->GetText()->GetValue();
+  if (this->CornerAnnotation && (strcmp(oldValue, text)))
+    {
+    this->CornerText[corner]->GetText()->SetValue(text);
+    this->SetCornerTextInternal(text, corner);
+
+    this->Update();
+
+    if (this->GetVisibility())
+      {
+      this->Render();
+      }
+
+    this->SendChangedEvent();
+
+    this->AddTraceEntry("$kw(%s) SetCornerText {%s} %d", 
+                        this->GetTclName(), text, corner);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVCornerAnnotation::Update() 
+{
+  // Maximum line height
+
+  if (this->MaximumLineHeightScale && this->CornerAnnotation)
+    {
+    this->MaximumLineHeightScale->SetValue(
+      this->CornerAnnotation->GetMaximumLineHeight());
+    }
+
+  // Text property
+
+  if (this->TextPropertyWidget)
+    {
+    this->TextPropertyWidget->SetTextProperty(
+      this->CornerAnnotation ? this->CornerAnnotation->GetTextProperty():NULL);
+    this->TextPropertyWidget->SetActor2D(this->CornerAnnotation);
+    this->TextPropertyWidget->Update();
+    }
+
+  if (this->CheckButton)
+    {
+    this->CheckButton->SetState(this->CornerAnnotation->GetVisibility());
+    }
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCornerAnnotation::Render() 
 {
   if (this->View)
@@ -157,9 +269,9 @@ void vtkPVCornerAnnotation::SaveState(ofstream *file)
   for (i = 0; i < 4; i++)
     {
     *file << "$kw(" << this->GetTclName() << ") SetCornerText {";
-    if (this->GetCornerText(i))
+    if (this->CornerText[i]->GetText()->GetValue())
       {
-      *file << this->GetCornerText(i);
+      *file << this->CornerText[i]->GetText()->GetValue();
       }
     *file << "} " << i << endl;
     }

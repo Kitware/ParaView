@@ -132,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.351");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.352");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1616,6 +1616,7 @@ void PVRenderView_IdleRender(ClientData arg)
 void vtkPVRenderView::EventuallyRender()
 {
   vtkDebugMacro("Enqueue EventuallyRender request");
+  this->CornerAnnotation->UpdateCornerText();
 
   this->RenderTimer->StartTimer();
   if ( !this->TimerToken )

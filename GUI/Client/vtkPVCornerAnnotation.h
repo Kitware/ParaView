@@ -47,10 +47,24 @@ public:
   virtual void SetVisibility(int i);
   virtual int GetVisibility();
   vtkBooleanMacro(Visibility, int);
+
+  // Description:
+  // Set corner text
+  virtual void SetCornerText(const char *txt, int corner);
+
+  // Description:
+  // Update the GUI according to the value of the ivars
+  // Temporarily overridden
+  virtual void Update();
+
+  void UpdateCornerText();
+  virtual void CornerTextCallback(int i);
   
 protected:
   vtkPVCornerAnnotation();
   ~vtkPVCornerAnnotation();
+
+  void SetCornerTextInternal(const char* text, int corner);
 
   vtkPVRenderView* View;
 
