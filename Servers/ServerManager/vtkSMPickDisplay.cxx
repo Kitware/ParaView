@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPickDisplay);
-vtkCxxRevisionMacro(vtkSMPickDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMPickDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -77,16 +77,16 @@ vtkSMPickDisplay::~vtkSMPickDisplay()
 vtkUnstructuredGrid* vtkSMPickDisplay::GetCollectedData()
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
-  if (pm == NULL)
+  if (pm == 0 || this->DuplicateProxy->GetNumberOfIDs() <= 0)
     {
-    return NULL;
+    return 0;
     }
   vtkMPIMoveData* dp;
   dp = vtkMPIMoveData::SafeDownCast(
       pm->GetObjectFromID(this->DuplicateProxy->GetID(0)));
-  if (dp == NULL)
+  if (dp == 0)
     {
-    return NULL;
+    return 0;
     }
 
   return dp->GetUnstructuredGridOutput();
