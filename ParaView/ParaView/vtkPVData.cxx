@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.157");
+vtkCxxRevisionMacro(vtkPVData, "1.158");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -123,11 +123,12 @@ vtkPVData::vtkPVData()
   this->InstanceCount = instanceCount;
     
   this->Properties = vtkKWFrame::New();
+  this->InformationsFrame = vtkKWFrame::New();
 
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
   this->ColorFrame = vtkKWLabeledFrame::New();
   this->DisplayStyleFrame = vtkKWLabeledFrame::New();
-  this->StatsFrame = vtkKWWidget::New();
+  this->StatsFrame = vtkKWLabeledFrame::New();
   this->ViewFrame = vtkKWLabeledFrame::New();
   
   this->NumCellsLabel = vtkKWLabel::New();
@@ -418,6 +419,9 @@ vtkPVData::~vtkPVData()
 
   this->Properties->Delete();
   this->Properties = NULL;
+
+  this->InformationsFrame->Delete();
+  this->InformationsFrame = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1040,6 +1044,9 @@ void vtkPVData::CreateProperties()
     {
     return;
     }
+
+  // Properties (aka Display page)
+
   if (this->GetPVSource()->GetHideDisplayPage())
     {
     // We use the parameters frame as a bogus parent.
@@ -1059,29 +1066,22 @@ void vtkPVData::CreateProperties()
   this->ScalarBarFrame->ShowHideFrameOn();
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
+
   this->ColorFrame->SetParent(this->Properties->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->Application);
   this->ColorFrame->SetLabel("Color");
+
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->Application);
   this->DisplayStyleFrame->SetLabel("Display Style");
-  this->StatsFrame->SetParent(this->Properties->GetFrame());
-  this->StatsFrame->Create(this->Application, "frame", "");
+
   this->ViewFrame->SetParent(this->Properties->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->Application);
   this->ViewFrame->SetLabel("View");
  
-  this->NumCellsLabel->SetParent(this->StatsFrame);
-  this->NumCellsLabel->Create(this->Application, "");
-  this->NumPointsLabel->SetParent(this->StatsFrame);
-  this->NumPointsLabel->Create(this->Application, "");
-  
-  this->BoundsDisplay->SetParent(this->Properties->GetFrame());
-  this->BoundsDisplay->Create(this->Application);
-  
   this->AmbientScale->SetParent(this->Properties->GetFrame());
   this->AmbientScale->Create(this->Application, "-showvalue 1");
   this->AmbientScale->DisplayLabel("Ambient Light");
@@ -1095,6 +1095,7 @@ void vtkPVData::CreateProperties()
   
   this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenu->Create(this->Application, "");    
+
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
   this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetText("Actor Color");
@@ -1142,6 +1143,7 @@ void vtkPVData::CreateProperties()
   this->RepresentationMenuLabel->SetParent(this->RepresentationMenuFrame);
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Representation:");
+
   this->RepresentationMenu->SetParent(this->RepresentationMenuFrame);
   this->RepresentationMenu->Create(this->Application, "");
   this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
@@ -1154,9 +1156,11 @@ void vtkPVData::CreateProperties()
   
   this->InterpolationMenuFrame->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenuFrame->Create(this->Application, "frame", "");
+
   this->InterpolationMenuLabel->SetParent(this->InterpolationMenuFrame);
   this->InterpolationMenuLabel->Create(this->Application, "");
   this->InterpolationMenuLabel->SetLabel("Interpolation:");
+
   this->InterpolationMenu->SetParent(this->InterpolationMenuFrame);
   this->InterpolationMenu->Create(this->Application, "");
   this->InterpolationMenu->AddEntryWithCommand("Flat", this,
@@ -1170,7 +1174,7 @@ void vtkPVData::CreateProperties()
   
   this->PointSizeLabel->SetParent(this->DisplayScalesFrame);
   this->PointSizeLabel->Create(this->Application, "");
-  this->PointSizeLabel->SetLabel("Point Size");
+  this->PointSizeLabel->SetLabel("Point size");
   
   this->PointSizeScale->SetParent(this->DisplayScalesFrame);
   this->PointSizeScale->Create(this->Application, "-showvalue 1");
@@ -1181,7 +1185,7 @@ void vtkPVData::CreateProperties()
 
   this->LineWidthLabel->SetParent(this->DisplayScalesFrame);
   this->LineWidthLabel->Create(this->Application, "");
-  this->LineWidthLabel->SetLabel("Line Width");
+  this->LineWidthLabel->SetLabel("Line width");
   
   this->LineWidthScale->SetParent(this->DisplayScalesFrame);
   this->LineWidthScale->Create(this->Application, "-showvalue 1");
@@ -1189,7 +1193,6 @@ void vtkPVData::CreateProperties()
   this->LineWidthScale->SetResolution(1);
   this->LineWidthScale->SetValue(1);
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
-  
   
   this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
@@ -1219,12 +1222,6 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s %s -side left",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
-  this->Script("pack %s", this->StatsFrame->GetWidgetName());
-  this->Script("pack %s %s -side left",
-               this->NumCellsLabel->GetWidgetName(),
-               this->NumPointsLabel->GetWidgetName());
-  this->Script("pack %s -fill x -expand t", 
-               this->BoundsDisplay->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
@@ -1261,12 +1258,6 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
 
-  if (!this->GetPVSource()->GetHideDisplayPage())
-    {
-    this->Script("pack %s -fill both -expand yes -side top",
-                 this->Properties->GetWidgetName());
-    }
-
   this->ActorControlFrame->SetParent(this->Properties->GetFrame());
   this->ActorControlFrame->Create(this->Application);
   this->ActorControlFrame->SetLabel("Actor Control");
@@ -1296,6 +1287,7 @@ void vtkPVData::CreateProperties()
                  this->ScaleEntry[cc]->GetWidgetName(),
                  this->GetTclName());
     }
+
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
   this->OpacityLabel->SetLabel("Opacity");
@@ -1332,8 +1324,61 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s -fill x -expand yes -side top", 
                this->ActorControlFrame->GetWidgetName());
 
-  this->PropertiesCreated = 1;
+  if (!this->GetPVSource()->GetHideDisplayPage())
+    {
+    this->Script("pack %s -fill both -expand yes -side top",
+                 this->Properties->GetWidgetName());
+    }
 
+  // Informations page
+
+  if (this->GetPVSource()->GetHideInformationsPage())
+    {
+    // We use the parameters frame as a bogus parent.
+    // This is not a problem since we never pack the
+    // properties frame in this case.
+    this->InformationsFrame->SetParent(
+      this->GetPVSource()->GetParametersParent());
+    }
+  else
+    {
+    this->InformationsFrame->SetParent(
+      this->GetPVSource()->GetNotebook()->GetFrame("Informations"));
+    }
+  this->InformationsFrame->Create(this->Application, 1);
+
+  this->StatsFrame->SetParent(this->InformationsFrame->GetFrame());
+  this->StatsFrame->ShowHideFrameOn();
+  this->StatsFrame->Create(this->Application);
+  this->StatsFrame->SetLabel("Statistics");
+
+  this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
+  this->NumCellsLabel->Create(this->Application, "");
+
+  this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
+  this->NumPointsLabel->Create(this->Application, "");
+  
+  this->BoundsDisplay->SetParent(this->InformationsFrame->GetFrame());
+  this->BoundsDisplay->Create(this->Application);
+  
+  this->Script("pack %s -fill x", this->StatsFrame->GetWidgetName());
+
+  this->Script("pack %s %s -side top -anchor nw",
+               this->NumCellsLabel->GetWidgetName(),
+               this->NumPointsLabel->GetWidgetName());
+
+  this->Script("pack %s -fill x -expand t", 
+               this->BoundsDisplay->GetWidgetName());
+
+  if (!this->GetPVSource()->GetHideInformationsPage())
+    {
+    this->Script("pack %s -fill both -expand yes -side top",
+                 this->InformationsFrame->GetWidgetName());
+    }
+
+  // OK, all done
+
+  this->PropertiesCreated = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1433,10 +1478,10 @@ void vtkPVData::UpdateProperties()
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent("Create LOD");
 
-  sprintf(tmp, "number of cells: %d", 
+  sprintf(tmp, "Number of cells: %d", 
           this->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
-  sprintf(tmp, "number of points: %d", numberOfPoints);
+  sprintf(tmp, "Number of points: %d", numberOfPoints);
   this->NumPointsLabel->SetLabel(tmp);
   
   this->BoundsDisplay->SetBounds(bounds);
@@ -2741,7 +2786,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.157 $");
+  this->ExtractRevision(os,"$Revision: 1.158 $");
 }
 
 //----------------------------------------------------------------------------

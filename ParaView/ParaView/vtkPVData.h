@@ -394,6 +394,7 @@ protected:
   
   // Not properties does not mean the same thing as vtk.
   vtkKWFrame *Properties;
+  vtkKWFrame *InformationsFrame;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
   vtkKWBoundsDisplay *BoundsDisplay;
@@ -403,7 +404,7 @@ protected:
   vtkKWLabeledFrame *ScalarBarFrame;
   vtkKWLabeledFrame *ColorFrame;
   vtkKWLabeledFrame *DisplayStyleFrame;
-  vtkKWWidget *StatsFrame;
+  vtkKWLabeledFrame *StatsFrame;
   vtkKWLabeledFrame *ViewFrame;
   
   vtkKWLabel *ColorMenuLabel;
