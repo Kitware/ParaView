@@ -151,6 +151,7 @@ class VTK_EXPORT vtkKWEvent
     ProbeInformationChangedEvent,
     ProbeInformationOffEvent,
     ProjectionTypeChangedEvent,
+    ReceiveRemoteSessionEvent,
     RenderEvent,
     RenderWidgetInSelectionFrameChangedEvent,
     RightMouseOptionChangedEvent,
