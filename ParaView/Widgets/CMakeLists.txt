@@ -100,9 +100,7 @@ ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
 vtkKWCommonTCL
-vtkParallelTCL
 vtkHybridTCL
-vtkParallel
 vtkHybrid
 ${TCL_LIBRARY}
 ${TK_LIBRARY}
