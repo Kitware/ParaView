@@ -110,7 +110,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.343");
+vtkCxxRevisionMacro(vtkPVWindow, "1.344");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -750,7 +750,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
   this->FlyButton->Create(
-    app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton");
+    app, "-indicatoron 0 -highlightthickness 0 -image KWFlyButton -selectimage KWActiveFlyButton");
   this->FlyButton->SetBalloonHelpString(
     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
   this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
@@ -761,7 +761,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->RotateCameraButton->Create(
-    app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton");
+    app, "-indicatoron 0 -highlightthickness 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton");
   this->RotateCameraButton->SetBalloonHelpString(
     "Rotate View Mode\n   Left Button: Rotate.\n  Shift + LeftButton: Z roll.\n   Right Button: Behaves like translate view mode.");
   this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
@@ -773,7 +773,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 
   this->TranslateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
   this->TranslateCameraButton->Create(
-    app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton");
+    app, "-indicatoron 0 -highlightthickness 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton");
   this->TranslateCameraButton->SetBalloonHelpString(
     "Translate View Mode\n   Left Button: Translate.\n   Right Button: Zoom.");
   this->Script("%s configure -command {%s ChangeInteractorStyle 2}", 
@@ -3472,7 +3472,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.343 $");
+  this->ExtractRevision(os,"$Revision: 1.344 $");
 }
 
 //----------------------------------------------------------------------------
