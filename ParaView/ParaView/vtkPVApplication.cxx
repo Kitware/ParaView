@@ -1023,8 +1023,11 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
     vtkWarningMacro("error looking up color ramp image");
     return;
     }  
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
+#else
   Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
-
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1336,7 +1339,7 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
 {
   ostrstream str;
   str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
-      << "http://public.kitware.com/ParaView" << endl
+      << "http://www.paraview.org" << endl
       << "http://www.kitware.com" << endl
       << "This is version " << this->MajorVersion << "." << this->MinorVersion
       << ", release " << this->GetApplicationReleaseName() << ends;
