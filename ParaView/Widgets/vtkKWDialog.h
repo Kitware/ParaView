@@ -89,6 +89,12 @@ public:
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand(vtkKWObject* CalledObject, const char *CommandString);
 
+  
+  // Description:
+  // Set the title of the dialog window. Should be called before
+  // create otherwise it will have no effect.
+  vtkSetStringMacro(Title);
+
 protected:
   vtkKWDialog();
   ~vtkKWDialog();
@@ -96,6 +102,7 @@ protected:
   void operator=(const vtkKWDialog&) {};
 
   char *Command;
+  char *Title;
   int Done;
 };
 

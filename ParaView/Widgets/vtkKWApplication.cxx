@@ -598,9 +598,11 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
   ostrstream str;
   str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;
 
+  char* msg = str.str();
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->Create(this,"");
-  dlg->SetText(str.str());
+  dlg->SetText(msg);
   dlg->Invoke();  
-  dlg->Delete();  
+  dlg->Delete(); 
+  delete[] msg;
 }
