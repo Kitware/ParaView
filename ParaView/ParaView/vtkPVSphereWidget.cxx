@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.31");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -210,12 +210,11 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkSphere " << "pvTemp" << this->SphereID << endl;
-  *file << "\t" << this->SphereID << " SetCenter ";
-  this->Script("%s GetCenter", this->SphereID);
-  *file << this->Application->GetMainInterp()->result << endl;
+  *file << "\tpvTemp" << this->SphereID << " SetCenter ";
+  *file << this->LastAcceptedCenter[0] << " " << this->LastAcceptedCenter[1] << " " 
+    << this->LastAcceptedCenter[2] << endl;
   *file << "\t" << "pvTemp" << this->SphereID << " SetRadius ";
-  this->Script("%s GetRadius", this->SphereID);
-  *file << this->Application->GetMainInterp()->result << endl;
+  *file << this->LastAcceptedRadius << endl;
 }
 
 //----------------------------------------------------------------------------
