@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.551");
+vtkCxxRevisionMacro(vtkPVWindow, "1.552");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4490,6 +4490,7 @@ void vtkPVWindow::EndProgress(int enabled)
 
   if ( !enabled || this->Enabled )
     {
+    this->UpdateEnableState();
     return;
     }
   this->EnabledOn();
