@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.4");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.5");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -176,7 +176,7 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
     {
     this->TopLevel = vtkKWWidget::New();
     this->TopLevel->Create(
-      app, "toplevel", "-bg #00356A -bd 2 -relief flat");
+      app, "toplevel", "-bg black -bd 2 -relief flat");
     this->Script("wm overrideredirect %s 1", 
                  this->TopLevel->GetWidgetName());
     this->Script("wm withdraw %s", 
