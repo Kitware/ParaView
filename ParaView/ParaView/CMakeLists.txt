@@ -67,7 +67,6 @@ SET( ParaViewClient_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVClassNameInformation.cxx
   vtkPVColorMap.cxx
-  vtkPVComponentSelection.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVCompositeBuffer.cxx
