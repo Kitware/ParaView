@@ -45,10 +45,9 @@ public:
   // Set the input data for this Actor
   virtual void SetInput(vtkPolyData *input);
   vtkPolyData *GetInput();
-  
+
   // Description:
   // Get the prop for this composite
-  virtual vtkProp *GetProp();
   virtual vtkActor *GetActor() {return this->Actor;};
   
   // Description:
@@ -62,6 +61,9 @@ protected:
 
   vtkActor *Actor;
   vtkPolyDataMapper *Mapper;
+
+  // Define method required by superclass.
+  virtual vtkProp* GetPropInternal();
 
 private:
   vtkKWActorComposite(const vtkKWActorComposite&);  // Not implemented.

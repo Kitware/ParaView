@@ -34,18 +34,37 @@ public:
   vtkTypeRevisionMacro(vtkKWGenericComposite,vtkKWComposite);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+# define SetPropA SetProp
+# define SetPropW SetProp
+#endif
+
   //BTX
   // Description:
-  // Get the prop for this composite
-  virtual vtkProp *GetProp() {return this->Prop;};
-  void SetProp(vtkProp *);
+  // Set the prop for this composite.
+  void SetProp(vtkProp*);
   //ETX
-  
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef SetPropW
+# undef SetPropA
+  //BTX
+  // Define possible mangled names.
+  void SetPropA(vtkProp*);
+  void SetPropW(vtkProp*);
+  //ETX
+#endif
+
 protected:
   vtkKWGenericComposite();
   ~vtkKWGenericComposite();
 
   vtkProp *Prop;
+
+  // Define method required by superclass.
+  virtual vtkProp* GetPropInternal();
+
 private:
   vtkKWGenericComposite(const vtkKWGenericComposite&); // Not implemented
   void operator=(const vtkKWGenericComposite&); // Not implemented

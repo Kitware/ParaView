@@ -20,7 +20,7 @@
 #include "vtkKWView.h"
 #include "vtkKWWindow.h"
 
-vtkCxxRevisionMacro(vtkKWComposite, "1.22");
+vtkCxxRevisionMacro(vtkKWComposite, "1.23");
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -183,7 +183,25 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.22 $");
+  this->ExtractRevision(os,"$Revision: 1.23 $");
+}
+
+//----------------------------------------------------------------------------
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetProp
+// Define possible mangled names.
+vtkProp* vtkKWComposite::GetPropA()
+{
+  return this->GetPropInternal();
+}
+vtkProp* vtkKWComposite::GetPropW()
+{
+  return this->GetPropInternal();
+}
+#endif
+vtkProp* vtkKWComposite::GetProp()
+{
+  return this->GetPropInternal();
 }
 
 //----------------------------------------------------------------------------

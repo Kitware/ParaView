@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.81");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.82");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -909,7 +909,25 @@ int vtkKWRenderWidget::HasProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef RemoveProp
+// Define possible mangled names.
+void vtkKWRenderWidget::RemovePropA(vtkProp* p)
+{
+  this->RemovePropInternal(p);
+}
+void vtkKWRenderWidget::RemovePropW(vtkProp* p)
+{
+  this->RemovePropInternal(p);
+}
+#endif
+void vtkKWRenderWidget::RemoveProp(vtkProp* p)
+{
+  this->RemovePropInternal(p);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
 {
   // safe to call both, vtkViewport does a check first
   this->GetRenderer()->RemoveProp(prop);

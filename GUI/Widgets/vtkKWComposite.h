@@ -41,11 +41,27 @@ public:
   vtkGetObjectMacro(View,vtkKWView);
   virtual void SetView(vtkKWView *view);
 
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+# define GetPropA GetProp
+# define GetPropW GetProp
+#endif
+
   //BTX
   // Description:
-  // Get the Prop for this class.
-  virtual vtkProp *GetProp() = 0;
+  // Get the prop for this composite.
+  vtkProp* GetProp();
   //ETX
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetPropW
+# undef GetPropA
+  //BTX
+  // Define possible mangled names.
+  vtkProp* GetPropA();
+  vtkProp* GetPropW();
+  //ETX
+#endif
 
   // Description:
   // Initialize properties should be called by any methods
@@ -107,6 +123,12 @@ protected:
   vtkKWView *View;
 
   vtkKWWidget *PropertiesParent;
+
+  //BTX
+  // Real implementation of GetProp method.  This is the one that
+  // subclasses must define.
+  virtual vtkProp* GetPropInternal() = 0;
+  //ETX
 private:
   vtkKWComposite(const vtkKWComposite&); // Not implemented
   void operator=(const vtkKWComposite&); // Not Implemented

@@ -107,9 +107,28 @@ public:
   virtual void AddProp(vtkProp *prop);
   virtual void AddOverlayProp(vtkProp *prop);
   virtual int  HasProp(vtkProp *prop);
-  virtual void RemoveProp(vtkProp *prop);
   virtual void RemoveAllProps();
-  
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+# define RemovePropA RemoveProp
+# define RemovePropW RemoveProp
+#endif
+
+  // Description:
+  // Manage props inside this widget renderer(s). Add, remove, query.
+  void RemoveProp(vtkProp *prop);
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef RemovePropA
+# undef RemovePropW
+  //BTX
+  // Define possible mangled names.
+  void RemovePropA(vtkProp*);
+  void RemovePropW(vtkProp*);
+  //ETX
+#endif
+
   // Description:
   // Set the widget background color
   virtual void GetRendererBackgroundColor(double *r, double *g, double *b);
@@ -289,6 +308,7 @@ protected:
   vtkKWRenderWidgetCallbackCommand *Observer;
   int EventIdentifier;
   
+  virtual void RemovePropInternal(vtkProp* prop);
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
   void operator=(const vtkKWRenderWidget&);  // Not implemented

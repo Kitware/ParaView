@@ -18,9 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
-vtkCxxRevisionMacro(vtkKWGenericComposite, "1.10");
-
-vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
+vtkCxxRevisionMacro(vtkKWGenericComposite, "1.11");
 
 
 
@@ -37,6 +35,27 @@ vtkKWGenericComposite::vtkKWGenericComposite()
 vtkKWGenericComposite::~vtkKWGenericComposite()
 {
   this->SetProp(NULL);
+}
+
+//----------------------------------------------------------------------------
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef SetProp
+// Define possible mangled names.
+void vtkKWGenericComposite::SetPropA(vtkProp* prop)
+{
+  return this->SetProp(prop);
+}
+void vtkKWGenericComposite::SetPropW(vtkProp* prop)
+{
+  return this->SetProp(prop);
+}
+#endif
+vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
+
+//----------------------------------------------------------------------------
+vtkProp* vtkKWGenericComposite::GetPropInternal()
+{
+  return this->Prop;
 }
 
 //----------------------------------------------------------------------------
