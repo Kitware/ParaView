@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.87");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.88");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1652,6 +1652,10 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
 
   if (visible)
     {
+    // Current renderer was set to Null when visible was set off.
+    // Set the CurrentRenderer to avoid the poked renderer issue.
+    this->ScalarBar->SetCurrentRenderer(
+      this->GetPVApplication()->GetRenderModule()->GetRenderer2D());
     // This removes all renderers from the render window before enabling 
     // the widget. It then adds them back into the render window.
     // I assume the widget needs to know which renderer it uses.
