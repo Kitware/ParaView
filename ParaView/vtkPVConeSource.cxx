@@ -120,6 +120,29 @@ void vtkPVConeSource::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartConeSourceProgress(void *arg)
+{
+  vtkPVConeSource *me = (vtkPVConeSource*)arg;
+  me->GetWindow()->SetStatusText("Processing ConeSource");
+}
+
+//----------------------------------------------------------------------------
+void ConeSourceProgress(void *arg)
+{
+  vtkPVConeSource *me = (vtkPVConeSource*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetConeSource()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndConeSourceProgress(void *arg)
+{
+  vtkPVConeSource *me = (vtkPVConeSource*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVConeSource::ConeParameterChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -131,6 +154,9 @@ void vtkPVConeSource::ConeParameterChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
+    this->GetConeSource()->SetStartMethod(StartConeSourceProgress, this);
+    this->GetConeSource()->SetProgressMethod(ConeSourceProgress, this);
+    this->GetConeSource()->SetEndMethod(EndConeSourceProgress, this);
     this->InitializeData();
     }
   
@@ -141,8 +167,8 @@ void vtkPVConeSource::ConeParameterChanged()
   
   window->GetMainView()->SetSelectedComposite(this);
 
-  this->GetView()->Render();
   window->GetMainView()->ResetCamera();
+  this->GetView()->Render();
 }
 
 

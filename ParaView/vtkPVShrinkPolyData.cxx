@@ -94,6 +94,29 @@ void vtkPVShrinkPolyData::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartShrinkPolyDataProgress(void *arg)
+{
+  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
+  me->GetWindow()->SetStatusText("Processing Shrink");
+}
+
+//----------------------------------------------------------------------------
+void ShrinkPolyDataProgress(void *arg)
+{
+  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetShrink()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndShrinkPolyDataProgress(void *arg)
+{
+  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::ShrinkFactorChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -103,6 +126,9 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
+    this->GetShrink()->SetStartMethod(StartShrinkPolyDataProgress, this);
+    this->GetShrink()->SetProgressMethod(ShrinkPolyDataProgress, this);
+    this->GetShrink()->SetEndMethod(EndShrinkPolyDataProgress, this);
     this->InitializeData();
     }
 

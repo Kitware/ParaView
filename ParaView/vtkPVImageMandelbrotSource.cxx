@@ -275,6 +275,35 @@ void vtkPVImageMandelbrotSource::SetCenter(float cr, float ci,
 }
 
 //----------------------------------------------------------------------------
+vtkImageMandelbrotSource *vtkPVImageMandelbrotSource::GetImageMandelbrotSource()
+{
+  return vtkImageMandelbrotSource::SafeDownCast(this->ImageSource);  
+}
+
+//----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartImageMandelbrotSourceProgress(void *arg)
+{
+  vtkPVImageMandelbrotSource *me = (vtkPVImageMandelbrotSource*)arg;
+  me->GetWindow()->SetStatusText("Processing ImageMandelbrotSource");
+}
+
+//----------------------------------------------------------------------------
+void ImageMandelbrotSourceProgress(void *arg)
+{
+  vtkPVImageMandelbrotSource *me = (vtkPVImageMandelbrotSource*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetImageMandelbrotSource()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndImageMandelbrotSourceProgress(void *arg)
+{
+  vtkPVImageMandelbrotSource *me = (vtkPVImageMandelbrotSource*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageMandelbrotSource::AcceptParameters()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -293,6 +322,12 @@ void vtkPVImageMandelbrotSource::AcceptParameters()
 
   if (this->GetPVData() == NULL)
     {
+    this->GetImageMandelbrotSource()->
+      SetStartMethod(StartImageMandelbrotSourceProgress, this);
+    this->GetImageMandelbrotSource()->
+      SetProgressMethod(ImageMandelbrotSourceProgress, this);
+    this->GetImageMandelbrotSource()->
+      SetEndMethod(EndImageMandelbrotSourceProgress, this);
     this->InitializeData();
     }
 
@@ -302,12 +337,6 @@ void vtkPVImageMandelbrotSource::AcceptParameters()
     }
   
   window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
   window->GetMainView()->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-vtkImageMandelbrotSource *vtkPVImageMandelbrotSource::GetImageMandelbrotSource()
-{
-  return vtkImageMandelbrotSource::SafeDownCast(this->ImageSource);  
+  this->GetView()->Render();
 }

@@ -277,6 +277,28 @@ void vtkPVElevationFilter::CreateProperties()
 	       this->RangeFrame->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartElevationFilterProgress(void *arg)
+{
+  vtkPVElevationFilter *me = (vtkPVElevationFilter*)arg;
+  me->GetWindow()->SetStatusText("Processing Elevation Filter");
+}
+
+//----------------------------------------------------------------------------
+void ElevationFilterProgress(void *arg)
+{
+  vtkPVElevationFilter *me = (vtkPVElevationFilter*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetElevation()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndElevationFilterProgress(void *arg)
+{
+  vtkPVElevationFilter *me = (vtkPVElevationFilter*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVElevationFilter::ElevationParameterChanged()
@@ -299,6 +321,9 @@ void vtkPVElevationFilter::ElevationParameterChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time. Initialize data.
+    this->GetElevation()->SetStartMethod(StartElevationFilterProgress, this);
+    this->GetElevation()->SetProgressMethod(ElevationFilterProgress, this);
+    this->GetElevation()->SetEndMethod(EndElevationFilterProgress, this);
     this->InitializeData();
     }
   

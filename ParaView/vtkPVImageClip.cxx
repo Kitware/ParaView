@@ -225,6 +225,29 @@ void vtkPVImageClip::SetOutputWholeExtent(int xMin, int xMax,
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartImageClipProgress(void *arg)
+{
+  vtkPVImageClip *me = (vtkPVImageClip*)arg;
+  me->GetWindow()->SetStatusText("Processing ImageClip");
+}
+
+//----------------------------------------------------------------------------
+void ImageClipProgress(void *arg)
+{
+  vtkPVImageClip *me = (vtkPVImageClip*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetImageClip()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndImageClipProgress(void *arg)
+{
+  vtkPVImageClip *me = (vtkPVImageClip*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageClip::ExtentsChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -242,6 +265,9 @@ void vtkPVImageClip::ExtentsChanged()
   
   if (this->GetPVData() == NULL)
     {
+    this->GetImageClip()->SetStartMethod(StartImageClipProgress, this);
+    this->GetImageClip()->SetProgressMethod(ImageClipProgress, this);
+    this->GetImageClip()->SetEndMethod(EndImageClipProgress, this);
     pvi = vtkPVImage::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();

@@ -32,7 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
-
+#include "vtkKWToolbar.h"
 
 int vtkPVCutterCommand(ClientData cd, Tcl_Interp *interp,
 		       int argc, char *argv[]);
@@ -63,6 +63,10 @@ vtkPVCutter::vtkPVCutter()
   this->NormalXEntry = vtkKWEntry::New();
   this->NormalYEntry = vtkKWEntry::New();
   this->NormalZEntry = vtkKWEntry::New();
+
+  this->PlaneStyleButton = vtkKWPushButton::New();
+  
+  this->PlaneStyle = vtkInteractorStylePlane::New();
   
   this->Cutter = vtkCutter::New();  
 }
@@ -104,6 +108,12 @@ vtkPVCutter::~vtkPVCutter()
   this->OriginFrame = NULL;
   this->NormalFrame->Delete();
   this->NormalFrame = NULL;
+  
+  this->PlaneStyleButton->Delete();
+  this->PlaneStyleButton = NULL;
+  
+  this->PlaneStyle->Delete();
+  this->PlaneStyle = NULL;
   
   this->Cutter->Delete();
   this->Cutter = NULL;
@@ -179,13 +189,26 @@ void vtkPVCutter::CreateProperties()
   this->NormalZEntry->SetParent(this->NormalFrame->GetFrame());
   this->NormalZEntry->Create(this->Application, "-width 5");
   this->NormalZEntry->SetValue(0, 2);
-  this->Script("pack  %s %s %s %s %s %s -side left -fill x",
+  this->Script("pack %s %s %s %s %s %s -side left -fill x",
 	       this->NormalXLabel->GetWidgetName(),
 	       this->NormalXEntry->GetWidgetName(),
 	       this->NormalYLabel->GetWidgetName(),
 	       this->NormalYEntry->GetWidgetName(),
 	       this->NormalZLabel->GetWidgetName(),
 	       this->NormalZEntry->GetWidgetName());
+  
+  this->PlaneStyleButton->SetParent(this->GetWindow()->GetToolbar());
+  this->PlaneStyleButton->Create(this->Application, "");
+  this->PlaneStyleButton->SetLabel("Plane");
+  this->PlaneStyleButton->SetCommand(this, "UsePlaneStyle");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->PlaneStyleButton->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::UsePlaneStyle()
+{
+  this->GetWindow()->GetMainView()->SetInteractorStyle(this->PlaneStyle);
 }
 
 //----------------------------------------------------------------------------
@@ -225,6 +248,29 @@ vtkPVPolyData *vtkPVCutter::GetOutput()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartCutterProgress(void *arg)
+{
+  vtkPVCutter *me = (vtkPVCutter*)arg;
+  me->GetWindow()->SetStatusText("Processing Cutter");
+}
+
+//----------------------------------------------------------------------------
+void CutterProgress(void *arg)
+{
+  vtkPVCutter *me = (vtkPVCutter*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetCutter()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndCutterProgress(void *arg)
+{
+  vtkPVCutter *me = (vtkPVCutter*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCutter::CutterChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -242,6 +288,9 @@ void vtkPVCutter::CutterChanged()
   
   if (this->GetPVData() == NULL)
     { // This is the first time.  Create the data.
+    this->GetCutter()->SetStartMethod(StartCutterProgress, this);
+    this->GetCutter()->SetProgressMethod(CutterProgress, this);
+    this->GetCutter()->SetEndMethod(EndCutterProgress, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);
@@ -261,7 +310,6 @@ void vtkPVCutter::SetCutPlane(float originX, float originY, float originZ,
 			      float normalX, float normalY, float normalZ)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPlane *plane = vtkPlane::New();
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -269,10 +317,10 @@ void vtkPVCutter::SetCutPlane(float originX, float originY, float originZ,
 			   this->GetTclName(), originX, originY, originZ,
 			   normalX, normalY, normalZ);
     }
-  plane->SetOrigin(originX, originY, originZ);
-  plane->SetNormal(normalX, normalY, normalZ);
-  this->GetCutter()->SetCutFunction(plane);
-  plane->Delete();
+
+  this->PlaneStyle->GetPlane()->SetOrigin(originX, originY, originZ);
+  this->PlaneStyle->GetPlane()->SetNormal(normalX, normalY, normalZ);
+  this->GetCutter()->SetCutFunction(this->PlaneStyle->GetPlane());
 }
 
 //----------------------------------------------------------------------------

@@ -229,6 +229,29 @@ void vtkPVImageSlice::SetOutputWholeExtent(int xmin, int xmax, int ymin,
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartImageSliceProgress(void *arg)
+{
+  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
+  me->GetWindow()->SetStatusText("Processing ImageSlice");
+}
+
+//----------------------------------------------------------------------------
+void ImageSliceProgress(void *arg)
+{
+  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetSlice()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndImageSliceProgress(void *arg)
+{
+  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SliceChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -300,6 +323,9 @@ void vtkPVImageSlice::SliceChanged()
   // Create the data if this is the first accept.
   if (this->GetPVData() == NULL)
     {
+    this->GetSlice()->SetStartMethod(StartImageSliceProgress, this);
+    this->GetSlice()->SetProgressMethod(ImageSliceProgress, this);
+    this->GetSlice()->SetEndMethod(EndImageSliceProgress, this);
     pvi = vtkPVImage::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();

@@ -87,6 +87,10 @@ public:
   // output whole extent is computed from the SliceAxis ...
   void SetOutputWholeExtent(int xmin, int xmax, int ymin, int ymax,
 			    int zmin, int zmax);
+
+  // Description:
+  // Get the underlying vtkImageSlice
+  vtkGetObjectMacro(Slice, vtkImageClip);
   
 protected:
   vtkPVImageSlice();

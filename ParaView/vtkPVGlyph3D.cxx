@@ -207,6 +207,29 @@ void vtkPVGlyph3D::ShowGlyphSource()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartGlyphProgress(void *arg)
+{
+  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
+  me->GetWindow()->SetStatusText("Processing Glyph");
+}
+
+//----------------------------------------------------------------------------
+void GlyphProgress(void *arg)
+{
+  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetGlyph()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndGlyphProgress(void *arg)
+{
+  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::ScaleFactorChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -223,6 +246,10 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     vtkPVPolyData *coneOut;
     vtkPVAssignment *coneAssignment;
 
+    this->GetGlyph()->SetStartMethod(StartGlyphProgress, this);
+    this->GetGlyph()->SetProgressMethod(GlyphProgress, this);
+    this->GetGlyph()->SetEndMethod(EndGlyphProgress, this);
+    
     // Here we are creating our own glyph source.
     // In the future this may be set in the UI.
     cone = vtkPVConeSource::New();

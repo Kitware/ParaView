@@ -176,6 +176,29 @@ void vtkPVImageReader::SetDataSpacing(float sx, float sy, float sz)
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartImageReaderProgress(void *arg)
+{
+  vtkPVImageReader *me = (vtkPVImageReader*)arg;
+  me->GetWindow()->SetStatusText("Reading Image");
+}
+
+//----------------------------------------------------------------------------
+void ImageReaderProgress(void *arg)
+{
+  vtkPVImageReader *me = (vtkPVImageReader*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetImageReader()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndImageReaderProgress(void *arg)
+{
+  vtkPVImageReader *me = (vtkPVImageReader*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageReader::ImageAccepted()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -193,12 +216,15 @@ void vtkPVImageReader::ImageAccepted()
 
   if (this->GetPVData() == NULL)
     {
+    this->GetImageReader()->SetStartMethod(StartImageReaderProgress, this);
+    this->GetImageReader()->SetProgressMethod(ImageReaderProgress, this);
+    this->GetImageReader()->SetEndMethod(EndImageReaderProgress, this);
     this->InitializeData();
     }
   
   window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
   window->GetMainView()->ResetCamera();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

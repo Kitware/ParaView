@@ -61,7 +61,7 @@ public:
   void SetDimensions(int dx, int dy, int dz);
   void SetSpacing(float sc, float sx);
   void SetCenter(float cReal, float cImage, float xReal, float xImag);
-  
+
 protected:
   vtkPVImageMandelbrotSource();
   ~vtkPVImageMandelbrotSource();
@@ -98,8 +98,3 @@ protected:
 };
 
 #endif
-
-
-
-
-

@@ -35,7 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 
 #include "vtkInteractorStylePlaneSource.h"
-#include "vtkInteractorStyleTrackballCamera.h"
 
 #include "vtkMath.h"
 #include "vtkSynchronizedTemplates3D.h"
@@ -77,12 +76,16 @@ vtkPVWindow::vtkPVWindow()
   this->PreviousSourceButton = vtkKWPushButton::New();
   this->NextSourceButton = vtkKWPushButton::New();
   this->SourceListButton = vtkKWPushButton::New();
+  this->CameraStyleButton = vtkKWPushButton::New();
+  
   this->Sources = vtkKWCompositeCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
   this->SourceList = vtkPVSourceList::New();
   this->SourceList->SetSources(this->Sources);
   this->SourceList->SetParent(this->ApplicationAreaFrame->GetFrame());
+  
+  this->CameraStyle = vtkInteractorStyleTrackballCamera::New();
 }
 
 //----------------------------------------------------------------------------
@@ -98,11 +101,16 @@ vtkPVWindow::~vtkPVWindow()
   this->NextSourceButton = NULL;
   this->SourceListButton->Delete();
   this->SourceListButton = NULL;
+  this->CameraStyleButton->Delete();
+  this->CameraStyleButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
   
   this->ApplicationAreaFrame->Delete();
+  
+  this->CameraStyle->Delete();
+  this->CameraStyle = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -157,10 +165,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SourceListButton->SetParent(this->Toolbar);
   this->SourceListButton->Create(app, "-text SourceList");
   this->SourceListButton->SetCommand(this, "ShowWindowProperties");
-  this->Script("pack %s %s %s -side left -pady 0 -fill none -expand no",
+  this->CameraStyleButton->SetParent(this->Toolbar);
+  this->CameraStyleButton->Create(app, "");
+  this->CameraStyleButton->SetLabel("Camera");
+  this->CameraStyleButton->SetCommand(this, "UseCameraStyle");
+  this->Script("pack %s %s %s %s -side left -pady 0 -fill none -expand no",
 	       this->PreviousSourceButton->GetWidgetName(),
 	       this->NextSourceButton->GetWidgetName(),
-	       this->SourceListButton->GetWidgetName());
+	       this->SourceListButton->GetWidgetName(),
+	       this->CameraStyleButton->GetWidgetName());
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->Toolbar->GetWidgetName());
   
@@ -199,8 +212,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   
   
   // Setup an interactor style.
-  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
-  this->MainView->SetInteractorStyle(style);
+//  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
+//  this->MainView->SetInteractorStyle(style);
+  this->MainView->SetInteractorStyle(this->CameraStyle);
+}
+
+void vtkPVWindow::UseCameraStyle()
+{
+  this->GetMainView()->SetInteractorStyle(this->CameraStyle);
 }
 
 void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)

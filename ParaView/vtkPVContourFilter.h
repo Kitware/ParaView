@@ -79,7 +79,7 @@ protected:
   vtkKWEntry *ContourValueEntry;
   vtkKWLabel *ContourValueLabel;
   vtkKWPushButton *SourceButton;
-
+  
   vtkKitwareContourFilter  *Contour;
 };
 

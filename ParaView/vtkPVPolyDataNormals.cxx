@@ -153,6 +153,29 @@ vtkPVPolyData *vtkPVPolyDataNormals::GetOutput()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartNormalsProgress(void *arg)
+{
+  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
+  me->GetWindow()->SetStatusText("Processing PolyData Normals");
+}
+
+//----------------------------------------------------------------------------
+void NormalsProgress(void *arg)
+{
+  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetPolyDataNormals()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndNormalsProgress(void *arg)
+{
+  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPolyDataNormals::NormalsParameterChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -166,6 +189,9 @@ void vtkPVPolyDataNormals::NormalsParameterChanged()
   
   if (this->GetPVData() == NULL)
     { // This is the first time.  Create the data.
+    this->GetPolyDataNormals()->SetStartMethod(StartNormalsProgress, this);
+    this->GetPolyDataNormals()->SetProgressMethod(NormalsProgress, this);
+    this->GetPolyDataNormals()->SetEndMethod(EndNormalsProgress, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);

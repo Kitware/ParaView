@@ -118,6 +118,29 @@ void vtkPVSphereSource::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartSphereSourceProgress(void *arg)
+{
+  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
+  me->GetWindow()->SetStatusText("Processing SphereSource");
+}
+
+//----------------------------------------------------------------------------
+void SphereSourceProgress(void *arg)
+{
+  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetSphereSource()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndSphereSourceProgress(void *arg)
+{
+  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSphereSource::SphereParameterChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -128,7 +151,10 @@ void vtkPVSphereSource::SphereParameterChanged()
   this->SetThetaResolution(this->ThetaResolutionEntry->GetValueAsInt());
 
   if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.  
+    { // This is the first time, initialize data.
+    this->GetSphereSource()->SetStartMethod(StartSphereSourceProgress, this);
+    this->GetSphereSource()->SetProgressMethod(SphereSourceProgress, this);
+    this->GetSphereSource()->SetEndMethod(EndSphereSourceProgress, this);
     this->InitializeData();
     }
   
@@ -139,8 +165,8 @@ void vtkPVSphereSource::SphereParameterChanged()
   
   window->GetMainView()->SetSelectedComposite(this);
 
-  this->GetView()->Render();
   window->GetMainView()->ResetCamera();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceList.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 
 class vtkKWNotebook;
 class vtkKWToolbar;
@@ -78,6 +79,9 @@ public:
   
   vtkKWCompositeCollection *GetSources();
   
+  // tcl callbacks for changing the interactor style
+  void UseCameraStyle();
+  
   //tcl callbacks that use GetNextComposite and GetPreviousComposite
   void NextSource();
   void PreviousSource();
@@ -92,6 +96,11 @@ public:
   // Callback to display window proerties
   void ShowWindowProperties();
   
+  // Description:
+  // Need to be able to get the toolbar so I can add buttons from outside
+  // this class.
+  vtkGetObjectMacro(Toolbar, vtkKWToolbar);
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -103,11 +112,14 @@ protected:
   vtkPVRenderView *MainView;
   vtkKWMenu *CreateMenu;
   
+  vtkInteractorStyleTrackballCamera *CameraStyle;
+  
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *ResetCameraButton;
   vtkKWPushButton *PreviousSourceButton;
   vtkKWPushButton *NextSourceButton;
   vtkKWPushButton *SourceListButton;
+  vtkKWPushButton *CameraStyleButton;
 
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

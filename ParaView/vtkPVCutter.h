@@ -32,9 +32,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCutter.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVSource.h"
+#include "vtkInteractorStylePlane.h"
 
 class vtkPVPolyData;
 class vtkPVImage;
@@ -70,6 +72,8 @@ public:
   void GetSource();
 
   vtkGetObjectMacro(Cutter, vtkCutter);
+  
+  void UsePlaneStyle();
 
 protected:
   vtkPVCutter();
@@ -94,8 +98,11 @@ protected:
   vtkKWEntry *NormalXEntry;
   vtkKWEntry *NormalYEntry;
   vtkKWEntry *NormalZEntry;
+
+  vtkKWPushButton *PlaneStyleButton;
   
   vtkCutter  *Cutter;
+  vtkInteractorStylePlane *PlaneStyle;
 };
 
 #endif

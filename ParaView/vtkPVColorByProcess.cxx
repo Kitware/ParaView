@@ -99,6 +99,28 @@ void vtkPVColorByProcess::CreateProperties()
   this->Script("pack %s", this->Accept->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartColorByProcessProgress(void *arg)
+{
+  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
+  me->GetWindow()->SetStatusText("Processing ColorByProcess");
+}
+
+//----------------------------------------------------------------------------
+void ColorByProcessProgress(void *arg)
+{
+  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetFilter()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndColorByProcessProgress(void *arg)
+{
+  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorByProcess::ParameterChanged()
@@ -107,11 +129,12 @@ void vtkPVColorByProcess::ParameterChanged()
   
   if (this->GetPVData() == NULL)
     { // This is the first time. Initialize data.
+    this->GetFilter()->SetStartMethod(StartColorByProcessProgress, this);
+    this->GetFilter()->SetProgressMethod(ColorByProcessProgress, this);
+    this->GetFilter()->SetEndMethod(EndColorByProcessProgress, this);
     this->InitializeData();
     }
   
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
 }
-
-

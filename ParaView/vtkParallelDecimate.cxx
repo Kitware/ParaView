@@ -70,8 +70,6 @@ vtkParallelDecimate::~vtkParallelDecimate()
 
 void vtkParallelDecimate::Execute()
 {
-  cerr << "entered vtkParallelDecimate::Execute" << endl;
-  
   vtkMultiProcessController *controller;
   int numProcs, myId, i;
   vtkPolyData *polyData = vtkPolyData::New();
@@ -95,16 +93,12 @@ void vtkParallelDecimate::Execute()
   numProcs = controller->GetNumberOfProcesses();
   myId = controller->GetLocalProcessId();
 
-  cerr << "proc. id: " << myId << endl;
-  
   pd->ShallowCopy(input);
 
   for (i = 0; i < ceil(log(numProcs)); i++)
     {
     if ((myId % (int)pow(2, i)) == 0)
       {
-      cerr << "before: " << pd->GetNumberOfCells()
-	   << " cells" << endl;
       clean->SetInput(pd);
       clean->Update();
       decimate->SetInput(clean->GetOutput());
@@ -114,8 +108,6 @@ void vtkParallelDecimate::Execute()
       decimate->SplittingOff();
       decimate->Update();
       temp = decimate->GetOutput();
-      cerr << "after: " << decimate->GetOutput()->GetNumberOfCells()
-	   << " cells" << endl;
       if ((myId % (int)pow(2, i+1)) != 0)
 	{
 	controller->Send(temp, myId - pow(2, i), 10);
@@ -129,9 +121,6 @@ void vtkParallelDecimate::Execute()
 	  append->AddInput(polyData);
 	  append->Update();
 	  temp = append->GetOutput();
-	  cerr << myId << " temp has "
-	       << temp->GetNumberOfCells()
-	       << " cells" << endl;
 	  }
 	}
       }
@@ -147,14 +136,7 @@ void vtkParallelDecimate::Execute()
     decimate->PreserveTopologyOn();
     decimate->SplittingOff();
     decimate->Update();
-    // Should we break the pipeline or create a special parallel decimate
-    // filter out of this method?
-    decimate->GetOutput()->SetMaximumNumberOfPieces(1000);
-
     output->ShallowCopy(decimate->GetOutput());
-    cerr << "temp has " << temp->GetNumberOfCells() << " cells" << endl;
-    cerr << "input to mapper has " << decimate->GetOutput()->GetNumberOfCells()
-	 << " cells" << endl;
     }
   
   polyData->Delete();

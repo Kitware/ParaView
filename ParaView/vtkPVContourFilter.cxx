@@ -51,7 +51,7 @@ vtkPVContourFilter::vtkPVContourFilter()
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
   
-  this->Contour = vtkKitwareContourFilter::New();  
+  this->Contour = vtkKitwareContourFilter::New();
 }
 
 //----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ void vtkPVContourFilter::CreateProperties()
   this->ContourValueLabel->SetLabel("Contour Value:");
   this->ContourValueEntry->Create(this->Application, "");
   this->ContourValueEntry->SetValue(this->GetContour()->GetValue(0), 2);
-  
+
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ContourValueChanged");
   this->Script("pack %s", this->Accept->GetWidgetName());
@@ -152,6 +152,29 @@ void vtkPVContourFilter::SetValue(int contour, float val)
 }
 
 //----------------------------------------------------------------------------
+// Functions to update the progress bar
+void StartContourFilterProgress(void *arg)
+{
+  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
+  me->GetWindow()->SetStatusText("Processing ContourFilter");
+}
+
+//----------------------------------------------------------------------------
+void ContourFilterProgress(void *arg)
+{
+  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetContour()->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void EndContourFilterProgress(void *arg)
+{
+  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVContourFilter::ContourValueChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -164,6 +187,9 @@ void vtkPVContourFilter::ContourValueChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time.  Create the data.
+    this->GetContour()->SetStartMethod(StartContourFilterProgress, this);
+    this->GetContour()->SetProgressMethod(ContourFilterProgress, this);
+    this->GetContour()->SetEndMethod(EndContourFilterProgress, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);

@@ -268,120 +268,10 @@ void vtkPVPolyData::Decimate()
   decimate->SetInput(this);
   decimate->SetOutput(output);
     
-  pvApp->BroadcastScript("[%s GetPolyData] DebugOn", output->GetTclName());
-  cerr << "output tcl name: " << output->GetTclName() << endl;
-  
   this->SetLocalRepresentation(output);
 
-  cerr << "LocalRepresentation: " << this->LocalRepresentation << endl;
-
-  // we want the delay of decimation to occur when the user selects the 
-  // decimate button.  (This is a parallel method.)
-//  decimate->Update();
-  
   output->Delete();
   decimate->Delete();
-  
-//  vtkMultiProcessController *controller;
-//  int numProcs, myId, i;
-//  vtkPolyData *polyData = vtkPolyData::New();
-//  vtkCleanPolyData *clean = vtkCleanPolyData::New();
-//  vtkDecimatePro *decimate = vtkDecimatePro::New();
-//  vtkAppendPolyData *append = vtkAppendPolyData::New();
-//  vtkPVApplication *pvApp = this->GetPVApplication();
-//  vtkPolyData *pd;
-  
-//  controller = pvApp->GetController();
-//  numProcs = controller->GetNumberOfProcesses();
-//  myId = controller->GetLocalProcessId();
-
-//  if (this->GetPVApplication()->GetController() == NULL)
-//    {
-//    vtkErrorMacro("You must have a controller before calling Decimate.");
-//    return;
-//    }
-  
-//  if (myId == 0)
-//    {
-//    if (!this->DecimateButton->GetState())
-//      {
-//      this->GetActorComposite()->GetMapper()->SetInput(this->GetPolyData());
-//      return;
-//      }
-//    else
-//      {
-//      pvApp->BroadcastScript("%s Decimate", this->GetTclName());
-//      }
-//    }
-  
-//  pd = this->GetPolyData();
-
-//  for (i = 0; i < ceil(log(numProcs)); i++)
-//    {
-//    if ((myId % (int)pow(2, i)) == 0)
-//      {
-//      cerr << "before: " << pd->GetNumberOfCells()
-//	   << " cells" << endl;
-//      clean->SetInput(pd);
-//      clean->Update();
-//      decimate->SetInput(clean->GetOutput());
-//      decimate->SetTargetReduction(0.5);
-//      decimate->BoundaryVertexDeletionOff();
-//      decimate->PreserveTopologyOn();
-//      decimate->SplittingOff();
-//      decimate->Update();
-//      pd = decimate->GetOutput();
-//      cerr << "after: " << decimate->GetOutput()->GetNumberOfCells()
-//	   << " cells" << endl;
-//      if ((myId % (int)pow(2, i+1)) != 0)
-//	{
-//	controller->Send(pd, myId - pow(2, i), 10);
-//	}
-//      else
-//	{
-//	if ((myId + pow(2, i)) < numProcs)
-//	  {
-//	  controller->Receive(polyData, myId + pow(2, i), 10);
-//	  append->AddInput(pd);
-//	  append->AddInput(polyData);
-//	  append->Update();
-//	  pd = append->GetOutput();
-//	  cerr << "local rep. has "
-//	       << pd->GetNumberOfCells()
-//	       << " cells" << endl;
-//	  }
-//	}
-//       }
-//    polyData->Reset();
-//    }
-  
-//  if (myId == 0)
-//    {
-//    clean->SetInput(pd);
-//    clean->Update();
-//    decimate->SetInput(clean->GetOutput());
-//    decimate->SetTargetReduction(0.5);
-//    decimate->BoundaryVertexDeletionOff();
-//    decimate->PreserveTopologyOn();
-//    decimate->SplittingOff();
-//    decimate->Update();
-    // Should we break the pipeline or create a special parallel decimate
-    // filter out of this method?
-//    decimate->GetOutput()->SetMaximumNumberOfPieces(1000);
-
-//    this->SetLocalRepresentation(decimate->GetOutput());
-//    cerr << "input to mapper has " << decimate->GetOutput()->GetNumberOfCells()
-//	 << " cells" << endl;
-//    }
-  
-//  polyData->Delete();
-//  polyData = NULL;
-//  clean->Delete();
-//  clean = NULL;
-//  decimate->Delete();
-//  decimate = NULL;
-//  append->Delete();
-//  append = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -418,8 +308,6 @@ void vtkPVPolyData::SetLocalRepresentation(vtkPVPolyData *data)
   
   myId = pvApp->GetController()->GetLocalProcessId();
   
-  cerr << "Setting Local Representation to " << data << endl;
-  
   if (myId == 0)
     {
     pvApp->BroadcastScript("%s SetLocalRepresentation %s",
@@ -439,7 +327,6 @@ void vtkPVPolyData::SetLocalRepresentation(vtkPVPolyData *data)
       }
     if (this->LocalRepresentation == NULL && data != NULL)
       {
-      cerr << "Adding Notifier callbacks\n";
       this->Application->GetEventNotifier()->
 	AddCallback("InteractiveRenderStart", this->GetPVSource()->GetWindow(),
 		    this, "InteractiveOnCallback" );
@@ -468,8 +355,6 @@ void vtkPVPolyData::InteractiveOnCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   int myId = pvApp->GetController()->GetLocalProcessId();
   
-  cerr << "OnCallback, this->LocalRepresentation: " << this->LocalRepresentation << endl;
-  
   if (myId == 0)
     {
     pvApp->BroadcastScript("%s InteractiveOnCallback", this->GetTclName());
@@ -477,11 +362,8 @@ void vtkPVPolyData::InteractiveOnCallback()
   
   if (this->LocalRepresentation)
     {
-    cerr << "LocalRepresentation tcl name: " << this->LocalRepresentation->GetTclName() << endl;
     this->GetActorComposite()->GetMapper()->
       SetInput(this->LocalRepresentation->GetPolyData());
-    cerr << myId << " : Setting mapper input to " 
-	 << this->LocalRepresentation->GetPolyData() << endl;
     }
 }
 
