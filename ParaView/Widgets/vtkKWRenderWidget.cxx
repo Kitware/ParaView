@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.66");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.67");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -116,16 +116,37 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
-  this->Observer->Delete();
-  this->Observer = NULL;
+  if (this->Observer)
+    {
+    this->Observer->Delete();
+    this->Observer = NULL;
+    }
 
-  this->Renderer->Delete();
-  this->OverlayRenderer->Delete();
-  this->RenderWindow->Delete();
+  if (this->Renderer)
+    {
+    this->Renderer->Delete();
+    this->Renderer = NULL;
+    }
+
+  if (this->OverlayRenderer)
+    {
+    this->OverlayRenderer->Delete();
+    this->OverlayRenderer = NULL;
+    }
+
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->Delete();
+    this->RenderWindow = NULL;
+    }
 
   this->SetParentWindow(NULL);
 
-  this->VTKWidget->Delete();
+  if (this->VTKWidget)
+    {
+    this->VTKWidget->Delete();
+    this->VTKWidget = NULL;
+    }
   
   if (this->CornerAnnotation)
     {
@@ -133,7 +154,11 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->CornerAnnotation = NULL;
     }
 
-  this->HeaderAnnotation->Delete();
+  if (this->HeaderAnnotation)
+    {
+    this->HeaderAnnotation->Delete();
+    this->HeaderAnnotation = NULL;
+    }
   
   this->SetDistanceUnits(NULL);
 }
