@@ -52,6 +52,8 @@ IF(BUILD_TESTING)
   INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
 ENDIF(BUILD_TESTING)
 
+IF(NOT PARAVIEW_TESTING_DART_SERVER)
+
 #########################################################################
 # Configure TclTk
 IF(UNIX)
@@ -81,6 +83,7 @@ SET(VTK_USE_VOLUMEPRO_ISSET OFF)
 SET(VTK_USE_GL2PS_ISSET OFF)
 SET(VTK_USE_ANSI_STDLIB ${PARAVIEW_USE_ANSI_STDLIB})
 
+SET(VTK_USE_PATENTED ON CACHE INTERNAL "" FORCE)
 SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
@@ -94,12 +97,13 @@ FIND_PATH(VTK_DATA_ROOT VTKData.readme ${ParaView_SOURCE_DIR}/../VTKData $ENV{VT
 MARK_AS_ADVANCED(VTK_DATA_ROOT)
 MARK_AS_ADVANCED(BUILD_EXAMPLES)
 
-OPTION(VTK_USE_PATENTED "Build VTK with patented support" OFF)
-
 # Specify python build so that we can use vtkTkRenderWidget with no
 # vtkRenderWindow wrapped.
 ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
+ADD_DEFINITIONS(-DVTK_LEAN_AND_MEAN)
 
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
+  ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 SUBDIRS(VTK)
 
 # This is a hack for now. Once the transition is over, this macro goes aways
@@ -118,12 +122,23 @@ FOREACH(kit ${kits})
     ${ParaView_BINARY_DIR}/VTK/${kit}
     )
 ENDFOREACH(kit)
-SET(VTKZLIB_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-  ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
 SET(VTKEXPAT_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities/expat
   ${ParaView_BINARY_DIR}/VTK/Utilities/expat)
+
+IF(VTK_USE_SYSTEM_ZLIB)
+  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
+  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
+  SET(VTKZLIB_INCLUDE_DIR ${ZLIB_INCLUDE_DIR})
+ELSE(VTK_USE_SYSTEM_ZLIB)
+  SET(VTK_ZLIB_LIBRARIES vtkzlib)
+  SET(VTK_ZLIB_INCLUDE_DIRS
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+  SET(VTKZLIB_INCLUDE_DIR
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
 # Configure HDF5
@@ -132,18 +147,11 @@ IF(PARAVIEW_USE_SYSTEM_HDF5)
 
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindHDF5.cmake)
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindZLIB.cmake)
-  SET(VTK_USE_SYSTEM_ZLIB 1)
   SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIBRARIES})
-  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
-  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
 
 ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 
   SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
-  SET(VTK_ZLIB_LIBRARIES vtkzlib)
-  SET(VTK_ZLIB_INCLUDE_DIRS
-    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
   SET(HDF5_INCLUDE_DIR 
     ${ParaView_SOURCE_DIR}/Utilities/hdf5
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
@@ -154,6 +162,7 @@ ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
 # Configure Xdmf
+SET(XDMF_NOT_INSTALL_INCLUDE_FILES ON)
 SET(XDMF_REGENERATE_YACCLEX OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_REGENERATE_WRAPPERS OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
@@ -191,6 +200,9 @@ IF(NOT VTK_USE_ANSI_STDLIB)
   SET(KWSYS_FORCE_OLD_STREAMS 1)
 ENDIF(NOT VTK_USE_ANSI_STDLIB)
 SET(KWSYS_INCLUDE_DIR ${ParaView_BINARY_DIR}/Utilities/KWSys)
+IF(BUILD_SHARED_LIBS)
+  SET(KWSYS_LIBRARY_INSTALL_DIR "/lib")
+ENDIF(BUILD_SHARED_LIBS)
 SUBDIRS(Utilities/KWSys)
 
 #########################################################################
@@ -202,6 +214,7 @@ SUBDIRS(Common)
 
 #########################################################################
 # Configure VTKClientServer wrapping
+SET(KW_INSTALL_LIB_DIR "/lib")
 SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
@@ -281,4 +294,5 @@ INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION} FILES
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/CMake/CTestCustom.ctest.in
   ${ParaView_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
+ENDIF(NOT PARAVIEW_TESTING_DART_SERVER)
 

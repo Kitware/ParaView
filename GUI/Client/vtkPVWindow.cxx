@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1101,11 +1101,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                wname, tname);
   this->Script("bind %s <Control-Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 0 1}",
                wname, tname);
-  //this->Script("bind %s <Motion> {%s MouseAction 2 0 %%x %%y 0 0}",
-  //             wname, tname);
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
                wname, tname);
   
+  // We need keyboard focus to get key events in the render window.
+  // we are using the p key for picking.
+  this->Script("bind %s <Enter> {focus %s}",
+               wname, wname);
+  this->Script("bind %s <KeyPress> {%s KeyAction %%K %%x %%y}",
+               wname, tname);
+
   // Interface for the animation tool.
   this->AnimationInterface->SetWindow(this);
   this->AnimationInterface->SetView(this->GetMainView());
@@ -1548,6 +1553,16 @@ void vtkPVWindow::MouseAction(int action,int button,
     { 
     this->Interactor->SatelliteMove(x, y);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::KeyAction(char keyCode, int x, int y)
+{
+  if ( !this->MainView->GetEnabled()  )
+    {
+    return;
+    }
+  this->Interactor->SatelliteKeyPress(keyCode, x, y);
 }
 
 //-----------------------------------------------------------------------------
@@ -2466,15 +2481,15 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     vtkPVSourceCollection* col = 0;
     if (it->GetData(col) == VTK_OK && col)
       {
-      vtkCollectionIterator *cit = col->NewIterator();
-      cit->InitTraversal();
-      while ( !cit->IsDoneWithTraversal() )
+      vtkCollectionIterator *collIt = col->NewIterator();
+      collIt->InitTraversal();
+      while ( !collIt->IsDoneWithTraversal() )
         {
-        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+        pvs = static_cast<vtkPVSource*>(collIt->GetObject()); 
         pvs->SetVisitedFlag(0);
-        cit->GoToNextItem();
+        collIt->GoToNextItem();
         }
-      cit->Delete();
+      collIt->Delete();
       }
     it->GoToNextItem();
     }
@@ -2496,7 +2511,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     pvs->SaveInBatchScript(file);
     cit->GoToNextItem();
     }
-  cit->Delete();
 
 // TODO replace this
 //   if (geometryFileName)
@@ -2536,8 +2550,11 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
       {
       *file << "$Ren1 StillRender" << endl;
       }
-
     }
+
+  cit->Delete();
+  
+      
 //   else
 //     { // Just do one frame.
 //     if (imageFileName)
@@ -4375,11 +4392,12 @@ void vtkPVWindow::UpdateMenuState()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SetProgress(const char* text, int val)
 {
+  double lastprog = vtkTimerLog::GetCurrentTime();
   if ( !this->ExpectProgress )
     {
+    this->LastProgress = lastprog;
     return;
     }
-  double lastprog = vtkTimerLog::GetCurrentTime();
   if ( lastprog - this->LastProgress < .5 )
     {
     return;
@@ -4409,6 +4427,7 @@ void vtkPVWindow::EndProgress(int enabled)
   this->ExpectProgress = 0;
   this->GetProgressGauge()->SetValue(100);
   this->GetProgressGauge()->SetValue(0);
+  this->LastProgress = vtkTimerLog::GetCurrentTime();
   this->SetStatusText("");
 
   this->MainView->EndBlockingRender();

@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.28.2.1");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -94,6 +94,24 @@ void vtkPVPointWidget::PositionResetCallback()
                   0.5*(bds[4]+bds[5]));
 
   this->SetPosition();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::SetVisibility(int v)
+{
+  if (v)
+    { // Get around the progress clearing the status text.
+    // We can get rid of this when Andy adds the concept of a global status.
+    this->Script("after 500 {%s SetStatusText {'p' picks a point.}}",
+                 this->GetPVApplication()->GetMainWindow()->GetTclName());
+    }
+  else
+    {
+    this->GetPVApplication()->GetMainWindow()->SetStatusText("");
+    }
+
+  this->Superclass::SetVisibility(v);
 }
 
 
@@ -279,18 +297,6 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->PositionResetButton->SetCommand(this, "PositionResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
                this->PositionResetButton->GetWidgetName());
-
-  // This appears to be doing nothing.  Take it out !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // Initialize the center of the point based on the input bounds.
-  //if (this->PVSource)
-  //  {
-  //  vtkPVData *input = this->PVSource->GetPVInput();
-  //  if (input)
-  //    {
-  //    float bds[6];
-  //    input->GetBounds(bds);
-  //    }
-  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -328,6 +334,11 @@ void vtkPVPointWidget::ActualPlaceWidget()
   this->SetPosition((bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2, 
                     (bounds[4]+bounds[5])/2);
   this->UpdateVTKObject();
+  // Get around the progress clearing the status text.
+  // We can get rid of this when Andy adds the concept of a global status.
+  // fixme: Put the message in enable.
+  this->Script("after 500 {%s SetStatusText {'p' picks a point.}}",
+               this->GetPVApplication()->GetMainWindow()->GetTclName());
 }
 
 //----------------------------------------------------------------------------

@@ -59,6 +59,10 @@ public:
   // Propagates the center to the manipulators.
   void SetCenterOfRotation(float x, float y, float z);
 
+  // Description:
+  // Do not let the superclass do anything with a char event.
+  virtual void OnChar() {};
+
 protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();

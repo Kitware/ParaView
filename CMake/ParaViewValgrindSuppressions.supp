@@ -1,4 +1,4 @@
-\{
+{
    <insert a suppression name here>
    Memcheck:Param
    writev(vector[...])
@@ -2475,4 +2475,22 @@
    Memcheck:Leak
    fun:malloc
    fun:XtMalloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Z12dice_yyallocj
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:H5MM_calloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:H5MM_malloc
 }

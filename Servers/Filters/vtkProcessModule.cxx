@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.1.2.1");
+vtkCxxRevisionMacro(vtkProcessModule, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -354,8 +354,6 @@ void vtkProcessModule::InterpreterCallback(unsigned long, void* pinfo)
     vtkErrorMacro(<< errorMessage << error.str());
     cerr << errorMessage << endl;
     error.rdbuf()->freeze(0);
-    vtkErrorMacro("Aborting execution for debugging purposes.");
-    abort();
     }
 }
 
