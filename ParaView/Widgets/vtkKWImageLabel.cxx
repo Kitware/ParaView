@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.25");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWImageLabel::vtkKWImageLabel()
@@ -71,6 +71,11 @@ void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
 {
+  if (!icon)
+    {
+    return;
+    }
+
   this->SetImageData(icon->GetData(), 
                      icon->GetWidth(), 
                      icon->GetHeight(), 
