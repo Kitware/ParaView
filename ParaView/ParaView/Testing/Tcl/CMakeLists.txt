@@ -62,6 +62,10 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Trace.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
+
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
 
@@ -109,3 +113,13 @@ ADD_TEST(Threshold ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(ThresholdAttrMode ${PARAVIEW_EXECUTABLE}
              ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl)
+
+ADD_TEST(Trace ${PARAVIEW_EXECUTABLE}
+             ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
+
+
+
+
+
+
+

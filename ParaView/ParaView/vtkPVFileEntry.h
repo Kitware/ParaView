@@ -77,6 +77,10 @@ public:
   void SetValue(const char* fileName);
   const char* GetValue() {return this->Entry->GetValue();}
 
+  // Description:
+  // Called when the browse button is pressed.
+  void BrowseCallback();
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
@@ -84,8 +88,11 @@ protected:
   void operator=(const vtkPVFileEntry&) {};
   
   vtkKWLabel *Label;
-  vtkKWPushButton *PushButton;
+  vtkKWPushButton *BrowseButton;
   vtkKWEntry *Entry;
+
+  char *Extension;
+  vtkSetStringMacro(Extension);
 };
 
 #endif

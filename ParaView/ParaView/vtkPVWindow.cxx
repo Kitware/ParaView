@@ -2572,7 +2572,7 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "</Source>\n"
 "\n"
 "<Source class=\"vtkImageReader\" root=\"ImageRead\" output=\"vtkImageData\">\n"
-"  <String name=\"FilePrefix\" help=\"Set the prefix for the files for this image data.\"/>\n"
+"  <File name=\"FilePrefix\" extension=\"\" help=\"Set the file root. Used with file pattern to format a file name.\"/>\n"  
 "  <String name=\"FilePattern\" help=\"Set the format string.\"/>\n"
 "  <Selection name=\"DataScalarType\" help=\"Select the pixel type in the file: short, int, float ...\">\n"
 "    <Choice name=\"char\" value=\"1\"/>\n"

@@ -55,26 +55,31 @@ vtkPVFileEntry* vtkPVFileEntry::New()
   return new vtkPVFileEntry;
 }
 
+//----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
 {
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->PushButton = vtkKWPushButton::New();
-  this->PushButton->SetParent(this);
+  this->BrowseButton = vtkKWPushButton::New();
+  this->BrowseButton->SetParent(this);
+  this->Extension = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVFileEntry::~vtkPVFileEntry()
 {
-  this->PushButton->Delete();
-  this->PushButton = NULL;
+  this->BrowseButton->Delete();
+  this->BrowseButton = NULL;
   this->Entry->Delete();
   this->Entry = NULL;
   this->Label->Delete();
   this->Label = NULL;
+  this->SetExtension(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
                             char *ext, char *help)
 {
@@ -118,26 +123,34 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
                this->Entry->GetWidgetName());
   
   // Now the push button
-  this->PushButton->Create(pvApp, "");
-  this->PushButton->SetLabel("Browse");
+  this->BrowseButton->Create(pvApp, "");
+  this->BrowseButton->SetLabel("Browse");
+  this->BrowseButton->SetCommand(this, "BrowseCallback");
   if (help)
     {
-    this->PushButton->SetBalloonHelpString(help);
+    this->BrowseButton->SetBalloonHelpString(help);
     }
-  this->Script("pack %s -side left", this->PushButton->GetWidgetName());
-  if (ext)
-    {
-    char str[1000];
-    sprintf(str, "SetValue [tk_getOpenFile -filetypes {{{} {.%s}}}]", ext);
-    this->PushButton->SetCommand(this->Entry, str);
-    }
-  else
-    {
-    this->PushButton->SetCommand(this->Entry, "SetValue [tk_getOpenFile]");
-    }
+  this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
+
+  this->SetExtension(ext);
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::BrowseCallback()
+{
+  if (this->Extension)
+    {
+    this->Script("%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}}}]", 
+                 this->GetTclName(), this->Extension);
+    }
+  else
+    {
+    this->Script("%s SetValue [tk_getOpenFile]", this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::SetValue(const char* fileName)
 {
   const char *old;
@@ -159,6 +172,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
 
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -178,6 +192,7 @@ void vtkPVFileEntry::Accept()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::Reset()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
