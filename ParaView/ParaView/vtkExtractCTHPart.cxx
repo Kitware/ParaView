@@ -17,6 +17,7 @@
 =========================================================================*/
 #include "vtkExtractCTHPart.h"
 
+#include "vtkToolkits.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
 #include "vtkClipPolyData.h"
@@ -33,9 +34,13 @@
 #include "vtkCharArray.h"
 #include "vtkFloatArray.h"
 
+#ifdef VTK_USE_PATENTED
+#include "vtkKitwareContourFilter.h"
+#endif
+
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.3");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.4");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
@@ -232,7 +237,13 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   data->GetPointData()->SetScalars(pointVolumeFraction);
 
   // Create the contour surface.
+#ifdef VTK_USE_PATENTED
+  vtkContourFilter *contour = vtkKitwareContourFilter::New();
+  // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
+  //contour->ComputeNormalsOn();
+#else
   vtkContourFilter *contour = vtkContourFilter::New();
+#endif
   contour->SetInput(data);
   contour->SetValue(0, 0.5);
 
