@@ -136,6 +136,13 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description
   // Printthe image. This may pop up a dialog box etc.
   virtual void PrintView();
+#ifdef _WIN32
+  void SetupPrint(RECT &rcDest, HDC ghdc, HDC adc,
+                  int printerPageSizeX, int printerPageSizeY,
+                  int printerDPIX, int printerDPIY,
+                  float minX, float minY, float scaleX, float scaleY,
+                  int screenSizeX, int screenSizeY);
+#endif
   int GetPrinting() {return this->Printing;};
   vtkSetMacro(Printing,int);
   
@@ -336,6 +343,10 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkGetMacro( SupportPrint, int );
   vtkBooleanMacro( SupportPrint, int );
 
+  vtkSetMacro( SupportCopy, int );
+  vtkGetMacro( SupportCopy, int );
+  vtkBooleanMacro( SupportCopy, int );
+
   vtkSetMacro( SupportControlFrame, int );
   vtkGetMacro( SupportControlFrame, int );
   vtkBooleanMacro( SupportControlFrame, int );
@@ -355,7 +366,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // be accessed by the render timer callback.
   int ShouldIAbort();
   
-  protected:
+protected:
   vtkKWView();
   ~vtkKWView();
 
@@ -412,7 +423,16 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   
   int              SupportSaveAsImage;
   int              SupportPrint;
+  int              SupportCopy;
   int              SupportControlFrame;
+  
+#ifdef _WIN32
+  // internal methods used in printing
+  void Print(HDC ghdc, HDC adc);
+  void Print(HDC ghdc, HDC adc, int printerPageSizeX, int printerPageSizeY,
+             int printerDPIX, int printerDPIY,
+             float minX, float minY, float scaleX, float scaleY);
+#endif
   
 private:
   vtkKWView(const vtkKWView&); // Not implemented

@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.80");
+vtkCxxRevisionMacro(vtkKWView, "1.81");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -125,6 +125,7 @@ vtkKWView::vtkKWView()
 {
   this->SupportPrint        = 1;
   this->SupportSaveAsImage  = 1;
+  this->SupportCopy         = 1;
   this->SupportControlFrame = 0;
   
   this->Frame = vtkKWWidget::New();
@@ -772,65 +773,8 @@ void vtkKWView::PrintView()
   StartDoc  (ghdc, &di);
   StartPage (ghdc);
 
-  float scale;
-  int cxDIB = size[0];         // Size of DIB - x
-  int cyDIB = size[1];         // Size of DIB - y
-  RECT rcDest;
+  this->Print(ghdc, ghdc);
   
-  // get size of printer page (in pixels)
-  int cxPage = GetDeviceCaps(ghdc,HORZRES);
-  int cyPage = GetDeviceCaps(ghdc,VERTRES);
-  // get printer pixels per inch
-  int cxInch = GetDeviceCaps(ghdc,LOGPIXELSX);
-  int cyInch = GetDeviceCaps(ghdc,LOGPIXELSY);
-
-  // target DPI specified here
-  if (this->GetParentWindow())
-    {
-    scale = cxInch/this->GetParentWindow()->GetPrintTargetDPI();
-    }
-  else
-    {
-    scale = cxInch/100.0;
-    }
-  
-
-  // Best Fit case -- create a rectangle which preserves
-  // the DIB's aspect ratio, and fills the page horizontally.
-  //
-  // The formula in the "->bottom" field below calculates the Y
-  // position of the printed bitmap, based on the size of the
-  // bitmap, the width of the page, and the relative size of
-  // a printed pixel (cyInch / cxInch).
-  //
-  rcDest.bottom = rcDest.left = 0;
-  if (((float)cyDIB*(float)cxPage/(float)cxInch) > 
-      ((float)cxDIB*(float)cyPage/(float)cyInch))
-    {
-    rcDest.top = cyPage;
-    rcDest.right = (static_cast<float>(cyPage)*cxInch*cxDIB) /
-      (static_cast<float>(cyInch)*cyDIB);
-    }
-  else
-    {
-    rcDest.right = cxPage;
-    rcDest.top = (static_cast<float>(cxPage)*cyInch*cyDIB) /
-      (static_cast<float>(cxInch)*cxDIB);
-    } 
-  
-  // Do we actually need this DPI?
-  //int DPI = 
-  vtkWin->GetDPI();
-  
-  this->SetupMemoryRendering(rcDest.right/scale,
-                             rcDest.top/scale, ghdc);
-  this->Render();
-  SetStretchBltMode(ghdc,HALFTONE);
-  StretchBlt(ghdc,0,0,
-             rcDest.right, rcDest.top, (HDC)this->GetMemoryDC(),
-             0, 0, rcDest.right/scale, rcDest.top/scale, SRCCOPY);
-  
-  this->ResumeScreenRendering();
   EndPage   (ghdc);
   EndDoc    (ghdc);
   DeleteDC  (ghdc);
@@ -886,6 +830,111 @@ void vtkKWView::PrintView()
   
   this->Printing = 0;
 }
+
+#ifdef _WIN32
+void vtkKWView::Print(HDC ghdc, HDC adc)
+{
+  if (!ghdc || !adc)
+    {
+    return;
+    }
+  
+  // get size of printer page (in pixels)
+  int cxPage = GetDeviceCaps(ghdc,HORZRES);
+  int cyPage = GetDeviceCaps(ghdc,VERTRES);
+  // get printer pixels per inch
+  int cxInch = GetDeviceCaps(ghdc,LOGPIXELSX);
+  int cyInch = GetDeviceCaps(ghdc,LOGPIXELSY);
+
+  this->Print(ghdc, adc, cxPage, cyPage, cxInch, cyInch,
+              0.0, 0.0, 1.0, 1.0);
+}
+
+void vtkKWView::Print(HDC ghdc, HDC adc,
+                      int printerPageSizeX, int printerPageSizeY,
+                      int printerDPIX, int printerDPIY,
+                      float minX, float minY, float scaleX, float scaleY)
+{
+  RECT rcDest;  
+  vtkWindow *vtkWin = this->GetVTKWindow();  
+  int size[2];
+  memcpy(size,vtkWin->GetSize(),sizeof(int)*2);
+
+  this->SetupPrint(rcDest, ghdc, adc, printerPageSizeX, printerPageSizeY,
+                   printerDPIX, printerDPIY, minX, minY,
+                   scaleX, scaleY, size[0], size[1]);
+  float scale;
+  // target DPI specified here
+  if (this->GetParentWindow())
+    {
+    scale = printerDPIX/this->GetParentWindow()->GetPrintTargetDPI();
+    }
+  else
+    {
+    scale = printerDPIX/100.0;
+    }
+
+  this->Render();
+  
+  SetStretchBltMode(ghdc,HALFTONE);
+  StretchBlt(ghdc, rcDest.right*minX, rcDest.top*minY,
+             rcDest.right*scaleX, rcDest.top*scaleY,
+             (HDC)this->GetMemoryDC(), 0, 0,
+             rcDest.right/scale*scaleX,
+             rcDest.top/scale*scaleY,
+             SRCCOPY);
+  
+  this->ResumeScreenRendering();
+}
+
+void vtkKWView::SetupPrint(RECT &rcDest, HDC ghdc, HDC adc,
+                           int printerPageSizeX, int printerPageSizeY,
+                           int printerDPIX, int printerDPIY,
+                           float minX, float minY, float scaleX, float scaleY,
+                           int screenSizeX, int screenSizeY)
+{
+  float scale;
+  int cxDIB = screenSizeX;         // Size of DIB - x
+  int cyDIB = screenSizeY;         // Size of DIB - y
+  
+  // target DPI specified here
+  if (this->GetParentWindow())
+    {
+    scale = printerDPIX/this->GetParentWindow()->GetPrintTargetDPI();
+    }
+  else
+    {
+    scale = printerDPIX/100.0;
+    }
+  
+
+  // Best Fit case -- create a rectangle which preserves
+  // the DIB's aspect ratio, and fills the page horizontally.
+  //
+  // The formula in the "->bottom" field below calculates the Y
+  // position of the printed bitmap, based on the size of the
+  // bitmap, the width of the page, and the relative size of
+  // a printed pixel (printerDPIY / printerDPIX).
+  //
+  rcDest.bottom = rcDest.left = 0;
+  if (((float)cyDIB*(float)printerPageSizeX/(float)printerDPIX) > 
+      ((float)cxDIB*(float)printerPageSizeY/(float)printerDPIY))
+    {
+    rcDest.top = printerPageSizeY;
+    rcDest.right = (static_cast<float>(printerPageSizeY)*printerDPIX*cxDIB) /
+      (static_cast<float>(printerDPIY)*cyDIB);
+    }
+  else
+    {
+    rcDest.right = printerPageSizeX;
+    rcDest.top = (static_cast<float>(printerPageSizeX)*printerDPIY*cyDIB) /
+      (static_cast<float>(printerDPIX)*cxDIB);
+    } 
+  
+  this->SetupMemoryRendering(rcDest.right/scale*scaleX,
+                             rcDest.top/scale*scaleY, ghdc);
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkKWView::SaveAsImage() 
@@ -1063,10 +1112,14 @@ void vtkKWView::Select(vtkKWWindow *pw)
                                      "Print", this, "PrintView", 0);
     }
   
+  if ( this->SupportCopy )
+    {
 #ifdef _WIN32
   // add the edit copy option
   pw->GetMenuEdit()->AddCommand("Copy view",this,"EditCopy", "Copy the contents of the current view to the clipboard");
 #endif
+    }
+  
   // change the color of the frame
   this->Script("%s configure -bg #008", this->Label->GetWidgetName());
   this->Script("%s configure -bg #008", this->Frame2->GetWidgetName());
@@ -1112,10 +1165,14 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
     pw->GetMenuFile()->DeleteMenuItem("Save Image");
     }
   
+  if ( this->SupportCopy )
+    {
 #ifdef _WIN32
   // add the edit copy option
   pw->GetMenuEdit()->DeleteMenuItem("Copy");
 #endif
+    }
+  
   // change the color of the frame
   this->Script("%s configure -bg #888", this->Label->GetWidgetName());
   this->Script("%s configure -bg #888", this->Frame2->GetWidgetName());
@@ -1388,7 +1445,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.80 $");
+  this->ExtractRevision(os,"$Revision: 1.81 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1549,4 +1606,5 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
   os << indent << "SupportSaveAsImage: " << this->GetSupportSaveAsImage() 
      << endl;
+  os << indent << "SupportCopy: " << this->GetSupportCopy() << endl;
 }
