@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSource.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxApplyFilterCommand);
 
 vtkCxxSetObjectMacro(vtkHierarchicalBoxApplyFilterCommand,
@@ -78,7 +78,10 @@ void vtkHierarchicalBoxApplyFilterCommand::Execute(
       vtkUniformGrid::SafeDownCast(this->Filter->GetOutputs()[0]);
     vtkUniformGrid* outputsc = output->NewInstance();
     outputsc->ShallowCopy(output);
-    this->Output->SetDataSet(info->Level, info->DataSetId, info->Box, outputsc);
+    this->Output->SetDataSet(info->Level, 
+                             info->DataSetId, 
+                             info->Box, 
+                             outputsc);
     outputsc->Delete();
     }
   else
