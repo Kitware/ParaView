@@ -163,8 +163,6 @@ protected:
 
   void UpdateProperty();
 
-  vtkPVStringAndScalarListWidgetProperty *Property;
-  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

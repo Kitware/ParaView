@@ -30,16 +30,14 @@
 #include "vtkPVFieldMenu.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVStringAndScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMProperty.h"
 #include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.60");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.61");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -57,8 +55,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
-
-  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
