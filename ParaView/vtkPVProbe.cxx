@@ -205,7 +205,9 @@ void vtkPVProbe::CreateProperties()
                this->DimensionalityMenu->GetWidgetName());
   
   this->SelectPointButton->SetParent(this->GetParameterFrame()->GetFrame());
-  this->SelectPointButton->Create(pvApp, "-text \"3D Cursor\"");
+//  this->SelectPointButton->Create(pvApp, "-text \"3D Cursor\"");
+  this->SelectPointButton->Create(pvApp, "-image PV3DCursorButton");
+  this->SelectPointButton->SetBalloonHelpString("3D Cursor");
   this->SelectPointButton->SetCommand(this, "SetInteractor");
   
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
@@ -438,6 +440,9 @@ void vtkPVProbe::AcceptCallback()
     char label[256]; // this may need to be longer
     char arrayData[256];
     char tempArray[32];
+
+    // label needs to be initialized so strcat doesn't fail
+    sprintf(label, "\0");
     
     for (i = 0; i < numArrays; i++)
       {
