@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.323");
+vtkCxxRevisionMacro(vtkPVApplication, "1.324");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -840,13 +840,7 @@ void vtkPVApplication::Initialize()
     vtkErrorMacro("No process module");
     vtkPVApplication::Abort();
     }
-  vtkSocketController* sc = this->GetSocketController();
-  if ( sc && sc->GetCommunicator() )
-    {
-    vtkDebugMacro("Setup observer for progress");
-    sc->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this->GetProcessModule()->GetObserver());
-    }
+
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
 
