@@ -108,3 +108,26 @@ ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS})
 TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
 
 
+SET(CFG_INIT "/${CMAKE_CFG_INTDIR}")
+IF(MAKE_SYSTEM OR UNIX)
+  SET(CFG_INIT "")
+ENDIF(MAKE_SYSTEM OR UNIX)
+SET(CMD ${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/ProcessXML${EXE_EXT})
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+  DEPENDS 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ProcessXML
+  COMMAND ${CMD}
+  ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+  vtkSMDefaultModules Interface GetInterfaces
+  filters readers sources utilities rendering)
+
+SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)

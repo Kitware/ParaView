@@ -26,8 +26,10 @@
 
 #include "vtkProcessModule.h"
 
+#include "vtkSMGeneratedModules.h"
+
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.2");
+vtkCxxRevisionMacro(vtkSMApplication, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -68,44 +70,75 @@ void vtkSMApplication::Initialize()
   vtkSMProxyManager* proxyM = vtkSMProxyManager::New();
   this->SetProxyManager(proxyM);
 
-//  const char* directory = args->GetValue("--configuration-path");
-  const char* directory =  "/home/berk/work/ParaView/ServerManager";
-  if (directory)
-    {
-    vtkDirectory* dir = vtkDirectory::New();
-    if(!dir->Open(directory))
-      {
-      dir->Delete();
-      return;
-      }
+  vtkSMXMLParser* parser = vtkSMXMLParser::New();
+
+  char* init_string;
+
+  init_string =  vtkSMDefaultModulesfiltersGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  init_string =  vtkSMDefaultModulesreadersGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  init_string =  vtkSMDefaultModulessourcesGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  init_string =  vtkSMDefaultModulesutilitiesGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  init_string =  vtkSMDefaultModulesrenderingGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  parser->Delete();
+
+// //  const char* directory = args->GetValue("--configuration-path");
+//   const char* directory =  "/home/berk/etc/servermanager";
+//   if (directory)
+//     {
+//     vtkDirectory* dir = vtkDirectory::New();
+//     if(!dir->Open(directory))
+//       {
+//       dir->Delete();
+//       return;
+//       }
     
-    for(int i=0; i < dir->GetNumberOfFiles(); ++i)
-      {
-      const char* file = dir->GetFile(i);
-      int extPos = vtkString::Length(file)-4;
+//     for(int i=0; i < dir->GetNumberOfFiles(); ++i)
+//       {
+//       const char* file = dir->GetFile(i);
+//       int extPos = vtkString::Length(file)-4;
       
-      // Look for the ".xml" extension.
-      if((extPos > 0) && vtkString::Equals(file+extPos, ".xml"))
-        {
-        char* fullPath 
-          = new char[vtkString::Length(file)+vtkString::Length(directory)+2];
-        strcpy(fullPath, directory);
-        strcat(fullPath, "/");
-        strcat(fullPath, file);
+//       // Look for the ".xml" extension.
+//       if((extPos > 0) && vtkString::Equals(file+extPos, ".xml"))
+//         {
+//         char* fullPath 
+//           = new char[vtkString::Length(file)+vtkString::Length(directory)+2];
+//         strcpy(fullPath, directory);
+//         strcat(fullPath, "/");
+//         strcat(fullPath, file);
         
-        cerr << fullPath << endl;
+//         cerr << fullPath << endl;
         
-        vtkSMXMLParser* parser = vtkSMXMLParser::New();
-        parser->SetFileName(fullPath);
-        parser->Parse();
-        parser->ProcessConfiguration(proxyM);
-        parser->Delete();
+//         vtkSMXMLParser* parser = vtkSMXMLParser::New();
+//         parser->SetFileName(fullPath);
+//         parser->Parse();
+//         parser->ProcessConfiguration(proxyM);
+//         parser->Delete();
         
-        delete [] fullPath;
-        }
-      }
-    dir->Delete();
-    }
+//         delete [] fullPath;
+//         }
+//       }
+//     dir->Delete();
+//     }
   
   proxyM->Delete();
 
