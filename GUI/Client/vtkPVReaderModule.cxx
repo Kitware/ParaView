@@ -23,7 +23,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -32,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.51");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.52");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -312,10 +311,7 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
   // How to add to the begining of a collection?
   // Just make a new one.
   vtkPVWidgetCollection *newWidgets = vtkPVWidgetCollection::New();
-  vtkPVWidgetProperty *prop = fileEntry->CreateAppropriateProperty();
-  prop->SetWidget(fileEntry);
   newWidgets->AddItem(fileEntry);
-  prop->Delete();
   
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();

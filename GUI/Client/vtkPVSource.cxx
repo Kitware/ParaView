@@ -44,7 +44,6 @@
 #include "vtkPVRenderModule.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPart.h"
@@ -62,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.375");
+vtkCxxRevisionMacro(vtkPVSource, "1.376");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1982,9 +1981,6 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 {
   char str[512];
   this->Widgets->AddItem(pvw);
-  vtkPVWidgetProperty *prop = pvw->CreateAppropriateProperty();
-  prop->SetWidget(pvw);
-  prop->Delete();
 
   if (pvw->GetTraceName() == NULL)
     {
