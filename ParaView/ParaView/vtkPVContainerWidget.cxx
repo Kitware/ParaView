@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.19");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -139,6 +139,26 @@ void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)
   it->Delete();
 
   this->ModifiedFlag = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVContainerWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
+{
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+
+  vtkPVWidget* widget;
+  vtkPVWidgetProperty *prop;
+  int i;
+
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
+    {
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->AddAnimationScriptsToMenu(menu, ai);
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //---------------------------------------------------------------------------

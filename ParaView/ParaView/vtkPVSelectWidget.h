@@ -149,7 +149,11 @@ public:
   // Description:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
+
+  // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+ 
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();

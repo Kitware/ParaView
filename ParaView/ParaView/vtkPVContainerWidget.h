@@ -103,6 +103,10 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+ 
 protected:
   vtkPVContainerWidget();
   ~vtkPVContainerWidget();
