@@ -1,6 +1,9 @@
 set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $pw(vtkTemp43) $argv $argc
+
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
 
 $pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
