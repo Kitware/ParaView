@@ -1,0 +1,280 @@
+<Interfaces>
+
+<Filter class="vtkBrownianPoints" root="BPts" input="vtkDataSet" output="vtkDataSet">
+  <Scalar name="MinimumSpeed" type="float" help="The minimum size of the random point vectors generated."/>
+  <Scalar name="MaximumSpeed" type="float" help="The maximum size of the random point vectors generated."/>
+</Filter>
+
+<Filter class="vtkButterflySubdivisionFilter" root="BFSubDiv" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles.."/>
+</Filter>
+
+<Filter class="vtkCellCenters" root="Centers" input="vtkDataSet" output="vtkPolyData">
+  <Boolean name="VertexCells" help="Generate vertex as geometry of just points."/>
+</Filter>
+
+<Filter class="vtkCellDataToPointData" root="CellToPoint" input="vtkDataSet" output="vtkDataSet">
+  <Boolean name="PassCellData" help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."/>
+</Filter>
+
+<Filter class="vtkCellDerivatives" root="CellDeriv" input="vtkDataSet" output="vtkDataSet">
+  <Selection name="VectorMode" help="Value to put in vector cell data">
+    <Choice name="Pass" value="0"/>
+    <Choice name="Vorticity" value="1"/>
+    <Choice name="Gradient" value="2"/>
+  </Selection>
+  <Selection name="TensorMode" help="Value to put in tensaor cell data">
+      <Choice name="Pass" value="0"/>
+      <Choice name="Strain" value="1"/>
+      <Choice name="Gradient" value="2"/>
+  </Selection>
+</Filter>
+
+<Filter class="vtkCleanPolyData" root="CleanPD" input="vtkPolyData" output="vtkPolyData"/>
+
+<Filter class="vtkClipPlane" root="ClipPlane" input="vtkPolyData" output="vtkPolyData">
+  <Vector name="Origin" type="float" length="3" help="Set the origin of the clipping plane"/>
+  <Vector name="Normal" type="float" length="3" help="Set the normal of the clipping plane"/>
+  <Scalar name="Value" type="float" help="Set the clipping value of the implicit plane"/>
+  <Boolean name="InsideOut" help="Select which &quot;side&quot; of the data set to clip away"/>
+  <Boolean name="GenerateClipScalars" help="If this flag is enabled, then the output scalar values will be interpolated from the implicit function values, and not the input scalar data"/>
+</Filter>
+
+<Filter class="vtkClipDataSet" root="ClipDS" input="vtkDataSet" output="vtkUnstructuredGrid" default="scalars">
+  <Scalar name="Value" type="float" help="Set the scalar value to clip by"/>
+  <Boolean name="InsideOut" help="Select which &quot;side&quot; of the data set to clip away"/>
+</Filter>
+
+<Filter class="vtkClipPolyData" root="ClipScalars" input="vtkPolyData" output="vtkPolyData" default="scalars">
+  <Scalar name="Value" type="float" help="Set the scalar value to clip by"/>
+  <Boolean name="InsideOut" help="Select which &quot;side&quot; of the data set to clip away"/>
+</Filter>
+
+<Filter class="vtkCutMaterial" root="CutMaterial" input="vtkDataSet" output="vtkPolyData">
+  <String name="MaterialArray" set="SetMaterialArrayName" get="GetMaterialArrayName" help="Enter the array name of the cell array containing the material values"/>
+  <Scalar name="Material" type="int" help="Set the value of the material to probe"/>
+  <String name="Array" set="SetArrayName" get="GetArrayName" help="Set the array name of the array to cut"/>
+  <Vector name="UpVector" type="float" length="3" help="Specify the normal vector of the plane to cut by"/>
+</Filter>
+
+<Filter class="vtkCutPlane" root="CutPlane" input="vtkDataSet" output="vtkPolyData">
+  <Vector name="Origin" type="float" length="3" help="Set the x, y, z coordinates of the origin of the plane"/>
+  <Vector name="Normal" type="float" length="3" help="Set the normal vector to the plane"/>
+  <Boolean name="GenerateCutScalars" help="Select whether to generate scalars from the implicit function values or from the input scalar data"/>
+</Filter>
+
+<Filter class="vtkDataSetSurfaceFilter" root="Surface" input="vtkDataSet" output="vtkPolyData"/>
+
+<Filter class="vtkDecimatePro" root="Deci" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="TargetReduction" type="float" help="Desired reduction of the total number of triangles."/>
+  <Boolean name="PreserveTopology" help="If off, better reduction can occur, but model may break up."/>
+  <Scalar name="FeatureAngle" type="float" help="Topology can be split along features."/>
+</Filter>
+
+<Filter class="vtkDelaunay2D" root="Del2D" input="vtkPointSet" output="vtkPolyData">
+  <Scalar name="Alpha" type="float" help="Distance value to control output of this filter."/>
+  <Boolean name="BoundingTriangulation" help="Include bounding triagulation or not."/>
+  <Scalar name="Offset" type="float" help="Multiplier for initial triagulation size."/>
+  <Scalar name="Tolerance" type="float" help="A value 0->1 for merginge close points."/>
+</Filter>
+
+<Filter class="vtkDelaunay3D" root="Del3D" input="vtkPointSet" output="vtkPolyData">
+  <Scalar name="Alpha" type="float" help="Distance value to control output of this filter."/>
+  <Boolean name="BoundingTriangulation" help="Include bounding triagulation or not."/>
+  <Scalar name="Offset" type="float" help="Multiplier for initial triagulation size."/>
+  <Scalar name="Tolerance" type="float" help="A value 0->1 for merginge close points."/>
+</Filter>
+
+<Filter class="vtkElevationFilter" root="Elevation" input="vtkDataSet" output="vtkDataSet">
+  <Vector name="LowPoint" type="float" length="3" help="Set the minimum point for the elevation"/>
+  <Vector name="HighPoint" type="float" length="3" help="Set the maximum point for the elevation"/>
+  <Vector name="ScalarRange" type="float" length="2" help="Set the range of scalar values to generate"/>
+</Filter>
+
+<Filter class="vtkExtractEdges" root="ExtractEdges" input="vtkDataSet" output="vtkPolyData"/>
+
+<Filter class="vtkExtractGrid" root="ExtractGrid" input="vtkStructuredGrid" output="vtkStructuredGrid">
+  <Extent name="VOI" help="Set the min/max values of the volume of interest (VOI)"/>
+  <Vector name="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension"/>
+  <Boolean name="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output"/>
+</Filter>
+
+<Filter class="vtkExtractPolyDataPiece" root="PDPiece" input="vtkPolyData" output="vtkPolyData">
+  <Boolean name="GhostCells" set="SetCreateGhostCells" get="GetCreateGhostCells" help="Select whether to generate ghost cells"/>
+</Filter>
+
+<Filter class="vtkExtractUnstructuredGridPiece" root="UGPiece" input="vtkUnstructuredGrid" output="vtkUnstructuredGrid">
+  <Boolean name="GhostCells" set="SetCreateGhostCells" get="GetCreateGhostCells" help="Select whether to generate ghost cells"/>
+</Filter>
+
+<Filter class="vtkImageClip" root="ImageClip" input="vtkImageData" output="vtkImageData">
+  <Extent name="OutputWholeExtent" help="Set the min/max extents in each dimension of the output"/>
+</Filter>
+
+<Filter class="vtkImageContinuousDilate3D" root="ContDilate" input="vtkImageData" output="vtkImageData">
+  <Vector name="KernelSize" type="int" length="3" help="Radius of elliptical footprint."/>
+</Filter>
+
+<Filter class="vtkImageContinuousErode3D" root="ContErode" input="vtkImageData" output="vtkImageData">
+  <Vector name="KernelSize" type="int" length="3" help="Radius of elliptical footprint."/>
+</Filter>
+
+<Filter class="vtkImageGradient" root="ImageGradient" input="vtkImageData" output="vtkImageData">
+  <Selection name="Dimensionality" help="Select whether to perform a 2d or 3d gradient">
+    <Choice name="2" value="0"/>
+    <Choice name="3" value="1"/>
+  </Selection>
+</Filter>
+
+<Filter class="vtkImageGaussianSmooth" root="GaussSmooth" input="vtkImageData" output="vtkImageData">
+  <Vector name="StandardDeviations" type="float" length="3" help="STD for x, y and z axes."/>
+  <Vector name="RadiusFactors" type="float" length="3" help="Kernel size is this factor times STD."/>
+  <Selection name="Dimensionality" help="Select whether to perform a 2d or 3d gradient">
+    <Choice name="2" value="0"/>
+    <Choice name="3" value="1"/>
+  </Selection>
+</Filter>
+
+<Filter class="vtkInhibitPoints" root="InhibPts" input="vtkDataSet" output="vtkPolyData" default="vectors">
+  <Scalar name="Scale" type="float" help="Set the size of the inihibition neighborhood."/>
+  <Scalar name="MagnitudeThreshold" type="float" help="Vectors smaller that this are not considered."/>
+  <Boolean name="GenerateVertices" help="Flag to create vertex cells"/>
+</Filter>
+
+<Filter class="vtkLinearExtrusionFilter" root="LinExtrude" input="vtkPolyData" output="vtkPolyData">
+  <Boolean name="Capping" help="Select whether to draw endcaps"/>
+  <Scalar name="ScaleFactor" type="float" help="Set the extrusion scale factor"/>
+  <Vector name="Vector" type="float" length="3" help="Set the direction for the extrusion"/>
+</Filter>
+
+<Filter class="vtkLinearSubdivisionFilter" root="LinSubDiv" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles."/>
+</Filter>
+
+<Filter class="vtkLoopSubdivisionFilter" root="LoopSubDiv" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles."/>
+</Filter>
+
+<Filter class="vtkMaskPoints" root="MaskPts" input="vtkDataSet" output="vtkPolyData">
+  <Scalar name="OnRatio" type="int" help="The ratio of points retained."/>
+  <Scalar name="MaxPoints" set="SetMaximumNumberOfPoints" get="GetMaximumNumberOfPoints" type="int" help="Limit the number of points."/>
+  <Scalar name="Offset" type="int" help="Start with this point."/>
+  <Boolean name="Random" set="SetRandomMode" get="GetRandomMode" help="Select whether to randomly select points, or subsample regularly."/>
+  <Boolean name="GenerateVertices" help="Convienience feature to display points."/>
+</Filter>
+
+<Filter class="vtkOBBDicer" root="Dicer" input="vtkDataSet" output="vtkDataSet">
+  <Boolean name="FieldData" help="Generate point scalars or a field array."/>
+  <Scalar name="NumberOfPointsPerPiece" type="int" help="Controls piece size."/>
+  <Scalar name="NumberOfPieces" type="int" help="Controls number of pieces generated."/>
+</Filter>
+
+<Filter class="vtkOutlineCornerFilter" root="COutline" input="vtkDataSet" output="vtkPolyData">
+  <Scalar name="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)"/>
+</Filter>
+
+<Filter class="vtkPieceScalars" root="ColorPieces" input="vtkDataSet" output="vtkDataSet">
+  <Boolean name="Random" set="SetRandomMode" get="GetRandomMode" help="Select whether to use random colors for the various pieces"/>
+</Filter>
+
+<Filter class="vtkPointDataToCellData" root="PtToCell" input="vtkDataSet" output="vtkDataSet">
+  <Boolean name="PassPointData"/>
+</Filter>
+
+<Filter class="vtkPolyDataNormals" root="PDNormals" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)"/>
+  <Boolean name="Splitting" help="Turn on/off the splitting of sharp edges."/>
+  <Boolean name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering."/>
+  <Boolean name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering."/>
+  <Boolean name="CellNormals" set="SetComputeCellNormals" get="GetComputeCellNormals" help="Turn on/off the computation of cell normals."/>
+  <Boolean name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering."/>
+  <Boolean name="FlipNormals" help="Flipping reverves the meaning of front and back."/>
+  <Boolean name="NonManifold" set="SetNonManifoldTraversal" get="GetNonManifoldTraversal" help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."/>
+</Filter>
+
+<Filter class="vtkPolyDataStreamer" root="Stream" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfDivisions" set="SetNumberOfStreamDivisions" get="GetNumberOfStreamDivisions"
+          type="int" help="Set the number of pieces to divide the data set into for streaming"/>
+</Filter>
+
+<Filter class="vtkReverseSense" root="RevSense" input="vtkPolyData" output="vtkPolyData">
+  <Boolean name="CellOrder" set="SetReverseCells" get="GetReverseCells"/>
+  <Boolean name="ReverseNormals"/>
+</Filter>
+
+<Filter class="vtkRibbonFilter" root="Ribbon" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="Width" type="float" help="The half width of the ribbon (or minimum)."/>
+  <Scalar name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)."/>
+  <Vector name="DefaultNormal" type="float" length="3" help="If no normals are supplied"/>
+  <Boolean name="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value."/>
+</Filter>
+
+<Filter class="vtkRotationalExtrusionFilter" root="RotExtrude" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="Resoultion" type="int"/>
+  <Boolean name="Capping"/>
+  <Scalar name="Angle" type="float" help="Set the angle of rotation."/>
+  <Scalar name="Translation" type="float" help="The total amount of translation along the z-axis."/>
+  <Scalar name="DeltaRadius" type="float" help="The change in radius during sweep process."/>
+</Filter>
+
+<Filter class="vtkQuadricClustering" root="QC" input="vtkPolyData" output="vtkPolyData">
+  <Vector name="Spacing" set="SetDivisionSpacing" get="GetDivisionSpacing" type="float" length="3" help="Set the spacing of the bins in each dimension"/>
+  <Boolean name="UseInputPoints" help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin"/>
+  <Boolean name="UseFeatureEdges" help="Select whether to use feature edge quadrics to match up the boundaries between pieces"/>
+  <Boolean name="UseFeaturePoints" help="Select whether to use feature point quadrics to align piece boundaries"/>
+</Filter>
+
+<Filter class="vtkShrinkPolyData" root="Shrink" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="ShrinkFactor" type="float" help="Set the amount to shrink by"/>
+</Filter>
+
+<Filter class="vtkSimpleFieldDataToAttributeDataFilter" root="FieldToAttr" input="vtkDataSet" output="vtkDataSet">
+  <Selection name="Attribute" help="Select whether the array contains scalars or vectors">
+    <Choice name="Scalars" value="0"/>
+    <Choice name="Vectors" value="1"/>
+  </Selection>
+  <String name="Field Name" set="SetFieldName" get="GetFieldName" help="Set the name of the array containing the data to operate on"/>
+</Filter>
+
+<Filter class="vtkSingleContourFilter" root="SingleContour" input="vtkDataSet" output="vtkPolyData" default="scalars">
+  <Scalar name="Value" set="SetFirstValue" get="GetFirstValue" type="float" help="Set the contour value"/>
+  <Boolean name="Normals" set="SetComputeNormals" get="GetComputeNormals" help="Select whether to compute normals"/>
+  <Boolean name="Gradients" set="SetComputeGradients" get="GetComputeGradients" help="Select whether to compute gradients"/>
+  <Boolean name="Scalars" set="SetComputeScalars" get="GetComputeScalars" help="Select whether to compute scalars"/>
+</Filter>
+
+<Filter class="vtkSmoothPolyDataFilter" root="Smooth" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfIterations" type="int" help="More iterations produces better smoothing."/>
+  <Scalar name="Convergence" type="float" help="Smooting factor (0->1)."/>
+</Filter>
+
+<Filter class="vtkStructuredGridGeometryFilter" root="GridGeom" input="vtkStructuredGrid" output="vtkPolyData">
+  <Vector name="Extent" type="int" length="6" help="Set the min/max extents of the grid"/>
+</Filter>
+
+<Filter class="vtkTriangleFilter" root="Tri" input="vtkPolyData" output="vtkPolyData"/>
+
+<Filter class="vtkTubeFilter" root="Tuber" input="vtkPolyData" output="vtkPolyData">
+  <Scalar name="NumberOfSides" type="int" help="Set the number of sides for the tube"/>
+  <Boolean name="Capping" help="Select whether to draw endcaps on the tube"/>
+  <Scalar name="Radius" type="float" help="Set the radius of the tube"/>
+  <Selection name="VaryRadius" help="Select whether/how to vary the radius of the tube">
+    <Choice name="Off" value="0"/>
+    <Choice name="ByScalar" value="1"/>
+    <Choice name="ByVector" value="2"/>
+  </Selection>
+  <Scalar name="RadiusFactor" type="float" help="Set the maximum tube radius in terms of a multiple of the minimum radius"/>
+</Filter>
+
+<Filter class="vtkWarpScalar" root="WarpS" input="vtkPointSet" output="vtkPointSet" default="scalars">
+  <Scalar name="ScaleFactor" type="float" help="Displacement is vector times scale."/>
+  <Vector name="Normal" type="float" length="3" help="Warp direction."/>
+  <Boolean name="UseNormal" help="Use instance model normals rather than instance normal."/>
+  <Boolean name="XYPlane" help="Z value is used to warp the surface, scalars to color surface."/>
+</Filter>
+
+<Filter class="vtkWarpVector" root="WarpV" input="vtkPointSet" output="vtkPointSet" default="vectors">
+  <Scalar name="ScaleFactor" type="float" help="Displacement is vector times scale."/>
+</Filter>
+
+</Interfaces>

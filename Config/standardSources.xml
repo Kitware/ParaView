@@ -1,0 +1,92 @@
+<Interfaces>
+<Source class="vtkArrowSource" root="Arrow" output="vtkPolyData">
+  <Scalar name="TipResolution" type="int" help="Set the number of faces on the tip."/>
+  <Scalar name="TipRadius" type="float" help="Set the radius of the widest part of the tip."/>
+  <Scalar name="TipLength" type="float" help="Set the length of the tip (the whole arrow is length 1)"/>
+  <Scalar name="ShaftResolution" type="int" help="Set the number of faces on shaft"/>
+  <Scalar name="ShaftRadius" type="float" help="Set the radius of the shaft"/>
+</Source>
+
+<Source class="vtkAxes" root="Axes" output="vtkPolyData">
+  <Scalar name="Scale" set="SetScaleFactor" get="GetScaleFactor" type="float" help="Set the size of the axes"/>
+  <Vector name="Origin" type="float" length="3" help="Set the x, y, z coordinates of the origin of the axes"/>
+  <Boolean name="Symmetric" help="Select whether to display the negative axes"/>
+</Source>
+
+<Source class="vtkConeSource" root="Cone" output="vtkPolyData">
+  <Scalar name="Resolution" type="int" help="Set the number of faces on this cone"/>
+  <Scalar name="Radius" type="float" help="Set the radius of the widest part of the cone"/>
+  <Scalar name="Height" type="float" help="Set the height of the cone"/>
+  <Boolean name="Capping" help="Set whether to draw the base of the cone"/>
+</Source>
+
+<Source class="vtkCubeSource" root="Cube" output="vtkPolyData">
+  <Scalar name="XLength" type="int" help="The length of the cube in the x direction."/>
+  <Scalar name="YLength" type="int" help="The length of the cube in the y direction."/>
+  <Scalar name="ZLength" type="int" help="The length of the cube in the z direction."/>
+  <Vector name="Center" type="float" length="3" help="Set the center of the cube."/>
+</Source>
+
+<Source class="vtkCylinderSource" root="Cyl" output="vtkPolyData">
+  <Scalar name="Resolution" type="int" help="The number of facets used to define the cylinder."/>
+  <Scalar name="Height" type="float" help="The height of the cylinder (along the y axis)."/>
+  <Scalar name="Radius" type="float" help="The radius of the cylinder."/>
+  <Vector name="Center" type="float" length="3" help="Set the center of the cylinder."/>
+  <Boolean name="Capping" help="Set whether to draw the ends of the cylinder"/>
+</Source>
+
+<Source class="vtkImageMandelbrotSource" root="Fractal" output="vtkImageData">
+  <Vector name="Extent" set="SetWholeExtent" get="GetWholeExtent" type="int" length="6" help="Set the min and max values of the data in each dimension"/>
+  <Vector name="SubSpace" set="SetProjectionAxes" get="GetProjectionAxes" type="int" length="3" help="Choose which axes of the data set to display"/>
+  <Vector name="Origin" set="SetOriginCX" get="GetOriginCX" type="float" length="4" help="Set the imaginary and real values for C (constant) and X (initial value)"/>
+  <Vector name="Spacing" set="SetSampleCX" get="GetSampleCX" type="float" length="4" help="Set the inaginary and real values for the spacing for C (constant) and X (initial value)"/>
+</Source>
+
+<Source class="vtkImageReader" root="ImageRead" output="vtkImageData">
+  <String name="FilePrefix" help="Set the prefix for the files for this image data."/>
+  <Scalar name="ScalarType" set="SetDataScalarType" get="GetDataScalarType" type="int" help="Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)"/>
+  <Vector name="Extent" set="SetDataExtent" get="GetDataExtent" type="int" length="6" help="Set the min and max values of the data in each dimension"/>
+</Source>  
+
+<Source class="vtkOutlineCornerSource" root="Corners" output="vtkPolyData">
+  <Vector name="Bounds" type="float" length="6" help="Bounds of the outline."/>
+  <Scalar name="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)"/>
+</Source>
+
+<Source class="vtkPOPReader" root="POPReader" output="vtkStructuredGrid">
+  <File name="FileName" extension="pop" help="Select the file for the data set"/>
+  <Scalar name="Radius" type="float" help="Set the radius of the data set"/>
+</Source>
+
+<Source class="vtkSphereSource" root="Sphere" output="vtkPolyData">
+  <Vector name="Center" type="float" length="3" help="Set the coordinates for the center of the sphere."/>
+  <Scalar name="Radius" type="float" help="Set the radius of the sphere"/>
+  <Scalar name="Theta Resolution" set="SetThetaResolution" get="GetThetaResolution" type="int" help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)"/>
+  <Scalar name="Start Theta" set="SetStartTheta" get="GetStartTheta" type="float" help="Set the starting angle in the longitude direction"/>
+  <Scalar name="End Theta" set="SetEndTheta" get="GetEndTheta" type="float" help="Set the ending angle in the longitude direction"/>
+  <Scalar name="Phi Resolution" set="SetPhiResolution" get="GetPhiResolution" type="int" help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)"/>
+  <Scalar name="Start Phi" set="SetStartPhi" get="GetStartPhi" type="float" help="Set the starting angle in the latitude direction"/>
+  <Scalar name="End Phi" set="SetEndPhi" get="GetEndPhi" type="float" help="Set the ending angle in the latitude direction"/>
+</Source>
+
+<Source class="vtkSTLReader" root="STLReader" output="vtkPolyData">
+  <File name="FileName" extension="stl" help="Select the data file for the STL data set"/>
+</Source>
+
+<Source class="vtkSuperquadricSource" root="SQuad" output="vtkPolyData">
+  <Vector name="Center" type="float" length="3" help="Set the center of the superquadric"/>
+  <Vector name="Scale" type="float" length="3" help="Set the scale of the superquadric"/>
+  <Scalar name="ThetaResolution" type="int" help="The number of points in the longitude direction."/>
+  <Scalar name="PhiResolution" type="int" help="The number of points in the latitude direction."/>
+  <Scalar name="Thickness" type="float" help="Changing thickness maintains the outside diameter of the toroid."/>
+  <Scalar name="ThetaRoundness" type="float" help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
+  <Scalar name="PhiRoundness" type="float" help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
+  <Scalar name="Size" type="float" help="Isotropic size"/>
+  <Boolean name="Toroidal" help="Whether or not the superquadric is toroidal or ellipsoidal"/>
+</Source>
+
+<Source class="vtkVectorText" root="VectorText" output="vtkPolyData">
+  <String name="Text" help="Enter the text to display"/>
+</Source>
+
+</Interfaces>
