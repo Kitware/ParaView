@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.205");
+vtkCxxRevisionMacro(vtkKWWindow, "1.206");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -761,7 +761,8 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name)
+void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name,
+  int visibility /*=1*/)
 {
   if (!this->Toolbars->AddToolbar(toolbar))
     {
@@ -770,10 +771,10 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name)
   if (!this->ToolbarsMenu)
     {
     this->ToolbarsMenu = vtkKWMenu::New();
-    this->ToolbarsMenu->SetParent(this->GetMenuView());
+    this->ToolbarsMenu->SetParent(this->GetMenuWindow());
     this->ToolbarsMenu->SetTearOff(0);
     this->ToolbarsMenu->Create(this->GetApplication(), "");
-    this->GetMenuView()->InsertCascade(1, " Toolbars", this->ToolbarsMenu, 1,
+    this->GetMenuWindow()->InsertCascade(2, " Toolbars", this->ToolbarsMenu, 1,
       "Customize Toolbars");
     }
   int id = this->ToolbarsMenu->GetNumberOfItems(); 
@@ -788,6 +789,15 @@ void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name)
   
   this->ToolbarsMenu->CheckCheckButton(this, name, 1);
   command.rdbuf()->freeze(0);
+
+  ostrstream reg_key;
+  reg_key << name << "_ToolbarVisibility" << ends;
+  if (this->GetApplication()->GetRegisteryValue(2, "RunTime", reg_key.str(), 0))
+    {
+    visibility = this->GetApplication()->GetIntRegisteryValue(2, "RunTime", reg_key.str());
+    }
+  this->SetToolbarVisibility(toolbar, name, visibility);
+  reg_key.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -810,6 +820,11 @@ void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, 
     {
     this->ToolbarsMenu->CheckCheckButton(this, name, flag);
     }
+  ostrstream reg_key;
+  reg_key << name << "_ToolbarVisibility" << ends;
+  this->GetApplication()->SetRegisteryValue(2, "RunTime", reg_key.str(),
+    "%d", flag);
+  reg_key.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

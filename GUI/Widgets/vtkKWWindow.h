@@ -198,7 +198,9 @@ public:
   // toggle visibility. Also, 
   // use HideToolbar / ShowToolbar / SetToolbarVisibility methods
   // alone to change the visibility of the toolbar.
-  void AddToolbar(vtkKWToolbar* toolbar, const char* name);
+  // visibility is the default toolbar visibility used
+  // if there is not rehistry entry for that toolbar.
+  void AddToolbar(vtkKWToolbar* toolbar, const char* name, int visibility=1);
 
   // Description:
   // Change the visibility of a toolbar.
