@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.25");
+vtkCxxRevisionMacro(vtkKWRange, "1.26");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -691,12 +691,44 @@ void vtkKWRange::UpdateEntriesValue()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstraintValueToResolution(float &value)
+void vtkKWRange::ConstraintRangeToResolution(float range[2])
 {
-  if (fmod((double)value, (double)this->Resolution) != 0.0)
+  int inv = (range[0] > range[1]) ? 1 : 0;
+
+  double res = (double)this->Resolution;
+  double epsilon = res / 1000.0;
+
+  for (int i = 0; i <= 1; i++)
     {
-    value = (float)((double)this->Resolution * 
-      vtkKWMath::Round((double)value / (double)this->Resolution));
+    double value = (double)range[i];
+    double new_value = res * vtkKWMath::Round(value / res);
+
+    if (new_value != value)
+      {
+      if (i - inv)
+        {
+        while (new_value > value + epsilon)
+          {
+          new_value -= res;
+          }
+        while (new_value <= (value - res) + epsilon)
+          {
+          new_value += res;
+          }
+        }
+      else
+        {
+        while (new_value < value - epsilon)
+          {
+          new_value += res;
+          }
+        while (new_value >= (value + res) - epsilon)
+          {
+          new_value -= res;
+          }
+        }
+      }
+    range[i] = (float)new_value;
     }
 }
 
@@ -705,10 +737,7 @@ void vtkKWRange::ConstraintWholeRange()
 {
   // Resolution OK for WholeRange ?
 
-  for (int i = 0; i <= 1; i++)
-    {
-    this->ConstraintValueToResolution(this->WholeRange[i]);
-    }
+  this->ConstraintRangeToResolution(this->WholeRange);
 }
 
 //----------------------------------------------------------------------------
@@ -722,10 +751,10 @@ void vtkKWRange::ConstraintRange(float range[2], float *range_hint)
 
   // Resolution OK for this ? Is it out of WholeRange ?
 
+  this->ConstraintRangeToResolution(range);
+
   for (i = 0; i <= 1; i++)
     {
-    this->ConstraintValueToResolution(range[i]);
-
     if (range[i] < this->WholeRange[wmin_idx])
       {
       range[i] = this->WholeRange[wmin_idx];

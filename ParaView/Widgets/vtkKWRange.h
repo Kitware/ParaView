@@ -330,7 +330,7 @@ protected:
 
   // Description:
   // Make sure all elements are constrained correctly
-  virtual void ConstraintValueToResolution(float &value);
+  virtual void ConstraintRangeToResolution(float range[2]);
   virtual void ConstraintWholeRange();
   virtual void ConstraintRange(float range[2], float *range_hint = 0);
   virtual void ConstraintRanges();
