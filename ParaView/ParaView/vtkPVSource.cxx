@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.338");
+vtkCxxRevisionMacro(vtkPVSource, "1.339");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1360,10 +1360,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // We need to update so we will have correct information for initialization.
     if (this->GetPVOutput())
       {
-      cout << "Updating data" << endl;
       // Update the VTK data.
       this->Update();
-      cout << "Done" << endl;
       }
 
     // The best test I could come up with to only reset
