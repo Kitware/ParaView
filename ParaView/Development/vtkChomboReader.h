@@ -37,7 +37,7 @@ class vtkHierarchicalBoxDataSet;
 class VTK_EXPORT vtkChomboReader : public vtkHierarchicalBoxSource
 {
 public:
-  vtkTypeRevisionMacro(vtkChomboReader,vtkSource);
+  vtkTypeRevisionMacro(vtkChomboReader,vtkHierarchicalBoxSource);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkChomboReader* New();
 
