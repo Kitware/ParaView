@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.4");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.5");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -79,7 +79,7 @@ void vtkRedistributePolyData::Execute()
   vtkPolyData *tmp = this->GetInput();
   vtkPolyData *output = this->GetOutput();
   vtkPolyData* input = vtkPolyData::New();
-  input->ShallowCopy(input);
+  input->ShallowCopy(tmp);
   this->CompleteInputArrays(input);
 
   int myId;
@@ -2673,7 +2673,7 @@ void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
     return;
     }
   int myId = this->Controller->GetLocalProcessId();
-  int numProc = this->Controller->GetNumberOfProcesses();
+  int numProcs = this->Controller->GetNumberOfProcesses();
   int* msg = new int[numProcs];
   int numPts = input->GetNumberOfPoints();
   int idx;
@@ -2732,7 +2732,7 @@ void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
 }
 
 //--------------------------------------------------------------------
-void vtkRedistributePolyData::ReceiveInputArrays(vtkAttributeData* attr,
+void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
                                                  int recFrom)
 {
   int j;
@@ -2808,7 +2808,7 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkAttributeData* attr,
 }
 
 //-----------------------------------------------------------------------
-void vtkRedistributePolyData::SendInputArrays(vtkAttributeData* attr,
+void vtkRedistributePolyData::SendInputArrays(vtkDataSetAttributes* attr,
                                               int sendTo)
 {
   int num;
