@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -889,5 +889,7 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
     << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
   
   os << indent << "CurrentProperty: " << this->CurrentProperty << endl;
+
+  os << indent << "CustomScript: " << this->CustomScript << endl;
 }
 
