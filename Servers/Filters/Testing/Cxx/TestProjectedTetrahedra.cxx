@@ -66,10 +66,11 @@ int main(int argc, char *argv[])
   // Create the standard renderer, render window, and interactor.
   vtkRenderer *ren1 = vtkRenderer::New();
   vtkRenderWindow *renWin = vtkRenderWindow::New();
+  renWin->OffScreenRenderingOn();
   renWin->AddRenderer(ren1);
-  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-  iren->SetRenderWindow(renWin);
-  iren->SetDesiredUpdateRate(3);
+//   vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+//   iren->SetRenderWindow(renWin);
+//   iren->SetDesiredUpdateRate(3);
 
   // Create the reader for the data.
   // This is the data that will be volume rendered.
@@ -158,15 +159,15 @@ int main(int argc, char *argv[])
   renWin->Render();
 
   int retVal = vtkTesting::Test(argc, argv, renWin, 75);
-  if (retVal == vtkRegressionTester::DO_INTERACTOR)
-    {
-    iren->Start();
-    }
+//   if (retVal == vtkRegressionTester::DO_INTERACTOR)
+//     {
+//     iren->Start();
+//     }
 
   // Clean up.
   ren1->Delete();
   renWin->Delete();
-  iren->Delete();
+//   iren->Delete();
   reader->Delete();
   reader2->Delete();
   thresh->Delete();
