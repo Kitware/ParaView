@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void vtkPVDataSetAttributesInformation::CopyFromDataSetAttributes(vtkDataSetAttr
   for (idx = 0; idx < num; ++idx)
     {
     array = da->GetArray(idx);
-    if (array->GetName() )
+    if (array->GetName() && strcmp(array->GetName(),"vtkGhostLevels") != 0)
       {
       vtkPVArrayInformation *info = vtkPVArrayInformation::New();
       info->CopyFromArray(array);

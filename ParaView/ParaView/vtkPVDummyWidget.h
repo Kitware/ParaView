@@ -79,6 +79,11 @@ public:
   // Empty method to keep superclass from complaining.
   virtual void Trace(ofstream*) {};
 
+
+  // Description:
+  // This does nothing.  It is only here to avoid a paraview warning.
+  virtual void SaveInBatchScript(ofstream*) {};
+
 protected:
   vtkPVDummyWidget();
   ~vtkPVDummyWidget();

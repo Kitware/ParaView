@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -259,7 +259,9 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
   this->PlaceWidget();
   pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
 
-  // I guess this should be done in the initialization.
+  // This should be done in the initialization.
+  // There must be a more general way of hooking up the plane object.
+  // ExtractCTH uses this varible, General Clipping uses the select widget.
   if (this->VariableName && sourceTclName)
     {
     pvApp->BroadcastScript("%s Set%s %s", sourceTclName,
@@ -325,6 +327,22 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream *file)
   *file << "\t" << this->PlaneTclName << " SetNormal ";
   this->Script("%s GetNormal", this->PlaneTclName);
   *file << this->Application->GetMainInterp()->result << endl;
+
+
+  // There must be a more general way of hooking up the plane object.
+  // ExtractCTH uses this varible, General Clipping uses the select widget.
+  if (this->VariableName && this->PVSource)
+    {
+    int num, idx;
+    num = this->PVSource->GetNumberOfVTKSources();
+    for (idx = 0; idx < num; ++idx)
+      {
+      *file << this->PVSource->GetVTKSourceTclName()
+            << " Set" << this->VariableName << " " 
+            << this->PlaneTclName << endl;                  
+      }
+    }
+
 }
 
 //----------------------------------------------------------------------------

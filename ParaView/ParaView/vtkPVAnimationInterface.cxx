@@ -135,7 +135,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.44");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1592,16 +1592,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     {
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
-    *file << "if {$myProcId != 0} {treeComp RenderRMI} else {\n\t";  
+    *file << "RenWin1 Render\n";
+    *file << "compManager Composite\n";
+    *file << "if {$myProcId == 0} {\n\t";  
     sprintf(countStr, "%05d", (int)(timeIdx));
-    // Not necessary because WinToImage causes a render.
-    //*file << "RenWin1 Render\n\t";
-    *file << "# This update is necessary to resolve some expose event\n\t";
-    *file << "# problems which occur with certain cards on Windows.\n\t";
-    *file << "update\n\t";
     if (imageFileName)
       {
-      *file << "WinToImage Modified\n\t";
       root = new char[strlen(imageFileName)+1];
       strcpy(root, imageFileName);
       ext = NULL;
@@ -1635,6 +1631,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
                                                  geometryFileName,
                                                  timeIdx);
       }
+    *file << endl;
 
     ++timeIdx;
     t = t + this->TimeStep;

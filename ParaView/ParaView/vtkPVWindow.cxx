@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.436");
+vtkCxxRevisionMacro(vtkPVWindow, "1.437");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2651,16 +2651,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     {
     *file << "RenWin1 SetOffScreenRendering 1\n\n";
     }    
-  // Set up the composite manager.
-  // We do not know if it will be run in parallel.
-  *file << "vtkCompositeManager compManager\n\t";
-  *file << "compManager SetRenderWindow RenWin1 \n\t";
-  *file << "compManager InitializePieces\n\n";
-  *file << "compManager ManualOn\n";
-  *file << "if {[catch {set myProcId [[compManager GetController] "
-      "GetLocalProcessId]}]} {set myProcId 0 } \n";
-  *file << "if {[catch {set numberOfProcs [[compManager GetController] "
-      "GetNumberOfProcesses]}]} {set numberOfProcs 0 } \n\n";
 
   // Save out the VTK data pipeline.
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
@@ -2703,15 +2693,23 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     }
   cit->Delete();
 
+  // Set up the composite manager.
+  // We do not know if it will be run in parallel.
+  *file << "\n\nvtkPVBatchCompositeManager compManager\n\t";
+  *file << "compManager SetRenderWindow RenWin1 \n\t";
+  *file << "compManager InitializePieces\n\n";
+  *file << "if {[catch {set myProcId [[compManager GetController] "
+      "GetLocalProcessId]}]} {set myProcId 0 } \n";
+  *file << "if {[catch {set numberOfProcs [[compManager GetController] "
+      "GetNumberOfProcesses]}]} {set numberOfProcs 0 } \n\n";
+
   // Create the image writer if necessary.
   if (imageFileName && vtkString::Length(imageFileName) > 0)
     {
     if ( extension && writerName)
       {
-      *file << "vtkWindowToImageFilter WinToImage\n\t";
-      *file << "WinToImage SetInput RenWin1\n\t";
       *file << writerName << " ImageWriter\n\t";
-      *file << "ImageWriter SetInput [WinToImage GetOutput]\n\n";
+      *file << "ImageWriter SetInput [compManager GetOutput]\n\n";
       }
     }
 
@@ -2721,7 +2719,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     *file << "GeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
     *file << "GeometryWriter SetDataModeToBinary" << endl;
     *file << "GeometryWriter EncodeAppendedDataOff" << endl;
-    *file << "GeometryWriter SetWritePiece $myProcId" << endl;
+    *file << "GeometryWriter SetWritePiece $myProcId\n\n";
     }
 
   if (animationFlag)
@@ -2731,8 +2729,9 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     }
   else
     { // Just do one frame.
-    *file << "if {$myProcId != 0} {compManager RenderRMI} else {\n\t";
-    *file << "RenWin1 Render\n\t";
+    *file << "RenWin1 Render\n";
+    *file << "compManager Composite\n";
+    *file << "if {$myProcId == 0} {\n\t";
     if ( extension && writerName)
       {
       *file << "ImageWriter SetFileName {" << imageFileName << "}\n\t";
@@ -2826,8 +2825,8 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
           }
         else if (numParts != 1 && timeIdx < 0)
           {
-          sprintf(fileName, "%s%sP%d.vtp", 
-                  fileRoot, sourceName, partIdx);
+          sprintf(fileName, "%s%s%sP%d.vtp", 
+                  filePath, fileRoot, sourceName, partIdx);
           }
         *file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
         *file << "GeometryWriter SetFileName {" << fileName << "}\n";
@@ -4181,7 +4180,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.436 $");
+  this->ExtractRevision(os,"$Revision: 1.437 $");
 }
 
 //-----------------------------------------------------------------------------
