@@ -32,7 +32,7 @@
 
 #include "vtkDataSetToUnstructuredGridFilter.h"
 
-class VTK_GRAPHICS_EXPORT vtkPickDataSetFilter : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkPickDataSetFilter : public vtkDataSetToUnstructuredGridFilter
 {
 public:
   vtkTypeRevisionMacro(vtkPickDataSetFilter,vtkDataSetToUnstructuredGridFilter);

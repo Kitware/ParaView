@@ -24,7 +24,7 @@
 #include "vtkFloatArray.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.2");
+vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.3");
 vtkStandardNewMacro(vtkPickDataSetFilter);
 
 
@@ -174,5 +174,8 @@ void vtkPickDataSetFilter::Execute()
 void vtkPickDataSetFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "SearchCells: " << (this->SearchCells?"on":"off") << endl;
+  os << indent << "SamplePoint: " << this->SamplePoint[0] << " "
+     << this->SamplePoint[1] << " " << this->SamplePoint[2] << endl;
 }
 
