@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.619");
+vtkCxxRevisionMacro(vtkPVWindow, "1.620");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -877,7 +877,8 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->Toolbar->ResizableOn();
   //this->ToolbarMenuButton->SetParent(this->Toolbar->GetFrame());
   this->ToolbarMenuButton->SetParent(this->Toolbar);
-  this->ToolbarMenuButton->Create(app, "-image PVPullDownArrow -relief flat");
+  this->ToolbarMenuButton->Create(app, 
+                                 "-image PVToolbarPullDownArrow -relief flat");
   this->ToolbarMenuButton->IndicatorOff();
 }
 
@@ -1012,6 +1013,10 @@ void vtkPVWindow::ToolbarMenuCheckCallback(const char* buttonName)
     if (checkValue)
       {
       this->Toolbar->AddWidget(button);
+      // First disable the button.  Enable will only turn it on.
+      button->EnabledOff();
+      // This is the only method that checks for the correct type.
+      this->EnableToolbarButtons();
       }
     else
       {
@@ -1475,7 +1480,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->UpdateEnableState();
   
   // Lets see if this works.
-  this->Script("pack %s -side right", this->ToolbarMenuButton->GetWidgetName());
+  this->Script("pack %s -side right -anchor se", this->ToolbarMenuButton->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -3725,8 +3730,13 @@ void vtkPVWindow::EnableToolbarButtons()
     {
     return;
     }
-  if (this->CurrentPVSource == NULL)
+  if (this->CurrentPVSource == 0)
     {
+    return;
+    }
+  if (this->CurrentPVSource->GetInitialized() == 0)
+    {
+    this->DisableToolbarButtons();
     return;
     }
 
