@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVVolumeAppearanceEditor.h"
-
+ 
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.3");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.4");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -560,10 +560,6 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
       
       volumeOpacityID = part->GetPartDisplay()->GetVolumeOpacityID();
       
-      vtkPiecewiseFunction *opacityFunc = 
-        vtkPiecewiseFunction::SafeDownCast(
-          pvApp->GetProcessModule()->GetObjectFromID(volumeOpacityID));
-
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
       
@@ -580,7 +576,9 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::ColorButtonCallback( float r, float g, float b )
+void vtkPVVolumeAppearanceEditor::ColorButtonCallback( float vtkNotUsed(r), 
+                                                       float vtkNotUsed(g), 
+                                                       float vtkNotUsed(b) )
 {
   this->ColorRampChanged();
 }
@@ -622,10 +620,6 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
       
       volumeColorID = part->GetPartDisplay()->GetVolumeColorID();
       
-      vtkColorTransferFunction *colorFunc = 
-        vtkColorTransferFunction::SafeDownCast(
-          pvApp->GetProcessModule()->GetObjectFromID(volumeColorID));
-
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
       
