@@ -59,6 +59,10 @@ public:
   vtkGetObjectMacro(RenderView, vtkKWView);
 
   // Description:
+  // Set the comparison image file name.
+  vtkSetStringMacro(ComparisonImage);
+
+  // Description:
   // Add argument
   virtual void AddArgument(const char* arg);
 
@@ -72,6 +76,7 @@ protected:
 
   vtkTesting* Testing;
   vtkKWView* RenderView;
+  char* ComparisonImage;
   
 private:
   vtkKWTesting(const vtkKWTesting&); // Not implemented
