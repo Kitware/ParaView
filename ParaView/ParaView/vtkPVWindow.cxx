@@ -824,6 +824,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
 
   this->DisableFilterButtons();
+
+  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
+	       this->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
