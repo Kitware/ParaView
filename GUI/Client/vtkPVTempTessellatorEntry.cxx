@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.13");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.14");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -209,12 +209,14 @@ void vtkPVTempTessellatorEntry::Update()
     this->Script( "%s itemconfigure %d -foreground " PLAIN , d->ScalarFieldList->GetListbox()->GetWidgetName(), a );
     delete[] listEntry;
     }
-  
-  if ( dvp->GetNumberOfElements() != numberOfArrays )
+
+  unsigned int numArrays = static_cast<unsigned int>(numberOfArrays);
+  unsigned int idx;
+  if ( dvp->GetNumberOfElements() != numArrays )
     {
-    for ( a = 0; a < numberOfArrays; ++a )
+    for ( idx = 0; idx < numArrays; ++idx )
       {
-      dvp->SetElement(a, -1);
+      dvp->SetElement(idx, -1);
       }
     }
 

@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.153");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.154");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1406,7 +1406,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext,
-                                         int width, int height, int aspectRatio /* = 0 */)
+                                         int width, int height, int vtkNotUsed(aspectRatio) /* = 0 */)
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
