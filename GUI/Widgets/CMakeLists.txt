@@ -5,7 +5,6 @@ SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 
 SET( KWWidgets_SRCS
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkCornerAnnotation.cxx
   vtkKWActorComposite.cxx 
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
@@ -102,7 +101,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkCornerAnnotation.cxx
   vtkKWCompositeCollection.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 

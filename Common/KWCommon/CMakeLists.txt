@@ -3,6 +3,7 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWCommon_SRCS
   vtkContainer.cxx
+  vtkCornerAnnotation.cxx
   vtkKWArguments.cxx
   vtkKWDirectoryUtilities.cxx
   vtkKWEvent.cxx
