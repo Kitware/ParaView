@@ -351,10 +351,6 @@ public:
   // Description:
   // Called by vtkPVSource::DeleteCallback().
   void DeleteCallback();
-
-  // Description:
-  // Get whether the data was initialized or not.
-  vtkGetMacro(Initialized, int);
   
 protected:
   vtkPVData();
@@ -495,8 +491,6 @@ protected:
   float PreviousDiffuse;
   float PreviousSpecular;
   int PreviousWasSolid;
-
-  int Initialized;
 
   // Tells PVData to only use the data in the first
   // process to render and to compute array ranges etc.

@@ -1266,7 +1266,10 @@ void vtkPVRenderView::UpdateAllPVData()
       {
       source = static_cast<vtkPVSource*>(it->GetObject());
       vtkPVData* data = source->GetPVOutput();
-      data->ForceUpdate(pvApp);
+      if ( source->GetInitialized() )
+        {
+        data->ForceUpdate(pvApp);
+        }
       it->GoToNextItem();
       }
     it->Delete();
@@ -1751,7 +1754,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.173 $");
+  this->ExtractRevision(os,"$Revision: 1.174 $");
 }
 
 //------------------------------------------------------------------------------

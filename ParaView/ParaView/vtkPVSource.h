@@ -329,6 +329,11 @@ public:
   vtkSetStringMacro(ModuleName);
   vtkGetStringMacro(ModuleName);
 
+  // Description:
+  // Check whether the source has been initialized 
+  // (Accept has been called at least one)
+  vtkGetMacro(Initialized, int);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();

@@ -88,7 +88,6 @@ vtkPVData::vtkPVData()
 {
   this->CommandFunction = vtkPVDataCommand;
 
-  this->Initialized = 0;
   this->VTKData = NULL;
   this->VTKDataTclName = NULL;
   this->PVSource = NULL;
@@ -687,7 +686,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 {
-  if ( this->Initialized && this->UpdateSupressorTclName )
+  if ( this->UpdateSupressorTclName )
     {
     pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
     pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSupressorTclName);
@@ -2162,7 +2161,6 @@ void vtkPVData::Initialize()
                          this->LODMapperTclName,
                          static_cast<vtkPVRenderView*>(
                            this->GetView())->GetImmediateModeCheck()->GetState());
-  this->Initialized = 1;
 }
 
 
@@ -2739,7 +2737,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.130 $");
+  this->ExtractRevision(os,"$Revision: 1.131 $");
 }
 
 //----------------------------------------------------------------------------
