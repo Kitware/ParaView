@@ -99,13 +99,20 @@ void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg,
                                 int remoteProcessId)
 {
   vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
-  vtkMultiProcessController* controler = self->GetController();
-  for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+  // Do not execute the RMI if Enabled flag is set to false. This
+  // flag is set at start up if the client does not have the right
+  // credentials
+  if (self->GetEnabled())
     {
-    controler->TriggerRMI(
-      i, remoteArg, remoteArgLength, VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+    vtkMultiProcessController* controler = self->GetController();
+    for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+      {
+      controler->TriggerRMI(
+        i, remoteArg, remoteArgLength, VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+      }
+    vtkPVClientServerMPIRMI(
+      localArg, remoteArg, remoteArgLength, remoteProcessId);
     }
-  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
 }
 
 
@@ -115,7 +122,15 @@ void vtkPVClientServerRootRMI(void *localArg, void *remoteArg,
                               int remoteArgLength,
                               int remoteProcessId)
 {
-  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  // Do not execute the RMI if Enabled flag is set to false. This
+  // flag is set at start up if the client does not have the right
+  // credentials
+  if (self->GetEnabled())
+    {
+    vtkPVClientServerMPIRMI(
+      localArg, remoteArg, remoteArgLength, remoteProcessId);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -132,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2.2.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -158,6 +173,9 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->NumberOfProcesses = 2;
   this->GatherRenderServer = 0;
   this->RemoteExecution = vtkKWRemoteExecute::New();
+
+  this->Enabled = 1;
+  this->ConnectID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -245,6 +263,37 @@ void vtkPVClientServerModule::Initialize()
       return;
       }
   
+    // The client sends the connect id to data server
+    this->SocketController->Send(&this->ConnectID, 1, 1, 8843);
+    int dsmatch = 1, rsmatch = 1;
+    // Check if it matched
+    this->SocketController->Receive(&dsmatch, 1, 1, 8843);
+    if (!dsmatch)
+      {
+      vtkErrorMacro("Connect ID mismatch. Data server was expecting another ID. "
+                    "The server will exit.");
+      }
+
+    // Send the client version
+    int version;
+    version = PARAVIEW_VERSION_MAJOR;
+    this->SocketController->Send(&version, 1, 1, 8843);
+    version = PARAVIEW_VERSION_MINOR;
+    this->SocketController->Send(&version, 1, 1, 8843);
+    version = PARAVIEW_VERSION_PATCH;
+    this->SocketController->Send(&version, 1, 1, 8843);
+
+    // Check if versions matched
+    int tmpmatch;
+    this->SocketController->Receive(&tmpmatch, 1, 1, 8843);
+    if (!tmpmatch)
+      {
+      vtkErrorMacro("Client and data server versions do not match. "
+                    "Please make sure that you are using the right "
+                    "client version.");
+      dsmatch = 0;
+      }
+
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -252,20 +301,93 @@ void vtkPVClientServerModule::Initialize()
    
     if(this->RenderServerMode)
       { 
+      // The client sends the connect id to data server
+      this->RenderServerSocket->Send(&this->ConnectID, 1, 1, 8843);
+      // Check if it matched
+      this->RenderServerSocket->Receive(&rsmatch, 1, 1, 8843);
+      if (!rsmatch)
+        {
+        vtkErrorMacro("Connect ID mismatch. Data server was expecting "
+                      "another ID. The server will exit.");
+        }
+      // Send the client version
+      version = PARAVIEW_VERSION_MAJOR;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+      version = PARAVIEW_VERSION_MINOR;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+      version = PARAVIEW_VERSION_PATCH;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+
+      // Check if versions matched
+      this->RenderServerSocket->Receive(&tmpmatch, 1, 1, 8843);
+      if (!tmpmatch)
+        {
+        vtkErrorMacro("Client and render server versions do not match. "
+                      "Please make sure that you are using the right "
+                      "client version.");
+        rsmatch = 0;
+        }
+
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
       }
 
-    // attempt to initialize render server connection to data server
-    this->InitializeRenderServer();
+    // Continue only if both ids match. Otherwise, the servers
+    // will exit anyway.
+    if (dsmatch && rsmatch)
+      {
+      // attempt to initialize render server connection to data server
+      this->InitializeRenderServer();
       
-    this->ReturnValue = this->GUIHelper->
-      RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
-    cout << "Exit Client\n";
-    cout.flush();
+      this->ReturnValue = this->GUIHelper->
+        RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+      }
+    else
+      {
+      this->GUIHelper->ExitApplication();
+      }
+      cout << "Exit Client\n";
+      cout.flush();
     }
   else if (myId == 0)
     { // process 0 of Server
+    int connectID;
+    // Receive the connect id from client
+    this->SocketController->Receive(&connectID, 1, 1, 8843);
+    int match = 1;
+    if ( (this->ConnectID != 0) && (connectID != this->ConnectID) )
+      {
+      // If the ids do not match, disable all rmis by setting
+      // this->Enabled to 0.
+      match = 0;
+      vtkErrorMacro("Connection ID mismatch.");
+      this->Enabled = 0;
+      }
+    // Tell the client the result of id check
+    this->SocketController->Send(&match, 1, 1, 8843);
+    // Do not send the actual number of procs. if the
+    // security check failed.
+    if (!match)
+      {
+      numProcs = 0;
+      }
+
+    // Receive the client version
+    int majorVersion, minorVersion, patchVersion;
+    this->SocketController->Receive(&majorVersion, 1, 1, 8843);
+    this->SocketController->Receive(&minorVersion, 1, 1, 8843);
+    this->SocketController->Receive(&patchVersion, 1, 1, 8843);
+
+    if ( (majorVersion != PARAVIEW_VERSION_MAJOR) ||
+         (minorVersion != PARAVIEW_VERSION_MINOR) )
+      {
+      match = 0;
+      vtkErrorMacro("Version mismatch.");
+      this->Enabled = 0;
+      }
+    // Tell the client the result of version check
+    this->SocketController->Send(&match, 1, 1, 8843);
+
     // send the number of server processes as a handshake. 
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
@@ -1026,6 +1148,8 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
   os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
   os << indent << "NumberOfServerProcesses: " << this->NumberOfServerProcesses << endl;
+  os << indent << "ConnectID: " << this->ConnectID << endl;
+  os << indent << "Enabled: " << this->Enabled << endl;
 }
 
 //----------------------------------------------------------------------------
