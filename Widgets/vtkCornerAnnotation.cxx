@@ -262,75 +262,79 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     this->LastSize[0] = vSize[0];
     this->LastSize[1] = vSize[1];
 
-    // Update all the composing objects tofind the best size for the font
-    // use the last size as a first guess
-    int tempi[8];
-    fontSize = this->TextMapper[0]->GetFontSize();
-    for (i = 0; i < 4; i++)
+    // only adjust size then the text changes due to non w/l slice reasons
+    if (this->GetMTime() > this->BuildTime)
       {
-      this->TextMapper[i]->GetSize(viewport,tempi+i*2);
-      }
-    maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-      tempi[1] + tempi[5] : tempi[3] + tempi[7];
-    maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
-      tempi[0] + tempi[2] : tempi[4] + tempi[6];
+      // Update all the composing objects tofind the best size for the font
+      // use the last size as a first guess
+      int tempi[8];
+      fontSize = this->TextMapper[0]->GetFontSize();
+      for (i = 0; i < 4; i++)
+        {
+        this->TextMapper[i]->GetSize(viewport,tempi+i*2);
+        }
+      maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
+        tempi[1] + tempi[5] : tempi[3] + tempi[7];
+      maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
+        tempi[0] + tempi[2] : tempi[4] + tempi[6];
       
-    int numLines1 = this->TextMapper[0]->GetNumberOfLines() + 
-      this->TextMapper[2]->GetNumberOfLines();
-    int numLines2 = this->TextMapper[1]->GetNumberOfLines() + 
-      this->TextMapper[3]->GetNumberOfLines();
-    
-    int lineMax = (int)(vSize[1]*this->MaximumLineHeight) * 
-                        (numLines1 > numLines2 ? numLines1 : numLines2);
-    
-    // target size is to use 90% of x and y
-    int tSize[2];
-    tSize[0] = (int)(0.9*vSize[0]);
-    tSize[1] = (int)(0.9*vSize[1]);    
-    
-    // while the size is too small increase it
-    while (maxY < tSize[1] && 
-           maxX < tSize[0] && 
-           maxY < lineMax &&
-           fontSize < 100)
-      {
-      fontSize++;
+      int numLines1 = this->TextMapper[0]->GetNumberOfLines() + 
+        this->TextMapper[2]->GetNumberOfLines();
+      int numLines2 = this->TextMapper[1]->GetNumberOfLines() + 
+        this->TextMapper[3]->GetNumberOfLines();
+      
+      int lineMax = (int)(vSize[1]*this->MaximumLineHeight) * 
+        (numLines1 > numLines2 ? numLines1 : numLines2);
+      
+      // target size is to use 90% of x and y
+      int tSize[2];
+      tSize[0] = (int)(0.9*vSize[0]);
+      tSize[1] = (int)(0.9*vSize[1]);    
+      
+      // while the size is too small increase it
+      while (maxY < tSize[1] && 
+             maxX < tSize[0] && 
+             maxY < lineMax &&
+             fontSize < 100)
+        {
+        fontSize++;
+        for (i = 0; i < 4; i++)
+          {
+          this->TextMapper[i]->SetFontSize(fontSize);
+          this->TextMapper[i]->GetSize(viewport,tempi+i*2);
+          }
+        maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
+          tempi[1] + tempi[5] : tempi[3] + tempi[7];
+        maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
+          tempi[0] + tempi[2] : tempi[4] + tempi[6];
+        }
+      // while the size is too large decrease it
+      while ((maxY > tSize[1] || maxX > tSize[0] || 
+              maxY > lineMax) && fontSize > 0)
+        {
+        fontSize--;
+        for (i = 0; i < 4; i++)
+          {
+          this->TextMapper[i]->SetFontSize(fontSize);
+          this->TextMapper[i]->GetSize(viewport,tempi+i*2);
+          }
+        maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
+          tempi[1] + tempi[5] : tempi[3] + tempi[7];
+        maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
+          tempi[0] + tempi[2] : tempi[4] + tempi[6];
+        }
+      this->FontSize = fontSize;
+      
+      // now set the position of the TextActors
+      this->TextActor[0]->SetPosition(5,5);
+      this->TextActor[1]->SetPosition(vSize[0]-5,5);
+      this->TextActor[2]->SetPosition(5,vSize[1]-5);
+      this->TextActor[3]->SetPosition(vSize[0] - 5, vSize[1] - 5);
+      
       for (i = 0; i < 4; i++)
         {
-        this->TextMapper[i]->SetFontSize(fontSize);
-        this->TextMapper[i]->GetSize(viewport,tempi+i*2);
+        this->TextActor[i]->SetProperty(this->GetProperty());
         }
-      maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-        tempi[1] + tempi[5] : tempi[3] + tempi[7];
-      maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
-        tempi[0] + tempi[2] : tempi[4] + tempi[6];
-      }
-    // while the size is too large decrease it
-    while ((maxY > tSize[1] || maxX > tSize[0] || 
-            maxY > lineMax) && fontSize > 0)
-      {
-      fontSize--;
-      for (i = 0; i < 4; i++)
-        {
-        this->TextMapper[i]->SetFontSize(fontSize);
-        this->TextMapper[i]->GetSize(viewport,tempi+i*2);
-        }
-      maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-        tempi[1] + tempi[5] : tempi[3] + tempi[7];
-      maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
-        tempi[0] + tempi[2] : tempi[4] + tempi[6];
-      }
-    this->FontSize = fontSize;
-    
-    // now set the position of the TextActors
-    this->TextActor[0]->SetPosition(5,5);
-    this->TextActor[1]->SetPosition(vSize[0]-5,5);
-    this->TextActor[2]->SetPosition(5,vSize[1]-5);
-    this->TextActor[3]->SetPosition(vSize[0] - 5, vSize[1] - 5);
-
-    for (i = 0; i < 4; i++)
-      {
-      this->TextActor[i]->SetProperty(this->GetProperty());
       }
     this->BuildTime.Modified();
     }
