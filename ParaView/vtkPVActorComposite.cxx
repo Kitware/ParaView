@@ -167,6 +167,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkQuadricClustering", tclName);
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
+  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
@@ -609,7 +610,7 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
   
   pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
                          this->ActorTclName, r, g, b);
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 void vtkPVActorComposite::ChangeColorMap()
@@ -654,7 +655,7 @@ void vtkPVActorComposite::ResetColorRange()
   
   this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
 			this->MapperTclName, range[0], range[1]);
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 void vtkPVActorComposite::GetColorRange(float range[2])
@@ -704,14 +705,16 @@ void vtkPVActorComposite::ColorByProperty()
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
   float *color;
   
+  color = this->ColorButton->GetColor();
+  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f", 
+			 this->ActorTclName, color[0], color[1], color[2]);
+  
   // No scalars visible.  Turn off scalar bar.
   this->SetScalarBarVisibility(0);
 
-  color = this->ColorButton->GetColor();
-  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
-                         this->ActorTclName, color[0], color[1], color[2]);
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
@@ -727,7 +730,7 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
   this->ScalarBar->SetTitle(name);
   
   this->ResetColorRange();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -744,7 +747,7 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
   this->ScalarBar->SetTitle(name);  
   
   this->ResetColorRange();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -759,7 +762,7 @@ void vtkPVActorComposite::DrawWireframe()
     }
   
   //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -774,7 +777,7 @@ void vtkPVActorComposite::DrawSurface()
     }
   
   //this->GetActor()->GetProperty()->SetRepresentationToSurface();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -789,7 +792,7 @@ void vtkPVActorComposite::DrawPoints()
     }
   
   //this->GetActor()->GetProperty()->SetRepresentationToPoints();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
@@ -805,7 +808,7 @@ void vtkPVActorComposite::SetInterpolationToFlat()
     }
   
   //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
@@ -821,7 +824,7 @@ void vtkPVActorComposite::SetInterpolationToGouraud()
     }
   
   //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
@@ -836,7 +839,7 @@ void vtkPVActorComposite::AmbientChanged()
 
   
   this->SetAmbient(ambient);
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -1048,7 +1051,7 @@ void vtkPVActorComposite::Deselect(vtkKWView *v)
 void vtkPVActorComposite::VisibilityCheckCallback()
 {
   this->SetVisibility(this->VisibilityCheck->GetState());
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -1078,6 +1081,13 @@ int vtkPVActorComposite::GetVisibility()
   
   return p->GetVisibility();
 }
+
+//----------------------------------------------------------------------------
+vtkPVRenderView* vtkPVActorComposite::GetPVRenderView()
+{
+  return vtkPVRenderView::SafeDownCast(this->GetView());
+}
+
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVActorComposite::GetPVApplication()
@@ -1232,7 +1242,7 @@ void vtkPVActorComposite::SetComposite(int val)
     this->Script("%s SetPiece 0", this->LODMapperTclName);
     }
   
-  ((vtkPVRenderView*)this->GetView())->GetComposite()->SetUseCompositing(val);
+  ((vtkPVRenderView*)this->GetPVRenderView())->GetComposite()->SetUseCompositing(val);
 
   this->Composite = val;
 }
@@ -1314,13 +1324,13 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
 void vtkPVActorComposite::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
-  this->GetView()->Render();  
+  this->GetPVRenderView()->EventuallyRender();  
 }
 
 void vtkPVActorComposite::CubeAxesCheckCallback()
 {
   this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();  
 }
 
 void vtkPVActorComposite::ScalarBarOrientationCallback()
@@ -1341,7 +1351,7 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     this->ScalarBar->SetHeight(0.13);
     this->ScalarBar->SetWidth(0.5);
     }
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)

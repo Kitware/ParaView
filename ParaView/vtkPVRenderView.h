@@ -94,7 +94,8 @@ public:
   // Description:
   // Composites
   void Render();
-  void EventuallyRender() {this->Render();}
+  void EventuallyRender();
+  void EventuallyRenderCallBack();
   
   // Description:
   // Update all the actors.
@@ -172,6 +173,7 @@ protected:
 
   vtkKWInteractor *CurrentInteractor;
 
+  int EventuallyRenderFlag;
 };
 
 

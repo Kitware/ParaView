@@ -49,6 +49,7 @@ class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
 class vtkPVSourceInterface;
+class vtkPVRenderView;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -242,6 +243,8 @@ protected:
   vtkPVSource(const vtkPVSource&) {};
   void operator=(const vtkPVSource&) {};
 
+  vtkPVRenderView* GetPVRenderView();
+  
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
   

@@ -230,7 +230,7 @@ void vtkPVScalarBar::SetScalarBarXPosition()
     SetCoordinateSystemToNormalizedViewport();
   this->ScalarBar->GetPositionCoordinate()->
     SetValue(this->XPositionScale->GetValue(), pos[1]);
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -244,28 +244,28 @@ void vtkPVScalarBar::SetScalarBarYPosition()
     SetCoordinateSystemToNormalizedViewport();
   this->ScalarBar->GetPositionCoordinate()->
     SetValue(pos[0], this->YPositionScale->GetValue());
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetScalarBarWidth()
 {
   this->ScalarBar->SetWidth(this->WidthScale->GetValue());
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetScalarBarHeight()
 {
   this->ScalarBar->SetHeight(this->HeightScale->GetValue());
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetScalarBarTitle()
 {
   this->ScalarBar->SetTitle(this->TitleEntry->GetValue());
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -279,7 +279,7 @@ void vtkPVScalarBar::SetScalarBarVisibility()
     {
     this->VisibilityOff();
     }
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -298,14 +298,14 @@ int vtkPVScalarBar::GetVisibility()
 void vtkPVScalarBar::SetOrientationToHorizontal()
 {
   this->ScalarBar->SetOrientationToHorizontal();
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVScalarBar::SetOrientationToVertical()
 {
   this->ScalarBar->SetOrientationToVertical();
-  this->GetView()->Render();
+  this->GetView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------

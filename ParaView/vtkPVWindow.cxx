@@ -572,7 +572,7 @@ vtkKWCompositeCollection* vtkPVWindow::GetSources()
 void vtkPVWindow::ResetCameraCallback()
 {
   this->MainView->ResetCamera();
-  this->MainView->Render();
+  this->MainView->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------

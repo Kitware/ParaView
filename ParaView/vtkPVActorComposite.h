@@ -49,6 +49,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //class vtkPVImageTextureFilter;
 class vtkPVApplication;
+class vtkPVRenderView;
 class vtkPVData;
 class vtkKWCheckButton;
 class vtkScalarBarActor;
@@ -193,11 +194,15 @@ public:
   // Description:
   // Save out the mapper and actor to a file.
   void Save(ofstream *file, const char *sourceName);
-
+  
   // Description:
   // Callback for the change color button.
   void ChangeActorColor(float r, float g, float b);
   
+  // Description:
+  // Needed to render.
+  vtkPVRenderView *GetPVRenderView();
+
 protected:
 
   vtkPVActorComposite();

@@ -76,6 +76,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->NavigationCanvas = vtkKWWidget::New();
   
   this->CurrentInteractor = NULL;
+  this->EventuallyRenderFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -89,10 +90,10 @@ void PVRenderViewAbortCheck(void *arg)
     return;
     }
   
-  //if (me->ShouldIAbort() == 2)
-  //  {
-  //  me->GetRenderWindow()->SetAbortRender(1);
-  //  }
+  if (me->ShouldIAbort() == 2)
+    {
+    me->GetRenderWindow()->SetAbortRender(1);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -270,7 +271,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
   
-  this->RenderWindow->Render();
+  this->EventuallyRender();
   delete [] local;
 }
 
@@ -481,7 +482,7 @@ void vtkPVRenderView::Exposed()
   if (this->InExpose) return;
   this->InExpose = 1;
   this->Script("update");
-  this->Render();
+  this->EventuallyRender();
   this->InExpose = 0;
 }
 
@@ -656,10 +657,41 @@ void vtkPVRenderView::Render()
   this->Update();
 
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  this->RenderWindow->SetDesiredUpdateRate(0.000001);
+  this->RenderWindow->SetDesiredUpdateRate(10.0);
   this->StartRender();
   this->RenderWindow->Render();
-  this->RenderWindow->SetDesiredUpdateRate(10.0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::EventuallyRender()
+{
+  if (this->EventuallyRenderFlag)
+    {
+    return;
+    }
+  this->EventuallyRenderFlag = 1;
+  // Make sure we do not delete the render view before the queued
+  // render gets executed
+  this->Register(NULL);
+  this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
+}
+                      
+//----------------------------------------------------------------------------
+void vtkPVRenderView::EventuallyRenderCallBack()
+{
+  // sanity check
+  if (this->EventuallyRenderFlag == 0)
+    {
+    vtkErrorMacro("Inconsistent EventuallyRenderFlag");
+    return;
+    }
+  this->EventuallyRenderFlag = 0;
+  this->UnRegister(NULL);
+  this->RenderWindow->SetDesiredUpdateRate(0.000001);
+  //this->SetRenderModeToStill();
+  this->ResetCameraClippingRange();
+  this->RenderWindow->Render();
+  //this->Render();
 }
 
 //----------------------------------------------------------------------------
