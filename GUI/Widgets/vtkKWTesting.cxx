@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.3");
+vtkCxxRevisionMacro(vtkKWTesting, "1.4");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
@@ -74,18 +74,20 @@ int vtkKWTesting::RegressionTest(float thresh)
   int res = vtkTesting::FAILED;
   if ( this->RenderView )
     {
+    cout << "Compare render window" << endl;
     this->Testing->SetRenderWindow(this->RenderView->GetRenderWindow());
-    res = this->Testing->RegressionTest(thresh) != vtkTesting::PASSED;
+    res = this->Testing->RegressionTest(thresh);
     }
   if ( this->ComparisonImage )
     {
+    cout << "Compare image: " << this->ComparisonImage << endl;
     vtkPNGReader* reader = vtkPNGReader::New();
     reader->SetFileName(this->ComparisonImage);
     reader->Update();
     res = this->Testing->RegressionTest(reader->GetOutput(), thresh);
     reader->Delete();
     }
-  return res;
+  return res != vtkTesting::PASSED;
 }
 
 //----------------------------------------------------------------------------
