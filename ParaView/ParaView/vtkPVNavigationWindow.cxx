@@ -419,6 +419,8 @@ void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
   this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
 				  "Set visibility for the current object");  
   delete [] var;
+  this->PopupMenu->AddCascade("Representation", 0, 0);
+  this->PopupMenu->AddCascade("Interpolation", 0, 0);
   /*
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   this->PopupMenu->AddCascade(
@@ -490,6 +492,8 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
   if ( !app->EvaluateBooleanExpression("%s GetHideDisplayPage", module) )
     {
     this->PopupMenu->SetState("Visibility", vtkKWMenu::Normal);
+    this->PopupMenu->SetState("Representation", vtkKWMenu::Normal);
+    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Normal);
     char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
     str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
 	 << var << ";"
@@ -506,10 +510,24 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
       this->Script("set %s 0", var);
       }
     delete [] var;
+    this->Script("%s SetCascade [ %s GetIndex \"Representation\" ] "
+		 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
+		 "GetMenu ] GetWidgetName ]",
+		 this->PopupMenu->GetTclName(),
+		 this->PopupMenu->GetTclName(), module);
+
+    this->Script("%s SetCascade [ %s GetIndex \"Interpolation\" ] "
+		 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
+		 "GetMenu ] GetWidgetName ]",
+		 this->PopupMenu->GetTclName(),
+		 this->PopupMenu->GetTclName(), module);
+		 
     }
   else
     {
     this->PopupMenu->SetState("Visibility", vtkKWMenu::Disabled);
+    this->PopupMenu->SetState("Representation", vtkKWMenu::Disabled);
+    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Disabled);
     }
   this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
   str1.rdbuf()->freeze(0);
