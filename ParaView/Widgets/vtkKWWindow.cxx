@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.126");
+vtkCxxRevisionMacro(vtkKWWindow, "1.127");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1169,7 +1169,7 @@ void vtkKWWindow::CreateStatusImage()
     lp = lp - 2*128*3;
     }
   
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
   Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
 #else
   Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
@@ -1299,7 +1299,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.126 $");
+  this->ExtractRevision(os,"$Revision: 1.127 $");
 }
 
 int vtkKWWindow::ExitDialog()

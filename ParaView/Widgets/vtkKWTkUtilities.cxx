@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.12");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.13");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -250,7 +250,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       }
     }
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height, TK_PHOTO_COMPOSITE_SET);
 #else
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
