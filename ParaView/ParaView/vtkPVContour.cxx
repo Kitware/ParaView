@@ -72,7 +72,7 @@ vtkPVContour::~vtkPVContour()
 {
   if (this->ArrayMenu)
     {
-    this->ArrayMenu->Delete();
+    this->ArrayMenu->UnRegister(this);
     this->ArrayMenu = NULL;
     }
 }
