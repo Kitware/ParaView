@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.44");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.45");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -433,14 +433,19 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::Update()
 {
+  this->UpdateEnableState();
+
+  // If no widget or view, let's disable everything
+
+  if (!this->View && !this->RenderWidget)
+    {
+    this->SetEnabled(0);
+    }
+
   if (!this->IsCreated())
     {
     return;
     }
-
-  // If no widget or view, let's just disable everything
-
-  // this->SetEnabled(this->View || this->RenderWidget);
 
   // Annotation visibility
 
@@ -761,52 +766,43 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.44 $");
+  this->ExtractRevision(os,"$Revision: 1.45 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetEnabled(int e)
+void vtkKWCornerAnnotation::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  if (this->CornerVisibilityButton)
     {
-    if (this->CornerVisibilityButton)
-      {
-      this->CornerVisibilityButton->SetEnabled(e);
-      }
+    this->CornerVisibilityButton->SetEnabled(this->Enabled);
+    }
 
-    if (this->CornerFrame)
-      {
-      this->CornerFrame->SetEnabled(e);
-      }
+  if (this->CornerFrame)
+    {
+    this->CornerFrame->SetEnabled(this->Enabled);
+    }
 
-    int i;
-    for (i = 0; i < 4; i++)
+  int i;
+  for (i = 0; i < 4; i++)
+    {
+    if (this->CornerText[i])
       {
-      if (this->CornerText[i])
-        {
-        this->CornerText[i]->SetEnabled(e);
-        }
-      }
-
-    if (this->MaximumLineHeightScale)
-      {
-      this->MaximumLineHeightScale->SetEnabled(e);
-      }
-
-    if (this->TextPropertyWidget)
-      {
-      this->TextPropertyWidget->SetEnabled(e);
+      this->CornerText[i]->SetEnabled(this->Enabled);
       }
     }
 
-  // Then call superclass, which will call SetEnabled and 
-  // update the internal Enabled ivar (although it is not of much use here)
+  if (this->MaximumLineHeightScale)
+    {
+    this->MaximumLineHeightScale->SetEnabled(this->Enabled);
+    }
 
-  this->Superclass::SetEnabled(e);
+  if (this->TextPropertyWidget)
+    {
+    this->TextPropertyWidget->SetEnabled(this->Enabled);
+    }
 }
 
 //----------------------------------------------------------------------------

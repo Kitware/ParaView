@@ -143,11 +143,6 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set/Get the enabled state.
-  // Override to pass down to children.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Update the GUI according to the value of the ivars
   void Update();
 
@@ -188,6 +183,10 @@ protected:
   vtkKWTextProperty      *TextPropertyWidget;
 
   void Render();
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWCornerAnnotation(const vtkKWCornerAnnotation&); // Not implemented
