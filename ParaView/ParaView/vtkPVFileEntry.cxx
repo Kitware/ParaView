@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.60");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -195,7 +195,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   // Now the entry
   this->Entry->Create(pvApp, "");
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->Entry->GetEntry()->GetWidgetName(), this->GetTclName());
+               this->Entry->GetWidgetName(), this->GetTclName());
   this->Entry->BindCommand(this, "EntryChangedCallback");
   // Change the order of the bindings so that the
   // modified command gets called after the entry changes.
@@ -524,7 +524,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       this->SetFormat(format);
       // cout << "Use first format" << endl;
       }
-    if ( this->Entry->GetNumberOfValues() > 1 )
+    if ( min < max -1 )
       {
       this->Script("pack %s -side bottom -expand 1 -fill x", this->TimestepFrame->GetWidgetName());
       this->Timestep->SetRange(min, max);
