@@ -1492,7 +1492,7 @@ int vtkPVWindow::Open(char *openFileName)
 	clone->Delete();
 	}
       it->Delete();
-      this->AddRecentFile(NULL, openFileName, this, "OpenFile");
+      this->AddRecentFile(NULL, openFileName, this, "Open");
       return VTK_OK;
       }
     it->GoToNextItem();
@@ -1806,6 +1806,9 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       }
     if (animationFlag)
       {
+      *file << "# prevent the tk window from showing up then start "
+	"the event loop\n";
+      *file << "wm withdraw .\n";
       int length = strlen(path);
       if (strcmp(path+length-4, ".jpg") == 0)
         {
@@ -2430,6 +2433,7 @@ void vtkPVWindow::ShowLog()
 void vtkPVWindow::SaveTrace()
 {
   ofstream *trace = this->GetPVApplication()->GetTraceFile();
+  cout << trace << endl;
   if ( ! trace)
     {
     return;
@@ -2438,6 +2442,7 @@ void vtkPVWindow::SaveTrace()
   char *filename;
   
   this->Script("tk_getSaveFile -filetypes {{{ParaView Script} {.pvs}}} -defaultextension .pvs");
+  cout << this->Application->GetMainInterp()->result << endl;
   filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
   sprintf(filename, "%s", this->Application->GetMainInterp()->result);
   
@@ -2452,8 +2457,9 @@ void vtkPVWindow::SaveTrace()
   const int bufferSize = 4096;
   char buffer[bufferSize];
 
-  ofstream newTrace("ParaViewTrace.pvs");
-  ifstream oldTrace(filename);
+  cout << filename << endl;
+  ofstream newTrace(filename);
+  ifstream oldTrace("ParaViewTrace.pvs");
   
   while(oldTrace)
     {
