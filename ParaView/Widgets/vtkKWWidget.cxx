@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.63");
+vtkCxxRevisionMacro(vtkKWWidget, "1.64");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -346,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.63 $");
+  this->ExtractRevision(os,"$Revision: 1.64 $");
 }
 
 //------------------------------------------------------------------------------
@@ -627,7 +627,7 @@ void vtkKWWidget::UnpackChildren()
 {
   this->Script("catch {eval pack forget [pack slaves %s]} \n "
                "catch {eval grid forget [grid slaves %s]}",
-               this->GetWidgetName());
+               this->GetWidgetName(),this->GetWidgetName());
 }
 
 //------------------------------------------------------------------------------
