@@ -52,7 +52,14 @@ public:
   // You have to clone this object before you create it.
   int Create(char *args);
   
-  void SetImageData(vtkImageData *data);
+  // Description:
+  // When this ivar is tru, then an outline is used to represent the image.
+  vtkSetMacro(OutlineFlag,int);
+  vtkGetMacro(OutlineFlag,int);
+  vtkBooleanMacro(OutlineFlag,int);
+  
+
+  void SetImageData(vtkImageData *image);
   vtkImageData *GetImageData();
   
   void Clip();
@@ -67,6 +74,8 @@ protected:
   ~vtkPVImage();
   vtkPVImage(const vtkPVImage&) {};
   void operator=(const vtkPVImage&) {};
+  
+  int OutlineFlag;
 };
 
 #endif

@@ -27,9 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVImageSlice.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVImage.h"
 
@@ -217,10 +216,32 @@ int* vtkPVImageSlice::GetDimensions()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImageSlice::SetInput(vtkPVImage *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetSlice()->SetInput(pvData->GetImageData());
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvi->GetTclName());
+    }  
+  
   this->SetPVData(pvi);
-
   pvi->SetImageData(this->Slice->GetOutput());
 }
 

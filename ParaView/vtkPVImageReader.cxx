@@ -61,9 +61,6 @@ int vtkPVImageReader::Create(char *args)
     return 0;
     }
   
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
-  
   this->Label->SetParent(this);
   this->Label->Create(this->Application, "");
   this->Label->SetLabel("vtkPVImageReader label");

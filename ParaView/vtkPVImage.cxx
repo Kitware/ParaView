@@ -39,6 +39,7 @@ int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVImage::vtkPVImage()
 {
+  this->OutlineFlag = 1;
   this->CommandFunction = vtkPVImageCommand;
 }
 
@@ -98,12 +99,22 @@ void vtkPVImage::Clip()
 //----------------------------------------------------------------------------
 void vtkPVImage::Slice()
 {
-  vtkPVImageSlice *slice;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *newComp;
+  vtkPVImageSlice *slice;
+  vtkPVImage *pvi;
   int *extents;
   
+  newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
   slice = vtkPVImageSlice::New();
-  slice->GetSlice()->SetInput(this->GetImageData());
+  slice->Clone(pvApp);
+  pvi = vtkPVImage::New();
+  pvi->Clone(pvApp);
+  
+  pvi->OutlineFlagOff();
+  slice->SetInput(this);
+  slice->SetOutput(pvi);
   
   extents = this->GetImageData()->GetExtent();
   slice->SetDimensions(extents);
@@ -115,7 +126,6 @@ void vtkPVImage::Slice()
   slice->GetSlice()->SetOutputWholeExtent(extents);
   slice->GetSlice()->Update();
 
-  newComp = vtkPVComposite::New();
   newComp->SetSource(slice);
   newComp->SetCompositeName("slice");
   
@@ -151,31 +161,28 @@ int vtkPVImage::Create(char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImage::SetImageData(vtkImageData *data)
+void vtkPVImage::SetImageData(vtkImageData *image)
 {
   vtkOutlineFilter *outline;
-  int *dim;
+
+  this->SetData(image);
   
-  data->Update();
-  dim = data->GetDimensions();
-  outline = vtkOutlineFilter::New();
-  outline->SetInput(data);
-  
-  this->SetData(data);
-  if ((dim[0] > 1) && (dim[1] > 1) && (dim[2] > 1))
+  if (this->OutlineFlag)
     {
+    image->UpdateInformation();
+    outline = vtkOutlineFilter::New();
+    outline->SetInput(image);
     this->Mapper->SetInput(outline->GetOutput());
+    outline->Delete();
     }
   else
     {
-    this->Mapper->SetInput(data);
+    this->Mapper->SetInput(image);
+    this->Data->Update();
+    this->Mapper->SetScalarRange(this->Data->GetScalarRange());
     }
   
-  this->Data->Update();
-  this->Mapper->SetScalarRange(this->Data->GetScalarRange());
   this->Actor->SetMapper(this->Mapper);
-  
-  outline->Delete();
 }
 
 //----------------------------------------------------------------------------
