@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCollectionWriter);
-vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.1");
+vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVCollectionWriter::vtkPVCollectionWriter()
@@ -77,7 +77,7 @@ int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int)
 
 //----------------------------------------------------------------------------
 void vtkPVCollectionWriter::Write(const char* fileName, const char*,
-                                  int numProcs, int)
+                                  int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
@@ -89,8 +89,9 @@ void vtkPVCollectionWriter::Write(const char* fileName, const char*,
   pm->ServerScript(
     "vtkXMLPVCollectionWriter writer\n"
     "writer SetNumberOfPieces %d\n"
+    "writer SetGhostLevel %d\n"
     "writer SetFileName {%s}",
-    numProcs, fileName);
+    numProcs, ghostLevel, fileName);
   for(i=0; i < n; ++i)
     {
     pm->ServerScript("writer AddInput [\"%s\" GetOutput]",

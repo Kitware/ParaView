@@ -55,6 +55,12 @@ public:
   vtkSetMacro(NumberOfPieces, int);
   
   // Description:
+  // Get/Set the number of ghost levels to be written for unstructured
+  // data.
+  vtkGetMacro(GhostLevel, int);
+  vtkSetMacro(GhostLevel, int);
+  
+  // Description:
   // Get/Set whether this instance will write the main collection
   // file.
   vtkGetMacro(WriteCollectionFile, int);
@@ -83,6 +89,9 @@ protected:
   
   // The number of pieces into which the inputs are split.
   int NumberOfPieces;
+  
+  // The number of ghost levels to write for unstructured data.
+  int GhostLevel;
   
   // Whether to write the collection file on this node.
   int WriteCollectionFile;

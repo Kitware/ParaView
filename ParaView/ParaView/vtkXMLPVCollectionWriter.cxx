@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.4");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -60,6 +60,7 @@ vtkXMLPVCollectionWriter::vtkXMLPVCollectionWriter()
   this->Internal = new vtkXMLPVCollectionWriterInternals;
   this->Piece = 0;
   this->NumberOfPieces = 1;
+  this->GhostLevel = 0;
   this->WriteCollectionFileInitialized = 0;
   this->WriteCollectionFile = 0;
 
@@ -137,14 +138,6 @@ int vtkXMLPVCollectionWriter::WriteInternal()
         this->Internal->CreatePieceFileName(i,
                                             this->Internal->FilePath.c_str());
       w->SetFileName(fname.c_str());
-      
-      // Copy settings to the writer.
-      w->SetDebug(this->GetDebug());
-      w->SetByteOrder(this->GetByteOrder());
-      w->SetCompressor(this->GetCompressor());
-      w->SetBlockSize(this->GetBlockSize());
-      w->SetDataMode(this->GetDataMode());
-      w->SetEncodeAppendedData(this->GetEncodeAppendedData());
       
       w->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);
       
@@ -362,13 +355,24 @@ void vtkXMLPVCollectionWriter::CreateWriters()
         break;
       }
     
+    // Copy settings to the writer.
+    if(vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
+      {
+      w->SetDebug(this->GetDebug());
+      w->SetByteOrder(this->GetByteOrder());
+      w->SetCompressor(this->GetCompressor());
+      w->SetBlockSize(this->GetBlockSize());
+      w->SetDataMode(this->GetDataMode());
+      w->SetEncodeAppendedData(this->GetEncodeAppendedData());
+      }
+    
     // If this is a parallel writer, set the piece information.
     if(vtkXMLPDataWriter* w = vtkXMLPDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer()))
       {
       w->SetStartPiece(this->Piece);
       w->SetEndPiece(this->Piece);
       w->SetNumberOfPieces(this->NumberOfPieces);
-      w->SetGhostLevel(0);
+      w->SetGhostLevel(this->GhostLevel);
       }
     }
 }
