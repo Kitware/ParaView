@@ -229,10 +229,10 @@ SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 IF(BUILD_SHARED_LIBS)
-  INSTALL_TARGETS(/lib
+  INSTALL_TARGETS(${PV_INSTALL_LIB_DIR}
     vtkPVServerManagerTCL
     vtkPVServerManager)
-  INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION}/ServerManager/Resources FILES
+  INSTALL_FILES(${PV_INSTALL_LIB_DIR}/ServerManager/Resources FILES
     Resources/filters.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml

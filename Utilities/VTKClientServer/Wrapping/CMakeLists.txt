@@ -2,4 +2,6 @@
 INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/VTK/Wrapping)
 ADD_EXECUTABLE(vtkWrapClientServer vtkWrapClientServer.c
                ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParse.tab.c)
-INSTALL_TARGETS(/lib/paraview-${PARAVIEW_VERSION} vtkWrapClientServer)
+IF(NOT PV_INSTALL_NO_DEVELOPMENT)
+  INSTALL_TARGETS(/lib/paraview-${PARAVIEW_VERSION} vtkWrapClientServer)
+ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
