@@ -81,7 +81,19 @@ public:
     { this->SetRelativeRange(range[0], range[1]); };
   
   // Description:
-  // Set/Get the resolution.
+  // Method to set/get the resolution of the slider.
+  // The whole range and sub range are not snapped to this resolution.
+  // Both ranges can be set to any floating point number. 
+  // Think of the sliders and the resolution as a way to set the bounds of
+  // the sub range interactively using nice clean steps (power of 10 for 
+  // example).
+  // The entries associated to the sub range can be used to set the bounds to 
+  // anything within the whole range, despite the resolution, allowing the user
+  // to enter precise values that could not be reached given the resolution.
+  // Of course, given a whole range of 1 to 64, if the resolution is set to 3
+  // the slider will only snap to values ranging from 3 to 63 (within the 
+  // whole range constraint), but the entries can be used to set accurate
+  // values out of the resolution (i.e., 1, 2... 64).
   virtual void SetResolution(float r);
   vtkGetMacro(Resolution, float);
 
@@ -286,6 +298,8 @@ protected:
 
   float WholeRange[2];
   float Range[2];
+  float WholeRangeAdjusted[2];
+  float RangeAdjusted[2];
   float Resolution;
   int   AdjustResolution;
   int   Inverted;
@@ -320,8 +334,8 @@ protected:
 
   virtual void CreateEntries();
   virtual void CreateZoomButtons();
-  virtual void UpdateEntriesValue();
-  virtual void ConstraintResolution();
+  virtual void UpdateEntriesValue(float range[2]);
+  virtual void ConstrainResolution();
 
   // Description:
   // Bind/Unbind all components.
@@ -330,10 +344,12 @@ protected:
 
   // Description:
   // Make sure all elements are constrained correctly
-  virtual void ConstraintRangeToResolution(float range[2]);
-  virtual void ConstraintWholeRange();
-  virtual void ConstraintRange(float range[2], float *range_hint = 0);
-  virtual void ConstraintRanges();
+  virtual void ConstrainRangeToResolution(float range[2], int adjust = 1);
+  virtual void ConstrainRangeToWholeRange(
+    float range[2], float whole_range[2], float *old_range_hint = 0);
+  virtual void ConstrainWholeRange();
+  virtual void ConstrainRange(float *old_range_hint = 0);
+  virtual void ConstrainRanges();
 
   // Description:
   // Pack the widget

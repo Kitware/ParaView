@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.26");
+vtkCxxRevisionMacro(vtkKWRange, "1.27");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -77,25 +77,29 @@ vtkKWRange::vtkKWRange()
 {
   int i;
 
-  this->WholeRange[0]       = 0;
-  this->WholeRange[1]       = 1;  
-  this->Range[0]            = this->WholeRange[0];
-  this->Range[1]            = this->WholeRange[1];  
-  this->Resolution          = (this->WholeRange[1]-this->WholeRange[0])/100.0;
-  this->AdjustResolution    = 0;
-  this->Thickness           = 19;
-  this->InternalThickness   = 0.5;
-  this->Orientation         = vtkKWRange::ORIENTATION_HORIZONTAL;
-  this->Inverted            = 0;
-  this->SliderSize          = 3;
-  this->ShowEntries         = 0;
-  this->LabelPosition       = vtkKWRange::POSITION_SIDE1;
-  this->EntriesPosition     = vtkKWRange::POSITION_SIDE1;
-  this->ZoomButtonsPosition = vtkKWRange::POSITION_SIDE1;
-  this->EntriesWidth        = 10;
-  this->SliderCanPush       = 0;
-  this->DisableCommands     = 0;
-  this->ShowZoomButtons     = 0;
+  this->WholeRange[0]         = 0;
+  this->WholeRange[1]         = 1;  
+  this->Range[0]              = this->WholeRange[0];
+  this->Range[1]              = this->WholeRange[1];  
+  this->WholeRangeAdjusted[0] = this->WholeRange[0];
+  this->WholeRangeAdjusted[1] = this->WholeRange[1];
+  this->RangeAdjusted[0]      = this->Range[0];
+  this->RangeAdjusted[1]      = this->Range[1];
+  this->Resolution            = (this->WholeRange[1]-this->WholeRange[0])*0.01;
+  this->AdjustResolution      = 0;
+  this->Thickness             = 19;
+  this->InternalThickness     = 0.5;
+  this->Orientation           = vtkKWRange::ORIENTATION_HORIZONTAL;
+  this->Inverted              = 0;
+  this->SliderSize            = 3;
+  this->ShowEntries           = 0;
+  this->LabelPosition         = vtkKWRange::POSITION_SIDE1;
+  this->EntriesPosition       = vtkKWRange::POSITION_SIDE1;
+  this->ZoomButtonsPosition   = vtkKWRange::POSITION_SIDE1;
+  this->EntriesWidth          = 10;
+  this->SliderCanPush         = 0;
+  this->DisableCommands       = 0;
+  this->ShowZoomButtons       = 0;
 
   this->InInteraction            = 0;
   this->StartInteractionPos      = 0;
@@ -125,9 +129,9 @@ vtkKWRange::vtkKWRange()
 
   this->ZoomButtons         = NULL;
 
-  this->ConstraintRanges();
+  this->ConstrainRanges();
 
-  this->ConstraintResolution();
+  this->ConstrainResolution();
 }
 
 //----------------------------------------------------------------------------
@@ -262,7 +266,7 @@ void vtkKWRange::CreateEntries()
       }
     }
 
-  this->UpdateEntriesValue();
+  this->UpdateEntriesValue(this->Range);
 }
 
 //----------------------------------------------------------------------------
@@ -536,10 +540,10 @@ void vtkKWRange::SetWholeRange(float r0, float r1)
 
   this->Modified();
 
-  this->ConstraintRanges();
+  this->ConstrainRanges();
 
   this->RedrawCanvas();
-  this->UpdateEntriesValue();
+  this->UpdateEntriesValue(this->Range);
 }
 
 //----------------------------------------------------------------------------
@@ -559,7 +563,13 @@ void vtkKWRange::SetRange(float r0, float r1)
 
   this->Modified();
 
-  this->ConstraintRange(this->Range, old_range);
+  int old_sliders_pos[2], sliders_pos[2];
+  if (this->IsCreated())
+    {
+    this->GetSlidersPositions(old_sliders_pos);
+    }
+
+  this->ConstrainRange(old_range);
 
   // Update the widget aspect
 
@@ -567,19 +577,18 @@ void vtkKWRange::SetRange(float r0, float r1)
     {
     this->RedrawRange();
 
-    int pos[2];
-    this->GetSlidersPositions(pos);
+    this->GetSlidersPositions(sliders_pos);
 
-    if (old_range[0] != this->Range[0])
+    if (old_sliders_pos[0] != sliders_pos[0])
       {
-      this->RedrawSlider(pos[0], vtkKWRange::SLIDER_INDEX_1);
+      this->RedrawSlider(sliders_pos[0], vtkKWRange::SLIDER_INDEX_1);
       }
-    if (old_range[1] != this->Range[1])
+    if (old_sliders_pos[1] != sliders_pos[1])
       {
-      this->RedrawSlider(pos[1], vtkKWRange::SLIDER_INDEX_2);
+      this->RedrawSlider(sliders_pos[1], vtkKWRange::SLIDER_INDEX_2);
       }
 
-    this->UpdateEntriesValue();
+    this->UpdateEntriesValue(this->Range);
     }
 
   // Invoke callback if needed
@@ -628,7 +637,7 @@ void vtkKWRange::SetResolution(float arg)
 
   float old_res = this->Resolution;
   this->Resolution = arg;
-  this->ConstraintResolution();
+  this->ConstrainResolution();
 
   if (this->Resolution == old_res)
     {
@@ -637,11 +646,11 @@ void vtkKWRange::SetResolution(float arg)
 
   this->Modified();
 
-  this->ConstraintRanges();
+  this->ConstrainRanges();
   
   this->RedrawCanvas();
 
-  this->UpdateEntriesValue();
+  this->UpdateEntriesValue(this->Range);
 }
 
 //----------------------------------------------------------------------------
@@ -656,11 +665,11 @@ void vtkKWRange::SetAdjustResolution(int arg)
 
   this->Modified();
 
-  this->ConstraintResolution();
+  this->ConstrainResolution();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstraintResolution()
+void vtkKWRange::ConstrainResolution()
 {
   if (this->AdjustResolution)
     {
@@ -679,19 +688,24 @@ void vtkKWRange::ConstraintResolution()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWRange::UpdateEntriesValue()
+void vtkKWRange::UpdateEntriesValue(float range[2])
 {
+  if (!range)
+    {
+    return;
+    }
+
   for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
     if (this->Entries[i] && this->Entries[i]->IsCreated())
       {
-      this->Entries[i]->SetValue(this->Range[i]);
+      this->Entries[i]->SetValue(range[i]);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstraintRangeToResolution(float range[2])
+void vtkKWRange::ConstrainRangeToResolution(float range[2], int adjust)
 {
   int inv = (range[0] > range[1]) ? 1 : 0;
 
@@ -702,29 +716,31 @@ void vtkKWRange::ConstraintRangeToResolution(float range[2])
     {
     double value = (double)range[i];
     double new_value = res * vtkKWMath::Round(value / res);
-
-    if (new_value != value)
+    if (adjust)
       {
-      if (i - inv)
+      if (new_value != value)
         {
-        while (new_value > value + epsilon)
+        if (i - inv)
           {
-          new_value -= res;
+          while (new_value > value + epsilon)
+            {
+            new_value -= res;
+            }
+          while (new_value <= (value - res) + epsilon)
+            {
+            new_value += res;
+            }
           }
-        while (new_value <= (value - res) + epsilon)
+        else
           {
-          new_value += res;
-          }
-        }
-      else
-        {
-        while (new_value < value - epsilon)
-          {
-          new_value += res;
-          }
-        while (new_value >= (value + res) - epsilon)
-          {
-          new_value -= res;
+          while (new_value < value - epsilon)
+            {
+            new_value += res;
+            }
+          while (new_value >= (value + res) - epsilon)
+            {
+            new_value -= res;
+            }
           }
         }
       }
@@ -733,35 +749,26 @@ void vtkKWRange::ConstraintRangeToResolution(float range[2])
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstraintWholeRange()
-{
-  // Resolution OK for WholeRange ?
-
-  this->ConstraintRangeToResolution(this->WholeRange);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRange::ConstraintRange(float range[2], float *range_hint)
+void vtkKWRange::ConstrainRangeToWholeRange(
+  float range[2], float whole_range[2], float *old_range_hint)
 {
   int i;
 
-  int inv = (this->WholeRange[0] > this->WholeRange[1]);
+  int inv = (whole_range[0] > whole_range[1]);
   int wmin_idx = (inv ? 1 : 0);
   int wmax_idx = (wmin_idx == 0 ? 1 : 0);
 
   // Resolution OK for this ? Is it out of WholeRange ?
 
-  this->ConstraintRangeToResolution(range);
-
   for (i = 0; i <= 1; i++)
     {
-    if (range[i] < this->WholeRange[wmin_idx])
+    if (range[i] < whole_range[wmin_idx])
       {
-      range[i] = this->WholeRange[wmin_idx];
+      range[i] = whole_range[wmin_idx];
       }
-    else if (range[i] > this->WholeRange[wmax_idx])
+    else if (range[i] > whole_range[wmax_idx])
       {
-      range[i] = this->WholeRange[wmax_idx];
+      range[i] = whole_range[wmax_idx];
       }
     }
 
@@ -769,9 +776,9 @@ void vtkKWRange::ConstraintRange(float range[2], float *range_hint)
 
   if (range[wmin_idx] > range[wmax_idx])
     {
-    if (range_hint) // range_hint is used as an old range value
+    if (old_range_hint) // old_range_hint is used as an old range value
       {
-      if (range[1] == range_hint[1]) // range[0] is moving
+      if (range[1] == old_range_hint[1]) // range[0] is moving
         {
         if (this->SliderCanPush)  
           {
@@ -798,10 +805,31 @@ void vtkKWRange::ConstraintRange(float range[2], float *range_hint)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstraintRanges()
+void vtkKWRange::ConstrainWholeRange()
 {
-  this->ConstraintWholeRange();
-  this->ConstraintRange(this->Range);
+  this->WholeRangeAdjusted[0] = this->WholeRange[0];
+  this->WholeRangeAdjusted[1] = this->WholeRange[1];
+
+  this->ConstrainRangeToResolution(this->WholeRangeAdjusted);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::ConstrainRange(float *old_range_hint)
+{
+  this->ConstrainRangeToWholeRange(
+    this->Range, this->WholeRange, old_range_hint);
+
+  this->RangeAdjusted[0] = this->Range[0];
+  this->RangeAdjusted[1] = this->Range[1];
+  
+  this->ConstrainRangeToResolution(this->RangeAdjusted);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::ConstrainRanges()
+{
+  this->ConstrainWholeRange();
+  this->ConstrainRange();
 }
 
 //----------------------------------------------------------------------------
@@ -1540,7 +1568,6 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
     }
 
   const char *canv = this->Canvas->GetWidgetName();
-  float r0, r1;
   int i, pos_min = 0, pos_max, pos_range;
 
   if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
@@ -1554,7 +1581,22 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
 
   pos_range = pos_max - pos_min;
 
-  this->GetRelativeRange(r0, r1);
+  float r0, r1;
+
+  if (this->WholeRangeAdjusted[1] == this->WholeRangeAdjusted[0])
+    {
+    r0 = r1 = 0.0;
+    }
+  else
+    {
+    double whole_range = ((double)this->WholeRangeAdjusted[1] - 
+                          (double)this->WholeRangeAdjusted[0]);
+    r0 = (float)(((double)this->RangeAdjusted[0] - 
+                  (double)this->WholeRangeAdjusted[0]) / whole_range);
+    r1 = (float)(((double)this->RangeAdjusted[1] - 
+                  (double)this->WholeRangeAdjusted[0]) / whole_range);
+    }
+
   pos[0] = (int)((float)pos_range * r0);
   pos[1] = (int)((float)pos_range * r1);
 
@@ -1582,7 +1624,6 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
       pos[i] = pos_max - this->SliderSize;
       }
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -1995,7 +2036,7 @@ void vtkKWRange::EntriesUpdateCallback(int i)
     return;
     }
 
-  float value = this->Entries[i]->GetValueAsFloat();
+  float value = (float)this->Entries[i]->GetValueAsFloat();
   float old_value = this->Range[i];
 
   if (i == 0)
@@ -2063,8 +2104,8 @@ void vtkKWRange::StartInteractionCallback(int x, int y)
     {
     this->StartInteractionPos = y;
     }
-  this->StartInteractionRange[0] = this->Range[0];
-  this->StartInteractionRange[1] = this->Range[1];
+  this->StartInteractionRange[0] = this->RangeAdjusted[0];
+  this->StartInteractionRange[1] = this->RangeAdjusted[1];
 
   this->UpdateRangeColors();
   this->InvokeStartCommand();
@@ -2093,7 +2134,7 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
-    (double)this->WholeRange[1] - (double)this->WholeRange[0];
+    (double)this->WholeRangeAdjusted[1] - (double)this->WholeRangeAdjusted[0];
 
   // Update depending on the orientation
 
@@ -2122,17 +2163,26 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     new_value = (float)(pos - min);
     }
   new_value = (float)
-    ((double)this->WholeRange[0] + 
+    ((double)this->WholeRangeAdjusted[0] + 
      ((double)new_value / (double)(max - min)) * whole_range);
+
+  float new_range[2];
 
   if (slider_idx == vtkKWRange::SLIDER_INDEX_1)
     {
-    this->SetRange(new_value, this->Range[1]);
+    new_range[0] = new_value;
+    new_range[1] = this->RangeAdjusted[1];
     }
   else
     {
-    this->SetRange(this->Range[0], new_value);
+    new_range[0] = this->RangeAdjusted[0];
+    new_range[1] = new_value;
     }
+
+  this->ConstrainRangeToWholeRange(
+    new_range, this->WholeRangeAdjusted, this->RangeAdjusted);
+  this->ConstrainRangeToResolution(new_range, 0);
+  this->SetRange(new_range);
 }
 
 //----------------------------------------------------------------------------
@@ -2145,7 +2195,7 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
 
   const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
-    (double)this->WholeRange[1] - (double)this->WholeRange[0];
+    (double)this->WholeRangeAdjusted[1] - (double)this->WholeRangeAdjusted[0];
 
   // Update depending on the orientation
 
@@ -2176,6 +2226,10 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
   new_range[0] = (float)((double)this->StartInteractionRange[0] + rel_delta);
   new_range[1] = (float)((double)this->StartInteractionRange[1] + rel_delta);
 
+  this->ConstrainRangeToWholeRange(
+    new_range, this->WholeRangeAdjusted, this->RangeAdjusted);
+  this->ConstrainRangeToResolution(new_range, 0);
+    
   // Check if the constrained new range has the same "width" as the old one
 
   if (!this->SliderCanPush)
@@ -2183,8 +2237,6 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     double old_delta = 
       (double)this->StartInteractionRange[1] - 
       (double)this->StartInteractionRange[0];
-    this->ConstraintRange(new_range, this->Range);
-
     if (fabs(old_delta - ((double)new_range[1] - (double)new_range[0])) 
         >= this->Resolution)
       {
@@ -2199,7 +2251,7 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
       }
     }
 
-  this->SetRange((float)new_range[0], (float)new_range[1]);
+  this->SetRange(new_range);
 }
 
 //----------------------------------------------------------------------------
