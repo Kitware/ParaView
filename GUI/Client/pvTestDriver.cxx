@@ -220,9 +220,6 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
       this->ArgStart = i+2;
       fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i+1]);
-      fprintf(stderr, "Extras server preflags were specified: %d %s\n",
-      this->MPIServerPreFlags.size(), 
-      this->MPIServerPreFlags[1].c_str());
       }
     if(strncmp(argv[i], "--server-postflags",18 ) == 0)
       {
