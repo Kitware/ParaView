@@ -676,14 +676,14 @@
     </Item>
   </SelectWidget>
   <SelectWidget label="Scale Mode" variable="ScaleMode" trace_name="Scale Mode">
-    <Item label="Scalar" value="0">
-      <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Choose the scalar array used to scale the glyphs."/>
-    </Item>
     <Item label="Vector Magnitude"  value="1">
       <DummyWidget/>
     </Item>
     <Item label="Vector Components"  value="2">
       <DummyWidget/>
+    </Item>
+    <Item label="Scalar" value="0">
+      <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Choose the scalar array used to scale the glyphs."/>
     </Item>
     <Item label="Data Scaling Off"  value="3">
       <DummyWidget/>
