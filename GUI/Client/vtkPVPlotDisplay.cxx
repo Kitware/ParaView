@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   vtkClientServerID id = pm->NewStreamObject("vtkM2NDuplicate");
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << id << "SetPassThrough" << 1
+    << id << "SetPassThrough" << 0
     << vtkClientServerStream::End;
   pm->SendStreamToRenderServerClientAndServer();
   pm->GetStream()
