@@ -34,7 +34,7 @@ public:
 
   // Description:
   // Set/Get the composite algorithm.
-  vtkCompositer* SetCompositer(vtkCompositer *c);
+  void SetCompositer(vtkCompositer *c);
   vtkGetObjectMacro(Compositer, vtkCompositer);
 
   // Description:
