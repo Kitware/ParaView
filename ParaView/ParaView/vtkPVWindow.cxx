@@ -992,7 +992,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   delete [] rootName;
 
   pvs = sInt->CreateCallback();
-  this->GetPVApplication()->AddTraceEntry("set pv(%s) [$pv(%s) Open {%s}]",
+  this->GetPVApplication()->AddTraceEntry("set pv(%s) [$pv(%s) Open %s]",
                                           pvs->GetTclName(),
                                           this->GetTclName(), openFileName);
 

@@ -68,6 +68,7 @@ public:
   // Description:
   // Set the interactor to use for choosing a point for probing.
   void SetInteractor();
+  vtkGetObjectMacro(Interactor, vtkKWSelectPointInteractor);
   
   // Description:
   // Called when the accept button is clicked.
@@ -123,6 +124,8 @@ public:
   void SaveInTclScript(ofstream *file);
   
   virtual void UpdateScalars();
+
+  vtkGetObjectMacro(EndPointMenu, vtkKWOptionMenu);
   
 protected:
   vtkPVProbe();

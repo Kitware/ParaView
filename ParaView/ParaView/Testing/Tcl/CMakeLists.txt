@@ -51,6 +51,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
 
@@ -105,6 +109,9 @@ ADD_TEST(ImageReader ${PARAVIEW_EXECUTABLE}
 ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
 
+ADD_TEST(ProbePoint ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)
+
 ADD_TEST(SphereTest ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
 
@@ -116,10 +123,3 @@ ADD_TEST(ThresholdAttrMode ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(Trace ${PARAVIEW_EXECUTABLE}
              ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
-
-
-
-
-
-
-
