@@ -16,12 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVSource.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.5");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.6");
 
 class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
 {
@@ -108,6 +109,26 @@ void vtkPVFileEntryProperty::SetAnimationTime(float time)
   
   this->SetTimeStep(static_cast<int>(time));
   widget->Reset();
+}
+
+void vtkPVFileEntryProperty::SetAnimationTimeInBatch(
+  ofstream *file, float val)
+{
+  vtkPVSource* pvs = this->Widget->GetPVSource();
+  if (pvs)
+    {
+    vtkPVFileEntry* fe = vtkPVFileEntry::SafeDownCast(this->Widget);
+    if (fe)
+      {
+      *file << "[$pvTemp" << pvs->GetVTKSourceID(0) 
+            <<  " GetProperty " << fe->GetVariableName() << "] SetElement 0 "
+            << " [ lindex $" << "pvTemp" << pvs->GetVTKSourceID(0)  
+            << "_files [expr round(" <<  val << ")]]" << endl;
+      *file << "$pvTemp" << pvs->GetVTKSourceID(0)
+            << " UpdateVTKObjects" << endl;
+
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
