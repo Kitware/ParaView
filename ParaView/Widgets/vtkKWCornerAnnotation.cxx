@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.43");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.44");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -401,7 +401,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   // Text property
 
   this->TextPropertyWidget->SetParent(this->GetFrame());
-  this->TextPropertyWidget->LongFormatOn();
+  this->TextPropertyWidget->LongFormatOff();
   this->TextPropertyWidget->LabelOnTopOff();
   this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->ShowLabelOn();
@@ -421,8 +421,9 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->SetOnColorChangeCommand(oncolorchangecommand.str());
   oncolorchangecommand.rdbuf()->freeze(0);
 
-  this->Script("pack %s -padx 2 -side top -anchor nw -fill y", 
-               this->TextPropertyWidget->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
+               this->TextPropertyWidget->GetWidgetName(),
+               this->TextPropertyWidget->GetLongFormat() ? 0 : 2);
 
   // Update the GUI according to the Ivar value (i.e. the corner prop, etc.)
 
@@ -760,7 +761,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.43 $");
+  this->ExtractRevision(os,"$Revision: 1.44 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -802,7 +803,7 @@ void vtkKWCornerAnnotation::SetEnabled(int e)
       }
     }
 
-  // Then call superclass, which will call SetEnabled on the label and 
+  // Then call superclass, which will call SetEnabled and 
   // update the internal Enabled ivar (although it is not of much use here)
 
   this->Superclass::SetEnabled(e);
