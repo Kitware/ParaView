@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -40,29 +40,10 @@ vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
+void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 {
-  unsigned int numMinMax = 1;
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
-  if (dvp)
-    {
-    // Use the larger of the number of checked and unchecked elements
-    int numElems   = dvp->GetNumberOfElements();
-    int numUnElems = dvp->GetNumberOfUncheckedElements();
-    if ( numElems > numUnElems )
-      {
-      numMinMax = numElems;
-      }
-    else
-      {
-      numMinMax = numUnElems;
-      }
-    }
-
   this->RemoveAllMinima();
   this->RemoveAllMaxima();
-  // This creates numMinMax entries but leaves them unset (no min or max)
-  this->SetNumberOfEntries(numMinMax);
 
   vtkSMProxyProperty* ip = 0;
   vtkSMStringVectorProperty* array = 0;
@@ -191,16 +172,20 @@ void vtkSMArrayRangeDomain::SetArrayRange(
     return;
     }
 
-  unsigned int numEntries = this->GetNumberOfEntries();
-  for (unsigned int i=0; i<numEntries; i++)
+  int numArrComp = ai->GetNumberOfComponents();
+
+  // This creates numMinMax entries but leaves them unset (no min or max)
+  this->SetNumberOfEntries(numArrComp);
+
+  for (int i=0; i<numArrComp; i++)
     {
     this->AddMinimum(i, ai->GetComponentRange(i)[0]);
     this->AddMaximum(i, ai->GetComponentRange(i)[1]);
     }
-  if (numEntries > 1) // vector magnitude range
+  if (numArrComp > 1) // vector magnitude range
     {
-    this->AddMinimum(numEntries, ai->GetComponentRange(-1)[0]);
-    this->AddMinimum(numEntries, ai->GetComponentRange(-1)[1]);
+    this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[0]);
+    this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[1]);
     }
 }
 
