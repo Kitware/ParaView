@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -361,9 +361,11 @@ void vtkPVLODPartDisplay::SetLODResolution(int res)
   if (pvApp)
     {
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    int r[3] = {res, res, res};
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->LODDeciID << "SetNumberOfDivisions" << res << res << res
+      << this->LODDeciID << "SetNumberOfDivisions" 
+      << vtkClientServerStream::InsertArray(r, 3)
       << vtkClientServerStream::End;
     pm->SendStreamToClientAndServer();
     }
