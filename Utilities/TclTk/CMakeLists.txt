@@ -60,8 +60,11 @@ ELSE(UNIX)
     "Path to tcl include" FORCE)
   SET(TK_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE INTERNAL
     "Path to tk include" FORCE)
+
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
+  # This includes the Tcl/Tk dll, and eventually some support dll
+
   IF (CMAKE_CONFIGURATION_TYPES)
     SET (CONFIG_TYPES ${CMAKE_CONFIGURATION_TYPES})
   ELSE (CMAKE_CONFIGURATION_TYPES)
@@ -69,55 +72,33 @@ ELSE(UNIX)
   ENDIF (CMAKE_CONFIGURATION_TYPES)
 
   FOREACH (config ${CONFIG_TYPES})
-    CONFIGURE_FILE(${TclTk_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-      ${ParaView_BINARY_DIR}/bin/${config}/tcl84.dll 
-      COPYONLY)
-    CONFIGURE_FILE(${TclTk_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-      ${ParaView_BINARY_DIR}/bin/${config}/tk84.dll
-      COPYONLY)
+    SET (DLLS 
+         TclTk8.4.5Win/bin/tcl84.dll 
+         TclTk8.4.5Win/bin/tk84.dll
+         tkdnd/lib/tkdnd/libtkdnd.dll)
+    FOREACH (dll ${DLLS})
+      GET_FILENAME_COMPONENT (dllname ${dll} NAME)
+      CONFIGURE_FILE(
+        ${TclTk_SOURCE_DIR}/${dll}
+        ${ParaView_BINARY_DIR}/bin/${config}/${dllname}
+        COPYONLY)
+    ENDFOREACH (dll)
   ENDFOREACH (config)
+
 ENDIF(UNIX)
 
 SET(TCL_TK_COPY_SUPPORT_LIBRARY 1)
 SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
 SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
 
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake)
-
-# ----------------------------------------------------------------------------
+# Copy the Tcl/Tk support files
+# See vtkTclTkMacros.cmake for full documentation about
 # VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR
-# Front-end to VTK_COPY_TCL_TK_SUPPORT_FILES, this macro will copy the
-# appropriate Tcl/Tk support files to a project build directory.
-# The support files will be copied simultaneously to all configuration 
-# sub-directories (Release, RelInfo, Debug, etc.) if needed.
-# The Tcl/Tk version is retrieved automatically and used to create
-# the subdirectories (see example below)
-#
-# in: tcl_support_lib_dir: path to the Tcl support lib dir
-#     tk_support_lib_dir:  path to the Tk support lib dir
-#     build_dir:           project build dir
-#     dir:                 relative subdir inside the build dir, into which the
-#                          support files will be copied.
-#
-# ex: VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
-#        "c:/tcl/lib/tcl8.4" "c:/tcl/lib/tk8.4" "d:/vtk-bin" "TclTk/lib")
-#     if this project is configured to use TclTk 8.4, this will copy support 
-#     files from:
-#       c:/tcl/lib/tcl8.4
-#       c:/tcl/lib/tk8.4
-#     to:
-#       d:/vtk-bin/TclTk/lib/tcl8.4
-#       d:/vtk-bin/TclTk/lib/tk8.4
-#     or (if configuration types are supported by the generator):
-#       d:/vtk-bin/Release/TclTk/lib/tcl8.4
-#       d:/vtk-bin/Release/TclTk/lib/tk8.4
-#       d:/vtk-bin/Debug/TclTk/lib/tcl8.4
-#       d:/vtk-bin/Debug/TclTk/lib/tk8.4
-#       etc.
+
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake)
 
 MACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR tcl_support_lib_dir tk_support_lib_dir build_dir dir)
 
-  # For each configuration type (Debug, RelInfo, Release, etc.)
   # Copy the TclTk support files to the corresponding sub-directory inside
   # the build dir
 
@@ -130,15 +111,33 @@ MACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR tcl_support_lib_dir tk_su
       "${tk_support_lib_dir}"
       "${build_dir}/${dir}/tk${TCL_TK_VERSION}"
 	   )
-    ENDFOREACH (config)
   ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
 
 ENDMACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR)
+
 PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR(
   "${TCL_SUPPORT_LIBRARY_PATH}"
   "${TK_SUPPORT_LIBRARY_PATH}"
   "${ParaView_BINARY_DIR}"
   "lib")
+
+INSTALL_FILES(/lib/tcl8.4 FILES ${TCL_SUPPORT_FILES})
+INSTALL_FILES(/lib/tk8.4 FILES ${TK_SUPPORT_FILES})
+
+# More support files
+
+IF (NOT UNIX)
+  SET (TKDND_SUPPORT_LIBRARY_PATH "${TclTk_SOURCE_DIR}/tkdnd/lib/tkdnd")
+  FOREACH (file "pkgIndex.tcl" "tkDND_Utils.tcl")
+    SET (TKDND_SUPPORT_FILES 
+         ${TKDND_SUPPORT_FILES} "${TKDND_SUPPORT_LIBRARY_PATH}/${file}")
+    CONFIGURE_FILE ("${TKDND_SUPPORT_LIBRARY_PATH}/${file}" 
+                    "${ParaView_BINARY_DIR}/lib/tkdnd/${file}" COPYONLY)
+  ENDFOREACH (file)
+  INSTALL_FILES(/lib/tkdnd FILES ${TKDND_SUPPORT_FILES})
+ENDIF (NOT UNIX)
+
+# Set TK_INTERNAL_PATH
 
 SET (try_file "")
 IF (CYGWIN OR WIN32)
@@ -149,31 +148,16 @@ IF (APPLE)
 ENDIF (APPLE)
 IF (try_file)
   VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
-  SET (TCL_TK_VERSION  "${TCL_TK_MAJOR_VERSION}${TCL_TK_MINOR_VERSION}")
   SET (TCL_TK_VERSIOND "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
-  SET (DOC_STRING "The path to the Tk internal headers (${try_file}).")
-  # Let's ease the pain: most users have the internal path set 
-  # correctly, so if it's the case, let's change the location on their
-  # behalf to the new location. That code should be removed in a week
-  # or so (mid january)
-  FIND_PATH(TK_INTERNAL_PATH tkWinInt.h
-    ${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals/tk8.4
-    )
-  SET (TK_INTERNAL_PATH_LEGACY 
-    "${VTK_SOURCE_DIR}/Rendering/tkInternals/tk${TCL_TK_VERSION}")
-  SET (TK_INTERNAL_PATH_TRY 
-    "${VTK_SOURCE_DIR}/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}")
-  IF ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
-    SET(TK_INTERNAL_PATH  
-      ${TK_INTERNAL_PATH_TRY} CACHE PATH ${DOC_STRING} FORCE)
-  ELSE ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
-    FIND_PATH(TK_INTERNAL_PATH 
-      ${try_file} ${TK_INTERNAL_PATH_TRY} DOC ${DOC_STRING})
-    MARK_AS_ADVANCED(TK_INTERNAL_PATH)
-  ENDIF ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
+  FIND_PATH(
+     TK_INTERNAL_PATH 
+     ${try_file} 
+     "${VTK_SOURCE_DIR}/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}"
+     DOC "The path to the Tk internal headers (${try_file}).")
+  MARK_AS_ADVANCED(TK_INTERNAL_PATH)
 ENDIF (try_file)
+
+# Take care of the resources
 
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl/vtkDetermineTkResources.cmake)
 
-INSTALL_FILES(/lib/tcl8.4 FILES ${TCL_SUPPORT_FILES})
-INSTALL_FILES(/lib/tk8.4 FILES ${TK_SUPPORT_FILES})

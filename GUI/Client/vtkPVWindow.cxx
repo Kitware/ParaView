@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.570");
+vtkCxxRevisionMacro(vtkPVWindow, "1.571");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1278,6 +1278,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
+  // Enable Drag&Drop from files if tkdnd is available
+  if (!app->EvaluateBooleanExpression("catch {package require tkdnd}"))
+    {
+    this->Script("dnd bindtarget %s Files <Drop> {%s Open %%D}",
+                 this->GetWidgetName(), this->GetTclName());
+    }
+  
   // Update the enable state
   this->UpdateEnableState();
 }
@@ -1797,8 +1804,13 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVWindow::Open(char *openFileName, int store)
+int vtkPVWindow::Open(char *openFileNameUnSafe, int store)
 {
+  // Clean filename 
+  // (Ex: {} are added when a filename with a space is dropped on ParaView
+
+  char *openFileName = vtkString::RemoveChars(openFileNameUnSafe, "{}");
+
   if (!this->CheckIfFileIsReadable(openFileName))
     {
     ostrstream error;
@@ -1814,9 +1826,9 @@ int vtkPVWindow::Open(char *openFileName, int store)
       vtkErrorMacro(<<error.str());
       }
     error.rdbuf()->freeze(0);
+    delete [] openFileName;
     return VTK_ERROR;
     }
-
 
   // Ask each reader module if it can read the file. This first
   // one which says OK gets to read the file.
@@ -1837,6 +1849,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         str.rdbuf()->freeze(0);
         }
       it->Delete();
+      delete [] openFileName;
       return VTK_OK;
       }
     it->GoToNextItem();
@@ -1882,6 +1895,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         this->AddRecentFile(openFileName, this, str.str());
         str.rdbuf()->freeze(0);
         dialog->Delete();
+        delete [] openFileName;
         return VTK_OK;
         }
       // Cleanup
@@ -1893,6 +1907,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
     vtkErrorMacro(<<error.str());
     }
 
+  delete [] openFileName;
   return VTK_ERROR;
 }
 
