@@ -966,9 +966,22 @@
         element_types="2 0" /> 
 
      <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1"/>
+
+     <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
-        number_of_elements="1" />
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
    <!-- End SAFReader -->
    </SourceProxy>
 
