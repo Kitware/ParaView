@@ -53,22 +53,32 @@ WRAP_EXCLUDE_FILES(kwinit vtktcl)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
-TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL vtkCommonTCL vtkFilteringTCL   
-                       vtkGraphicsTCL vtkImagingTCL vtkRenderingTCL vtkIOTCL
-		       vtkHybridTCL vtkParallelTCL vtkPatentedTCL
-                       ${TCL_LIBRARY} ${TK_LIBRARY})
+
+IF (VTK_USE_PARALLEL)
+  LINK_LIBRARIES(vtkParallelTCL vtkParallel)
+ENDIF (VTK_USE_PARALLEL)
+IF (VTK_USE_PATENTED)
+  LINK_LIBRARIES(vtkPatentedTCL vtkPatented)
+ENDIF (VTK_USE_PATENTED)
+IF (VTK_USE_HYBRID)
+  LINK_LIBRARIES(vtkHybridTCL vtkHybrid)
+ENDIF (VTK_USE_HYBRID)
 
 LINK_LIBRARIES (
-vtkCommon 
-vtkFiltering
+vtkRenderingTCL 
+vtkImagingTCL 
+vtkGraphicsTCL 
+vtkIOTCL
+vtkFilteringTCL   
+vtkCommonTCL 
+vtkRendering
 vtkImaging
 vtkGraphics
 vtkIO
-vtkRendering
-vtkHybrid
-vtkParallel
-vtkPatented
+vtkFiltering
+vtkCommon 
 ${TCL_LIBRARY}
 ${TK_LIBRARY}
 )
+
 
