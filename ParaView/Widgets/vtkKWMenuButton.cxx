@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.12");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.13");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -86,6 +86,12 @@ void vtkKWMenuButton::SetButtonText(const char *text)
 {
     this->Script("%s configure -text {%s}",
                  this->GetWidgetName(), text);
+}
+
+const char* vtkKWMenuButton::GetButtonText()
+{
+    return this->Script("%s cget -text",
+                 this->GetWidgetName());
 }
 
 void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
