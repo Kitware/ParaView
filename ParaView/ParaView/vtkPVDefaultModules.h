@@ -39,24 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkExodusReader - Read exodus 2 files .ex2
+// .NAME 
 // .SECTION Description
-// vtkExodusReader is a unstructured grid source object that reads ExodusII
-// files.  Most of the meta data associated with the file is loaded when 
-// UpdateInformation is called.  This includes information like Title, number
-// of blocks, number and names of arrays. This data can be retrieved from 
-// methods in this reader. Separate arrays that are meant to be a single 
-// vector, are combined internally for convenience.  To be combined, the array 
-// names have to be identical except for a trailing X,Y and Z (or x,y,z).  By 
-// default all cell and point arrays are loaded.  However, the user can flag 
-// arrays not to load with the methods "SetPointArrayStatus" and
-// "SetCellArrayStatus".  The reader responds to piece requests
-// by loading only a range of the possible blocks.  Unused points
-// are filtered out internally.
 
-
-#ifndef __vtkExodusReader_h
-#define __vtkExodusReader_h
+#ifndef __vtkPVDefaultModules_h
+#define __vtkPVDefaultModules_h
 
 #include "vtkToolkits.h"
 
