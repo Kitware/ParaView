@@ -141,12 +141,14 @@ VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
                       EXPORT_MACRO VTK_EXPORT
                       HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
 
-VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS} ${ParaView_SRCS})
-ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS} ${ParaView_SRCS})
+VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS} 
+                                               ${ParaView_SRCS})
+ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS} 
+                                                 ${ParaView_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
                        vtkKWWidgetsTCL 
-                       )
+                       vtkParallel)
 
 
 CONFIGURE_FILE(
