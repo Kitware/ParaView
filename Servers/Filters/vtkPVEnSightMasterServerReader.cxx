@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.21");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -296,7 +296,7 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     this->InformationError = 1;
     return;
     }
-  for (int i= 0;i < this->NumberOfOutputs; ++i)
+  for (i=0; i < this->NumberOfOutputs; ++i)
     {
     this->Outputs[i]->SetMaximumNumberOfPieces(-1);
     }
