@@ -49,7 +49,7 @@
          command="SetVectorMode"
          number_of_elements="1" 
          default_values="1">
-       <EnumarationDomain name="enum" 
+       <EnumerationDomain name="enum" 
           values="MAGNITUDE:0 COMPONENT:1" />
       </IntVectorProperty>
     </LookupTableProxy>
