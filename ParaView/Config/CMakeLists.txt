@@ -1,3 +1,4 @@
-INSTALL_FILES(/share/ParaView/Config .xml standardFilters 
-                                          standardSources 
-                                          standardReaders)
+INSTALL_FILES(/share/ParaView-${PARAVIEW_VERSION_STRING}/Config
+              .xml standardFilters 
+                   standardSources 
+                   standardReaders)

@@ -41,21 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVWindow.h"
 
-#include "vtkImageData.h"
-#include "vtkStructuredPoints.h"
-#include "vtkStructuredGrid.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkPolyData.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkAxes.h"
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
+#include "vtkImageData.h"
 #include "vtkInstantiator.h"
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
@@ -83,38 +77,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPart.h"
-#include "vtkPVPartDisplay.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
 #include "vtkPVInitialize.h"
+#include "vtkPVInputProperty.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
+#include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSaveBatchScriptDialog.h"
 #include "vtkPVSelectCustomReader.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
 #include "vtkPVWriter.h"
-#include "vtkPVInputProperty.h"
-#include "vtkPVSaveBatchScriptDialog.h"
 #include "vtkPVXMLPackageParser.h"
+#include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkString.h"
+#include "vtkStructuredGrid.h"
+#include "vtkStructuredPoints.h"
 #include "vtkToolkits.h"
+#include "vtkUnstructuredGrid.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -137,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.458");
+vtkCxxRevisionMacro(vtkPVWindow, "1.459");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1677,7 +1678,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
   vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
   const char* selfPath = util->FindSelfPath(
     this->GetPVApplication()->GetArgv0());
-  const char* relPath = "../share/ParaView/Demos";
+  const char* relPath = "../share/ParaView-" PARAVIEW_VERSION_STRING "/Demos";
   char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
   sprintf(newPath, "%s/%s", selfPath, relPath);
 
