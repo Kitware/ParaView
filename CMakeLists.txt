@@ -3,9 +3,10 @@ PROJECT(ParaView)
 
 #########################################################################
 # Disallow in-source build
-IF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" "${ParaView_BINARY_DIR}" INSOURCE)
+IF(INSOURCE)
   MESSAGE(FATAL_ERROR "ParaView requiers out of source Build. Please create a separate binary directory and run CMake there.")
-ENDIF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+ENDIF(INSOURCE)
 
 #########################################################################
 # Common settings
