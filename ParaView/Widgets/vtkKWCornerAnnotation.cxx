@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.64");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.65");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -970,7 +970,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.64 $");
+  this->ExtractRevision(os,"$Revision: 1.65 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1077,5 +1077,6 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
      << (this->PopupTextProperty ? "On" : "Off") << endl;
   os << indent << "DisablePopupButtonWhenNotDisplayed: " 
      << (this->DisablePopupButtonWhenNotDisplayed ? "On" : "Off") << endl;
+  os << indent << "PopupButton: " << this->PopupButton << endl;
 }
 

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.5");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.6");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -286,5 +286,6 @@ void vtkKWPopupButton::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTopLevel: " << this->PopupTopLevel << endl;
   os << indent << "PopupFrame: " << this->PopupFrame << endl;
   os << indent << "PopupCloseButton: " << this->PopupCloseButton << endl;
+  os << indent << "PopupTitle: " << (this->PopupTitle?this->PopupTitle:"(none)") << endl;
 }
 
