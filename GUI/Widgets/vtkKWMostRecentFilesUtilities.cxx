@@ -22,7 +22,7 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.2");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.3");
 vtkStandardNewMacro(vtkKWMostRecentFilesUtilities );
 
 int vtkKWMostRecentFilesUtilitiesCommand(ClientData cd, Tcl_Interp *interp,
@@ -58,7 +58,7 @@ public:
     void SetTargetObject(vtkKWObject *object) 
       { this->TargetObject = object; }
 
-    int IsEqual(const char *filename, vtkKWObject *target_object, const char *target_command) 
+    int IsEqual(const char *filename, vtkKWObject *, const char *) 
       { return (filename && !strcmp(filename, this->FileName.c_str())); }
   
   private:
