@@ -694,6 +694,9 @@ void vtkPVSource::AcceptCallback()
   vtkPVSource *source;
   
   window = this->GetWindow();
+
+  this->Script("%s configure -cursor watch", window->GetWidgetName());
+  this->Script("update");
   
 #ifdef _WIN32
   this->Script("%s configure -background SystemButtonFace",
@@ -752,6 +755,9 @@ void vtkPVSource::AcceptCallback()
     window->GetSelectMenu()->AddCommand(source->GetName(), window,
                                         methodAndArg);
     }
+  
+  this->Script("update");
+  this->Script("%s configure -cursor arrow", window->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
