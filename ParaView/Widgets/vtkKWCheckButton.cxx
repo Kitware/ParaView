@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.18");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.19");
 
 //------------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -177,8 +177,9 @@ void vtkKWCheckButton::SetState(int s)
 //------------------------------------------------------------------------------
 void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
 {
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("CheckButton already created");
     return;
@@ -192,6 +193,10 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
   this->Script("checkbutton %s", wname);
   this->Configure();
   this->Script("%s configure %s", wname, (args?args:""));
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //------------------------------------------------------------------------------
