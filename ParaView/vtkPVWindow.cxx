@@ -50,6 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVThreshold.h"
 #include "vtkPVContour.h"
 #include "vtkPVGlyph3D.h"
+#include "vtkPVProbe.h"
 
 #include "vtkKWInteractor.h"
 #include "vtkKWFlyInteractor.h"
@@ -88,12 +89,14 @@ vtkPVWindow::vtkPVWindow()
   this->FlyInteractor = vtkKWFlyInteractor::New();
   this->RotateCameraInteractor = vtkKWRotateCameraInteractor::New();
   this->TranslateCameraInteractor = vtkKWTranslateCameraInteractor::New();
-
+  this->SelectPointInteractor = vtkKWSelectPointInteractor::New();
+  
   this->Toolbar = vtkKWToolbar::New();
   this->CalculatorButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
   this->GlyphButton = vtkKWPushButton::New();
+  this->ProbeButton = vtkKWPushButton::New();
 
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
@@ -140,6 +143,7 @@ void vtkPVWindow::PrepareForDelete()
     this->FlyInteractor->Delete();
     this->FlyInteractor = NULL;
     }
+
   if (this->RotateCameraInteractor)
     {
     // Circular reference.
@@ -151,6 +155,11 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->TranslateCameraInteractor->Delete();
     this->TranslateCameraInteractor = NULL;
+    }
+  if (this->SelectPointInteractor)
+    {
+    this->SelectPointInteractor->Delete();
+    this->SelectPointInteractor = NULL;
     }
   
   if (this->CalculatorButton)
@@ -175,6 +184,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->GlyphButton->Delete();
     this->GlyphButton = NULL;
+    }
+  
+  if (this->ProbeButton)
+    {
+    this->ProbeButton->Delete();
+    this->ProbeButton = NULL;
     }
   
   if (this->FrameRateLabel)
@@ -348,11 +363,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GlyphButton->Create(app, "-text Glyph");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
 
-  this->Script("pack %s %s %s %s -side left -pady 0 -fill none -expand no",
+  this->ProbeButton->SetParent(this->Toolbar);
+  this->ProbeButton->Create(app, "-text Probe");
+  this->ProbeButton->SetCommand(this, "ProbeCallback");
+  
+  this->Script("pack %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
-               this->GlyphButton->GetWidgetName());
+               this->GlyphButton->GetWidgetName(),
+               this->ProbeButton->GetWidgetName());
 
   this->FrameRateScale->SetParent(this->GetToolbarFrame());
   this->FrameRateScale->Create(app, "-resolution 0.1 -orient horizontal");
@@ -476,6 +496,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   button->Delete();
   button = NULL;
 
+//  this->SelectPointInteractor->SetParent(this->GetToolbarFrame());
+  this->SelectPointInteractor->SetRenderView(this->GetMainView());
+//  this->SelectPointInteractor->Create(this->Application, "");
+  
   this->Script("%s SetInteractor %s", this->GetMainView()->GetTclName(),
                this->FlyInteractor->GetTclName());
   
@@ -497,6 +521,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->MakeSelected();
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
+  this->MainView->AddBindings(); // additional bindings in PV not in KW
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 }
@@ -851,7 +876,7 @@ void vtkPVWindow::ReductionCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::CalculatorCallback()
 {
-  static int instanceCount = 0;
+  static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
@@ -915,7 +940,7 @@ void vtkPVWindow::CalculatorCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ThresholdCallback()
 {
-  static int instanceCount = 0;
+  static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
@@ -980,7 +1005,7 @@ void vtkPVWindow::ThresholdCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ContourCallback()
 {
-  static int instanceCount = 0;
+  static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
@@ -1045,7 +1070,7 @@ void vtkPVWindow::ContourCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::GlyphCallback()
 {
-  static int instanceCount = 0;
+  static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
@@ -1106,6 +1131,89 @@ void vtkPVWindow::GlyphCallback()
   pvd->Delete();
   
   ++instanceCount;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ProbeCallback()
+{
+  static int instanceCount = 1;
+  char tclName[100];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVProbe *probe;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  vtkPVData *current;
+  const char* outputDataType;
+  int i, numMenus;
+  
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("No data to use as source for vtkProbeFilter");
+    return;
+    }
+  outputDataType = "vtkPolyData";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "Probe", instanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkProbeFilter", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  probe = vtkPVProbe::New();
+  probe->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  probe->SetApplication(pvApp);
+  probe->SetVTKSource(s, tclName);
+  probe->SetProbeSourceTclName(this->GetCurrentPVData()->GetTclName());
+  probe->SetName(tclName);
+
+  this->GetMainView()->AddComposite(probe);
+  probe->CreateProperties();
+  this->SetCurrentPVSource(probe);
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "Probe", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  probe->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", probe->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+
+  probe->Delete();
+  pvd->Delete();
+  
+  ++instanceCount;
+  
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

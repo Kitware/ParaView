@@ -142,7 +142,7 @@ public:
 
   // Description:
   // Called when the delete button is pressed.
-  void DeleteCallback();
+  virtual void DeleteCallback();
 
   // Description:
   // A call back method from the Navigation window.

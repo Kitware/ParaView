@@ -17,6 +17,7 @@ vtkKWCenterOfRotation
 vtkKWFlyInteractor 
 vtkKWInteractor 
 vtkKWRotateCameraInteractor 
+vtkKWSelectPointInteractor
 vtkKWTranslateCameraInteractor 
 vtkPOPReader 
 vtkPVActorComposite 
@@ -32,6 +33,7 @@ vtkPVGlyph3D
 vtkPVInputMenu 
 vtkPVMethodInterface 
 vtkPVOutputWindow
+vtkPVProbe
 vtkPVRenderView 
 vtkPVSelectionList 
 vtkPVSource 

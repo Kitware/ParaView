@@ -72,8 +72,9 @@ public:
   virtual void Button1Motion(int x, int y) {};
   virtual void Button2Motion(int x, int y) {};
   virtual void Button3Motion(int x, int y) {};
-  virtual void AKeyPress(char key, int x, int y) {};
-
+  virtual void MotionCallback(int x, int y) {};
+  virtual void AKeyPress(char key, int x, int y) {};  
+  
   // Description:
   // Get rid of all references.  A quick and dirty way
   // of dealing with reference loops.

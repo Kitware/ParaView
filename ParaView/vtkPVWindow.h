@@ -89,6 +89,8 @@ public:
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);
   vtkGetObjectMacro(FilterMenu, vtkKWMenu);
   
+  vtkGetObjectMacro(SelectPointInteractor, vtkKWInteractor);
+  
   // Description:
   // Callback from the reset camera button.
   void ResetCameraCallback();
@@ -127,8 +129,12 @@ public:
   void ContourCallback();
 
   // Description:
-  // Callback from the contour button.
+  // Callback from the glyph button.
   void GlyphCallback();
+  
+  // Description:
+  // Callback from the probe button.
+  void ProbeCallback();
   
   // Description:
   // Callback from the frame rate scale.
@@ -144,6 +150,12 @@ public:
   void StartLog();
   void StopLog();
 
+  vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
+  vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
+  vtkGetObjectMacro(ContourButton, vtkKWPushButton);
+  vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
+  vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -163,14 +175,15 @@ protected:
   vtkKWInteractor *FlyInteractor;
   vtkKWInteractor *RotateCameraInteractor;
   vtkKWInteractor *TranslateCameraInteractor;
-
-
+  vtkKWInteractor *SelectPointInteractor;
+  
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;
-
+  vtkKWPushButton *ProbeButton;
+  
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
 

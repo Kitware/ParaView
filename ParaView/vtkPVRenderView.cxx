@@ -87,6 +87,7 @@ vtkPVRenderView::vtkPVRenderView()
   
   this->CurrentInteractor = NULL;
   this->EventuallyRenderFlag = 0;
+  this->RenderPending = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +179,14 @@ vtkPVRenderView::~vtkPVRenderView()
     this->SetRenderWindowTclName(NULL);
     this->RenderWindow = NULL;
     }
+
+  // undo the binding we set up
+  this->Script("bind %s <Motion> {}", this->VTKWidget->GetWidgetName());
+  if (this->RenderPending)
+    {
+    this->Script("after cancel %s", this->RenderPending);
+    }
+  this->SetRenderPending(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -575,7 +584,11 @@ void vtkPVRenderView::ResetCameraClippingRange()
   this->GetRenderer()->ResetCameraClippingRange();
 }
 
-
+void vtkPVRenderView::AddBindings()
+{
+  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
+               this->VTKWidget->GetWidgetName(), this->GetTclName());
+}
     
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AButtonPress(int num, int x, int y)
@@ -619,6 +632,15 @@ void vtkPVRenderView::Button3Motion(int x, int y)
   if (this->CurrentInteractor)
     {
     this->CurrentInteractor->Button3Motion(x, y);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::MotionCallback(int x, int y)
+{
+  if (this->CurrentInteractor)
+    {
+    this->CurrentInteractor->MotionCallback(x, y);
     }
 }
 
@@ -786,10 +808,13 @@ void vtkPVRenderView::EventuallyRender()
     return;
     }
   this->EventuallyRenderFlag = 1;
-  // Make sure we do not delete the render view before the queued
-  // render gets executed
-  this->Register(this);
+
+  // Keep track of whether there is a render pending so that if a render is
+  // pending when this object is deleted, we can cancel the "after" command.
+  // We don't want to have this object register itself to because this can
+  // cause leaks if we exit before EventuallyRenderCallBack is called.
   this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
+  this->SetRenderPending(this->Application->GetMainInterp()->result);
 }
                       
 //----------------------------------------------------------------------------
@@ -799,13 +824,12 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // sanity check
-  if (this->EventuallyRenderFlag == 0)
+  if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
     {
     vtkErrorMacro("Inconsistent EventuallyRenderFlag");
     return;
     }
   this->EventuallyRenderFlag = 0;
-  this->UnRegister(this);
   this->RenderWindow->SetDesiredUpdateRate(0.000001);
   //this->SetRenderModeToStill();
 

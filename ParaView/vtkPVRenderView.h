@@ -133,7 +133,10 @@ public:
   void Button1Motion(int x, int y);
   void Button2Motion(int x, int y);
   void Button3Motion(int x, int y);
-
+  void MotionCallback(int x, int y);
+  
+  void AddBindings();
+  
   // Description:
   // Bound events are forwarded to this interactor.
   void SetInteractor(vtkKWInteractor *interactor);
@@ -204,7 +207,8 @@ protected:
   vtkKWInteractor *CurrentInteractor;
 
   int EventuallyRenderFlag;
-
+  char* RenderPending;
+  vtkSetStringMacro(RenderPending);
 
   double StillRenderTime;
   double InteractiveRenderTime;

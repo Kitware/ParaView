@@ -144,9 +144,7 @@ void vtkKWRotateCameraInteractor::Select()
   this->CenterUI->ShowCenterOn();
 
 
-  // Should change the cursor here
-  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
-        this->RenderView->GetVTKWidget()->GetWidgetName(), this->GetTclName());
+  // Should change the cursor here -- done in MotionCallback
 
   // Do a full res render.
   this->RenderView->EventuallyRender(); 
@@ -165,8 +163,6 @@ void vtkKWRotateCameraInteractor::Deselect()
   this->CenterUI->ShowCenterOff();
   
    // Should change the cursor here
-  this->Script("bind %s <Motion> {}", 
-               this->RenderView->GetVTKWidget()->GetWidgetName());
   this->Script("%s configure -cursor top_left_arrow",
                this->RenderView->GetWidgetName());
                  

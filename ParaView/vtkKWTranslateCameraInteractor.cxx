@@ -108,9 +108,7 @@ void vtkKWTranslateCameraInteractor::Select()
     }
   this->vtkKWInteractor::Select();
 
-  // Should change the cursor here
-  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
-        this->RenderView->GetVTKWidget()->GetWidgetName(), this->GetTclName());
+  // Should change the cursor here -- done in MotionCallback
 }
 
 //----------------------------------------------------------------------------
@@ -123,8 +121,6 @@ void vtkKWTranslateCameraInteractor::Deselect()
   this->vtkKWInteractor::Deselect();
 
   // Should change the cursor here
-  this->Script("bind %s <Motion> {}", 
-               this->RenderView->GetVTKWidget()->GetWidgetName());
   this->Script("%s configure -cursor top_left_arrow",
                this->RenderView->GetWidgetName());
 }
