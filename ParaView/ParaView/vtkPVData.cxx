@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.5");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.6");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -419,7 +419,11 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
     {
     this->PVColorMap->Register(this);
     }
-  this->UpdateProperties();
+  
+  // Updating properties caused some problems:
+  // The arrays were "completed" in the middle of CopyByPointFieldComponent.
+  // The array name was deleted before the method finished using it.
+  //this->UpdateProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -1727,7 +1731,6 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
     }
   numComps = a->GetNumberOfComponents();
 
-
   this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name));
   if (this->PVColorMap == NULL)
     {
@@ -2773,7 +2776,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.6 $");
 }
 
 //----------------------------------------------------------------------------

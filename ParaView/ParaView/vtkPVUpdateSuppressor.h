@@ -47,18 +47,29 @@ public:
 
   // Description:
   // Overwrite UpdateData so that it will not propagate update.
-  void UpdateData(vtkDataObject *output);
+  void UpdateData(vtkDataObject *);
+  void UpdateInformation();
+  void PropagateUpdateExtent(vtkDataObject *);
+  void TriggerAsynchronousUpdate();
 
   // Description:
   // Set number of pieces and piece on the data.
-  virtual void SetUpdateNumberOfPieces(int);
-  virtual void SetUpdatePiece(int);
+  // This causes the filter to ingore the request from the output.
+  // It is here because the user may not have celled update on the output
+  // before calling force update (it is an easy fix).
+  vtkSetMacro(UpdatePiece, int);
+  vtkGetMacro(UpdatePiece, int);
+  vtkSetMacro(UpdateNumberOfPieces, int);
+  vtkGetMacro(UpdateNumberOfPieces, int);
 
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
 
   void Execute();
+
+  int UpdatePiece;
+  int UpdateNumberOfPieces;
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
