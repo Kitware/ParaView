@@ -1182,6 +1182,10 @@ The Random Vectors filter generates a point-centered array of random vectors. It
                  type="float"
                  help="The center of the mirror plane."
                  default_value="0.0"/>
+    <LabeledToggle variable="CopyInput" trace_name="CopyInput"
+                   label="Copy Input"
+                   help="Include both the input and its reflection in the output."
+                   default_value="1"/>
     <Documentation>
 The Reflection filter reflects the input data set across the specified plane. The output is the union of the input data set and its reflection. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set producing an unstructured grid output.
     </Documentation>
