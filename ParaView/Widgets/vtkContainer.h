@@ -41,7 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkContainer - a base class for templated containers
 
+
 #include "vtkWin32Header.h"
+#include "vtkKWWidgets.h"
 
 class vtkObject;
 
