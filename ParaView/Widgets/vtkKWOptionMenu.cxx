@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.15");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -95,6 +95,12 @@ void vtkKWOptionMenu::SetValue(const char *s)
     }
 }
 
+//-----------------------------------------------------------------------------
+void vtkKWOptionMenu::SetCurrentEntry(const char *name)
+{ 
+  this->SetValue(name);
+}
+ 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntry(const char *name)
 {
@@ -174,12 +180,6 @@ void vtkKWOptionMenu::ClearEntries()
   this->Script("%s delete 0 end", this->Menu->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
-void vtkKWOptionMenu::SetCurrentEntry(const char *name)
-{ 
-  this->Script("set %sValue {%s}",this->GetWidgetName(), name);
-}
- 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
