@@ -120,6 +120,8 @@ INCLUDE_DIRECTORIES(
   ${PVFilters_BINARY_DIR}
   ${VTK_SOURCE_DIR}
   ${VTK_BINARY_DIR}
+  ${ParaView_SOURCE_DIR}/Common/KWCommon
+  ${ParaView_BINARY_DIR}/Common/KWCommon
   ${ParaView_SOURCE_DIR}/Utilities/hdf5
   ${ParaView_BINARY_DIR}/Utilities/hdf5
   )
@@ -139,9 +141,16 @@ CONFIGURE_FILE(${PVFilters_SOURCE_DIR}/vtkPVFiltersConfig.h.in
   ${PVFilters_BINARY_DIR}/vtkPVFiltersConfig.h
   ESCAPE_QUOTES)
 
+# Setup vtkInstantiator registration for this library's classes.
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS 
+  "${Filters_SRCS}"
+  VTK_EXPORT
+  "${PVFilters_BINARY_DIR}" "")
+
 # Create filters library.
-ADD_LIBRARY(vtkPVFilters ${Filters_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkHybrid vtkParallel)
+ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkHybrid vtkParallel vtkKWCommon)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
@@ -169,4 +178,5 @@ IF(VTK_USE_PATENTED)
 ENDIF(VTK_USE_PATENTED)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Filters/Utilities")
 PV_WRAP_VTK_CS(PVFilters PVFILTERS "${KIT_WRAP_DEPS}")
+
 
