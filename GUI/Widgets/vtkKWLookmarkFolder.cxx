@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.6");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.7");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -134,7 +134,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->LabelFrame->SetParent(this->MainFrame->GetFrame());
   this->LabelFrame->ShowHideFrameOn();
   this->LabelFrame->Create(app, 0);
-  this->LabelFrame->SetLabel("Folder");
+  this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->Script("pack %s -fill x -expand t -side left", this->LabelFrame->GetWidgetName());
 
@@ -205,7 +205,7 @@ void vtkKWLookmarkFolder::RemoveDragAndDropTargetCues()
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::SetFolderName(const char *name)
 {
-  this->LabelFrame->SetLabel(name);
+  this->LabelFrame->SetLabelText(name);
 }
 
 
@@ -214,8 +214,8 @@ void vtkKWLookmarkFolder::EditCallback()
 {
   char *temp = new char[100];
 
-  strcpy(temp,this->LabelFrame->GetLabel()->GetLabel());
-  this->LabelFrame->SetLabel("");
+  strcpy(temp,this->LabelFrame->GetLabel()->GetText());
+  this->LabelFrame->SetLabelText("");
   this->Script("pack %s", this->NameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->NameField->GetTextWidget()->GetWidgetName(), strlen(temp));
   if(this->NameField)
@@ -233,7 +233,7 @@ void vtkKWLookmarkFolder::ChangeName()
   strcpy(lmkName,this->NameField->GetValue());
   this->NameField->Unpack();
   this->Script("pack %s -side left -fill x -expand t -padx 2", this->LabelFrame->GetLabel()->GetWidgetName());
-  this->LabelFrame->SetLabel(lmkName);
+  this->LabelFrame->SetLabelText(lmkName);
 
   this->ToggleNestedCheckBoxes(this->LabelFrame, 0);
 
@@ -329,7 +329,7 @@ void vtkKWLookmarkFolder::ToggleNestedCheckBoxes(vtkKWWidget *parent, int onoff)
           checkBox->SetState(onoff);
         //else cleanup
         }
-      else if(!widget->IsA("vtkKWLabeledCheckButton"))
+      else if(!widget->IsA("vtkKWCheckButtonLabeled"))
         {
         this->ToggleNestedCheckBoxes(widget,onoff);
         }

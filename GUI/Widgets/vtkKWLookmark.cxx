@@ -31,11 +31,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
 #include "vtkKWRadioButton.h"
-#include "vtkKWLabeledCheckButton.h"
+#include "vtkKWCheckButtonLabeled.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.6");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.7");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -54,7 +54,7 @@ vtkKWLookmark::vtkKWLookmark()
   this->LmkMainFrame = vtkKWFrameLabeled::New();
   this->LmkCommentsFrame= vtkKWFrameLabeled::New();
   this->LmkDatasetLabel= vtkKWLabel::New();
-  this->LmkDatasetCheckbox = vtkKWLabeledCheckButton::New();
+  this->LmkDatasetCheckbox = vtkKWCheckButtonLabeled::New();
   this->LmkDatasetFrame = vtkKWFrame::New();
   this->LmkCommentsText= vtkKWText::New();
   this->LmkNameField = vtkKWText::New();
@@ -92,11 +92,6 @@ vtkKWLookmark::~vtkKWLookmark()
     this->LmkDatasetCheckbox = NULL;
     }
 
-  if(this->DatasetOption)
-    {
-    this->DatasetOption->Delete();
-    this->DatasetOption = NULL;
-    }
   if(this->LmkCommentsText)
     {
     this->LmkCommentsText->Delete();
@@ -185,7 +180,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkMainFrame->SetParent(this->LmkFrame->GetFrame());
   this->LmkMainFrame->ShowHideFrameOn();
   this->LmkMainFrame->Create(app, 0);
-  this->LmkMainFrame->SetLabel("Lookmark");
+  this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
 
   this->SeparatorFrame->SetParent(this);
@@ -202,7 +197,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkIcon->SetParent(this->LmkLeftFrame->GetFrame());
   this->LmkIcon->Create(app, "");
 
-  this->LmkIcon->SetLabel("Empty");
+  this->LmkIcon->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
                this->LmkIcon->GetWidgetName());
 
@@ -231,18 +226,18 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->LmkDatasetLabel->SetParent(this->LmkDatasetFrame->GetFrame());
   this->LmkDatasetLabel->Create(app, "");
-  this->LmkDatasetLabel->SetLabel("Dataset: ");
+  this->LmkDatasetLabel->SetText("Dataset: ");
 
   this->LmkDatasetCheckbox->SetParent(this->LmkDatasetFrame->GetFrame());
   this->LmkDatasetCheckbox->Create(app, "");
-  this->LmkDatasetCheckbox->GetCheckButton()->SetIndicator(1);
-  this->LmkDatasetCheckbox->GetCheckButton()->SetState(1);
-  this->LmkDatasetCheckbox->SetLabel("Lock to Dataset");
+  this->LmkDatasetCheckbox->GetWidget()->SetIndicator(1);
+  this->LmkDatasetCheckbox->GetWidget()->SetState(1);
+  this->LmkDatasetCheckbox->GetLabel()->SetText("Lock to Dataset");
 
   this->LmkCommentsFrame->SetParent(this->LmkRightFrame->GetFrame());
   this->LmkCommentsFrame->ShowHideFrameOn();
   this->LmkCommentsFrame->Create(app, 0);
-  this->LmkCommentsFrame->SetLabel("Comments:");
+  this->LmkCommentsFrame->SetLabelText("Comments:");
 
   this->LmkCommentsText->SetParent(this->LmkCommentsFrame->GetFrame());
   this->LmkCommentsText->Create(app, "");
@@ -280,7 +275,7 @@ void vtkKWLookmark::DragAndDropPerformCommand(int x, int y, vtkKWWidget *vtkNotU
 //----------------------------------------------------------------------------
 int vtkKWLookmark::IsLockedToDataset()
 {
-  return this->LmkDatasetCheckbox->GetCheckButton()->GetState();
+  return this->LmkDatasetCheckbox->GetWidget()->GetState();
 }
 
 
@@ -297,8 +292,8 @@ void vtkKWLookmark::EditLookmarkCallback()
 
   this->SetSelectionState(0);
 
-  strcpy(temp,this->LmkMainFrame->GetLabel()->GetLabel());
-  this->LmkMainFrame->SetLabel("");
+  strcpy(temp,this->LmkMainFrame->GetLabel()->GetText());
+  this->LmkMainFrame->SetLabelText("");
   this->Script("pack %s", this->LmkNameField->GetWidgetName());
   this->Script("%s configure -bg white -height 1 -width %d -wrap none", this->LmkNameField->GetTextWidget()->GetWidgetName(),strlen(temp));
   this->LmkNameField->SetValue(temp);
@@ -315,7 +310,7 @@ void vtkKWLookmark::ChangeLookmarkName()
   strcpy(lmkName,this->LmkNameField->GetValue());
   this->LmkNameField->Unpack();
   this->Script("pack %s -anchor nw -side left -fill both -expand true -padx 2 -pady 0", this->LmkMainFrame->GetLabel()->GetWidgetName());
-  this->LmkMainFrame->SetLabel(lmkName);
+  this->LmkMainFrame->SetLabelText(lmkName);
 
   delete [] lmkName;
 }
@@ -323,7 +318,7 @@ void vtkKWLookmark::ChangeLookmarkName()
 //----------------------------------------------------------------------------
 void vtkKWLookmark::SetLookmarkName(char *name)
 {
-  this->LmkMainFrame->SetLabel(name);
+  this->LmkMainFrame->SetLabelText(name);
 }
 
 char *vtkKWLookmark::GetComments()
@@ -338,7 +333,7 @@ char *vtkKWLookmark::GetComments()
 //----------------------------------------------------------------------------
 char *vtkKWLookmark::GetLookmarkName()
 {
-  return this->LmkMainFrame->GetLabel()->GetLabel();
+  return this->LmkMainFrame->GetLabel()->GetText();
 }
 
 //----------------------------------------------------------------------------
@@ -360,7 +355,7 @@ void vtkKWLookmark::SetDataset(char *dsetName)
   this->Dataset = new char[15+strlen(ptr)];
   strcpy(this->Dataset,"Dataset: ");
   strcat(this->Dataset,ptr);
-  this->LmkDatasetLabel->SetLabel(this->Dataset);
+  this->LmkDatasetLabel->SetText(this->Dataset);
 }
 
 //----------------------------------------------------------------------------
@@ -412,7 +407,6 @@ void vtkKWLookmark::Pack()
   this->Script("pack %s -anchor nw -side left -padx 1 -pady 1", this->LmkIcon->GetWidgetName());
   this->Script("pack %s -anchor w", this->LmkDatasetLabel->GetWidgetName());
   this->Script("pack %s -anchor w", this->LmkDatasetCheckbox->GetWidgetName());
-//  this->Script("pack %s -anchor w", this->DatasetOption->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand true", this->LmkDatasetFrame->GetWidgetName());
   this->Script("pack %s -anchor w", this->LmkCommentsText->GetWidgetName());
   this->Script("%s configure -bg white -height 3 -width 50 -wrap none", this->LmkCommentsText->GetTextWidget()->GetWidgetName());

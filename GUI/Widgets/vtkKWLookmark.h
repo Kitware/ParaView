@@ -31,7 +31,7 @@
 
 #include "vtkKWWidget.h"
 
-class vtkKWLabeledCheckButton;
+class vtkKWCheckButtonLabeled;
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
@@ -39,7 +39,7 @@ class vtkKWFrameLabeled;
 class vtkKWCheckButton;
 class vtkPVCameraIcon;
 class vtkKWText;
-class vtkKWLabeledCheckButton;
+class vtkKWCheckButtonLabeled;
 class vtkKWRadioButtonSet;
 
 
@@ -113,7 +113,7 @@ protected:
   vtkKWFrameLabeled *LmkMainFrame;
   vtkKWFrameLabeled *LmkCommentsFrame;
   vtkKWLabel *LmkDatasetLabel;
-  vtkKWLabeledCheckButton *LmkDatasetCheckbox;
+  vtkKWCheckButtonLabeled *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
   vtkKWLabel *LmkIcon;
   vtkKWText *LmkCommentsText;
