@@ -180,7 +180,8 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
       d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
       break;
     case VTK_STRUCTURED_POINTS:
-      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkStructuredPoints", outputTclName));
+    case VTK_IMAGE_DATA:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkImageData", outputTclName));
       break;
     default:
       vtkErrorMacro("Could not determine output type.");
