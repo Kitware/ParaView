@@ -74,6 +74,10 @@ public:
   vtkGetStringMacro(BoxTclName);
 
   // Description:
+  // The Tcl name of the VTK transform.
+  vtkGetStringMacro(BoxTransformTclName);
+
+  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
@@ -138,7 +142,10 @@ public:
 
   vtkGetObjectMacro(BoxTransform, vtkTransform);
 
-  void UpdateBox();
+  // Description:
+  // If update is specified, then it is updated from the gui, otherwise from
+  // the stored variables.
+  void UpdateBox(int update);
   void UpdateFromBox();
 
 protected:
@@ -199,6 +206,8 @@ protected:
   float StoredPosition[3];
   float StoredRotation[3];
   float StoredScale[3];
+
+  int Initialized;
 
 private:
   vtkPVBoxWidget(const vtkPVBoxWidget&); // Not implemented
