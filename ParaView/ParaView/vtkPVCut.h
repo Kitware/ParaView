@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVClipPlane.h
+  Module:    vtkPVCut.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,32 +39,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVClipPlane - A class to handle the special case of cutting
+// .NAME vtkPVCut - A class to handle the special case of cutting
 // with an implict plane
 // .SECTION Description
 
 
-#ifndef __vtkPVClipPlane_h
-#define __vtkPVClipPlane_h
+#ifndef __vtkPVCut_h
+#define __vtkPVCut_h
 
 #include "vtkPVSource.h"
 
-class VTK_EXPORT vtkPVClipPlane : public vtkPVSource
+class VTK_EXPORT vtkPVCut : public vtkPVSource
 {
 public:
-  static vtkPVClipPlane* New();
-  vtkTypeMacro(vtkPVClipPlane, vtkPVSource);
-  
+  static vtkPVCut* New();
+  vtkTypeMacro(vtkPVCut, vtkPVSource);
+    
   // Decription:
   // VTKSource must be set before this is called.
   void CreateProperties();
 
 protected:
-  vtkPVClipPlane();
-  ~vtkPVClipPlane();
-  vtkPVClipPlane(const vtkPVClipPlane&) {};
-  void operator=(const vtkPVClipPlane&) {};
-
+  vtkPVCut();
+  ~vtkPVCut();
+  vtkPVCut(const vtkPVCut&) {};
+  void operator=(const vtkPVCut&) {};
 };
+
+
 
 #endif

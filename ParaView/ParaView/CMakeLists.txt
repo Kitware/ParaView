@@ -16,8 +16,8 @@ vtkPVArrayCalculator
 vtkPVArrayMenu 
 vtkPVArraySelection
 vtkPVBoundsDisplay
-vtkPVClipPlane
-vtkPVCutPlane
+vtkPVClip
+vtkPVCut
 vtkPVContour 
 vtkPVContourEntry 
 vtkPVData 

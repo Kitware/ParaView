@@ -81,6 +81,10 @@ public:
   virtual void CreateViewProperties();
   
   // Description:
+  // Pack the properties so that they exapnd with the split frame.
+  virtual void PackProperties();
+
+  // Description:
   // Create the TK widgets associated with the view.
   void Create(vtkKWApplication *app, const char *args);
 

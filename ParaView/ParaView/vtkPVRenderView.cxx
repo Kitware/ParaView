@@ -41,9 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkToolkits.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkPVTreeComposite.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWInteractor.h"
 #include "vtkPVApplication.h"
@@ -428,7 +428,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   
   this->NavigationFrame->SetParent(this->GetPropertiesParent());
   this->NavigationFrame->ShowHideFrameOn();
-  this->NavigationFrame->Create(this->Application);
+  this->NavigationFrame->Create(this->Application);  
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
 
@@ -442,6 +442,30 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   delete [] local;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PackProperties()
+{
+  // make sure the view is packed if necc
+  if (this->SharedPropertiesParent)
+    {
+    // if the windows prop is not currently this views prop
+    this->Script("pack slaves %s",
+                 this->PropertiesParent->GetParent()->GetWidgetName());
+    if (strcmp(this->Application->GetMainInterp()->result,
+               this->PropertiesParent->GetWidgetName()))
+      {
+      // forget current props
+      this->Script("pack forget [pack slaves %s]",
+                   this->PropertiesParent->GetParent()->GetWidgetName());  
+      this->Script("pack %s -side left -anchor nw -fill both -expand t",
+                   this->PropertiesParent->GetWidgetName());
+      }
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::CreateViewProperties()
 {
   this->vtkKWView::CreateViewProperties();

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVClipPlane.cxx
+  Module:    vtkPVCut.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,60 +39,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVClipPlane.h"
-#include "vtkPVSelectWidget.h"
-#include "vtkPVPlaneWidget.h"
-#include "vtkPVSphereWidget.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkPVVectorEntry.h"
+#include "vtkPVCut.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVData.h"
+#include "vtkPVContourEntry.h"
+#include "vtkPVSelectWidget.h"
+#include "vtkPVPlaneWidget.h"
+#include "vtkPVSphereWidget.h"
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWFrame.h"
+#include "vtkKWScrollableFrame.h"
 
-int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVCutCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVClipPlane::vtkPVClipPlane()
+vtkPVCut::vtkPVCut()
 {
-  this->CommandFunction = vtkPVClipPlaneCommand;
-  this->ReplaceInputOn();
+  this->CommandFunction = vtkPVCutCommand;
+  this->ReplaceInputOff();
 }
 
 //----------------------------------------------------------------------------
-vtkPVClipPlane::~vtkPVClipPlane()
+vtkPVCut::~vtkPVCut()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPVClipPlane* vtkPVClipPlane::New()
+vtkPVCut* vtkPVCut::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVClipPlane");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVCut");
   if(ret)
     {
-    return (vtkPVClipPlane*)ret;
+    return (vtkPVCut*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVClipPlane;
+  return new vtkPVCut;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVClipPlane::CreateProperties()
+void vtkPVCut::CreateProperties()
 {
   vtkPVInputMenu *inputMenu;
-  vtkPVSelectWidget *selectWidget;
-  vtkPVPlaneWidget *planeWidget;
-  vtkPVSphereWidget *sphereWidget;
-  vtkPVArrayMenu *arrayMenu;
-  vtkPVVectorEntry *offsetEntry;
+  vtkPVSelectWidget  *selectWidget;
+  vtkPVPlaneWidget  *planeWidget;
+  vtkPVSphereWidget  *sphereWidget;
+  vtkPVContourEntry *contourEntry;
 
-  // This makes the assumption that the vtkClipDataSet filter 
+  // This makes the assumption that the vtkCutDataSet filter 
   // has already been set.  In the future we could also implement 
   // the virtual method "SetVTKSource" to catch the condition when
   // the VTKSource is set after the properties are created.
@@ -110,13 +108,12 @@ void vtkPVClipPlane::CreateProperties()
 
   this->AddBoundsDisplay(inputMenu);
 
-  
   selectWidget = vtkPVSelectWidget::New();
   selectWidget->SetParent(this->GetParameterFrame()->GetFrame());
   selectWidget->Create(this->Application);
-  selectWidget->SetLabel("Clip Function");
+  selectWidget->SetLabel("Cut Function");
   selectWidget->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  selectWidget->SetObjectVariable(this->VTKSourceTclName, "ClipFunction");
+  selectWidget->SetObjectVariable(this->VTKSourceTclName, "CutFunction");
   this->AddPVWidget(selectWidget);
   this->Script("pack %s -side top -fill x -expand 1", 
                selectWidget->GetWidgetName());
@@ -140,26 +137,6 @@ void vtkPVClipPlane::CreateProperties()
   sphereWidget->Create(this->Application);
   selectWidget->AddItem("Sphere", sphereWidget, sphereWidget->GetSphereTclName());
 
-  // Put an option to clip by scalar array.
-  arrayMenu = vtkPVArrayMenu::New();
-  arrayMenu->SetNumberOfComponents(1);
-  arrayMenu->SetInputName("Input");
-  arrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
-  arrayMenu->SetObjectTclName(this->VTKSourceTclName);
-  arrayMenu->SetLabel("Scalars");
-
-  arrayMenu->SetParent(selectWidget->GetFrame());
-  arrayMenu->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
-  arrayMenu->Create(this->Application);
-  arrayMenu->SetBalloonHelpString("Choose the clipping scalar array.");
-  selectWidget->AddItem("Scalars", arrayMenu, "");
-
-  // Set up the dependancy so that the array menu updates when the input changes.
-  inputMenu->AddDependant(arrayMenu);
-  arrayMenu->SetInputMenu(inputMenu);  
-
-  arrayMenu->Delete();
-  arrayMenu = NULL;
   planeWidget->Delete();
   planeWidget = NULL;
   sphereWidget->Delete();
@@ -167,21 +144,27 @@ void vtkPVClipPlane::CreateProperties()
   selectWidget->Delete();
   selectWidget = NULL;
 
-  // Offset -------------------------
-  offsetEntry = vtkPVVectorEntry::New();
-  offsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  offsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Value");
-  offsetEntry->SetModifiedCommand(this->GetTclName(), 
-                                  "SetAcceptButtonColorToRed");
-  offsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
-  this->AddPVWidget(offsetEntry);
-  this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());
-  offsetEntry->Delete();
-  offsetEntry = NULL;
+
+  contourEntry = vtkPVContourEntry::New();
+  contourEntry->SetPVSource(this);
+  contourEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  contourEntry->SetLabel("Cut Values");
+  contourEntry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  contourEntry->Create(this->Application);
+  this->AddPVWidget(contourEntry);
+  this->Script("pack %s", contourEntry->GetWidgetName());
+  contourEntry->Delete();
+  contourEntry = NULL;
+
+  // This makes the assumption that the vtkCutDataSet filter 
+  // has already been set.  In the future we could also implement 
+  // the virtual method "SetVTKSource" to catch the condition when
+  // the VTKSource is set after the properties are created.
 
   this->UpdateProperties();
   this->UpdateParameterWidgets();
 }
+
 
 
 

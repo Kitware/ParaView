@@ -179,12 +179,16 @@ public:
   vtkPVSource *CalculatorCallback();
   
   // Description:
-  // Callback from the CutPlane button.
-  vtkPVSource *CutPlaneCallback();
+  // Callback from the Cut button.
+  vtkPVSource *CutCallback();
 
   // Description:
-  // Callback from the ClipPlane button.
-  vtkPVSource *ClipPlaneCallback();
+  // Callback from the Clip button.
+  vtkPVSource *ClipCallback();
+
+  // Description:
+  // Callback from the ExtractGrid button.
+  vtkPVSource *ExtractGridCallback();
 
   // Description:
   // Callback from the threshold button.
@@ -228,8 +232,9 @@ public:
 
 
   vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
-  vtkGetObjectMacro(CutPlaneButton, vtkKWPushButton);
-  vtkGetObjectMacro(ClipPlaneButton, vtkKWPushButton);
+  vtkGetObjectMacro(CutButton, vtkKWPushButton);
+  vtkGetObjectMacro(ClipButton, vtkKWPushButton);
+  vtkGetObjectMacro(ExtractGridButton, vtkKWPushButton);
   vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
@@ -314,8 +319,9 @@ protected:
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
-  vtkKWPushButton *CutPlaneButton;
-  vtkKWPushButton *ClipPlaneButton;
+  vtkKWPushButton *CutButton;
+  vtkKWPushButton *ClipButton;
+  vtkKWPushButton *ExtractGridButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;

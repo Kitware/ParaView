@@ -109,12 +109,20 @@ int vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
-  this->Script("pack %s -side left -fill x -expand true", 
+  this->Script("pack %s -side top -fill both -expand true", 
                this->LabeledFrame->GetWidgetName());
 
-  this->Menu->SetParent(this->LabeledFrame->GetFrame());
+  vtkKWWidget *justifyFrame = vtkKWWidget::New();
+  justifyFrame->SetParent(this->LabeledFrame->GetFrame());
+  justifyFrame->Create(app, "frame", "");
+  this->Script("pack %s -side top -fill x -expand true", 
+               justifyFrame->GetWidgetName());
+
+  this->Menu->SetParent(justifyFrame);
   this->Menu->Create(app, "");
-  this->Script("pack %s -side top", this->Menu->GetWidgetName());
+  this->Script("pack %s -side left", this->Menu->GetWidgetName());
+
+  justifyFrame->Delete();
 
   return 1;
 }

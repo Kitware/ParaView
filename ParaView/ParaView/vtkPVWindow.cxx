@@ -63,8 +63,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkPVArrayCalculator.h"
-#include "vtkPVCutPlane.h"
-#include "vtkPVClipPlane.h"
+#include "vtkPVCut.h"
+#include "vtkPVClip.h"
 #include "vtkPVThreshold.h"
 #include "vtkPVContour.h"
 #include "vtkPVGlyph3D.h"
@@ -143,8 +143,9 @@ vtkPVWindow::vtkPVWindow()
   
   this->Toolbar = vtkKWToolbar::New();
   this->CalculatorButton = vtkKWPushButton::New();
-  this->CutPlaneButton = vtkKWPushButton::New();
-  this->ClipPlaneButton = vtkKWPushButton::New();
+  this->CutButton = vtkKWPushButton::New();
+  this->ClipButton = vtkKWPushButton::New();
+  this->ExtractGridButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
   this->GlyphButton = vtkKWPushButton::New();
@@ -298,16 +299,22 @@ void vtkPVWindow::PrepareForDelete()
     this->CalculatorButton = NULL;
     }
   
-  if (this->CutPlaneButton)
+  if (this->CutButton)
     {
-    this->CutPlaneButton->Delete();
-    this->CutPlaneButton = NULL;
+    this->CutButton->Delete();
+    this->CutButton = NULL;
     }
   
-  if (this->ClipPlaneButton)
+  if (this->ClipButton)
     {
-    this->ClipPlaneButton->Delete();
-    this->ClipPlaneButton = NULL;
+    this->ClipButton->Delete();
+    this->ClipButton = NULL;
+    }
+  
+  if (this->ExtractGridButton)
+    {
+    this->ExtractGridButton->Delete();
+    this->ExtractGridButton = NULL;
     }
   
   if (this->ThresholdButton)
@@ -573,16 +580,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
   this->CalculatorButton->SetBalloonHelpString("Array calculator. Allows user to create new arrays using mathematical operations and existing arrays.");
   
-  this->CutPlaneButton->SetParent(this->Toolbar);
-  this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
-  this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
-  this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
+  this->CutButton->SetParent(this->Toolbar);
+  this->CutButton->Create(app, "-image PVCutButton");
+  this->CutButton->SetCommand(this, "CutCallback");
+  this->CutButton->SetBalloonHelpString("Cut with an implicit plane or sphere. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
   
-  this->ClipPlaneButton->SetParent(this->Toolbar);
-  //this->ClipPlaneButton->Create(app, "-text Clip");
-  this->ClipPlaneButton->Create(app, "-image PVClipPlaneButton");
-  this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
-  this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
+  this->ClipButton->SetParent(this->Toolbar);
+  //this->ClipButton->Create(app, "-text Clip");
+  this->ClipButton->Create(app, "-image PVClipButton");
+  this->ClipButton->SetCommand(this, "ClipCallback");
+  this->ClipButton->SetBalloonHelpString("Clip with an implicit plane, sphere or with scalars.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
+  
+  this->ExtractGridButton->SetParent(this->Toolbar);
+  //this->ExtractGridButton->Create(app, "-text Clip");
+  this->ExtractGridButton->Create(app, "-image PVExtractGridButton");
+  this->ExtractGridButton->SetCommand(this, "ExtractGridCallback");
+  this->ExtractGridButton->SetBalloonHelpString("Extract a sub grid from a structured data set.");
   
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-image PVThresholdButton");
@@ -604,10 +617,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->ProbeButton->SetCommand(this, "ProbeCallback");
   this->ProbeButton->SetBalloonHelpString("Probe");
   
-  this->Script("pack %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+  this->Script("pack %s %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),
-               this->CutPlaneButton->GetWidgetName(),
-               this->ClipPlaneButton->GetWidgetName(),
+               this->CutButton->GetWidgetName(),
+               this->ClipButton->GetWidgetName(),
+               this->ExtractGridButton->GetWidgetName(),
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
                this->GlyphButton->GetWidgetName(),
@@ -1639,7 +1653,6 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
     }
   if (pvd)
     {
-    this->EnableFilterButtons();
     pvd->Register(this);
     this->CurrentPVData = pvd;
     // Add all the appropriate filters to the filter menu.
@@ -1655,7 +1668,8 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
         }
       }
     this->Script("%s entryconfigure \"VTK Filters\" -state normal",
-		 this->AdvancedMenu->GetWidgetName());
+		this->AdvancedMenu->GetWidgetName());
+    this->EnableFilterButtons();
     }
   else
     {
@@ -1907,9 +1921,11 @@ void vtkPVWindow::DisableFilterButtons()
   this->Script("%s configure -state disabled",
                this->CalculatorButton->GetWidgetName());
   this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
+               this->CutButton->GetWidgetName());
   this->Script("%s configure -state disabled",
-               this->ClipPlaneButton->GetWidgetName());
+               this->ClipButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ExtractGridButton->GetWidgetName());
   this->Script("%s configure -state disabled",
                this->ThresholdButton->GetWidgetName());
   this->Script("%s configure -state disabled",
@@ -1923,12 +1939,17 @@ void vtkPVWindow::DisableFilterButtons()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableFilterButtons()
 {
+  if (this->CurrentPVData == NULL)
+    {
+    return;
+    }
+   
   this->Script("%s configure -state normal",
                this->CalculatorButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               this->CutPlaneButton->GetWidgetName());
+               this->CutButton->GetWidgetName());
   this->Script("%s configure -state normal",
-               this->ClipPlaneButton->GetWidgetName());
+               this->ClipButton->GetWidgetName());
   this->Script("%s configure -state normal",
                this->ThresholdButton->GetWidgetName());
   this->Script("%s configure -state normal",
@@ -1937,6 +1958,20 @@ void vtkPVWindow::EnableFilterButtons()
                this->GlyphButton->GetWidgetName());
   this->Script("%s configure -state normal",
                this->ProbeButton->GetWidgetName());
+
+  int type = this->CurrentPVData->GetVTKData()->GetDataObjectType();
+  if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS ||
+      type == VTK_RECTILINEAR_GRID || type == VTK_STRUCTURED_GRID)
+    {
+    this->Script("%s configure -state normal",
+                 this->ExtractGridButton->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -state disabled",
+                 this->ExtractGridButton->GetWidgetName());
+    }
+
 
 }
 
@@ -2020,13 +2055,13 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVWindow::CutPlaneCallback()
+vtkPVSource *vtkPVWindow::CutCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
-  vtkPVCutPlane *cutPlane;
+  vtkPVCut *cut;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
@@ -2043,11 +2078,11 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   outputDataType = "vtkPolyData";
   
   // Create the vtkSource.
-  sprintf(tclName, "%s%d", "CutPlane", instanceCount);
+  sprintf(tclName, "%s%d", "Cut", instanceCount);
   // Create the object through tcl on all processes.
   // I would like to get rid of the pointer, and do everything
   // through the tcl name.
-  // VTKCutPlane will be going away, and we will create the 
+  // VTKCut will be going away, and we will create the 
   // implicit function here.
   s = (vtkSource *)(pvApp->MakeTclObject("vtkCutter", tclName));
   if (s == NULL)
@@ -2056,36 +2091,36 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
     return NULL;
     }
   
-  cutPlane = vtkPVCutPlane::New();
-  cutPlane->SetView(this->GetMainView());
-  cutPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  cutPlane->SetApplication(pvApp);
-  cutPlane->SetVTKSource(s, tclName);
-  cutPlane->SetPVInput(current);
-  cutPlane->SetName(tclName);
+  cut = vtkPVCut::New();
+  cut->SetView(this->GetMainView());
+  cut->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  cut->SetApplication(pvApp);
+  cut->SetVTKSource(s, tclName);
+  cut->SetPVInput(current);
+  cut->SetName(tclName);
 
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CutPlaneCallback]", 
-                       cutPlane->GetTclName(), this->GetTclName());
-  cutPlane->SetTraceInitialized(1);
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CutCallback]", 
+                       cut->GetTclName(), this->GetTclName());
+  cut->SetTraceInitialized(1);
 
-  cutPlane->CreateProperties();
+  cut->CreateProperties();
 
-  this->AddPVSource(cutPlane);
-  this->SetCurrentPVSource(cutPlane);
+  this->AddPVSource(cut);
+  this->SetCurrentPVSource(cut);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
-  sprintf(tclName, "%sOutput%d", "CutPlane", instanceCount);
+  sprintf(tclName, "%sOutput%d", "Cut", instanceCount);
   // Create the object through tcl on all processes.
 
   d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  cutPlane->SetPVOutput(pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", cutPlane->GetVTKSourceTclName(),
+  cut->SetPVOutput(pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", cut->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
   // Push along the extent translator (for consistent pieces).
@@ -2093,7 +2128,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
 
-  cutPlane->Delete();
+  cut->Delete();
   pvd->Delete();
   
   ++instanceCount;
@@ -2101,7 +2136,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   this->DisableMenus();
   this->DisableFilterButtons();
 
-  return cutPlane;
+  return cut;
 }
 
 
@@ -2185,13 +2220,13 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVWindow::ClipPlaneCallback()
+vtkPVSource *vtkPVWindow::ClipCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
-  vtkPVSource *clipPlane;
+  vtkPVSource *clip;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
@@ -2209,11 +2244,11 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   outputDataType = "vtkUnstructuredGrid";
   
   // Create the vtkSource.
-  sprintf(tclName, "%s%d", "ClipPlane", instanceCount);
+  sprintf(tclName, "%s%d", "Clip", instanceCount);
   // Create the object through tcl on all processes.
   // I would like to get rid of the pointer, and do everything
   // through the tcl name.
-  // vtkClipPlane will be going away, and we will create the 
+  // vtkClip will be going away, and we will create the 
   // implicit function here.
   s = (vtkSource *)(pvApp->MakeTclObject("vtkClipDataSet", tclName));
   if (s == NULL)
@@ -2222,35 +2257,35 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
     return NULL;
     }
   
-  clipPlane = vtkPVClipPlane::New();
-  clipPlane->SetView(this->GetMainView());
-  clipPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  clipPlane->SetApplication(pvApp);
-  clipPlane->SetVTKSource(s, tclName);
-  clipPlane->SetPVInput(current);
-  clipPlane->SetName(tclName);
+  clip = vtkPVClip::New();
+  clip->SetView(this->GetMainView());
+  clip->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  clip->SetApplication(pvApp);
+  clip->SetVTKSource(s, tclName);
+  clip->SetPVInput(current);
+  clip->SetName(tclName);
 
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ClipPlaneCallback]", 
-                       clipPlane->GetTclName(), this->GetTclName());
-  clipPlane->SetTraceInitialized(1);
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ClipCallback]", 
+                       clip->GetTclName(), this->GetTclName());
+  clip->SetTraceInitialized(1);
 
-  clipPlane->CreateProperties();
-  this->AddPVSource(clipPlane);
-  this->SetCurrentPVSource(clipPlane);
+  clip->CreateProperties();
+  this->AddPVSource(clip);
+  this->SetCurrentPVSource(clip);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
-  sprintf(tclName, "%sOutput%d", "ClipPlane", instanceCount);
+  sprintf(tclName, "%sOutput%d", "Clip", instanceCount);
   // Create the object through tcl on all processes.
 
   d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  clipPlane->SetPVOutput(pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", clipPlane->GetVTKSourceTclName(),
+  clip->SetPVOutput(pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", clip->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
   // Push along the extent translator (for consistent pieces).
@@ -2258,7 +2293,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
 
-  clipPlane->Delete();
+  clip->Delete();
   pvd->Delete();
   
   ++instanceCount;
@@ -2266,9 +2301,33 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   this->DisableMenus();
   this->DisableFilterButtons();
 
-  return clipPlane;
+  return clip;
 }
 
+//----------------------------------------------------------------------------
+vtkPVSource *vtkPVWindow::ExtractGridCallback()
+{
+  if (this->CurrentPVData == NULL)
+    { // This should not be able to happen but ...
+    return NULL;
+    }
+
+  int type = this->CurrentPVData->GetVTKData()->GetDataObjectType();
+  if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS)
+    {
+    return this->CreatePVSource("vtkImageClip"); 
+    }
+  if (type == VTK_STRUCTURED_GRID)
+    {
+    return this->CreatePVSource("vtkExtractGrid");
+    }
+  if (type == VTK_RECTILINEAR_GRID)
+    {
+    return NULL;
+    }
+  vtkErrorMacro("Unknown data type.");
+  return NULL;
+}
 
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVWindow::ContourCallback()
@@ -2554,7 +2613,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->MainView->GetPropertiesParent()->GetWidgetName());
-  this->Script("pack %s -side top -fill x",
+  this->Script("pack %s -side top -fill x -expand t",
                this->MainView->GetNavigationFrame()->GetWidgetName());
   
   if (!this->GetCurrentPVSource())
@@ -2563,7 +2622,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     }
   
   //this->GetCurrentPVSource()->UpdateParameterWidgets();
-  this->Script("pack %s -side top -fill x",
+  this->Script("pack %s -side top -fill x -expand t",
                this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
   this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
 }

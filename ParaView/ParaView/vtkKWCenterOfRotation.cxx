@@ -39,6 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVTreeComposite.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCenterOfRotation.h"
 #include "vtkPVRenderView.h"
@@ -50,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPropPicker.h"
 #include "vtkCamera.h"
 #include "vtkActor.h"
-#include "vtkPVTreeComposite.h"
 #include "vtkObjectFactory.h"
 
 
