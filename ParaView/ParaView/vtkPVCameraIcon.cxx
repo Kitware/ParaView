@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 
+#include "vtkPNGWriter.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
 
@@ -166,17 +168,11 @@ void vtkPVCameraIcon::StoreCamera()
                                          static_cast<float>(this->Height)/height);
     resample->SetInput(w2i->GetOutput());
     resample->Update();
-    
-    vtkImageFlip *flip = vtkImageFlip::New();
-    flip->SetInput(resample->GetOutput());
-    flip->SetFilteredAxis(1);
 
     vtkKWIcon* icon = vtkKWIcon::New();
-    icon->SetImageData(flip->GetOutput());
+    icon->SetImageData(resample->GetOutput());
     this->SetImageData(icon);
-    icon->Delete();
-    flip->Delete();
-    
+    icon->Delete();    
     resample->Delete();
     w2i->Delete();
     // Fix label
