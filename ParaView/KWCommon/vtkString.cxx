@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.18");
+vtkCxxRevisionMacro(vtkString, "1.19");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -234,6 +234,24 @@ char* vtkString::ToLower(char *str)
 }
 
 //----------------------------------------------------------------------------
+char* vtkString::ToLowerFirst(char *str)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (isalpha(*ptr) && (ptr == str || isspace(*(ptr - 1))))
+        {
+        *ptr = (char)tolower(*ptr);
+        }
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
 char* vtkString::ToUpper(char *str)
 {
   if (str)
@@ -242,6 +260,24 @@ char* vtkString::ToUpper(char *str)
     while (*ptr)
       {
       *ptr = (char)toupper(*ptr);
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::ToUpperFirst(char *str)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (isalpha(*ptr) && (ptr == str || isspace(*(ptr - 1))))
+        {
+        *ptr = (char)toupper(*ptr);
+        }
       ++ptr;
       }
     }

@@ -110,13 +110,17 @@ public:
   
   // Description:
   // Transform the string to lowercase (inplace).
+  // ToLowerFirst() will only lowercase the first letter of each word
   // Return a pointer to the string (i.e. 'str').
   static char* ToLower(char* str);
+  static char* ToLowerFirst(char* str);
 
   // Description:
   // Transform the string to uppercase (inplace).
+  // ToUpperFirst() will only uppercase the first letter of each word
   // Return a pointer to the string (i.e. 'str').
   static char* ToUpper(char* str);
+  static char* ToUpperFirst(char* str);
 
   // Description:
   // Replace a character or some characters in the string (inplace).
