@@ -1,4 +1,4 @@
-$Application ExitOnReturnOn
+#$Application ExitOnReturnOn
 
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
@@ -116,4 +116,4 @@ if {![$Application GetExitStatus]} {
         }
     }
 }
-$Application Exit
+#$Application Exit

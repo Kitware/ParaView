@@ -25,8 +25,16 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
+#include <vtkstd/map>
+#include "vtkStdString.h"
+
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.3.2.1");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.3.2.2");
+
+struct vtkSMArrayListDomainInternals
+{
+  vtkstd::map<vtkStdString, int> PartialMap;
+};
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::vtkSMArrayListDomain()
@@ -34,12 +42,21 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
   this->AttributeType = vtkDataSetAttributes::SCALARS;
   this->DefaultElement = 0;
   this->InputDomainName = 0;
+  this->ALDInternals = new vtkSMArrayListDomainInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::~vtkSMArrayListDomain()
 {
   this->SetInputDomainName(0);
+  delete this->ALDInternals;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
+{
+  const char* name = this->GetString(idx);
+  return this->ALDInternals->PartialMap[name];
 }
 
 //---------------------------------------------------------------------------
@@ -58,6 +75,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(idx);
     if ( iad->IsFieldValid(sp, info->GetArrayInformation(idx)) )
       {
+      this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
       unsigned int newidx = this->AddString(arrayInfo->GetName());
       if (arrayInfo == attrInfo)
         {

@@ -40,6 +40,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
+class vtkSMArrayListDomainInternals;
 
 class VTK_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
 {
@@ -62,6 +63,11 @@ public:
   // set to the index of the array that is the active scalars
   // in the dataset.
   vtkGetMacro(DefaultElement, unsigned int);
+
+  // Description:
+  // Returns true if the array with the given idx is partial
+  // false otherwise. See vtkPVArrayInformation for more information.
+  int IsArrayPartial(unsigned int idx);
 
 protected:
   vtkSMArrayListDomain();
@@ -101,6 +107,8 @@ protected:
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
   void operator=(const vtkSMArrayListDomain&); // Not implemented
+
+  vtkSMArrayListDomainInternals* ALDInternals;
 };
 
 #endif

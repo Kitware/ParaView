@@ -83,10 +83,18 @@ public:
   virtual void CopyToStream(vtkClientServerStream*) const;
   virtual void CopyFromStream(const vtkClientServerStream*);
 
+  // Description:
+  // If IsPartial is true, this array is in only some of the
+  // parts of a multi-block dataset. By default, IsPartial is
+  // set to 0.
+  vtkSetMacro(IsPartial, int);
+  vtkGetMacro(IsPartial, int);
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation();
 
+  int IsPartial;
   int DataType;
   int NumberOfComponents;
   char *Name;

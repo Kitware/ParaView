@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.292.2.2");
+vtkCxxRevisionMacro(vtkPVData, "1.292.2.3");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1359,28 +1359,38 @@ void vtkPVData::UpdatePropertiesInternal()
     sprintf(cmd, "ColorByPointField {%s} %d", 
             arrayInfo->GetName(), numComps);
     sprintf(volCmd, "VolumeRenderPointField {%s}", arrayInfo->GetName());
+    ostrstream tmpstr;
     if (numComps > 1)
       {
-      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
+      tmpstr << "Point " << arrayInfo->GetName() << " (" << numComps << ")";
       }
     else
       {
-      sprintf(tmp, "Point %s", arrayInfo->GetName());
-      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
+      tmpstr << "Point " << arrayInfo->GetName();
+      }
+
+    if (arrayInfo->GetIsPartial())
+      {
+      tmpstr << " (partial)";
+      }
+    tmpstr << ends;
+    if (numComps == 1)
+      {
+      this->VolumeScalarsMenu->AddEntryWithCommand(tmpstr.str(), this, volCmd);
       if ( (firstField && !strlen(currentVolumeField)) ||
-           !strcmp( tmp, currentVolumeField ) )
+           !strcmp( tmpstr.str(), currentVolumeField ) )
         {
-        this->VolumeScalarsMenu->SetValue( tmp );
+        this->VolumeScalarsMenu->SetValue( tmpstr.str() );
         volRenArray = arrayInfo;
         firstField = 0;
         }
       }
-    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-    if (strcmp(tmp, currentColorBy) == 0)
+    this->ColorMenu->AddEntryWithCommand(tmpstr.str(), this, cmd);
+    if (strcmp(tmpstr.str(), currentColorBy) == 0)
       {
       currentColorByFound = 1;
       }
-    if (strcmp(tmp, inputColorBy) == 0)
+    if (strcmp(tmpstr.str(), inputColorBy) == 0)
       {
       inputColorByFound = 1;
       inputPoint = 1;
@@ -1388,15 +1398,16 @@ void vtkPVData::UpdatePropertiesInternal()
       }
     if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
       {
-      strcpy(defCmd, tmp);
+      strcpy(defCmd, tmpstr.str());
       defPoint = 1;
       defArray = arrayInfo;
       if ( !strlen(currentVolumeField) )
         {
         volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
+        this->VolumeScalarsMenu->SetValue( tmpstr.str() );
         }
       }
+    delete[] tmpstr.str();
     }
 
   attrInfo = dataInfo->GetCellDataInformation();
@@ -1406,21 +1417,31 @@ void vtkPVData::UpdatePropertiesInternal()
     arrayInfo = attrInfo->GetArrayInformation(i);
     sprintf(cmd, "ColorByCellField {%s} %d", 
             arrayInfo->GetName(), arrayInfo->GetNumberOfComponents());
+    ostrstream tmpstr;
     if (arrayInfo->GetNumberOfComponents() > 1)
       {
-      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(),
-              arrayInfo->GetNumberOfComponents());
+      tmpstr << "Cell " 
+             << arrayInfo->GetName() << " (" 
+             << arrayInfo->GetNumberOfComponents() << ")";
       }
     else
       {
-      sprintf(tmp, "Cell %s", arrayInfo->GetName());
+      tmpstr << "Cell " << arrayInfo->GetName();
       }
-    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-    if (strcmp(tmp, currentColorBy) == 0)
+
+    if (arrayInfo->GetIsPartial())
+      {
+      tmpstr << " (partial)";
+      }
+
+    tmpstr << ends;
+
+    this->ColorMenu->AddEntryWithCommand(tmpstr.str(), this, cmd);
+    if (strcmp(tmpstr.str(), currentColorBy) == 0)
       {
       currentColorByFound = 1;
       }
-    if (strcmp(tmp, inputColorBy) == 0 && !inputArray)
+    if (strcmp(tmpstr.str(), inputColorBy) == 0 && !inputArray)
       {
       inputColorByFound = 1;
       inputPoint = 0;
@@ -1428,10 +1449,12 @@ void vtkPVData::UpdatePropertiesInternal()
       }
     if (defArray == NULL && attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
       {
-      strcpy(defCmd, tmp);
+      strcpy(defCmd, tmpstr.str());
       defPoint = 0;
       defArray = arrayInfo;
       }
+
+    delete[] tmpstr.str();
     }
 
   // Current color by will never be NULL ....
