@@ -34,18 +34,6 @@ $kw(vtkTemp21) SetCameraState -1.614 -13.040 2.643  15.000 15.000 15.000  0.231 
 $kw(vtkTemp358) RemoveAllValues
 $kw(vtkTemp358) AddValue 1.000000
 $kw(vtkTemp358) AddValue 10.000000
-$kw(vtkTemp358) AddValue 25.000000
-$kw(vtkTemp349) AcceptCallback
-$kw(vtkTemp21) SetCameraState 24.265 -6.315 -10.977  15.000 15.000 15.000  0.363 0.780 -0.510
-$kw(vtkTemp358) RemoveAllValues
-$kw(vtkTemp358) AddValue 1.000000
-$kw(vtkTemp358) AddValue 10.000000
-$kw(vtkTemp358) AddValue 20.000000
-$kw(vtkTemp349) AcceptCallback
-$kw(vtkTemp21) SetCameraState 30.660 -1.254 -11.562  15.000 15.000 15.000  0.331 0.879 -0.343
-$kw(vtkTemp358) RemoveAllValues
-$kw(vtkTemp358) AddValue 1.000000
-$kw(vtkTemp358) AddValue 10.000000
 $kw(vtkTemp358) AddValue 20.000000
 $kw(vtkTemp358) AddValue 0.500000
 $kw(vtkTemp349) AcceptCallback
