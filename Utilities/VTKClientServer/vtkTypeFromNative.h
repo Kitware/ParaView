@@ -86,10 +86,14 @@ VTK_TYPE_FROM_NATIVE(long, vtkTypeInt64);
 VTK_TYPE_FROM_NATIVE(unsigned long, vtkTypeUInt64);
 #endif
 
-// Map 64-bit types if they are special.
-#if defined(VTK_TYPE_INT64_NOT_STANDARD)
-VTK_TYPE_FROM_NATIVE(vtkTypeInt64, vtkTypeInt64);
-VTK_TYPE_FROM_NATIVE(vtkTypeUInt64, vtkTypeUInt64);
+// Map non-standard types.
+#if defined(VTK_SIZEOF___INT64) && (VTK_SIZEOF___INT64 == 8)
+VTK_TYPE_FROM_NATIVE(__int64, vtkTypeInt64);
+VTK_TYPE_FROM_NATIVE(unsigned __int64, vtkTypeUInt64);
+#endif
+#if defined(VTK_SIZEOF_LONG_LONG) && (VTK_SIZEOF_LONG_LONG == 8)
+VTK_TYPE_FROM_NATIVE(long long, vtkTypeInt64);
+VTK_TYPE_FROM_NATIVE(unsigned long long, vtkTypeUInt64);
 #endif
 
 // Map floating-point types.
