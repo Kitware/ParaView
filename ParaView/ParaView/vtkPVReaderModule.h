@@ -126,6 +126,10 @@ public:
   vtkSetMacro(AcceptAfterRead, int);
   vtkGetMacro(AcceptAfterRead, int);
 
+  // Description:
+  // Get the file entry.
+  vtkGetObjectMacro(FileEntry, vtkPVFileEntry);
+
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();
