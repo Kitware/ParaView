@@ -92,10 +92,12 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   // Should the registry be locked?
   vtkGetMacro(Locked, int);
 
+//BTX
   enum {
     READONLY,
     READWRITE
   };
+//ETX
 
   protected:
   vtkKWRegisteryUtilities();

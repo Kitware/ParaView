@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWUNIXRegisteryUtilities.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkKWHashTable.h"
-#include "vtkKWHashTableIterator.h"
 #include "vtkString.h"
 #include "vtkArrayMap.txx"
 #include "vtkArrayMapIterator.txx"

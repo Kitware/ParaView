@@ -1,8 +1,6 @@
 PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SOURCE_FILES( KWCommon_SRCS
-vtkKWHashTable.cxx
-vtkKWHashTableIterator.cxx
 vtkKWIcon.cxx
 vtkKWProcessStatistics.cxx
 vtkKWRegisteryUtilities.cxx
@@ -11,6 +9,8 @@ vtkKWSerializer.cxx
 
 #ABSTRACT_FILES(
 #)
+#vtkKWHashTable.cxx
+#vtkKWHashTableIterator.cxx
 
 
 IF (WIN32)
@@ -30,10 +30,10 @@ ELSE (WIN32)
   )
 ENDIF (WIN32)
   
-WRAP_EXCLUDE_FILES(
-  vtkKWHashTable 
-  vtkKWRegisteryUtilities
-)
+#WRAP_EXCLUDE_FILES(
+#  vtkKWHashTable 
+#  vtkKWRegisteryUtilities
+#)
 
 VTK_WRAP_TCL(vtkKWCommonTCL KWCommonTCL_SRCS KWCommon_SRCS)
 ADD_LIBRARY(vtkKWCommonTCL KWCommonTCL_SRCS KWCommon_SRCS)
