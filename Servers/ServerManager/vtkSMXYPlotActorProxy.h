@@ -64,11 +64,14 @@ protected:
   ~vtkSMXYPlotActorProxy();
 
   vtkSMXYPlotActorProxyInternals* Internals;
-  int ArrayNamesModified;
+  int ArrayNamesModified; // Flag indicating if the arraynames have been modified,
+    // indicating that the XYActor inputs need to be rebuilt.
 
   vtkSMSourceProxy* Input;
   void SetInput(vtkSMSourceProxy*);
 
+  // Description:
+  // Called to build the XYActor inputs for the selected arrays.
   void SetupInputs();
 
 private:

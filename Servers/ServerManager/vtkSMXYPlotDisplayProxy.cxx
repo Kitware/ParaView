@@ -15,9 +15,52 @@
 
 #include "vtkSMXYPlotDisplayProxy.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkCommand.h"
+#include "vtkXYPlotWidget.h"
+#include "vtkXYPlotActor.h"
+#include "vtkClientServerStream.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkCoordinate.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkMPIMoveData.h"
+#include "vtkPolyData.h"
+#include "vtkSMIntVectorProperty.h"
+
+class vtkSMXYPlotDisplayProxyObserver : public vtkCommand
+{
+public:
+  static vtkSMXYPlotDisplayProxyObserver* New() 
+    { return new vtkSMXYPlotDisplayProxyObserver; }
+  virtual void Execute (vtkObject* obj, unsigned long event, void* calldata)
+    {
+    if (this->Target)
+      {
+      this->Target->ExecuteEvent(obj, event, calldata);
+      }
+    }
+  void SetTarget(vtkSMXYPlotDisplayProxy* t)
+    {
+    this->Target = t;
+    }
+protected:
+  vtkSMXYPlotDisplayProxy* Target;
+  vtkSMXYPlotDisplayProxyObserver() { this->Target = 0; }
+  ~vtkSMXYPlotDisplayProxyObserver() { this->SetTarget(0); }
+};
+
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -25,15 +68,25 @@ vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
   this->CollectProxy = 0;
   this->XYPlotActorProxy = 0;
   this->PropertyProxy =0;
+  this->Observer = vtkSMXYPlotDisplayProxyObserver::New();
+  this->Observer->SetTarget(this);
+  this->XYPlotWidget = vtkXYPlotWidget::New();
+  this->RenderModuleProxy = 0;
+  this->Visibility = 0;
+  this->GeometryIsValid = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::~vtkSMXYPlotDisplayProxy()
 {
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
+  this->XYPlotWidget->Delete();
   this->UpdateSuppressorProxy = 0;
   this->CollectProxy = 0;
   this->XYPlotActorProxy = 0;
   this->PropertyProxy =0;
+  this->RenderModuleProxy = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -44,19 +97,19 @@ void vtkSMXYPlotDisplayProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
-  this->CollectProxy = this->GetSubProxy("CollectProxy");
+  this->CollectProxy = this->GetSubProxy("Collect");
   this->XYPlotActorProxy = this->GetSubProxy("XYPlotActor");
   this->PropertyProxy = this->GetSubProxy("Property");
 
-  if (!this->UpdateSuppressorProxy || !this->CollectProxy || !this->XYPlotActor
+  if (!this->UpdateSuppressorProxy || !this->CollectProxy || !this->XYPlotActorProxy
     || !this->PropertyProxy)
     {
     vtkErrorMacro("Not all required subproxies were defined!");
     return;
     }
 
-  this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->CollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->XYPlotActorProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->PropertyProxy->SetServers(
@@ -64,24 +117,80 @@ void vtkSMXYPlotDisplayProxy::CreateVTKObjects(int numObjects)
   
   this->Superclass::CreateVTKObjects(numObjects);
 
+}
+
+//-----------------------------------------------------------------------------
+  
+void vtkSMXYPlotDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
+  int , int )
+{
+  this->InvalidateGeometry();
+  this->CreateVTKObjects(1);
+
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    this->CollectProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find property Input on CollectProxy.");
+    return;
+    }
+  ip->RemoveAllProxies();
+  ip->AddProxy(input);
+  this->CollectProxy->UpdateVTKObjects();
+
   this->SetupPipeline();
   this->SetupDefaults();
+  this->SetupWidget();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::SetupWidget()
+{
+  if (!this->XYPlotActorProxy || this->XYPlotActorProxy->GetNumberOfIDs() < 1)
+    {
+    vtkErrorMacro("XYPlotActorProxy not defined!");
+    return;
+    }
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkXYPlotActor* actor = vtkXYPlotActor::SafeDownCast(
+    pm->GetObjectFromID(this->XYPlotActorProxy->GetID(0)));
+
+  this->XYPlotWidget->SetXYPlotActor(actor);
+  this->XYPlotWidget->AddObserver(vtkCommand::InteractionEvent,
+    this->Observer);
+  this->XYPlotWidget->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Observer);
+  this->XYPlotWidget->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Observer);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::SetupPipeline()
 {
   vtkSMInputProperty* ipp;
+  vtkSMStringVectorProperty* svp;
 
-  ipp = vtkSMInputProperty::SafeDownCast(
-    this->UpdateSuppressorProxy->GetProperty("Input"));
-  if (!ipp)
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
-    vtkErrorMacro("Failed to find property Input on UpdateSuppressor.");
-    return;
+    if (this->CollectProxy)
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
+        << vtkClientServerStream::End
+        << vtkClientServerStream::Invoke
+        << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
     }
-  ipp->RemoveAllProxies();
-  ipp->AddProxy(this->GeometryFilterProxy);
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->UpdateSuppressorProxy->GetServers(), stream);
+    }
 
   svp  = vtkSMStringVectorProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("OutputType"));
@@ -125,20 +234,20 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
   
   int i, num;
   num = this->CollectProxy->GetNumberOfIDs();
+  // We always duplicate beacuse all processes render the plot.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CollectProxy->GetProperty("MoveMode"));
+  ivp->SetElement(0, 2); // Clone mode.
+  this->CollectProxy->UpdateVTKObjects();
+
   // This stuff is quite similar to vtkSMCompositePartDisplay::SetupCollectionFilter.
   // If only I could avoid repetition.
   for (i=0; i < num; i++)
     {
-    // We always duplicate beacuse all processes render the plot.
-    stream << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i)
-      << "SetMoveModeToClone"
-      << vtkClientServerStream::End;
-    pm->SendStream( this->CollectProxy->GetServers(), stream);
 
     stream << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i)
-      << " SetMPIMToNSocketConnection"
+      << "SetMPIMToNSocketConnection"
       << pm->GetMPIMToNSocketConnectionID()
       << vtkClientServerStream::End;
     // create, SetPassThrough, and set the mToN connection
@@ -162,7 +271,7 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
         << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       }
-    
+
     // if running in render server mode
     if (pm->GetOptions()->GetRenderServerMode())
       {
@@ -192,12 +301,12 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->SendStream( 
-      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
     }
 
   // Not we set the properties for the XYPlotActor.
   vtkSMDoubleVectorProperty* dvp;
-  vtkSMIntVectorProperty* ivp;
   vtkSMStringVectorProperty* svp;
 
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -332,6 +441,9 @@ void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->AddProxy(this->XYPlotActorProxy);
+
+  this->RenderModuleProxy = rm;
+  this->SetVisibility(this->Visibility);
 }
 
 //-----------------------------------------------------------------------------
@@ -344,12 +456,152 @@ void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
     return;
     }
-  pp->RemoveProxy(this->XYPlotActorProxy); 
+  pp->RemoveProxy(this->XYPlotActorProxy);
+  if (this->XYPlotWidget->GetEnabled())
+    {
+    this->XYPlotWidget->SetEnabled(0);
+    }
+  this->XYPlotWidget->SetXYPlotActor(0);
+  this->XYPlotWidget->SetInteractor(0);
+  this->XYPlotWidget->SetCurrentRenderer(0);
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::Update()
+{
+  if (this->GeometryIsValid || !this->UpdateSuppressorProxy || 
+    !this->RenderModuleProxy)
+    {
+    return;
+    }
+  vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
+  p->Modified();
+  this->UpdateSuppressorProxy->UpdateVTKObjects();
+}
+
 //-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::SetVisibility(int visible)
+{
+  this->Visibility = visible;
+  if (!this->RenderModuleProxy)
+    {
+    return;
+    }
+
+  // Set widget interactor.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
+    pm->GetObjectFromID(this->RenderModuleProxy->GetInteractorProxy()->GetID(0)));
+  if (!iren)
+    {
+    vtkErrorMacro("Failed to get client side Interactor.");
+    return;
+    }
+  this->XYPlotWidget->SetInteractor(iren);
+  
+  vtkRenderer* ren = vtkRenderer::SafeDownCast(
+    pm->GetObjectFromID(this->RenderModuleProxy->GetRenderer2DProxy()->GetID(0)));
+  if (!ren)
+    {
+    vtkErrorMacro("Failed to get client side 2D renderer.");
+    return;
+    }
+  this->XYPlotWidget->SetCurrentRenderer(ren);
+  this->XYPlotWidget->SetEnabled(visible);
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->XYPlotActorProxy->GetProperty("Visibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Visibility on XYPlotActorProxy.");
+    return;
+    }
+  ivp->SetElement(0, visible);
+  this->XYPlotActorProxy->UpdateVTKObjects();
+}
+
 //-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::ExecuteEvent(vtkObject*, unsigned long event, 
+  void*)
+{
+  vtkPVGenericRenderWindowInteractor* iren;
+  switch (event)
+    {
+  case vtkCommand::StartInteractionEvent:
+    //TODO: enable Interactive rendering.
+    iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->XYPlotWidget->GetInteractor());
+    iren->InteractiveRenderEnabledOn();
+    break;
+    
+  case vtkCommand::EndInteractionEvent:
+    //TODO: disable interactive rendering.
+    iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->XYPlotWidget->GetInteractor());
+    iren->InteractiveRenderEnabledOff();
+    break;
+
+  case vtkCommand::InteractionEvent:
+    // Take the client position values and push on to the server.
+    vtkXYPlotActor* actor = this->XYPlotWidget->GetXYPlotActor();
+    double *pos1 = actor->GetPositionCoordinate()->GetValue();
+    double *pos2 = actor->GetPosition2Coordinate()->GetValue();
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->XYPlotActorProxy->GetProperty("Position"));
+    if (dvp)
+      {
+      dvp->SetElement(0, pos1[0]);
+      dvp->SetElement(1, pos1[1]);
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property Position on XYPlotActorProxy.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->XYPlotActorProxy->GetProperty("Position2"));
+    if (dvp)
+      {
+      dvp->SetElement(0, pos2[0]);
+      dvp->SetElement(1, pos2[1]);
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property Position2 on XYPlotActorProxy.");
+      }
+    this->XYPlotActorProxy->UpdateVTKObjects();
+    break;
+    }
+  this->InvokeEvent(event); // just in case the GUI wants to know about interaction.
+}
+//-----------------------------------------------------------------------------
+vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
+{
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  
+  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
+      pm->GetObjectFromID(this->CollectProxy->GetID(0)));
+  if (dp == NULL)
+    {
+    return NULL;
+    }
+
+  return vtkPolyData::SafeDownCast(dp->GetOutput());
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::InvalidateGeometry()
+{
+  this->GeometryIsValid = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotDisplayProxy::MarkConsumersAsModified()
+{
+  this->Superclass::MarkConsumersAsModified();
+  this->InvalidateGeometry();
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -20,6 +20,9 @@
 #include "vtkKWLabel.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
+
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
@@ -32,11 +35,17 @@
 #include "vtkPVRenderModule.h"
 #include "vtkCommand.h"
 
+#include "vtkSMXYPlotDisplayProxy.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include <vtkstd/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.1");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -85,7 +94,6 @@ vtkPVProbe::vtkPVProbe()
   
   this->ProbeFrame = vtkKWWidget::New();
   
-  this->XYPlotWidget = 0;
   this->XYPlotObserver = NULL;
   
   this->ReplaceInputOff();
@@ -94,26 +102,32 @@ vtkPVProbe::vtkPVProbe()
   // We cannot process inputs that have more than one part.
   this->RequiredNumberOfInputParts = 1;
   
-  this->PlotDisplay = vtkSMPlotDisplay::New();
+  this->PlotDisplayProxy = 0; 
+  this->PlotDisplayProxyName = 0;
 }
 
 vtkPVProbe::~vtkPVProbe()
 {  
-  if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
+  if (this->PlotDisplayProxy)
     {
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PlotDisplay);
+    if (this->GetPVApplication() && this->GetPVApplication()->GetRenderModuleProxy())
+      {
+      this->GetPVApplication()->GetRenderModuleProxy()->RemoveDisplay(
+        this->PlotDisplayProxy);
+      this->GetPVApplication()->GetRenderModuleProxy()->UpdateVTKObjects();
+      }
+
+    if  (this->PlotDisplayProxyName)
+      {
+      vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+      pxm->UnRegisterProxy("displays", this->PlotDisplayProxyName);
+      this->SetPlotDisplayProxyName(0);
+      }
+
+    this->PlotDisplayProxy->Delete();
+    this->PlotDisplayProxy = NULL;
     }
 
-  this->PlotDisplay->Delete();
-  this->PlotDisplay = NULL;
-
-  if ( this->XYPlotWidget )
-    {
-    this->XYPlotWidget->SetEnabled(0);
-    this->XYPlotWidget->SetInteractor(NULL);
-    this->XYPlotWidget->Delete();
-    this->XYPlotWidget = 0;
-    }
   if (this->XYPlotObserver)
     {
     this->XYPlotObserver->Delete();
@@ -140,9 +154,8 @@ void vtkPVProbe::CreateProperties()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
-  
-  this->PlotDisplay->SetProcessModule(pm);
-  this->vtkPVSource::CreateProperties();
+    
+  this->Superclass::CreateProperties();
   // We do not support probing groups and multi-block objects. Therefore,
   // we use the first VTKSource id.
   stream << vtkClientServerStream::Invoke 
@@ -186,9 +199,9 @@ void vtkPVProbe::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVProbe::SetVisibilityNoTrace(int val)
 {
-  if (this->PlotDisplay)
+  if (this->PlotDisplayProxy)
     {
-    this->PlotDisplay->SetVisibility(val);
+    this->PlotDisplayProxy->cmSetVisibility(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
 }
@@ -200,6 +213,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                               void* vtkNotUsed(calldata))
 {
   //law int fixme;  // move this to the server.
+/*
   switch ( event )
     {
     case vtkCommand::StartInteractionEvent:
@@ -242,6 +256,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 
       break;
     }
+    */
 }
 
 
@@ -254,53 +269,51 @@ void vtkPVProbe::AcceptCallbackInternal()
   
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
-    
-  if (this->PlotDisplay->GetNumberOfIDs() == 0)
+   
+  if (!this->PlotDisplayProxy)
     {
-    // Connect to the display.
-    // These should be merged.
-    this->PlotDisplay->SetInput(this->GetProxy());
-    //this->GetProxy()->AddDisplay(this->PlotDisplay);
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PlotDisplay);
-    }
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
-  //law int fixme; // This should be in server.
-  if ( !this->XYPlotWidget )
-    {
-    this->XYPlotWidget = vtkXYPlotWidget::New();
-    this->PlotDisplay->ConnectWidgetAndActor(this->XYPlotWidget);
-
-  
-    vtkPVGenericRenderWindowInteractor* iren = 
-      this->GetPVWindow()->GetInteractor();
-    if ( iren )
+    this->PlotDisplayProxy = vtkSMXYPlotDisplayProxy::SafeDownCast(
+      pxm->NewProxy("displays", "XYPlotDisplay"));
+    if (!this->PlotDisplayProxy)
       {
-      this->XYPlotWidget->SetInteractor(iren);
+      vtkErrorMacro("Failed to create Plot Display Proxy!");
+      return;
       }
 
-    // This observer synchronizes all processes when
-    // the widget changes the plot.
-    this->XYPlotObserver = vtkXYPlotWidgetObserver::New();
-    this->XYPlotObserver->PVProbe = this;
-    this->XYPlotWidget->AddObserver(vtkCommand::InteractionEvent, 
-                                    this->XYPlotObserver);
-    this->XYPlotWidget->AddObserver(vtkCommand::StartInteractionEvent, 
-                                    this->XYPlotObserver);
-    this->XYPlotWidget->AddObserver(vtkCommand::EndInteractionEvent, 
-                                    this->XYPlotObserver);
+    ostrstream str;
+    // SourceListName.SourceProxyName.XYPlotDisplay == name for the 
+    // Display proxy.
+    str << this->GetSourceList() << "."
+      << this->GetName() << "."
+      << "XYPlotDisplay" << ends;
+    this->SetPlotDisplayProxyName(str.str());
+    str.rdbuf()->freeze(0);
+    pxm->RegisterProxy("displays", this->PlotDisplayProxyName, this->PlotDisplayProxy);
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+      this->PlotDisplayProxy->GetProperty("Input"));
+    if (!ip)
+      {
+      vtkErrorMacro("Failed to find property Input on PlotDisplayProxy.");
+      return;
+      }
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->GetProxy());
+    this->PlotDisplayProxy->UpdateVTKObjects();
+
+    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+    rm->AddDisplay(this->PlotDisplayProxy);
+    rm->UpdateVTKObjects();
     }
-
-
-
-
   // We need to update manually for the case we are probing one point.
-  this->PlotDisplay->Update();
   int numPts = this->GetDataInformation()->GetNumberOfPoints();
 
   if (numPts == 1)
     { // Put the array information in the UI. 
     // Get the collected data from the display.
-    vtkPolyData* d = this->PlotDisplay->GetCollectedData();
+    this->PlotDisplayProxy->Update();
+    vtkPolyData* d = this->PlotDisplayProxy->GetCollectedData();
     vtkPointData* pd = d->GetPointData();
   
     // update the ui to see the point data for the probed point
@@ -310,8 +323,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkstd::string label;
     vtkstd::string arrayData;
     vtkstd::string tempArray;
-
-    this->XYPlotWidget->SetEnabled(0);
 
     int numArrays = pd->GetNumberOfArrays();
     for (int i = 0; i < numArrays; i++)
@@ -378,18 +389,29 @@ void vtkPVProbe::AcceptCallbackInternal()
 
   if (this->ShowXYPlotToggle->GetState() && numPts > 1)
     {
-    vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-    this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
-    this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
-
-    this->PlotDisplay->SetVisibility(1);
+//    vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
+//    this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
+//    this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
+    vtkPVArrayInformation* arrayInfo = 
+      this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(0);
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->PlotDisplayProxy->GetProperty("ArrayNames"));
+    if (svp)
+      {
+      svp->SetNumberOfElements(1);
+      svp->SetElement(0, arrayInfo->GetName());
+      this->PlotDisplayProxy->UpdateVTKObjects();
+      }
+      
+    this->PlotDisplayProxy->cmSetVisibility(1);
     }
   else
     {
-    this->XYPlotWidget->SetEnabled(0);
-    vtkPVApplication* pvApp = this->GetPVApplication();
-    vtkPVRenderModule* rm = pvApp->GetProcessModule()->GetRenderModule();
-    rm->RemoveDisplay(this->PlotDisplay);
+//    this->XYPlotWidget->SetEnabled(0);
+//    vtkPVApplication* pvApp = this->GetPVApplication();
+//    vtkPVRenderModule* rm = pvApp->GetProcessModule()->GetRenderModule();
+//    rm->RemoveDisplay(this->PlotDisplay);
+    this->PlotDisplayProxy->cmSetVisibility(0);
     }
     
 }
@@ -400,5 +422,4 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
-  os << indent << "XYPlotWidget: " << this->XYPlotWidget << endl;
 }

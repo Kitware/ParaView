@@ -188,6 +188,7 @@ protected:
   friend class vtkSMIceTRenderModuleProxy;
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMMultiDisplayRenderModuleProxy;
+  friend class vtkSMXYPlotDisplayProxy;
 //ETX
 
   // Description:

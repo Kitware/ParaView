@@ -26,7 +26,7 @@ class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkXYPlotWidget;
-class vtkSMPlotDisplay;
+class vtkSMXYPlotDisplayProxy;
 class vtkXYPlotWidgetObserver;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
@@ -44,12 +44,6 @@ public:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
-  //BTX
-  // Description:
-  // Get the XY Plot widget.
-  vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
-  //ETX
-  
   // Description:
   // This method is called when event is triggered on the XYPlotWidget.
 //BTX
@@ -65,7 +59,10 @@ protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
-  vtkSMPlotDisplay* PlotDisplay;
+  vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
+  char* PlotDisplayProxyName; // Name used to register the plot display proxy
+                              // with the Proxy Manager.
+  vtkSetStringMacro(PlotDisplayProxyName);
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
@@ -80,7 +77,6 @@ protected:
   
   vtkKWCheckButton *ShowXYPlotToggle;
   
-  vtkXYPlotWidget* XYPlotWidget;
   vtkXYPlotWidgetObserver* XYPlotObserver;
 
 private:

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
     {
     vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
@@ -156,7 +156,7 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
     }
  
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetRendererProxy()->GetProperty("ViewProps"));
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
     {
     vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");

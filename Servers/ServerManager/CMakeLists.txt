@@ -100,6 +100,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMPointLabelDisplay.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
+  vtkSMXYPlotDisplayProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

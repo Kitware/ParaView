@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.3");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -138,7 +138,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
 
 
   int total_numArrays = this->Internals->ArrayNames.size();
-
+  const char* arrayname = 0;
   if (total_numArrays == 0)
     {
     pm->SendStream(this->GetServers(), stream);
@@ -162,7 +162,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     {
     stream << vtkClientServerStream::Invoke
       << sourceID << "AddInput"
-      << this->Input->GetPart(0)
+      << this->Input->GetPart(0)->GetID(0)
       << (*iter).c_str() << 0 /*component no*/
       << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
@@ -177,6 +177,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
       << arrayCount << r << g << b 
       << vtkClientServerStream::End;
 
+    arrayname = (*iter).c_str();
     color += color_step;
     arrayCount++;
     }
@@ -194,7 +195,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
   if (arrayCount == 1)
     {
     stream << vtkClientServerStream::Invoke
-      << sourceID << "SetYTitle" << (*iter).c_str() 
+      << sourceID << "SetYTitle" << arrayname 
       << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
       << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1

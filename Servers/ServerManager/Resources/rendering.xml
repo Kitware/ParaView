@@ -895,6 +895,39 @@
         default_values="1.0 1.0 1.0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
+      <!-- End of Property -->
+    </Proxy>
+    
+    <Proxy name="Property2D" class="vtkProperty2D">
+      <DoubleVectorProperty
+        name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="PointSize"
+        command="SetPointSize"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+    <!-- End of Property2D -->
     </Proxy>
   </ProxyGroup>
 
@@ -1328,11 +1361,9 @@
   
   <ProxyGroup name="displays">
     <XYPlotDisplayProxy name="XYPlotDisplay">
-      <ProxyProperty
+      <InputProperty
         name="Input"
-        command="SetInput"
-        immediate_update="1"
-        update_self="1">
+        command="SetInput-not-used">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -1340,7 +1371,7 @@
         <InputArrayDomain name="input_array"
           attribute_type="point">
         </InputArrayDomain>
-      </ProxyProperty>
+      </InputProperty>
       <Property
         name="Update"
         command="Update"
@@ -1351,13 +1382,7 @@
         command="InvalidateGeometry"
         update_self="1">
       </Property>
-      <IntVectorProperty
-        name="CacheUpdate"
-        command="CacheUpdate"
-        number_of_elements="2"
-        update_self="1"
-        default_values="0 -1">
-      </IntVectorProperty>
+      <!-- Cache Update directly on UpdateSuppressor subproxy -->
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -1376,7 +1401,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <Proxy name="Property" proxygroup="properties" proxyname="Property2D" />
       </SubProxy>
       <SubProxy>
         <Proxy 

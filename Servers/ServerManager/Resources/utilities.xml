@@ -1289,7 +1289,6 @@
         update_self="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -1325,18 +1324,18 @@
         default_values="5">
         <IntRangeDomain name="range" min="0" max="50" />
       </IntVectorProperty>
-      <IntVectorProperty
+      <DoubleVectorProperty
         name="LegendPosition"
         command="SetLegendPosition"
         number_of_elements="2"
         default_values="0.85 0.75">
-      </IntVectorProperty>
-      <IntVectorProperty
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
         name="LegendPosition2"
         command="SetLegendPosition2"
         number_of_elements="2"
         default_values="0.15 0.20">
-      </IntVectorProperty>
+      </DoubleVectorProperty>
       <IntVectorProperty
         name="LegendVisibility"
         command="SetLegend"
@@ -1350,10 +1349,10 @@
         number_of_elements="1">
       </StringVectorProperty>
       <StringVectorProperty
-        name="SelectInputScalars"
-        command="SelectInputScalars"
+        name="ArrayNames"
+        command="AddArrayName"
         update_self="1"
-        clean_command="RemoveAllInputScalars"
+        clean_command="RemoveAllArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1">
         <ArrayListDomain name="array_list" attribute_type="Scalars">

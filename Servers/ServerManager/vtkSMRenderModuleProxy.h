@@ -37,7 +37,9 @@ public:
 
   // Description:
   // Any display that must be rendered by this rendermodule
-  // needs to be added to it.
+  // needs to be added to it. 
+  // NOTE: If you call this method directly (without using properties)
+  // don't forget to call UpdateVTKObjects() on the RenderModule.
   virtual void AddDisplay(vtkSMDisplayProxy* disp);
   virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
 
@@ -132,6 +134,8 @@ protected:
   friend class vtkSM3DWidgetProxy;
   friend class vtkSMScalarBarWidgetProxy;
   friend class vtkSMCubeAxesDisplayProxy;
+  friend class vtkSMXYPlotDisplayProxy;
+
   //ETX
   // Just a convienience method.
   int GetDisplayVisibility(vtkSMDisplayProxy* pDisp);
