@@ -360,6 +360,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkGetObjectMacro( ControlFrame, vtkKWWidget );
   
   vtkGetObjectMacro(Renderer, vtkRenderer);
+  virtual vtkRenderer* GetRenderer2D() { return NULL; }
   
   // Description:
   // Get the render window used by this widget

@@ -57,6 +57,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkPVInputMenu;
 class vtkPVMinMax;
+class vtkPVExtentWidgetProperty;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -124,12 +125,18 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+
+  vtkSetMacro(AnimationAxis, int);
+  vtkGetMacro(AnimationAxis, int);
+  
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
@@ -150,6 +157,11 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
+  int AcceptCalled;
+
+  vtkPVExtentWidgetProperty *Property;
+  int AnimationAxis;
+  
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
   void operator=(const vtkPVExtentEntry&); // Not implemented

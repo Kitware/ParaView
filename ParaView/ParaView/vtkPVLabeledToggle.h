@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWCheckButton;
+class vtkPVIndexWidgetProperty;
 
 class VTK_EXPORT vtkPVLabeledToggle : public vtkPVObjectWidget
 {
@@ -88,6 +89,9 @@ public:
   vtkPVLabeledToggle* ClonePrototype(vtkPVSource* pvSource,
                                      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
+  
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
 protected:
   vtkPVLabeledToggle();
@@ -95,23 +99,20 @@ protected:
   
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
-  // Side effect is to turn modified flag off.
+  // Side effect is to turn modified flag off.Resources/
   virtual void AcceptInternal(const char* sourceTclName);
   
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
   
-  // This serves a dual purpose.  For tracing and for saving state.
+  // This serves a dual purpose.  For tracing and Resources/for saving state.
   virtual void Trace(ofstream *file);
 
 
   vtkKWLabel *Label;
   vtkKWCheckButton *CheckButton;
-
-  vtkPVLabeledToggle(const vtkPVLabeledToggle&); // Not implemented
-  void operator=(const vtkPVLabeledToggle&); // Not implemented
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -120,6 +121,16 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+  
+  int DefaultValue;
+  vtkSetMacro(DefaultValue, int);
+  int AcceptCalled;
+
+  vtkPVIndexWidgetProperty *Property;
+  
+private:
+  vtkPVLabeledToggle(const vtkPVLabeledToggle&); // Not implemented
+  void operator=(const vtkPVLabeledToggle&); // Not implemented
 };
 
 #endif

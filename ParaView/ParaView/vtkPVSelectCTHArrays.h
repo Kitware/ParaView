@@ -94,7 +94,7 @@ public:
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void ResetInternal(const char* vtkSourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This input menu supplies the array options.

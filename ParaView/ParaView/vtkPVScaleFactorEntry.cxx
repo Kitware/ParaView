@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.1");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -64,11 +64,11 @@ vtkPVScaleFactorEntry::~vtkPVScaleFactorEntry()
   this->SetInputMenu(NULL);
 }
 
-void vtkPVScaleFactorEntry::ResetInternal(const char *sourceTclName)
+void vtkPVScaleFactorEntry::ResetInternal()
 {
   if (this->AcceptCalled)
     {
-    this->Superclass::ResetInternal(sourceTclName);
+    this->Superclass::ResetInternal();
     }
   this->Update();
 }

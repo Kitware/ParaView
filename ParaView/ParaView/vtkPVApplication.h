@@ -169,6 +169,13 @@ public:
                            const char *tclName);
 
   // Description:
+  // This constructs a vtk object (type specified by class name) on the
+  // server processes and uses the tclName for the tcl instance command.
+  // The user must cast to the correct type, and is responsible for deleting
+  // the object.
+  void MakeServerTclObject(const char *className, const char *tclName);
+
+  // Description:
   // This method returns pointer to the object specified as a tcl
   // name.
   vtkObject *TclToVTKObject(const char *tclName);

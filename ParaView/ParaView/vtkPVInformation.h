@@ -73,10 +73,17 @@ public:
   virtual int GetMessageLength(); 
   virtual void WriteMessage(unsigned char* msg);
 
+  // Description:
+  // Set/get whether to gather information only from the root.
+  vtkGetMacro(RootOnly, int);
+  vtkSetMacro(RootOnly, int);
+  
 protected:
-  vtkPVInformation() {};
+  vtkPVInformation();
   ~vtkPVInformation() {};
 
+  int RootOnly;
+  
   vtkPVInformation(const vtkPVInformation&); // Not implemented
   void operator=(const vtkPVInformation&); // Not implemented
 };

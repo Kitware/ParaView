@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.13");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -123,26 +123,26 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     }
   if (this->BoxTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-                                              this->BoxTclName);
+    this->GetPVApplication()->BroadcastScript(
+      "%s Delete", this->BoxTclName);
     this->SetBoxTclName(NULL);
     }
   if ( this->BoxTransformTclName )
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-      this->BoxTransformTclName);
+    this->GetPVApplication()->BroadcastScript(
+      "%s Delete", this->BoxTransformTclName);
     this->SetBoxTransformTclName(0);
     }
   if ( this->BoxMatrixTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-      this->BoxMatrixTclName);
+    this->GetPVApplication()->BroadcastScript(
+      "%s Delete", this->BoxMatrixTclName);
     this->SetBoxMatrixTclName(0);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
+void vtkPVBoxWidget::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -166,7 +166,7 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     this->TranslateThumbWheel[2]->SetValue(this->StoredPosition[2]);
     this->UpdateBox(1);
     }
-  this->Superclass::ResetInternal(sourceTclName);
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -175,7 +175,8 @@ void vtkPVBoxWidget::ActualPlaceWidget()
   this->Superclass::ActualPlaceWidget();
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
     this->Application);
-  pvApp->BroadcastScript("%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
+  pvApp->BroadcastScript(
+    "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +191,8 @@ void vtkPVBoxWidget::AcceptInternal(const char* sourceTclName)
     {
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
       this->Application);
-    pvApp->BroadcastScript("%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
+    pvApp->BroadcastScript(
+      "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
 
     this->SetStoredPosition(this->PositionGUI);
     this->SetStoredRotation(this->RotationGUI);
@@ -516,7 +518,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     if (input)
       {
       this->Reset();
-      pvApp->BroadcastScript("%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
+      pvApp->BroadcastScript(
+        "%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
       }
     }
 

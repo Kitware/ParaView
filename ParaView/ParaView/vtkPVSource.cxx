@@ -65,11 +65,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInputProperty.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkPVWidgetCollection.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkString.h"
@@ -81,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.319");
+vtkCxxRevisionMacro(vtkPVSource, "1.320");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -97,6 +98,8 @@ vtkPVSource::vtkPVSource()
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
 
+  this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();
+  
   // Number of instances cloned from this prototype
   this->PrototypeInstanceCount = 0;
 
@@ -125,7 +128,6 @@ vtkPVSource::vtkPVSource()
 
   // The underlying VTK object. This will change. PVSource will
   // support multiple VTK sources/filters.
-  this->VTKSources = vtkCollection::New();
   this->VTKSourceTclNames = vtkStringList::New();
 
   // The frame which contains the parameters related to the data source
@@ -145,7 +147,7 @@ vtkPVSource::vtkPVSource()
   this->LongHelpLabel = vtkKWLabeledLabel::New();
   this->LabelEntry = vtkKWLabeledEntry::New();
       
-  this->Widgets = vtkPVWidgetCollection::New();
+  this->WidgetProperties = vtkCollection::New();
     
   this->ReplaceInput = 1;
 
@@ -190,6 +192,9 @@ vtkPVSource::~vtkPVSource()
   this->DataInformation->Delete();
   this->DataInformation = NULL;
 
+  this->NumberOfOutputsInformation->Delete();
+  this->NumberOfOutputsInformation = NULL;
+  
   if (this->PVConsumers)
     {
     delete [] this->PVConsumers;
@@ -199,7 +204,6 @@ vtkPVSource::~vtkPVSource()
 
   // We need to delete the Tcl object too.  This call does it.
   this->RemoveAllVTKSources();
-  this->VTKSources->Delete();
   this->VTKSourceTclNames->Delete();
 
   // Do not use SetName() or SetLabel() here. These make
@@ -218,8 +222,8 @@ vtkPVSource::~vtkPVSource()
   this->Notebook->Delete();
   this->Notebook = NULL;
 
-  this->Widgets->Delete();
-  this->Widgets = NULL;
+  this->WidgetProperties->Delete();
+  this->WidgetProperties = NULL;
 
   this->AcceptButton->Delete();
   this->AcceptButton = NULL;  
@@ -618,7 +622,7 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
-void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
+void vtkPVSource::AddVTKSource(const char *tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -627,25 +631,23 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
     return;
     }
   
-  if (tclName == NULL || source == NULL)
+  if (tclName == NULL)
     {
-    vtkErrorMacro("Missing Tcl name or source.");
+    vtkErrorMacro("Missing source  Tcl name.");
     return;
     }
 
-  // I hate having two collections: one for the vtk object, and one for its
-  // Tcl name.  I should probably create an object to contain both.
-  this->VTKSources->AddItem(source);
   this->VTKSourceTclNames->AddString(tclName);
+
+  // This script won't work if we aren't creating VTK objects on the client.
+//  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
+//                tclName, this->GetTclName());
     
-  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
-                tclName, this->GetTclName());
-    
-  pvApp->BroadcastScript(
+  pvApp->GetProcessModule()->ServerScript(
     "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
     tclName, tclName);
 
-  pvApp->BroadcastScript(
+  pvApp->GetProcessModule()->ServerScript(
     "%s AddObserver EndEvent {$Application LogEndEvent {Execute %s}}", 
     tclName, tclName);
 
@@ -662,27 +664,20 @@ void vtkPVSource::RemoveAllVTKSources()
   for (idx = 0; idx < num; ++ idx)
     {
     tclName = this->VTKSourceTclNames->GetString(idx);
-    pvApp->BroadcastScript("%s Delete", tclName);
+    pvApp->GetProcessModule()->ServerScript("%s Delete", tclName);
     }
 
   this->VTKSourceTclNames->RemoveAllItems();
-  this->VTKSources->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfVTKSources()
 {
-  if (this->VTKSources == NULL)
+  if (this->VTKSourceTclNames == NULL)
     {
     return 0;
     }
-  return this->VTKSources->GetNumberOfItems();
-}
-
-//----------------------------------------------------------------------------
-vtkSource* vtkPVSource::GetVTKSource(int idx)
-{
-  return static_cast<vtkSource*>(this->VTKSources->GetItemAsObject(idx));
+  return this->VTKSourceTclNames->GetNumberOfStrings();
 }
 
 //----------------------------------------------------------------------------
@@ -879,17 +874,22 @@ void vtkPVSource::CreateProperties()
   this->UpdateProperties();
 
   vtkPVWidget *pvWidget;
-  this->Widgets->InitTraversal();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   int i;
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvWidget = this->Widgets->GetNextPVWidget();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvWidget = pvwProp->GetWidget();
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
     pvWidget->Create(this->Application);
     this->Script("pack %s -side top -fill x -expand t", 
                  pvWidget->GetWidgetName());
+    it->GoToNextItem();
     }
-
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -907,10 +907,11 @@ void vtkPVSource::UpdateDescriptionFrame()
 
   if (this->TypeLabel && this->TypeLabel->IsCreated())
     {
-    if (this->GetVTKSource()) 
+    if (this->GetSourceClassName()) 
       {
       this->TypeLabel->GetLabel2()->SetLabel(
-        this->GetVTKSource()->GetClassName());
+        this->GetSourceClassName());
+//        this->GetVTKSource()->GetClassName());
       if (this->DescriptionFrame->IsPacked())
         {
         this->Script("grid %s", this->TypeLabel->GetWidgetName());
@@ -1018,13 +1019,16 @@ void vtkPVSource::Select()
     }
 
   int i;
-  vtkPVWidget *pvw = 0;
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkPVWidgetProperty *pvwProp = 0;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvw = this->Widgets->GetNextPVWidget();
-    pvw->Select();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->Select();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1035,13 +1039,17 @@ void vtkPVSource::Deselect(int doPackForget)
     this->Script("pack forget %s", this->Notebook->GetWidgetName());
     }
   int i;
-  vtkPVWidget *pvw = 0;
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkPVWidgetProperty *pvwProp = 0;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvw = this->Widgets->GetNextPVWidget();
-    pvw->Deselect();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->Deselect();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 
@@ -1596,11 +1604,13 @@ void vtkPVSource::VTKSourceModifiedMethod()
 void vtkPVSource::UpdateParameterWidgets()
 {
   vtkPVWidget *pvw;
-  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvw = pvwProp->GetWidget();
     // Do not try to reset the widget if it is not initialized
     if (pvw->GetApplication())
       {
@@ -1621,18 +1631,15 @@ void vtkPVSource::RaiseSourcePage()
 // This should be apart of AcceptCallbackInternal.
 void vtkPVSource::UpdateVTKSourceParameters()
 {
-  vtkPVWidget *pvw;
+  vtkPVWidgetProperty *pvwProp;
   vtkCollectionIterator *it;
 
-  it = this->Widgets->NewIterator();
+  it = this->WidgetProperties->NewIterator();
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    if (pvw->GetModifiedFlag())
-      {
-      pvw->Accept();
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->Accept();
     it->GoToNextItem();
     }
   it->Delete();
@@ -1833,10 +1840,9 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
 void vtkPVSource::SaveInBatchScript(ofstream *file)
 {
   int i, numWidgets;
-  vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.
-  if (this->GetVTKSource() == NULL)
+  if (this->GetSourceClassName() == NULL)
     {
     return;
     }
@@ -1864,7 +1870,8 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   numSources = this->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    *file << this->GetVTKSource(sourceIdx)->GetClassName()
+//    *file << this->GetVTKSource(sourceIdx)->GetClassName()
+    *file << this->GetSourceClassName()
           << " " << this->GetVTKSourceTclName(sourceIdx) << "\n";
     }
 
@@ -1872,15 +1879,17 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   this->SetInputsInBatchScript(file);
 
   // Let the PVWidgets set up the object.
-  numWidgets = this->Widgets->GetNumberOfItems();
+  numWidgets = this->WidgetProperties->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkPVWidgetProperty *pvwProp;
+  
   for (i = 0; i < numWidgets; i++)
     {
-    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveInBatchScript(file);
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->SaveInBatchScript(file);
+    it->GoToNextItem();
     }
+  it->Delete();
 
   // Sub-classes which need to update the source before
   // connecting it to other objects should set UpdateSourceInBatch
@@ -1901,7 +1910,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
 void vtkPVSource::SaveState(ofstream *file)
 {
   int i, numWidgets;
-  vtkPVWidget *widget;
+  vtkPVWidgetProperty *pvwProp;
 
   // Detect if this source is in Glyph sourcesm and already exists.
   if (this->GetTraceReferenceCommand())
@@ -1913,10 +1922,10 @@ void vtkPVSource::SaveState(ofstream *file)
     }
 
   // Detect special sources we do not handle yet.
-  if (this->GetVTKSource() == NULL)
-    {
-    return;
-    }
+//  if (this->GetVTKSource() == NULL)
+//    {
+//    return;
+//    }
 
   // This should not be needed, but We can check anyway.
   if (this->VisitedFlag)
@@ -1951,16 +1960,17 @@ void vtkPVSource::SaveState(ofstream *file)
         << "CreatePVSource " << this->GetModuleName() << "]" << endl;
 
   // Let the PVWidgets set up the object.
-  numWidgets = this->Widgets->GetNumberOfItems();
+  numWidgets = this->WidgetProperties->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
   for (i = 0; i < numWidgets; i++)
     {
-    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveState(file);
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->SaveState(file);
+    it->GoToNextItem();
     }
-
+  it->Delete();
+  
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
@@ -2015,9 +2025,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       for (sourceCount = 0; sourceCount < numSources; ++sourceCount)
         {
         // Loop through all of the outputs of this vtk source (multiple outputs).
-        pm->RootScript("%s GetNumberOfOutputs",
-                       pvs->GetVTKSourceTclName(sourceCount));
-        numOutputs = atoi(pm->GetRootResult());
+        pm->GatherInformation(this->NumberOfOutputsInformation,
+                              (char*)(pvs->GetVTKSourceTclName(sourceCount)));
+        numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
         for (outputCount = 0; outputCount < numOutputs; ++outputCount)
           {
           *file << "\t";
@@ -2056,9 +2066,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         return;
         }
       outputCount = 0;
-      pm->RootScript("%s GetNumberOfOutputs",
-                     pvs->GetVTKSourceTclName(sourceCount));
-      numOutputs = atoi(pm->GetRootResult());
+      pm->GatherInformation(this->NumberOfOutputsInformation,
+                            (char*)(pvs->GetVTKSourceTclName(sourceCount)));
+      numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
       }
 
     vtkPVInputProperty* ip = this->GetInputProperty(idx);
@@ -2087,7 +2097,10 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 {
   char str[512];
-  this->Widgets->AddItem(pvw);  
+  vtkPVWidgetProperty *prop = pvw->CreateAppropriateProperty();
+  prop->SetWidget(pvw);
+  this->WidgetProperties->AddItem(prop);
+  prop->Delete();
 
   if (pvw->GetTraceName() == NULL)
     {
@@ -2186,14 +2199,19 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 {
   vtkObject *o;
   vtkPVWidget *pvw;
-  this->Widgets->InitTraversal();
-
-  while ( (o = this->Widgets->GetNextItemAsObject()) )
+  vtkPVWidgetProperty *pvwProp;
+  this->WidgetProperties->InitTraversal();
+  
+  while ( (o = this->WidgetProperties->GetNextItemAsObject()) )
     {
-    pvw = vtkPVWidget::SafeDownCast(o);
-    if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
+    pvwProp = vtkPVWidgetProperty::SafeDownCast(o);
+    if (pvwProp)
       {
-      return pvw;
+      pvw = pvwProp->GetWidget();
+      if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
+        {
+        return pvw;
+        }
       }
     }
 
@@ -2344,17 +2362,9 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       }
 
     // Create a vtkSource
-    vtkSource* vtksource = 
-      static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
-                                                    tclName));
-    if (vtksource == NULL)
-      {
-      vtkErrorMacro("Could not get pointer from object.");
-      pvs->Delete();
-      return VTK_ERROR;
-      }
-
-    pvs->AddVTKSource(vtksource, tclName);
+    pvApp->MakeServerTclObject(this->SourceClassName, tclName);
+    
+    pvs->AddVTKSource(tclName);
     }
 
   pvs->SetView(this->GetPVWindow()->GetMainView());
@@ -2368,16 +2378,22 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   // Copy all widgets
   vtkPVWidget *pvWidget, *clonedWidget;
-  this->Widgets->InitTraversal();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+
   int i;
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvWidget = this->Widgets->GetNextPVWidget();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvWidget = pvwProp->GetWidget();
     clonedWidget = pvWidget->ClonePrototype(pvs, widgetMap);
     pvs->AddPVWidget(clonedWidget);
     clonedWidget->Delete();
+    it->GoToNextItem();
     }
   widgetMap->Delete();
+  it->Delete();
 
   clone = pvs;
   return VTK_OK;
@@ -2432,17 +2448,9 @@ int vtkPVSource::InitializeData()
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
     sourceTclName = this->GetVTKSourceTclName(sourceIdx);
-    pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
-    const char* result = pm->GetRootResult();
-    if(result)
-      {
-      numOutputs = atoi(result);
-      }
-    else 
-      {
-      vtkErrorMacro("GetRootResult is null");
-      numOutputs = 0;
-      }
+    pm->GatherInformation(this->NumberOfOutputsInformation,
+                          (char*)(sourceTclName));
+    numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
 
     for (idx = 0; idx < numOutputs; ++idx)
       {
@@ -2491,8 +2499,6 @@ int vtkPVSource::InitializeData()
   return VTK_OK;
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -2522,7 +2528,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
-  os << indent << "Widgets: " << this->GetWidgets() << endl;
+  os << indent << "WidgetProperties: " << this->GetWidgetProperties() << endl;
   os << indent << "IsPermanent: " << this->IsPermanent << endl;
   os << indent << "SourceClassName: " 
      << (this->SourceClassName?this->SourceClassName:"null") << endl;
@@ -2544,4 +2550,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     this->GetInputProperty(idx)->PrintSelf(os, i2);
     }
+  os << indent << "NumberOfOutputsInformation: "
+     << this->NumberOfOutputsInformation << endl;
 }

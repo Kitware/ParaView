@@ -43,22 +43,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
+#include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkKWLabel.h"
+#include "vtkPVIndexWidgetProperty.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVInputProperty.h"
 #include "vtkPVSource.h"
-#include "vtkSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.4");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -75,9 +76,10 @@ vtkPVFieldMenu::vtkPVFieldMenu()
   this->InputMenu = NULL;
   this->Label = vtkKWLabel::New();
   this->FieldMenu = vtkKWOptionMenu::New();
-  this->Value = vtkDataSet::POINT_DATA_FIELD;
+  this->Value = vtkDataSet::POINT_DATA_FIELD;  
   
-  this->SuppressReset = 1;
+  this->Property = NULL;
+  this->PropertyInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -89,6 +91,8 @@ vtkPVFieldMenu::~vtkPVFieldMenu()
   this->FieldMenu = NULL;
 
   this->SetInputMenu(NULL);
+  
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -204,25 +208,17 @@ vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (sourceTclName == NULL)
+  if (sourceTclName &&
+      (this->Value == vtkDataSet::POINT_DATA_FIELD ||
+       this->Value == vtkDataSet::CELL_DATA_FIELD))
     {
-    return;
+    this->Property->SetVTKSourceTclName(sourceTclName);
+    this->Property->SetIndex(this->Value);
+    this->Property->AcceptInternal();
     }
-
-  if (this->Value == vtkDataSet::POINT_DATA_FIELD ||
-      this->Value == vtkDataSet::CELL_DATA_FIELD)
-    {
-    pvApp->BroadcastScript("%s SetAttributeMode %d", 
-                           sourceTclName, this->Value);
-    }
-
+  
   this->ModifiedFlag = 0;
 }
-
-
-
 
 //---------------------------------------------------------------------------
 void vtkPVFieldMenu::Trace(ofstream *file)
@@ -238,12 +234,13 @@ void vtkPVFieldMenu::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::ResetInternal(const char* sourceTclName)
+void vtkPVFieldMenu::ResetInternal()
 {
   // Get the selected array form the VTK filter.
-  this->Script("%s SetValue [%s GetAttributeMode]",
-               this->GetTclName(), 
-               sourceTclName);
+//  this->Script("%s SetValue [%s GetAttributeMode]",
+//               this->GetTclName(), 
+//               sourceTclName);
+  this->SetValue(this->Property->GetIndex());
 
   this->ModifiedFlag = 0;
   // Do we really need to update?
@@ -335,6 +332,12 @@ void vtkPVFieldMenu::Update()
     this->FieldMenu->SetCurrentEntry("Cell Data");
     }
 
+  if (!this->PropertyInitialized)
+    {
+    this->Property->SetIndex(this->Value);
+    this->PropertyInitialized = 1;
+    }
+  
   // This updates any array menu dependent on this widget.
   this->vtkPVWidget::Update();
 }
@@ -438,3 +441,16 @@ int vtkPVFieldMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
+void vtkPVFieldMenu::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVIndexWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    this->Property->SetVTKCommand("SetAttributeMode");
+    }
+}
+
+vtkPVWidgetProperty* vtkPVFieldMenu::CreateAppropriateProperty()
+{
+  return vtkPVIndexWidgetProperty::New();
+}

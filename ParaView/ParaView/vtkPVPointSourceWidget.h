@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkPVPointWidget;
 class vtkPVVectorEntry;
+class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVPointSourceWidget : public vtkPVSourceWidget
 {
@@ -102,7 +103,7 @@ public:
   // Description:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -119,6 +120,8 @@ protected:
 
   vtkPVVectorEntry* RadiusWidget;
   vtkPVVectorEntry* NumberOfPointsWidget;
+  vtkPVWidgetProperty *RadiusProperty;
+  vtkPVWidgetProperty *NumberOfPointsProperty;
 
   vtkPVPointSourceWidget(const vtkPVPointSourceWidget&); // Not implemented
   void operator=(const vtkPVPointSourceWidget&); // Not implemented

@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 
@@ -67,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVWidget, "1.37");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -86,6 +87,10 @@ vtkPVWidget::vtkPVWidget()
 
   this->TraceNameState = vtkPVWidget::Uninitialized;
   this->SuppressReset = 0;
+  
+  this->UseWidgetRange = 0;
+  this->WidgetRange[0] = 0;
+  this->WidgetRange[1] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -184,11 +189,11 @@ void vtkPVWidget::Reset()
     {
     return;
     }
-  this->ResetInternal(this->PVSource->GetVTKSourceTclName(0));
+  this->ResetInternal();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::ResetInternal(const char*)
+void vtkPVWidget::ResetInternal()
 {
   // Get rid of this eventually.  Display widgets (label) do not really
   // need to implement this method.
@@ -452,6 +457,12 @@ vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
 }
 
 //-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVWidget::CreateAppropriateProperty()
+{
+  return vtkPVWidgetProperty::New();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -463,4 +474,7 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ModifiedCommandObjectTclName?
          this->ModifiedCommandObjectTclName:"(none)") << endl;
   os << indent << "TraceNameState: " << this->TraceNameState << endl;
+  os << indent << "UseWidgetRange: " << this->UseWidgetRange << endl;
+  os << indent << "WidgetRange: " << this->WidgetRange[0] << " "
+     << this->WidgetRange[1] << endl;
 }

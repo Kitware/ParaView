@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.47");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.48");
 
 
 //----------------------------------------------------------------------------
@@ -383,7 +383,7 @@ void vtkPVInputMenu::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::ResetInternal(const char*)
+void vtkPVInputMenu::ResetInternal()
 {
   if (this->PVSource == NULL)
     {

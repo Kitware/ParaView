@@ -41,17 +41,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVComponentSelection.h"
 
-#include "vtkPVSource.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
 #include "vtkKWCheckButton.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkArrayMap.txx"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.10");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -61,6 +62,7 @@ vtkPVComponentSelection::vtkPVComponentSelection()
   this->ObjectTclName = NULL;
   this->VariableName = NULL;
   this->NumberOfComponents = 0;
+  this->LastAcceptedState = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -69,6 +71,11 @@ vtkPVComponentSelection::~vtkPVComponentSelection()
   this->CheckButtons->Delete();
   this->SetObjectTclName(NULL);
   this->SetVariableName(NULL);
+  if (this->LastAcceptedState)
+    {
+    delete [] this->LastAcceptedState;
+    this->LastAcceptedState = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -91,6 +98,8 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
+
+  this->LastAcceptedState = new unsigned char[this->NumberOfComponents];
   
   for (i = 0; i <= this->NumberOfComponents; i++)
     {
@@ -102,10 +111,11 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
     sprintf(compId, "%d", i);
     button->SetText(compId);
     this->CheckButtons->AddItem(button);
-    pvApp->BroadcastScript("%s Set%s %d %d", this->ObjectTclName, 
-                           this->VariableName, i, i);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s Set%s %d %d", this->ObjectTclName, this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
+    this->LastAcceptedState[i] = 1;
     }
 }
 
@@ -135,21 +145,21 @@ void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
   
   if (this->ModifiedFlag)
     {
-    pvApp->BroadcastScript("%s RemoveAllValues", sourceTclName);
+    pvApp->GetProcessModule()->ServerScript(
+      "%s RemoveAllValues", sourceTclName);
     for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
       {
       if (this->GetState(i))
         {
-        pvApp->BroadcastScript("%s Set%s %d %d",
-                               sourceTclName, this->VariableName,
-                               i, i);
+        pvApp->GetProcessModule()->ServerScript(
+          "%s Set%s %d %d", sourceTclName, this->VariableName, i, i);
         }
       else
         {
-        pvApp->BroadcastScript("%s Set%s %d %d",
-                               sourceTclName, this->VariableName,
-                               i, -1);
+        pvApp->GetProcessModule()->ServerScript(
+          "%s Set%s %d %d", sourceTclName, this->VariableName, i, -1);
         }
+      this->LastAcceptedState[i] = this->GetState(i);
       }
     }
   
@@ -158,7 +168,7 @@ void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::ResetInternal(const char* sourceTclName)
+void vtkPVComponentSelection::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -175,9 +185,7 @@ void vtkPVComponentSelection::ResetInternal(const char* sourceTclName)
 
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
-    this->Script("%s SetState %d [expr [%s GetValue %d]+1]",
-                 this->GetTclName(), i, sourceTclName,
-                 i);
+    this->SetState(i, this->LastAcceptedState[i]);
     }
   
   this->ModifiedFlag = 0;

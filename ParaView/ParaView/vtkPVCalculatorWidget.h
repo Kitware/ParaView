@@ -59,6 +59,7 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWWidget;
+class vtkPVStringAndScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVCalculatorWidget : public vtkPVWidget
 {
@@ -103,7 +104,7 @@ public:
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void ResetInternal(const char* vtkSourceTclName);
+  virtual void ResetInternal();
     
   // Description:
   // Save this source to a file.  We need more than just the source tcl name.
@@ -113,6 +114,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVCalculatorWidget();
   ~vtkPVCalculatorWidget();
@@ -167,6 +171,21 @@ protected:
   vtkKWMenuButton* ScalarsMenu;
   vtkKWMenuButton* VectorsMenu;
 
+  char *LastAcceptedFunction;
+  vtkSetStringMacro(LastAcceptedFunction);
+
+  char **ScalarArrayNames;
+  char **ScalarVariableNames;
+  int *ScalarComponents;
+  int NumberOfScalarVariables;
+  char **VectorArrayNames;
+  char **VectorVariableNames;
+  int NumberOfVectorVariables;
+  void ClearAllVariables();
+  
+  vtkPVStringAndScalarListWidgetProperty *Property;
+  
+private:
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
 };

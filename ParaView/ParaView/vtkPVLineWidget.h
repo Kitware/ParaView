@@ -142,7 +142,7 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -198,6 +198,13 @@ protected:
 
   int ShowResolution;
 
+  float LastAcceptedPoint1[3];
+  float LastAcceptedPoint2[3];
+  float LastAcceptedResolution;
+  vtkSetVector3Macro(LastAcceptedPoint1, float);
+  vtkSetVector3Macro(LastAcceptedPoint2, float);
+  vtkSetMacro(LastAcceptedResolution, float);
+  
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
   virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);

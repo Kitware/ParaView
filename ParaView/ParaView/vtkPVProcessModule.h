@@ -60,6 +60,8 @@ class vtkPVPart;
 class vtkPVPartDisplay;
 class vtkSource;
 class vtkStringList;
+class vtkClientServerInterpreter;
+class vtkClientServerStream;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkKWObject
 {
@@ -154,7 +156,17 @@ public:
   // Description:
   // Get a file selection dialog instance.
   virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
-  
+//BTX  
+  // Description:
+  // Return the client server stream
+  vtkClientServerStream& GetStream() 
+    {
+      return *this->ClientServerStream;
+    }
+//ETX
+  // Description:
+  // Send the current vtkClientServerStream contents to the server.
+  virtual void SendMessages();
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -165,6 +177,9 @@ protected:
   vtkPVInformation *TemporaryInformation;
 
   char *RootResult;
+
+  vtkClientServerInterpreter* ClientServerInterpreter;
+  vtkClientServerStream* ClientServerStream;
 
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

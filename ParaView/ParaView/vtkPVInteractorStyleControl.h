@@ -180,6 +180,7 @@ protected:
 
   ManipulatorMap*          Manipulators;
   WidgetsMap*              Widgets;
+  vtkCollection*           WidgetProperties;
   MapStringToArrayStrings* Arguments;
 //ETX
 

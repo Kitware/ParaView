@@ -48,12 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVStringWidgetProperty.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.20");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -63,6 +64,9 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->EntryLabel = 0;
+  this->DefaultValue = 0;
+  this->AcceptCalled = 0;
+  this->Property = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -73,6 +77,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
   this->SetEntryLabel(0);
+  this->SetProperty(0);
 }
 
 void vtkPVStringEntry::SetLabel(const char* label)
@@ -159,7 +164,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
     }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
-
+  this->SetValue(this->Property->GetString());
 }
 
 
@@ -183,6 +188,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
     }
 
   this->Entry->SetValue(fileName); 
+
+  if (!this->AcceptCalled && this->Property)
+    {
+    this->Property->SetString(fileName);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -190,13 +201,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s Set%s {%s}",
-                         sourceTclName, this->VariableName,
-                         this->GetValue());
-
   this->ModifiedFlag = 0;
+  
+  this->Property->SetString(this->GetValue());
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -211,7 +221,7 @@ void vtkPVStringEntry::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
+void vtkPVStringEntry::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -219,12 +229,12 @@ void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
     }
 
   // Command to update the UI.
-  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("%s Get%s", sourceTclName, this->VariableName); 
-  vtkstd::string value = pm->GetRootResult()?pm->GetRootResult():"";
-  this->Script("%s SetValue {%s}", this->Entry->GetTclName(), value.c_str());
-
-  this->ModifiedFlag = 0;
+  this->SetValue(this->Property->GetString());
+  
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -244,6 +254,7 @@ void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone,
   if (pvse)
     {
     pvse->SetLabel(this->EntryLabel);
+    pvse->SetDefaultValue(this->DefaultValue);
     }
   else 
     {
@@ -267,6 +278,10 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetLabel(this->VariableName);
     }
+  
+  // Set the default value.
+  const char* defaultValue = element->GetAttribute("default_value");
+  this->SetDefaultValue(defaultValue);
   
   return 1;
 }
@@ -295,6 +310,26 @@ void vtkPVStringEntry::SaveInBatchScriptForPart(ofstream *file,
                sourceTclName, this->VariableName);
   result = this->Application->GetMainInterp()->result;
   *file << " {" << result << "}\n";
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVStringWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    this->Property->SetString(this->DefaultValue);
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommand(cmd);
+    delete [] cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVStringEntry::CreateAppropriateProperty()
+{
+  return vtkPVStringWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

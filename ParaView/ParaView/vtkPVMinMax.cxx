@@ -41,18 +41,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVMinMax.h"
 
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
-#include "vtkKWScale.h"
 #include "vtkKWLabel.h"
-#include "vtkPVArrayMenu.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.21");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -85,9 +86,9 @@ vtkPVMinMax::vtkPVMinMax()
 
   this->ArrayMenu = NULL;
 
-  // We do not want the filter default value.
-  // We use the range of the scalars instead.
-  this->SuppressReset = 1;
+  this->AcceptCalled = 0;
+
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -112,6 +113,8 @@ vtkPVMinMax::~vtkPVMinMax()
   this->SetMaxHelp(0);
 
   this->SetArrayMenu(NULL);
+  
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -256,11 +259,26 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 void vtkPVMinMax::SetMinValue(float val)
 {
   this->MinScale->SetValue(val);
+  float *scalars = NULL;
+
+  if (this->Property)
+    {
+    scalars = this->Property->GetScalars();
+    }
+  
+  if (!this->AcceptCalled && scalars)
+    {
+    scalars[0] = val;
+    }
   if (val > this->MaxScale->GetValue())
     {
     this->MaxScale->SetValue(val);
+    if (!this->AcceptCalled && scalars)
+      {
+      scalars[1] = val;
+      }
     }
-  
+
   this->ModifiedCallback();
 }
 
@@ -268,9 +286,24 @@ void vtkPVMinMax::SetMinValue(float val)
 void vtkPVMinMax::SetMaxValue(float val)
 {
   this->MaxScale->SetValue(val);
+  float *scalars = NULL;
+  
+  if (this->Property)
+    {
+    scalars = this->Property->GetScalars();
+    }
+  
+  if (!this->AcceptCalled && scalars)
+    {
+    scalars[1] = val;
+    }
   if (val < this->MinScale->GetValue())
     {
     this->MinScale->SetValue(val);
+    if (!this->AcceptCalled && scalars)
+      {
+      scalars[0] = val;
+      }
     }
   
   this->ModifiedCallback();
@@ -279,13 +312,15 @@ void vtkPVMinMax::SetMaxValue(float val)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s %s %f %f",
-                         sourceTclName, this->SetCommand,
-                         this->GetMinValue(), this->GetMaxValue());
-
+  float scalars[2];
+  scalars[0] = this->GetMinValue();
+  scalars[1] = this->GetMaxValue();
+  this->Property->SetScalars(2, scalars);
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
+  
   this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -304,15 +339,14 @@ void vtkPVMinMax::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::ResetInternal(const char* sourceTclName)
+void vtkPVMinMax::ResetInternal()
 {
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
-    this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
-                 sourceTclName, this->GetMinCommand); 
-    this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
-                 sourceTclName, this->GetMaxCommand); 
+    float *values = this->Property->GetScalars();
+    this->SetMinValue(values[0]);
+    this->SetMaxValue(values[1]);
     }
   this->ModifiedFlag = 0;
 }
@@ -351,8 +385,8 @@ void vtkPVMinMax::Update()
     this->MinScale->SetRange(range);
     this->MaxScale->SetRange(range);
 
-    this->MinScale->SetValue(range[0]);
-    this->MaxScale->SetValue(range[1]);
+    this->SetMinValue(range[0]);
+    this->SetMaxValue(range[1]);
     return;
     }
 
@@ -376,8 +410,8 @@ void vtkPVMinMax::Update()
     this->MaxScale->SetResolution(resolution);
     this->MaxScale->SetRange(range);
 
-    this->MinScale->SetValue(range[0]);
-    this->MaxScale->SetValue(range[1]);
+    this->SetMinValue(range[0]);
+    this->SetMaxValue(range[1]);
     }
 }
 
@@ -478,6 +512,8 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvmm->SetSetCommand(this->SetCommand);
     pvmm->SetGetMinCommand(this->GetMinCommand);
     pvmm->SetGetMaxCommand(this->GetMaxCommand);
+    pvmm->SetMinValue(this->GetMinValue());
+    pvmm->SetMaxValue(this->GetMaxValue());
     }
   else 
     {
@@ -593,6 +629,30 @@ float vtkPVMinMax::GetMaxValue()
 //----------------------------------------------------------------------------
 float vtkPVMinMax::GetResolution() 
 { return this->MinScale->GetResolution(); }
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->SetCommand)+1];
+    strcpy(cmd, this->SetCommand);
+    int numScalars = 2;
+    this->Property->SetVTKCommands(1, &cmd, &numScalars);
+    float scalars[2];
+    scalars[0] = this->MinScale->GetValue();
+    scalars[1] = this->MaxScale->GetValue();
+    this->Property->SetScalars(2, scalars);
+    delete [] cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVMinMax::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)

@@ -53,21 +53,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVStringAndScalarListWidgetProperty.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.8");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -126,6 +128,16 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->ButtonRightParenthesis = vtkKWPushButton::New();
   this->ScalarsMenu = vtkKWMenuButton::New();
   this->VectorsMenu = vtkKWMenuButton::New();
+  
+  this->ScalarArrayNames = 0;
+  this->ScalarVariableNames = 0;
+  this->ScalarComponents = 0;
+  this->NumberOfScalarVariables = 0;
+  this->VectorArrayNames = 0;
+  this->VectorVariableNames = 0;
+  this->NumberOfVectorVariables = 0;
+  
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -227,6 +239,10 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
   this->VectorsMenu = NULL;
   this->CalculatorFrame->Delete();
   this->CalculatorFrame = NULL;
+  
+  this->ClearAllVariables();
+  
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -536,19 +552,7 @@ void vtkPVCalculatorWidget::ClearFunction()
   
   this->FunctionLabel->SetLabel("");
 
-  // This should be done in accept.
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("Missing PVSource.");
-    return;
-    }
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    pvApp->BroadcastScript("%s RemoveAllVariables",
-                           this->PVSource->GetVTKSourceTclName(idx));
-    }
+  this->ClearAllVariables();
   
   this->ModifiedCallback();
 }
@@ -566,24 +570,6 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionLabel->SetLabel("");
-
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    pvApp->BroadcastScript("%s RemoveAllVariables",
-                           this->PVSource->GetVTKSourceTclName(idx));
-    if (strcmp(newMode, "point") == 0)
-      {
-      pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
-                             this->PVSource->GetVTKSourceTclName());
-      }
-    else if (strcmp(newMode, "cell") == 0)
-      {
-      pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
-                             this->PVSource->GetVTKSourceTclName());
-      }
-    }
 
   // Populate the scalar and array menu using collected data information.
   if (strcmp(newMode, "point") == 0)
@@ -638,15 +624,64 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   
   this->UpdateFunction(variableName);
 
-  // This should be in accept.
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
+  char** arrayNames = new char *[this->NumberOfScalarVariables];
+  char** varNames = new char *[this->NumberOfScalarVariables];
+  int* tempComponents = new int[this->NumberOfScalarVariables];
+  int i;
+  
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
     {
-    pvApp->BroadcastScript("%s AddScalarVariable {%s} {%s} {%d}",
-                           this->PVSource->GetVTKSourceTclName(idx),
-                           variableName, arrayName, component);
+    arrayNames[i] = new char[strlen(this->ScalarArrayNames[i]) + 1];
+    strcpy(arrayNames[i], this->ScalarArrayNames[i]);
+    delete [] this->ScalarArrayNames[i];
+    this->ScalarArrayNames[i] = NULL;
+    varNames[i] = new char[strlen(this->ScalarVariableNames[i]) + 1];
+    strcpy(varNames[i], this->ScalarVariableNames[i]);
+    delete [] this->ScalarVariableNames[i];
+    this->ScalarVariableNames[i] = NULL;
+    tempComponents[i] = this->ScalarComponents[i];
     }
+  if (this->ScalarArrayNames)
+    {
+    delete [] this->ScalarArrayNames;
+    this->ScalarArrayNames = NULL;
+    }
+  if (this->ScalarVariableNames)
+    {
+    delete [] this->ScalarVariableNames;
+    this->ScalarVariableNames = NULL;
+    }
+  if (this->ScalarComponents)
+    {
+    delete [] this->ScalarComponents;
+    this->ScalarComponents = NULL;
+    }
+  
+  this->ScalarArrayNames = new char *[this->NumberOfScalarVariables + 1];
+  this->ScalarVariableNames = new char *[this->NumberOfScalarVariables + 1];
+  this->ScalarComponents = new int[this->NumberOfScalarVariables + 1];
+  
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
+    {
+    this->ScalarArrayNames[i] = new char[strlen(arrayNames[i]) + 1];
+    strcpy(this->ScalarArrayNames[i], arrayNames[i]);
+    delete [] arrayNames[i];
+    this->ScalarVariableNames[i] = new char[strlen(varNames[i]) + 1];
+    strcpy(this->ScalarVariableNames[i], varNames[i]);
+    delete [] varNames[i];
+    this->ScalarComponents[i] = tempComponents[i];
+    }
+  delete [] arrayNames;
+  delete [] varNames;
+  delete [] tempComponents;
+  
+  this->ScalarArrayNames[i] = new char[strlen(arrayName) + 1];
+  strcpy(this->ScalarArrayNames[i], arrayName);
+  this->ScalarVariableNames[i] = new char[strlen(variableName) + 1];
+  strcpy(this->ScalarVariableNames[i], variableName);
+  this->ScalarComponents[i] = component;
+  
+  this->NumberOfScalarVariables++;
   
   this->AddTraceEntry("$kw(%s) AddScalarVariable {%s} {%s} {%d}",
                        this->GetTclName(), variableName, arrayName, component);
@@ -659,17 +694,54 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
 
   this->UpdateFunction(variableName);
 
-
-  // This should be in accept.
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
+  char** arrayNames = new char *[this->NumberOfVectorVariables];
+  char** varNames = new char *[this->NumberOfVectorVariables];
+  int i;
+  
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
     {
-    pvApp->BroadcastScript("%s AddVectorVariable {%s} {%s} 0 1 2",
-                           this->PVSource->GetVTKSourceTclName(idx),
-                           variableName, arrayName);
+    arrayNames[i] = new char[strlen(this->VectorArrayNames[i]) + 1];
+    strcpy(arrayNames[i], this->VectorArrayNames[i]);
+    delete [] this->VectorArrayNames[i];
+    this->VectorArrayNames[i] = NULL;
+    varNames[i] = new char[strlen(this->VectorVariableNames[i]) + 1];
+    strcpy(varNames[i], this->VectorVariableNames[i]);
+    delete [] this->VectorVariableNames[i];
+    this->VectorVariableNames[i] = NULL;
     }
-
+  if (this->VectorArrayNames)
+    {
+    delete [] this->VectorArrayNames;
+    this->VectorArrayNames = NULL;
+    }
+  if (this->VectorVariableNames)
+    {
+    delete [] this->VectorVariableNames;
+    this->VectorVariableNames = NULL;
+    }
+  
+  this->VectorArrayNames = new char *[this->NumberOfVectorVariables + 1];
+  this->VectorVariableNames = new char *[this->NumberOfVectorVariables + 1];
+  
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
+    {
+    this->VectorArrayNames[i] = new char[strlen(arrayNames[i]) + 1];
+    strcpy(this->VectorArrayNames[i], arrayNames[i]);
+    delete [] arrayNames[i];
+    this->VectorVariableNames[i] = new char[strlen(varNames[i]) + 1];
+    strcpy(this->VectorVariableNames[i], varNames[i]);
+    delete [] varNames[i];
+    }
+  delete [] arrayNames;
+  delete [] varNames;
+  
+  this->VectorArrayNames[i] = new char[strlen(arrayName) + 1];
+  strcpy(this->VectorArrayNames[i], arrayName);
+  this->VectorVariableNames[i] = new char[strlen(variableName) + 1];
+  strcpy(this->VectorVariableNames[i], variableName);
+  
+  this->NumberOfVectorVariables++;
+  
   this->AddTraceEntry("$kw(%s) AddVectorVariable {%s} {%s}",
                        this->GetTclName(), variableName, arrayName);
 }
@@ -678,34 +750,26 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
 //---------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Trace(ofstream *file)
 {
-  int num, idx;
-  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));
-  char* variableName;
-  char* arrayName;
-  int   component;
+  int idx;
 
   if ( ! this->InitializeTrace(file))
     {
     return;
     }
 
-  num = calc->GetNumberOfScalarArrays();
-  for (idx = 0; idx < num; ++ idx)
+  for (idx = 0; idx < this->NumberOfScalarVariables; ++ idx)
     {
-    variableName = calc->GetScalarVariableName(idx);
-    arrayName = calc->GetScalarArrayName(idx);
-    component = calc->GetSelectedScalarComponent(idx);
     *file << "$kw(" << this->GetTclName() << ") AddScalarVariable {"
-          << variableName << "} {" << arrayName << "} " << component << endl;
+          << this->ScalarVariableNames[idx] << "} {"
+          << this->ScalarArrayNames[idx] << "} " << this->ScalarComponents[idx]
+          << endl;
     }
 
-  num = calc->GetNumberOfVectorArrays();
-  for (idx = 0; idx < num; ++ idx)
+  for (idx = 0; idx < this->NumberOfVectorVariables; ++ idx)
     {
-    variableName = calc->GetVectorVariableName(idx);
-    arrayName = calc->GetVectorArrayName(idx);
     *file << "$kw(" << this->GetTclName() << ") AddVectorVariable {"
-          << variableName << "} {" << arrayName << "}" << endl;
+          << this->VectorVariableNames[idx] << "} {"
+          << this->VectorArrayNames[idx] << "}" << endl;
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetFunctionLabel {"
@@ -721,20 +785,124 @@ void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
   // Format a command to move value from widget to vtkObjects (on all
   // processes).  The VTK objects do not yet have to have the same Tcl
   // name!
-  pvApp->BroadcastScript("%s SetFunction {%s}", vtkSourceTclName,
-                         this->FunctionLabel->GetLabel());
+  int i;
+  
+  char **cmds = new char *[this->NumberOfScalarVariables +
+                          this->NumberOfVectorVariables + 3];
+  char **strings = new char *[2*(this->NumberOfScalarVariables +
+                                 this->NumberOfVectorVariables)+1];
+  float *scalars = new float[this->NumberOfScalarVariables +
+                            3*this->NumberOfVectorVariables];
+  int *numStrings = new int[this->NumberOfScalarVariables +
+                           this->NumberOfVectorVariables + 3];
+  int *numScalars = new int[this->NumberOfScalarVariables +
+                           this->NumberOfVectorVariables + 3];
+  int stringCount = 0, scalarCount = 0, cmdCount = 0;
+  
+  cmds[cmdCount] = new char[19];
+  strcpy(cmds[cmdCount], "RemoveAllVariables");
+  numStrings[cmdCount] = 0;
+  numScalars[cmdCount] = 0;
+  cmdCount++;
+  
+  const char *mode = this->AttributeModeMenu->GetValue();
+  if (strcmp(mode, "Point Data") == 0)
+    {
+    cmds[cmdCount] = new char[31];
+    strcpy(cmds[cmdCount], "SetAttributeModeToUsePointData");
+    numStrings[cmdCount] = 0;
+    numScalars[cmdCount] = 0;
+    cmdCount++;
+    }
+  else
+    {
+    cmds[cmdCount] = new char[30];
+    strcpy(cmds[cmdCount], "SetAttributeModeToUseCellData");
+    numStrings[cmdCount] = 0;
+    numScalars[cmdCount] = 0;
+    cmdCount++;
+    }
+  
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
+    {
+    cmds[cmdCount] = new char[18];
+    strcpy(cmds[cmdCount], "AddScalarVariable");
+    strings[stringCount] = new char[strlen(this->ScalarVariableNames[i])+1];
+    strcpy(strings[stringCount], this->ScalarVariableNames[i]);
+    stringCount++;
+    strings[stringCount] = new char[strlen(this->ScalarArrayNames[i])+1];
+    strcpy(strings[stringCount], this->ScalarArrayNames[i]);
+    stringCount++;
+    scalars[scalarCount] = this->ScalarComponents[i];
+    scalarCount++;
+    numStrings[cmdCount] = 2;
+    numScalars[cmdCount] = 1;
+    cmdCount++;
+    }
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
+    {
+    cmds[cmdCount] = new char[18];
+    strcpy(cmds[cmdCount], "AddVectorVariable");
+    strings[stringCount] = new char[strlen(this->VectorVariableNames[i])+1];
+    strcpy(strings[stringCount], this->VectorVariableNames[i]);
+    stringCount++;
+    strings[stringCount] = new char[strlen(this->VectorArrayNames[i])+1];
+    strcpy(strings[stringCount], this->VectorArrayNames[i]);
+    stringCount++;
+    scalars[scalarCount] = 0;
+    scalarCount++;
+    scalars[scalarCount] = 1;
+    scalarCount++;
+    scalars[scalarCount] = 2;
+    scalarCount++;
+    numStrings[cmdCount] = 2;
+    numScalars[cmdCount] = 3;
+    cmdCount++;
+    }
+  
+  cmds[cmdCount] = new char[12];
+  strcpy(cmds[cmdCount], "SetFunction");
+  strings[stringCount] = new char[strlen(this->FunctionLabel->GetLabel())+1];
+  strcpy(strings[stringCount], this->FunctionLabel->GetLabel());
+  stringCount++;
+  numStrings[cmdCount] = 1;
+  numScalars[cmdCount] = 0;
+  cmdCount++;
+  
+  this->Property->SetVTKCommands(cmdCount, cmds, numStrings, numScalars);
+  this->Property->SetStrings(stringCount, strings);
+  this->Property->SetScalars(scalarCount, scalars);
+  this->Property->SetVTKSourceTclName(vtkSourceTclName);
+  this->Property->AcceptInternal();
+  
+  for (i = 0; i < cmdCount; i++)
+    {
+    delete [] cmds[i];
+    }
+  for (i = 0; i < stringCount; i++)
+    {
+    delete [] strings[i];
+    }
+  delete [] cmds;
+  delete [] strings;
+  delete [] scalars;
+  delete [] numStrings;
+  delete [] numScalars;
+  
   this->ModifiedFlag = 0;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::ResetInternal(const char* vtkSourceTclName)
+void vtkPVCalculatorWidget::ResetInternal()
 {
   if ( this->FunctionLabel->IsCreated() )
     {
-    this->Script("%s SetLabel [%s GetFunction]", 
-                 this->FunctionLabel->GetTclName(), 
-                 vtkSourceTclName);
+    int numStrings = this->Property->GetNumberOfStrings();
+    if (numStrings > 0)
+      {
+      this->FunctionLabel->SetLabel(this->Property->GetString(numStrings-1));
+      }
     }
   
   this->ModifiedFlag = 0;
@@ -758,14 +926,6 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
   numSources = this->PVSource->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(sourceIdx));
-
-    // Detect special sources we do not handle yet.
-    if (calc == NULL)
-      {
-      return;
-      }
-
     // This suff is what should be in PVWidgets.
     *file << "\t" << this->PVSource->GetVTKSourceTclName(sourceIdx) 
           << " SetAttributeModeToUse";
@@ -778,21 +938,21 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
       *file << "CellData\n\t";
       }
   
-    for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
+    for (i = 0; i < this->NumberOfScalarVariables; i++)
       {
       *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
             << " AddScalarVariable {"
-            << calc->GetScalarVariableName(i) << "} {"
-            << calc->GetScalarArrayName(i) 
-            << "} " << calc->GetSelectedScalarComponent(i)
+            << this->ScalarVariableNames[i] << "} {"
+            << this->ScalarArrayNames[i] 
+            << "} " << this->ScalarComponents[i]
             << "\n\t";
       }
-    for (i = 0; i < calc->GetNumberOfVectorArrays(); i++)
+    for (i = 0; i < this->NumberOfVectorVariables; i++)
       {
       *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
             << " AddVectorVariable {"
-            << calc->GetVectorVariableName(i) << "} {"
-            << calc->GetVectorArrayName(i)
+            << this->VectorVariableNames[i] << "} {"
+            << this->VectorArrayNames[i]
             << "} 0 1 2\n\t";
       }  
 
@@ -802,6 +962,67 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
             << this->FunctionLabel->GetLabel() << "}\n";
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::ClearAllVariables()
+{
+  int i;
+  
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
+    {
+    delete [] this->ScalarVariableNames[i];
+    this->ScalarVariableNames[i] = NULL;
+    delete [] this->ScalarArrayNames[i];
+    this->ScalarArrayNames[i] = NULL;
+    }
+  if (this->ScalarVariableNames)
+    {
+    delete [] this->ScalarVariableNames;
+    this->ScalarVariableNames = NULL;
+    }
+  if (this->ScalarArrayNames)
+    {
+    delete [] this->ScalarArrayNames;
+    this->ScalarArrayNames = NULL;
+    }
+  if (this->ScalarComponents)
+    {
+    delete [] this->ScalarComponents;
+    this->ScalarComponents = NULL;
+    }
+  this->NumberOfScalarVariables = 0;
+  
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
+    {
+    delete [] this->VectorVariableNames[i];
+    this->VectorVariableNames[i] = NULL;
+    delete [] this->VectorArrayNames[i];
+    this->VectorArrayNames[i] = NULL;
+    }
+  if (this->VectorVariableNames)
+    {
+    delete [] this->VectorVariableNames;
+    this->VectorVariableNames = NULL;
+    }
+  if (this->VectorArrayNames)
+    {
+    delete [] this->VectorArrayNames;
+    this->VectorArrayNames = NULL;
+    }
+  this->NumberOfVectorVariables = 0;  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVCalculatorWidget::CreateAppropriateProperty()
+{
+  return vtkPVStringAndScalarListWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

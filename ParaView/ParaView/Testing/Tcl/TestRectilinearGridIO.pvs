@@ -53,6 +53,7 @@ $kw(vtkTemp328) AddValue 3.0
 $kw(vtkTemp328) AddValue 4.0
 $kw(vtkTemp328) AddValue 5.0
 $kw(vtkTemp319) AcceptCallback
+[$kw(vtkTemp319) GetPVOutput] SetColorRange 0 10
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

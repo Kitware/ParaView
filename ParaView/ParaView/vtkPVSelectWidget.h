@@ -55,12 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
-class vtkPVWidgetCollection;
+class vtkCollection;
 class vtkPVSource;
+class vtkPVStringWidgetProperty;
 class vtkKWLabeledFrame;
 class vtkStringList;
-class vtkPVWidgetCollection;
-
 
 //BTX
 template <class key, class data> 
@@ -163,16 +162,18 @@ public:
   // Description:
   // Called when reset button is pushed.
   // Sets UI current value from objects variable.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
-
 
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);
@@ -187,11 +188,14 @@ protected:
   // Using this list as an array of strings.
   vtkStringList *Labels;
   vtkStringList *Values;
-  vtkPVWidgetCollection *Widgets;
+  vtkCollection *WidgetProperties;
 
   int CurrentIndex;
   int UseWidgetCommand;
 
+  vtkPVStringWidgetProperty *Property;
+  int AcceptCalled;
+  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

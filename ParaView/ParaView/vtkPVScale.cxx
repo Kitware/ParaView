@@ -50,11 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.19");
+vtkCxxRevisionMacro(vtkPVScale, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -63,6 +64,9 @@ vtkPVScale::vtkPVScale()
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
   this->Round = 0;
+
+  this->AcceptedValueInitialized = 0;
+  this->Property = NULL;
 
   this->RangeSourceVariable = 0;
 }
@@ -76,6 +80,8 @@ vtkPVScale::~vtkPVScale()
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
 
+  this->SetProperty(NULL);
+  
   this->SetRangeSourceVariable(0);
 }
 
@@ -223,7 +229,14 @@ void vtkPVScale::SetValue(float val)
     return;
     }
 
-  this->Scale->SetValue(newVal); 
+  this->Scale->SetValue(newVal);
+  
+  if (!this->AcceptedValueInitialized)
+    {
+    this->Property->SetScalars(1, &newVal);
+    this->AcceptedValueInitialized = 1;
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -238,17 +251,20 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
     {
     if(this->Round)
       {
-      pvApp->BroadcastScript("%s Set%s %d", 
-                             sourceTclName,
-                             this->VariableName, 
-                             this->RoundValue(this->GetValue()));
+      pvApp->GetProcessModule()->ServerScript(
+        "%s Set%s %d", sourceTclName, this->VariableName, 
+        this->RoundValue(this->GetValue()));
+      float scalar = this->RoundValue(this->GetValue());
+      this->Property->SetScalars(1, &scalar);
       }
     else
       {
-      pvApp->BroadcastScript("%s Set%s %g", 
-                             sourceTclName,
-                             this->VariableName, 
-                             this->GetValue());
+      pvApp->GetProcessModule()->ServerScript("%s Set%s %g", 
+                                              sourceTclName,
+                                              this->VariableName, 
+                                              this->GetValue());
+      float scalar = this->GetValue();
+      this->Property->SetScalars(1, &scalar);
       }
     }
 
@@ -269,16 +285,13 @@ void vtkPVScale::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVScale::ResetInternal(const char* sourceTclName)
+void vtkPVScale::ResetInternal()
 {
-  if (sourceTclName && this->VariableName)
+  if (this->Property)
     {
-    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
-                  this->ObjectTclName, this->VariableName);
-    this->Script("%s SetValue %s", this->Scale->GetTclName(),
-                  this->GetPVApplication()->GetProcessModule()->GetRootResult());
+    this->SetValue(this->Property->GetScalar(0));
     }
-  if ( sourceTclName && this->RangeSourceVariable )
+  if ( this->ObjectTclName && this->RangeSourceVariable )
     {
     this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
                   this->ObjectTclName, this->RangeSourceVariable);
@@ -417,4 +430,16 @@ int vtkPVScale::RoundValue(float val)
     {
     return -static_cast<int>((-val)+0.5);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVScale::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
 }

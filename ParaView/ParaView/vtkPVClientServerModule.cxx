@@ -101,6 +101,8 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG 838428
 #define VTK_PV_SATELLITE_SCRIPT              838431
 
+#define VTK_PV_CLIENTSERVER_RMI_TAG          938531
+
 #define VTK_PV_ROOT_SCRIPT_RMI_TAG           838485
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
@@ -108,7 +110,7 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 
 #define VTK_PV_SEND_DATA_OBJECT_TAG          838489
 #define VTK_PV_DATA_OBJECT_TAG               923857
-    
+
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
 void vtkPVRootScript(void *localArg, void *remoteArg, 
@@ -217,7 +219,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.46");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -226,6 +228,9 @@ int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::vtkPVClientServerModule()
 {
+  this->ClientServerInterpreter = 0;
+  this->ClientServerStream = 0;
+
   this->Controller = NULL;
   this->SocketController = NULL;
   this->ClientMode = 1;
@@ -288,6 +293,9 @@ void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller),
 {
   cout << (char*)calldata << endl;
 }
+// Declare the initialization function as external
+// this is defined in the PackageInit file
+extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
 // This method is a bit long, we should probably break it up 
@@ -369,7 +377,7 @@ void vtkPVClientServerModule::Initialize()
     { // Sattelite processes of server.
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
-
+    
     this->Controller->CreateOutputWindow();
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVValueList.h"
 
 class vtkPVArrayMenu;
+class vtkPVContourWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
 {
@@ -69,25 +70,37 @@ public:
 
   // Description:
   // Gets called when the reset button is pressed.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This virtual method returns the scalar range of the selected
   // array for the input.
   virtual int GetValueRange(float range[2]);
-
+  
   // Description:
   // ArrayMenu is used to obtain the scalar range (it contains an array
   // information object)
   virtual void SetArrayMenu(vtkPVArrayMenu*);
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
+  // Description:
+  // Set the property to use with this widget.
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
   
   vtkPVArrayMenu *ArrayMenu;
-
+  
+  int AcceptCalled;
+  void UpdateProperty();
+  vtkPVContourWidgetProperty *Property;
+  
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented
 

@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkDataSet;
 class vtkPVApplication;
+class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkPVPartDisplay;
 class vtkPolyDataMapper;
@@ -110,6 +111,7 @@ public:
   // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
+  vtkGetObjectMacro(ClassNameInformation, vtkPVClassNameInformation);
   
   // Description:
   // This method collects data information from all processes.
@@ -144,6 +146,8 @@ protected:
 
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
+  
+  vtkPVClassNameInformation *ClassNameInformation;
   
   char *VTKDataTclName;
     

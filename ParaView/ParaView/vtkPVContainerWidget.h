@@ -51,8 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //BTX
 template <class key, class data> 
 class vtkArrayMap;
-template <class value>
-class vtkLinkedList;
+class vtkCollection;
 //ETX
 
 class VTK_EXPORT vtkPVContainerWidget : public vtkPVWidget
@@ -123,7 +122,7 @@ public:
   // Description:
   // Called when reset button is pushed.
   // Sets UI current value from objects variable.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -134,7 +133,8 @@ protected:
   ~vtkPVContainerWidget();
 
 //BTX
-  vtkLinkedList<vtkPVWidget*>* Widgets;
+
+  vtkCollection *WidgetProperties;
 
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

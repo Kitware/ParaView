@@ -58,6 +58,7 @@ class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
 class vtkPVAnimationInterfaceEntry;
+class vtkPVWidgetProperty;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
@@ -241,8 +242,16 @@ public:
   // Most subclasses implement these methods to move state from VTK objects
   // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
+  virtual void SetProperty(vtkPVWidgetProperty *) {}
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
+  vtkSetMacro(UseWidgetRange, int);
+  vtkGetMacro(UseWidgetRange, int);
+  vtkSetVector2Macro(WidgetRange, float);
+  vtkGetVector2Macro(WidgetRange, float);
+  
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -268,6 +277,8 @@ protected:
   vtkPVSource* PVSource;
 
 
+  int UseWidgetRange;
+  float WidgetRange[2];
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

@@ -45,7 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVInformation, "1.3");
+
+//----------------------------------------------------------------------------
+vtkPVInformation::vtkPVInformation()
+{
+  this->RootOnly = 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVInformation::CopyFromObject(vtkObject*)
@@ -82,9 +88,5 @@ void vtkPVInformation::WriteMessage(unsigned char*)
 void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "RootOnly: " << this->RootOnly;
 }
-
-  
-
-
-

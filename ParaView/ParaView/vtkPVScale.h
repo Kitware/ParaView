@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWScale;
 class vtkKWLabel;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
@@ -117,7 +118,7 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -137,6 +138,9 @@ public:
   vtkSetMacro(Round, int);
   vtkGetMacro(Round, int);
   vtkBooleanMacro(Round, int);
+  
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
   vtkPVScale();
@@ -159,6 +163,10 @@ protected:
   char* RangeSourceVariable;
   
   int Round;
+
+  int AcceptedValueInitialized;
+
+  vtkPVScalarListWidgetProperty *Property;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

@@ -46,12 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPointWidget.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVWidgetProperty.h"
 
 int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.11");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -70,13 +71,15 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   this->RadiusWidget->SetParent(this);
   this->RadiusWidget->SetTraceReferenceObject(this);
   this->RadiusWidget->SetTraceReferenceCommand("GetRadiusWidget");
-
+  this->RadiusProperty = NULL;
+  
   this->NumberOfPointsWidget = vtkPVVectorEntry::New();
   this->NumberOfPointsWidget->SetParent(this);
   this->NumberOfPointsWidget->SetTraceReferenceObject(this);
   this->NumberOfPointsWidget->SetTraceReferenceCommand(
     "GetNumberOfPointsWidget");
-
+  this->NumberOfPointsProperty = NULL;
+  
   // Start out modified so that accept will set the source
   this->ModifiedFlag = 1;
 }
@@ -87,6 +90,14 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
   this->PointWidget->Delete();
   this->RadiusWidget->Delete();
   this->NumberOfPointsWidget->Delete();
+  if (this->RadiusProperty)
+    {
+    this->RadiusProperty->Delete();
+    }
+  if (this->NumberOfPointsProperty)
+    {
+    this->NumberOfPointsProperty->Delete();
+    }
 }
 
 
@@ -170,9 +181,11 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                                        "SetAcceptButtonColorToRed");
   
   this->RadiusWidget->Create(this->Application);
+  this->RadiusProperty = this->RadiusWidget->CreateAppropriateProperty();
+  this->RadiusProperty->SetWidget(this->RadiusWidget);
   this->Script("pack %s -side top -fill both -expand true",
                this->RadiusWidget->GetWidgetName());
-
+  
   this->NumberOfPointsWidget->SetObjectTclName(name);
   this->NumberOfPointsWidget->SetVariableName("NumberOfPoints");
   this->NumberOfPointsWidget->SetPVSource(this->GetPVSource());
@@ -181,9 +194,13 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToRed");
   
   this->NumberOfPointsWidget->Create(this->Application);
+  this->NumberOfPointsProperty =
+    this->NumberOfPointsWidget->CreateAppropriateProperty();
+  this->NumberOfPointsProperty->SetWidget(this->NumberOfPointsWidget);
+  this->NumberOfPointsWidget->SetValue("1"); // match value set in point source
   this->Script("pack %s -side top -fill both -expand true",
                this->NumberOfPointsWidget->GetWidgetName());
-
+  
   this->PointWidget->Create(this->Application);
   this->Script("pack %s -side top -fill both -expand true",
                this->PointWidget->GetWidgetName());
@@ -209,13 +226,13 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
  
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::ResetInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVPointSourceWidget::ResetInternal()
 {
   // Ignore the source passed in.  We are updating our
   // own point source.
-  this->PointWidget->ResetInternal(this->SourceTclName);
-  this->RadiusWidget->ResetInternal(this->SourceTclName);
-  this->NumberOfPointsWidget->ResetInternal(this->SourceTclName);
+  this->PointWidget->ResetInternal();
+  this->RadiusWidget->ResetInternal();
+  this->NumberOfPointsWidget->ResetInternal();
   this->ModifiedFlag = 0;
 }
 

@@ -27,6 +27,7 @@ SET( ParaView_SRCS
   vtkPVCalculatorWidget.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
+  vtkPVClassNameInformation.cxx
   vtkPVClientServerModule.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
@@ -38,6 +39,7 @@ SET( ParaView_SRCS
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
+  vtkPVContourWidgetProperty.cxx
   vtkPVCutEntry.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
@@ -52,6 +54,7 @@ SET( ParaView_SRCS
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
   vtkPVExtentTranslator.cxx 
+  vtkPVExtentWidgetProperty.cxx
   vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
@@ -61,6 +64,7 @@ SET( ParaView_SRCS
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
+  vtkPVIndexWidgetProperty.cxx
   vtkPVInformation.cxx
   vtkPVInitialize.cxx
   vtkPVInputArrayRequirement.cxx
@@ -93,6 +97,7 @@ SET( ParaView_SRCS
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVMultiDisplayRenderModuleUI.cxx
   vtkPVNavigationWindow.cxx
+  vtkPVNumberOfOutputsInformation.cxx
   vtkPVObjectWidget.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
@@ -111,6 +116,7 @@ SET( ParaView_SRCS
   vtkPVRenderModuleUI.cxx
   vtkPVRenderView.cxx 
   vtkPVSaveBatchScriptDialog.cxx
+  vtkPVScalarListWidgetProperty.cxx
   vtkPVScalarRangeLabel.cxx 
   vtkPVScale.cxx 
   vtkPVScaleFactorEntry.cxx
@@ -126,7 +132,9 @@ SET( ParaView_SRCS
   vtkPVSourceWidget.cxx
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx
+  vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
+  vtkPVStringWidgetProperty.cxx
   vtkPVSummaryHelper.cxx
   vtkPVTiledDisplayManager.cxx
   vtkPVTimerInformation.cxx
@@ -142,6 +150,7 @@ SET( ParaView_SRCS
   vtkPVVectorEntry.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx
+  vtkPVWidgetProperty.cxx
   vtkPVWindow.cxx 
   vtkPVWindowResources.cxx 
   vtkPVWorldPointPicker.cxx 

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -78,7 +78,7 @@ void vtkPVDataSetFileEntry::AcceptInternal(const char* sourceTclName)
     {
     this->GetPVApplication()->GetMainWindow()->WarningMessage(
       "Could not read file.");
-    this->ResetInternal(sourceTclName);
+    this->ResetInternal();
     return;
     }
   if (this->Type == -1)
@@ -89,7 +89,7 @@ void vtkPVDataSetFileEntry::AcceptInternal(const char* sourceTclName)
     {
     this->GetPVApplication()->GetMainWindow()->WarningMessage(
       "Output type does not match previous file.");
-    this->ResetInternal(sourceTclName);
+    this->ResetInternal();
     return;
     }
 

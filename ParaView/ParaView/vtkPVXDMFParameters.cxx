@@ -42,20 +42,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXDMFParameters.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkKWEvent.h"
-#include "vtkKWLabel.h"
-#include "vtkKWScale.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVXMLElement.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkPVSource.h"
-#include "vtkPVProcessModule.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkPVAnimationInterfaceEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterfaceEntry.h"
+#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
+#include "vtkPVXMLElement.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.9");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -285,7 +285,7 @@ void vtkPVXDMFParameters::AcceptInternal(const char* vtkNotUsed(sourceTclName))
   //cout << "List: " << str.str() << endl;
   if ( some )
     {
-    pm->BroadcastScript(
+    pm->ServerScript(
       "namespace eval ::paraview::vtkPVXDMFParameters {\n"
       "  proc SetParameters { reader parameters } {\n"
       "    foreach { array value } $parameters {\n"
@@ -326,7 +326,7 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::ResetInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVXDMFParameters::ResetInternal()
 {
   this->UpdateFromReader();
   this->ModifiedFlag = 0;

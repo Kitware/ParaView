@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.25");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -95,7 +95,9 @@ vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
-  this->RootResult = NULL;
+  this->RootResult = NULL; 
+  this->ClientServerStream = 0;
+  this->ClientServerInterpreter = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -108,8 +110,6 @@ vtkPVProcessModule::~vtkPVProcessModule()
     }
   this->SetRootResult(NULL);
 }
-
-
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::Start(int argc, char **argv)
@@ -308,9 +308,18 @@ void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
   // method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript(
-    "[$Application GetProcessModule] GatherInformationInternal %s %s",
-    info->GetClassName(), objectTclName); 
+  if (!info->GetRootOnly())
+    {
+    this->ServerScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName); 
+    }
+  else
+    {
+    this->RootScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName); 
+    }
   this->TemporaryInformation = NULL; 
 }
 
@@ -508,6 +517,12 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
   return 1;
 
 }
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendMessages()
+{
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)

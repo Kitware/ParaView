@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.7");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.8");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -937,4 +937,5 @@ void vtkKWScalarBarAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "ShowLabelFormat: " << this->ShowLabelFormat << endl;
 }

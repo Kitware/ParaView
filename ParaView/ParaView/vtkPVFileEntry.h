@@ -53,6 +53,7 @@ class vtkKWEntry;
 class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
+class vtkPVStringWidgetProperty;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -111,7 +112,7 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
   
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -147,10 +148,12 @@ public:
   // Get the range of files.
   vtkGetVector2Macro(Range, int);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
-  
 
   vtkKWLabel *LabelWidget;
   vtkKWPushButton *BrowseButton;
@@ -177,8 +180,7 @@ protected:
   int FileNameLength;
   int Range[2];
 
-  vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
-  void operator=(const vtkPVFileEntry&); // Not implemented
+  vtkPVStringWidgetProperty *Property;
 
   //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -187,6 +189,10 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
     vtkPVXMLPackageParser* parser);
+  
+private:
+  vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
+  void operator=(const vtkPVFileEntry&); // Not implemented
 };
 
 #endif

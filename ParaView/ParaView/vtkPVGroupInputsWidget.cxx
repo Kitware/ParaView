@@ -41,21 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVGroupInputsWidget.h"
 
-#include "vtkKWWidget.h"
-#include "vtkKWListBox.h"
-#include "vtkKWLabel.h"
 #include "vtkCollection.h"
+#include "vtkKWLabel.h"
+#include "vtkKWListBox.h"
+#include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSourceCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.14");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -112,7 +113,7 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::ResetInternal(const char*)
+void vtkPVGroupInputsWidget::ResetInternal()
 {
   int idx;
   vtkPVWindow *pvWin;
@@ -200,8 +201,8 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
   this->Inputs->RemoveAllItems();
 
   // Now loop through the input mask setting the selection states.
-  pvApp->BroadcastScript("%s RemoveAllInputs",
-                         vtkSourceTclName);
+  pvApp->GetProcessModule()->ServerScript("%s RemoveAllInputs",
+                                          vtkSourceTclName);
   this->PVSource->RemoveAllPVInputs();  
   sources->InitTraversal();
   for (idx = 0; idx < num; ++idx)
@@ -230,7 +231,7 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
       //for (partIdx = 0; partIdx < numParts; ++partIdx)
       //  {
       //  part = pvd->GetPVPart(partIdx);
-      //  pvApp->BroadcastScript("%s AddInput %s",  vtkSourceTclName,
+      //  pvApp->GetProcessModule()->ServerScript("%s AddInput %s",  vtkSourceTclName,
       //                         part->GetVTKDataTclName());
       //  }
       }

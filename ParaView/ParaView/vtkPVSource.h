@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
+class vtkCollection;
 class vtkDataSet;
 class vtkKWEntry;
 class vtkKWFrame;
@@ -69,13 +70,14 @@ class vtkPVLabel;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
 class vtkPVWidget;
-class vtkPVWidgetCollection;
+class vtkPVWidgetProperty;
 class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
 class vtkCollection;
 class vtkPVPart;
 class vtkPVDataInformation;
+class vtkPVNumberOfOutputsInformation;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -218,21 +220,19 @@ public:
 
   // Description:
   // Set the vtk source that will be a part of the pipeline.
-  // The pointer to this class is used as little as possible.
+  // The pointer to this class is not used.
   // (VTKSourceTclName is used instead.)
-  void AddVTKSource(vtkSource *source, const char *tclName);
+  void AddVTKSource(const char *tclName);
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
-  vtkSource *GetVTKSource(int idx);
   const char *GetVTKSourceTclName(int idx);
   // Legacy
-  vtkSource *GetVTKSource() {return this->GetVTKSource(0);}
   const char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
   
-  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
+  vtkGetObjectMacro(WidgetProperties, vtkCollection);
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
@@ -454,6 +454,11 @@ public:
   // interface will use this method to stop updates too (flag)?
   void MarkSourcesForUpdate(int flag);
 
+  // Description:
+  // Access to the vtkPVNumberOfOutputsInformation object.
+  vtkGetObjectMacro(NumberOfOutputsInformation,
+                    vtkPVNumberOfOutputsInformation);
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -466,6 +471,8 @@ protected:
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
 
+  vtkPVNumberOfOutputsInformation *NumberOfOutputsInformation;
+  
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
@@ -487,7 +494,6 @@ protected:
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
 
-  vtkCollection *VTKSources;
   vtkStringList *VTKSourceTclNames;
 
   // One output. Now used only to hold UI
@@ -527,7 +533,7 @@ protected:
   vtkKWWidget *ButtonFrame;
   vtkKWFrame *ParameterFrame;
   
-  vtkPVWidgetCollection *Widgets;
+  vtkCollection *WidgetProperties;
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;

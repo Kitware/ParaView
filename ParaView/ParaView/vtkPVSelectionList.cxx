@@ -40,17 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSelectionList.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
+
+#include "vtkArrayMap.txx"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkArrayMap.txx"
+#include "vtkPVApplication.h"
+#include "vtkPVIndexWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.34");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.35");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -70,6 +72,11 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->Names = vtkStringList::New();
 
   this->OptionWidth = 0;
+  
+  this->DefaultValue = 0;
+  this->AcceptCalled = 0;
+  
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -83,6 +90,8 @@ vtkPVSelectionList::~vtkPVSelectionList()
   this->Menu = NULL;
   this->Names->Delete();
   this->Names = NULL;
+  
+  this->SetProperty(NULL);
 }
 
 void vtkPVSelectionList::SetBalloonHelpString(const char *str)
@@ -179,6 +188,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
 
+  this->SetCurrentValue(this->Property->GetIndex());
 }
 
 
@@ -206,15 +216,13 @@ const char *vtkPVSelectionList::GetLabel()
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // Command to update the UI.
-  pvApp->BroadcastScript("%s Set%s %d",
-                         sourceTclName,
-                         this->VariableName,
-                         this->CurrentValue); 
-
   this->ModifiedFlag = 0;
+  this->Property->SetIndex(this->CurrentValue);
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  
+  this->Property->AcceptInternal();
+  
+  this->AcceptCalled = 1;
 }
 
 
@@ -232,14 +240,10 @@ void vtkPVSelectionList::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::ResetInternal(const char* sourceTclName)
+void vtkPVSelectionList::ResetInternal()
 {
-
-  this->Script("%s SetCurrentValue [%s Get%s]",
-               this->GetTclName(),
-               sourceTclName,
-               this->VariableName);
-
+  this->SetCurrentValue(this->Property->GetIndex());
+  
   this->ModifiedFlag = 0;
 }
 
@@ -283,6 +287,11 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     this->Menu->SetValue(name);
     this->SelectCallback(name, value);
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetIndex(value);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -322,6 +331,7 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
         pvsl->Names->SetString(i, name);
         }
       }
+    pvsl->SetDefaultValue(this->DefaultValue);
     }
   else 
     {
@@ -351,6 +361,12 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->Label->SetLabel(this->VariableName);
     }
+
+  const char* defaultValue = element->GetAttribute("default_value");
+  if (defaultValue)
+    {
+    sscanf(defaultValue, "%d", &this->DefaultValue);
+    }
   
   // Extract the list of items.
   unsigned int i;
@@ -379,6 +395,26 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
 
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVIndexWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommand(cmd);
+    this->Property->SetIndex(this->DefaultValue);
+    delete [] cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVSelectionList::CreateAppropriateProperty()
+{
+  return vtkPVIndexWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

@@ -94,7 +94,7 @@ public:
   // Description:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

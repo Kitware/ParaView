@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWScale;
 class vtkKWLabel;
 class vtkPVArrayMenu;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 {
@@ -167,12 +168,15 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
@@ -203,14 +207,14 @@ protected:
   int MinLabelWidth;
   int MaxLabelWidth;
 
+  int AcceptCalled;
+  
+  vtkPVScalarListWidgetProperty *Property;
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-  
-
-  vtkPVMinMax(const vtkPVMinMax&); // Not implemented
-  void operator=(const vtkPVMinMax&); // Not implemented
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
@@ -218,6 +222,10 @@ protected:
   // Description:
   // Save this widget to a file
   virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  
+private:
+  vtkPVMinMax(const vtkPVMinMax&); // Not implemented
+  void operator=(const vtkPVMinMax&); // Not implemented
 };
 
 #endif

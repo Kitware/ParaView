@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVAnimationInterfaceEntry.h"
 
+#include "vtkCollection.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
@@ -52,11 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
-#include "vtkPVWidgetCollection.h"
 #include "vtkPVWidget.h"
 #include "vtkCommand.h"
 #include "vtkKWText.h"
-
+#include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 
 #include <vtkstd/string>
@@ -94,7 +94,10 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.20");
+
+vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
+                     vtkPVWidgetProperty);
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -137,6 +140,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->Dirty = 1;
 
   this->ScriptEditorDirty = 0;
+  
+  this->CurrentProperty = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -350,6 +355,8 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->StartTimeEntry->Delete();
   this->TimeRange->Delete();
   this->TimeScriptEntryFrame->Delete();
+  
+  this->SetCurrentProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -462,9 +469,9 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
 {
-  vtkPVWidgetCollection *pvWidgets;
-  vtkPVWidget *pvw;
-
+  vtkCollection *pvwProps;
+  vtkPVWidgetProperty *pvwp;
+  
   // Remove all previous items form the menu.
   vtkKWMenu* menu = this->GetMethodMenuButton()->GetMenu();
   menu->DeleteAllMenuItems();
@@ -481,11 +488,12 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     return;
     }
   
-  pvWidgets = this->GetPVSource()->GetWidgets();
-  pvWidgets->InitTraversal();
-  while ( (pvw = pvWidgets->GetNextPVWidget()) )
+  pvwProps = this->GetPVSource()->GetWidgetProperties();
+  pvwProps->InitTraversal();
+  while ((pvwp =
+          static_cast<vtkPVWidgetProperty*>(pvwProps->GetNextItemAsObject())))
     {
-    pvw->AddAnimationScriptsToMenu(menu, this);
+    pvwp->GetWidget()->AddAnimationScriptsToMenu(menu, this);
     }
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "ScriptMethodCallback");
@@ -845,5 +853,7 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "SaveStateScript: " 
     << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
+  
+  os << indent << "CurrentProperty: " << this->CurrentProperty << endl;
 }
 

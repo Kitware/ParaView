@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkCamera.h"
+#include "vtkImplicitPlaneWidget.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkPVProcessModule.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -58,17 +58,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVXMLElement.h"
-#include "vtkImplicitPlaneWidget.h"
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -97,6 +97,11 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
   this->PlaneTclName = 0;
+  
+  this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
+    this->LastAcceptedCenter[2] = 0;
+  this->LastAcceptedNormal[0] = this->LastAcceptedNormal[1] = 0;
+  this->LastAcceptedNormal[2] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -106,8 +111,8 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 
   if (this->PlaneTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-                                              this->PlaneTclName);
+    this->GetPVApplication()->BroadcastScript(
+      "%s Delete", this->PlaneTclName);
     this->SetPlaneTclName(NULL);
     }
   int i;
@@ -213,7 +218,7 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::ResetInternal(const char* sourceTclName)
+void vtkPVImplicitPlaneWidget::ResetInternal()
 {
   vtkPVApplication *pvApp;
 
@@ -224,14 +229,11 @@ void vtkPVImplicitPlaneWidget::ResetInternal(const char* sourceTclName)
 
   pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
-  if ( this->PlaneTclName )
-    {
-    this->Script("eval %s SetCenter [ %s GetOrigin ]", 
-                 this->GetTclName(), this->PlaneTclName);
-    this->Script("eval %s SetNormal [ %s GetNormal ]", 
-                 this->GetTclName(), this->PlaneTclName);
-    }
-  this->Superclass::ResetInternal(sourceTclName);
+
+  this->SetCenter(this->LastAcceptedCenter);
+  this->SetNormal(this->LastAcceptedNormal);
+
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -264,8 +266,8 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
   // ExtractCTH uses this varible, General Clipping uses the select widget.
   if (this->VariableName && sourceTclName)
     {
-    pvApp->BroadcastScript("%s Set%s %s", sourceTclName,
-                           this->VariableName, this->PlaneTclName);                   
+    pvApp->GetProcessModule()->ServerScript(
+      "%s Set%s %s", sourceTclName, this->VariableName, this->PlaneTclName);
     }
   if ( this->PlaneTclName )
     {
@@ -276,17 +278,17 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
       val[cc] = atof( this->CenterEntry[cc]->GetValue() );
       }
     this->SetCenterInternal(val[0], val[1], val[2]);
-    pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
-                           this->PlaneTclName,
+    pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->PlaneTclName,
                            val[0], val[1], val[2]);
+    this->SetLastAcceptedCenter(val);
     for ( cc = 0; cc < 3; cc ++ )
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
       }
     this->SetNormalInternal(val[0], val[1], val[2]);
-    pvApp->BroadcastScript("%s SetNormal %f %f %f", 
-                           this->PlaneTclName,
+    pvApp->BroadcastScript("%s SetNormal %f %f %f", this->PlaneTclName,
                            val[0], val[1], val[2]);
+    this->SetLastAcceptedNormal(val);
     }
 
   this->Superclass::AcceptInternal(sourceTclName);
@@ -472,9 +474,10 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   // This is for tiled display and client server.
   // This may decrease compresion durring compositing.
   // We should have a special call instead of broadcast script.
-  // Better yet, controll visibility based on mode (client-server ...).
+  // Better yet, control visibility based on mode (client-server ...).
   sprintf(tclName, "pvImplicitPlaneWidget%d", instanceCount);
-  pvApp->BroadcastScript("vtkImplicitPlaneWidget %s", tclName);
+  pvApp->BroadcastScript(
+    "vtkImplicitPlaneWidget %s", tclName);
   this->SetWidget3DTclName(tclName);
   pvApp->BroadcastScript("%s SetPlaceFactor 1.0", this->Widget3DTclName);
   pvApp->BroadcastScript("%s OutlineTranslationOff", this->Widget3DTclName);
@@ -603,10 +606,14 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       float bds[6];
       input->GetDataInformation()->GetBounds(bds);
       pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->PlaneTclName,
-                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                             0.5*(bds[4]+bds[5]));
+        0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]), 0.5*(bds[4]+bds[5]));
+      this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                                  0.5*(bds[4]+bds[5]));
+      this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                      0.5*(bds[4]+bds[5]));
       pvApp->BroadcastScript("%s SetNormal 0 0 1", this->PlaneTclName);
-      this->Reset();
+      this->SetLastAcceptedNormal(0, 0, 1);
+      this->SetNormal(0, 0, 1);
       }
     }
 
@@ -632,20 +639,14 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
   if ( widget )
     {
     float val[3];
-    int cc;
     widget->GetOrigin(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->CenterEntry[cc]->SetValue(val[cc]);
-      }
-    widget->GetNormal(val); 
-    for (cc=0; cc < 3; cc ++ )
-      {
-      this->NormalEntry[cc]->SetValue(val[cc]);
-      }
+    this->SetCenterInternal(val[0], val[1], val[2]);
+    widget->GetNormal(val);
+    this->SetNormalInternal(val[0], val[1], val[2]);
     if (!widget->GetDrawPlane())
       {
-      widget->SetDrawPlane(1);
+      this->GetPVApplication()->BroadcastScript("%s SetDrawPlane 1",
+                                                this->Widget3DTclName);
       }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
@@ -776,7 +777,8 @@ void vtkPVImplicitPlaneWidget::Update()
   if (input)
     {
     input->GetDataInformation()->GetBounds(bds);
-    pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
+    pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f",
+                           this->Widget3DTclName,
                            bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
 
     // Should I also move the center of the plane?  Keep the old plane?

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
@@ -56,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.37");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.38");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -78,7 +79,11 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->EntryValues[cc] = 0;
+    this->DefaultValues[cc] = 0;
     }
+  this->AcceptCalled = 0;
+  
+  this->Property = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -104,6 +109,8 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
       this->EntryValues[cc] = 0;
       }
     }
+  
+  this->SetProperty(NULL);
 }
 
 void vtkPVVectorEntry::SetLabel(const char* label)
@@ -288,20 +295,21 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkKWEntry *entry;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char acceptCmd[1024];
-
-  sprintf(acceptCmd, "%s Set%s ", sourceTclName, this->VariableName);
+  float scalars[6];
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
+  int count = 0;
   while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
     {
-    strcat(acceptCmd, entry->GetValue());
-    strcat(acceptCmd, " ");
+    scalars[count] = entry->GetValueAsFloat();
+    count++;
     }
-  pvApp->BroadcastScript(acceptCmd);
-
+  this->Property->SetScalars(count, scalars);
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
+  
+  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;  
 }
 
@@ -329,7 +337,7 @@ void vtkPVVectorEntry::Trace(ofstream *file)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
+void vtkPVVectorEntry::ResetInternal()
 {
   int count = 0;
 
@@ -338,15 +346,32 @@ void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
     return;
     }
 
+  float *scalars = this->Property->GetScalars();
+  
   // Set each entry to the appropriate value.
   for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
-    this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
-      this->GetTclName(), count, sourceTclName, 
-      this->VariableName, count); 
+    ostrstream val;
+    val << scalars[count] << ends;
+    if (this->DataType == VTK_FLOAT || this->DataType == VTK_DOUBLE)
+      {
+      this->SetEntryValue(count, val.str());
+      }
+    else
+      {
+      int scalar = atoi(val.str());
+      char *newStr = new char[strlen(val.str())+1];
+      sprintf(newStr, "%d", scalar);
+      this->SetEntryValue(count, newStr);
+      delete [] newStr;
+      }
+    val.rdbuf()->freeze(0);
     }
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -395,6 +420,9 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     vtkErrorMacro("Componenet mismatch.");
     return;
     }
+
+  float scalars[6];
+  
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
@@ -404,7 +432,14 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(values[idx]);
+    sscanf(values[idx], "%f", &scalars[idx]);
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetScalars(num, scalars);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -419,6 +454,9 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
     vtkErrorMacro("Componenet mismatch.");
     return;
     }
+  
+  float scalars[6];
+  
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
@@ -428,7 +466,14 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
+    scalars[idx] = entry->GetValueAsFloat();
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetScalars(num, scalars);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -544,36 +589,21 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[500];
-
   if (ai->InitializeTrace(NULL))
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-      this->GetTclName(), ai->GetTclName());
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+                        this->GetTclName(), ai->GetTclName());
     }
-
+  
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    // I do not like setting the label like this but ...
-    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
+    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL);
+    ai->SetCurrentProperty(this->Property);
+    if (this->UseWidgetRange)
       {
-      sprintf(script, "%s Set%s [expr round($pvTime)]", 
-        this->ObjectTclName, this->VariableName);
+      ai->SetTimeStart(this->WidgetRange[0]);
+      ai->SetTimeEnd(this->WidgetRange[1]);
       }
-    else
-      {
-      sprintf(script, "%s Set%s $pvTime", 
-        this->ObjectTclName, this->VariableName);
-      }
-    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
-    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
-      {
-      ai->SetTypeToInt();
-      }
-    sprintf(script, "AnimationMenuCallback $kw(%s)", 
-      ai->GetTclName());
-    ai->SetSaveStateScript(script);
-    ai->SetSaveStateObject(this);
     ai->Update();
     }
   // What if there are more than one entry?
@@ -617,6 +647,9 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
       {
       pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
       }
+    pvve->SetDefaultValues(this->DefaultValues);
+    pvve->SetUseWidgetRange(this->UseWidgetRange);
+    pvve->SetWidgetRange(this->WidgetRange);
     }
   else 
     {
@@ -695,5 +728,66 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     }
 
+  const char *defaultValue = element->GetAttribute("default_value");
+  if (defaultValue)
+    {
+    switch(this->VectorLength)
+      {
+      case 1:
+        sscanf(defaultValue, "%f", &this->DefaultValues[0]);
+        break;
+      case 2:
+        sscanf(defaultValue, "%f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1]);
+        break;
+      case 3:
+        sscanf(defaultValue, "%f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2]);
+        break;
+      case 4:
+        sscanf(defaultValue, "%f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3]);
+        break;
+      case 5:
+        sscanf(defaultValue, "%f %f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3], &this->DefaultValues[4]);
+        break;
+      case 6:
+        sscanf(defaultValue, "%f %f %f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3], &this->DefaultValues[4],
+               &this->DefaultValues[5]);
+        break;
+      }
+    }
+  
+  const char *range = element->GetAttribute("data_range");
+  if (range)
+    {
+    sscanf(range, "%f %f", &this->WidgetRange[0], &this->WidgetRange[1]);
+    this->UseWidgetRange = 1;
+    }
+  
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    this->Property->SetScalars(this->VectorLength, this->DefaultValues);
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommands(1, &cmd, &this->VectorLength);
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVVectorEntry::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
 }

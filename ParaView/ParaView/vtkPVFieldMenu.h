@@ -58,6 +58,7 @@ class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkKWLabel;
 class vtkKWOptionMenu;
+class vtkPVIndexWidgetProperty;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVDataSetAttributesInformation;
@@ -113,8 +114,11 @@ public:
   // Called when the accept or reset button is pressed.
   // This internal version is passed VTK source name,
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVFieldMenu();
   ~vtkPVFieldMenu();
@@ -134,8 +138,11 @@ protected:
   // The property filters the allowable values of this menu..
   vtkPVInputProperty* GetInputProperty();
 
-  int Value;
+  int Value;  
 
+  vtkPVIndexWidgetProperty *Property;
+  int PropertyInitialized;
+  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

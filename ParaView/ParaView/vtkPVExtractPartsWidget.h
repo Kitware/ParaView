@@ -56,6 +56,7 @@ class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
 class vtkCollection;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVExtractPartsWidget : public vtkPVWidget
 {
@@ -92,8 +93,11 @@ public:
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void ResetInternal(const char* vtkSourceTclName);
+  virtual void ResetInternal();
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVExtractPartsWidget();
   ~vtkPVExtractPartsWidget();
@@ -109,6 +113,9 @@ protected:
   // Called to inactivate widget (after accept is called).
   void Inactivate();
 
+  int AcceptCalled;
+
+  vtkPVScalarListWidgetProperty *Property;
   
   vtkPVExtractPartsWidget(const vtkPVExtractPartsWidget&); // Not implemented
   void operator=(const vtkPVExtractPartsWidget&); // Not implemented

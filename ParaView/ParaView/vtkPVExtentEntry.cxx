@@ -53,15 +53,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
+#include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVExtentWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -82,6 +84,12 @@ vtkPVExtentEntry::vtkPVExtentEntry()
 
   this->Range[0] = this->Range[2] = this->Range[4] = -VTK_LARGE_INTEGER;
   this->Range[1] = this->Range[3] = this->Range[5] = VTK_LARGE_INTEGER;
+
+  this->AcceptCalled = 0;
+  
+  this->Property = NULL;
+
+  this->AnimationAxis = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,6 +110,8 @@ vtkPVExtentEntry::~vtkPVExtentEntry()
     this->MinMax[i]->Delete();
     this->MinMax[i] = 0;
     }
+  
+  this->SetProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -113,11 +123,13 @@ void vtkPVExtentEntry::Update()
   if (input == NULL)
     {
     this->SetRange(0, 0, 0, 0, 0, 0);
+    this->SetValue(0, 0, 0, 0, 0, 0);
     }
   else
     {
     int *ext = input->GetDataInformation()->GetExtent();
     this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+    this->SetValue(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
     }
 }
 
@@ -234,18 +246,20 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  float values[6];
+  values[0] = this->MinMax[0]->GetMinValue();
+  values[1] = this->MinMax[0]->GetMaxValue();
+  values[2] = this->MinMax[1]->GetMinValue();
+  values[3] = this->MinMax[1]->GetMaxValue();
+  values[4] = this->MinMax[2]->GetMinValue();
+  values[5] = this->MinMax[2]->GetMaxValue();
 
-  pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
-                         sourceTclName, this->VariableName,
-                         static_cast<int>(this->MinMax[0]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[0]->GetMaxValue()),
-                         static_cast<int>(this->MinMax[1]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[1]->GetMaxValue()),
-                         static_cast<int>(this->MinMax[2]->GetMinValue()), 
-                         static_cast<int>(this->MinMax[2]->GetMaxValue()));
-
-  this->ModifiedFlag = 0;  
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetScalars(6, values);
+  this->Property->AcceptInternal();
+  
+  this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -266,16 +280,18 @@ void vtkPVExtentEntry::Trace(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::ResetInternal(const char* sourceTclName)
+void vtkPVExtentEntry::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
-  this->Script("eval %s SetValue [%s Get%s]",
-               this->GetTclName(), sourceTclName,  this->VariableName);
-
+  float *values = this->Property->GetScalars();
+  this->SetValue(static_cast<int>(values[0]), static_cast<int>(values[1]),
+                 static_cast<int>(values[2]), static_cast<int>(values[3]),
+                 static_cast<int>(values[4]), static_cast<int>(values[5]));
+  
   this->ModifiedFlag = 0;
 }
 
@@ -323,17 +339,23 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
   if (v5 < range[0]) {v5 = static_cast<int>(range[0]);}
   if (v5 > range[1]) {v5 = static_cast<int>(range[1]);}
 
+  float values[6];
+  
   if ( v1 >= v0 )
     {
     if ( (float)v1 < this->MinMax[0]->GetMinValue() )
       {
       this->MinMax[0]->SetMinValue(v0);
       this->MinMax[0]->SetMaxValue(v1);
+      values[0] = v0;
+      values[1] = v1;
       }
     else
       {
       this->MinMax[0]->SetMaxValue(v1);
       this->MinMax[0]->SetMinValue(v0);
+      values[0] = v1;
+      values[1] = v0;
       }
     }
 
@@ -343,11 +365,15 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
       {
       this->MinMax[1]->SetMinValue(v2);
       this->MinMax[1]->SetMaxValue(v3);
+      values[2] = v2;
+      values[3] = v3;
       }
     else
       {
       this->MinMax[1]->SetMaxValue(v3);
       this->MinMax[1]->SetMinValue(v2);
+      values[2] = v3;
+      values[3] = v2;
       }
     }
 
@@ -357,14 +383,23 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
       {
       this->MinMax[2]->SetMinValue(v4);
       this->MinMax[2]->SetMaxValue(v5);
+      values[4] = v4;
+      values[5] = v5;
       }
     else
       {
       this->MinMax[2]->SetMaxValue(v5);
       this->MinMax[2]->SetMinValue(v4);
+      values[4] = v5;
+      values[5] = v4;
       }
     }
-
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetScalars(6, values);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -393,15 +428,12 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 
   cascadeMenu->Delete();
   cascadeMenu = NULL;
-
-  return;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int mode)
 {
-  char script[500];
   int ext[6];
 
   if (ai->InitializeTrace(NULL))
@@ -414,34 +446,28 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   // Get the whole extent to set up defaults.
   // Now I can imagine that we will need a more flexible way of getting 
   // the whole extent from sources (in the future.
-  this->Script("[%s GetInput] GetWholeExtent", this->ObjectTclName);
-  sscanf(this->Application->GetMainInterp()->result, "%d %d %d %d %d %d",
-    ext, ext+1, ext+2, ext+3, ext+4, ext+5);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->GetProcessModule()->RootScript(
+    "[%s GetInput] GetWholeExtent", this->ObjectTclName);
+  const char *res = pvApp->GetProcessModule()->GetRootResult();
+  sscanf(res, "%d %d %d %d %d %d",
+         ext, ext+1, ext+2, ext+3, ext+4, ext+5);
 
   if (mode == 0)
     {
-    sprintf(script, 
-      "%s Set%s [expr int($pvTime)] [expr round($pvTime)] %d %d %d %d", 
-      this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
-    ai->SetLabelAndScript("X Axis", script);
+    ai->SetLabelAndScript("X Axis", NULL);
     ai->SetTimeStart(ext[0]);
     ai->SetTimeEnd(ext[1]);
     }
   else if (mode == 1)
     {
-    sprintf(script, 
-      "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
-      this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
-    ai->SetLabelAndScript("Y Axis", script);
+    ai->SetLabelAndScript("Y Axis", NULL);
     ai->SetTimeStart(ext[2]);
     ai->SetTimeEnd(ext[3]);
     }
   else if (mode == 2)
     {
-    sprintf(script, 
-      "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
-      this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
-    ai->SetLabelAndScript("Z Axis", script);
+    ai->SetLabelAndScript("Z Axis", NULL);
     ai->SetTimeStart(ext[4]);
     ai->SetTimeEnd(ext[5]);
     }
@@ -449,10 +475,9 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
     {
     vtkErrorMacro("Bad extent animation mode.");
     }
-  sprintf(script, "AnimationMenuCallback $kw(%s) %d", 
-    ai->GetTclName(), mode);
-  ai->SetSaveStateScript(script);
-  ai->SetSaveStateObject(this);
+
+  this->SetAnimationAxis(mode);
+  ai->SetCurrentProperty(this->Property);
   ai->Update();
 }
 
@@ -530,10 +555,31 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVExtentEntry::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVExtentWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    int numScalars = 6;
+    this->Property->SetVTKCommands(1, &cmd, &numScalars);
+    delete [] cmd;
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVExtentEntry::CreateAppropriateProperty()
+{
+  return vtkPVExtentWidgetProperty::New();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << "InputMenu: " << this->InputMenu << endl;
-  os << "Label: " << (this->Label ? this->Label : "(none)") << endl;
-  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
+  os << indent << "Label: " << (this->Label ? this->Label : "(none)") << endl;
+  os << indent << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
+  os << indent << "AnimationAxis: " << this->AnimationAxis << endl;
 }
