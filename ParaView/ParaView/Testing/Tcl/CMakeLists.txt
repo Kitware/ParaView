@@ -34,6 +34,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                Transform
                ImageReader
                Mandelbrot
+               OrientationWidget
                ProbeLine
                ProbePoint
                ScalarBar

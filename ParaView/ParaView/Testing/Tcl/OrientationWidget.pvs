@@ -1,0 +1,88 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
+
+$kw(vtkTemp21) SetOrientationAxesVisibility 1
+$kw(vtkTemp21) SetOrientationAxesInteractivity 1
+$kw(vtkTemp21) SetOrientationAxesOutlineColor 1 0 0
+
+set kw(vtkTemp22) [$kw(vtkTemp1) GetInteractor]
+
+#Reposition widget
+$kw(vtkTemp22) SetEventInformationFlipY 2 503 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 300 250 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Resize widget from lower left corner
+$kw(vtkTemp22) SetEventInformationFlipY 298 352 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 200 400 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Rotate
+$kw(vtkTemp22) SetEventInformationFlipY 200 200 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 300 150 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Resize widget from upper left corner
+$kw(vtkTemp22) SetEventInformationFlipY 200 231 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 279 254 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Resize widget from upper right corner
+$kw(vtkTemp22) SetEventInformationFlipY 423 324 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 449 298 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Resize widget from lower right corner
+$kw(vtkTemp22) SetEventInformationFlipY 452 469 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 516 510 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+#Move widget to upper right corner
+$kw(vtkTemp22) SetEventInformationFlipY 384 442 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
+$kw(vtkTemp22) SetEventInformationFlipY 405 102 0 0 0 0 0
+$kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
+$kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
+update
+
+# Fix the size of the image.
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+
+$Application Exit
