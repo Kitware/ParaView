@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
-
+#include "vtkObjectFactory.h"
 
 // We need to:
 // Format min/max/resolution entries better.
