@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.50");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.51");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -220,7 +220,7 @@ void vtkPVThreshold::UpdateMinMaxScale()
       const char* name = scalars->GetName();
       if (name)
         {
-        input->GetArrayComponentRange(range, pointDataFlag, name, 0);
+        input->GetArrayComponentRange(pointDataFlag, name, 0, range);
         }
       else
         {

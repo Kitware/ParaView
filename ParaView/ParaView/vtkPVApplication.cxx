@@ -86,6 +86,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVHelpPaths.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVRenderGroupDialog.h"
+#include "vtkPVData.h"
+#include "vtkPVProcessModule.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -102,10 +104,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.162");
+vtkCxxRevisionMacro(vtkPVApplication, "1.163");
+
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
+{
+  this->ProcessModule = pm;
+}
 
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -252,6 +264,8 @@ vtkPVApplication::vtkPVApplication()
   this->RunningParaViewScript = 0;
 
   char name[128];
+
+  this->ProcessModule = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
   this->MinorVersion = 6;
@@ -259,8 +273,6 @@ vtkPVApplication::vtkPVApplication()
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
   this->SetApplicationReleaseName("1");
-
-  this->Controller = NULL;
   this->NumberOfPipes = 1;
 
   this->UseRenderingGroup = 0;
@@ -268,6 +280,16 @@ vtkPVApplication::vtkPVApplication()
 
   this->UseTiledDisplay = 0;
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
+
+  this->ClientMode = 0;
+  this->ServerMode = 0;
+  this->HostName = NULL;
+  this->SetHostName("localhost");
+  this->Port = 11111;
+  this->UseSoftwareRendering = 0;
+  this->UseSatelliteSoftware = 0;
+  this->StartEmpty = 0;
+  this->PlayDemo = 0;
 
   // GUI style & consistency
 
@@ -309,7 +331,7 @@ vtkPVApplication::~vtkPVApplication()
     this->AboutDialog->Delete();
     this->AboutDialog = 0;
     }
-  this->SetController(NULL);
+  this->SetProcessModule(NULL);
   if ( this->TraceFile )
     {
     delete this->TraceFile;
@@ -322,8 +344,16 @@ vtkPVApplication::~vtkPVApplication()
   this->SetGroupFileName(0);
   this->SetTraceFileName(0);
   this->SetArgv0(0);
+  this->SetHostName(NULL);
 }
 
+
+  
+//----------------------------------------------------------------------------
+vtkMultiProcessController* vtkPVApplication::GetController()
+{
+  return this->ProcessModule->GetController();
+}
 
 //----------------------------------------------------------------------------
 vtkPVWindow *vtkPVApplication::GetMainWindow()
@@ -333,80 +363,6 @@ vtkPVWindow *vtkPVApplication::GetMainWindow()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetController(vtkMultiProcessController *c)
-{
-  if (this->Controller == c)
-    {
-    return;
-    }
-
-  if (c)
-    {
-    c->Register(this);
-    this->ProcessId = c->GetLocalProcessId();
-    }
-  if (this->Controller)
-    {
-    this->Controller->UnRegister(this);
-    }
-  
-
-  this->Controller = c;
-
-  this->NumberOfPipes = 1;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::RemoteScript(int id, char *format, ...)
-{
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);  
-  
-  this->RemoteSimpleScript(id, buffer);
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-//----------------------------------------------------------------------------
-void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
-{
-  int length;
-
-  // send string to evaluate.
-  length = vtkString::Length(str) + 1;
-  if (length <= 1)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() == remoteId)
-    {
-    this->SimpleScript(str);
-    return;
-    }
-  
-  this->Controller->TriggerRMI(remoteId, const_cast<char*>(str), 
-                               VTK_PV_SLAVE_SCRIPT_RMI_TAG);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::BroadcastScript(char *format, ...)
@@ -438,26 +394,34 @@ void vtkPVApplication::BroadcastScript(char *format, ...)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::BroadcastSimpleScript(const char *str)
+void vtkPVApplication::RemoteScript(int id, char *format, ...)
 {
-  int id, num;
+  char event[1600];
+  char* buffer = event;
+
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
   
-  num = this->Controller->GetNumberOfProcesses();
-
-  int len = vtkString::Length(str);
-  if (!str || (len < 1))
+  if(length > 1599)
     {
-    return;
-    }
-
-  for (id = 1; id < num; ++id)
-    {
-    this->RemoteSimpleScript(id, str);
+    buffer = new char[length+1];
     }
   
-  // Do reverse order, because 0 will block.
-  this->SimpleScript(str);
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(buffer, format, var_args);
+  va_end(var_args);  
+  
+  this->RemoteSimpleScript(id, buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
 }
+
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::AcceptLicense()
@@ -519,7 +483,15 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 }
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
-{ "--start-empty" , "-e", 
+{ "--client" , "-c", 
+  "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
+  "--server" , "-v", 
+  "Start ParaView as a server (use MPI run).",
+  "--host", "-h",
+  "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
+  "--port", "",
+  "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
+  "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
   "Do not use registry when running ParaView (for testing).", 
@@ -578,6 +550,7 @@ char* vtkPVApplication::CreateHelpString()
   
 }
 
+//----------------------------------------------------------------------------
 int vtkPVApplication::IsParaViewScriptFile(const char* arg)
 {
   if (!arg || strlen(arg) < 4)
@@ -662,37 +635,22 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   exportDialog->Delete();
 }
 
+
+
+
 //----------------------------------------------------------------------------
-void vtkPVApplication::Start(int argc, char*argv[])
+int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 {
+  int i;
+  
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
-  // set the font size to be small
-#ifdef _WIN32
-  this->Script("option add *font {{Tahoma} 8}");
-#else
-  // Specify a font only if there isn't one in the database
-  this->Script(
-    "toplevel .tmppvwindow -class ParaView;"
-    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
-    "option add *font "
-    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
-    "destroy .tmppvwindow");
-  this->Script("option add *highlightThickness 0");
-  this->Script("option add *highlightBackground #ccc");
-  this->Script("option add *activeBackground #eee");
-  this->Script("option add *activeForeground #000");
-  this->Script("option add *background #ccc");
-  this->Script("option add *foreground #000");
-  this->Script("option add *Entry.background #ffffff");
-  this->Script("option add *Text.background #ffffff");
-  this->Script("option add *Button.padX 6");
-  this->Script("option add *Button.padY 3");
-  this->Script("option add *selectColor #666");
-#endif
+  // This should really be part of Parsing !!!!!!
+  if (argv)
+    {
+    this->SetArgv0(argv[0]);
+    }
 
-
-  int i;
   for (i=1; i < argc; i++)
     {
     if ( vtkPVApplication::IsParaViewScriptFile(argv[i]) )
@@ -745,8 +703,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
         vtkErrorMacro("Unrecognized argument " << argv[i] << "." << endl
                       << error);
         delete[] error;
-        this->Exit();
-        return;
+        return 1;
         }
       }
     }
@@ -758,17 +715,16 @@ void vtkPVApplication::Start(int argc, char*argv[])
     char* error = this->CreateHelpString();
     vtkWarningMacro(<<error);
     delete[] error;
-    this->Exit();
-    return;
+    return 1;
     }
 
-  int playDemo=0;
+  this->PlayDemo = 0;
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--play-demo",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-pd",
                                           index) == VTK_OK )
     {
-    playDemo = 1;
+    this->PlayDemo = 1;
     }
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
@@ -850,6 +806,67 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #endif
 
 
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--client",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-c",
+                                          index) == VTK_OK )
+    {
+    this->ClientMode = 1;
+
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-h",
+                                          index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetHostName(newarg);
+      }
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-v",
+                                          index) == VTK_OK )
+    {
+    this->ServerMode = 1;
+    }
+
+  if (this->ServerMode || this->ClientMode)
+    {
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--port",
+                                            index) == VTK_OK)
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->Port = atoi(newarg);
+      }
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
+       == VTK_OK || 
+       vtkPVApplication::CheckForArgument(argc, argv, "-e", index) 
+       == VTK_OK)
+    {
+    this->StartEmpty = 1;
+    }
+
 #ifdef VTK_MANGLE_MESA
   
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
@@ -862,17 +879,63 @@ void vtkPVApplication::Start(int argc, char*argv[])
                                           index) == VTK_OK ||
        getenv("PV_SOFTWARE_RENDERING") )
     {
+    this->UseSoftwareRendering = 1;
+    if ( getenv("PV_SOFTWARE_RENDERING") ||
+         vtkPVApplication::CheckForArgument(
+           argc, argv, "--use-satellite-software", index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-s",
+                                            index) == VTK_OK)
+      {
+      this->UseSatelliteSoftware = 1;
+      }
+    }
+#endif
+
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::Start(int argc, char*argv[])
+{
+  // Done in ParseCommandLineArguments also.
+  // Which place should it be !!!
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+
+  // set the font size to be small
+#ifdef _WIN32
+  this->Script("option add *font {{Tahoma} 8}");
+#else
+  // Specify a font only if there isn't one in the database
+  this->Script(
+    "toplevel .tmppvwindow -class ParaView;"
+    "if {[option get .tmppvwindow font ParaView] == \"\"} {"
+    "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1};"
+    "destroy .tmppvwindow");
+  this->Script("option add *highlightThickness 0");
+  this->Script("option add *highlightBackground #ccc");
+  this->Script("option add *activeBackground #eee");
+  this->Script("option add *activeForeground #000");
+  this->Script("option add *background #ccc");
+  this->Script("option add *foreground #000");
+  this->Script("option add *Entry.background #ffffff");
+  this->Script("option add *Text.background #ffffff");
+  this->Script("option add *Button.padX 6");
+  this->Script("option add *Button.padY 3");
+  this->Script("option add *selectColor #666");
+#endif
+
+#ifdef VTK_MANGLE_MESA
+  if (this->UseSoftwareRendering)
+    {
     this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
                           "_graphics_fact SetUseMesaClasses 1\n"
                           "_graphics_fact Delete");
     this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
                           "_imaging_fact SetUseMesaClasses 1\n"
                           "_imaging_fact Delete");
-    if ( getenv("PV_SOFTWARE_RENDERING") ||
-         vtkPVApplication::CheckForArgument(
-           argc, argv, "--use-satellite-software", index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-s",
-                                            index) == VTK_OK)
+    if (this->UseSatelliteSoftware)
       {
       this->Script("vtkGraphicsFactory _graphics_fact\n"
                    "_graphics_fact SetUseMesaClasses 0\n"
@@ -887,7 +950,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Handle setting up the SGI pipes.
   if (this->UseRenderingGroup)
     {
-    int numProcs = this->Controller->GetNumberOfProcesses();
+    int numProcs = this->ProcessModule->GetNumberOfPartitions();
     int numPipes = 1;
     int id;
     // Until I add a user interface to set the number of pipes,
@@ -984,10 +1047,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
-       == VTK_OK || 
-       vtkPVApplication::CheckForArgument(argc, argv, "-e", index) 
-       == VTK_OK)
+  if (this->StartEmpty)
     {
     ui->InitializeDefaultInterfacesOff();
     }
@@ -1085,7 +1145,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
                       ui->GetMainView()->GetTclName(), ui->GetTclName());
   ui->GetMainView()->SetTraceInitialized(1);
 
-  // If any of the argumens has a .pvs extension, load it as a script.
+  // If any of the arguments has a .pvs extension, load it as a script.
+  int i;
   for (i=1; i < argc; i++)
     {
     if (vtkPVApplication::IsParaViewScriptFile(argv[i]))
@@ -1096,7 +1157,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  if (playDemo)
+  if (this->PlayDemo)
     {
     this->Script("set pvDemoCommandLine 1");
     ui->PlayDemo();
@@ -1110,48 +1171,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
 }
 
 
-#ifdef VTK_USE_MPI
-//----------------------------------------------------------------------------
-vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
-{
-  vtkMPICommunicator* localComm = vtkMPICommunicator::New();
-  vtkMPIGroup* localGroup= vtkMPIGroup::New();
-  vtkMPIController* localController = vtkMPIController::New();
-  vtkMPICommunicator* worldComm = vtkMPICommunicator::GetWorldCommunicator();
-
-  // I might want to pass the reference controller as a parameter.
-  localGroup->Initialize( static_cast<vtkMPIController*>(this->Controller) );
-  for(int i=minId; i<=maxId; i++)
-    {
-    localGroup->AddProcessId(i);
-    }
-  localComm->Initialize(worldComm, localGroup);
-  localGroup->UnRegister(0);
-
-  // Create a local controller (for the sub-group)
-  localController->SetCommunicator(localComm);
-  localComm->UnRegister(0);
-
-  return localController;
-}
-#else
-//----------------------------------------------------------------------------
-vtkMultiProcessController *vtkPVApplication::NewController(int, int)
-{
-  return NULL;
-}
-#endif
-
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
-{
-  int id, myId, num;
-  
-  // Send a break RMI to each of the slaves.
-  num = this->Controller->GetNumberOfProcesses();
-  myId = this->Controller->GetLocalProcessId();
-  
+{  
   this->vtkKWApplication::Exit();
   if ( this->AboutDialog )
     {
@@ -1159,55 +1182,7 @@ void vtkPVApplication::Exit()
     this->AboutDialog = 0;
     }
 
-  for (id = 0; id < num; ++id)
-    {
-    if (id != myId)
-      {
-      this->Controller->TriggerRMI(id, 
-                                   vtkMultiProcessController::BREAK_RMI_TAG);
-      }
-    }
-
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendDataBounds(vtkDataSet *data)
-{
-  float *bounds;
-  
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  bounds = data->GetBounds();
-  this->Controller->Send(bounds, 6, 0, 1967);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendDataNumberOfCells(vtkDataSet *data)
-{
-  int num;
-  
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  num = data->GetNumberOfCells();
-  this->Controller->Send(&num, 1, 0, 1968);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendDataNumberOfPoints(vtkDataSet *data)
-{
-  int num;
-  
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  num = data->GetNumberOfPoints();
-  this->Controller->Send(&num, 1, 0, 1969);
+  this->ProcessModule->Exit();
 }
 
 //----------------------------------------------------------------------------
@@ -1254,55 +1229,6 @@ void vtkPVApplication::GetMapperColorRange(float range[2],
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
-{
-  float range[2];
-  
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-
-  this->GetMapperColorRange(range, mapper);
-  this->Controller->Send(range, 2, 0, 1969);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, 
-                                          int pointDataFlag, 
-                                          char *arrayName,
-                                          int component)
-{
-  float range[2];
-  vtkDataArray *array;
-
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  
-  if (pointDataFlag)
-    {
-    array = data->GetPointData()->GetArray(arrayName);
-    }
-  else
-    {
-    array = data->GetCellData()->GetArray(arrayName);
-    }
-
-  if (array && component >= 0 && component < array->GetNumberOfComponents())
-    {
-    array->GetRange(range, component);
-    }
-  else
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    }
-
-  this->Controller->Send(range, 2, 0, 1976);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartRecordingScript(char *filename)
@@ -1342,479 +1268,29 @@ void vtkPVApplication::StopRecordingScript()
 
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
-{
-  int i, j;
-  int numProcs;
-  int nonEmptyFlag = 0;
-  int activeAttributes[5];
-
-  if (mapper->GetInput() == NULL || this->Controller == NULL ||
-      mapper->GetInput()->GetNumberOfPoints() > 0 ||
-      mapper->GetInput()->GetNumberOfCells() > 0)
-    {
-    return;
-    }
-
-  // Find the first non empty data object on another processes.
-  numProcs = this->Controller->GetNumberOfProcesses();
-  for (i = 1; i < numProcs; ++i)
-    {
-    this->RemoteScript(i, "$Application SendCompleteArrays %s", mapperTclName);
-    this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
-    if (nonEmptyFlag)
-      { // This process has data.  Receive all the arrays, type and component.
-      int num = 0;
-      vtkDataArray *array = 0;
-      char *name;
-      int nameLength = 0;
-      int type = 0;
-      int numComps = 0;
-      
-      // First Point data.
-      mapper->GetInput()->GetPointData()->Initialize();
-      this->Controller->Receive(&num, 1, i, 987244);
-      for (j = 0; j < num; ++j)
-        {
-        this->Controller->Receive(&type, 1, i, 987245);
-        switch (type)
-          {
-          case VTK_INT:
-            array = vtkIntArray::New();
-            break;
-          case VTK_FLOAT:
-            array = vtkFloatArray::New();
-            break;
-          case VTK_DOUBLE:
-            array = vtkDoubleArray::New();
-            break;
-          case VTK_CHAR:
-            array = vtkCharArray::New();
-            break;
-          case VTK_LONG:
-            array = vtkLongArray::New();
-            break;
-          case VTK_SHORT:
-            array = vtkShortArray::New();
-            break;
-          case VTK_UNSIGNED_CHAR:
-            array = vtkUnsignedCharArray::New();
-            break;
-          case VTK_UNSIGNED_INT:
-            array = vtkUnsignedIntArray::New();
-            break;
-          case VTK_UNSIGNED_LONG:
-            array = vtkUnsignedLongArray::New();
-            break;
-          case VTK_UNSIGNED_SHORT:
-            array = vtkUnsignedShortArray::New();
-            break;
-          }
-        this->Controller->Receive(&numComps, 1, i, 987246);
-        array->SetNumberOfComponents(numComps);
-        this->Controller->Receive(&nameLength, 1, i, 987247);
-        name = new char[nameLength];
-        this->Controller->Receive(name, nameLength, i, 987248);
-        array->SetName(name);
-        delete [] name;
-        mapper->GetInput()->GetPointData()->AddArray(array);
-        array->Delete();
-        } // end of loop over point arrays.
-      // Which scalars, ... are active?
-      this->Controller->Receive(activeAttributes, 5, i, 987258);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
-      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
- 
-      // Next Cell data.
-      mapper->GetInput()->GetCellData()->Initialize();
-      this->Controller->Receive(&num, 1, i, 987244);
-      for (j = 0; j < num; ++j)
-        {
-        this->Controller->Receive(&type, 1, i, 987245);
-        switch (type)
-          {
-          case VTK_INT:
-            array = vtkIntArray::New();
-            break;
-          case VTK_FLOAT:
-            array = vtkFloatArray::New();
-            break;
-          case VTK_DOUBLE:
-            array = vtkDoubleArray::New();
-            break;
-          case VTK_CHAR:
-            array = vtkCharArray::New();
-            break;
-          case VTK_LONG:
-            array = vtkLongArray::New();
-            break;
-          case VTK_SHORT:
-            array = vtkShortArray::New();
-            break;
-          case VTK_UNSIGNED_CHAR:
-            array = vtkUnsignedCharArray::New();
-            break;
-          case VTK_UNSIGNED_INT:
-            array = vtkUnsignedIntArray::New();
-            break;
-          case VTK_UNSIGNED_LONG:
-            array = vtkUnsignedLongArray::New();
-            break;
-          case VTK_UNSIGNED_SHORT:
-            array = vtkUnsignedShortArray::New();
-            break;
-          }
-        this->Controller->Receive(&numComps, 1, i, 987246);
-        array->SetNumberOfComponents(numComps);
-        this->Controller->Receive(&nameLength, 1, i, 987247);
-        name = new char[nameLength];
-        this->Controller->Receive(name, nameLength, i, 987248);
-        array->SetName(name);
-        delete [] name;
-        mapper->GetInput()->GetCellData()->AddArray(array);
-        array->Delete();
-        } // end of loop over cell arrays.
-      // Which scalars, ... are active?
-      this->Controller->Receive(activeAttributes, 5, i, 987258);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
-      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
-      
-      // We only need information from one.
-      return;
-      } // End of if-non-empty check.
-    }// End of loop over processes.
-}
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
-{
-  int nonEmptyFlag;
-  int num;
-  int i;
-  int type;
-  int numComps;
-  int nameLength;
-  const char *name;
-  vtkDataArray *array;
-  int activeAttributes[5];
-
-  if (mapper->GetInput() == NULL ||
-      (mapper->GetInput()->GetNumberOfPoints() == 0 &&
-       mapper->GetInput()->GetNumberOfCells() == 0))
-    {
-    nonEmptyFlag = 0;
-    this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-    return;
-    }
-  nonEmptyFlag = 1;
-  this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-
-  // First point data.
-  num = mapper->GetInput()->GetPointData()->GetNumberOfArrays();
-  this->Controller->Send(&num, 1, 0, 987244);
-  for (i = 0; i < num; ++i)
-    {
-    array = mapper->GetInput()->GetPointData()->GetArray(i);
-    type = array->GetDataType();
-
-    this->Controller->Send(&type, 1, 0, 987245);
-    numComps = array->GetNumberOfComponents();
-
-    this->Controller->Send(&numComps, 1, 0, 987246);
-    name = array->GetName();
-    if (name == NULL)
-      {
-      name = "";
-      }
-    nameLength = vtkString::Length(name)+1;
-    this->Controller->Send(&nameLength, 1, 0, 987247);
-    // I am pretty sure that Send does not modify the string.
-    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
-    }
-  mapper->GetInput()->GetPointData()->GetAttributeIndices(activeAttributes);
-  this->Controller->Send(activeAttributes, 5, 0, 987258);
-
-  // Next cell data.
-  num = mapper->GetInput()->GetCellData()->GetNumberOfArrays();
-  this->Controller->Send(&num, 1, 0, 987244);
-  for (i = 0; i < num; ++i)
-    {
-    array = mapper->GetInput()->GetCellData()->GetArray(i);
-    type = array->GetDataType();
-
-    this->Controller->Send(&type, 1, 0, 987245);
-    numComps = array->GetNumberOfComponents();
-
-    this->Controller->Send(&numComps, 1, 0, 987246);
-    name = array->GetName();
-    if (name == NULL)
-      {
-      name = "";
-      }
-    nameLength = vtkString::Length(name+1);
-    this->Controller->Send(&nameLength, 1, 0, 987247);
-    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
-    }
-  mapper->GetInput()->GetCellData()->GetAttributeIndices(activeAttributes);
-  this->Controller->Send(activeAttributes, 5, 0, 987258);
-}
-
-
-// It is easier and safer (for the release) just to duplication this code.
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CompleteArrays(vtkDataSet *data, char *dataTclName)
-{
-  int i, j;
-  int numProcs;
-  int nonEmptyFlag = 0;
-  int activeAttributes[5];
-
-  if (data == NULL || this->Controller == NULL ||
-      data->GetNumberOfPoints() > 0 ||
-      data->GetNumberOfCells() > 0)
-    {
-    return;
-    }
-
-  // Find the first non empty data object on another processes.
-  numProcs = this->Controller->GetNumberOfProcesses();
-  for (i = 1; i < numProcs; ++i)
-    {
-    this->RemoteScript(i, "$Application SendCompleteArrays %s", dataTclName);
-    this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
-    if (nonEmptyFlag)
-      { // This process has data.  Receive all the arrays, type and component.
-      int num = 0;
-      vtkDataArray *array = 0;
-      char *name;
-      int nameLength = 0;
-      int type = 0;
-      int numComps = 0;
-      
-      // First Point data.
-      data->GetPointData()->Initialize();
-      this->Controller->Receive(&num, 1, i, 987244);
-      for (j = 0; j < num; ++j)
-        {
-        this->Controller->Receive(&type, 1, i, 987245);
-        switch (type)
-          {
-          case VTK_INT:
-            array = vtkIntArray::New();
-            break;
-          case VTK_FLOAT:
-            array = vtkFloatArray::New();
-            break;
-          case VTK_DOUBLE:
-            array = vtkDoubleArray::New();
-            break;
-          case VTK_CHAR:
-            array = vtkCharArray::New();
-            break;
-          case VTK_LONG:
-            array = vtkLongArray::New();
-            break;
-          case VTK_SHORT:
-            array = vtkShortArray::New();
-            break;
-          case VTK_UNSIGNED_CHAR:
-            array = vtkUnsignedCharArray::New();
-            break;
-          case VTK_UNSIGNED_INT:
-            array = vtkUnsignedIntArray::New();
-            break;
-          case VTK_UNSIGNED_LONG:
-            array = vtkUnsignedLongArray::New();
-            break;
-          case VTK_UNSIGNED_SHORT:
-            array = vtkUnsignedShortArray::New();
-            break;
-          }
-        this->Controller->Receive(&numComps, 1, i, 987246);
-        array->SetNumberOfComponents(numComps);
-        this->Controller->Receive(&nameLength, 1, i, 987247);
-        name = new char[nameLength];
-        this->Controller->Receive(name, nameLength, i, 987248);
-        array->SetName(name);
-        delete [] name;
-        data->GetPointData()->AddArray(array);
-        array->Delete();
-        } // end of loop over point arrays.
-      // Which scalars, ... are active?
-      this->Controller->Receive(activeAttributes, 5, i, 987258);
-      data->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
-      data->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
-      data->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
-      data->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
-      data->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
- 
-      // Next Cell data.
-      data->GetCellData()->Initialize();
-      this->Controller->Receive(&num, 1, i, 987244);
-      for (j = 0; j < num; ++j)
-        {
-        this->Controller->Receive(&type, 1, i, 987245);
-        switch (type)
-          {
-          case VTK_INT:
-            array = vtkIntArray::New();
-            break;
-          case VTK_FLOAT:
-            array = vtkFloatArray::New();
-            break;
-          case VTK_DOUBLE:
-            array = vtkDoubleArray::New();
-            break;
-          case VTK_CHAR:
-            array = vtkCharArray::New();
-            break;
-          case VTK_LONG:
-            array = vtkLongArray::New();
-            break;
-          case VTK_SHORT:
-            array = vtkShortArray::New();
-            break;
-          case VTK_UNSIGNED_CHAR:
-            array = vtkUnsignedCharArray::New();
-            break;
-          case VTK_UNSIGNED_INT:
-            array = vtkUnsignedIntArray::New();
-            break;
-          case VTK_UNSIGNED_LONG:
-            array = vtkUnsignedLongArray::New();
-            break;
-          case VTK_UNSIGNED_SHORT:
-            array = vtkUnsignedShortArray::New();
-            break;
-          }
-        this->Controller->Receive(&numComps, 1, i, 987246);
-        array->SetNumberOfComponents(numComps);
-        this->Controller->Receive(&nameLength, 1, i, 987247);
-        name = new char[nameLength];
-        this->Controller->Receive(name, nameLength, i, 987248);
-        array->SetName(name);
-        delete [] name;
-        data->GetCellData()->AddArray(array);
-        array->Delete();
-        } // end of loop over cell arrays.
-      // Which scalars, ... are active?
-      this->Controller->Receive(activeAttributes, 5, i, 987258);
-      data->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
-      data->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
-      data->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
-      data->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
-      data->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
-      
-      // We only need information from one.
-      return;
-      } // End of if-non-empty check.
-    }// End of loop over processes.
-}
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendCompleteArrays(vtkDataSet *data)
-{
-  int nonEmptyFlag;
-  int num;
-  int i;
-  int type;
-  int numComps;
-  int nameLength;
-  const char *name;
-  vtkDataArray *array;
-  int activeAttributes[5];
-
-  if (data == NULL ||
-      (data->GetNumberOfPoints() == 0 &&
-       data->GetNumberOfCells() == 0))
-    {
-    nonEmptyFlag = 0;
-    this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-    return;
-    }
-  nonEmptyFlag = 1;
-  this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
-
-  // First point data.
-  num = data->GetPointData()->GetNumberOfArrays();
-  this->Controller->Send(&num, 1, 0, 987244);
-  for (i = 0; i < num; ++i)
-    {
-    array = data->GetPointData()->GetArray(i);
-    type = array->GetDataType();
-
-    this->Controller->Send(&type, 1, 0, 987245);
-    numComps = array->GetNumberOfComponents();
-
-    this->Controller->Send(&numComps, 1, 0, 987246);
-    name = array->GetName();
-    if (name == NULL)
-      {
-      name = "";
-      }
-    nameLength = vtkString::Length(name)+1;
-    this->Controller->Send(&nameLength, 1, 0, 987247);
-    // I am pretty sure that Send does not modify the string.
-    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
-    }
-  data->GetPointData()->GetAttributeIndices(activeAttributes);
-  this->Controller->Send(activeAttributes, 5, 0, 987258);
-
-  // Next cell data.
-  num = data->GetCellData()->GetNumberOfArrays();
-  this->Controller->Send(&num, 1, 0, 987244);
-  for (i = 0; i < num; ++i)
-    {
-    array = data->GetCellData()->GetArray(i);
-    type = array->GetDataType();
-
-    this->Controller->Send(&type, 1, 0, 987245);
-    numComps = array->GetNumberOfComponents();
-
-    this->Controller->Send(&numComps, 1, 0, 987246);
-    name = array->GetName();
-    if (name == NULL)
-      {
-      name = "";
-      }
-    nameLength = vtkString::Length(name+1);
-    this->Controller->Send(&nameLength, 1, 0, 987247);
-    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
-    }
-  data->GetCellData()->GetAttributeIndices(activeAttributes);
-  this->Controller->Send(activeAttributes, 5, 0, 987258);
-}
-
-
-
-
-
-
-
-
-
-
-
 void vtkPVApplication::SetGlobalLODFlag(int val)
 {
-  vtkPVApplication::GlobalLODFlag = val;
-
-  if (this->Controller->GetLocalProcessId() == 0)
+  if (vtkPVApplication::GlobalLODFlag == val)
     {
-    int idx, num;
-    num = this->Controller->GetNumberOfProcesses();
-    for (idx = 1; idx < num; ++idx)
-      {
-      this->RemoteScript(idx, "$Application SetGlobalLODFlag %d", val);
-      }
+    return;
     }
+
+  this->ProcessModule->BroadcastScript(
+                        "$Application SetGlobalLODFlagInternal %d",val);
 }
 
+ 
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetGlobalLODFlagInternal(int val)
+{
+  vtkPVApplication::GlobalLODFlag = val;
+}
+
+
+
+
+
+//----------------------------------------------------------------------------
 int vtkPVApplication::GetGlobalLODFlag()
 {
   return vtkPVApplication::GlobalLODFlag;
@@ -2052,7 +1528,7 @@ void vtkPVApplication::ErrorExit()
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Controller: " << this->Controller << endl;;
+  os << indent << "ProcessModule: " << this->ProcessModule << endl;;
   os << indent << "MajorVersion: " << this->MajorVersion << endl;
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "RunningParaViewScript: " 
@@ -2066,6 +1542,27 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "UseTiledDisplay: On\n";
     os << indent << "TileDimensions: " << this->TileDimensions[0]
        << ", " << this->TileDimensions[1] << endl;
+    }
+
+  if (this->ClientMode)
+    {
+    os << indent << "Running as a client\n";
+    }
+  if (this->ServerMode)
+    {
+    os << indent << "Running as a server\n";
+    }
+  if (this->UseSoftwareRendering)
+    {
+    os << indent << "UseSoftwareRendering: Enabled\n";
+    }
+  if (this->UseSatelliteSoftware)
+    {
+    os << indent << "UseSatelliteSoftware: Enabled\n";
+    }
+  if (this->StartEmpty)
+    {
+    os << indent << "ParaView was started with no default modules.\n";
     }
 
   os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
@@ -2134,3 +1631,122 @@ const char* const vtkPVApplication::LoadComponentProc =
 "    }\n"
 "    namespace export load_component\n"
 "}\n";
+
+
+
+
+
+
+//============================================================================
+// Stuff that is a part of render-process module.
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
+{
+  if (this->ProcessModule)
+    {
+    this->ProcessModule->RemoteSimpleScript(remoteId, str);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::BroadcastSimpleScript(const char *str)
+{
+  if (this->ProcessModule)
+    {
+    this->ProcessModule->BroadcastSimpleScript(str);
+    }
+  else
+    {
+    this->SimpleScript(str);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::GetPVDataBounds(vtkPVData *pvd, float bounds[6])
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return;
+    }
+
+  this->ProcessModule->GetPVDataBounds(pvd, bounds);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::GetPVDataNumberOfCells(vtkPVData *pvd)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return 0;
+    }
+
+  return this->ProcessModule->GetPVDataNumberOfCells(pvd);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::GetPVDataNumberOfPoints(vtkPVData *pvd)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return 0;
+    }
+
+  return this->ProcessModule->GetPVDataNumberOfPoints(pvd);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
+                            const char *arrayName, int component, float *range)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return;
+    }
+
+  this->ProcessModule->GetPVDataArrayComponentRange(pvd, pointDataFlag, 
+                                                arrayName, component, range);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::InitializePVDataPartition(vtkPVData *pvd)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return;
+    }
+
+  this->ProcessModule->InitializePVDataPartition(pvd);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return;
+    }
+
+  this->ProcessModule->CompleteArrays(mapper, mapperTclName);
+}
+//----------------------------------------------------------------------------
+void vtkPVApplication::CompleteArrays(vtkDataSet *data, char *dataTclName)
+{
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("Missing process module.");
+    return;
+    }
+
+  this->ProcessModule->CompleteArrays(data, dataTclName);
+}
+

@@ -338,11 +338,6 @@ public:
   // Description:
   // Get the tcl name of the vtkPVGeometryFilter.
   vtkGetStringMacro(GeometryTclName);
-
-  // Description:
-  // Get the tcl name of the mapper
-  vtkGetStringMacro(MapperTclName);
-  vtkGetStringMacro(LODMapperTclName);
   
   vtkPVRenderView *PVRenderView;
 
@@ -361,8 +356,8 @@ public:
   // Description:
   // This method returns the range of an arrays component.
   // It gathers range from partitions on all processes.
-  void GetArrayComponentRange(float *range, int pointDataFlag,
-                              const char *arrayName, int component);
+  void GetArrayComponentRange(int pointDataFlag, const char *arrayName, 
+                              int component, float *range);
 
   void ForceUpdate(vtkPVApplication* pvApp);
 
@@ -382,6 +377,15 @@ public:
   // the size of the total (across all processes) data set size.
   void SetCollectThreshold(float size);
   vtkGetMacro(CollectThreshold, float)
+
+  //=============================================================== 
+  // Description:
+  // These access methods are neede for process module abstraction.
+  vtkGetStringMacro(UpdateSuppressorTclName);
+  vtkGetStringMacro(LODUpdateSuppressorTclName);
+  vtkGetStringMacro(MapperTclName);
+  vtkGetStringMacro(LODMapperTclName);
+
 
 protected:
   vtkPVData();

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderGroupDialog.h"
 
 #include "vtkKWApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntry.h"
@@ -56,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.3");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -319,12 +320,8 @@ void vtkPVRenderGroupDialog::NumberEntryCallback()
     vtkPVApplication::SafeDownCast(this->GetApplication());
   if (pvApp)
     {
-    vtkMultiProcessController* cont = pvApp->GetController();
-    if (cont)
-      {
-      int numProcs = cont->GetNumberOfProcesses();
-      if (num > numProcs) { num = numProcs; }
-      }
+    int numProcs = pvApp->GetProcessModule()->GetNumberOfPartitions();
+    if (num > numProcs) { num = numProcs; }
     }
   this->SetNumberOfProcessesInGroup(num);
 }

@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
+#include "vtkPVProcessModule.h"
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
@@ -104,7 +105,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.218");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.219");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -521,7 +522,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->SetRenderWindowTclName("RenWin1");
   
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
-      (pvApp->GetController()->GetNumberOfProcesses() > 1))
+      (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
     {
     pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
     }
@@ -536,6 +537,19 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
     this->CompositeTclName = NULL;
     this->SetCompositeTclName("TDispManager1");
+    }
+  else if (pvApp->GetClientMode() || pvApp->GetServerMode())
+    {
+    this->Composite = NULL;
+    pvApp->MakeTclObject("vtkClientCompositeManager", "CCompositeManager1");
+    // Clean up this mess !!!!!!!!!!!!!
+    // Even a cast to vtkPVClientServerModule would be better than this.
+    // How can we syncronize the process modules and render modules?
+    pvApp->BroadcastScript("CCompositeManager1 SetClientController [[$Application GetProcessModule] GetSocketController]");
+    pvApp->BroadcastScript("CCompositeManager1 SetClientFlag [$Application GetClientMode]");
+
+    this->CompositeTclName = NULL;
+    this->SetCompositeTclName("CCompositeManager1");    
     }
   else
     {
@@ -1264,8 +1278,8 @@ void vtkPVRenderView::CreateViewProperties()
                this->InterruptRenderCheck->GetWidgetName());
 
   // LOD parameters: collection threshold
-
-  if (pvapp->GetController()->GetNumberOfProcesses() > 1 &&
+  // Conditional interface should really be part of a module. !!!!
+  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 &&
       !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
@@ -1312,8 +1326,8 @@ void vtkPVRenderView::CreateViewProperties()
     }
 
   // Parallel rendering parameters
-
-  if (pvapp->GetController()->GetNumberOfProcesses() > 1 && this->Composite)
+  // Conditional interface should really be part of a module !!!!!!
+  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 && this->Composite)
     {
     this->ParallelRenderParametersFrame->SetParent( 
       this->GeneralProperties->GetFrame() );
@@ -2321,7 +2335,8 @@ void vtkPVRenderView::InterruptRenderCallback()
   if (this->Composite)
     {
     vtkPVApplication* pvApp = this->GetPVApplication();
-    if (pvApp->GetController()->GetNumberOfProcesses() > 1 )
+    // Interrupts will have to work with client server process modules. !!!!!!
+    if (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1 )
       {
       pvApp->BroadcastScript(
         "%s SetEnableAbort %d",this->CompositeTclName,
@@ -2617,7 +2632,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.218 $");
+  this->ExtractRevision(os,"$Revision: 1.219 $");
 }
 
 //------------------------------------------------------------------------------

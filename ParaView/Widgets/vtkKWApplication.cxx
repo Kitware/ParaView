@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.99");
+vtkCxxRevisionMacro(vtkKWApplication, "1.100");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -146,6 +146,10 @@ vtkKWApplication::vtkKWApplication()
                  this->BalloonHelpWindow->GetWidgetName());
     this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
     this->SplashScreen = vtkKWSplashScreen::New();
+    }
+  else
+    {
+    this->SplashScreen = NULL;
     }
 
   this->ExitOnReturn = 0;

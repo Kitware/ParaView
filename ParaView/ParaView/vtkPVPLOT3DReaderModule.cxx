@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.8");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -163,11 +163,11 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
       int len;
       if ( i == 0 )
         {
-        len = strlen(tclName)+ strlen("Output") + 3;
+        len = (int)(strlen(tclName)+ strlen("Output")) + 3;
         }
       else
         {
-        len = strlen(tclName)+ strlen("Output") + 
+        len = (int)(strlen(tclName)+ strlen("Output")) + 
           static_cast<int>(log10(static_cast<double>(i))) + 3;
         }
       outputTclName = new char[len];

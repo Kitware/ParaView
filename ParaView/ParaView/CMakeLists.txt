@@ -1,6 +1,7 @@
 SET( ParaView_SRCS
 vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
+vtkClientCompositeManager.cxx
 vtkCompositeProp.cxx
 vtkDuplicatePolyData.cxx
 vtkRedistributePolyData.cxx
@@ -19,6 +20,7 @@ vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
 vtkPVCameraIcon.cxx
 vtkPVCameraManipulator.cxx
+vtkPVClientServerModule.cxx
 vtkPVColorMap.cxx
 vtkPVComponentSelection.cxx
 vtkPVConnectivityFilter.cxx
@@ -55,6 +57,7 @@ vtkPVLabeledToggle.cxx
 vtkPVLineWidget.cxx
 vtkPVLineSourceWidget.cxx
 vtkPVMinMax.cxx
+vtkPVMPIProcessModule.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
 vtkPVPassThrough.cxx
@@ -64,6 +67,7 @@ vtkPVPlaneWidget.cxx
 vtkPVPointSourceWidget.cxx
 vtkPVPointWidget.cxx
 vtkPVProbe.cxx
+vtkPVProcessModule.cxx
 vtkPVPushButton.cxx
 vtkPVReaderModule.cxx
 vtkPVRenderGroupDialog.cxx

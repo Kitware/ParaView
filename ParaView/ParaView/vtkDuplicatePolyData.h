@@ -43,6 +43,17 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  void InitializeSchedule(int numProcs);
+
+  // Description:
+  // This flag causes sends and receives to be matched.
+  // When this flag is off, two sends occur then two receives.
+  // I want to see if it makes a difference in performance.
+  // The flag is on by default.
+  vtkSetMacro(Synchronous, int);
+  vtkGetMacro(Synchronous, int);
+  vtkBooleanMacro(Synchronous, int);
+
 protected:
   vtkDuplicatePolyData();
   ~vtkDuplicatePolyData();
@@ -53,6 +64,11 @@ protected:
   void ExecuteInformation();
 
   vtkMultiProcessController *Controller;
+  int Synchronous;
+
+  int NumberOfProcesses;
+  int ScheduleLength;
+  int **Schedule;
 
 private:
   vtkDuplicatePolyData(const vtkDuplicatePolyData&); // Not implemented
@@ -60,3 +76,4 @@ private:
 };
 
 #endif
+

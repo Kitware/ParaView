@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.36");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.37");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1389,7 +1389,7 @@ void vtkPVColorMap::ResetScalarRange()
     {
     pvd = pvs->GetPVOutput();
     // For point data ...
-    pvd->GetArrayComponentRange(tmp, 1, this->ArrayName, component);
+    pvd->GetArrayComponentRange(1, this->ArrayName, component, tmp);
     if (tmp[0] < range[0])
       {
       range[0] = tmp[0];
@@ -1399,7 +1399,7 @@ void vtkPVColorMap::ResetScalarRange()
       range[1] = tmp[1];
       }
     // For cell data ...
-    pvd->GetArrayComponentRange(tmp, 0, this->ArrayName, component);
+    pvd->GetArrayComponentRange(0, this->ArrayName, component, tmp);
     if (tmp[0] < range[0])
       {
       range[0] = tmp[0];

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.11");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -106,12 +106,9 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 void vtkPVScalarRangeLabel::Update()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int id, num;
   vtkPVInputMenu *inputMenu;
   vtkPVData *pvd;
   vtkDataArray *array;
-  float temp[2];
 
   if (this->ArrayMenu == NULL)
     {
@@ -142,35 +139,8 @@ void vtkPVScalarRangeLabel::Update()
     return;
     }
 
-  this->Range[0] = VTK_LARGE_FLOAT;
-  this->Range[1] = -VTK_LARGE_FLOAT;
-  pvApp->BroadcastScript("$Application SendDataArrayRange %s 1 {%s} 0",
-                         pvd->GetVTKDataTclName(),
-                         array->GetName());
-  
-  array->GetRange(this->Range, 0);  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; id++)
-    {
-    controller->Receive(temp, 2, id, 1976);
-    // try to protect against invalid ranges.
-    if (this->Range[0] > this->Range[1])
-      {
-      this->Range[0] = temp[0];
-      this->Range[1] = temp[1];
-      }
-    else if (temp[0] < temp[1])
-      {
-      if (temp[0] < this->Range[0])
-        {
-        this->Range[0] = temp[0];
-        }
-      if (temp[1] > this->Range[1])
-        {
-        this->Range[1] = temp[1];
-        }
-      }
-    }
+  pvApp->GetPVDataArrayComponentRange(pvd, 1, array->GetName(), 0, 
+                                      this->Range);
 
   char str[512];
   if (this->Range[0] > this->Range[1])

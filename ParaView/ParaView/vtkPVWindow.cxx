@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVWindow.h"
+#include "vtkPVProcessModule.h"
 
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
@@ -127,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.394");
+vtkCxxRevisionMacro(vtkPVWindow, "1.395");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1582,7 +1583,7 @@ void vtkPVWindow::PlayDemo()
     sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
     if (stat(temp1, &fs) == 0) 
       {
-      int len=strlen(loc);
+      int len=(int)(strlen(loc));
       for(int i=0; i<len; i++)
         {
         if (loc[i] == '\\') { loc[i] = '/';}
@@ -2114,12 +2115,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
   
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numProcs = 1;
-  if (pvApp->GetController())
-    {
-    numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    }
-  int parallel = (numProcs > 1);
+  int numParts = pvApp->GetProcessModule()->GetNumberOfPartitions();
+  int parallel = (numParts > 1);
   
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = this->FindPVWriter(filename, parallel);
@@ -2163,7 +2160,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
   
   // Actually write the file.
   writer->Write(filename, this->GetCurrentPVData()->GetVTKDataTclName(),
-                numProcs, ghostLevel);
+                numParts, ghostLevel);
 }
 
 //----------------------------------------------------------------------------
@@ -2182,12 +2179,8 @@ void vtkPVWindow::WriteData()
 
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numProcs = 1;
-  if (pvApp->GetController())
-    {
-    numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    }
-  int parallel = (numProcs > 1);
+  int numParts = pvApp->GetProcessModule()->GetNumberOfPartitions();
+  int parallel = (numParts > 1);
   const char* defaultExtension = 0;
   
   ostrstream typesStr;
@@ -3915,7 +3908,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.394 $");
+  this->ExtractRevision(os,"$Revision: 1.395 $");
 }
 
 //----------------------------------------------------------------------------

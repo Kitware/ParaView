@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.178");
+vtkCxxRevisionMacro(vtkPVData, "1.179");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -470,7 +470,6 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
 //----------------------------------------------------------------------------
 void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  int numProcs, id;
   char tclName[100];
   
   this->vtkKWObject::SetApplication(pvApp);
@@ -655,65 +654,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
                          this->LODMapperTclName);
   
-
-
-  // Hard code assignment based on processes.
-  numProcs = pvApp->GetController()->GetNumberOfProcesses();
-
-  // Special debug situation. Only generate half the data.
-  // This allows us to debug the parallel features of the
-  // application and VTK on only one process.
-  int debugNum = numProcs;
-  if (getenv("PV_DEBUG_ZERO") != NULL)
-    {
-    this->Script("%s SetNumberOfPieces 0",this->MapperTclName);
-    this->Script("%s SetPiece 0", this->MapperTclName);
-    this->Script("%s SetUpdateNumberOfPieces 0",this->UpdateSuppressorTclName);
-    this->Script("%s SetUpdatePiece 0", this->UpdateSuppressorTclName);
-    this->Script("%s SetNumberOfPieces 0", this->LODMapperTclName);
-    this->Script("%s SetPiece 0", this->LODMapperTclName);
-    for (id = 1; id < numProcs; ++id)
-      {
-      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-                          this->MapperTclName, debugNum-1);
-      pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id-1);
-      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->UpdateSuppressorTclName, debugNum-1);
-      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->UpdateSuppressorTclName, id-1);
-      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-                          this->LODMapperTclName, debugNum-1);
-      pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
-      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->LODUpdateSuppressorTclName, debugNum-1);
-      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->LODUpdateSuppressorTclName, id-1);
-      }
-    }
-  else 
-    {
-    if (getenv("PV_DEBUG_HALF") != NULL)
-      {
-      debugNum *= 2;
-      }
-    for (id = 0; id < numProcs; ++id)
-      {
-      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-                          this->MapperTclName, debugNum);
-      pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
-      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->UpdateSuppressorTclName, debugNum);
-      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->UpdateSuppressorTclName, id);
-      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-                          this->LODMapperTclName, debugNum);
-      pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
-      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->LODUpdateSuppressorTclName, debugNum);
-      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->LODUpdateSuppressorTclName, id);
-      }
-    }
+  pvApp->InitializePVDataPartition(this);
 }
 
 //----------------------------------------------------------------------------
@@ -841,9 +782,6 @@ vtkPVSource *vtkPVData::GetPVConsumer(int i)
 void vtkPVData::GetBounds(float bounds[6])
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  float tmp[6];
-  int id, num;
   
   if (this->VTKData == NULL)
     {
@@ -852,40 +790,7 @@ void vtkPVData::GetBounds(float bounds[6])
     return;
     }
 
-  this->VTKData->GetBounds(bounds);
-
-  pvApp->BroadcastScript("$Application SendDataBounds %s", 
-                         this->VTKDataTclName);
-  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    controller->Receive(tmp, 6, id, 1967);
-    if (tmp[0] < bounds[0])
-      {
-      bounds[0] = tmp[0];
-      }
-    if (tmp[1] > bounds[1])
-      {
-      bounds[1] = tmp[1];
-      }
-    if (tmp[2] < bounds[2])
-      {
-      bounds[2] = tmp[2];
-      }
-    if (tmp[3] > bounds[3])
-      {
-      bounds[3] = tmp[3];
-      }
-    if (tmp[4] < bounds[4])
-      {
-      bounds[4] = tmp[4];
-      }
-    if (tmp[5] > bounds[5])
-      {
-      bounds[5] = tmp[5];
-      }
-    }
+  pvApp->GetPVDataBounds(this, bounds);
 }
 
 //----------------------------------------------------------------------------
@@ -893,27 +798,13 @@ void vtkPVData::GetBounds(float bounds[6])
 int vtkPVData::GetNumberOfCells()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int tmp = 0;
-  int numCells, id, numProcs;
   
   if (this->VTKData == NULL)
     {
     return 0;
     }
 
-  numCells = this->VTKData->GetNumberOfCells();
-
-  pvApp->BroadcastScript("$Application SendDataNumberOfCells %s", 
-                         this->VTKDataTclName);
-  
-  numProcs = controller->GetNumberOfProcesses();
-  for (id = 1; id < numProcs; ++id)
-    {
-    controller->Receive(&tmp, 1, id, 1968);
-    numCells += tmp;
-    }
-  return numCells;
+  return pvApp->GetPVDataNumberOfCells(this);
 }
 
 //----------------------------------------------------------------------------
@@ -921,27 +812,13 @@ int vtkPVData::GetNumberOfCells()
 int vtkPVData::GetNumberOfPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int tmp = 0;
-  int numPoints, id, numProcs;
   
   if (this->VTKData == NULL)
     {
     return 0;
     }
 
-  numPoints = this->VTKData->GetNumberOfPoints();
-  
-  pvApp->BroadcastScript("$Application SendDataNumberOfPoints %s", 
-                         this->VTKDataTclName);
-  
-  numProcs = controller->GetNumberOfProcesses();
-  for (id = 1; id < numProcs; ++id)
-    {
-    controller->Receive(&tmp, 1, id, 1969);
-    numPoints += tmp;
-    }
-  return numPoints;
+  return pvApp->GetPVDataNumberOfPoints(this);
 }
 
 //----------------------------------------------------------------------------
@@ -2979,6 +2856,15 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LODResolution: " << this->LODResolution << endl;
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
+
+  if (this->UpdateSuppressorTclName)
+    {
+    os << indent << "UpdateSuppressor: " << this->UpdateSuppressorTclName << endl;
+    }
+  if (this->LODUpdateSuppressorTclName)
+    {
+    os << indent << "LODUpdateSuppressor: " << this->LODUpdateSuppressorTclName << endl;
+    }
 }
 
 //-------}---------------------------------------------------------------------
@@ -3387,7 +3273,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.178 $");
+  this->ExtractRevision(os,"$Revision: 1.179 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3578,60 +3464,13 @@ void vtkPVData::SerializeToken(istream& is, const char token[1024])
 }
   
 //----------------------------------------------------------------------------
-void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
-                                       const char *arrayName, int component)
+void vtkPVData::GetArrayComponentRange(int pointDataFlag,
+                         const char *arrayName, int component, float *range)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int id, num;
-  vtkDataArray *array;
-  float temp[2];
 
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
-
-  if (pointDataFlag)
-    {
-    array = this->VTKData->GetPointData()->GetArray(arrayName);
-    }
-  else
-    {
-    array = this->VTKData->GetCellData()->GetArray(arrayName);
-    }
-
-  if (array == NULL || array->GetName() == NULL)
-    {
-    return;
-    }
-
-  array->GetRange(range, component);  
-
-  pvApp->BroadcastScript("$Application SendDataArrayRange %s %d {%s} %d",
-                         this->GetVTKDataTclName(),
-                         pointDataFlag, array->GetName(), component);
-  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; id++)
-    {
-    controller->Receive(temp, 2, id, 1976);
-    // try to protect against invalid ranges.
-    if (range[0] > range[1])
-      {
-      range[0] = temp[0];
-      range[1] = temp[1];
-      }
-    else if (temp[0] <= temp[1])
-      {
-      if (temp[0] < range[0])
-        {
-        range[0] = temp[0];
-        }
-      if (temp[1] > range[1])
-        {
-        range[1] = temp[1];
-        }
-      }
-    }
+  pvApp->GetPVDataArrayComponentRange(this, pointDataFlag, arrayName, 
+                                      component, range);
 }
 
 

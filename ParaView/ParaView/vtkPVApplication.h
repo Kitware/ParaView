@@ -52,11 +52,13 @@ class vtkDataSet;
 class vtkKWMessageDialog;
 class vtkMapper;
 class vtkMultiProcessController;
+class vtkPVProcessModule;
 class vtkPVOutputWindow;
 class vtkPVSource;
 class vtkPVWindow;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
+class vtkPVData;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -71,6 +73,13 @@ public:
   vtkTypeRevisionMacro(vtkPVApplication,vtkKWApplication);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // Parses the command line arguments and modifies the applications
+  // ivars appropriately.
+  // Return error (1) if the arguments are not formed properly.
+  // Returns 0 if all went well.
+  int ParseCommandLineArguments(int argc, char*argv[]);
+
   // Description:
   // Start running the main application.
   virtual void Start(int argc, char *argv[]);
@@ -95,10 +104,15 @@ public:
   void BroadcastSimpleScript(const char *str);
   
   // Description:
+  // Process module contains all methods for managing 
+  // processes and communication.
+  void SetProcessModule(vtkPVProcessModule *module);
+  vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
+  
+  // Description:
   // We need to keep the controller in a prominent spot because there is no
   // more "RegisterAndGetGlobalController" method.
-  void SetController(vtkMultiProcessController *c);
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  vtkMultiProcessController *GetController();
   
   // Description:
   // Make sure the user accepts the license before running.
@@ -138,19 +152,6 @@ public:
   // This method returns pointer to the object specified as a tcl
   // name.
   vtkObject *TclToVTKObject(const char *tclName);
-
-  // Description:
-  // When ParaView needs to query data on other procs, it needs a way to
-  // get the information back (only VTK object on satellite procs).
-  // These methods send the requested data to proc 0 with a tag of 1966.
-  // Note:  Process 0 returns without sending.
-  // These should probably be consolidated into one GetDataInfo method.
-  void SendDataBounds(vtkDataSet *data);
-  void SendDataNumberOfCells(vtkDataSet *data);
-  void SendDataNumberOfPoints(vtkDataSet *data);
-  void SendMapperColorRange(vtkPolyDataMapper *mapper);
-  void SendDataArrayRange(vtkDataSet *data, int pointDataFlag,
-                          char *arrayName, int component);
   
   // Description:
   // A method that should probably be in the mapper.
@@ -173,10 +174,9 @@ public:
   // Description:
   // Temporary fix because empty VTK objects do not have arrays.
   // This will create arrays if they exist on other processes.
+  // Get rid of the mapper version of this call !!!!!!!!!!!
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
-  void SendCompleteArrays(vtkMapper *mapper);
   void CompleteArrays(vtkDataSet *data, char *dataTclName);
-  void SendCompleteArrays(vtkDataSet *data);
 
   // Description:
   // Since ParaView has only one window, we might as well provide access to it.
@@ -206,6 +206,7 @@ public:
   // vtkCollectPolydata filter.
   void SetGlobalLODFlag(int val);
   static int GetGlobalLODFlag();
+  void SetGlobalLODFlagInternal(int val);
 
   // Description:
   // For loggin from Tcl start and end execute events.  We do not have c
@@ -228,11 +229,6 @@ public:
   // Description:
   // Get the process Id when running in MPI mode.
   vtkGetMacro(ProcessId, int);
-
-  // Description:
-  // A helper class to create a controller/communicator pair
-  // the has a restricted set of processes as its world.
-  vtkMultiProcessController *NewController(int minId, int maxId);
 
   // Description:
   // A method used to set environment variables in the satellite
@@ -259,6 +255,43 @@ public:
   vtkGetVector2Macro(TileDimensions, int);
 
   // Description:
+  // Variable set by command line arguments --client or -c
+  // Client mode tries to connect to a server through a socket.
+  // The client does not have any local partitioned data.
+  vtkGetMacro(ClientMode,int);
+
+  // Description:
+  // Variable set by command line arguments --server or -v
+  // Server can have many processes, but has no UI.
+  vtkGetMacro(ServerMode,int);
+
+  // Description:
+  // Get the host command line option. (--host=localhost).
+  vtkGetStringMacro(HostName);
+
+  // Description:
+  // The the port for the client/server socket connection.
+  vtkGetMacro(Port,int);
+
+  // Description:
+  // Set by the command line arguments --use-software-rendering or -r
+  // Requires ParaView is linked with mangled mesa.
+  // Supports off screen rendering.
+  vtkGetMacro(UseSoftwareRendering,int);
+
+  // Description:
+  // Set by the command line arguments --use-satellite-software or -s
+  // Requires ParaView is linked with mangled mesa.
+  // Satellite processes use mesa (supports offscreen) while root
+  // can still use hardware acceleration.
+  vtkGetMacro(UseSatelliteSoftware,int);
+
+  // Description:
+  // Set by the command line arguments --start-empty or -e
+  // This flag is set when ParaView was started without the default modules.
+  vtkGetMacro(StartEmpty,int);
+
+  // Description:
   // This is used internally for specifying how many pipes
   // to use for rendering when UseRenderingGroup is defined.
   // All processes have this set to the same value.
@@ -266,14 +299,39 @@ public:
   vtkGetMacro(NumberOfPipes, int);
 
   // Description:
-  // The name of the trace file.
-  vtkGetStringMacro(TraceFileName);
-
-  // Description:
   // This is used (Unix only) to obtain the path of the executable.
   // This path is used to locate demos etc.
   vtkGetStringMacro(Argv0);
-  vtkSetStringMacro(Argv0);
+
+  // Description:
+  // The name of the trace file.
+  vtkGetStringMacro(TraceFileName);
+
+  //=============================================================================
+  // Methods that belong in a renderer-process module.
+
+  // Description:
+  // Get the bounds of the distributed data.
+  void GetPVDataBounds(vtkPVData *pvd, float bounds[6]);
+
+  // Description:
+  // Get the total number of points across all processes.
+  int GetPVDataNumberOfPoints(vtkPVData *pvd);
+
+  // Description:
+  // Get the total number of cells across all processes.
+  int GetPVDataNumberOfCells(vtkPVData *pvd);
+
+  // Description:
+  // Get the range across all processes of a component of an array.
+  // If the component is -1, then the magnitude range is returned.
+  void GetPVDataArrayComponentRange(vtkPVData *pvd, int pointDataFlag,
+                                    const char *arrayName, int component, 
+                                    float *range);
+
+  // Description:
+  // This initializes the data object to request the correct partiaion.
+  void InitializePVDataPartition(vtkPVData *pvd);
 
 protected:
   vtkPVApplication();
@@ -299,10 +357,19 @@ protected:
 
   int Display3DWidgets;
 
+  // Command line arguments.
+  int ClientMode;
+  int ServerMode;
+  char* HostName;
+  vtkSetStringMacro(HostName);
+  int Port;
+  int UseSoftwareRendering;
+  int UseSatelliteSoftware;
+  int StartEmpty;
+  int PlayDemo;
   int UseRenderingGroup;
   char* GroupFileName;
   vtkSetStringMacro(GroupFileName);
-
   int UseTiledDisplay;
   int TileDimensions[2];
 
@@ -313,7 +380,7 @@ protected:
 
   int RunningParaViewScript;
 
-  vtkMultiProcessController *Controller;
+  vtkPVProcessModule *ProcessModule;
   
   vtkPVOutputWindow *OutputWindow;
 
@@ -329,6 +396,7 @@ protected:
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
   char* Argv0;
+  vtkSetStringMacro(Argv0);
 
   //BTX
   enum

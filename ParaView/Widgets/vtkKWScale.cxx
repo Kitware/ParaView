@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.34");
+vtkCxxRevisionMacro(vtkKWScale, "1.35");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -536,7 +536,7 @@ void vtkKWScale::UpdateEntryResolution()
     char *pos = strchr(res, '.');
     if (pos)
       {
-      this->EntryResolution = strlen(res) - (pos - res) - 1;
+      this->EntryResolution = (int)(strlen(res)) - (pos - res) - 1;
       }
     }
 }

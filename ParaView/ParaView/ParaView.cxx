@@ -28,101 +28,105 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkToolkits.h"
 #ifdef VTK_USE_MPI
 # include <mpi.h>
-#else
-# include "vtkDummyController.h"
 #endif
 
 #include "vtkMultiProcessController.h"
+#include "vtkPVMPIProcessModule.h"
+#include "vtkPVClientServerModule.h"
 #include "vtkPVApplication.h"
 
 #include "vtkObject.h"
 #include "vtkTclUtil.h"
 
-
-// external global variable.
-vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
-
-
-struct vtkPVArgs
+//----------------------------------------------------------------------------
+int MyMain(int argc, char *argv[])
 {
-  int argc;
-  char **argv;
-  int* RetVal;
-};
+  int retVal = 0;
+  int myId = 0;
+  vtkPVProcessModule *pm;
+  vtkPVApplication *app;
 
-
-
-void vtkPVSlaveScript(void *localArg, void *remoteArg, 
-                      int vtkNotUsed(remoteArgLength),
-                      int vtkNotUsed(remoteProcessId))
-{
-  vtkPVApplication *self = (vtkPVApplication *)(localArg);
-
-  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
-  
-  self->SimpleScript((char*)remoteArg);
-}
-
-// Each process starts with this method.  One process is designated as
-// "master" and starts the application.  The other processes are slaves to
-// the application.
-void Process_Init(vtkMultiProcessController *controller, void *arg )
-{
-  vtkPVArgs *pvArgs = (vtkPVArgs *)arg;
-  int myId, numProcs;
-  
-  myId = controller->GetLocalProcessId();
-  numProcs = controller->GetNumberOfProcesses();
-
-#ifdef MPIPROALLOC
-  vtkCommunicator::SetUseCopy(1);
+#ifdef VTK_USE_MPI
+  // This is here to avoid false leak messages from vtkDebugLeaks when
+  // using mpich. It appears that the root process which spawns all the
+  // main processes waits in MPI_Init() and calls exit() when
+  // the others are done, causing apparent memory leaks for any objects
+  // created before MPI_Init().
+  MPI_Init(&argc, &argv);
+  // Might as well get our process ID here.  I use it to determine
+  // Whether to initialize tk.  Once again, splitting Tk and Tcl 
+  // initialization would clean things up.
+  MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
 #endif
 
+  // The server is a special case.  We do not initialize Tk for process 0.
+  // I would rather have application find this command line option, but
+  // I cannot create an application before I initialize Tcl.
+  // I could clean this up if I separate the initialization of Tk and Tcl.
+  // I do not do this because it would affect other applications.
+  int serverMode = 0;
+  int idx;
+  for (idx = 0; idx < argc; ++idx)
+    {
+    if (strcmp(argv[idx],"--server") == 0 || strcmp(argv[idx],"-v") == 0)
+      {
+      serverMode = 1;
+      }
+    }
 
+  // Initialize Tcl/Tk.
   Tcl_Interp *interp;
+  if (serverMode || myId > 0)
+    { // DO not initialize Tk.
+    vtkKWApplication::SetWidgetVisibility(0);
+    }
+  interp = vtkPVApplication::InitializeTcl(argc,argv);
 
-  if (myId ==  0)
-    { // The last process is for UI.
-
-    // We need to pass the local controller to the UI process.
-    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    
-    vtkPVApplication *app = vtkPVApplication::New();
-
-    app->SetNumberOfPipes(numProcs);
-    
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-    app->SetupTrapsForSignals(myId);   
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
-    app->SetController(controller);
-    app->Script("wm withdraw .");
-    app->SetArgv0(pvArgs->argv[0]);
-    app->Start(pvArgs->argc,pvArgs->argv);
-    *(pvArgs->RetVal) = app->GetExitStatus();
+  // Create the application to parse the command line arguments.
+  app = vtkPVApplication::New();
+  if (app->ParseCommandLineArguments(argc, argv))
+    {
+    // Clean up for exit.
     app->Delete();
+    Tcl_DeleteInterp(interp);  
+    return 1;
+    }
+
+  // Create the process module for initializing the processes.
+  if (app->GetClientMode() || app->GetServerMode())
+    {
+    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+    pm = processModule;
     }
   else
     {
-    // The slaves try to connect.  In the future, we may not want to
-    // initialize Tk.
-    //putenv("DISPLAY=:0.0");
-
-    vtkKWApplication::SetWidgetVisibility(0);
-    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    
-    // We should use the application tcl name in the future.
-    // All object in the satellite processes must be created through tcl.
-    // (To assign the correct name).
-    vtkPVApplication *app = vtkPVApplication::New();
-    app->SetController(controller);
-    controller->AddRMI(vtkPVSlaveScript, (void *)(app), 
-                       VTK_PV_SLAVE_SCRIPT_RMI_TAG);
-    controller->ProcessRMIs();
-    app->Delete();
+#ifdef VTK_USE_MPI
+    vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
+#else 
+    vtkPVProcessModule *processModule = vtkPVProcessModule::New();
+#endif
+    pm = processModule;
     }
 
+  pm->SetApplication(app);
+  app->SetProcessModule(pm);
+
+  // This initializes the processes and starts the application.
+  retVal = pm->Start(argc, argv);
+
+  // Clean up for exit.
+  app->Delete();
+  pm->Delete();
+  pm = NULL;
   Tcl_DeleteInterp(interp);
+
+  return retVal;
 }
+
+
+
+
+
 
 #ifdef _WIN32
 #include <windows.h>
@@ -131,12 +135,12 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
                       HINSTANCE vtkNotUsed(hPrevInstance),
                       LPSTR lpCmdLine, int vtkNotUsed(nShowCmd))
 {
-  int argc, retVal=0;
-  char **argv;
-  vtkPVArgs pvArgs;
-
+  int          argc;
+  int          retVal;
+  char**       argv;
   unsigned int i;
-  int j;
+  int          j;
+
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
 
@@ -218,96 +222,23 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
     }
   argv[argc] = 0;
 
-#ifdef VTK_USE_MPI
-// This is here to avoid false leak messages from vtkDebugLeaks when
-// using mpich. It appears that the root process which spawns all the
-// main processes waits in MPI_Init() and calls exit() when
-// the others are done, causing apparent memory leaks for any objects
-// created before MPI_Init().
-  MPI_Init(&argc, &argv);
-  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-  controller->Initialize(&argc, &argv, 1);
-#else
-  vtkDummyController *controller = vtkDummyController::New();  
-#endif
-  
-  if (controller->GetNumberOfProcesses() > 1)
-    {
-    controller->CreateOutputWindow();
-    }
+  // Initialize the processes and start the application.
+  retVal = MyMain(argc, argv);
 
-  pvArgs.argc = argc;
-  pvArgs.argv = argv;
-  pvArgs.RetVal = &retVal;
-
-#ifdef VTK_USE_MPI
-
-  controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
-  controller->SingleMethodExecute();
-  
-  controller->Finalize();
-  controller->Delete();
-
-#else
-  controller->SetNumberOfProcesses(1);
-  vtkMultiProcessController::SetGlobalController(controller);
-  Process_Init(controller, (void *)(&pvArgs)); 
-  controller->Delete();
-#endif
-
+  // Delete arguments
   for(j=0; j<argc; j++)
     {
     free(argv[j]);
     }
   free(argv);
 
-  
+  // !!!!! Should this be in the common main. !!!!!!
   Tcl_Finalize();
   return retVal;;
 }
 #else
 int main(int argc, char *argv[])
 {
-
-#ifdef VTK_USE_MPI
-// This is here to avoid false leak messages from vtkDebugLeaks when
-// using mpich. It appears that the root process which spawns all the
-// main processes waits in MPI_Init() and calls exit() when
-// the others are done, causing apparent memory leaks for any objects
-// created before MPI_Init().
-  MPI_Init(&argc, &argv);
-  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-  controller->Initialize(&argc, &argv, 1);
-#else
-  vtkDummyController *controller = vtkDummyController::New();  
-#endif
-
-  int retVal = 0;
-  // New processes need these args to initialize.
-  vtkPVArgs pvArgs;
-  pvArgs.argc = argc;
-  pvArgs.argv = argv;
-  pvArgs.RetVal = &retVal;
-
-
-#ifdef VTK_USE_MPI
-
-  controller->CreateOutputWindow();
-
-
-  controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
-  controller->SingleMethodExecute();
-  
-  controller->Finalize();
-  controller->Delete();
-
-#else
-  controller->SetNumberOfProcesses(1);
-  vtkMultiProcessController::SetGlobalController(controller);
-  Process_Init(controller, (void *)(&pvArgs)); 
-  controller->Delete();
-#endif
-  
-  return retVal;
+  return MyMain(argc, argv);
 }
 #endif

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.16");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.17");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -461,7 +462,8 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
 //----------------------------------------------------------------------------
 int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 {
-  pvm->SetApplication(this->Window->GetPVApplication());
+  vtkPVApplication *pvApp = this->Window->GetPVApplication();
+  pvm->SetApplication(pvApp);
   pvm->SetParametersParent(this->Window->GetMainView()->GetSourceParent());
 
   const char* menu_name = me->GetAttribute("menu_name");
@@ -486,31 +488,17 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     { 
     if (strcmp(multiprocess_support, "single_process") == 0)
       {
-#ifdef VTK_USE_MPI
-      vtkMultiProcessController* controller =
-        this->Window->GetPVApplication()->GetController();
-      if (controller && controller->GetNumberOfProcesses() > 1)
+      if ( pvApp->GetProcessModule()->GetNumberOfPartitions() > 1)
         {
         return 0;
         }
-#endif
       }
     else if (strcmp(multiprocess_support, "multiple_processes") == 0)
       {
-#ifdef VTK_USE_MPI
-      vtkMultiProcessController* controller =
-        this->Window->GetPVApplication()->GetController();
-      if (!controller)
+      if ( pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
         {
         return 0;
-        }
-      if (controller->GetNumberOfProcesses() == 1)
-        {
-        return 0;
-        }
-#else
-      return 0;
-#endif
+        } 
       }
     else if (strcmp(multiprocess_support, "both") != 0)
       {
@@ -536,7 +524,10 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     }
 
   const char* output = me->GetAttribute("output");
-  if(output) { pvm->SetOutputClassName(output); }
+  if (output) 
+    { 
+    pvm->SetOutputClassName(output); 
+    }
   else
     {
     vtkErrorMacro("Module missing output attribute.");

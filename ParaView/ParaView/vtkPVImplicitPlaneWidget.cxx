@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkPVProcessModule.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.7");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -510,7 +511,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 
   vtkImplicitPlaneWidget* plane = 
     static_cast<vtkImplicitPlaneWidget*>(this->Widget3D);
-  if (pvApp->GetController()->GetNumberOfProcesses() == 1)
+  if (pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
     {
     plane->GetPlaneProperty()->SetOpacity(0.25);
     plane->GetSelectedPlaneProperty()->SetOpacity(0.25);
