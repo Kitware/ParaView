@@ -178,7 +178,8 @@ public:
   void Resize();
 
   // Description
-  // Advanced access to some internal widgets
+  // Convenience method to set the width of the label
+  virtual void SetLabelWidth(int width);
 
 protected:
   vtkKWScale();
