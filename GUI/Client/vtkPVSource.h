@@ -376,10 +376,6 @@ public:
   vtkBooleanMacro(IsPermanent, int);
 
   // Description:
-  // Raise the current source page.
-  void RaiseSourcePage();
-
-  // Description:
   // Set or get the module name. This name is used to store the
   // prototype in the sources/filters/readers maps. It is passed
   // to CreatePVSource when creating a new instance.
