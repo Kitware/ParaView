@@ -35,9 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.22");
-
-vtkCxxSetObjectMacro(vtkSMSourceProxy, PartDisplay, vtkSMPartDisplay);
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.23");
 
 struct vtkSMSourceProxyInternals
 {
@@ -52,7 +50,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
-  this->PartDisplay = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -61,7 +58,6 @@ vtkSMSourceProxy::~vtkSMSourceProxy()
   delete this->PInternals;
 
   this->DataInformation->Delete();
-  this->SetPartDisplay(0);
 }
 
 //---------------------------------------------------------------------------
@@ -406,10 +402,6 @@ void vtkSMSourceProxy::GatherDataInformation()
 {
   this->DataInformation->Initialize();
 
-  if (this->PartDisplay)
-    {
-    this->PartDisplay->Update();
-    }
   vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
     this->PInternals->Parts.begin();
   for (; it != this->PInternals->Parts.end(); it++)
@@ -642,6 +634,4 @@ void vtkSMSourceProxy::ConvertArrayInformationToProperty(
 void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "PartDisplay: " << this->PartDisplay << endl;
 }

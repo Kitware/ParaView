@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.404");
+vtkCxxRevisionMacro(vtkPVSource, "1.405");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1060,9 +1060,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // Render module keeps a list of all the displays.
     rm->AddDisplay(pDisp);
 
-    this->Proxy->SetPartDisplay(pDisp);
-    //pDisp->Update();
-    
     // Hookup cube axes display.
     this->CubeAxesDisplay->SetInput(this->Proxy);
     this->CubeAxesDisplay->SetVisibility(0);

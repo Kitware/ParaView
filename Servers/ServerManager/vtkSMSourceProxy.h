@@ -127,9 +127,6 @@ public:
       return this->Superclass::GetProperty(name);
     }
 
-  void SetPartDisplay(vtkSMPartDisplay* pd);
-  vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
-
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -168,8 +165,6 @@ protected:
 
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
-
-  vtkSMPartDisplay* PartDisplay;
 
   // Description:
   // Call superclass' and then assigns a new executive 
