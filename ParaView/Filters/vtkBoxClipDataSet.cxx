@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.11");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.12");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -68,11 +68,11 @@ vtkBoxClipDataSet::~vtkBoxClipDataSet()
 // Do not say we have two outputs unless we are generating the clipped output. 
 int vtkBoxClipDataSet::GetNumberOfOutputs()
 {
-    if (this->GenerateClippedOutput)
-    {
-        return 2;
-    }
-    return 1;
+  if (this->GenerateClippedOutput)
+  {
+    return 2;
+  }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -250,15 +250,15 @@ void vtkBoxClipDataSet::Execute()
       {
       if((cell->GetCellDimension())==3 )
         {
-      if (orientation)
+        if (orientation)
           {
-        ClipHexahedronInOut(newPoints,cell,this->Locator, conn,
-                    inPD, outPD, inCD, cellId, outCD);
+          ClipHexahedronInOut(newPoints,cell,this->Locator, conn,
+                              inPD, outPD, inCD, cellId, outCD);
           }
-      else
+        else
           {
            ClipBoxInOut(newPoints,cell, this->Locator, conn,
-                    inPD, outPD, inCD, cellId, outCD);
+                        inPD, outPD, inCD, cellId, outCD);
           }
 
         numNew[0] = conn[0]->GetNumberOfCells() - num[0];
@@ -280,32 +280,32 @@ void vtkBoxClipDataSet::Execute()
             ClipBoxInOut2D(newPoints,cell, this->Locator, conn,
                            inPD, outPD, inCD, cellId, outCD);
             }
-
-      numNew[0] = conn[0]->GetNumberOfCells() - num[0];
-      numNew[1] = conn[1]->GetNumberOfCells() - num[1];
-      num[0]    = conn[0]->GetNumberOfCells();
-      num[1]    = conn[1]->GetNumberOfCells();
-      } 
+                                                                                                        
+          numNew[0] = conn[0]->GetNumberOfCells() - num[0];
+          numNew[1] = conn[1]->GetNumberOfCells() - num[1];
+          num[0]    = conn[0]->GetNumberOfCells();
+          num[1]    = conn[1]->GetNumberOfCells();
+          }
         }
       } 
     else 
       {
       if((cell->GetCellDimension())==3 )
         {
-      if (orientation)
+        if (orientation)
           {
-        ClipHexahedron(newPoints,cell,this->Locator, conn[0],
-                inPD, outPD, inCD, cellId, outCD[0]);
+          ClipHexahedron(newPoints,cell,this->Locator, conn[0],
+                         inPD, outPD, inCD, cellId, outCD[0]);
           }
-      else
+        else
           {
-        ClipBox(newPoints,cell, this->Locator, conn[0],
-              inPD, outPD, inCD, cellId, outCD[0]);
+          ClipBox(newPoints,cell, this->Locator, conn[0],
+                  inPD, outPD, inCD, cellId, outCD[0]);
           }
     
-      numNew[0] = conn[0]->GetNumberOfCells() - num[0];
-      num[0]    = conn[0]->GetNumberOfCells();
-      }  
+        numNew[0] = conn[0]->GetNumberOfCells() - num[0];
+        num[0]    = conn[0]->GetNumberOfCells();
+        }  
       else{
         if((cell->GetCellDimension())==2 )
           {
@@ -850,6 +850,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
   switch(typeobj)
     {
     case VTK_TRIANGLE: // 5
+    case VTK_QUADRATIC_TRIANGLE:
       newCellId = newCellArray->InsertNextCell(ptstriangle,tri);
       break;
 
@@ -881,6 +882,8 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
       break;
 
     case VTK_QUAD: // 9
+    case VTK_QUADRATIC_QUAD:
+
       {
       static vtkIdType vtriq[2][3] = {{0,1,2},{0,2,3}};
       newCellId = newCellArray->InsertNextCell(3,vtriq[0]);
@@ -889,6 +892,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
       break;
 
     case VTK_TETRA: // 10
+    case VTK_QUADRATIC_TETRA:
       {
       static  vtkIdType tetra[4]={0,1,2,3};
       newCellId = newCellArray->InsertNextCell(ptstetra,tetra);
@@ -1035,6 +1039,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
         break;
 
     case VTK_HEXAHEDRON: // 12
+    case VTK_QUADRATIC_HEXAHEDRON: 
       {
       // each face: search edge with smallest global index  
       // face 0 (0,1,5,4)
@@ -1177,7 +1182,9 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
         }
       }
       break;      
+
     case VTK_WEDGE:
+    case VTK_QUADRATIC_WEDGE:
       if(npts == 6) //create 3 tetrahedra
         {
         //first tetrahedron 
@@ -1232,7 +1239,9 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
         fprintf(stdout," ERROR: this cell is not a wedge\n");
         }
       break;
+  
     case VTK_PYRAMID: //Create 2 tetrahedra
+    case VTK_QUADRATIC_PYRAMID:
       if(npts== 5)
         {
         //note: the first element vpyram[][0] is the smallest index of pyramid
@@ -1268,6 +1277,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
 //  
 void vtkBoxClipDataSet::CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArray *newCellArray)
 {
+
   vtkIdType tabp[5];
   vtkIdType tab[3][4];
   
@@ -1283,7 +1293,7 @@ void vtkBoxClipDataSet::CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArr
     //VTK_WEDGE: Create 3 tetrahedra
     //first tetrahedron 
     static  vtkIdType vwedge[6][4]={{0,4,3,5},{1,4,3,5},{2,4,3,5},
-              {3,0,1,2},{4,0,1,2},{5,0,1,2}};             
+                                    {3,0,1,2},{4,0,1,2},{5,0,1,2}};             
     xmin = cellIds[0];
     id = 0;
     for(i=1;i<6;i++) 
@@ -1303,9 +1313,9 @@ void vtkBoxClipDataSet::CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArr
     //Pyramid: create 2 tetrahedra
   
     static vtkIdType vert[6][5]= {{1,2,5,4,0},{2,0,3,5,1},{3,0,1,4,2},
-                  {1,2,5,4,3},{2,0,3,5,4},{3,0,1,4,5}};  
+                                  {1,2,5,4,3},{2,0,3,5,4},{3,0,1,4,5}};  
     static vtkIdType vpy[8][4] = {{0,1,2,4},{0,2,3,4},{1,2,3,4},{1,3,0,4},
-                  {2,3,0,4},{2,0,1,4},{3,0,1,4},{3,1,2,4}};                      
+                                  {2,3,0,4},{2,0,1,4},{3,0,1,4},{3,1,2,4}};                      
     xmin    = cellIds[vert[id][0]];
     tabp[0] = vert[id][0];
     idpy = 0;
@@ -1336,7 +1346,7 @@ void vtkBoxClipDataSet::CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArr
     //VTK_PYRAMID: Create 2 tetrahedra
     //The first element in each set is the smallest index of pyramid
     static  vtkIdType vpyram[8][4]={{0,1,2,4},{0,2,3,4},{1,2,3,4},{1,3,0,4},
-                                      {2,3,0,4},{2,0,1,4},{3,0,1,4},{3,1,2,4}};
+                                    {2,3,0,4},{2,0,1,4},{3,0,1,4},{3,1,2,4}};
     xmin = cellIds[0];
     id   = 0;
     for(i=1;i<4;i++) 
@@ -1627,7 +1637,7 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
     }
 
   // Convert all volume cells to tetrahedra       
-  CellGrid(cellType,npts,cellptId,arraytetra);   
+        CellGrid(cellType,npts,cellptId,arraytetra);   
   unsigned totalnewtetra = arraytetra->GetNumberOfCells();
   unsigned idtetranew;
 
@@ -2128,449 +2138,449 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
 
   for (idtetranew = 0 ; idtetranew < totalnewtetra; idtetranew++) 
     {
-      arraytetra->GetNextCell(ptstetra,v_id);
+    arraytetra->GetNextCell(ptstetra,v_id);
 
-      // Test Outside
-      unsigned test[6] = {1,1,1,1,1,1};
-      for (i=0; i<4; i++)
+    // Test Outside
+    unsigned test[6] = {1,1,1,1,1,1};
+    for (i=0; i<4; i++)
+      {
+      cellPts->GetPoint(v_id[i],v);
+
+      // Use plane equation 
+      for(k=0;k<6;k++)
         {
-        cellPts->GetPoint(v_id[i],v);
-
-        // Use plane equation 
-        for(k=0;k<6;k++)
-          {
         p[k] = n_pl[k][0]*(v[0] - o_pl[k][0])+ 
                n_pl[k][1]*(v[1] - o_pl[k][1]) +  
-                n_pl[k][2]*(v[2] - o_pl[k][2]);
-          }
-
-       
-        for(k=0;k<3;k++)
-          {
-          if (p[2*k] < 0) test[2*k] = 0;
-          if (p[2*k+1] < 0) test[2*k+1] = 0;
-          }
-             
-        }//for all points of the cell.
-
-      if ((test[0] == 1)|| (test[1] == 1) ||
-          (test[2] == 1)|| (test[3] == 1) ||
-          (test[4] == 1)|| (test[5] == 1))
-        {
-        continue;                         // Tetrahedron is outside.
+               n_pl[k][2]*(v[2] - o_pl[k][2]);
         }
+
      
-      float  *pPtr = (float *)cellPts->GetVoidPointer(0);   
-      for (allInside=1, i=0; i<4; i++)
+      for(k=0;k<3;k++)
         {
-        ptId = cellIds->GetId(v_id[i]);
-        cellPts->GetPoint(v_id[i],v);
-          
-        for(k=0;k<6;k++)
-            p[k] = n_pl[k][0]*(v[0] - o_pl[k][0])+ 
-                   n_pl[k][1]*(v[1] - o_pl[k][1]) +  
-                   n_pl[k][2]*(v[2] - o_pl[k][2]);
-
-        if (!((p[0] <= 0) && (p[1] <= 0) &&
-             (p[2] <= 0) && (p[3] <= 0) &&
-             (p[4] <= 0) && (p[5] <= 0)))
-          {
-          allInside = 0;
-          }
-         
-        // Currently all points are injected because of the possibility 
-        // of intersection point merging.
-        if ( locator->InsertUniquePoint(v, iid[i]) )
-          {
-          outPD->CopyData(inPD,ptId, iid[i]);
-          }
-        }//for all points of the tetrahedron.
-
-      if ( allInside )
-        {  
-        vtkIdType newCellId = tets->InsertNextCell(4,iid);     // Tetrahedron inside.
-        outCD->CopyData(inCD,cellId,newCellId);
-        continue;
+        if (p[2*k] < 0) test[2*k] = 0;
+        if (p[2*k+1] < 0) test[2*k+1] = 0;
         }
+           
+      }//for all points of the cell.
 
-      float  pc[3];
-      float *pc1  , *pc2;
-      double *pedg1,*pedg2;
+    if ((test[0] == 1)|| (test[1] == 1) ||
+        (test[2] == 1)|| (test[3] == 1) ||
+        (test[4] == 1)|| (test[5] == 1))
+      {
+      continue;                         // Tetrahedron is outside.
+      }
+   
+    float  *pPtr = (float *)cellPts->GetVoidPointer(0);   
+    for (allInside=1, i=0; i<4; i++)
+      {
+      ptId = cellIds->GetId(v_id[i]);
+      cellPts->GetPoint(v_id[i],v);
+        
+        for(k=0;k<6;k++)
+          p[k] = n_pl[k][0]*(v[0] - o_pl[k][0])+ 
+                 n_pl[k][1]*(v[1] - o_pl[k][1]) +  
+                 n_pl[k][2]*(v[2] - o_pl[k][2]);
 
-      unsigned tab4[6][6] = { {0,1,1,2,3,3},   // Tetrahedron Intersection Cases
-              {2,0,0,3,2,1},
-              {3,3,2,0,2,1},
-              {1,0,2,0,1,3},
-              {0,0,1,2,3,3},
-              {0,1,2,1,2,3}};
-      unsigned tab3[4][6] = { {0,2,1,1,3,2},
-              {0,2,1,0,3,2},
-              {0,1,2,1,0,3},
-              {0,1,2,0,1,2}};
-      unsigned tab2[12][5] = { {0,0,1,2,3},
-               {2,1,0,1,3},
-               {1,0,1,0,3},
-               {1,0,1,2,0},
-               {3,1,0,1,0},
-               {2,0,1,3,0},
-               {3,1,0,2,1},
-               {2,1,0,0,1},
-               {0,0,1,3,1},
-               {1,0,1,3,2},
-               {3,1,0,0,2},
-               {0,0,1,1,2}}; 
-      unsigned tab1[12][3] = { {2,3,1},
-               {3,2,0},
-               {3,0,1},
-               {0,3,2},
-               {1,3,0},
-               {3,1,2},
-               {2,1,0},
-               {1,2,3},
-               {0,2,3},
-               {2,0,1},
-               {0,1,3},
-               {1,0,2}}; 
-      
-      vtkCellArray *cellarray = vtkCellArray::New();
-      vtkIdType newCellId = cellarray->InsertNextCell(4,iid);
-
-      // Test Cell intersection with each plane of box
-      for (planes = 0; planes < 6; planes++) 
+      if (!((p[0] <= 0) && (p[1] <= 0) &&
+           (p[2] <= 0) && (p[3] <= 0) &&
+           (p[4] <= 0) && (p[5] <= 0)))
         {
-        switch(planes) 
-          {
-          case 0:
-          case 1:
-            ind[0] = 0;
-            ind[1] = 1;
-            ind[2] = 2;
-            break;
-          case 2:
-          case 3:
-            ind[0] = 1;
-            ind[1] = 0;
-            ind[2] = 2;
-            break;
-          case 4:
-          case 5:
-            ind[0] = 2;
-            ind[1] = 0;
-            ind[2] = 1;
-            break;
-          }
-        
-        vtkIdType totalnewcells = cellarray->GetNumberOfCells();
-        vtkCellArray *newcellArray = vtkCellArray::New();
-        
-        for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
-          {
-          unsigned i0,i1;
-          double p_inter[4][3];   
-          unsigned num_inter = 0;
-          unsigned edges_inter = 0;
-          vtkIdType p_id[4];
+        allInside = 0;
+        }
+       
+      // Currently all points are injected because of the possibility 
+      // of intersection point merging.
+      if ( locator->InsertUniquePoint(v, iid[i]) )
+        {
+        outPD->CopyData(inPD,ptId, iid[i]);
+        }
+      }//for all points of the tetrahedron.
 
-          cellarray->GetNextCell(npts,v_id);
+    if ( allInside )
+      {  
+      vtkIdType newCellId = tets->InsertNextCell(4,iid);     // Tetrahedron inside.
+      outCD->CopyData(inCD,cellId,newCellId);
+      continue;
+      }
+
+    float  pc[3];
+    float *pc1  , *pc2;
+    double *pedg1,*pedg2;
+
+    unsigned tab4[6][6] = { {0,1,1,2,3,3},   // Tetrahedron Intersection Cases
+            {2,0,0,3,2,1},
+            {3,3,2,0,2,1},
+            {1,0,2,0,1,3},
+            {0,0,1,2,3,3},
+            {0,1,2,1,2,3}};
+    unsigned tab3[4][6] = { {0,2,1,1,3,2},
+            {0,2,1,0,3,2},
+            {0,1,2,1,0,3},
+            {0,1,2,0,1,2}};
+    unsigned tab2[12][5] = { {0,0,1,2,3},
+             {2,1,0,1,3},
+             {1,0,1,0,3},
+             {1,0,1,2,0},
+             {3,1,0,1,0},
+             {2,0,1,3,0},
+             {3,1,0,2,1},
+             {2,1,0,0,1},
+             {0,0,1,3,1},
+             {1,0,1,3,2},
+             {3,1,0,0,2},
+             {0,0,1,1,2}}; 
+    unsigned tab1[12][3] = { {2,3,1},
+             {3,2,0},
+             {3,0,1},
+             {0,3,2},
+             {1,3,0},
+             {3,1,2},
+             {2,1,0},
+             {1,2,3},
+             {0,2,3},
+             {2,0,1},
+             {0,1,3},
+             {1,0,2}}; 
+    
+    vtkCellArray *cellarray = vtkCellArray::New();
+    vtkIdType newCellId = cellarray->InsertNextCell(4,iid);
+
+    // Test Cell intersection with each plane of box
+      for (planes = 0; planes < 6; planes++) 
+      {
+      switch(planes) 
+        {
+        case 0:
+        case 1:
+          ind[0] = 0;
+          ind[1] = 1;
+          ind[2] = 2;
+          break;
+        case 2:
+        case 3:
+          ind[0] = 1;
+          ind[1] = 0;
+          ind[2] = 2;
+          break;
+        case 4:
+        case 5:
+          ind[0] = 2;
+          ind[1] = 0;
+          ind[2] = 1;
+          break;
+        }
+      
+      vtkIdType totalnewcells = cellarray->GetNumberOfCells();
+      vtkCellArray *newcellArray = vtkCellArray::New();
+      
+      for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
+        {
+        unsigned i0,i1;
+        double p_inter[4][3];   
+        unsigned num_inter = 0;
+        unsigned edges_inter = 0;
+        vtkIdType p_id[4];
+
+        cellarray->GetNextCell(npts,v_id);
+        
+        newPoints->GetPoint(v_id[0],v_tetra[0]); //coord (x,y,z) 
+        newPoints->GetPoint(v_id[1],v_tetra[1]); 
+        newPoints->GetPoint(v_id[2],v_tetra[2]); 
+        newPoints->GetPoint(v_id[3],v_tetra[3]); 
+
+        p[0] = n_pl[planes][0]*(v_tetra[0][0] - o_pl[planes][0]) +
+               n_pl[planes][1]*(v_tetra[0][1] - o_pl[planes][1]) +  
+               n_pl[planes][2]*(v_tetra[0][2] - o_pl[planes][2]);  
+        p[1] = n_pl[planes][0]*(v_tetra[1][0] - o_pl[planes][0]) + 
+               n_pl[planes][1]*(v_tetra[1][1] - o_pl[planes][1]) +  
+               n_pl[planes][2]*(v_tetra[1][2] - o_pl[planes][2]);
+        p[2] = n_pl[planes][0]*(v_tetra[2][0] - o_pl[planes][0]) + 
+               n_pl[planes][1]*(v_tetra[2][1] - o_pl[planes][1]) +  
+               n_pl[planes][2]*(v_tetra[2][2] - o_pl[planes][2]);
+        p[3] = n_pl[planes][0]*(v_tetra[3][0] - o_pl[planes][0]) + 
+               n_pl[planes][1]*(v_tetra[3][1] - o_pl[planes][1]) +  
+               n_pl[planes][2]*(v_tetra[3][2] - o_pl[planes][2]);
+      
+        for (int edgeNum=0; edgeNum < 6; edgeNum++)
+          {
+          verts = edges[edgeNum]; 
+      
+          p1 = v_tetra[verts[0]];
+          p2 = v_tetra[verts[1]];
+          double s1 = p[verts[0]];
+          double s2 = p[verts[1]];    
+          if ( (s1 * s2) <=0)
+            {
+            deltaScalar = s2 - s1;
           
-          newPoints->GetPoint(v_id[0],v_tetra[0]); //coord (x,y,z) 
-          newPoints->GetPoint(v_id[1],v_tetra[1]); 
-          newPoints->GetPoint(v_id[2],v_tetra[2]); 
-          newPoints->GetPoint(v_id[3],v_tetra[3]); 
+            if (deltaScalar > 0)
+              {
+              pedg1 = p1;   pedg2 = p2;
+              v1 = verts[0]; v2 = verts[1];
+              }
+            else
+              {
+              pedg1 = p2;   pedg2 = p1;
+              v1 = verts[1]; v2 = verts[0];
+              deltaScalar = -deltaScalar;
+              t = s1; s1 = s2; s2 = t;
+              }
+      
+            // linear interpolation
+            t = ( deltaScalar == 0.0 ? 0.0 : ( - s1) / deltaScalar );
+      
+            if ( t == 0.0 )
+              {
+              continue;
+              }
+            else if ( t == 1.0 )
+              {
+              continue;
+              }
+      
+            pc1 = pPtr + 3*v1;
+            pc2 = pPtr + 3*v2;
+      
+            for (j=0; j<3; j++)
+              {
+              x[j]  = pedg1[j]  + t*(pedg2[j] - pedg1[j]);
+              pc[j] = pc1[j] + t*(pc2[j] - pc1[j]);
+              p_inter[num_inter][j] = x[j];
+              }
+      
+            // Incorporate point into output and interpolate edge data as necessary
+            edges_inter = edges_inter * 10 + (edgeNum+1);
 
-          p[0] = n_pl[planes][0]*(v_tetra[0][0] - o_pl[planes][0]) +
-                 n_pl[planes][1]*(v_tetra[0][1] - o_pl[planes][1]) +  
-                 n_pl[planes][2]*(v_tetra[0][2] - o_pl[planes][2]);  
-          p[1] = n_pl[planes][0]*(v_tetra[1][0] - o_pl[planes][0]) + 
-                 n_pl[planes][1]*(v_tetra[1][1] - o_pl[planes][1]) +  
-                 n_pl[planes][2]*(v_tetra[1][2] - o_pl[planes][2]);
-          p[2] = n_pl[planes][0]*(v_tetra[2][0] - o_pl[planes][0]) + 
-                 n_pl[planes][1]*(v_tetra[2][1] - o_pl[planes][1]) +  
-                 n_pl[planes][2]*(v_tetra[2][2] - o_pl[planes][2]);
-          p[3] = n_pl[planes][0]*(v_tetra[3][0] - o_pl[planes][0]) + 
-                 n_pl[planes][1]*(v_tetra[3][1] - o_pl[planes][1]) +  
-                 n_pl[planes][2]*(v_tetra[3][2] - o_pl[planes][2]);
-        
-          for (int edgeNum=0; edgeNum < 6; edgeNum++)
+            if ( locator->InsertUniquePoint(x, p_id[num_inter]) )
+              {
+              outPD->InterpolateEdge(inPD, p_id[num_inter], cellIds->GetId(v1),
+                   cellIds->GetId(v2), t);
+              }
+      
+            num_inter++;        
+            }//if edge intersects value
+          }//for all edges
+        if (num_inter == 0) 
+          {  
+          unsigned outside = 0;
+          for(i=0;i<4;i++)
             {
-            verts = edges[edgeNum]; 
-        
-            p1 = v_tetra[verts[0]];
-            p2 = v_tetra[verts[1]];
-            double s1 = p[verts[0]];
-            double s2 = p[verts[1]];    
-            if ( (s1 * s2) <=0)
+            if (p[i] > 0)
               {
-              deltaScalar = s2 - s1;
-            
-              if (deltaScalar > 0)
-                {
-                pedg1 = p1;   pedg2 = p2;
-                v1 = verts[0]; v2 = verts[1];
-                }
-              else
-                {
-                pedg1 = p2;   pedg2 = p1;
-                v1 = verts[1]; v2 = verts[0];
-                deltaScalar = -deltaScalar;
-                t = s1; s1 = s2; s2 = t;
-                }
-        
-              // linear interpolation
-              t = ( deltaScalar == 0.0 ? 0.0 : ( - s1) / deltaScalar );
-        
-              if ( t == 0.0 )
-                {
-                continue;
-                }
-              else if ( t == 1.0 )
-                {
-                continue;
-                }
-        
-              pc1 = pPtr + 3*v1;
-              pc2 = pPtr + 3*v2;
-        
-              for (j=0; j<3; j++)
-                {
-                x[j]  = pedg1[j]  + t*(pedg2[j] - pedg1[j]);
-                pc[j] = pc1[j] + t*(pc2[j] - pc1[j]);
-                p_inter[num_inter][j] = x[j];
-                }
-        
-              // Incorporate point into output and interpolate edge data as necessary
-              edges_inter = edges_inter * 10 + (edgeNum+1);
+              // If only one vertex is ouside, so the tetrahedron is outside 
+              // because there is not intersection.
+              // some vertex could be on plane, so you need to test all vertex
 
-              if ( locator->InsertUniquePoint(x, p_id[num_inter]) )
-                {
-                outPD->InterpolateEdge(inPD, p_id[num_inter], cellIds->GetId(v1),
-                     cellIds->GetId(v2), t);
-                }
-        
-              num_inter++;        
-              }//if edge intersects value
-            }//for all edges
-          if (num_inter == 0) 
-            {  
-            unsigned outside = 0;
-            for(i=0;i<4;i++)
-              {
-              if (p[i] > 0)
-                {
-                // If only one vertex is ouside, so the tetrahedron is outside 
-                // because there is not intersection.
-                // some vertex could be on plane, so you need to test all vertex
-
-                outside = 1;  
-                break; 
-                }
+              outside = 1;  
+              break; 
               }
-            if (outside == 0)
-              {
-              // else it is possible intersection if other plane
-
-              newCellId = newcellArray->InsertNextCell(4,v_id);
-              }
-            continue;
             }
-          switch(num_inter) 
+          if (outside == 0)
             {
-            case 4:                 // We have two wedges
-              switch(edges_inter) 
-                {
-                case 1246:
-                  i0 = 0;
-                  break;
-                case 2345:
-                  i0 = 2;
-                  break;
-                case 1356:
-                  i0 = 4;
-                  break;
-                default:
-                  printf(
-                    "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
-                    num_inter,edges_inter);
-                  continue;
-                }                                                    
+            // else it is possible intersection if other plane
 
-              if (((p[3] > 0) && ((planes % 2) == 0)) ||
-                  ((p[3] > 0) && ((planes % 2) == 1))) 
-                {
-                // The v_tetra[3] is outside box, so the first wedge is outside
-                // ps: v_tetra[3] is always in first wedge (see tab)
-
-                tab_id[0] = p_id[tab4[i0+1][0]];
-                tab_id[1] = v_id[tab4[i0+1][1]];
-                tab_id[2] = p_id[tab4[i0+1][2]];
-                tab_id[3] = p_id[tab4[i0+1][3]];          
-                tab_id[4] = v_id[tab4[i0+1][4]];
-                tab_id[5] = p_id[tab4[i0+1][5]];
-                CreateTetra(6,tab_id,newcellArray);
-                }
-              else 
-                {
-                tab_id[0] = p_id[tab4[i0][0]];
-                tab_id[1] = v_id[tab4[i0][1]];
-                tab_id[2] = p_id[tab4[i0][2]];
-                tab_id[3] = p_id[tab4[i0][3]];
-                tab_id[4] = v_id[tab4[i0][4]];
-                tab_id[5] = p_id[tab4[i0][5]];
-                CreateTetra(6,tab_id,newcellArray);
-                }
-              break;
-            case 3:                   // We have one tetrahedron and one wedge
-              switch(edges_inter) 
-                {
-                case 134:
-                  i0 = 0;
-                  break;
-                case 125:
-                  i0 = 1;
-                  break;
-                case 236:
-                  i0 = 2;
-                  break;
-                case 456:
-                  i0 = 3;
-                  break;
-                default:
-                  printf(
-                    "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
-                    num_inter,edges_inter);
-                  continue;
-                }                                                     
-
-                if (((p[i0] > 0) && ((planes % 2) == 0)) ||   
-                    ((p[i0] > 0) && ((planes % 2) == 1))) 
-                  {
-                  // Isolate vertex is outside box, so the tetrahedron is outside
-
-                  tab_id[0] = p_id[tab3[i0][0]];
-                  tab_id[1] = p_id[tab3[i0][1]];
-                  tab_id[2] = p_id[tab3[i0][2]];
-                  tab_id[3] = v_id[tab3[i0][3]];
-                  tab_id[4] = v_id[tab3[i0][4]];
-                  tab_id[5] = v_id[tab3[i0][5]];
-                  CreateTetra(6,tab_id,newcellArray);
-                  }
-                else 
-                  {
-                  tab_id[0] = v_id[i0];
-                  tab_id[1] = p_id[tab3[i0][0]];
-                  tab_id[2] = p_id[tab3[i0][1]];
-                  tab_id[3] = p_id[tab3[i0][2]];
-                  newCellId = newcellArray->InsertNextCell(4,tab_id);                
-                  }
+            newCellId = newcellArray->InsertNextCell(4,v_id);
+            }
+          continue;
+          }
+        switch(num_inter) 
+          {
+          case 4:                 // We have two wedges
+            switch(edges_inter) 
+              {
+              case 1246:
+                i0 = 0;
                 break;
-            case 2:                    // We have one tetrahedron and one pyramid
-              switch(edges_inter)      // i1 = vertex of the tetrahedron
-                {
-                case 12:
-                  i0 = 0; i1 = 1;  
-                  break;
-                case 13:
-                  i0 = 1;  i1 = 0;
-                  break;
-                case 23:
-                  i0 = 2;  i1 = 2; 
-                  break;
-                case 25:
-                  i0 = 3;  i1 = 1;
-                  break;
-                case 26:
-                  i0 = 4;  i1 = 2;
-                  break;
-                case 56:
-                  i0 = 5;  i1 = 3;
-                  break;
-                case 34:
-                  i0 = 6;  i1 = 0;
-                  break;
-                case 46:
-                  i0 = 7;  i1 = 3;
-                  break;
-                case 36:
-                  i0 = 8;  i1 = 2; 
-                  break;
-                case 14:
-                  i0 = 9;  i1 = 0; 
-                  break;
-                case 15:
-                  i0 = 10; i1 = 1;
-                  break;
-                case 45:
-                  i0 = 11; i1 = 3;
-                  break;
-                default:
-                  printf(
-                    "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
-                    num_inter,edges_inter);
-                  continue;
-                } 
-              if (((p[i1] > 0) && ((planes % 2) == 0)) ||
-                  ((p[i1] > 0) && ((planes % 2) == 1)))
-                {
-                // Isolate vertex is outside box, so the tetrahedron is outside
-
-                tab_id[0] = v_id[tab2[i0][0]];
-                tab_id[1] = p_id[tab2[i0][1]];
-                tab_id[2] = p_id[tab2[i0][2]];
-                tab_id[3] = v_id[tab2[i0][3]];
-                tab_id[4] = v_id[tab2[i0][4]];
-                CreateTetra(5,tab_id,newcellArray);
-                }
-              else 
-                {
-                tab_id[0] = v_id[i1];
-                tab_id[1] = v_id[tab2[i0][4]];
-                tab_id[2] = p_id[tab2[i0][1]];
-                tab_id[3] = p_id[tab2[i0][2]];
-                newCellId = newcellArray->InsertNextCell(4,tab_id);    
-                }
-              break;
-            case 1:              // We have two tetrahedron.
-              if ((edges_inter > 6) || (edges_inter < 1)) 
-                {
+              case 2345:
+                i0 = 2;
+                break;
+              case 1356:
+                i0 = 4;
+                break;
+              default:
                 printf(
                   "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
                   num_inter,edges_inter);
                 continue;
-                }                                        
-              if (((p[tab1[2*edges_inter-1][2]] > 0) && ((planes % 2) == 0)) ||
-                  ((p[tab1[2*edges_inter-1][2]] > 0) && ((planes % 2) == 1)))
+              }                                                    
+
+            if (((p[3] > 0) && ((planes % 2) == 0)) ||
+                ((p[3] > 0) && ((planes % 2) == 1))) 
+              {
+              // The v_tetra[3] is outside box, so the first wedge is outside
+              // ps: v_tetra[3] is always in first wedge (see tab)
+
+              tab_id[0] = p_id[tab4[i0+1][0]];
+              tab_id[1] = v_id[tab4[i0+1][1]];
+              tab_id[2] = p_id[tab4[i0+1][2]];
+              tab_id[3] = p_id[tab4[i0+1][3]];          
+              tab_id[4] = v_id[tab4[i0+1][4]];
+              tab_id[5] = p_id[tab4[i0+1][5]];
+              CreateTetra(6,tab_id,newcellArray);
+              }
+            else 
+              {
+              tab_id[0] = p_id[tab4[i0][0]];
+              tab_id[1] = v_id[tab4[i0][1]];
+              tab_id[2] = p_id[tab4[i0][2]];
+              tab_id[3] = p_id[tab4[i0][3]];
+              tab_id[4] = v_id[tab4[i0][4]];
+              tab_id[5] = p_id[tab4[i0][5]];
+              CreateTetra(6,tab_id,newcellArray);
+              }
+            break;
+          case 3:                   // We have one tetrahedron and one wedge
+            switch(edges_inter) 
+              {
+              case 134:
+                i0 = 0;
+                break;
+              case 125:
+                i0 = 1;
+                break;
+              case 236:
+                i0 = 2;
+                break;
+              case 456:
+                i0 = 3;
+                break;
+              default:
+                printf(
+                  "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
+                  num_inter,edges_inter);
+                continue;
+              }                                                     
+
+              if (((p[i0] > 0) && ((planes % 2) == 0)) ||   
+                  ((p[i0] > 0) && ((planes % 2) == 1))) 
                 {
                 // Isolate vertex is outside box, so the tetrahedron is outside
-                tab_id[0] = p_id[0];
-                tab_id[1] = v_id[tab1[2*edges_inter-2][0]];
-                tab_id[2] = v_id[tab1[2*edges_inter-2][1]];
-                tab_id[3] = v_id[tab1[2*edges_inter-2][2]];
-                newCellId = newcellArray->InsertNextCell(4,tab_id);
+
+                tab_id[0] = p_id[tab3[i0][0]];
+                tab_id[1] = p_id[tab3[i0][1]];
+                tab_id[2] = p_id[tab3[i0][2]];
+                tab_id[3] = v_id[tab3[i0][3]];
+                tab_id[4] = v_id[tab3[i0][4]];
+                tab_id[5] = v_id[tab3[i0][5]];
+                CreateTetra(6,tab_id,newcellArray);
                 }
               else 
                 {
-                tab_id[0] = p_id[0];
-                tab_id[1] = v_id[tab1[2*edges_inter-1][0]];
-                tab_id[2] = v_id[tab1[2*edges_inter-1][1]];
-                tab_id[3] = v_id[tab1[2*edges_inter-1][2]];
-                newCellId = newcellArray->InsertNextCell(4,tab_id);
+                tab_id[0] = v_id[i0];
+                tab_id[1] = p_id[tab3[i0][0]];
+                tab_id[2] = p_id[tab3[i0][1]];
+                tab_id[3] = p_id[tab3[i0][2]];
+                newCellId = newcellArray->InsertNextCell(4,tab_id);                
                 }
               break;
-            }
-          } // for all new cells
-        cellarray->Delete();
-        cellarray = newcellArray;
-        } //for all planes
+          case 2:                    // We have one tetrahedron and one pyramid
+            switch(edges_inter)      // i1 = vertex of the tetrahedron
+              {
+              case 12:
+                i0 = 0; i1 = 1;  
+                break;
+              case 13:
+                i0 = 1;  i1 = 0;
+                break;
+              case 23:
+                i0 = 2;  i1 = 2; 
+                break;
+              case 25:
+                i0 = 3;  i1 = 1;
+                break;
+              case 26:
+                i0 = 4;  i1 = 2;
+                break;
+              case 56:
+                i0 = 5;  i1 = 3;
+                break;
+              case 34:
+                i0 = 6;  i1 = 0;
+                break;
+              case 46:
+                i0 = 7;  i1 = 3;
+                break;
+              case 36:
+                i0 = 8;  i1 = 2; 
+                break;
+              case 14:
+                i0 = 9;  i1 = 0; 
+                break;
+              case 15:
+                i0 = 10; i1 = 1;
+                break;
+              case 45:
+                i0 = 11; i1 = 3;
+                break;
+              default:
+                printf(
+                  "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
+                  num_inter,edges_inter);
+                continue;
+              } 
+            if (((p[i1] > 0) && ((planes % 2) == 0)) ||
+                ((p[i1] > 0) && ((planes % 2) == 1)))
+              {
+              // Isolate vertex is outside box, so the tetrahedron is outside
 
-      vtkIdType totalnewcells = cellarray->GetNumberOfCells();
-
-      for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
-        {
-        cellarray->GetNextCell(npts,v_id);
-        newCellId = tets->InsertNextCell(npts,v_id);
-        outCD->CopyData(inCD,cellId,newCellId);
-        }
+              tab_id[0] = v_id[tab2[i0][0]];
+              tab_id[1] = p_id[tab2[i0][1]];
+              tab_id[2] = p_id[tab2[i0][2]];
+              tab_id[3] = v_id[tab2[i0][3]];
+              tab_id[4] = v_id[tab2[i0][4]];
+              CreateTetra(5,tab_id,newcellArray);
+              }
+            else 
+              {
+              tab_id[0] = v_id[i1];
+              tab_id[1] = v_id[tab2[i0][4]];
+              tab_id[2] = p_id[tab2[i0][1]];
+              tab_id[3] = p_id[tab2[i0][2]];
+              newCellId = newcellArray->InsertNextCell(4,tab_id);    
+              }
+            break;
+          case 1:              // We have two tetrahedron.
+            if ((edges_inter > 6) || (edges_inter < 1)) 
+              {
+              printf(
+                "Intersection not found: Num_inter = %5d  Edges_inter = %8d\n",
+                num_inter,edges_inter);
+              continue;
+              }                                        
+            if (((p[tab1[2*edges_inter-1][2]] > 0) && ((planes % 2) == 0)) ||
+                ((p[tab1[2*edges_inter-1][2]] > 0) && ((planes % 2) == 1)))
+              {
+              // Isolate vertex is outside box, so the tetrahedron is outside
+              tab_id[0] = p_id[0];
+              tab_id[1] = v_id[tab1[2*edges_inter-2][0]];
+              tab_id[2] = v_id[tab1[2*edges_inter-2][1]];
+              tab_id[3] = v_id[tab1[2*edges_inter-2][2]];
+              newCellId = newcellArray->InsertNextCell(4,tab_id);
+              }
+            else 
+              {
+              tab_id[0] = p_id[0];
+              tab_id[1] = v_id[tab1[2*edges_inter-1][0]];
+              tab_id[2] = v_id[tab1[2*edges_inter-1][1]];
+              tab_id[3] = v_id[tab1[2*edges_inter-1][2]];
+              newCellId = newcellArray->InsertNextCell(4,tab_id);
+              }
+            break;
+          }
+        } // for all new cells
       cellarray->Delete();
+      cellarray = newcellArray;
+      } //for all planes
+
+    vtkIdType totalnewcells = cellarray->GetNumberOfCells();
+
+    for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
+      {
+      cellarray->GetNextCell(npts,v_id);
+      newCellId = tets->InsertNextCell(npts,v_id);
+      outCD->CopyData(inCD,cellId,newCellId);
+      }
+    cellarray->Delete();
     }           
   arraytetra->Delete();
 }               
@@ -2624,11 +2634,11 @@ void vtkBoxClipDataSet::ClipBoxInOut(vtkPoints *newPoints,
     cellptId[i] = cellIds->GetId(i);
 
   // Convert all volume cells to tetrahedra       
-  CellGrid(cellType,npts,cellptId,arraytetra);   
+        CellGrid(cellType,npts,cellptId,arraytetra);   
   unsigned totalnewtetra = arraytetra->GetNumberOfCells();
 
   for (idtetranew = 0 ; idtetranew < totalnewtetra; idtetranew++) 
-  {
+    {
     arraytetra->GetNextCell(ptstetra,v_id);
 
     float  *pPtr = (float *)cellPts->GetVoidPointer(0);   
@@ -3075,7 +3085,7 @@ void vtkBoxClipDataSet::ClipBoxInOut(vtkPoints *newPoints,
               continue;
               }                                                         
             if (((v_tetra[tab1[2*edges_inter-1][2]][ind[1]] < value) && ((planes % 2) == 0)) ||   
-          ((v_tetra[tab1[2*edges_inter-1][2]][ind[1]] > value) && ((planes % 2) == 1))) 
+                ((v_tetra[tab1[2*edges_inter-1][2]][ind[1]] > value) && ((planes % 2) == 1))) 
               {   
               // Isolate vertex is outside box, so the tetrahedron is outside
                                           
@@ -3131,7 +3141,7 @@ void vtkBoxClipDataSet::ClipBoxInOut(vtkPoints *newPoints,
       outCD[1]->CopyData(inCD,cellId,newCellId);
       }
     cellarrayout->Delete();
-  }
+    }
   arraytetra->Delete();
 }
 
@@ -3171,7 +3181,7 @@ void vtkBoxClipDataSet::ClipHexahedronInOut(vtkPoints *newPoints,
   int ind[3];
 
   vtkIdType edges[6][2] = { {0,1}, {1,2}, {2,0},
-          {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
+                            {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
   double deltaScalar;
   double p[6], t;
   double v_tetra[4][3];
@@ -3348,17 +3358,17 @@ void vtkBoxClipDataSet::ClipHexahedronInOut(vtkPoints *newPoints,
       newPoints->GetPoint(v_id[3],v_tetra[3]); 
 
       p[0] = n_pl[planes][0]*(v_tetra[0][0] - o_pl[planes][0]) +
-       n_pl[planes][1]*(v_tetra[0][1] - o_pl[planes][1]) +  
-       n_pl[planes][2]*(v_tetra[0][2] - o_pl[planes][2]);  
+             n_pl[planes][1]*(v_tetra[0][1] - o_pl[planes][1]) +  
+             n_pl[planes][2]*(v_tetra[0][2] - o_pl[planes][2]);  
       p[1] = n_pl[planes][0]*(v_tetra[1][0] - o_pl[planes][0]) + 
-                         n_pl[planes][1]*(v_tetra[1][1] - o_pl[planes][1]) +  
-                         n_pl[planes][2]*(v_tetra[1][2] - o_pl[planes][2]);
+             n_pl[planes][1]*(v_tetra[1][1] - o_pl[planes][1]) +  
+             n_pl[planes][2]*(v_tetra[1][2] - o_pl[planes][2]);
       p[2] = n_pl[planes][0]*(v_tetra[2][0] - o_pl[planes][0]) + 
-                         n_pl[planes][1]*(v_tetra[2][1] - o_pl[planes][1]) +  
-                         n_pl[planes][2]*(v_tetra[2][2] - o_pl[planes][2]);
+             n_pl[planes][1]*(v_tetra[2][1] - o_pl[planes][1]) +  
+             n_pl[planes][2]*(v_tetra[2][2] - o_pl[planes][2]);
       p[3] = n_pl[planes][0]*(v_tetra[3][0] - o_pl[planes][0]) + 
-                         n_pl[planes][1]*(v_tetra[3][1] - o_pl[planes][1]) +  
-                         n_pl[planes][2]*(v_tetra[3][2] - o_pl[planes][2]);
+             n_pl[planes][1]*(v_tetra[3][1] - o_pl[planes][1]) +  
+             n_pl[planes][2]*(v_tetra[3][2] - o_pl[planes][2]);
     
       for (int edgeNum=0; edgeNum < 6; edgeNum++)
         {
@@ -4488,7 +4498,7 @@ void vtkBoxClipDataSet::ClipHexahedron2D(vtkPoints *newPoints,
     // Test Outside
     unsigned test[6] = {1,1,1,1,1,1};
     for (i=0; i<3; i++)
-      {       
+      {
       cellPts->GetPoint(v_id[i],v);
 
       // Use plane equation 
@@ -4836,7 +4846,7 @@ void vtkBoxClipDataSet::ClipHexahedronInOut2D(vtkPoints *newPoints,
     // Test Outside
     unsigned test[6] = {1,1,1,1,1,1};
     for (i=0; i<3; i++)
-      {       
+      {
       ptIdout[i] = cellIds->GetId(v_id[i]);
       cellPts->GetPoint(v_id[i],v_triangle[i]);
 
@@ -5154,7 +5164,7 @@ void vtkBoxClipDataSet::ClipHexahedronInOut2D(vtkPoints *newPoints,
         cellarray = newcellArray;
       } //for all planes
 
-    unsigned totalnewcells = cellarray->GetNumberOfCells();    // Inside 
+    unsigned totalnewcells = cellarray->GetNumberOfCells();    // Inside
 
     for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
       {
