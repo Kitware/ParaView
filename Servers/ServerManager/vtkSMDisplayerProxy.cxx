@@ -22,12 +22,13 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-
+#include "vtkSMDisplayWindowProxy.h"
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -272,25 +273,29 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   
   vtkClientServerStream str;
 
-  this->CreateParts();
+  //this->CreateParts();
 
   int i;
 
   vtkSMProxy* mapperProxy = this->GetSubProxy("mapper");
   if (!mapperProxy)
     {
-    vtkErrorMacro("No mapper sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
+    //vtkErrorMacro("No mapper sub-proxy was defined. Please make sure that "
+    //              "the configuration file defines it.");
     }
   else
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     for (i=0; i<numObjects; i++)
       {
+      str << vtkClientServerStream::Invoke
+          << this->GetID(i)
+          << "GetOutput" << 0
+          << vtkClientServerStream::End;
       str << vtkClientServerStream::Invoke 
           << mapperProxy->GetID(i)
           << "SetInput"
-          << this->GetPart(i)->GetID(0)
+          << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
       str << vtkClientServerStream::Invoke 
           << pm->GetProcessModuleID()
@@ -316,8 +321,8 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   vtkSMProxy* actorProxy = this->GetSubProxy("actor");
   if (!actorProxy)
     {
-    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
+    //vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
+    //              "the configuration file defines it.");
     }
   else
     {
@@ -340,8 +345,8 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   vtkSMProxy* propertyProxy = this->GetSubProxy("property");
   if (!propertyProxy)
     {
-    vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
-                  "the configuration file defines it.");
+    //vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
+    //              "the configuration file defines it.");
     }
   else
     {
@@ -360,6 +365,78 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream(this->Servers, str, 0);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDisplayerProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* dw)
+{
+  vtkSMProxy* actorProxy = this->GetSubProxy("actor");
+  if (!actorProxy)
+    {
+    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+  
+  vtkSMProxy* rendererProxy = dw->GetRendererProxy();
+  if (!rendererProxy)
+    {
+    vtkErrorMacro("No renderer sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    return;
+    }
+  vtkClientServerStream str;
+  int numActors = actorProxy->GetNumberOfIDs();
+  for (int i=0; i<numActors; i++)
+    {
+    str << vtkClientServerStream::Invoke 
+        << rendererProxy->GetID(0) 
+        << "AddActor" 
+        << actorProxy->GetID(i)
+        << vtkClientServerStream::End;
+    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, str, 0);
+  str.Reset();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDisplayerProxy::AddInput(
+  vtkSMSourceProxy *input, const char* method, int hasMultipleInputs)
+{
+  if (!input)
+    {
+    return;
+    }
+  if (hasMultipleInputs)
+    {
+    vtkErrorMacro("Displayer should not have MultipleInputs");
+    }
+  input->CreateParts();
+  int numInputs = input->GetNumberOfParts();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  vtkClientServerStream stream;
+  this->CreateVTKObjects(numInputs);
+  int numSources = this->GetNumberOfIDs();
+  for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+    {
+    vtkClientServerID sourceID = this->GetID(sourceIdx);
+    // This is to handle the case when there are multiple
+    // inputs and the first one has multiple parts. For
+    // example, in the Glyph filter, when the input has multiple
+    // parts, the glyph source has to be applied to each.
+    // NOTE: Make sure that you set the input which has as
+    // many parts as there will be filters first. OR call
+    // CreateVTKObjects() with the right number of inputs.
+    int partIdx = sourceIdx % numInputs;
+    vtkSMPart* part = input->GetPart(partIdx);
+    stream << vtkClientServerStream::Invoke 
+      << sourceID << method << part->GetID(0) 
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //---------------------------------------------------------------------------

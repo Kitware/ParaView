@@ -14,45 +14,27 @@
 =========================================================================*/
 // .NAME vtkPVLineSourceWidget - a LineWidget which contains a separate line source
 // .SECTION Description
-// This widget contains a vtkPVLineWidget as well as a vtkLineSource. 
+// This widget adds vtkLineSource to vtkPVLineWidget.
 // This vtkLineSource (which is created on all processes) can be used as 
 // input or source to filters (for example as streamline seed).
 
 #ifndef __vtkPVLineSourceWidget_h
 #define __vtkPVLineSourceWidget_h
 
-#include "vtkPVSourceWidget.h"
+#include "vtkPVLineWidget.h"
+class vtkSMSourceProxy;
 
-class vtkPVLineWidget;
-
-class VTK_EXPORT vtkPVLineSourceWidget : public vtkPVSourceWidget
+class VTK_EXPORT vtkPVLineSourceWidget : public vtkPVLineWidget
 {
 public:
+
   static vtkPVLineSourceWidget* New();
-  vtkTypeRevisionMacro(vtkPVLineSourceWidget, vtkPVSourceWidget);
+  vtkTypeRevisionMacro(vtkPVLineSourceWidget, vtkPVLineWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Creates common widgets.
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // The underlying line widget.
-  vtkGetObjectMacro(LineWidget, vtkPVLineWidget);
-
-  // Description:
-  // This method looks to the subwidgets to compute the modified flag.
-  virtual int GetModifiedFlag();
-
-  // Description:
-  // This method is called when the source that contains this widget
-  // is selected.
-  virtual void Select();
-
-  // Description:
-  // This method is called when the source that contains this widget
-  // is deselected.
-  virtual void Deselect();
 
   // Description:
   // Saves the value of this widget into a VTK Tcl script.
@@ -71,26 +53,15 @@ public:
   // It sets this widgets value using the VTK objects value.
   virtual void ResetInternal();
 
-  // Description:
-  // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file);
-
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
- 
+  virtual vtkSMProxy* GetProxyByName(const char*) { return reinterpret_cast<vtkSMProxy*>(this->SourceProxy); }
+  
 protected:
   vtkPVLineSourceWidget();
   ~vtkPVLineSourceWidget();
-
-
-
-  vtkPVLineWidget* LineWidget;
+  
+  vtkSMSourceProxy *SourceProxy;
+  char* SourceProxyName;
+  vtkSetStringMacro(SourceProxyName);
 
   vtkPVLineSourceWidget(const vtkPVLineSourceWidget&); // Not implemented
   void operator=(const vtkPVLineSourceWidget&); // Not implemented

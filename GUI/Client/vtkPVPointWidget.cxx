@@ -31,16 +31,17 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPickPointWidget.h"
 #include "vtkRenderer.h"
 #include "vtkPVRenderModule.h"
 
 #include "vtkKWEvent.h"
-#include "vtkRMPointWidget.h"
 #include "vtkPVRenderModule.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMPointWidgetProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.35");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -57,7 +58,7 @@ vtkPVPointWidget::vtkPVPointWidget()
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
   this->PositionResetButton = vtkKWPushButton::New();
-  this->RM3DWidget = static_cast<vtkRM3DWidget*>(vtkRMPointWidget::New());
+  this->SetWidgetProxyXMLName("PointWidgetProxy");
 }
 
 //----------------------------------------------------------------------------
@@ -72,7 +73,6 @@ vtkPVPointWidget::~vtkPVPointWidget()
     this->CoordinateLabel[i]->Delete();
     }
   this->PositionResetButton->Delete();
-  this->RM3DWidget->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -120,21 +120,78 @@ void vtkPVPointWidget::SetVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ResetInternal()
 {
-  if ( ! this->ModifiedFlag)
+  if (!this->AcceptCalled)
+    {
+    this->ActualPlaceWidget();
+    return;
+    }
+  if (this->SuppressReset || !this->ModifiedFlag)
     {
     return;
     }
-  // Reset point
-  static_cast<vtkRMPointWidget*>(this->RM3DWidget)->ResetInternal();
+
+  double pt[3];
+  const char*variablename;
+  
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  variablename = (this->VariableName)? this->VariableName : "Position";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if (sdvp)
+    {
+    pt[0] = sdvp->GetElement(0);
+    pt[1] = sdvp->GetElement(1);
+    pt[2] = sdvp->GetElement(2);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property " << variablename 
+      << " for widget: "<< sproxy->GetVTKClassName());
+    return;
+    }
+  this->SetPositionInternal(pt[0],pt[1],pt[2]);
   this->Superclass::ResetInternal();
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVPointWidget::AcceptInternal(vtkClientServerID sourceID)  
+//---------------------------------------------------------------------------
+void vtkPVPointWidget::Accept()
 {
-  this->UpdateVTKObject();
-  this->Superclass::AcceptInternal(sourceID);
+ 
+  int modFlag = this->GetModifiedFlag();
+  double pt[3];
+  const char* variablename;
+  
+  this->WidgetProxy->UpdateInformation();
+  this->GetPositionInternal(pt);
+  
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  variablename = (this->VariableName)? this->VariableName : "Position";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if(sdvp)
+    {
+    sdvp->SetElements3(pt[0], pt[1],pt[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
+    }
+  
+  this->ModifiedFlag = 0;
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -152,46 +209,33 @@ void vtkPVPointWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::UpdateVTKObject()  
-{
-  if ( this->VariableName && this->ObjectID.ID )
-    {
-    static_cast<vtkRMPointWidget*>(this->RM3DWidget)->
-      UpdateVTKObject(this->ObjectID,this->VariableName);
-    }
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
 {
+  //Same as vtkPVLineWidget::SaveInBatchScript, probably never invoked.
+  //Only the derrived class SaveInBatchScript is used.
+
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-  double pos[3];
-  static_cast<vtkRMPointWidget*>(this->RM3DWidget)->GetPosition(pos);
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  const char* variablename = (this->VariableName)? this->VariableName : "Position";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
 
   // Point1
-  if (this->VariableName)
+  if (sdvp)
     {  
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-          << this->VariableName << "] SetElements3 "
-          << pos[0] << " "
-          << pos[1] << " "
-          << pos[2] << endl;
+          << variablename << "] SetElements3 "
+          << sdvp->GetElement(0) << " "
+          << sdvp->GetElement(1) << " "
+          << sdvp->GetElement(2) << endl;
     }
+  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-}
-
-//----------------------------------------------------------------------------
-vtkPVPointWidget* vtkPVPointWidget::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
-{
-  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
-  return vtkPVPointWidget::SafeDownCast(clone);
 }
 
 //----------------------------------------------------------------------------
@@ -203,17 +247,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceName("Point");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-
-  vtkPVProcessModule *pm = pvApp->GetProcessModule();
-
-  // Widget needs the RenderModule for picking.
-  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(
-             pm->GetObjectFromID(this->RM3DWidget->GetWidget3DID()));
-  if (widget)
-    {
-    widget->SetRenderModule(pm->GetRenderModule());
-    }
-
+  
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -282,25 +316,14 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {
       double pos[3];
-      static_cast<vtkRMPointWidget*>(this->RM3DWidget)->GetPosition(pos);
+      this->WidgetProxy->UpdateInformation();
+      this->GetPositionInternal(pos);
       this->PositionEntry[0]->SetValue(pos[0]);
       this->PositionEntry[1]->SetValue(pos[1]);
       this->PositionEntry[2]->SetValue(pos[2]);
       this->Render();
     }
-  else
-    {
-    vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
-    if ( !widget )
-      {
-      vtkErrorMacro( "This is not a point widget" );
-      return;
-      }
-    double val[3];
-    widget->GetPosition(val); 
-    this->SetPosition(val[0], val[1], val[2]);
-    this->Superclass::ExecuteEvent(wdg, l, p);
-    }
+ this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
 //----------------------------------------------------------------------------
@@ -321,7 +344,6 @@ void vtkPVPointWidget::ActualPlaceWidget()
 
   this->SetPosition((bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2, 
                     (bounds[4]+bounds[5])/2);
-  this->UpdateVTKObject();
   // Get around the progress clearing the status text.
   // We can get rid of this when Andy adds the concept of a global status.
   // fixme: Put the message in enable.
@@ -332,7 +354,10 @@ void vtkPVPointWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
 { 
-  ((vtkRMPointWidget*)this->RM3DWidget)->SetPosition(x,y,z);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Position")); 
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -350,12 +375,27 @@ void vtkPVPointWidget::GetPosition(double pt[3])
     vtkErrorMacro("Cannot get your point.");
     return;
     }
-  ((vtkRMPointWidget*)this->RM3DWidget)->GetPosition(pt);
+  this->WidgetProxy->UpdateInformation();
+  this->GetPositionInternal(pt);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::GetPositionInternal(double pt[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("PositionInfo"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPosition()
 {
+  if(!this->ValueChanged)
+    {
+    return;
+    }
   double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )

@@ -1,0 +1,5 @@
+vtkSMBoxWidgetProxy     GetPosition              307 3
+vtkSMBoxWidgetProxy     GetRotation              307 3
+vtkSMBoxWidgetProxy     GetScale                 307 3
+vtkSMBoxWidgetProxy     GetMatrix                307 16
+

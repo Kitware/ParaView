@@ -1,6 +1,13 @@
 PROJECT(ServerManager)
 
 SET( ServerManagerCommon_SRCS
+  vtkSMInteractorObserverProxy.cxx
+  vtkSM3DWidgetProxy.cxx
+  vtkSMBoxWidgetProxy.cxx
+  vtkSMImplicitPlaneWidgetProxy.cxx
+  vtkSMLineWidgetProxy.cxx
+  vtkSMPointWidgetProxy.cxx 
+  vtkSMSphereWidgetProxy.cxx
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
@@ -38,6 +45,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMSimpleIntInformationHelper.cxx
+  vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
@@ -58,12 +66,6 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVSimpleRenderModule.cxx
   vtkRMObject.cxx
   vtkRMScalarBarWidget.cxx
-  vtkRM3DWidget.cxx
-  vtkRMBoxWidget.cxx
-  vtkRMImplicitPlaneWidget.cxx
-  vtkRMLineWidget.cxx
-  vtkRMPointWidget.cxx
-  vtkRMSphereWidget.cxx
   vtkPVDisplay.cxx
   vtkPVPartDisplay.cxx
   vtkPVCompositePartDisplay.cxx
@@ -81,7 +83,8 @@ SET( ServerManager_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkRM3DWidget.cxx
+  vtkSMInteractorObserverProxy.cxx
+  vtkSM3DWidgetProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
@@ -120,6 +123,8 @@ FOREACH(kit ${kits})
     ${VTK_BINARY_DIR}/${kit}
     )
 ENDFOREACH(kit)
+
+SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)

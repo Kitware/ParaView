@@ -23,11 +23,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSmartPointer.h"
-
+#include "vtkSMDisplayerProxy.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.16");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -302,7 +302,12 @@ void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMProxy* display)
   this->DWInternals->Displayers.push_back(display);
 
   this->CreateVTKObjects(1);
-
+  vtkSMDisplayerProxy* dProxy = vtkSMDisplayerProxy::SafeDownCast(display);
+  if (dProxy)
+    {
+    dProxy->AddToDisplayWindow(this);
+    }
+  /*
   vtkSMProxy* actorProxy = display->GetSubProxy("actor");
   if (!actorProxy)
     {
@@ -332,6 +337,7 @@ void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMProxy* display)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->Servers, str, 0);
   str.Reset();
+  */
 }
 
 //---------------------------------------------------------------------------

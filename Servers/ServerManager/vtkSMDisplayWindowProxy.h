@@ -76,6 +76,11 @@ public:
   vtkRenderWindow* GetRenderWindow();
 //ETX
 
+  // Description:
+  // Obtain the renderer/interactor proxy. Needed by vtkSMDisplayerProxy
+  vtkSMProxy* GetRendererProxy() { return this->GetSubProxy("renderer"); }
+  vtkSMProxy* GetInteractorProxy() { return this->GetSubProxy("interactor");}
+  
 protected:
   vtkSMDisplayWindowProxy();
   ~vtkSMDisplayWindowProxy();

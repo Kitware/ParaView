@@ -31,10 +31,8 @@ class vtkKWWidget;
 class vtkKWLabel;
 class vtkKWThumbWheel;
 class vtkKWScale;
-class vtkTransform;
-class vtkBoxWidget;
-class vtkPlanes;
 class vtkXMProxy;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVBoxWidget : public vtkPV3DWidget
 {
@@ -45,23 +43,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // This method sets the input to the 3D widget and places the widget.
-  virtual void ActualPlaceWidget();
-
-  // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
-
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVBoxWidget* ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -70,8 +54,9 @@ public:
   //BTX
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(vtkClientServerID);
+  //virtual void AcceptInternal(vtkClientServerID);
   //ETX
+  virtual void Accept();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -106,10 +91,6 @@ public:
   void SetOrientation(double p[3]){ this->SetOrientation(p[0], p[1], p[2]); }
   void SetOrientation(double px, double py, double pz);
 
-  //BTX
-  vtkBoxWidget* GetBoxWidget();
-  //ETX
-
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -127,11 +108,30 @@ public:
   // BoxPoints == BoxPointsProxy
   // BoxNormals == BoxNormalsProxy
   vtkSMProxy* GetProxyByName(const char* name);
-  
+ 
+  // Description:
+  // The input from the input menu is used to place the widget.
+  virtual void SetInputMenu(vtkPVInputMenu*);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+
+  // Description:
+  // Called when the input changes (before accept).
+  virtual void Update();
+
+  // Description:
+  // Overloaded to create the ImplicitFunction proxy
+  //BTX
+  virtual void Create(vtkKWApplication *app);
+  //ETX
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
 
+  // Description:
+  // PlaceWidget is overloaded since, this class has to position the
+  // bounds on the BoxProxy(vtkBox) as well.
+  virtual void PlaceWidget(double bds[6]);
+  
   // Description:
   // Call creation on the child.
   virtual void ChildCreate(vtkPVApplication*);
@@ -139,8 +139,6 @@ protected:
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
-
-  void UpdateVTKObject(const char* sourceTclName);
 
   // Description:
   // Get iVar values from vtkRMBoxWidget object and update the GUI.
@@ -164,30 +162,35 @@ protected:
   vtkKWLabel*        OrientationLabel;
   vtkKWScale*        OrientationScale[3];
 
-  vtkSMProxy *BoxProxy;
+  vtkPVInputMenu*   InputMenu;
+
+  vtkSMProxy *BoxProxy; //The Implicit function proxy
   vtkSMProxy *BoxTransformProxy;
-  vtkSMProxy *BoxMatrixProxy;
-  vtkSMProxy *BoxPointsProxy;
-  vtkSMProxy *BoxNormalsProxy;
   char *BoxProxyName;
   char *BoxTransformProxyName;
-  char *BoxMatrixProxyName;
-  char *BoxPointsProxyName;
-  char *BoxNormalsProxyName;
   vtkSetStringMacro(BoxProxyName);
   vtkSetStringMacro(BoxTransformProxyName);
-  vtkSetStringMacro(BoxMatrixProxyName);
-  vtkSetStringMacro(BoxPointsProxyName);
-  vtkSetStringMacro(BoxNormalsProxyName);
-  
+
   int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+    vtkPVXMLPackageParser* parser);
 
   // Description:
   // For saving the widget into a VTK tcl script.
   // This saves the implicit sphere.  Parts will share this
   // one sphere.
   virtual void SaveInBatchScript(ofstream *file);
+
+  //BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  virtual vtkPVWidget* ClonePrototypeInternal(
+    vtkPVSource* pvSource,
+    vtkArrayMap<vtkPVWidget*, 
+    vtkPVWidget*>* map);
+  //ETX
 
   double* GetPositionFromGUI();
   double* GetRotationFromGUI();
@@ -198,8 +201,6 @@ protected:
   double PositionGUI[3];
   double RotationGUI[3];
   double ScaleGUI[3];
-
-  int Initialized;
 
 private:
   vtkPVBoxWidget(const vtkPVBoxWidget&); // Not implemented

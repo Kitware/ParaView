@@ -50,11 +50,6 @@ public:
   void NormalYCallback();
   void NormalZCallback();
 
-
-  // Description:
-  // This method sets the input to the 3D widget and places the widget.
-  virtual void ActualPlaceWidget();
-
   // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
@@ -65,16 +60,16 @@ public:
   // Center of the plane.
   void SetCenter();
   virtual void SetCenter(double,double,double);
-  virtual void SetCenterInternal(double,double,double);
   virtual void SetCenter(double f[3]) { this->SetCenter(f[0], f[1], f[2]); }
+  void GetCenter(double pts[3]);
 
   // Description:
   // The normal to the plane.
   void SetNormal();
   virtual void SetNormal(double,double,double);
-  virtual void SetNormalInternal(double,double,double);
   virtual void SetNormal(double f[3]) { this->SetNormal(f[0], f[1], f[2]); }
-
+  void GetNormal(double pts[3]);
+  
   // Description:
   // The input from the input menu is used to place the widget.
   virtual void SetInputMenu(vtkPVInputMenu*);
@@ -96,7 +91,7 @@ public:
   //BTX
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -115,8 +110,14 @@ public:
   // Description:
   // Provide access to the proxy used by this widget.
   // Plane == PlaneProxy
-  vtkSMProxy* GetProxyByName(const char*);
+  virtual vtkSMProxy* GetProxyByName(const char*);
 
+  // Description:
+  // Overloaded to create the ImplicitFunctionProxy
+  // BTX
+  virtual void Create(vtkKWApplication *app);
+  //ETX
+   
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
@@ -129,6 +130,15 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
+  virtual void SetCenterInternal(double,double,double);
+  virtual void SetNormalInternal(double,double,double);
+
+  // Description:
+  // These methods assume that UpdateInformation() has been
+  // called on the WidgetProxy()
+  void GetCenterInternal(double pts[3]);
+  void GetNormalInternal(double pts[3]);
+  
   vtkPVInputMenu *InputMenu;
 
   vtkKWEntry *CenterEntry[3];
@@ -144,9 +154,9 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  vtkSMProxy *PlaneProxy;
-  char *PlaneProxyName;
-  vtkSetStringMacro(PlaneProxyName);
+  vtkSMProxy *ImplicitFunctionProxy;
+  char *ImplicitFunctionProxyName;
+  vtkSetStringMacro(ImplicitFunctionProxyName);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

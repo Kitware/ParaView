@@ -14,10 +14,11 @@
 =========================================================================*/
 // .NAME vtkPVSphereWidget - A widget to manipulate an implicit plane.
 // .SECTION Description
-// This widget creates and manages its own vtkPlane on each process.
-// I could not descide whether to include the bounds display or not. 
-// (I did not.) 
-
+// vtkPVSphereWidget can be considered as equivalent to the combination of
+// vtkPVLineWidget and vtkPVLineSourceWidget.
+// Unlike vtkPVLineWidget, vtkPVSphereWidget is never used without the 
+// implicit function, hence there was no need to have the distinction here.
+// 
 
 #ifndef __vtkPVSphereWidget_h
 #define __vtkPVSphereWidget_h
@@ -29,6 +30,7 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVSphereWidget : public vtkPV3DWidget
 {
@@ -43,35 +45,18 @@ public:
   void CenterResetCallback();
 
   // Description:
-  // This method sets the input to the 3D widget and places the widget.
-  virtual void ActualPlaceWidget();
-
-  // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
 
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVSphereWidget* ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
-
   void SetCenter();
   void SetCenter(double,double,double);
-  void SetCenterInternal(double,double,double);
   void SetCenter(double c[3]) { this->SetCenter(c[0], c[1], c[2]); }
-  void SetCenterInternal(double c[3]) 
-    { 
-      this->SetCenterInternal(c[0], c[1], c[2]); 
-    }
+  void GetCenter(double pts[3]);
+  
   void SetRadius();
   void SetRadius(double);
-  void SetRadiusInternal(double);
+  double GetRadius();
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -80,7 +65,8 @@ public:
   //BTX
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(vtkClientServerID);
+  //virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -99,11 +85,46 @@ public:
   // Description:
   // Provide access to the proxy used by this widget.
   // Sphere == SphereProxy
-  vtkSMProxy* GetProxyByName(const char*);
-  
+  //vtkSMProxy* GetProxyByName(const char*);
+
+  // Description:
+  // Returns the implicit function proxy.
+  // May be,we should use the GetProxyByName interface 
+  // but for now...we use this one.
+  //virtual vtkSMProxy* GetImplicitFunctionProxy() { return this->ImplicitFunctionProxy; }
+  virtual vtkSMProxy* GetProxyByName(const char*);
+
+  // Description:
+  // Called when the input changes (before accept).
+  virtual void Update();
+
+  // Description:
+  // The input from the input menu is used to place the widget.
+  virtual void SetInputMenu(vtkPVInputMenu*);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+
+  // Description:
+  // Overloaded to create the ImplicitFunction proxy
+  //BTX
+  virtual void Create(vtkKWApplication *app);
+  //ETX
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
+
+  // Description:
+  // These methods assume that the Property has been
+  // updated before calling them; i.e. Property->UpdateInformation
+  // has been invoked.  
+  void GetCenterInternal(double pt[3]);
+  double GetRadiusInternal();
+
+  void SetCenterInternal(double,double,double);
+  void SetCenterInternal(double c[3]) 
+    { 
+    this->SetCenterInternal(c[0], c[1], c[2]); 
+    }
+  void SetRadiusInternal(double);
 
   // Description:
   // Call creation on the child.
@@ -113,8 +134,6 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
-  void UpdateVTKObject(const char* sourceTclName);
-
   vtkKWEntry *CenterEntry[3];
   vtkKWEntry *RadiusEntry;
   vtkKWPushButton *CenterResetButton;
@@ -122,12 +141,11 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  vtkSMProxy *SphereProxy;
-  char *SphereProxyName;
-  vtkSetStringMacro(SphereProxyName);
-  
-  int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+  vtkPVInputMenu* InputMenu;
+
+  vtkSMProxy *ImplicitFunctionProxy;
+  char *ImplicitFunctionProxyName;
+  vtkSetStringMacro(ImplicitFunctionProxyName);
 
   // Description:
   // For saving the widget into a VTK tcl script.
@@ -135,6 +153,22 @@ protected:
   // one sphere.
   virtual void SaveInBatchScript(ofstream *file);
 
+  virtual void ActualPlaceWidget();
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
+
+  //BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  virtual vtkPVWidget* ClonePrototypeInternal(
+    vtkPVSource* pvSource,
+    vtkArrayMap<vtkPVWidget*, 
+    vtkPVWidget*>* map);
+  //ETX
 private:
   vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
   void operator=(const vtkPVSphereWidget&); // Not implemented

@@ -19,15 +19,15 @@
 #ifndef __vtkRMObject_h
 #define __vtkRMObject_h
 
-#include "vtkObject.h"
+#include "vtkSMProxy.h"
 #include "vtkClientServerID.h" //needed for Create
 
 class vtkPVProcessModule;
 
-class VTK_EXPORT vtkRMObject : public vtkObject
+class VTK_EXPORT vtkRMObject : public vtkSMProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkRMObject, vtkObject);
+  vtkTypeRevisionMacro(vtkRMObject, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

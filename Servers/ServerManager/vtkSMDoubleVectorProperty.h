@@ -57,6 +57,7 @@ public:
   // or one or more of the values is not in all domains.
   // Returns 1 otherwise.
   int SetElements(const double* values);
+  double *GetElements();
 
   // Description:
   // Set the value of 1st element. The vector is resized as necessary.

@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVSphereWidget.h"
 
+#include "vtkArrayMap.txx"
 #include "vtkCamera.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWEntry.h"
@@ -26,23 +27,25 @@
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSphereWidget.h"
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
 
 #include "vtkKWEvent.h"
-#include "vtkRMSphereWidget.h"
+#include "vtkSMSphereWidgetProxy.h"
 
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
-
+#include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.43");
+
+vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -51,6 +54,9 @@ int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVSphereWidget::vtkPVSphereWidget()
 {
   int cc;
+
+  this->InputMenu = 0;
+
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
   for ( cc = 0; cc < 3; cc ++ )
@@ -60,16 +66,18 @@ vtkPVSphereWidget::vtkPVSphereWidget()
    }
   this->RadiusEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
-  this->RM3DWidget = vtkRMSphereWidget::New();
   
-  this->SphereProxy = 0;
-  this->SphereProxyName = 0;
+  this->ImplicitFunctionProxy = 0;
+  this->ImplicitFunctionProxyName = 0;
+  this->SetWidgetProxyXMLName("SphereWidgetProxy");
 }
 
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
   int i;
+
+  this->SetInputMenu(NULL);
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
   for (i=0; i<3; i++)
@@ -79,25 +87,24 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
     }
   this->RadiusEntry->Delete();
   this->CenterResetButton->Delete();
-  this->RM3DWidget->Delete();
   
-  if (this->SphereProxyName)
+  if(this->ImplicitFunctionProxyName)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
-                                                    this->SphereProxyName);
+  vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
+      this->ImplicitFunctionProxyName);
     }
-  this->SetSphereProxyName(0);
-  if (this->SphereProxy)
+  this->SetImplicitFunctionProxyName(0);
+  if(this->ImplicitFunctionProxy)
     {
-    this->SphereProxy->Delete();
-    this->SphereProxy = 0;
+    this->ImplicitFunctionProxy->Delete();
+    this->ImplicitFunctionProxy = 0;
     }
 }
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkPVSphereWidget::GetProxyByName(const char*)
 {
-  return this->SphereProxy;
+  return this->ImplicitFunctionProxy;
 }
 
 //----------------------------------------------------------------------------
@@ -126,65 +133,114 @@ void vtkPVSphereWidget::CenterResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::ResetInternal()
-{
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->ResetInternal();
-  this->Superclass::ResetInternal();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSphereWidget::ActualPlaceWidget()
 {
   double center[3];
   double radius;
-  //int cc;
-  //for ( cc = 0; cc < 3; cc ++ )
-  //  {
-  //  center[cc] = atof(this->CenterEntry[cc]->GetValue());
-  //  }
-  //radius = atof(this->RadiusEntry->GetValue());
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetCenter(center);
-  radius = 
-    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetRadius();
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(center);
+  radius = this->GetRadiusInternal();
   this->Superclass::ActualPlaceWidget();
-  this->SetCenter(center[0], center[1], center[2]);
-  this->SetRadius(radius);
+  this->SetCenterInternal(center);
+  this->SetRadiusInternal(radius);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)  
+void vtkPVSphereWidget::ResetInternal()
 {
-  this->PlaceWidget();
-  if ( ! this->ModifiedFlag)
+  if( !this->AcceptCalled)
+    {
+    this->ActualPlaceWidget();
+    return;
+    }
+  if ( ! this->ModifiedFlag || this->SuppressReset)
     {
     return;
     }
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->UpdateVTKObject();
 
-  vtkSMDoubleVectorProperty *cProp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->SphereProxy->GetProperty("Center"));
-  vtkSMDoubleVectorProperty *rProp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->SphereProxy->GetProperty("Radius"));
-  if (cProp)
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Center"));
+  if(sdvp)
     {
-    cProp->SetElement(0, this->CenterEntry[0]->GetValueAsFloat());
-    cProp->SetElement(1, this->CenterEntry[1]->GetValueAsFloat());
-    cProp->SetElement(2, this->CenterEntry[2]->GetValueAsFloat());
+    double center[3];
+    center[0] = sdvp->GetElement(0);
+    center[1] = sdvp->GetElement(1);
+    center[2] = sdvp->GetElement(2);
+    this->SetCenterInternal(center[0],center[1],center[2]);
     }
-  if (rProp)
+  else
     {
-    rProp->SetElement(0, this->RadiusEntry->GetValueAsFloat());
+    vtkErrorMacro("Could not find property Center for widget: "<< 
+      this->ImplicitFunctionProxy->GetVTKClassName());
     }
-  this->SphereProxy->UpdateVTKObjects();
-  
-  this->Superclass::AcceptInternal(sourceID);
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Radius"));
+  if(sdvp)
+    {
+    double radius = sdvp->GetElement(0);
+    this->SetRadiusInternal(radius);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Radius for widget: "<< 
+      this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  this->Superclass::ResetInternal();
 }
 
+//---------------------------------------------------------------------------
+void vtkPVSphereWidget::Accept()
+{
+  int modFlag = this->GetModifiedFlag();
+  double center[3];
+  double radius;
+  
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(center);
+  radius = this->GetRadiusInternal();
 
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Center"));
+  if (sdvp)
+    {
+    sdvp->SetElements3(center[0],center[1],center[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Center for widget: "
+      << this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Radius"));
+  if (sdvp)
+    {
+    sdvp->SetElements1(radius);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Radius for widget: "
+      << this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  this->ImplicitFunctionProxy->UpdateVTKObjects();
+  this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
+  this->ValueChanged = 0;
+}
 //---------------------------------------------------------------------------
 void vtkPVSphereWidget::Trace(ofstream *file)
 {
@@ -212,56 +268,105 @@ void vtkPVSphereWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::UpdateVTKObject(const char*)
-{
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sphereID = this->SphereProxy->GetID(0);
-  double center[3];
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->
-    GetLastAcceptedCenter(center);
-
-  double radius = static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->
-    GetLastAcceptedRadius();
+  if (!this->ImplicitFunctionProxy)
+    {
+    vtkErrorMacro("ImplicitFunction Proxy must be set to save to a batch script");
+    return;
+    }
+  
+  vtkClientServerID sphereID = this->ImplicitFunctionProxy->GetID(0);
 
   *file << endl;
   *file << "set pvTemp" << sphereID.ID
-        << " [$proxyManager NewProxy implicit_functions Sphere]"
-        << endl;
+    << " [$proxyManager NewProxy implicit_functions Sphere]"
+    << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-        << sphereID.ID << " $pvTemp" << sphereID.ID
-        << endl;
+    << sphereID.ID << " $pvTemp" << sphereID.ID
+    << endl;
   *file << "  $pvTemp" << sphereID.ID << " UnRegister {}" << endl;
-  *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center] "
-        << "SetElements3 " 
-        << center[0] << " "
-        << center[1] << " "
-        << center[2] << " "
-        << endl;
-  *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius] "
-        << "SetElements1 "
-        << radius << endl << endl;
+  
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Center"));  
+  if(sdvp)
+    {
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center] "
+      << "SetElements3 " 
+      << sdvp->GetElement(0) << " "
+      << sdvp->GetElement(1) << " "
+      << sdvp->GetElement(2)
+      << endl;
+    }
+
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Radius"));
+  if (sdvp)
+    {
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius] "
+      << "SetElements1 "
+      << sdvp->GetElement(0) << endl << endl;
+    }
   *file << "  $pvTemp" << sphereID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
+
+  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-//  os << indent << "SphereID: " << this->SphereID << endl;
+  os << indent << "ImplicitFunctionProxy: " << this->ImplicitFunctionProxy << endl;
+  os << indent << "ImplicitFunctionProxyName: " << 
+    (this->ImplicitFunctionProxyName? this->ImplicitFunctionProxyName: "None") << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
+
 }
 
 //----------------------------------------------------------------------------
-vtkPVSphereWidget* vtkPVSphereWidget::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+vtkPVWidget* vtkPVSphereWidget::ClonePrototypeInternal(
+  vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
-  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
-  return vtkPVSphereWidget::SafeDownCast(clone);
+    vtkPVWidget* pvWidget = 0;
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+
+    vtkPVSphereWidget* sw = vtkPVSphereWidget::SafeDownCast(
+      pvWidget);
+    if(!sw)
+      {
+      vtkErrorMacro("Internal error. Could not downcast pointer.");
+      pvWidget->Delete();
+      return 0;
+      }
+     if (this->InputMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
+      sw->SetInputMenu(im);
+      im->Delete();
+      }
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+  return pvWidget;
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
@@ -289,7 +394,7 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
       strcpy(this->BalloonHelpString, str);
       }
     }
-  
+
   if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
@@ -311,7 +416,7 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
 void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Sphere");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
@@ -343,57 +448,57 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->RadiusEntry->Create(pvApp, "");
 
   this->Script("grid propagate %s 1",
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-               this->CoordinateLabel[0]->GetWidgetName(),
-               this->CoordinateLabel[1]->GetWidgetName(),
-               this->CoordinateLabel[2]->GetWidgetName());
+    this->CoordinateLabel[0]->GetWidgetName(),
+    this->CoordinateLabel[1]->GetWidgetName(),
+    this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-               this->Labels[0]->GetWidgetName(),
-               this->CenterEntry[0]->GetWidgetName(),
-               this->CenterEntry[1]->GetWidgetName(),
-               this->CenterEntry[2]->GetWidgetName());
+    this->Labels[0]->GetWidgetName(),
+    this->CenterEntry[0]->GetWidgetName(),
+    this->CenterEntry[1]->GetWidgetName(),
+    this->CenterEntry[2]->GetWidgetName());
   this->Script("grid %s %s - - -sticky ew",
-               this->Labels[1]->GetWidgetName(),
-               this->RadiusEntry->GetWidgetName());
+    this->Labels[1]->GetWidgetName(),
+    this->RadiusEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetCenter}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetCenter}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     }
   this->Script("bind %s <Key> {%s SetValueChanged}",
-               this->RadiusEntry->GetWidgetName(),
-               this->GetTclName());
+    this->RadiusEntry->GetWidgetName(),
+    this->GetTclName());
   this->Script("bind %s <FocusOut> {%s SetRadius}",
-               this->RadiusEntry->GetWidgetName(),
-                 this->GetTclName());
+    this->RadiusEntry->GetWidgetName(),
+    this->GetTclName());
   this->Script("bind %s <KeyPress-Return> {%s SetRadius}",
-               this->RadiusEntry->GetWidgetName(),
-               this->GetTclName());
+    this->RadiusEntry->GetWidgetName(),
+    this->GetTclName());
   this->CenterResetButton->SetParent(this->Frame->GetFrame());
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetLabel("Set Sphere Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
-               this->CenterResetButton->GetWidgetName());
+    this->CenterResetButton->GetWidgetName());
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
     {
@@ -403,40 +508,42 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                      0.5*(bds[4]+bds[5]));
-      static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedCenter(
-                      0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                                  0.5*(bds[4]+bds[5]));
+        0.5*(bds[4]+bds[5]));
       this->SetRadius(0.5*(bds[1]-bds[0]));
-      static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedRadius(
-                      0.5*(bds[1]-bds[0]));
       }
     }
 
   this->SetBalloonHelpString(this->BalloonHelpString);
-
-  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
-  this->SphereProxy = pm->NewProxy("implicit_functions", "Sphere");
-  ostrstream str;
-  static int instanceCount = 0;
-  str << "Sphere" << instanceCount << ends;
-  instanceCount++;
-  this->SetSphereProxyName(str.str());
-  pm->RegisterProxy("implicit_functions", this->SphereProxyName,
-                    this->SphereProxy);
-  this->SphereProxy->CreateVTKObjects(1);
-  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSphereWidget::Create( vtkKWApplication *app)
+{
+  this->Superclass::Create(app);
+
+
+  static int proxyNum = 0;
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->ImplicitFunctionProxy = pm->NewProxy("implicit_functions", "Sphere");
+  ostrstream str;
+  str << "Sphere" << proxyNum << ends;
+  proxyNum++;
+  this->SetImplicitFunctionProxyName(str.str());
+  pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
+    this->ImplicitFunctionProxy);
+  this->ImplicitFunctionProxy->CreateVTKObjects(1);
+  str.rdbuf()->freeze(0);
+}
+//----------------------------------------------------------------------------
 void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  if(l == vtkKWEvent::WidgetModifiedEvent && wdg == this->RM3DWidget)
+  if(l == vtkKWEvent::WidgetModifiedEvent)
     {
     double center[3];
     double radius;
-    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetCenter(center);
-    radius = static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetRadius();
+    this->WidgetProxy->UpdateInformation();
+    this->GetCenterInternal(center);
+    radius = this->GetRadiusInternal();
     this->CenterEntry[0]->SetValue(center[0]);
     this->CenterEntry[1]->SetValue(center[1]);
     this->CenterEntry[2]->SetValue(center[2]);
@@ -445,46 +552,85 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     this->ModifiedCallback();
     this->ValueChanged = 0;
     }
-  else
-    {
-    vtkSphereWidget *widget = vtkSphereWidget::SafeDownCast(wdg);
-    if ( widget )
-      {
-      double val[3];
-      widget->GetCenter(val); 
-      this->SetCenter(val[0], val[1], val[2]);
-      double rad = widget->GetRadius();
-      this->SetRadius(rad);
-      }
-    this->Superclass::ExecuteEvent(wdg, l, p);
-    }
+  this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
-                                        vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
+
+  // Setup the InputMenu.
+  const char* input_menu = element->GetAttribute("input_menu");
+  if(!input_menu)
+    {
+    vtkErrorMacro("No input_menu attribute.");
+    return 0;
+    }
+
+  vtkPVXMLElement* ame = element->LookupElement(input_menu);
+  if (!ame)
+    {
+    vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+    return 0;
+    }
+  
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+  if(!imw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+    return 0;
+    }
+  imw->AddDependent(this);
+  this->SetInputMenu(imw);
+  imw->Delete();  
   return 1;
 }
 
-void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::GetCenter(double pt[3])
 {
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetCenter(x,y,z);
-  //vtkPVApplication *pvApp = this->GetPVApplication();
-  //vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //this->CenterEntry[0]->SetValue(x);
-  //this->CenterEntry[1]->SetValue(y);
-  //this->CenterEntry[2]->SetValue(z);  
-  //if ( this->Widget3DID.ID )
-  //  {
-  //  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-  //                  << "SetCenter" << x << y << z
-  //                  << vtkClientServerStream::End;
-  //  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  //  }
+  if(!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(pt);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::GetCenterInternal(double pt[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("CenterInfo"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVSphereWidget::GetRadius()
+{
+  if(!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return 0.0;
+    }
+  this->WidgetProxy->UpdateInformation();
+  return this->GetRadiusInternal();
+}
+
+//----------------------------------------------------------------------------
+double vtkPVSphereWidget::GetRadiusInternal()
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("RadiusInfo"));
+  return dvp->GetElement(0);
+}
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetCenter(double x, double y, double z)
 {
@@ -495,6 +641,10 @@ void vtkPVSphereWidget::SetCenter(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetCenter()
 {
+  if(!this->ValueChanged)
+    {
+    return;
+    }
   double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
@@ -508,21 +658,31 @@ void vtkPVSphereWidget::SetCenter()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Center"));
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
+}
+//----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadiusInternal(double r)
 {
-  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetRadius(r);
-  //this->RadiusEntry->SetValue(r); 
-  //if ( this->Widget3DID.ID )
-  //  {
-  //  vtkPVApplication *pvApp = this->GetPVApplication();
-  //  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-  //                << "SetRadius" << r
-  //                << vtkClientServerStream::End;
-  //  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  //  }
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Radius"));
+  dvp->SetElements1(r);
+  this->WidgetProxy->UpdateVTKObjects(); 
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius(double r)
@@ -534,6 +694,10 @@ void vtkPVSphereWidget::SetRadius(double r)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius()
 {
+  if(this-ValueChanged == 0)
+    {
+    return;
+    }
   double val;
   val = atof(this->RadiusEntry->GetValue());
   this->SetRadiusInternal(val);
@@ -547,6 +711,7 @@ void vtkPVSphereWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
+  this->PropagateEnableState(this->InputMenu);
   this->PropagateEnableState(this->RadiusEntry);
   this->PropagateEnableState(this->CenterResetButton);
 
@@ -561,4 +726,19 @@ void vtkPVSphereWidget::UpdateEnableState()
   this->PropagateEnableState(this->Labels[1]);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::Update()
+{
+  vtkPVSource* input;
+  double bds[6];
 
+  this->Superclass::Update();
+  //Input bounds may have changed so call place widget
+  input = this->InputMenu->GetCurrentValue();
+  if (input)
+    {
+    input->GetDataInformation()->GetBounds(bds);
+    this->PlaceWidget(bds);
+    this->Render();
+    }
+}

@@ -32,10 +32,15 @@
 #include "vtkPVProcessModule.h"
 
 #include "vtkKWEvent.h"
-#include "vtkRMLineWidget.h"
+#include "vtkSMLineWidgetProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.53");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -50,7 +55,6 @@ vtkPVLineWidget::vtkPVLineWidget()
     this->Point2[i] = vtkKWEntry::New();
     }
   this->ResolutionEntry = vtkKWEntry::New();
-  this->RM3DWidget = vtkRMLineWidget::New();
   this->Point1Variable = 0;
   this->Point2Variable = 0;
   this->ResolutionVariable = 0;
@@ -64,6 +68,7 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->SetResolutionLabelTextName("Resolution");
 
   this->ShowResolution = 1;
+  this->SetWidgetProxyXMLName("LineWidgetProxy");
 }
 
 //----------------------------------------------------------------------------
@@ -79,7 +84,6 @@ vtkPVLineWidget::~vtkPVLineWidget()
     }
   this->ResolutionLabel->Delete();
   this->ResolutionEntry->Delete();
-  this->RM3DWidget->Delete();
 
   this->SetPoint1Variable(0);
   this->SetPoint2Variable(0);
@@ -130,7 +134,10 @@ void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
 {
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetPoint1(x,y,z);
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Point1"));
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -148,13 +155,28 @@ void vtkPVLineWidget::GetPoint1(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint1(pt);
+  this->WidgetProxy->UpdateInformation();
+  this->GetPoint1Internal(pt);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::GetPoint1Internal(double pt[3])
+{
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Point1Info"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
+  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
 {
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetPoint2(x,y,z);
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Point2"));
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +194,18 @@ void vtkPVLineWidget::GetPoint2(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint2(pt);
+  this->WidgetProxy->UpdateInformation();
+  this->GetPoint2Internal(pt);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::GetPoint2Internal(double pt[3])
+{
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Point2Info"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
 }
 
 //----------------------------------------------------------------------------
@@ -214,7 +247,15 @@ void vtkPVLineWidget::SetPoint2()
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetResolution(int i)
 {
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetResolution(i);
+  if(!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Resolution"));
+  ivp->SetElements1(i);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -226,7 +267,16 @@ int vtkPVLineWidget::GetResolution()
     return 0;
     }
 
-  return static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetResolution();
+  this->WidgetProxy->UpdateInformation();
+  return this->GetResolutionInternal();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLineWidget::GetResolutionInternal()
+{
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("ResolutionInfo"));
+  return ivp->GetElement(0);
 }
 
 //----------------------------------------------------------------------------
@@ -261,19 +311,74 @@ void vtkPVLineWidget::Trace(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetResolution "
         << this->ResolutionEntry->GetValue() << endl;
 }
-//----------------------------------------------------------------------------
-void vtkPVLineWidget::AcceptInternal(vtkClientServerID sourceID)
-{
-  this->UpdateVTKObject(sourceID);
-  this->Superclass::AcceptInternal(sourceID);
-}
-
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
+void vtkPVLineWidget::Accept()
 {
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->UpdateVTKObject(sourceID,
-    this->Point1Variable, this->Point2Variable, this->ResolutionVariable);
+  int modFlag = this->GetModifiedFlag();
+  double pt1[3],pt2[3];
+  int res;
+  const char* variablename;
+  
+  this->WidgetProxy->UpdateInformation();
+  this->GetPoint1Internal(pt1);
+  this->GetPoint2Internal(pt2);
+  res = this->GetResolutionInternal();
+
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  variablename = (this->Point1Variable)?this->Point1Variable : "Point1";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if (sdvp)
+    {
+    sdvp->SetElements3(pt1[0],pt1[1],pt1[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
+    }
+  variablename = (this->Point2Variable)? this->Point2Variable : "Point2";
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(sproxy->GetProperty(variablename));
+  if(sdvp)
+    {
+    sdvp->SetElements3(pt2[0],pt2[1],pt2[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
+    }
+
+  if (this->ResolutionVariable)
+    {
+    vtkSMIntVectorProperty* sivp = vtkSMIntVectorProperty::SafeDownCast(
+      sproxy->GetProperty(this->ResolutionVariable));
+    if (sivp)
+      {
+      sivp->SetElements1(res);
+      }
+    else
+      {
+      vtkErrorMacro("Could not find property "<<this->ResolutionVariable
+        <<" for widget: "<< sproxy->GetVTKClassName());
+      }
+    }
+  sproxy->UpdateVTKObjects();
+  sproxy->UpdatePipeline();
+  this->ModifiedFlag = 0;
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -300,45 +405,62 @@ void vtkPVLineWidget::ActualPlaceWidget()
     bds[0] = bds[2] = bds[4] = 0.0;
     bds[1] = bds[3] = bds[5] = 1.0;
     }
-  
-  this->RM3DWidget->PlaceWidget(bds);
-  this->UpdateVTKObject(this->ObjectID);
+
+  if (this->WidgetProxy)
+    {
+    this->WidgetProxy->PlaceWidget(bds);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
 {
+  //TODO: this method is incorrect. Why was this method incorrect even
+  //before the changes were made? Is this never invoked?
+  //I believe it is so, since PVLineWidget is used only(?) while
+  //creating a line source, so, it is not saved in batch script.
+
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
   // Point1
-  if (this->Point1Variable)
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  const char *variablename = (this->Point1Variable)? this->Point1Variable : "Point1";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if(sdvp)
     {  
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-          << this->Point1Variable << "] SetElements3 "
-          << this->Point1[0]->GetValueAsFloat() << " "
-          << this->Point1[1]->GetValueAsFloat() << " "
-          << this->Point1[2]->GetValueAsFloat() << endl;
+      << variablename << "] SetElements3 "
+      << sdvp->GetElement(0) << " "
+      << sdvp->GetElement(1) << " "
+      << sdvp->GetElement(2) << endl;
     }
   // Point2
-  if (this->Point2Variable)
+  variablename = (this->Point2Variable)? this->Point2Variable : "Point2";
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if(sdvp)
     {
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-          << this->Point2Variable << "] SetElements3 "
-          << this->Point2[0]->GetValueAsFloat() << " "
-          << this->Point2[1]->GetValueAsFloat() << " "
-          << this->Point2[2]->GetValueAsFloat() << endl;
-
+      << variablename << "] SetElements3 "
+      << sdvp->GetElement(0) << " "
+      << sdvp->GetElement(1) << " "
+      << sdvp->GetElement(2) << endl;
     }
 
   // Resolution
   if (this->ResolutionVariable)
     {
-    *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-          << this->ResolutionVariable << "] SetElements1 "
-          << this->ResolutionEntry->GetValueAsFloat() << endl;
+    vtkSMIntVectorProperty* sivp = vtkSMIntVectorProperty::SafeDownCast(
+      sproxy->GetProperty(this->ResolutionVariable));
+    if(sivp)
+      {
+      *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << variablename << "] SetElements1 "
+        << sivp->GetElement(0) << endl;
+      }
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ResetInternal()
@@ -347,17 +469,66 @@ void vtkPVLineWidget::ResetInternal()
     {
     return;
     }
-  if ( ! this->ModifiedFlag)
+  if ( ! this->ModifiedFlag || !this->AcceptCalled)
     {
     return;
     }
-  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->ResetInternal();
+  double pt1[3],pt2[3];
+  int res;
+  const char* variablename;
+
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  variablename = (this->Point1Variable)? this->Point1Variable : "Point1";
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if(sdvp)
+    {
+    pt1[0] = sdvp->GetElement(0);
+    pt1[1] = sdvp->GetElement(1);
+    pt1[2] = sdvp->GetElement(2);
+    this->SetPoint1Internal(pt1[0],pt1[1],pt1[2]);
+    } 
+  else
+    {
+    vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
+    }
+
+  variablename = (this->Point2Variable)? this->Point2Variable : "Point2";
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sproxy->GetProperty(variablename));
+  if(sdvp)
+    {
+    pt2[0] = sdvp->GetElement(0);
+    pt2[1] = sdvp->GetElement(1);
+    pt2[2] = sdvp->GetElement(2);
+    this->SetPoint2Internal(pt2[0],pt2[1],pt2[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
+    }
+
+  if (this->ResolutionVariable)
+    {
+    vtkSMIntVectorProperty* sivp = vtkSMIntVectorProperty::SafeDownCast(
+      sproxy->GetProperty(this->ResolutionVariable));
+    if(sivp)
+      {
+      res = sivp->GetElement(0);
+      this->SetResolution(res);
+      }
+    else
+      {
+      vtkErrorMacro("Could not find property "<<
+        this->ResolutionVariable <<" for widget: "<< sproxy->GetVTKClassName());
+      }
+    }
   this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget* vtkPVLineWidget::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVLineWidget::SafeDownCast(clone);
@@ -365,8 +536,8 @@ vtkPVLineWidget* vtkPVLineWidget::ClonePrototype(vtkPVSource* pvSource,
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone, 
-                                      vtkPVSource* pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVLineWidget* pvlw = vtkPVLineWidget::SafeDownCast(clone);
@@ -388,7 +559,7 @@ void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone,
 
 //----------------------------------------------------------------------------
 int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
-                                        vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
 
@@ -444,39 +615,23 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     double pos[3];
     int res;
-    static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint1(pos);
+    this->WidgetProxy->UpdateInformation();
+    this->GetPoint1Internal(pos);
     this->Point1[0]->SetValue(pos[0]);
     this->Point1[1]->SetValue(pos[1]);
     this->Point1[2]->SetValue(pos[2]);
 
-    static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint2(pos);
+    this->GetPoint2Internal(pos);
     this->Point2[0]->SetValue(pos[0]);
     this->Point2[1]->SetValue(pos[1]);
     this->Point2[2]->SetValue(pos[2]);
-    
-    res = static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetResolution();
+
+    res = this->GetResolutionInternal();
     this->ResolutionEntry->SetValue(res);
 
     this->Render();
-  
     }
-  else
-    {
-    vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
-    if (!widget)
-      {
-      return;
-      }
-    double val[3];
-    
-    widget->GetPoint1(val);
-    this->SetPoint1(val[0],val[1],val[2]);
-    
-    widget->GetPoint2(val);
-    this->SetPoint2(val[0],val[1],val[2]);
-    
-    this->Superclass::ExecuteEvent(wdg, l, p);
-    }
+  this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
 
@@ -506,7 +661,7 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
       strcpy(this->BalloonHelpString, str);
       }
     }
-  
+
   if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
@@ -529,12 +684,12 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Line");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  
+
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -551,6 +706,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     sprintf(buffer, "%c", "xyz"[i]);
     this->CoordinateLabel[i]->SetLabel(buffer);
     }
+
   for (i=0; i<3; i++)
     {
     this->Point1[i]->SetParent(this->Frame->GetFrame());
@@ -570,69 +726,69 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->ResolutionEntry->SetValue(0);
 
   this->Script("grid propagate %s 1",
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-               this->CoordinateLabel[0]->GetWidgetName(),
-               this->CoordinateLabel[1]->GetWidgetName(),
-               this->CoordinateLabel[2]->GetWidgetName());
+    this->CoordinateLabel[0]->GetWidgetName(),
+    this->CoordinateLabel[1]->GetWidgetName(),
+    this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-               this->Labels[0]->GetWidgetName(),
-               this->Point1[0]->GetWidgetName(),
-               this->Point1[1]->GetWidgetName(),
-               this->Point1[2]->GetWidgetName());
+    this->Labels[0]->GetWidgetName(),
+    this->Point1[0]->GetWidgetName(),
+    this->Point1[1]->GetWidgetName(),
+    this->Point1[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-               this->Labels[1]->GetWidgetName(),
-               this->Point2[0]->GetWidgetName(),
-               this->Point2[1]->GetWidgetName(),
-               this->Point2[2]->GetWidgetName());
+    this->Labels[1]->GetWidgetName(),
+    this->Point2[0]->GetWidgetName(),
+    this->Point2[1]->GetWidgetName(),
+    this->Point2[2]->GetWidgetName());
   if (this->ShowResolution)
     {
     this->Script("grid %s %s - - -sticky ew",
-                 this->ResolutionLabel->GetWidgetName(),
-                 this->ResolutionEntry->GetWidgetName());
+      this->ResolutionLabel->GetWidgetName(),
+      this->ResolutionEntry->GetWidgetName());
     }
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-                 this->Point1[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point1[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <Key> {%s SetValueChanged}",
-                 this->Point2[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point2[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetPoint1}",
-                 this->Point1[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point1[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetPoint2}",
-                 this->Point2[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point2[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPoint1}",
-                 this->Point1[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point1[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPoint2}",
-                 this->Point2[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->Point2[i]->GetWidgetName(),
+      this->GetTclName());
     }
   this->Script("bind %s <Key> {%s SetValueChanged}",
-               this->ResolutionEntry->GetWidgetName(),
-               this->GetTclName());
+    this->ResolutionEntry->GetWidgetName(),
+    this->GetTclName());
   this->Script("bind %s <FocusOut> {%s SetResolution}",
-               this->ResolutionEntry->GetWidgetName(),
-               this->GetTclName());
+    this->ResolutionEntry->GetWidgetName(),
+    this->GetTclName());
   this->Script("bind %s <KeyPress-Return> {%s SetResolution}",
-               this->ResolutionEntry->GetWidgetName(),
-               this->GetTclName());
-  
+    this->ResolutionEntry->GetWidgetName(),
+    this->GetTclName());
+
   this->SetResolution(20);
 
   this->SetBalloonHelpString(this->BalloonHelpString);
@@ -654,23 +810,23 @@ void vtkPVLineWidget::UpdateEnableState()
   this->PropagateEnableState(this->ResolutionLabel);
   this->PropagateEnableState(this->ResolutionEntry);
 }
-  
+
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Point1Variable: " 
-     << ( this->Point1Variable ? this->Point1Variable : "(none)" ) << endl;
+    << ( this->Point1Variable ? this->Point1Variable : "(none)" ) << endl;
   os << indent << "Point1LabelText: " 
-     << ( this->Point1LabelText ? this->Point1LabelText : "(none)" ) << endl;
+    << ( this->Point1LabelText ? this->Point1LabelText : "(none)" ) << endl;
   os << indent << "Point2Variable: " 
-     << ( this->Point2Variable ? this->Point2Variable : "(none)" ) << endl;
+    << ( this->Point2Variable ? this->Point2Variable : "(none)" ) << endl;
   os << indent << "Point2LabelText: " 
-     << ( this->Point2LabelText ? this->Point2LabelText : "(none)" ) << endl;
+    << ( this->Point2LabelText ? this->Point2LabelText : "(none)" ) << endl;
   os << indent << "ResolutionVariable: " 
-     << ( this->ResolutionVariable ? this->ResolutionVariable : "(none)" ) << endl;
+    << ( this->ResolutionVariable ? this->ResolutionVariable : "(none)" ) << endl;
   os << indent << "ResolutionLabelText: " 
-     << ( this->ResolutionLabelText ? this->ResolutionLabelText : "(none)" ) 
-     << endl;
+    << ( this->ResolutionLabelText ? this->ResolutionLabelText : "(none)" ) 
+    << endl;
   os << indent << "ShowResolution: " << this->ShowResolution << endl;
 }

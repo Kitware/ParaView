@@ -162,7 +162,7 @@ protected:
   friend class vtkPVImplicitPlaneWidget;
   friend class vtkPVSphereWidget;
   friend class vtkPVBoxWidget;
-  
+  friend class vtkSMBoxWidgetProxy;
   // Temporary
   friend class vtkPVSource;
 //ETX

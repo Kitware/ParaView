@@ -32,7 +32,7 @@ set pv(vtkTemp138) [$pv(vtkTemp1) CreatePVSource Probe]
 set pv(vtkTemp341) [$pv(vtkTemp138) GetPVWidget {Probe object}]
 $pv(vtkTemp341) SetCurrentValue {Point}
 set pv(vtkTemp280) [$pv(vtkTemp341) GetPVWidget {Point}]
-[ $pv(vtkTemp280) GetPointWidget ] SetPosition 1.0 1.0 1.0
+$pv(vtkTemp280) SetPosition 1.0 1.0 1.0
 [ $pv(vtkTemp280) GetRadiusWidget ] SetValue 0
 [ $pv(vtkTemp280) GetNumberOfPointsWidget ] SetValue 1
 $pv(vtkTemp138) AcceptCallback

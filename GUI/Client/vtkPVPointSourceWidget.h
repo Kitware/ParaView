@@ -23,27 +23,23 @@
 #ifndef __vtkPVPointSourceWidget_h
 #define __vtkPVPointSourceWidget_h
 
-#include "vtkPVSourceWidget.h"
+#include "vtkPVPointWidget.h"
 
 class vtkPVInputMenu;
-class vtkPVPointWidget;
 class vtkPVScaleFactorEntry;
 class vtkPVVectorEntry;
+class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkPVPointSourceWidget : public vtkPVSourceWidget
+class VTK_EXPORT vtkPVPointSourceWidget : public vtkPVPointWidget
 {
 public:
   static vtkPVPointSourceWidget* New();
-  vtkTypeRevisionMacro(vtkPVPointSourceWidget, vtkPVSourceWidget);
+  vtkTypeRevisionMacro(vtkPVPointSourceWidget, vtkPVPointWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Creates common widgets.
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // The underlying line widget.
-  vtkGetObjectMacro(PointWidget, vtkPVPointWidget);
 
   // Description:
   // Controls the radius of the point cloud.
@@ -56,16 +52,6 @@ public:
   // Description:
   // Returns if any subwidgets are modified.
   virtual int GetModifiedFlag();
-
-  // Description:
-  // This method is called when the source that contains this widget
-  // is selected.
-  virtual void Select();
-
-  // Description:
-  // This method is called when the source that contains this widget
-  // is deselected.
-  virtual void Deselect();
 
   // Description:
   // Create the point source in the VTK Tcl script.
@@ -109,6 +95,9 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  virtual vtkSMProxy* GetProxyByName(const char*)
+    { return reinterpret_cast<vtkSMProxy*>(this->SourceProxy); }
+  
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();
@@ -120,9 +109,10 @@ protected:
   virtual int ReadXMLAttributes(vtkPVXMLElement *element,
                                 vtkPVXMLPackageParser *parser);
 
-  vtkPVPointWidget* PointWidget;
-
-  static int InstanceCount;
+  //vtkPVPointWidget* PointWidget;
+  vtkSMSourceProxy *SourceProxy;
+  char *SourceProxyName;
+  vtkSetStringMacro(SourceProxyName);
 
   vtkPVScaleFactorEntry* RadiusWidget;
   vtkPVVectorEntry* NumberOfPointsWidget;

@@ -1593,8 +1593,7 @@ proc stream_init {} {
     $streams(vtkTemp691) SetValue {Momentum}
     set streams(vtkTemp700) [$streams(vtkTemp679) GetPVWidget {Seed}]
     set streams(vtkTemp735) [$streams(vtkTemp700) GetPVWidget {Point Cloud}]
-    set streams(vtkTemp697) [$streams(vtkTemp735) GetPointWidget]
-    $streams(vtkTemp697) SetPosition -7.46909 0.00000 2.41026
+    $streams(vtkTemp735) SetPosition -7.46909 0.00000 2.41026
     set streams(vtkTemp694) [$streams(vtkTemp735) GetRadiusWidget]
     $streams(vtkTemp694) SetValue 0.5
     set streams(vtkTemp695) [$streams(vtkTemp735) GetNumberOfPointsWidget]
@@ -1673,8 +1672,7 @@ proc stream_run { } {
     set streams(vtkTemp700) [$streams(vtkTemp679) GetPVWidget {Seed}]
     $streams(vtkTemp700) SetCurrentValue {Point Cloud}
     set streams(vtkTemp735) [$streams(vtkTemp700) GetPVWidget {Point Cloud}]
-    set streams(vtkTemp697) [$streams(vtkTemp735) GetPointWidget]
-    $streams(vtkTemp697) SetPosition -7.46909 0.00000 2.41026
+    $streams(vtkTemp735) SetPosition -7.46909 0.00000 2.41026
     set streams(vtkTemp694) [$streams(vtkTemp735) GetRadiusWidget]
     $streams(vtkTemp694) SetValue 0.5
     set streams(vtkTemp695) [$streams(vtkTemp735) GetNumberOfPointsWidget]
@@ -1682,7 +1680,7 @@ proc stream_run { } {
     set streams(vtkTemp736) [$streams(vtkTemp679) GetPVWidget {MaxProp}]
     set streams(vtkTemp704) [$streams(vtkTemp736) GetPVWidget {MaxPropLen}]
     $streams(vtkTemp704) SetValue 20
-    $streams(vtkTemp697) SetVisibility 1
+    $streams(vtkTemp735) SetVisibility 1
     $streams(vtkTemp679) AcceptCallback
     ForceRender
 
@@ -1700,7 +1698,7 @@ proc stream_run { } {
     DemoAfter 1000
 
     # fly
-    $streams(vtkTemp697) SetVisibility 0
+    $streams(vtkTemp735) SetVisibility 0
 
     if $pvDemoShouldStop {
         return
@@ -1735,12 +1733,11 @@ proc stream_run { } {
         return
     }
     set streams(vtkTemp899) [$streams(vtkTemp700) GetPVWidget {Line}]
-    set streams(vtkTemp699) [$streams(vtkTemp899) GetLineWidget]
-    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
-    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
-    $streams(vtkTemp699) SetResolution 20
+    $streams(vtkTemp899) SetPoint1 -5.99623 -4.36920 2.68942
+    $streams(vtkTemp899) SetPoint2 -5.99623 3.45009 3.07720
+    $streams(vtkTemp899) SetResolution 20
     # line widget
-    $streams(vtkTemp699) SetVisibility 1
+    $streams(vtkTemp899) SetVisibility 1
     $streams(vtkTemp679) AcceptCallback
     update
     ForceRender
@@ -1772,9 +1769,9 @@ proc stream_run { } {
     }
     DemoAfter 2000
 
-    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
-    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
-    $streams(vtkTemp699) SetResolution 10
+    $streams(vtkTemp899) SetPoint1 -5.99623 -4.36920 2.68942
+    $streams(vtkTemp899) SetPoint2 -5.99623 3.45009 3.07720
+    $streams(vtkTemp899) SetResolution 10
     $streams(vtkTemp704) SetValue 20
     $streams(vtkTemp679) AcceptCallback
     update
@@ -1793,7 +1790,7 @@ proc stream_run { } {
     # tube
     $streams(vtkTemp900) SetVisibility 0
     # line widget
-    $streams(vtkTemp699) SetVisibility 0
+    $streams(vtkTemp899) SetVisibility 0
 
     ForceRender
 }
@@ -4517,7 +4514,7 @@ if ![info exists DemoDir] {
             extract_run
             clip_run
             threshold_run
-
+            
             if $pvDemoShouldStop {
                 break
             }

@@ -46,8 +46,6 @@ public:
   void SetPoint2(double x, double y, double z);
   void GetPoint1(double pt[3]);
   void GetPoint2(double pt[3]);
-  void SetPoint1Internal(double x, double y, double z);
-  void SetPoint2Internal(double x, double y, double z);
 
   // Description:
   // Set the resolution of the line widget.
@@ -110,7 +108,7 @@ public:
   // Called when accept button is pushed.
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -156,10 +154,21 @@ protected:
   virtual void ChildCreate(vtkPVApplication*);
 
   // Description:
-  // Execute event of the 3D Widget.
+  // Execute event of the RM3DWidget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
-  void UpdateVTKObject(vtkClientServerID);
+  //void UpdateVTKObject(vtkClientServerID);
+
+  void SetPoint1Internal(double x, double y, double z);
+  void SetPoint2Internal(double x, double y, double z);
+
+  // Description:
+  // These methods assume that the Property has been
+  // updated before calling them; i.e. Property->UpdateInformation
+  // has been invoked.
+  void GetPoint1Internal(double pt[3]);
+  void GetPoint2Internal(double pt[3]);
+  int GetResolutionInternal();
 
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];

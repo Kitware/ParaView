@@ -225,62 +225,66 @@
           </DoubleVectorProperty>
        </Proxy>
      </SubProxy>
-
      <SubProxy>
-       <Proxy name="camera" class="vtkCamera">
-          <DoubleVectorProperty
-             name="CameraPosition"
-             command="SetPosition"
-             number_of_elements="3"
-             default_values="1 0 0">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-             name="CameraFocalPoint"
-             command="SetFocalPoint"
-             number_of_elements="3"
-             default_values="0 0 0">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-             name="CameraViewUp"
-             command="SetViewUp"
-             number_of_elements="3"
-             default_values="0 1 0">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-             name="CameraViewAngle"
-             command="SetViewAngle"
-             number_of_elements="1"
-             default_values="30">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-             name="CameraClippingRange"
-             command="SetClippingRange"
-             number_of_elements="2"
-             default_values="0.01 1000.01">
-          </DoubleVectorProperty>
+       <Proxy name="interactor" class="vtkRenderWindowInteractor">
+         <!--no properties for the time being -->
        </Proxy>
      </SubProxy>
-
      <SubProxy>
-#if defined(VTK_USE_MPI) && defined(_WIN32)
-       <Proxy name="composite" class="vtkPVTreeComposite">
-#else
-       <Proxy name="composite" class="vtkCompositeRenderManager">
-#endif
+       <Proxy name="camera" class="vtkCamera">
          <DoubleVectorProperty
-           name="ImageReductionFactor"
-           command="SetImageReductionFactor"
+           name="CameraPosition"
+           command="SetPosition"
+           number_of_elements="3"
+           default_values="1 0 0">
+         </DoubleVectorProperty>
+
+         <DoubleVectorProperty
+           name="CameraFocalPoint"
+           command="SetFocalPoint"
+           number_of_elements="3"
+           default_values="0 0 0">
+         </DoubleVectorProperty>
+
+         <DoubleVectorProperty
+           name="CameraViewUp"
+           command="SetViewUp"
+           number_of_elements="3"
+           default_values="0 1 0">
+         </DoubleVectorProperty>
+
+         <DoubleVectorProperty
+           name="CameraViewAngle"
+           command="SetViewAngle"
            number_of_elements="1"
-           default_values="1">
+           default_values="30">
+         </DoubleVectorProperty>
+
+         <DoubleVectorProperty
+           name="CameraClippingRange"
+           command="SetClippingRange"
+           number_of_elements="2"
+           default_values="0.01 1000.01">
          </DoubleVectorProperty>
        </Proxy>
      </SubProxy>
-   </DisplayWindowProxy>
-   
-  </ProxyGroup>
 
-</ServerManagerConfiguration>
+     <SubProxy>
+       #if defined(VTK_USE_MPI) && defined(_WIN32)
+       <Proxy name="composite" class="vtkPVTreeComposite">
+         #else
+         <Proxy name="composite" class="vtkCompositeRenderManager">
+           #endif
+           <DoubleVectorProperty
+             name="ImageReductionFactor"
+             command="SetImageReductionFactor"
+             number_of_elements="1"
+             default_values="1">
+           </DoubleVectorProperty>
+         </Proxy>
+       </SubProxy>
+     </DisplayWindowProxy>
+
+   </ProxyGroup>
+
+ </ServerManagerConfiguration>

@@ -16,7 +16,6 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkCamera.h"
-#include "vtkImplicitPlaneWidget.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -40,15 +39,16 @@
 #include "vtkRenderer.h"
 
 #include "vtkKWEvent.h"
-#include "vtkRMImplicitPlaneWidget.h"
+#include "vtkSMImplicitPlaneWidgetProxy.h"
 
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -76,11 +76,10 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalXButton = vtkKWPushButton::New();
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
-  
-  this->RM3DWidget = vtkRMImplicitPlaneWidget::New();
-  
-  this->PlaneProxy = 0;
-  this->PlaneProxyName = 0;
+
+  this->ImplicitFunctionProxy = 0;
+  this->ImplicitFunctionProxyName = 0;
+  this->SetWidgetProxyXMLName("ImplicitPlaneWidgetProxy");
 }
 
 //----------------------------------------------------------------------------
@@ -102,18 +101,17 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
   this->NormalXButton->Delete();
   this->NormalYButton->Delete();
   this->NormalZButton->Delete();
-  this->RM3DWidget->Delete();
   
-  if (this->PlaneProxyName)
+  if (this->ImplicitFunctionProxyName)
     {
     vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
-                                                    this->PlaneProxyName);
+                                                    this->ImplicitFunctionProxyName);
     }
-  this->SetPlaneProxyName(0);
-  if (this->PlaneProxy)
+  this->SetImplicitFunctionProxyName(0);
+  if (this->ImplicitFunctionProxy)
     {
-    this->PlaneProxy->Delete();
-    this->PlaneProxy = 0;
+    this->ImplicitFunctionProxy->Delete();
+    this->ImplicitFunctionProxy = 0;
     }
 }
 
@@ -123,15 +121,11 @@ void vtkPVImplicitPlaneWidget::CenterResetCallback()
   vtkPVSource *input;
   double bds[6];
 
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource has not been set.");
-    return;
-    }
-
-  input = this->PVSource->GetPVInput(0);
+  //Input bounds may have changed so call place widget
+  input = this->InputMenu->GetCurrentValue();
   if (input == NULL)
     {
+    vtkErrorMacro("No input set to reset the center");
     return;
     }
   input->GetDataInformation()->GetBounds(bds);
@@ -198,67 +192,124 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ResetInternal()
 {
-  if ( ! this->ModifiedFlag)
+  if ( !this->AcceptCalled)
+    {
+    this->ActualPlaceWidget();
+    return;
+    }
+  if ( ! this->ModifiedFlag || this->SuppressReset)
     {
     return;
     }
-  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->ResetInternal();
-  this->Superclass::ResetInternal();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
-{
-  double center[3];
-  double normal[3];
-  int cc;
-  for ( cc = 0; cc < 3; cc ++ )
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Origin"));
+  if(sdvp)
     {
-    center[cc] = atof(this->CenterEntry[cc]->GetValue());
-    normal[cc] = atof(this->NormalEntry[cc]->GetValue());
+    double center[3];
+    center[0] = sdvp->GetElement(0);
+    center[1] = sdvp->GetElement(1);
+    center[2] = sdvp->GetElement(2);
+    this->SetCenterInternal(center[0],center[1],center[2]);
     }
- 
-  this->Superclass::ActualPlaceWidget();
-  this->SetCenter(center[0], center[1], center[2]);
-  this->SetNormal(normal[0], normal[1], normal[2]);
+  else
+    {
+    vtkErrorMacro("Could not find property Origin for widget: "<< 
+      this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Normal"));
+  if(sdvp)
+    {
+    double normal[3];
+    normal[0] = sdvp->GetElement(0);
+    normal[1] = sdvp->GetElement(1);
+    normal[2] = sdvp->GetElement(2);
+    this->SetNormalInternal(normal[0],normal[1],normal[2]);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Normal for widget: "<< 
+      this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("DrawPlane"));
+  if (ivp)
+    {
+    ivp->SetElements1(0);
+    }
+  this->WidgetProxy->UpdateVTKObjects();
+
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkPVImplicitPlaneWidget::GetProxyByName(const char*)
 {
-  return this->PlaneProxy;
+  return this->ImplicitFunctionProxy;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
-{ 
-  this->PlaceWidget();
-  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->UpdateVTKObject(
-    sourceID, this->VariableName);
-  
-  if (this->GetModifiedFlag())
-    {
-    vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PlaneProxy->GetProperty("Origin"));
-    vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->PlaneProxy->GetProperty("Normal"));
-    if (oProp)
-      {
-      oProp->SetElement(0, this->CenterEntry[0]->GetValueAsFloat());
-      oProp->SetElement(1, this->CenterEntry[1]->GetValueAsFloat());
-      oProp->SetElement(2, this->CenterEntry[2]->GetValueAsFloat());
-      }
-    if (nProp)
-      {
-      nProp->SetElement(0, this->NormalEntry[0]->GetValueAsFloat());
-      nProp->SetElement(1, this->NormalEntry[1]->GetValueAsFloat());
-      nProp->SetElement(2, this->NormalEntry[2]->GetValueAsFloat());
-      }
-    this->PlaneProxy->UpdateVTKObjects();
-    }
-  this->Superclass::AcceptInternal(sourceID);
-}
+void vtkPVImplicitPlaneWidget::Accept()
+{
+  int modFlag = this->GetModifiedFlag();
+  double center[3];
+  double normal[3];
 
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(center);
+  this->GetNormalInternal(normal);
+
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Origin"));
+  if (sdvp)
+    {
+    sdvp->SetElements(center);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Origin for widget: "
+      << this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Normal"));
+  if (sdvp)
+    {
+    sdvp->SetElements(normal);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Normal for widget: "
+      << this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("DrawPlane"));
+  if (ivp)
+    {
+    ivp->SetElements1(0);
+    }
+  this->WidgetProxy->UpdateVTKObjects();
+  this->ImplicitFunctionProxy->UpdateVTKObjects();
+  this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->ValueChanged = 0;
+  this->AcceptCalled = 1;
+}
 //---------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 {
@@ -275,59 +326,69 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
     val[cc] = atof( this->CenterEntry[cc]->GetValue() );
     }
   *file << "$kw(" << this->GetTclName() << ") SetCenter "
-        << val[0] << " " << val[1] << " " << val[2] << endl;
-   for ( cc = 0; cc < 3; cc ++ )
+    << val[0] << " " << val[1] << " " << val[2] << endl;
+  for ( cc = 0; cc < 3; cc ++ )
     {
     val[cc] = atof( this->NormalEntry[cc]->GetValue() );
     }
   *file << "$kw(" << this->GetTclName() << ") SetNormal "
-        << val[0] << " " << val[1] << " " << val[2] << endl;
+    << val[0] << " " << val[1] << " " << val[2] << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID planeID = this->PlaneProxy->GetID(0);
+  vtkClientServerID planeID = this->ImplicitFunctionProxy->GetID(0);
   *file << endl;
   *file << "set pvTemp" <<  planeID.ID
-        << " [$proxyManager NewProxy implicit_functions Plane]"
-        << endl;
+    << " [$proxyManager NewProxy implicit_functions Plane]"
+    << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-        << planeID.ID << " $pvTemp" << planeID.ID
-        << endl;
+    << planeID.ID << " $pvTemp" << planeID.ID
+    << endl;
   *file << "  $pvTemp" << planeID.ID << " UnRegister {}" << endl;
 
-  double val[3];
-  int cc;
-
-  for ( cc = 0; cc < 3; cc ++ )
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Origin"));
+  if (sdvp)
     {
-    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin] "
+      << "SetElements3 " 
+      << sdvp->GetElement(0) << " " 
+      << sdvp->GetElement(1) << " " 
+      << sdvp->GetElement(2) << endl;
     }
-  *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin] "
-        << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
 
-  for ( cc = 0; cc < 3; cc ++ )
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Normal"));
+  if(sdvp)
     {
-    val[cc] = atof( this->NormalEntry[cc]->GetValue() );
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal] "
+      << "SetElements3 " 
+      << sdvp->GetElement(0) << " " 
+      << sdvp->GetElement(1) << " " 
+      << sdvp->GetElement(2) << endl;
     }
-  *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal] "
-        << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
   *file << "  $pvTemp" << planeID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
+
+  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "InputMenu: " << this->GetInputMenu();
+  os << indent << "ImplicitFunctionProxyName: " 
+    << (this->ImplicitFunctionProxyName? this->ImplicitFunctionProxyName: "None") << endl;
+  os << indent << "ImplicitFunctionProxy: " << this->ImplicitFunctionProxy << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVImplicitPlaneWidget::ClonePrototypeInternal(
-                                 vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+  vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* pvWidget = 0;
 
@@ -347,7 +408,7 @@ vtkPVWidget* vtkPVImplicitPlaneWidget::ClonePrototypeInternal(
       pvWidget->Delete();
       return 0;
       }
-    
+
     if (this->InputMenu)
       {
       // This will either clone or return a previously cloned
@@ -395,7 +456,7 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
       strcpy(this->BalloonHelpString, str);
       }
     }
-  
+
   if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
@@ -421,13 +482,10 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  static int instanceCount = 0;
-  ++instanceCount;
-
   // Now that the 3D widget is on each process,
   // we do not need to create our own plane (but it does not hurt).
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Plane");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
@@ -463,92 +521,92 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   this->Script("grid propagate %s 1",
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-               this->CoordinateLabel[0]->GetWidgetName(),
-               this->CoordinateLabel[1]->GetWidgetName(),
-               this->CoordinateLabel[2]->GetWidgetName());
+    this->CoordinateLabel[0]->GetWidgetName(),
+    this->CoordinateLabel[1]->GetWidgetName(),
+    this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-               this->Labels[0]->GetWidgetName(),
-               this->CenterEntry[0]->GetWidgetName(),
-               this->CenterEntry[1]->GetWidgetName(),
-               this->CenterEntry[2]->GetWidgetName());
+    this->Labels[0]->GetWidgetName(),
+    this->CenterEntry[0]->GetWidgetName(),
+    this->CenterEntry[1]->GetWidgetName(),
+    this->CenterEntry[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-               this->Labels[1]->GetWidgetName(),
-               this->NormalEntry[0]->GetWidgetName(),
-               this->NormalEntry[1]->GetWidgetName(),
-               this->NormalEntry[2]->GetWidgetName());
+    this->Labels[1]->GetWidgetName(),
+    this->NormalEntry[0]->GetWidgetName(),
+    this->NormalEntry[1]->GetWidgetName(),
+    this->NormalEntry[2]->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <Key> {%s SetValueChanged}",
-                 this->NormalEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->NormalEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetCenter}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetNormal}",
-                 this->NormalEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->NormalEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetCenter}",
-                 this->CenterEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->CenterEntry[i]->GetWidgetName(),
+      this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetNormal}",
-                 this->NormalEntry[i]->GetWidgetName(),
-                 this->GetTclName());
+      this->NormalEntry[i]->GetWidgetName(),
+      this->GetTclName());
     }
   this->CenterResetButton->SetParent(this->Frame->GetFrame());
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetLabel("Set Plane Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
-               this->CenterResetButton->GetWidgetName());
+    this->CenterResetButton->GetWidgetName());
 
   this->NormalButtonFrame->SetParent(this->Frame->GetFrame());
   this->NormalButtonFrame->Create(pvApp, "frame", "");
   this->Script("grid %s - - - - -sticky ew", 
-               this->NormalButtonFrame->GetWidgetName());
+    this->NormalButtonFrame->GetWidgetName());
 
   this->NormalCameraButton->SetParent(this->NormalButtonFrame);
   this->NormalCameraButton->Create(pvApp, "");
   this->NormalCameraButton->SetLabel("Use Camera Normal");
   this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
-               this->NormalCameraButton->GetWidgetName());
+    this->NormalCameraButton->GetWidgetName());
   this->NormalXButton->SetParent(this->NormalButtonFrame);
   this->NormalXButton->Create(pvApp, "");
   this->NormalXButton->SetLabel("X Normal");
   this->NormalXButton->SetCommand(this, "NormalXCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
-               this->NormalXButton->GetWidgetName());
+    this->NormalXButton->GetWidgetName());
   this->NormalYButton->SetParent(this->NormalButtonFrame);
   this->NormalYButton->Create(pvApp, "");
   this->NormalYButton->SetLabel("Y Normal");
   this->NormalYButton->SetCommand(this, "NormalYCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
-               this->NormalYButton->GetWidgetName());
+    this->NormalYButton->GetWidgetName());
   this->NormalZButton->SetParent(this->NormalButtonFrame);
   this->NormalZButton->Create(pvApp, "");
   this->NormalZButton->SetLabel("Z Normal");
   this->NormalZButton->SetCommand(this, "NormalZCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
-               this->NormalZButton->GetWidgetName());
+    this->NormalZButton->GetWidgetName());
 
   // Initialize the center of the plane based on the input bounds.
-  if (this->PVSource)  // *********************************** DON'T FORGET ME
+  if (this->PVSource)  
     {
     vtkPVSource *input = this->PVSource->GetPVInput(0);
     if (input)
@@ -556,26 +614,28 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                      0.5*(bds[4]+bds[5]));
-      static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->
-        SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                                  0.5*(bds[4]+bds[5]));
+        0.5*(bds[4]+bds[5]));
       this->SetNormal(0, 0, 1);
-      static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->
-        SetLastAcceptedNormal(0, 0, 1);
-
       }
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
-  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
+{
+  this->Superclass::Create(app);
+
+  static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
-  this->PlaneProxy = pm->NewProxy("implicit_functions", "Plane");
+  this->ImplicitFunctionProxy = pm->NewProxy("implicit_functions", "Plane");
   ostrstream str;
-  str << "Plane" << instanceCount << ends;
-  this->SetPlaneProxyName(str.str());
-  pm->RegisterProxy("implicit_functions", this->PlaneProxyName,
-                    this->PlaneProxy);
-  this->PlaneProxy->CreateVTKObjects(1);
+  str << "Plane" << proxyNum << ends;
+  proxyNum++;
+  this->SetImplicitFunctionProxyName(str.str());
+  pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
+    this->ImplicitFunctionProxy);
+  this->ImplicitFunctionProxy->CreateVTKObjects(1);
   str.rdbuf()->freeze(0);
 }
 
@@ -584,46 +644,33 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
 {
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-    double val[3];
-    static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetCenter(val);
-    this->CenterEntry[0]->SetValue(val[0]);
-    this->CenterEntry[1]->SetValue(val[1]);
-    this->CenterEntry[2]->SetValue(val[2]);
+    double center[3];
+    double normal[3];
+    this->WidgetProxy->UpdateInformation();
+    this->GetCenterInternal(center);
+    this->GetNormalInternal(normal);
 
-    static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetNormal(val);
-    this->NormalEntry[0]->SetValue(val[0]);
-    this->NormalEntry[1]->SetValue(val[1]);
-    this->NormalEntry[2]->SetValue(val[2]);
+    this->CenterEntry[0]->SetValue(center[0]);
+    this->CenterEntry[1]->SetValue(center[1]);
+    this->CenterEntry[2]->SetValue(center[2]);
+
+    this->NormalEntry[0]->SetValue(normal[0]);
+    this->NormalEntry[1]->SetValue(normal[1]);
+    this->NormalEntry[2]->SetValue(normal[2]);
 
     this->Render();
     this->ModifiedCallback();
     this->ValueChanged = 0;
     }
-  else
-    {
-    vtkImplicitPlaneWidget *widget = vtkImplicitPlaneWidget::SafeDownCast(wdg);
-    if ( widget )
-      {
-      double val[3];
-      widget->GetOrigin(val); 
-      this->SetCenterInternal(val[0], val[1], val[2]);
-      widget->GetNormal(val);
-      this->SetNormalInternal(val[0], val[1], val[2]);
-      if (!widget->GetDrawPlane())
-        { 
-        static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetDrawPlane(1);
-        }
-      }
-    this->Superclass::ExecuteEvent(wdg, l, p);
-    }
+  this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
-                                        vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
-  
+
   // Setup the InputMenu.
   const char* input_menu = element->GetAttribute("input_menu");
   if(!input_menu)
@@ -631,7 +678,7 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     vtkErrorMacro("No input_menu attribute.");
     return 0;
     }
-  
+
   vtkPVXMLElement* ame = element->LookupElement(input_menu);
   if (!ame)
     {
@@ -649,14 +696,17 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   imw->AddDependent(this);
   this->SetInputMenu(imw);
   imw->Delete();  
-  
+
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
 {
-  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetCenter(x,y,z);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Center"));
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -667,9 +717,34 @@ void vtkPVImplicitPlaneWidget::SetCenter(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::GetCenter(double pt[3])
+{
+  if(!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(pt);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::GetCenterInternal(double pt[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("CenterInfo"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
 {
-  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetNormal(x,y,z);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("Normal"));
+  dvp->SetElements3(x,y,z);
+  this->WidgetProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -680,8 +755,34 @@ void vtkPVImplicitPlaneWidget::SetNormal(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::GetNormal(double pt[3])
+{
+  if(!this->IsCreated())
+    {
+    vtkErrorMacro("Not created yet");
+    return;
+    }
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(pt);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::GetNormalInternal(double pt[3])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("NormalInfo"));
+  pt[0] = dvp->GetElement(0);
+  pt[1] = dvp->GetElement(1);
+  pt[2] = dvp->GetElement(2);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetCenter()
 {
+  if (!this->ValueChanged)
+    {
+    return;
+    }
   double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
@@ -697,6 +798,10 @@ void vtkPVImplicitPlaneWidget::SetCenter()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetNormal()
 {
+  if (!this->ValueChanged)
+    {
+    return;
+    }
   double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
@@ -707,28 +812,6 @@ void vtkPVImplicitPlaneWidget::SetNormal()
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::Update()
-{
-  vtkPVSource *input;
-  double bds[6];
-
-  this->Superclass::Update();
-
-  if (this->InputMenu == NULL)
-    {
-    return;
-    }
-
-  input = this->InputMenu->GetCurrentValue();
-  if (input)
-    {
-    input->GetDataInformation()->GetBounds(bds);
-    this->RM3DWidget->PlaceWidget(bds);
-    this->GetPVApplication()->GetMainWindow()->GetMainView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -754,5 +837,21 @@ void vtkPVImplicitPlaneWidget::UpdateEnableState()
     this->PropagateEnableState(this->CoordinateLabel[cc]);
     this->PropagateEnableState(this->CenterEntry[cc]);
     this->PropagateEnableState(this->NormalEntry[cc]);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Update()
+{
+  vtkPVSource* input;
+  double bds[6];
+
+  this->Superclass::Update();
+  //Input bounds may have changed so call place widget
+  input = this->InputMenu->GetCurrentValue();
+  if (input)
+    {
+    input->GetDataInformation()->GetBounds(bds);
+    this->PlaceWidget(bds);
     }
 }

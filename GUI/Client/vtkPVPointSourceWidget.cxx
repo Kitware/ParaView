@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVPointWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVScaleFactorEntry.h"
 #include "vtkPVSource.h"
@@ -29,12 +28,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-
-int vtkPVPointSourceWidget::InstanceCount = 0;
+#include "vtkSM3DWidgetProxy.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.35");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -45,12 +43,9 @@ vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 vtkPVPointSourceWidget::vtkPVPointSourceWidget()
 {
   this->CommandFunction = vtkPVPointSourceWidgetCommand;
-  this->PointWidget = vtkPVPointWidget::New();
-  this->PointWidget->SetParent(this);
-  this->PointWidget->SetTraceReferenceObject(this);
-  this->PointWidget->SetTraceReferenceCommand("GetPointWidget");
-  this->PointWidget->SetUseLabel(0);
-
+  this->SourceProxy = 0;
+  this->SourceProxyName = 0;
+  
   this->RadiusWidget = vtkPVScaleFactorEntry::New();
   this->RadiusWidget->SetParent(this);
   this->RadiusWidget->SetTraceReferenceObject(this);
@@ -75,7 +70,17 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
 //-----------------------------------------------------------------------------
 vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 {
-  this->PointWidget->Delete();
+  if (this->SourceProxyName)
+   {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
+      this->SourceProxyName);
+    }
+  this->SetSourceProxyName(0);
+  if(this->SourceProxy)
+    {
+    this->SourceProxy->Delete();
+    this->SourceProxy = 0;
+    }
   this->RadiusWidget->Delete();
   this->NumberOfPointsWidget->Delete();
   this->SetInputMenu(NULL);
@@ -84,7 +89,6 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 {
-  double pt[3];
   float rad;
   float num;
   
@@ -96,7 +100,7 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   
   vtkClientServerID sourceID = this->SourceProxy->GetID(0);
   
-  if (sourceID.ID == 0 || this->PointWidget == NULL)
+  if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
@@ -111,29 +115,35 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
         << endl;
   *file << "  $pvTemp" << sourceID << " UnRegister {}" << endl;
 
-  this->PointWidget->GetPosition(pt);
-  *file << "  [$pvTemp" << sourceID << " GetProperty Center] "
-        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Center"));
+  if(dvp)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty Center] "
+      << "SetElements3 " 
+      << dvp->GetElement(0) << " " 
+      << dvp->GetElement(1) << " " 
+      << dvp->GetElement(2) << endl;
+    }
+
   this->NumberOfPointsWidget->GetValue(&num, 1);
   *file << "  [$pvTemp" << sourceID << " GetProperty NumberOfPoints] "
-        << "SetElements1 " << static_cast<int>(num) << endl;
+    << "SetElements1 " << static_cast<int>(num) << endl;
+  
   this->RadiusWidget->GetValue(&rad, 1);
   *file << "  [$pvTemp" << sourceID << " GetProperty Radius] "
-        << "SetElements1 " << rad << endl;
+    << "SetElements1 " << rad << endl;
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
+
+  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
-
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
+  this->Superclass::Create(app);
 
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
@@ -147,12 +157,11 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   str.rdbuf()->freeze(0);
   this->SourceProxy->CreateVTKObjects(1);
 
-  this->RadiusWidget->SetObjectID(this->SourceID);
   this->RadiusWidget->SetVariableName("Radius");
   this->RadiusWidget->SetPVSource(this->GetPVSource());
   this->RadiusWidget->SetLabel("Radius");
   this->RadiusWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
-                                       "SetAcceptButtonColorToModified");
+    "SetAcceptButtonColorToModified");
   vtkSMProperty *prop = this->SourceProxy->GetProperty("Radius");
   vtkSMBoundsDomain *bd = vtkSMBoundsDomain::New();
   vtkPVInputMenu *input = vtkPVInputMenu::SafeDownCast(
@@ -164,7 +173,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   prop->AddDomain("bounds", bd);
   this->RadiusWidget->SetSMProperty(prop);
   bd->Delete();
-  
+
   this->RadiusWidget->Create(app);
   if (this->RadiusWidget->GetSMPropertyName())
     {
@@ -178,16 +187,8 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   if (this->ShowEntries)
     {
     this->Script("pack %s -side top -fill both -expand true",
-                 this->RadiusWidget->GetWidgetName());
+      this->RadiusWidget->GetWidgetName());
     }
-
-  this->PointWidget->SetObjectID(this->SourceID);
-  this->PointWidget->SetVariableName("Center");
-  this->PointWidget->SetPVSource(this->GetPVSource());
-  this->PointWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
-                                       "SetAcceptButtonColorToModified");
-  
-  this->NumberOfPointsWidget->SetObjectID(this->SourceID);
   this->NumberOfPointsWidget->SetVariableName("NumberOfPoints");
   this->NumberOfPointsWidget->SetPVSource(this->GetPVSource());
   this->NumberOfPointsWidget->SetLabel("Number of Points");
@@ -196,7 +197,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->SourceProxy->GetProperty("NumberOfPoints"));
   this->NumberOfPointsWidget->SetSMProperty(ivp);
-  
+
   this->NumberOfPointsWidget->Create(app);
   float numPts = static_cast<float>(this->DefaultNumberOfPoints);
   this->NumberOfPointsWidget->SetValue(&numPts, 1);
@@ -204,13 +205,8 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   if (this->ShowEntries)
     {
     this->Script("pack %s -side top -fill both -expand true",
-                 this->NumberOfPointsWidget->GetWidgetName());
+      this->NumberOfPointsWidget->GetWidgetName());
     }
-  
-  this->PointWidget->Create(app);
-  
-  this->Script("pack %s -side top -fill both -expand true",
-               this->PointWidget->GetWidgetName());
 
   this->ModifiedCallback();
 }
@@ -222,15 +218,14 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
     {
     return 1;
     }
-  if (this->PointWidget->GetModifiedFlag() ||
-      this->RadiusWidget->GetModifiedFlag() ||
-      this->NumberOfPointsWidget->GetModifiedFlag())
+  if (this->RadiusWidget->GetModifiedFlag() ||
+    this->NumberOfPointsWidget->GetModifiedFlag())
     {
     return 1;
     }
   return 0;
 }
- 
+
 
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::ResetInternal()
@@ -241,13 +236,13 @@ void vtkPVPointSourceWidget::ResetInternal()
       this->SourceProxy->GetProperty("Center"));
     if (dvp)
       {
-      this->PointWidget->SetPosition(dvp->GetElement(0), dvp->GetElement(1),
-                                     dvp->GetElement(2));
+      this->SetPosition(dvp->GetElement(0), dvp->GetElement(1),
+        dvp->GetElement(2));
       }
     }
   else
     {
-    this->PointWidget->PositionResetCallback();
+    this->PositionResetCallback();
     }
 
   this->RadiusWidget->ResetInternal();
@@ -270,7 +265,7 @@ void vtkPVPointSourceWidget::Accept()
     if (dvp)
       {
       double center[3];
-      this->PointWidget->GetPosition(center);
+      this->GetPosition(center);
       dvp->SetElement(0, center[0]);
       dvp->SetElement(1, center[1]);
       dvp->SetElement(2, center[2]);
@@ -281,7 +276,7 @@ void vtkPVPointSourceWidget::Accept()
     this->SourceProxy->UpdatePipeline();
     }
   this->ModifiedFlag = 0;
-  
+
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...
   // Putting this here simplifies subclasses AcceptInternal methods.
@@ -306,32 +301,20 @@ void vtkPVPointSourceWidget::Trace(ofstream *file)
     return;
     }
 
-  this->PointWidget->Trace(file);
+  this->Superclass::Trace(file);
   this->RadiusWidget->Trace(file);
   this->NumberOfPointsWidget->Trace(file);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Select()
-{
-  this->PointWidget->Select();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Deselect()
-{
-  this->PointWidget->Deselect();
-}
-
-//-----------------------------------------------------------------------------
 int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
-                                              vtkPVXMLPackageParser *parser)
+  vtkPVXMLPackageParser *parser)
 {
   if (!this->Superclass::ReadXMLAttributes(element, parser))
     {
     return 0;
     }
-  
+
   const char *input_menu = element->GetAttribute("input_menu");
   if (input_menu)
     {
@@ -341,7 +324,7 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
       vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
       return 0;
       }
-    
+
     vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
     vtkPVInputMenu *imw = vtkPVInputMenu::SafeDownCast(w);
     if (!imw)
@@ -357,24 +340,24 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     this->SetInputMenu(imw);
     imw->Delete();
     }
-  
+
   if (!element->GetScalarAttribute("radius_scale_factor",
-                                   &this->RadiusScaleFactor))
+      &this->RadiusScaleFactor))
     {
     this->RadiusScaleFactor = 0.1;
     }
-  
+
   if (!element->GetScalarAttribute("default_radius", &this->DefaultRadius))
     {
     this->DefaultRadius = 0;
     }
 
   if (!element->GetScalarAttribute("default_number_of_points",
-                                   &this->DefaultNumberOfPoints))
+      &this->DefaultNumberOfPoints))
     {
     this->DefaultNumberOfPoints = 1;
     }
-  
+
   if (!element->GetScalarAttribute("show_entries", &this->ShowEntries))
     {
     this->ShowEntries = 1;
@@ -424,8 +407,6 @@ void vtkPVPointSourceWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->PointWidget);
-
   this->PropagateEnableState(this->RadiusWidget);
   this->PropagateEnableState(this->NumberOfPointsWidget);
 
@@ -436,12 +417,14 @@ void vtkPVPointSourceWidget::UpdateEnableState()
 void vtkPVPointSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Point widget: " << this->PointWidget << endl;
+  os << indent << "SourceProxy: " << this->SourceProxy << endl;
+  os << indent << "SourceProxyName: " << 
+    (this->SourceProxyName? this->SourceProxyName: "None") << endl;
   os << indent << "RadiusWidget: " << this->RadiusWidget << endl;
   os << indent << "NumberOfPointsWidget: " << this->NumberOfPointsWidget << endl;
   os << indent << "DefaultRadius: " << this->DefaultRadius << endl;
   os << indent << "DefaultNumberOfPoints: " << this->DefaultNumberOfPoints
-     << endl;
+    << endl;
   os << indent << "RadiusScaleFactor: " << this->RadiusScaleFactor << endl;
   os << indent << "ShowEntries: " << this->ShowEntries << endl;
 }

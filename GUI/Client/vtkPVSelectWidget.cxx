@@ -25,7 +25,6 @@
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
-#include "vtkPVSourceWidget.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
@@ -39,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.57");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -185,8 +184,6 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
     this->GetSMProperty());
-  vtkPVSourceWidget *sw = vtkPVSourceWidget::SafeDownCast(
-    this->Widgets->GetItemAsObject(this->CurrentIndex));
   vtkPV3DWidget *w3d = vtkPV3DWidget::SafeDownCast(
     this->Widgets->GetItemAsObject(this->CurrentIndex));
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -205,13 +202,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
       }
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMPropertyName << "] RemoveAllProxies" << endl;
-    if (sw)
-      {
-      *file << "  [$pvTemp" << sourceID << " GetProperty "
-            << this->SMPropertyName << "] AddProxy $pvTemp"
-            << sw->GetSourceProxy()->GetID(0);
-      }
-    else if (w3d)
+    if (w3d)
       {
       *file << "  [$pvTemp" << sourceID << " GetProperty "
             << this->SMPropertyName << "] AddProxy $pvTemp"
@@ -284,18 +275,13 @@ void vtkPVSelectWidget::Accept()
     this->GetSMProperty());
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  vtkPVSourceWidget *sw = vtkPVSourceWidget::SafeDownCast(
-    this->Widgets->GetItemAsObject(this->CurrentIndex));
   vtkPV3DWidget *w3d = vtkPV3DWidget::SafeDownCast(
     this->Widgets->GetItemAsObject(this->CurrentIndex));
+  
   if (pp)
     {
     pp->RemoveAllProxies();
-    if (sw)
-      {
-      pp->AddProxy(sw->GetSourceProxy());
-      }
-    else if (w3d)
+    if(w3d)
       {
       pp->AddProxy(w3d->GetProxyByName(this->GetCurrentVTKValue()));
       }
@@ -328,14 +314,7 @@ void vtkPVSelectWidget::Accept()
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
-    if (!w3d)
-      {
-      widget->Accept();
-      }
-    else
-      {
-      widget->AcceptInternal(this->PVSource->GetVTKSourceID(0));
-      }
+    widget->Accept();
     }
 
   this->ModifiedFlag = 0;
@@ -390,19 +369,9 @@ void vtkPVSelectWidget::ResetInternal()
       vtkSMProxy *proxy = pp->GetProxy(0);
       for (i = 0; i < num; i++)
         {
-        vtkPVSourceWidget *sw = vtkPVSourceWidget::SafeDownCast(
-          this->Widgets->GetItemAsObject(i));
         vtkPV3DWidget *w3d = vtkPV3DWidget::SafeDownCast(
           this->Widgets->GetItemAsObject(i));
-        if (sw)
-          {
-          if (sw->GetSourceProxy() == proxy)
-            {
-            index = i;
-            break;
-            }
-          }
-        else if (w3d)
+        if (w3d)
           {
           if (w3d->GetProxyByName(this->GetVTKValue(i)) == proxy)
             {

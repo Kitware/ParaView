@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.19");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.20");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -129,6 +129,14 @@ unsigned int vtkSMIntVectorProperty::GetNumberOfElements()
 int vtkSMIntVectorProperty::GetElement(unsigned int idx)
 {
   return this->Internals->Values[idx];
+}
+
+//---------------------------------------------------------------------------
+int *vtkSMIntVectorProperty::GetElements()
+{
+  
+  return (this->Internals->Values.size() > 0)?
+    &this->Internals->Values[0] : NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -28,12 +28,11 @@
 
 class vtkKWCheckButton;
 class vtkKWLabeledFrame;
-class vtk3DWidget;
+
 class vtkPV3DWidgetObserver;
 class vtkKWFrame;
-
-class vtkRM3DWidget;
 class vtkSMProxy;
+class vtkSM3DWidgetProxy;
 
 class VTK_EXPORT vtkPV3DWidget : public vtkPVObjectWidget
 {
@@ -42,10 +41,15 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Create the 3DWidget. 
+  // Creates a SM3DWidgetProxy. The actual proxy XML name is
+  // determined using WidgetProxyXMLName which is set by derrived
+  // clases of this class.
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
-  // Set the widget visibility.
+  // Set the widget visibility. 
   void SetVisibility();
   virtual void SetVisibility(int val);
   void SetVisibilityNoTrace(int val);
@@ -80,14 +84,10 @@ public:
   vtkSetMacro(UseLabel, int);
   vtkGetMacro(UseLabel, int);
 
-  // Description:
-  // Internal method used only to get the widget pointer.
-  void InitializeObservers(vtk3DWidget* widget3D); 
-
   //BTX
   // Description:
   // Move widget state to VTK object or back.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void ResetInternal();
   //ETX
 
@@ -103,15 +103,31 @@ public:
   // Description:
   // Provide access to the proxy used by this widget.
   virtual vtkSMProxy* GetProxyByName(const char*) { return NULL; }
+//BTX
+  vtkGetObjectMacro(WidgetProxy,vtkSM3DWidgetProxy);
+  vtkGetStringMacro(WidgetProxyName);
+  vtkGetStringMacro(WidgetProxyXMLName);
+//ETX
 
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
+  
+  virtual void PlaceWidget(double bds[6]);
+  
+  // Description:
+  // Initialize observers on the SM3DWidgetProxy.
+  void InitializeObservers(vtkSM3DWidgetProxy* widgetproxy); 
 
   void Render();
 
   vtkPV3DWidgetObserver* Observer;
-
+  vtkSM3DWidgetProxy *WidgetProxy;
+  char *WidgetProxyName;
+  char *WidgetProxyXMLName; //The name of the SM3DWidgetProxy to create
+  vtkSetStringMacro(WidgetProxyName);
+  vtkSetStringMacro(WidgetProxyXMLName);
+  
   // Description:
   // Set label of the frame
   void SetFrameLabel(const char* label);
@@ -119,11 +135,7 @@ protected:
   // Description:
   // Call creation on the child.
   virtual void ChildCreate(vtkPVApplication*) = 0;
-
-  // Description:
-  // Set the 3D widget we are observing.
-  void SetObservable3DWidget(vtk3DWidget*);
-
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -131,8 +143,6 @@ protected:
   friend class vtkPV3DWidgetObserver;
 //ETX
 
-  // Description:
-  // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
   
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
@@ -141,13 +151,10 @@ protected:
   vtkKWFrame*        Frame;
   vtkKWLabeledFrame* LabeledFrame;
   vtkKWCheckButton* Visibility;
-  vtkRM3DWidget* RM3DWidget;
   int ValueChanged;
   int Placed;
   int Visible;
   int UseLabel;
-
-  vtk3DWidget* Widget3D;
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented

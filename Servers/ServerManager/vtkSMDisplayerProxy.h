@@ -25,16 +25,17 @@
 #ifndef __vtkSMDisplayerProxy_h
 #define __vtkSMDisplayerProxy_h
 
-#include "vtkSMSourceProxy.h"
+#include "vtkSMProxy.h"
 
 class vtkSMDisplayerProxyInternals;
 class vtkSMPart;
+class vtkSMDisplayWindowProxy;
 
-class VTK_EXPORT vtkSMDisplayerProxy : public vtkSMSourceProxy
+class VTK_EXPORT vtkSMDisplayerProxy : public vtkSMProxy
 {
 public:
   static vtkSMDisplayerProxy* New();
-  vtkTypeRevisionMacro(vtkSMDisplayerProxy, vtkSMSourceProxy);
+  vtkTypeRevisionMacro(vtkSMDisplayerProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -59,6 +60,26 @@ public:
   // Set the color of the render window. Also set specular color
   // to (1,1,1)
   void SetColor(double r, double g, double b);
+
+  // Description:
+  // Adds this displayer to the Display window proxy
+  virtual void AddToDisplayWindow(vtkSMDisplayWindowProxy* dw);
+
+  // Description:
+  // Connects filters/sinks to an input. If the filter(s) is not
+  // created, this will create it. If hasMultipleInputs is
+  // true,  only one filter is created, even if the input has
+  // multiple parts. All the inputs are added using the method
+  // name provided. If hasMultipleInputs is not true, one filter
+  // is created for each input. NOTE: The filter(s) is created
+  // when SetInput is called the first and if the it wasn't already
+  // created. If the filter has two inputs and one is multi-block
+  // whereas the other one is not, SetInput() should be called with
+  // the multi-block input first. Otherwise, it will create only
+  // on filter and can not apply to the multi-block input.
+  void AddInput(vtkSMSourceProxy* input, 
+                const char* method,
+                int hasMultipleInputs);
 
 protected:
   vtkSMDisplayerProxy();

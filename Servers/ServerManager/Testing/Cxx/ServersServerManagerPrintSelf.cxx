@@ -26,14 +26,14 @@
 #include "vtkPVPickDisplay.h"
 #include "vtkPVPlotDisplay.h"
 #include "vtkPVSimpleRenderModule.h"
-#include "vtkRM3DWidget.h"
-#include "vtkRMBoxWidget.h"
-#include "vtkRMImplicitPlaneWidget.h"
-#include "vtkRMLineWidget.h"
 #include "vtkRMObject.h"
-#include "vtkRMPointWidget.h"
 #include "vtkRMScalarBarWidget.h"
-#include "vtkRMSphereWidget.h"
+#include "vtkSM3DWidgetProxy.h"
+#include "vtkSMBoxWidgetProxy.h"
+#include "vtkSMImplicitPlaneWidgetProxy.h"
+#include "vtkSMLineWidgetProxy.h"
+#include "vtkSMPointWidgetProxy.h"
+#include "vtkSMSphereWidgetProxy.h"
 #include "vtkSMApplication.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMArrayRangeDomain.h"
@@ -109,14 +109,14 @@ int main(int , char *[])
   c = vtkPVPickDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVPlotDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVSimpleRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkRM3DWidget::New(); c->Print( cout ); c->Delete();
-  c = vtkRMBoxWidget::New(); c->Print( cout ); c->Delete();
-  c = vtkRMImplicitPlaneWidget::New(); c->Print( cout ); c->Delete();
-  c = vtkRMLineWidget::New(); c->Print( cout ); c->Delete();
   c = vtkRMObject::New(); c->Print( cout ); c->Delete();
-  c = vtkRMPointWidget::New(); c->Print( cout ); c->Delete();
   c = vtkRMScalarBarWidget::New(); c->Print( cout ); c->Delete();
-  c = vtkRMSphereWidget::New(); c->Print( cout ); c->Delete();
+  c = vtkSM3DWidgetProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMBoxWidgetProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMImplicitPlaneWidgetProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMLineWidgetProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMPointWidgetProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMSphereWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMApplication::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayListDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayRangeDomain::New(); c->Print( cout ); c->Delete();

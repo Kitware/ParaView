@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPV3DWidget.h"
 
-#include "vtk3DWidget.h"
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
@@ -32,12 +31,13 @@
 #include "vtkPVProcessModule.h"
 
 #include "vtkKWEvent.h"
-#include "vtkRM3DWidget.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSM3DWidgetProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.58");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.59");
 
 //===========================================================================
 //***************************************************************************
@@ -74,13 +74,14 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
-  this->RM3DWidget = 0; //will be initialized by subclass
   this->ValueChanged = 1;
   this->ModifiedFlag = 1;
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
-  this->Widget3D = 0;
+  this->WidgetProxy = 0;
+  this->WidgetProxyName = 0;
+  this->WidgetProxyXMLName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -90,6 +91,17 @@ vtkPV3DWidget::~vtkPV3DWidget()
   this->Visibility->Delete();
   this->LabeledFrame->Delete();
   this->Frame->Delete();
+  if (this->WidgetProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("3d_widgets",this->WidgetProxyName);
+    }
+  this->SetWidgetProxyName(0);
+  if (this->WidgetProxy)
+    {
+    this->WidgetProxy->Delete();
+    this->WidgetProxy = 0;
+    }
+  this->SetWidgetProxyXMLName(0);
 }
 
 
@@ -140,47 +152,42 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -fill x -expand 1",
                this->Visibility->GetWidgetName());
 
-  vtkPVProcessModule *pm = pvApp->GetProcessModule();
-
-  this->RM3DWidget->Create(pm,pm->GetRenderModule()->GetRendererID(),
-    this->GetPVSource()->GetPVWindow()->GetInteractorID());
-
-
-  this->ChildCreate(pvApp);
-
-  if(this->RM3DWidget->GetWidget3DID().ID != 0)
+  //Create the WidgetProxy
+  vtkSMProxyManager *pxm = vtkSMObject::GetProxyManager();
+  static int proxyNum = 0;
+  
+  if (!this->WidgetProxyXMLName)
     {
-    this->Widget3D = 
-      vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->
-      GetObjectFromID(this->RM3DWidget->GetWidget3DID()));
-    this->InitializeObservers(this->Widget3D);
+    vtkErrorMacro("ProxyXMLName not set. Cannot determine what proxy to create");
+    return;
     }
+  this->WidgetProxy = vtkSM3DWidgetProxy::SafeDownCast(pxm->NewProxy("3d_widgets",this->WidgetProxyXMLName));
+  if(!this->WidgetProxy)
+    {
+    vtkErrorMacro("Failed to create proxy " << this->WidgetProxyXMLName);
+    return;
+    }
+  ostrstream str;
+  str << this->WidgetProxyXMLName << proxyNum << ends;
+  this->SetWidgetProxyName(str.str());
+  pxm->RegisterProxy("3d_widgets",this->WidgetProxyName, this->WidgetProxy);
+  proxyNum++;
+  str.rdbuf()->freeze(0);
+  this->WidgetProxy->CreateVTKObjects(1);
+  this->InitializeObservers(this->WidgetProxy);
+  this->ChildCreate(pvApp);
   this->PlaceWidget();
 }
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::InitializeObservers(vtk3DWidget* widget3D) 
+void vtkPV3DWidget::InitializeObservers(vtkSM3DWidgetProxy* widgetproxy)
 {
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetInteractor();
-  if (iren)
+  if(widgetproxy)
     {
-    //widget3D->SetInteractor(iren);
-    widget3D->AddObserver(vtkCommand::InteractionEvent, 
-                          this->Observer);
-    widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
-                          this->Observer);
-    widget3D->AddObserver(vtkCommand::StartInteractionEvent, 
-                          this->Observer);
-    widget3D->AddObserver(vtkCommand::EndInteractionEvent, 
-                          this->Observer);
-    widget3D->EnabledOff();
+    widgetproxy->AddObserver(vtkKWEvent::WidgetModifiedEvent,this->Observer);
+    widgetproxy->AddObserver(vtkCommand::StartInteractionEvent,this->Observer);
+    widgetproxy->AddObserver(vtkCommand::EndInteractionEvent,this->Observer);
     }
-  if(this->RM3DWidget)
-    {
-    this->RM3DWidget->AddObserver(vtkKWEvent::WidgetModifiedEvent,this->Observer);
-    }
-  this->Observer->Execute(widget3D, vtkCommand::InteractionEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -200,13 +207,13 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
     }
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::AcceptInternal(vtkClientServerID id)
+void vtkPV3DWidget::Accept()
 {
-  this->PlaceWidget();
-  this->Superclass::AcceptInternal(id);
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;
+  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -241,10 +248,8 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     {
     this->PlaceWidget();
     }
-  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
-  this->RM3DWidget->SetVisibility(visibility);
-  this->AddTraceEntry("$kw(%s) SetVisibility %d", 
-                      this->GetTclName(), visibility);
+  this->SetVisibilityNoTrace(visibility);
+  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
   this->Visible = visibility;
 }
@@ -252,9 +257,8 @@ void vtkPV3DWidget::SetVisibility(int visibility)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Select()
 {
-  if ( this->Visible )
+  if (this->Visible && this->WidgetProxy)
     {
-    this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
     this->SetVisibilityNoTrace(1);
     }
 }
@@ -268,7 +272,13 @@ void vtkPV3DWidget::Deselect()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
 {  
-  this->RM3DWidget->SetVisibility(visibility);
+  if(this->WidgetProxy)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->WidgetProxy->GetProperty("Visibility"));
+    ivp->SetElements1(visibility);
+    this->WidgetProxy->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -284,16 +294,37 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 void vtkPV3DWidget::ActualPlaceWidget()
 {
   double bds[6];
-  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
-  this->RM3DWidget->PlaceWidget(bds);
+  if (  this->PVSource->GetPVInput(0))
+    {
+    this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
+    }
+  else
+    {
+    bds[0] = bds[2] = bds[4] = 0.0;
+    bds[1] = bds[3] = bds[5] = 1.0;
+    }
+  this->PlaceWidget(bds);
 }
 
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::PlaceWidget(double bds[6])
+{
+  if(this->WidgetProxy)
+    {
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->WidgetProxy->GetProperty("PlaceWidget"));
+    if(dvp)
+      {
+      dvp->SetElements(bds);
+      }
+    this->WidgetProxy->UpdateVTKObjects();
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::PlaceWidget()
 {
   // We should really check to see if the input has changed (modified).
-
-  if (!this->Placed && this->RM3DWidget->GetWidget3DID().ID != 0 )
+  if (!this->Placed)
     {
     this->ActualPlaceWidget();
     this->Placed = 1;
@@ -304,10 +335,9 @@ void vtkPV3DWidget::PlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
-  if ( event == vtkCommand::PlaceWidgetEvent )
-    {
-    }
-  else if ( event == vtkCommand::StartInteractionEvent )
+  //Interactive rendering enabling/disabling code should eventually
+  //move to the SM3DWidget
+  if ( event == vtkCommand::StartInteractionEvent )
     {
     this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
     }
@@ -319,11 +349,12 @@ void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
     {
     this->ModifiedCallback();
     }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
 int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement* element,
-                                     vtkPVXMLPackageParser* parser)
+  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
 
@@ -360,5 +391,9 @@ void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Use Label: " << (this->UseLabel?"on":"off") << endl;
   os << indent << "3D Widget:" << endl;
-  os << indent << "RM3DWidget: " << this->RM3DWidget << endl; 
+  os << indent << "WidgetProxyName: " << (this->WidgetProxyName? this->WidgetProxyName : "NULL") << endl;
+  os << indent << "WidgetProxyXMLName: " << (this->WidgetProxyXMLName? 
+    this->WidgetProxyXMLName : "NULL") << endl;
+  os << indent << "WidgetProxy: " << this->WidgetProxy <<endl;
+  
 }

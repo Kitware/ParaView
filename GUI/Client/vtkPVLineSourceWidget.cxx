@@ -16,17 +16,16 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVLineWidget.h"
 #include "vtkPVSource.h"
 #include "vtkPVProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-
+#include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.24");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -35,30 +34,32 @@ int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVLineSourceWidget::vtkPVLineSourceWidget()
 {
   this->CommandFunction = vtkPVLineSourceWidgetCommand;
-  this->LineWidget = vtkPVLineWidget::New();
-  this->LineWidget->SetParent(this);
-  this->LineWidget->SetTraceReferenceObject(this);
-  this->LineWidget->SetTraceReferenceCommand("GetLineWidget");
-  this->LineWidget->SetUseLabel(0);
+  this->SourceProxyName = 0;
+  this->SourceProxy = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
 {
-  this->LineWidget->Delete();
+  if(this->SourceProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
+      this->SourceProxyName);
+    }
+  this->SetSourceProxyName(0);
+  if(this->SourceProxy)
+    {
+    this->SourceProxy->Delete();
+    this->SourceProxy = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
-
-  if (!this->vtkKWWidget::Create(app, "frame", NULL))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
-
+  this->Superclass::Create(app);
+  
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
   this->SourceProxy = vtkSMSourceProxy::SafeDownCast(
@@ -70,71 +71,44 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   proxyNum++;
   str.rdbuf()->freeze(0);
   this->SourceProxy->CreateVTKObjects(1);
-
-  this->LineWidget->SetPoint1VariableName("Point1");
-  this->LineWidget->SetPoint2VariableName("Point2");
-  this->LineWidget->SetResolutionVariableName("Resolution");
-  this->LineWidget->SetPVSource(this->GetPVSource());
-  this->LineWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
-                                       "SetAcceptButtonColorToModified");
-  
-  this->LineWidget->Create(app);
-  this->Script("pack %s -side top -fill both -expand true",
-               this->LineWidget->GetWidgetName());
-}
-
-
-//----------------------------------------------------------------------------
-int vtkPVLineSourceWidget::GetModifiedFlag()
-{
-  if (this->ModifiedFlag || this->LineWidget->GetModifiedFlag())
-    {
-    return 1;
-    }
-  else
-    {
-    return 0;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::ResetInternal()
 {
-  if (this->AcceptCalled)
+  if (!this->AcceptCalled)
     {
-    vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->SourceProxy->GetProperty("Point1"));
-    vtkSMDoubleVectorProperty *pt2p = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->SourceProxy->GetProperty("Point2"));
-    vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
-      this->SourceProxy->GetProperty("Resolution"));
-    if (pt1p)
-      {
-      this->LineWidget->SetPoint1(pt1p->GetElement(0), pt1p->GetElement(1),
-                                  pt1p->GetElement(2));
-      }
-    if (pt2p)
-      {
-      this->LineWidget->SetPoint2(pt2p->GetElement(0), pt2p->GetElement(1),
-                                  pt2p->GetElement(2));
-      }
-    if (resp)
-      {
-      this->LineWidget->SetResolution(resp->GetElement(0));
-      }
-    this->ModifiedFlag = 0;
+    this->ActualPlaceWidget();
+    return;
     }
-  else
+  vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Point1"));
+  vtkSMDoubleVectorProperty *pt2p = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Point2"));
+  vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Resolution"));
+  if (pt1p)
     {
-    this->LineWidget->ActualPlaceWidget();
+    this->SetPoint1Internal(pt1p->GetElement(0), pt1p->GetElement(1),
+      pt1p->GetElement(2));
     }
+  if (pt2p)
+    {
+    this->SetPoint2Internal(pt2p->GetElement(0), pt2p->GetElement(1),
+      pt2p->GetElement(2));
+    }
+  if (resp)
+    {
+    this->SetResolution(resp->GetElement(0));
+    }
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Accept()
 {
   int modFlag = this->GetModifiedFlag();
-  
+
   if (modFlag)
     {
     vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -144,29 +118,30 @@ void vtkPVLineSourceWidget::Accept()
     vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
       this->SourceProxy->GetProperty("Resolution"));
     double pt[3];
+    this->WidgetProxy->UpdateInformation();
     if (pt1p)
       {
-      this->LineWidget->GetPoint1(pt);
+      this->GetPoint1Internal(pt);
       pt1p->SetElement(0, pt[0]);
       pt1p->SetElement(1, pt[1]);
       pt1p->SetElement(2, pt[2]);
       }
     if (pt2p)
       {
-      this->LineWidget->GetPoint2(pt);
+      this->GetPoint2Internal(pt);
       pt2p->SetElement(0, pt[0]);
       pt2p->SetElement(1, pt[1]);
       pt2p->SetElement(2, pt[2]);
       }
     if (resp)
       {
-      resp->SetElement(0, this->LineWidget->GetResolution());
+      resp->SetElement(0, this->GetResolutionInternal());
       }
     this->SourceProxy->UpdateVTKObjects();
     this->SourceProxy->UpdatePipeline();
     }
   this->ModifiedFlag = 0;
-  
+
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...
   // Putting this here simplifies subclasses AcceptInternal methods.
@@ -183,78 +158,70 @@ void vtkPVLineSourceWidget::Accept()
   this->AcceptCalled = 1;
 }
 
-//---------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Trace(ofstream *file)
-{
-  if ( ! this->InitializeTrace(file))
-    {
-    return;
-    }
-
-  this->LineWidget->Trace(file);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Select()
-{
-  this->LineWidget->Select();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Deselect()
-{
-  this->LineWidget->Deselect();
-}
-
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
-  double pt[3];
-
   if (!this->SourceProxy)
-    {
-    vtkErrorMacro("Source proxy must be set to save to a batch script.");
-    return;
-    }
-  
+  {
+  vtkErrorMacro("Source proxy must be set to save to a batch script.");
+  return;
+  }
+
   vtkClientServerID sourceID = this->SourceProxy->GetID(0);
-  
-  if (sourceID.ID == 0 || this->LineWidget == NULL)
-    {
-    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
-    return;
-    } 
+
+  if (sourceID.ID == 0)
+  {
+  vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+  return;
+  } 
 
   *file << endl;
   *file << "set pvTemp" << sourceID
-        << " [$proxyManager NewProxy sources LineSource]" << endl;
+    << " [$proxyManager NewProxy sources LineSource]" << endl;
   *file << "  $proxyManager RegisterProxy sources pvTemp"
-        << sourceID << " $pvTemp" << sourceID << endl;
+    << sourceID << " $pvTemp" << sourceID << endl;
   *file << "  $pvTemp" << sourceID << " UnRegister {}" << endl;
 
-  this->LineWidget->GetPoint1(pt);
+  
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Point1"));
+  if(dvp)
+    {
   *file << "  [$pvTemp" << sourceID << " GetProperty Point1] "
-        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
-  this->LineWidget->GetPoint2(pt);
-  *file << "  [$pvTemp" << sourceID << " GetProperty Point2] "
-        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
-  *file << "  [$pvTemp" << sourceID << " GetProperty Resolution] "
-        << "SetElements1 " << this->LineWidget->GetResolution() << endl;
+    << "SetElements3 " 
+    << dvp->GetElement(0) << " " 
+    << dvp->GetElement(1) << " " 
+    << dvp->GetElement(2) << endl;
+    }
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Point2"));
+  if (dvp)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty Point2] "
+      << "SetElements3 " 
+      << dvp->GetElement(0) << " " 
+      << dvp->GetElement(1) << " " 
+      << dvp->GetElement(2) << endl;
+    }
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("Resolution"));
+  if(ivp)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty Resolution] "
+      << "SetElements1 " << ivp->GetElement(0) << endl;
+    }
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
-}
 
-//----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::UpdateEnableState()
-{
-  this->Superclass::UpdateEnableState();
-
-  this->PropagateEnableState(this->LineWidget);
+  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Line widget: " << this->LineWidget << endl;
+  os << indent << "SourceProxyName: " << 
+    (this->SourceProxyName? this->SourceProxyName: "None") << endl;
+  os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }

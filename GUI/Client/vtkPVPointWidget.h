@@ -46,19 +46,8 @@ public:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVPointWidget* ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
-
   void SetPosition();
   void SetPosition(double,double,double);
-  void SetPositionInternal(double,double,double);
   void GetPosition(double pt[3]);
 
   // Description:
@@ -68,7 +57,7 @@ public:
   //BTX
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -87,6 +76,7 @@ protected:
   vtkPVPointWidget();
   ~vtkPVPointWidget();
 
+  void SetPositionInternal(double,double,double);
 
   // Description:
   // Call creation on the child.
@@ -96,7 +86,10 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
-  void UpdateVTKObject();
+  // Description:
+  // This method assumes that WidgetProxy->UpdateInformation() has been invoked before calling
+  // this method.
+  void GetPositionInternal(double pt[3]);
 
   vtkKWEntry *PositionEntry[3];
   vtkKWPushButton *PositionResetButton;
