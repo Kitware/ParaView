@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.20");
+vtkCxxRevisionMacro(vtkKWEntry, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -413,7 +413,7 @@ void vtkKWEntry::DeleteAllValues()
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteValue(int idx)
 {
-  if ( idx < this->Internals->Entries.size() )
+  if ( idx < (int)this->Internals->Entries.size() )
     {
     vtkErrorMacro("This entry has only: " << this->Internals->Entries.size() << 
       " elements. Index " << idx << " is too high");
