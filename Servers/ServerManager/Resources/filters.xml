@@ -2169,7 +2169,7 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
-        name="InputBounds">
+        name="InputBounds" information_only="1">
        <BoundsDomain name="bounds">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -2215,7 +2215,7 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
-        name="InputBounds">
+        name="InputBounds"  information_only="1">
        <BoundsDomain name="bounds">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -2870,7 +2870,7 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
-        name="InputBounds">
+        name="InputBounds"  information_only="1">
        <BoundsDomain name="bounds">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -3003,7 +3003,7 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
-        name="InputBounds">
+        name="InputBounds"  information_only="1">
        <BoundsDomain name="bounds">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
