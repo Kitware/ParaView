@@ -177,17 +177,22 @@ public:
   vtkGetMacro(MajorVersion, int);
   vtkGetMacro(MinorVersion, int);
 
-protected:
-  vtkPVApplication();
-  ~vtkPVApplication();
-  vtkPVApplication(const vtkPVApplication&) {};
-  void operator=(const vtkPVApplication&) {};
+  // Description:
+  // Show help.
+  void DisplayHelp();
 
   // For locating help (.chm) on Windows.
   virtual int GetApplicationKey() 
     {
       return 15;
     };
+
+protected:
+  vtkPVApplication();
+  ~vtkPVApplication();
+  vtkPVApplication(const vtkPVApplication&) {};
+  void operator=(const vtkPVApplication&) {};
+
   
   void *Log;
   char *LogFileName;

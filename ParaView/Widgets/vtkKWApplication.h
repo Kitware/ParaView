@@ -156,6 +156,8 @@ public:
   ofstream *GetTraceFile() {return this->TraceFile;}
 //ETX
 
+  virtual int GetApplicationKey() {return -1;};
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -175,7 +177,6 @@ protected:
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
 
-  virtual int GetApplicationKey() {return -1;};
 
   static int WidgetVisibility;
   int InExit;

@@ -82,6 +82,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SUBDIRS(Widgets Utilities/Expat ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
+ SUBDIRS(Config Documentation)
 
  OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
  OPTION(BUILD_EXAMPLES "Build VTK examples." OFF)
@@ -124,5 +125,8 @@ IF (PARAVIEW_CAN_BUILD)
 
  INCLUDE (${PARAVIEW_BINARY_DIR}/LocalUserOptions.cmake OPTIONAL)
  INCLUDE (${PARAVIEW_SOURCE_DIR}/LocalUserOptions.cmake OPTIONAL)
+
+ INSTALL_FILES(/share/ParaView/Data .bin Data/Data/combq Data/Data/combxyz)
+ INSTALL_FILES(/share/ParaView/Data .vtk Data/Data/blow)
 
 ENDIF (PARAVIEW_CAN_BUILD)

@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContourFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
@@ -82,7 +83,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVRenderView.h"
 
+#include "vtkPVDemoPaths.h"
+
 #include <ctype.h>
+
+#ifdef _WIN32
+#include "vtkKWRegisteryUtilities.h"
+#endif
+
+#ifndef VTK_USE_ANSI_STDLIB
+#define PV_NOCREATE ios::nocreate
+#else
+#define PV_NOCREATE 0
+#endif
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -754,6 +767,10 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->AddBindings(); // additional bindings in PV not in KW
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
+
+  this->MenuFile->InsertCommand(this->MenuFile->GetIndex("Close"), 
+				"Play Demo", this, "PlayDemo");
+  this->MenuFile->InsertSeparator(this->MenuFile->GetIndex("Close"));
 }
 
 
@@ -764,6 +781,95 @@ void vtkPVWindow::NewWindow()
   nw->Create(this->Application,"");
   this->Application->AddWindow(nw);  
   nw->Delete();
+}
+
+void vtkPVWindow::PlayDemo()
+{
+  int found=0;
+  int foundData=0;
+
+  char temp1[1024];
+  char temp2[1024];
+
+#ifdef _WIN32  
+
+  // First look in the registery
+  char fkey[1024];
+  char loc[1024];
+
+  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplication()->GetApplicationKey());  
+  HKEY hKey;
+  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
+		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+    vtkKWRegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
+    RegCloseKey(hKey);
+    sprintf(temp1,"%s/Demos/Demo1.tcl",loc);
+    sprintf(temp2,"%s/Data/blow.vtk",loc);
+    }
+
+  ifstream fptr2(temp2, ios::in | PV_NOCREATE);
+  if (!fptr2.fail())
+    {
+    fptr2.close();
+    foundData=1;
+    this->Application->Script("set tmpPvDataDir %s/Data", loc);
+    }
+
+  vtkDebugMacro(<<temp1);
+  ifstream fptr(temp1, ios::in | PV_NOCREATE);
+  if (!fptr.fail())
+    {
+    fptr.close();
+    this->LoadScript(temp1);
+    found=1;
+    }
+
+
+#endif // _WIN32  
+
+  // Look in binary and installation directories
+
+  const char** dir;
+  for(dir=VTK_PV_DEMO_PATHS; !foundData && *dir; ++dir)
+    {
+    if (!foundData)
+      {
+      sprintf(temp2, "%s/Data/blow.vtk", *dir);
+      ifstream fptr2(temp2, ios::in | PV_NOCREATE);
+      if (!fptr2.fail())
+	{
+	fptr2.close();
+	foundData=1;
+	this->Application->Script("set tmpPvDataDir %s/Data", *dir);
+	}
+      }
+    }
+
+  for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+    {
+    sprintf(temp1, "%s/Demos/Demo1.tcl", *dir);
+    ifstream fptr(temp1, ios::in | PV_NOCREATE);
+    if (!fptr.fail())
+      {
+      fptr.close();
+      this->LoadScript(temp1);
+      found=1;
+      }
+    }
+
+  if (!found)
+    {
+      vtkDebugMacro("Booo");
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->Create(this->Application,"");
+    dlg->SetText(
+      "Could not find Demo1.tcl in the installation or\n"
+      "build directory. Please make sure that ParaView\n"
+      "is installed properly.");
+    dlg->Invoke();  
+    dlg->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -785,7 +891,7 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  input = new ifstream(openFileName, ios::in);
+  input = new ifstream(openFileName, ios::in|PV_NOCREATE );
   if (input->fail())
     {
     vtkErrorMacro("Permission denied for opening " << openFileName);

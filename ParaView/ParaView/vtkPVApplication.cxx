@@ -83,6 +83,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkOutputWindow.h"
 
+#ifdef _WIN32
+#include "htmlhelp.h"
+#include "vtkKWRegisteryUtilities.h"
+#endif
+
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
@@ -901,4 +906,36 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
     }
   
   return o;
+}
+
+void vtkPVApplication::DisplayHelp()
+{
+#ifdef _WIN32
+  char temp[1024];
+  char fkey[1024];
+  char loc[1024];
+  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
+  HKEY hKey;
+  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
+		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+    vtkKWRegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
+    RegCloseKey(hKey);
+    sprintf(temp,"%s/%s.chm::/UsersGuide/index.html",
+            loc,this->ApplicationName);
+    }
+  else
+    {
+    sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
+    }
+  HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
+#else
+  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->Create(this,"");
+  dlg->SetText(
+    "HTML help is included in the Documentation/HTML subdirectory of\n"
+    "this application. You can view this help using a standard web browser.");
+  dlg->Invoke();  
+  dlg->Delete();
+#endif
 }

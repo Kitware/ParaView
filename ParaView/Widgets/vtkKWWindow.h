@@ -92,7 +92,7 @@ public:
   // Load in a Tcl based script to drive the application. If called
   // without an argument it will open a file dialog.
   void LoadScript();
-  void LoadScript(char *name);
+  void LoadScript(const char *name);
   
   // Description:
   // Allow windows to get at the different menu entries. In some

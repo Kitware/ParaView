@@ -156,6 +156,10 @@ public:
   vtkPVSource *Open(char *fileName);
   
   // Description:
+  // Play the demo
+  void PlayDemo();
+
+  // Description:
   // Callback from the calculator button.
   vtkPVSource *CalculatorCallback();
   
