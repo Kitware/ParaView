@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.20");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.21");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2937,9 +2937,34 @@ void vtkPVDisplayGUI::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
 {
+
   if(this->VolumeRenderMode)
     {
     *file << "[$kw(" << this->GetPVSource()->GetTclName()
           << ") GetPVOutput] VolumeRenderModeOn" << endl;
+
+      // The command is more specific about what is the variable name and
+      // what is the number of vector entries.
+      vtkStdString command(this->VolumeScalarsMenu->GetValue());
+
+      // The form of the command is of the form
+      // vtkTemp??? ColorBy???Field {Field Name} NumComponents
+      // The field name is between the first and last braces, and
+      // the number of components is at the end of the string.
+      vtkStdString::size_type firstspace = command.find_first_of(' ');
+      vtkStdString::size_type lastspace = command.find_last_of(' ');
+      vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
+      vtkStdString::size_type firstbrace = command.find_first_of('(');
+      vtkStdString::size_type lastbrace = command.find_last_of(')');
+      vtkStdString numComps = command.substr(firstbrace+1, lastbrace-firstbrace-1);
+
+      if (strncmp(this->VolumeScalarsMenu->GetValue(), "Point", 5) == 0)
+        {
+        *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderPointField {" << name << "} " << numComps << endl;
+        }
+      else
+        {
+        *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderCellField {" << name << "} " << numComps << endl;
+        }
     }
 }
