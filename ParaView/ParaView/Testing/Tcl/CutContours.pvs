@@ -64,10 +64,9 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp249)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp283) [$pv(vtkTemp1) CreatePVSource ElevationFilter]
-set pv(vtkTemp297) [$pv(vtkTemp283) GetPVWidget {LowPoint}]
-$pv(vtkTemp297) SetValue 0 -1 0
-set pv(vtkTemp302) [$pv(vtkTemp283) GetPVWidget {HighPoint}]
-$pv(vtkTemp302) SetValue 0 1 0
+set pv(vtkTemp297) [$pv(vtkTemp283) GetPVWidget {Line}]
+$pv(vtkTemp297) SetPoint1 0 -1 0
+$pv(vtkTemp297) SetPoint2 0 1 0
 $pv(vtkTemp283) AcceptCallback
 
 # Retrace

@@ -13,6 +13,9 @@ set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ConeSource]
 $kw(vtkTemp224) AcceptCallback
 set kw(vtkTemp260) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+set kw(vtkTemp999) [$kw(vtkTemp260) GetPVWidget {Line}]
+$kw(vtkTemp999) SetPoint1 0 0 0
+$kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp260) AcceptCallback
 set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
 $kw(vtkTemp294) ChangeColorMapToBlueRed

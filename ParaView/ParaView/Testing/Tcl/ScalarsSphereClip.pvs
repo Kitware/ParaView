@@ -1,3 +1,4 @@
+Application ExitOnReturnOn
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -19,7 +20,7 @@ set kw(vtkTemp303) [$kw(vtkTemp288) GetPVWidget {Clip Function}]
 $kw(vtkTemp303) SetCurrentValue {Scalars}
 set kw(vtkTemp999) [$kw(vtkTemp303) GetPVWidget {Scalars}]
 set kw(vtkTemp313) [$kw(vtkTemp999) GetPVWidget 1]
-$kw(vtkTemp313) SetValue {ImageValues}
+$kw(vtkTemp313) SetValue {RTData}
 set kw(vtkTemp314) [$kw(vtkTemp288) GetPVWidget {Offset}]
 $kw(vtkTemp314) SetValue 200
 $kw(vtkTemp288) AcceptCallback
@@ -29,6 +30,8 @@ set kw(vtkTemp351) [$kw(vtkTemp337) GetPVWidget {Clip Function}]
 $kw(vtkTemp351) SetCurrentValue {Sphere}
 set kw(vtkTemp358) [$kw(vtkTemp351) GetPVWidget {Sphere}]
 $kw(vtkTemp358) SetCenter 10 0 0
+$kw(vtkTemp337) AcceptCallback
+$kw(vtkTemp358) SetRadius 10
 $kw(vtkTemp337) AcceptCallback
 set kw(vtkTemp389) [$kw(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $kw(vtkTemp389) AcceptCallback

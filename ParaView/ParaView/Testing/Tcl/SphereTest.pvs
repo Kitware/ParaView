@@ -21,6 +21,9 @@ set pvShrink [$pvWindow CreatePVSource ShrinkPolyData]
 $pvShrink AcceptCallback
 
 set pvElevation [$pvWindow CreatePVSource ElevationFilter]
+set pv(vtkTemp999) [$pvElevation GetPVWidget {Line}]
+$pv(vtkTemp999) SetPoint1 0 0 0
+$pv(vtkTemp999) SetPoint2 0 0 1
 $pvElevation AcceptCallback
 
 set pvExtract [$pvWindow CreatePVSource ExtractEdges]

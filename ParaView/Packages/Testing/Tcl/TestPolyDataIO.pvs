@@ -31,6 +31,9 @@ update
 
 # Give it some scalar data.
 set kw(vtkTemp295) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+set kw(vtkTemp999) [$kw(vtkTemp295) GetPVWidget {Line}]
+$kw(vtkTemp999) SetPoint1 0 0 0
+$kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp295) AcceptCallback
 
 # Choose the file name/type based on whether we are in parallel mode.

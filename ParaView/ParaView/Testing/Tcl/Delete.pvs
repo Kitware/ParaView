@@ -1,3 +1,4 @@
+Application ExitOnReturnOn
     if {[info exists argc]} { 
         set argcm1 [expr $argc - 1]
         for {set i 0} {$i < $argcm1} {incr i} {
@@ -41,6 +42,9 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 
 # Add a filter that we do not delete.
 set pv(vtkTemp220) [$pv(vtkTemp1) CreatePVSource ElevationFilter]
+set pv(vtkTemp999) [$pv(vtkTemp220) GetPVWidget {Line}]
+$pv(vtkTemp999) SetPoint1 0 0 0
+$pv(vtkTemp999) SetPoint2 0 0 1
 set pv(vtkTemp229) [$pv(vtkTemp220) GetPVWidget {Input}]
 $pv(vtkTemp229) SetCurrentValue $pv(vtkTemp98)
 $pv(vtkTemp220) AcceptCallback

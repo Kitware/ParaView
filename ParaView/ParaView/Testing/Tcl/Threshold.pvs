@@ -1,3 +1,4 @@
+Application ExitOnReturnOn
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -22,8 +23,9 @@ set pv(vtkTemp127) [$pv(vtkTemp98) GetPVWidget {Phi Resolution}]
 $pv(vtkTemp127) SetValue 16
 $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource ElevationFilter]
-set pv(vtkTemp199) [$pv(vtkTemp180) GetPVWidget {HighPoint}]
-$pv(vtkTemp199) SetValue 1 1 1
+set pv(vtkTemp199) [$pv(vtkTemp180) GetPVWidget {Line}]
+$pv(vtkTemp199) SetPoint1 0 0 0
+$pv(vtkTemp199) SetPoint2 1 1 1
 $pv(vtkTemp180) AcceptCallback
 set pv(vtkTemp215) [$pv(vtkTemp1) CreatePVSource Threshold]
 set pv(vtkTemp229) [$pv(vtkTemp215) GetPVWidget {Lower Threshold}]
