@@ -180,7 +180,11 @@ vtkPVData::vtkPVData()
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
-  this->SetPVColorMap(NULL);
+  if (this->PVColorMap)
+    {
+    this->PVColorMap->Delete();
+    this->PVColorMap = 0;
+    }
 
   // Get rid of the circular reference created by the extent translator.
   if (this->VTKDataTclName)
@@ -2398,6 +2402,7 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
                          pointDataFlag, array->GetName(), component);
   
   array->GetRange(range, 0);  
+
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; id++)
     {
