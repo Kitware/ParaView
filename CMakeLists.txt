@@ -88,6 +88,12 @@ IF(UNIX)
   ENDIF(CMAKE_HAS_X)
 ENDIF(UNIX)
 
+SET(APPLICATION_BINARY_DIR "${ParaView_BINARY_DIR}")
+SET(VTK_TCL_TK_MACROS_MODULE 
+    "${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake")
+SET(VTK_TCL_TK_INTERNALS_DIR 
+    "${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals")
+SET(VTK_TCL_TK_WRAPPING_DIR "${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl")
 SUBDIRS(Utilities/TclTk)
 
 #########################################################################
