@@ -199,6 +199,20 @@ int vtkKWMessageDialog::Invoke()
     this->SetBindAll("<Right>", "focus [ tk_focusNext %W ]");
     this->SetBindAll("<Left>", "focus [ tk_focusPrev %W ]");
     }
+  
+  if ( this->GetMasterWindow() )
+    {
+    int width, height, x, y;
+    this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+	   &width, &height, &x, &y);
+    cout << "Main window: " << width << "x" << height << endl;
+    cout << "Position: " << x << ", " << y << endl;
+    x += width/2;
+    y += height/2;
+    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
+		 x, y);
+    }
 
   return vtkKWDialog::Invoke();
 }

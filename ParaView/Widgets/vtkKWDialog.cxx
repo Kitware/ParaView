@@ -159,6 +159,11 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 
 }
 
+vtkKWWindow *vtkKWDialog::GetMasterWindow()
+{
+  return this->MasterWindow;
+}
+
 void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 

@@ -4,7 +4,6 @@
 
 int main()
 {
-  int res = 0;
   int error = 0;
   int cc;  
   char names[][10] = {

@@ -424,6 +424,16 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
   char loc[1024];
   sprintf(temp, "%i", this->GetApplicationKey());
   vtkKWRegisteryUtilities *reg = this->GetRegistery(temp);
+  if ( reg )
+    {
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetMasterWindow(master);
+    dlg->Create(this,"");
+    dlg->SetText(
+      "Internal error... Cannot get the registery.");
+    dlg->Invoke();  
+    dlg->Delete();
+    }
   if ( reg->ReadValue( "Inst", "Loc", loc ) )
     {
     sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",

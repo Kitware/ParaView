@@ -109,6 +109,7 @@ public:
   // window and will minimize with it (assuming that the windowing
   // system supports this)
   void SetMasterWindow(vtkKWWindow* win);
+  vtkKWWindow *GetMasterWindow();
 
 protected:
   // Description:
