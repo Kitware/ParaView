@@ -484,7 +484,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // invoke super method first
   // Make sure the widget is name appropriately: paraview instead of a number
   // On X11, the window name is the same as the widget name.
-  this->WidgetName = new char [strlen("paraview")+1];
+  this->WidgetName = new char [strlen(".paraview")+1];
   strcpy(this->WidgetName,".paraview");
   this->vtkKWWindow::Create(pvApp,"");
 
