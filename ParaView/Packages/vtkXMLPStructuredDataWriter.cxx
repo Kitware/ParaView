@@ -20,7 +20,7 @@
 #include "vtkExtentTranslator.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPStructuredDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPStructuredDataWriter, "1.2");
 vtkCxxSetObjectMacro(vtkXMLPStructuredDataWriter, ExtentTranslator,
                      vtkExtentTranslator);
 
@@ -40,6 +40,14 @@ vtkXMLPStructuredDataWriter::~vtkXMLPStructuredDataWriter()
 void vtkXMLPStructuredDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  if(this->ExtentTranslator)
+    {
+    os << indent << "ExtentTranslator: " << this->ExtentTranslator << "\n";
+    }
+  else
+    {
+    os << indent << "ExtentTranslator: (none)\n";
+    }
 }
 
 //----------------------------------------------------------------------------

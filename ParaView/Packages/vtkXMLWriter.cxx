@@ -27,7 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.4");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -70,6 +70,36 @@ void vtkXMLWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: "
      << (this->FileName? this->FileName:"(none)") << "\n";
+  if(this->ByteOrder == vtkXMLWriter::BigEndian)
+    {
+    os << indent << "ByteOrder: BigEndian\n";
+    }
+  else
+    {
+    os << indent << "ByteOrder: LittleEndian\n";
+    }
+  if(this->DataMode == vtkXMLWriter::Ascii)
+    {
+    os << indent << "DataMode: Ascii\n";
+    }
+  else if(this->DataMode == vtkXMLWriter::Binary)
+    {
+    os << indent << "DataMode: Binary\n";
+    }
+  else
+    {
+    os << indent << "DataMode: Appended\n";
+    }
+  if(this->Compressor)
+    {
+    os << indent << "Compressor: " << this->Compressor << "\n";
+    }
+  else
+    {
+    os << indent << "Compressor: (none)\n";
+    }
+  os << indent << "EncodeAppendedData: " << this->EncodeAppendedData << "\n";
+  os << indent << "BlockSize: " << this->BlockSize << "\n";
 }
 
 //----------------------------------------------------------------------------

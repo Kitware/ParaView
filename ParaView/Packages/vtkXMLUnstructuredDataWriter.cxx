@@ -26,7 +26,7 @@
 #include "vtkPoints.h"
 #include "vtkDataSetAttributes.h"
 
-vtkCxxRevisionMacro(vtkXMLUnstructuredDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLUnstructuredDataWriter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLUnstructuredDataWriter::vtkXMLUnstructuredDataWriter()
@@ -51,6 +51,9 @@ vtkXMLUnstructuredDataWriter::~vtkXMLUnstructuredDataWriter()
 void vtkXMLUnstructuredDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "NumberOfPieces: " << this->NumberOfPieces << "\n";
+  os << indent << "WritePiece: " << this->WritePiece << "\n";
+  os << indent << "GhostLevel: " << this->GhostLevel << "\n";
 }
 
 //----------------------------------------------------------------------------

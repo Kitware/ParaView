@@ -21,7 +21,7 @@
 #include "vtkDataCompressor.h"
 #include "vtkExtentTranslator.h"
 
-vtkCxxRevisionMacro(vtkXMLStructuredDataWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLStructuredDataWriter, "1.3");
 vtkCxxSetObjectMacro(vtkXMLStructuredDataWriter, ExtentTranslator,
                      vtkExtentTranslator);
 
@@ -45,6 +45,19 @@ vtkXMLStructuredDataWriter::~vtkXMLStructuredDataWriter()
 void vtkXMLStructuredDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "WriteExtent: "
+     << this->WriteExtent[0] << " " << this->WriteExtent[1] << "  "
+     << this->WriteExtent[2] << " " << this->WriteExtent[3] << "  "
+     << this->WriteExtent[4] << " " << this->WriteExtent[5] << "\n";
+  if(this->ExtentTranslator)
+    {
+    os << indent << "ExtentTranslator: " << this->ExtentTranslator << "\n";
+    }
+  else
+    {
+    os << indent << "ExtentTranslator: (none)\n";
+    }
+  os << indent << "NumberOfPieces" << this->NumberOfPieces << "\n";
 }
 
 //----------------------------------------------------------------------------

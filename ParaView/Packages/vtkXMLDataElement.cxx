@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkXMLDataElement, "1.2");
+vtkCxxRevisionMacro(vtkXMLDataElement, "1.3");
 vtkStandardNewMacro(vtkXMLDataElement);
 
 //----------------------------------------------------------------------------
@@ -91,6 +91,9 @@ vtkXMLDataElement::~vtkXMLDataElement()
 void vtkXMLDataElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "XMLByteIndex: " << this->XMLByteIndex << "\n";
+  os << indent << "Name: " << (this->Name? this->Name : "(none)") << "\n";
+  os << indent << "Id: " << (this->Id? this->Id : "(none)") << "\n";
 }
 
 //----------------------------------------------------------------------------

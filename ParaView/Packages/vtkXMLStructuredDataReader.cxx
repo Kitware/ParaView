@@ -20,7 +20,7 @@
 #include "vtkXMLDataParser.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLStructuredDataReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLStructuredDataReader, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLStructuredDataReader::vtkXMLStructuredDataReader()
@@ -43,6 +43,7 @@ vtkXMLStructuredDataReader::~vtkXMLStructuredDataReader()
 void vtkXMLStructuredDataReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "WholeSlices: " << this->WholeSlices << "\n";
 }
 
 //----------------------------------------------------------------------------

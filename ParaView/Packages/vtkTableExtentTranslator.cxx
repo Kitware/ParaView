@@ -18,7 +18,7 @@
 #include "vtkTableExtentTranslator.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkTableExtentTranslator, "1.1");
+vtkCxxRevisionMacro(vtkTableExtentTranslator, "1.2");
 vtkStandardNewMacro(vtkTableExtentTranslator);
 
 //----------------------------------------------------------------------------
@@ -65,6 +65,7 @@ void vtkTableExtentTranslator::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "ExtentTable: (none)\n";
     }
+  os << indent << "MaximumGhostLevel: " this->MaximumGhostLevel << "\n";
 }
 
 //----------------------------------------------------------------------------

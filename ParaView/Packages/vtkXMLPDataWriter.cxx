@@ -18,7 +18,7 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataWriter::vtkXMLPDataWriter()
@@ -47,6 +47,9 @@ void vtkXMLPDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "NumberOfPieces: " << this->NumberOfPieces << "\n";
+  os << indent << "Piece: " << this->Piece << "\n";
+  os << indent << "GhostLevel: " << this->GhostLevel << "\n";
+  os << indent << "WriteSummaryFile: " << this->WriteSummaryFile << "\n";
 }
 
 //----------------------------------------------------------------------------

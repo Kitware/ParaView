@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkBase64InputStream.h"
 #include "vtkDataCompressor.h"
 
-vtkCxxRevisionMacro(vtkXMLDataParser, "1.1");
+vtkCxxRevisionMacro(vtkXMLDataParser, "1.2");
 vtkStandardNewMacro(vtkXMLDataParser);
 vtkCxxSetObjectMacro(vtkXMLDataParser, Compressor, vtkDataCompressor);
 
@@ -110,6 +110,14 @@ void vtkXMLDataParser::PrintSelf(ostream& os, vtkIndent indent)
   if(this->RootElement)
     {
     this->RootElement->PrintXML(os, indent);
+    }
+  if(this->Compressor)
+    {
+    os << indent << "Compressor: " << this->Compressor << "\n";
+    }
+  else
+    {
+    os << indent << "Compressor: (none)\n";
     }
 }
 

@@ -20,7 +20,7 @@
 #include "vtkXMLDataReader.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.4");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -47,6 +47,7 @@ vtkXMLPDataReader::~vtkXMLPDataReader()
 void vtkXMLPDataReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfPieces: " << this->NumberOfPieces << "\n";
 }
 
 //----------------------------------------------------------------------------
