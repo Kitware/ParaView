@@ -206,6 +206,7 @@ public:
   virtual void* GetMemoryDC();
   
   virtual void ExecuteEvent(vtkObject *wdg, unsigned long event, void *calldata);
+
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
   virtual void UpdateEnableState();
