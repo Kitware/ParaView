@@ -41,6 +41,11 @@ protected:
   vtkCTHSource();
   ~vtkCTHSource();
 
+  // Update extent of CTHData is specified in pieces.  
+  // Since all DataObjects should be able to set UpdateExent as pieces,
+  // just copy output->UpdateExtent  all Inputs.
+  void ComputeInputUpdateExtents(vtkDataObject *output);
+
 private:
   void InternalImageDataCopy(vtkCTHSource *src);
 private:

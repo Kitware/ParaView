@@ -17,7 +17,7 @@
 #include "vtkCTHData.h"
 
 
-vtkCxxRevisionMacro(vtkCTHSource, "1.2");
+vtkCxxRevisionMacro(vtkCTHSource, "1.3");
 vtkStandardNewMacro(vtkCTHSource);
 
 //----------------------------------------------------------------------------
@@ -48,6 +48,36 @@ vtkCTHData *vtkCTHSource::GetOutput()
 vtkCTHData *vtkCTHSource::GetOutput(int idx)
 {
   return static_cast<vtkCTHData *>( this->vtkSource::GetOutput(idx) ); 
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHSource::ComputeInputUpdateExtents(vtkDataObject *data)
+{
+  int piece, numPieces, ghostLevel;
+  vtkCTHData *output = (vtkCTHData*)data;
+  int idx;
+
+  output->GetUpdateExtent(piece, numPieces, ghostLevel);
+  
+  // make sure piece is valid
+  if (piece < 0 || piece >= numPieces)
+    {
+    return;
+    }
+  
+  if (ghostLevel < 0)
+    {
+    return;
+    }
+  
+  // just copy the Update extent as default behavior.
+  for (idx = 0; idx < this->NumberOfInputs; ++idx)
+    {
+    if (this->Inputs[idx])
+      {
+      this->Inputs[idx]->SetUpdateExtent(piece, numPieces, ghostLevel);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
