@@ -251,10 +251,7 @@ public:
   // Description:
   // Set and get the application options
   vtkGetObjectMacro(Options, vtkPVOptions);
-  virtual void SetOptions(vtkPVOptions* op)
-    {
-    this->Options = op;
-    }
+  virtual void SetOptions(vtkPVOptions* op);
 
   // Description:
   // Set the gui helper

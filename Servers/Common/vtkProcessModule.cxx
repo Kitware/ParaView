@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.11");
+vtkCxxRevisionMacro(vtkProcessModule, "1.12");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -735,6 +735,23 @@ int vtkProcessModule::SetupRenderModule()
   this->Options->SetRenderModuleName(renderModuleName);
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetOptions(vtkPVOptions* op)
+{
+  this->Options = op;
+  if ( op ) 
+    {
+    if ( op->GetServerMode() )
+      {
+      this->GetProgressHandler()->SetServerMode(1);
+      }
+    if ( op->GetClientMode() )
+      {
+      this->GetProgressHandler()->SetClientMode(1);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
