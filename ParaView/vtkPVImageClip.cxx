@@ -161,6 +161,15 @@ void vtkPVImageClip::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageClip::SetPVInput(vtkPVImageData *pvi)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  // Handle parallelism.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
+			   pvi->GetTclName());
+    }
+
   this->GetImageClip()->SetInput(pvi->GetImageData());
   this->vtkPVSource::SetNthPVInput(0, pvi);
   if (pvi)

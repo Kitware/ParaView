@@ -120,7 +120,15 @@ vtkPVImageData *vtkPVDataSetToDataSetFilter::GetPVImageDataOutput()
 void vtkPVDataSetToDataSetFilter::SetPVInput(vtkPVData *pvData)
 {
   vtkDataSetToDataSetFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
+  // Handle parallelism.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }
+
   f = vtkDataSetToDataSetFilter::SafeDownCast(this->GetVTKSource());
   if (f == NULL)
     {

@@ -42,7 +42,8 @@ class VTK_EXPORT vtkPVPolyData : public vtkPVData
 {
 public:
   static vtkPVPolyData* New();
-  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
+//  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
+  vtkTypeMacro(vtkPVPolyData, vtkPVData);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object

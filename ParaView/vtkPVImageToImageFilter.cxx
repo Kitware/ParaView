@@ -51,7 +51,15 @@ vtkPVImageToImageFilter* vtkPVImageToImageFilter::New()
 void vtkPVImageToImageFilter::SetPVInput(vtkPVImageData *pvData)
 {
   vtkImageToImageFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
+  // Handle parallelism.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }
+
   // Set the input of the VTK filter.
   f = vtkImageToImageFilter::SafeDownCast(this->GetVTKSource());
   f->SetInput(pvData->GetImageData());

@@ -357,6 +357,7 @@ void vtkPVSource::CreateProperties()
   this->AddMethodInterface("Output", VTK_STRING, 1);
 
   this->UpdateNavigationCanvas();
+  
   this->UpdateParameterWidgets();
 }
 
@@ -393,7 +394,7 @@ void vtkPVSource::Select(vtkKWView *v)
   vtkKWMenu* MenuProperties = v->GetParentWindow()->GetMenuProperties();
   char* rbv = 
     MenuProperties->CreateRadioButtonVariable(MenuProperties,"Radio");
-
+  
   // now add our own menu options
   if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 10)
     {
@@ -1884,15 +1885,6 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNthPVInput(int idx, vtkPVData *input)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // Handle parallelism.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetNthPVInput %d %s", this->GetTclName(),
-			   idx, input->GetTclName());
-    }
-  
   if (idx < 0)
     {
     vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");
@@ -2101,15 +2093,6 @@ void vtkPVSource::SetNumberOfPVOutputs(int num)
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *output)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // Handle parallelism.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(),
-			   idx, output->GetTclName());
-    }
-  
   if (idx < 0)
     {
     vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");

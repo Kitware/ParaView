@@ -50,7 +50,8 @@ class VTK_EXPORT vtkPVImageData : public vtkPVData
 {
 public:
   static vtkPVImageData* New();
-  vtkTypeMacro(vtkPVImageData,vtkKWWidget);
+//  vtkTypeMacro(vtkPVImageData,vtkKWWidget);
+  vtkTypeMacro(vtkPVImageData, vtkPVData);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object
