@@ -146,14 +146,18 @@ SUBDIRS(Utilities/Xdmf)
 
 #########################################################################
 # Configure IceT
-OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" OFF)
-IF(PARAVIEW_USE_ICE_T)
-  SET(ICE_T_INCLUDE_DIR 
-    ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
-    ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
-    )
-  SUBDIRS(Utilities/IceT)
-ENDIF(PARAVIEW_USE_ICE_T)
+MARK_AS_ADVANCED(CLEAR VTK_USE_MPI)
+IF(VTK_USE_MPI)
+  OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" ON)
+  MARK_AS_ADVANCED(PARAVIEW_USE_ICE_T)
+  IF(PARAVIEW_USE_ICE_T)
+    SET(ICE_T_INCLUDE_DIR 
+      ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
+      ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
+      )
+    SUBDIRS(Utilities/IceT)
+  ENDIF(PARAVIEW_USE_ICE_T)
+ENDIF(VTK_USE_MPI)
 
 #########################################################################
 # Configure KWsys
