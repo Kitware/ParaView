@@ -106,7 +106,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.117");
+vtkCxxRevisionMacro(vtkKWView, "1.118");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1000,7 +1000,7 @@ void vtkKWView::SaveAsImage()
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
   dlg->SetParent(window);
   dlg->Create(this->Application,"");  
-  int enabled;
+  int enabled = 0;
   if (window)
     {
     enabled = window->GetEnabled();
@@ -1572,7 +1572,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.117 $");
+  this->ExtractRevision(os,"$Revision: 1.118 $");
 }
 
 //----------------------------------------------------------------------------
