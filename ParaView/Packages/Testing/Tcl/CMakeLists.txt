@@ -34,6 +34,8 @@ FOREACH (tfile ${PROJECT_TESTS})
              -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
-ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
-         ${PARAVIEW_SOURCE_DIR}/KWCommon/Testing/Tcl/PrintSelfCheck.tcl  
-         ${PARAVIEW_SOURCE_DIR}/${TEST_PATH})
+IF(VTK_PRINT_SELF_CHECK_TCL)
+  ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
+           ${VTK_PRINT_SELF_CHECK_TCL}
+           ${PARAVIEW_SOURCE_DIR}/${TEST_PATH})
+ENDIF(VTK_PRINT_SELF_CHECK_TCL)
