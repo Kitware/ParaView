@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.45");
+vtkCxxRevisionMacro(vtkKWMenu, "1.46");
 
 
 
@@ -965,7 +965,7 @@ void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
     {
     return;
     }
-  this->Script("%s entryconfigure %d -compound left -image %s -hidemargin 0", 
+  this->Script("%s entryconfigure %d -compound left -image %s -hidemargin 1", 
                this->GetWidgetName(), idx, imagename);
 #endif
 }
