@@ -576,7 +576,6 @@ void vtkPVArrayCalculator::AddScalarVariable(const char* variableName,
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->UpdateFunction(variableName);
-  this->Calculator->AddScalarVariable(variableName, arrayName, component);
   pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
                          this->GetVTKSourceTclName(),
                          variableName, arrayName, component);
@@ -588,7 +587,6 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
   vtkPVApplication* pvApp = this->GetPVApplication();
 
   this->UpdateFunction(variableName);
-  this->Calculator->AddVectorVariable(variableName, arrayName);
   pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
                          this->GetVTKSourceTclName(),
                          variableName, arrayName);
