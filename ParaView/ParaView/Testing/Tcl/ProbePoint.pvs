@@ -14,6 +14,17 @@ set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
+[ $pv(vtkTemp43) GetHeaderEntry ] SetValue "ProbePoint"
+[ $pv(vtkTemp43) GetHeaderButton ] SetState 1
+[ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "0" 0
+[ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "1" 1
+[ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "2" 2
+[ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "3" 3
+[ $pv(vtkTemp43) GetCornerAnnotation ] SetVisibility 1
+$pv(vtkTemp43) SetHeaderTextColor 1 1 1
+$pv(vtkTemp43) HeaderChanged
+$pv(vtkTemp43) OnDisplayHeader
+
 $pv(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set pv(vtkTemp100) [$pv(vtkTemp1) GetCurrentPVSource]
 set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
