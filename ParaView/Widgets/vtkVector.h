@@ -46,6 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAbstractList.h"
 
+#define vtkAbstractListCompareFunction(DType, CompareFunction) \
+    int (*CompareFunction)(DType item1, DType item2)
+
+
 template <class DType>
 class vtkVector : public vtkAbstractList<DType>
 {
@@ -94,7 +98,7 @@ public:
   // Find an item in the vector using a comparison routine. 
   // Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  int FindItem(DType a, vtkAbstractList<DType>::CompareFunction compare, 
+  int FindItem(DType a, vtkAbstractListCompareFunction(DType, compare), 
 	       unsigned long &res);
   
   // Description:

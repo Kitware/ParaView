@@ -212,8 +212,7 @@ int vtkVector<DType>::FindItem(DType a, unsigned long &res)
 // not found. The location of the item is returned in res.
 template <class DType>
 int vtkVector<DType>::FindItem(DType a, 
-			       vtkAbstractList<DType>::CompareFunction 
-			       compare, 
+			       vtkAbstractListCompareFunction(DType, compare),
 			       unsigned long &res) 
 {
   unsigned long i;
