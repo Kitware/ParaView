@@ -249,8 +249,8 @@ public:
   
   vtkSetMacro(UseWidgetRange, int);
   vtkGetMacro(UseWidgetRange, int);
-  vtkSetVector2Macro(WidgetRange, double);
-  vtkGetVector2Macro(WidgetRange, double);
+  vtkSetVector2Macro(WidgetRange, float);
+  vtkGetVector2Macro(WidgetRange, float);
   
 protected:
   vtkPVWidget();
@@ -278,7 +278,7 @@ protected:
 
 
   int UseWidgetRange;
-  double WidgetRange[2];
+  float WidgetRange[2];
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

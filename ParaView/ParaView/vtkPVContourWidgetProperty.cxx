@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.3");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -98,7 +98,11 @@ void vtkPVContourWidgetProperty::AcceptInternal()
       this->Widget->GetPVSource()->GetPVWidget("ScalarRangeLabel"));
     if (label)
       {
-      this->Widget->SetWidgetRange(label->GetRange());
+      double *tmpRange = label->GetRange();
+      float range[2];
+      range[0] = (float)(tmpRange[0]);
+      range[1] = (float)(tmpRange[1]);
+      this->Widget->SetWidgetRange(range);
       }
     }
 }
