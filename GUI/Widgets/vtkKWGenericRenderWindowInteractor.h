@@ -45,6 +45,10 @@ public:
   // Manually set the last even position
   vtkSetVector2Macro(LastEventPosition, int);
   
+  // Description:
+  // Override Render to render through the widget
+  virtual void Render();
+  
 protected:
   vtkKWGenericRenderWindowInteractor();
   ~vtkKWGenericRenderWindowInteractor();

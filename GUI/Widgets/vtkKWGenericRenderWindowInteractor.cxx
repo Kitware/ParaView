@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.4");
+vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWGenericRenderWindowInteractor::vtkKWGenericRenderWindowInteractor()
@@ -58,6 +58,15 @@ void vtkKWGenericRenderWindowInteractor::SetRenderWidget(
       {
       this->SetRenderWindow(NULL);
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWGenericRenderWindowInteractor::Render()
+{
+  if (this->RenderWidget)
+    {
+    this->RenderWidget->Render();
     }
 }
 
