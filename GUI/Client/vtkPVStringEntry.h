@@ -23,7 +23,6 @@
 
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkPVStringWidgetProperty;
 
 class VTK_EXPORT vtkPVStringEntry : public vtkPVObjectWidget
 {
@@ -63,7 +62,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -76,15 +75,6 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -112,16 +102,10 @@ protected:
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
 
-  char* DefaultValue;
-  vtkSetStringMacro(DefaultValue);
-  vtkGetStringMacro(DefaultValue);
-
   vtkSetStringMacro(InitSourceVariable);
   vtkGetStringMacro(InitSourceVariable);
   char* InitSourceVariable;
 
-  vtkPVStringWidgetProperty *Property;
-  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

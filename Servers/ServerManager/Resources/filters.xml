@@ -530,7 +530,7 @@
         name="ResultArrayName" 
         command="SetResultArrayName" 
         number_of_elements="1"
-        default_values="result" /> 
+        default_values="Result" /> 
 
      <StringVectorProperty 
         name="Function" 

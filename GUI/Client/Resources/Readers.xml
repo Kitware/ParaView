@@ -330,8 +330,7 @@
     <Source class="vtkImageReader"/>
     <StringEntry label="File pattern"
                  trace_name="FilePattern"
-                 variable="FilePattern"
-                 default_value="%s"
+                 property="FilePattern"
                  help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"/>
     <SelectionList label="Data type"
                    trace_name="DataScalarType"
@@ -387,9 +386,8 @@
                  help="How many componenets does each pixel have. (i.e. RGB would be 3.)"/>
     <StringEntry label="Array name"
                  trace_name="ArrayName"
-                 variable="ScalarArrayName"
-                 help="Name to assign to array read"
-                 default_value="ImageFile"/>
+                 property="ScalarArrayName"
+                 help="Name to assign to array read"/>
   </Module>
 #ifdef PARAVIEW_LINK_XDMF
   <Module name="XdmfReader"
@@ -420,12 +418,12 @@
           module_type="Reader"
           extensions=".g .e .ex2 .exo .gen .0 .00 .000 .0000"
           file_description="Exodus">
-    <StringEntry variable="FilePrefix"
-                 extension="*" label="File prefix"
+    <StringEntry property="FilePrefix"
+                 label="File prefix"
                  init_source="FilePrefix"
                  trace_name="file_prefix"
                  help="Set the file root. Used with file pattern to format a file name." />
-    <StringEntry variable="FilePattern"
+    <StringEntry property="FilePattern"
                  label="File Pattern"
                  init_source="FilePattern"
                  trace_name="file_pattern"
@@ -437,7 +435,7 @@
                  trace_name="file_range"
                  length="2"
                  help="Range of files that are loaded" />
-    <StringEntry variable="XMLFileName"
+    <StringEntry property="XMLFileName"
                  label="XML File"
                  init_source="XMLFileName"
                  trace_name="xml_file"
