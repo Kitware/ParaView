@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.9");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
@@ -139,11 +139,6 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
         break;
         }
       }
-    if ( !found )
-      {
-      res = 0;
-      }
-    
     }
   ifs->close();
   this->SetSubKey( subkey );
