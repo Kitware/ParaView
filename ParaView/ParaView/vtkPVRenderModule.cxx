@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.5");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -92,6 +92,8 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->Interactive = 0;
   this->UseReductionFactor = 1;
   
+  this->PartDisplays = vtkCollection::New();
+
   this->Renderer = 0;
   this->RenderWindow = 0;
   this->RendererTclName     = 0;
@@ -125,6 +127,9 @@ vtkPVRenderModule::~vtkPVRenderModule()
     {
     this->Renderer->RemoveObserver(this->ResetCameraClippingRangeTag);
     }
+
+  this->PartDisplays->Delete();
+  this->PartDisplays = NULL;
 
   // Tree Composite
   if (this->CompositeTclName && pvApp)
@@ -367,20 +372,22 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::ComputeVisiblePropBounds(float bds[6])
 {
-  double *tmp;
-  vtkPVSource *pvs;
-  vtkPVSourceCollection *sources;
+  double* tmp;
+  vtkObject* object;
+  vtkPVPartDisplay* pDisp;
+  vtkPVPart* part;
 
   // Compute the bounds for our sources.
   bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
   bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
-  sources = this->GetPVWindow()->GetSourceList("Sources");
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
     {
-    if (pvs->GetVisibility())
+    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    part = pDisp->GetPart();
+    if (part && pDisp->GetVisibility())
       {
-      tmp = pvs->GetDataInformation()->GetBounds();
+      tmp = part->GetDataInformation()->GetBounds();
       if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
       if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
       if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
@@ -402,6 +409,7 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
+  vtkPVPartDisplay *pDisp;
   int num, idx;
   
   if (pvs == NULL)
@@ -410,15 +418,27 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     }  
   
   // I would like to move the addition of the prop into vtkPVPart sometime.
-  num = pvs->GetNumberOfPVParts();
+  num = pvs->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = pvs->GetPVPart(idx);
-    if (part && part->GetPartDisplay()->GetPropTclName() != NULL)
+    part = pvs->GetPart(idx);
+    // Create a part display for each part.
+    pDisp = vtkPVPartDisplay::New();
+    this->PartDisplays->AddItem(pDisp);
+    pDisp->SetPVApplication(pvApp);
+    part->SetPartDisplay(pDisp);
+    pDisp->SetPart(part);
+
+    // This initialization should be done by a render module.
+    pDisp->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
+    pDisp->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
+
+    if (part && pDisp->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-                             part->GetPartDisplay()->GetPropTclName());
+                             pDisp->GetPropTclName());
       }
+    pDisp->Delete();
     }
 }
 
@@ -428,20 +448,27 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
   int idx, num;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
+  vtkPVPartDisplay *pDisp;
 
   if (pvs == NULL)
     {
     return;
     }
 
-  num = pvs->GetNumberOfPVParts();
+  num = pvs->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = pvs->GetPVPart(idx);
-    if (part->GetPartDisplay()->GetPropTclName() != NULL)
+    part = pvs->GetPart(idx);
+    pDisp = part->GetPartDisplay();
+    if (pDisp)
       {
-      pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-                             part->GetPartDisplay()->GetPropTclName());
+      this->PartDisplays->RemoveItem(pDisp);
+      if (pDisp->GetPropTclName() != NULL)
+        {
+        pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
+                               pDisp->GetPropTclName());
+        }
+      part->SetPartDisplay(NULL);
       }
     }
 }
@@ -671,11 +698,11 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetUseStrips %d",
-                             pvs->GetPVPart(partIdx)->GetGeometryTclName(),
+                             pvs->GetPart(partIdx)->GetGeometryTclName(),
                              val);
       }
     }
@@ -728,14 +755,14 @@ void vtkPVRenderModule::SetUseImmediateMode(int val)
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
+                             pvs->GetPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
                              val);
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
+                             pvs->GetPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
                              val);
       }
     }
@@ -767,6 +794,8 @@ void vtkPVRenderModule::SetLODResolution(int resolution)
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
+  int idx, num;
+  vtkPVPart *part;
 
   this->LODResolution = resolution;
 
@@ -781,8 +810,13 @@ void vtkPVRenderModule::SetLODResolution(int resolution)
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvs->SetLODResolution(resolution);
-    }
+    num = pvs->GetNumberOfParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      part = pvs->GetPart(idx);
+      part->GetPartDisplay()->SetLODResolution(resolution);
+      }
+    } 
 }
 
 

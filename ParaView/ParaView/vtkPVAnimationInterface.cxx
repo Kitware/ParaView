@@ -136,7 +136,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.51");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1554,10 +1554,10 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
       if (source->GetVisibility())
         {
         sourceName = source->GetName();
-        numParts = source->GetNumberOfPVParts();
+        numParts = source->GetNumberOfParts();
         for ( partIdx = 0; partIdx < numParts; ++partIdx)
           {
-          part = source->GetPVPart(partIdx);
+          part = source->GetPart(partIdx);
           // Create a file name for this image.
           if (numParts == 1)
             { // Clean up these nested loops (stream). !!!!!!!!

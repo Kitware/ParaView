@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -229,10 +229,10 @@ void vtkPVExtractPartsWidget::ResetInternal(const char* vtkSourceTclName)
   this->PartSelectionList->DeleteAll();
   // Loop through all of the parts of the input adding to the list.
   input = this->PVSource->GetPVInput(0);
-  num = input->GetNumberOfPVParts();
+  num = input->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = input->GetPVPart(idx);
+    part = input->GetPart(idx);
     this->PartSelectionList->InsertEntry(idx, part->GetName());
     }
 

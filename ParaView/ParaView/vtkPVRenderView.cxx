@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.252");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.253");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1367,11 +1367,11 @@ void vtkPVRenderView::TriangleStripsCallback()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetUseStrips %d",
-                             pvs->GetPVPart(partIdx)->GetGeometryTclName(),
+                             pvs->GetPart(partIdx)->GetGeometryTclName(),
                              this->TriangleStripsCheck->GetState());
       }
     }
@@ -1426,14 +1426,14 @@ void vtkPVRenderView::ImmediateModeCallback()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
+                             pvs->GetPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPVPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
+                             pvs->GetPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
                              this->ImmediateModeCheck->GetState());
       }
     }
@@ -1614,7 +1614,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.252 $");
+  this->ExtractRevision(os,"$Revision: 1.253 $");
 }
 
 //------------------------------------------------------------------------------

@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.447");
+vtkCxxRevisionMacro(vtkPVWindow, "1.448");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -455,10 +455,10 @@ int vtkPVWindow::MakeCollectionDecision()
   while ( (pvs=col->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvp = pvs->GetPVPart(partIdx);
+      pvp = pvs->GetPart(partIdx);
       pvp->GetPartDisplay()->SetCollectionDecision(this->CollectionDecision);
       }
     }
@@ -502,10 +502,10 @@ int vtkPVWindow::MakeLODCollectionDecision()
   while ( (pvs=col->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    numParts = pvs->GetNumberOfPVParts();
+    numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvp = pvs->GetPVPart(partIdx);
+      pvp = pvs->GetPart(partIdx);
       pvp->GetPartDisplay()->SetLODCollectionDecision(this->LODCollectionDecision);
       }
     }
@@ -2244,7 +2244,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
   
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numParts = this->GetCurrentPVSource()->GetNumberOfPVParts();
+  int numParts = this->GetCurrentPVSource()->GetNumberOfParts();
   int numProcs = pvApp->GetProcessModule()->GetNumberOfPartitions();
   int parallel = (numProcs > 1);
   
@@ -2307,7 +2307,7 @@ void vtkPVWindow::WriteData()
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->RootScript("%s GetClassName",
-                 this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
+                 this->GetCurrentPVSource()->GetPart()->GetVTKDataTclName());
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
   const char* dataClassName = pm->GetRootResult();
@@ -2347,7 +2347,7 @@ void vtkPVWindow::WriteData()
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
   int parallel = (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1);
-  int numParts = this->GetCurrentPVSource()->GetNumberOfPVParts();
+  int numParts = this->GetCurrentPVSource()->GetNumberOfParts();
   const char* defaultExtension = 0;
   
   ostrstream typesStr;
@@ -2465,7 +2465,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->RootScript("%s GetClassName",
-                 this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
+                 this->GetCurrentPVSource()->GetPart()->GetVTKDataTclName());
 
   vtkDataSet* data;
   const char* dataClassName = pm->GetRootResult();
@@ -2863,10 +2863,10 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
     if (source->GetVisibility())
       {
       sourceName = source->GetName();
-      numParts = source->GetNumberOfPVParts();
+      numParts = source->GetNumberOfParts();
       for ( partIdx = 0; partIdx < numParts; ++partIdx)
         {
-        part = source->GetPVPart(partIdx);
+        part = source->GetPart(partIdx);
         // Create a file name for the geometry (without extension).
         if (numParts == 1 && timeIdx >= 0)
           {
@@ -4252,7 +4252,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.447 $");
+  this->ExtractRevision(os,"$Revision: 1.448 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4641,10 +4641,10 @@ void vtkPVWindow::CacheUpdate(int idx, int total)
     {
     if (pvs->GetVisibility())
       {
-      numParts = pvs->GetNumberOfPVParts();
+      numParts = pvs->GetNumberOfParts();
       for (partIdx = 0; partIdx < numParts; ++partIdx)
         {
-        pvp = pvs->GetPVPart(partIdx);
+        pvp = pvs->GetPart(partIdx);
         pvp->GetPartDisplay()->CacheUpdate(idx, total);
         }
       }

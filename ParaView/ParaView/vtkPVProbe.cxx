@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.96");
+vtkCxxRevisionMacro(vtkPVProbe, "1.97");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -223,7 +223,7 @@ void vtkPVProbe::AcceptCallbackInternal()
   // Get the probe filter's output from the root node's process.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkDataObject* output = pm->ReceiveRootDataObject(
-    this->GetPVPart(0)->GetVTKDataTclName());
+    this->GetPart(0)->GetVTKDataTclName());
   vtkPolyData* probeOutput = vtkPolyData::SafeDownCast(output);
   if(!probeOutput)
     {

@@ -333,11 +333,11 @@ public:
 
   // Description:
   // Access to individual parts.
-  void AddPVPart(vtkPVPart *part);
-  void SetPVPart(vtkPVPart *part);
-  vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
-  vtkPVPart *GetPVPart(int idx); 
-  int GetNumberOfPVParts();
+  void AddPart(vtkPVPart *part);
+  void SetPart(vtkPVPart *part);
+  vtkPVPart *GetPart() {return this->GetPart(0);} 
+  vtkPVPart *GetPart(int idx); 
+  int GetNumberOfParts();
 
   // Descriptions:
   // Properties that describe the inputs to the filter of type
@@ -444,12 +444,6 @@ public:
   void InvalidateDataInformation();
 
   // Description:
-  // Set the resolution of the decimation LOD.
-  // Resulting decimation uses dim^3 volume.
-  void SetLODResolution(int dim);
-  vtkGetMacro(LODResolution, int);
-
-  // Description:
   // Convenience method for rendering.
   vtkPVRenderView *GetPVRenderView();
 
@@ -463,7 +457,7 @@ protected:
   vtkPVSource();
   ~vtkPVSource();
 
-  vtkCollection *PVParts;
+  vtkCollection *Parts;
 
   // Description:
   // This method collects data information from all processes.
@@ -588,8 +582,6 @@ protected:
 
   // Taking responsibility of saving inputs away from input menu.
   void SetInputsInBatchScript(ofstream *file);
-
-  int LODResolution;
 
   int UpdateSourceInBatch;
 

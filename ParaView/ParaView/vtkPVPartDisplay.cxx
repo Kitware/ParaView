@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.3");
 
 int vtkPVPartDisplayCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -73,6 +73,8 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->CommandFunction = vtkPVPartDisplayCommand;
 
   this->DirectColorFlag = 1;
+  this->Visibility = 1;
+  this->Part = NULL;
 
   this->CollectionDecision = 1;
   this->LODCollectionDecision = 1;
@@ -173,6 +175,7 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
       }
     this->SetLODCollectTclName(NULL);
     }
+  this->SetPart(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -380,6 +383,15 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
 
 //----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetLODResolution(int res)
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                         this->LODDeciTclName, res, res, res);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPartDisplay::SetCollectionDecision(int v)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
@@ -466,6 +478,7 @@ void vtkPVPartDisplay::SetVisibility(int v)
     {
     pvApp->BroadcastScript("%s SetVisibility %d", this->GetPropTclName(), v);
     }
+  this->Visibility = v;
 
   // Recompute total visibile memory size.
   pvApp->SetTotalVisibleMemorySizeValid(0);
@@ -575,6 +588,8 @@ void vtkPVPartDisplay::SetDirectColorFlag(int val)
 void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Visibility: " << this->Visibility << endl;
+  os << indent << "Part: " << this->Part << endl;
   os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;
   os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;

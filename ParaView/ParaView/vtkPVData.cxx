@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.202");
+vtkCxxRevisionMacro(vtkPVData, "1.203");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1261,10 +1261,10 @@ void vtkPVData::SetActorColor(float r, float g, float b)
   vtkPVPart *part;
   int idx, num;
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     pvApp->BroadcastScript("%s SetColor %f %f %f", 
                            part->GetPartDisplay()->GetPropertyTclName(), 
                            r, g, b);
@@ -1285,7 +1285,7 @@ void vtkPVData::SetActorColor(float r, float g, float b)
 void vtkPVData::ChangeActorColor(float r, float g, float b)
 {
   vtkPVPart *part;
-  part = this->GetPVSource()->GetPVPart();
+  part = this->GetPVSource()->GetPart();
 
   if (part->GetPartDisplay()->GetMapper()->GetScalarVisibility())
     {
@@ -1361,10 +1361,10 @@ void vtkPVData::ColorByPropertyInternal()
   vtkPVPart *part;
   int idx, num;
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     pvApp->BroadcastScript("%s ScalarVisibilityOff", 
                            part->GetPartDisplay()->GetMapperTclName());
     pvApp->BroadcastScript("%s ScalarVisibilityOff", 
@@ -1431,10 +1431,10 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     return;
     }
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     // Turn off the specualr so it does not interfere with data.
     pvApp->BroadcastScript("%s SetSpecular 0.0", 
                            part->GetPartDisplay()->GetPropertyTclName());
@@ -1512,10 +1512,10 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     return;
     }
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     // Turn off the specualr so it does not interfere with data.
     pvApp->BroadcastScript("%s SetSpecular 0.0", 
                            part->GetPartDisplay()->GetPropertyTclName());
@@ -1633,10 +1633,10 @@ void vtkPVData::DrawWireframe()
   // Well, this would complicate initialization.  We would have to pass
   // the property into the part for the mappers.
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       if (this->PreviousWasSolid)
@@ -1670,10 +1670,10 @@ void vtkPVData::DrawPoints()
   this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
   this->RepresentationMenu->SetValue("Points");
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       if (this->PreviousWasSolid)
@@ -1708,10 +1708,10 @@ void vtkPVData::DrawSurface()
   this->RepresentationMenu->SetValue("Surface");
 
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       if (!this->PreviousWasSolid)
@@ -1764,10 +1764,10 @@ void vtkPVData::SetInterpolationToFlat()
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       pvApp->BroadcastScript("%s SetInterpolationToFlat",
@@ -1792,10 +1792,10 @@ void vtkPVData::SetInterpolationToGouraud()
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       pvApp->BroadcastScript("%s SetInterpolationToGouraud",
@@ -1836,10 +1836,10 @@ void vtkPVData::SetAmbient(float ambient)
   vtkPVPart *part;
   int num, idx;
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->GetProperty()->SetAmbient(ambient);
     }
 }
@@ -1881,10 +1881,10 @@ void vtkPVData::Initialize()
   
   int dataType = this->GetPVSource()->GetDataInformation()->GetDataSetType();
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (dataType == VTK_POLY_DATA || dataType == VTK_UNSTRUCTURED_GRID)
       {
       pvApp->BroadcastScript("%s SetUseStrips %d", part->GetGeometryTclName(),
@@ -2080,10 +2080,10 @@ void vtkPVData::SetDirectColorFlag(int val)
     }
 
   int num, idx;
-  num = this->PVSource->GetNumberOfPVParts();
+  num = this->PVSource->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    this->PVSource->GetPVPart(idx)->GetPartDisplay()->SetDirectColorFlag(val);
+    this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(val);
     }
 }
 
@@ -2110,10 +2110,10 @@ void vtkPVData::ChangePointSize()
   vtkPVPart *part;
   int idx, num;
   
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       pvApp->BroadcastScript("%s SetPointSize %f",
@@ -2159,10 +2159,10 @@ void vtkPVData::ChangeLineWidth()
   vtkPVPart *part;
   int idx, num;
   
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     if (part->GetPartDisplay()->GetPropertyTclName())
       {
       pvApp->BroadcastScript("%s SetLineWidth %f",
@@ -2233,10 +2233,10 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     sourceCount = -1;
     numOutputs = 0;
     outputCount = 0;
-    numParts = this->GetPVSource()->GetNumberOfPVParts();
+    numParts = this->GetPVSource()->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      part = this->GetPVSource()->GetPVPart(partIdx);
+      part = this->GetPVSource()->GetPart(partIdx);
       // Get the next output from the sequence of sources/outputs.
       if (outputCount >= numOutputs)
         { // Move to next source
@@ -2510,10 +2510,10 @@ void vtkPVData::OpacityChangedCallback()
   vtkPVPart *part;
   int idx, num;
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
                                               part->GetPartDisplay()->GetPropTclName(), 
                                               this->OpacityScale->GetValue());
@@ -2538,7 +2538,7 @@ void vtkPVData::GetActorTranslate(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVSource()->GetPVPart(0);  
+  part = this->GetPVSource()->GetPart(0);  
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
   if (prop)
     {
@@ -2562,10 +2562,10 @@ void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
   this->TranslateThumbWheel[1]->SetValue(y);
   this->TranslateThumbWheel[2]->SetValue(z);
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
                                               part->GetPartDisplay()->GetPropTclName(), x, y, z);
     }
@@ -2622,7 +2622,7 @@ void vtkPVData::GetActorScale(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVSource()->GetPVPart(0);
+  part = this->GetPVSource()->GetPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
   if (prop)
     {
@@ -2646,10 +2646,10 @@ void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
   this->ScaleThumbWheel[1]->SetValue(y);
   this->ScaleThumbWheel[2]->SetValue(z);
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
                                               part->GetPartDisplay()->GetPropTclName(), x, y, z);
     }
@@ -2706,7 +2706,7 @@ void vtkPVData::GetActorOrientation(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVSource()->GetPVPart(0);
+  part = this->GetPVSource()->GetPart(0);
 
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
   if (prop)
@@ -2731,10 +2731,10 @@ void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
   this->OrientationScale[1]->SetValue(y);
   this->OrientationScale[2]->SetValue(z);
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
                                               part->GetPartDisplay()->GetPropTclName(), x, y, z);
     }
@@ -2791,7 +2791,7 @@ void vtkPVData::GetActorOrigin(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVSource()->GetPVPart(0);
+  part = this->GetPVSource()->GetPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
   if (prop)
     {
@@ -2815,10 +2815,10 @@ void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
   this->OriginThumbWheel[1]->SetValue(y);
   this->OriginThumbWheel[2]->SetValue(z);
 
-  num = this->GetPVSource()->GetNumberOfPVParts();
+  num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPVPart(idx);
+    part = this->GetPVSource()->GetPart(idx);
     this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
                                               part->GetPartDisplay()->GetPropTclName(), x, y, z);
     }
@@ -2906,7 +2906,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.202 $");
+  this->ExtractRevision(os,"$Revision: 1.203 $");
 }
 
 //----------------------------------------------------------------------------

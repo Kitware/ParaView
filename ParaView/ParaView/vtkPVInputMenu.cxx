@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.46");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.47");
 
 
 //----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   // Have to have the same number of parts as last input.
   if (this->CurrentValue)
     {
-    if (pvs->GetNumberOfPVParts() != this->CurrentValue->GetNumberOfPVParts())
+    if (pvs->GetNumberOfParts() != this->CurrentValue->GetNumberOfParts())
       {
       return 0;
       }

@@ -126,6 +126,7 @@ public:
   // Temporary access to the display object.
   // Render modules may eleimnate the need for this access.
   vtkPVPartDisplay* GetPartDisplay() { return this->PartDisplay;}
+  void SetPartDisplay(vtkPVPartDisplay* pDisp);
 
 protected:
   vtkPVPart();

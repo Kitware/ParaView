@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputGroupRequirement);
-vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.3");
+vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVInputGroupRequirement::vtkPVInputGroupRequirement()
@@ -92,7 +92,7 @@ int vtkPVInputGroupRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 int vtkPVInputGroupRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource*)
 {
-  int num = input->GetNumberOfPVParts();
+  int num = input->GetNumberOfParts();
   if (this->Quantity == -1 && num > 1)
     {
     return 1;

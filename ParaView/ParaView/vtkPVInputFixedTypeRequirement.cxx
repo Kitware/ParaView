@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.4");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
@@ -88,8 +88,8 @@ int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSou
   // Better would have been to passed the input property as an argument.
   // I already spent too long on this, so it will have to wait.
   int partIdx, numParts;
-  numParts = pvs->GetNumberOfPVParts(); 
-  if (input->GetNumberOfPVParts() != numParts)
+  numParts = pvs->GetNumberOfParts(); 
+  if (input->GetNumberOfParts() != numParts)
     {
     return 0;
     }
@@ -97,8 +97,8 @@ int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSou
     {
     vtkPVDataInformation *info1;
     vtkPVDataInformation *info2;
-    info1 = input->GetPVPart(partIdx)->GetDataInformation();
-    info2 = pvs->GetPVPart(partIdx)->GetDataInformation();
+    info1 = input->GetPart(partIdx)->GetDataInformation();
+    info2 = pvs->GetPart(partIdx)->GetDataInformation();
     if (info1->GetDataSetType() != info2->GetDataSetType())
       {
       return 0;

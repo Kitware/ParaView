@@ -63,6 +63,7 @@ class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
+class vtkCollection;
 
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
 {
@@ -195,6 +196,10 @@ public:
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
+
+  // This collection keeps a reference to all PartDisplays created
+  // by this module.
+  vtkCollection* PartDisplays;
 
   // This is used before a render to make sure all visible sources
   // have been updated.  It returns 1 if all the data has been collected

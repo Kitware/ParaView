@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.7");
+vtkCxxRevisionMacro(vtkPVWriter, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -113,7 +113,7 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
                         int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  const char* dataTclName = pvs->GetPVPart()->GetVTKDataTclName();
+  const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
   if(!this->Parallel)
     {
     pvApp->GetProcessModule()->ServerScript("%s writer", this->WriterClassName);

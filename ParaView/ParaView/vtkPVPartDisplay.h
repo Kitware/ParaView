@@ -58,6 +58,7 @@ class vtkPVDataInformation;
 class vtkPolyDataMapper;
 class vtkProp;
 class vtkProperty;
+class vtkPVPart;
 
 class VTK_EXPORT vtkPVPartDisplay : public vtkKWObject
 {
@@ -74,9 +75,13 @@ public:
   vtkGetMacro(LODCollectionDecision, int);
 
   // Description:
+  // Set the number of bins per axes on the quadric decimation filter.
+  void SetLODResolution(int res);
+
+  // Description:
   // Turns visibilioty on or off.
-  // When visibility is off, geometry data is released.
   void SetVisibility(int v);
+  vtkGetMacro(Visibility,int);
 
   // Description:
   // Change the color mode to map scalars or 
@@ -136,13 +141,22 @@ public:
   void RemoveAllCaches();
   void CacheUpdate(int idx, int total);
 
+  // Description:
+  // Not referenced counted.  I might get rid of this reference later.
+  void SetPart(vtkPVPart* part) {this->Part = part;}
+  vtkPVPart* GetPart() {return this->Part;}
+
 protected:
   vtkPVPartDisplay();
   ~vtkPVPartDisplay();
   
+  // I might get rid of this reference.
+  vtkPVPart* Part;
+
   int CollectionDecision;
   int LODCollectionDecision;
   int DirectColorFlag;
+  int Visibility;
 
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;

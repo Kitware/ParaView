@@ -64,7 +64,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.20");
+vtkCxxRevisionMacro(vtkPVPart, "1.21");
+
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -75,7 +76,7 @@ vtkPVPart::vtkPVPart()
 {
   this->CommandFunction = vtkPVPartCommand;
 
-  this->PartDisplay = vtkPVPartDisplay::New();
+  this->PartDisplay = NULL;
 
   this->Name = NULL;
 
@@ -95,8 +96,7 @@ vtkPVPart::vtkPVPart()
 //----------------------------------------------------------------------------
 vtkPVPart::~vtkPVPart()
 {  
-  this->PartDisplay->Delete();
-  this->PartDisplay = NULL;
+  this->SetPartDisplay(NULL);
 
   // Get rid of the circular reference created by the extent translator.
   // We have a problem with ExtractPolyDataPiece also.
@@ -153,11 +153,24 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
 
-
-  this->PartDisplay->SetPVApplication(pvApp);
-  this->PartDisplay->ConnectToGeometry(this->GeometryTclName);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
+{
+  if (this->PartDisplay)
+    {
+    this->PartDisplay->UnRegister(this);
+    this->PartDisplay = NULL;
+    }
+  if (pDisp)
+    {
+    this->PartDisplay = pDisp;
+    this->PartDisplay->Register(this);
+    // This is special (why we cannot use a macro).
+    this->PartDisplay->ConnectToGeometry(this->GeometryTclName);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVPart::GatherDataInformation()

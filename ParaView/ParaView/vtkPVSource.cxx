@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.298");
+vtkCxxRevisionMacro(vtkPVSource, "1.299");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -93,7 +93,7 @@ vtkPVSource::vtkPVSource()
 {
   this->CommandFunction = vtkPVSourceCommand;
 
-  this->PVParts = vtkCollection::New();
+  this->Parts = vtkCollection::New();
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
 
@@ -174,8 +174,6 @@ vtkPVSource::vtkPVSource()
 
   this->Prototype = 0;
 
-  this->LODResolution = 50;
-
   this->UpdateSourceInBatch = 0;
 }
 
@@ -185,8 +183,8 @@ vtkPVSource::~vtkPVSource()
   this->SetPVOutput(NULL);  
   this->RemoveAllPVInputs();
 
-  this->PVParts->Delete();
-  this->PVParts = NULL;
+  this->Parts->Delete();
+  this->Parts = NULL;
   this->DataInformation->Delete();
   this->DataInformation = NULL;
 
@@ -317,10 +315,10 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     {
     inputName = "Input";
     }
-  numParts = pvs->GetNumberOfPVParts();
+  numParts = pvs->GetNumberOfParts();
   for (partIdx = 0; partIdx < numParts; ++partIdx)
     {
-    part = pvs->GetPVPart(partIdx);
+    part = pvs->GetPart(partIdx);
     if (this->VTKMultipleInputsFlag)
       { // Only one source takes all parts as input.
       sourceTclName = this->GetVTKSourceTclName(0);
@@ -431,29 +429,29 @@ vtkPVSource *vtkPVSource::GetPVConsumer(int i)
 
 
 //----------------------------------------------------------------------------
-int vtkPVSource::GetNumberOfPVParts()
+int vtkPVSource::GetNumberOfParts()
 {
-  return this->PVParts->GetNumberOfItems();
+  return this->Parts->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVPart(vtkPVPart* part)
+void vtkPVSource::SetPart(vtkPVPart* part)
 {
-  this->PVParts->AddItem(part);
+  this->Parts->AddItem(part);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddPVPart(vtkPVPart* part)
+void vtkPVSource::AddPart(vtkPVPart* part)
 {
-  this->PVParts->AddItem(part);
+  this->Parts->AddItem(part);
 }
 
 //----------------------------------------------------------------------------
-vtkPVPart* vtkPVSource::GetPVPart(int idx)
+vtkPVPart* vtkPVSource::GetPart(int idx)
 {
   vtkPVPart *part;
 
-  part = static_cast<vtkPVPart*>(this->PVParts->GetItemAsObject(idx));
+  part = static_cast<vtkPVPart*>(this->Parts->GetItemAsObject(idx));
   return part;
 }
 
@@ -479,8 +477,8 @@ void vtkPVSource::GatherDataInformation()
   vtkPVPart *part;
 
   this->DataInformation->Initialize();
-  this->PVParts->InitTraversal();
-  while ( ( part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
+  this->Parts->InitTraversal();
+  while ( ( part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
     part->GatherDataInformation();
     this->DataInformation->AddInformation(part->GetDataInformation());
@@ -506,8 +504,8 @@ void vtkPVSource::ForceUpdate(vtkPVApplication* pvApp)
     }
   this->UpdateTime.Modified();
 
-  this->PVParts->InitTraversal();
-  while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
+  this->Parts->InitTraversal();
+  while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
     part->GetPartDisplay()->ForceUpdate(pvApp);
     }
@@ -518,10 +516,13 @@ void vtkPVSource::Update()
 {
   vtkPVPart *part;
 
-  this->PVParts->InitTraversal();
-  while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
+  this->Parts->InitTraversal();
+  while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
-    part->GetPartDisplay()->Update();
+    if (part->GetPartDisplay())
+      {
+      part->GetPartDisplay()->Update();
+      }
     }
 }
 
@@ -537,10 +538,10 @@ void vtkPVSource::SetVisibilityInternal(int v)
     this->GetPVOutput()->SetVisibilityCheckState(v);
     }
 
-  num = this->GetNumberOfPVParts();
+  num = this->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVPart(idx);
+    part = this->GetPart(idx);
     part->GetPartDisplay()->SetVisibility(v);
     }
 }
@@ -1247,6 +1248,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       return;
       }
 
+    pvd->CreateProperties();
+    this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
+
     // I need to update the data before 
     // UpdateFilterMenu which is called by SetCurrentPVSource.
     // Although tis fixes my problem,  I should not have to actually update.
@@ -1256,7 +1260,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // for a polydata and imagedata collection.
     this->Update();
     
-    this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
     if (!this->GetHideDisplayPage())
       {
       this->Notebook->AddPage("Display");
@@ -1265,8 +1268,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       this->Notebook->AddPage("Information");
       }
-
-    pvd->CreateProperties();
 
     // Make the last data invisible.
     input = this->GetPVInput(0);
@@ -1326,13 +1327,13 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   vtkPVData *pvd = this->GetPVOutput();
   if (pvd)
     {
-    num = this->GetNumberOfPVParts();
+    num = this->GetNumberOfParts();
     for (idx = 0; idx < num; ++idx)
       {
-      part = this->GetPVPart(idx);
+      part = this->GetPart(idx);
       // This has a side effect of gathering and displaying information.
       // Should this be part->Update() !!!!!!!!!!!!!!??????
-      this->GetPVPart()->GetPartDisplay()->Update();
+      this->GetPart()->GetPartDisplay()->Update();
       }
     pvd->UpdateProperties();
     }
@@ -1365,10 +1366,10 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     // Get rid of caches.
     int idx, numParts;
     vtkPVPart *part;
-    numParts = this->GetNumberOfPVParts();
+    numParts = this->GetNumberOfParts();
     for (idx = 0; idx < numParts; ++idx)
       {
-      part = this->GetPVPart(idx);
+      part = this->GetPart(idx);
       part->GetPartDisplay()->RemoveAllCaches();
       }
     }
@@ -2269,7 +2270,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   if (this->GetNumberOfInputProperties() > 0)
     {
     vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
-    numSources = input->GetNumberOfPVParts();
+    numSources = input->GetNumberOfParts();
     }
   // If the VTK filter takes multiple inputs (vtkAppendPolyData)
   // then we create only one filter with each part as an input.
@@ -2393,12 +2394,7 @@ int vtkPVSource::InitializeData()
       part->SetPVApplication(pvApp);
       this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
                    dataName);
-      // !!! This is also done in vtkPVPartDisplay.  Probably not needed here !!!!
-      pm->InitializePartition(part->GetPartDisplay());
-      this->AddPVPart(part);
-      // This initialization should be done by a render module.
-      part->GetPartDisplay()->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
-      part->GetPartDisplay()->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
+      this->AddPart(part);
 
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
@@ -2432,30 +2428,6 @@ int vtkPVSource::InitializeData()
   pvd->Delete();
 
   return VTK_OK;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetLODResolution(int dim)
-{
-  vtkPVPart *part;
-  int idx, num;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  if (this->LODResolution == dim)
-    {
-    return;
-    }
-  this->LODResolution = dim;
-
-  num = this->GetNumberOfPVParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = this->GetPVPart(idx);
-    pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                           part->GetPartDisplay()->GetLODDeciTclName(), this->LODResolution,
-                           this->LODResolution, this->LODResolution); 
-    }
 }
 
 
@@ -2649,7 +2621,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.298 $");
+  this->ExtractRevision(os,"$Revision: 1.299 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2692,7 +2664,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "PVOutput: " << this->PVOutput << endl;
   os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers() << endl;
-  os << indent << "NumberOfPVParts: " << this->GetNumberOfPVParts() << endl;
+  os << indent << "NumberOfParts: " << this->GetNumberOfParts() << endl;
 
   os << indent << "VTKMultipleInputsFlag: " << this->VTKMultipleInputsFlag << endl;
   os << indent << "InputProperties: \n";
@@ -2703,5 +2675,4 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     this->GetInputProperty(idx)->PrintSelf(os, i2);
     }
-  os << indent << "LODResolution: " << this->LODResolution << endl;
 }
