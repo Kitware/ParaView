@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.17");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.18");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -252,7 +252,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->ReductionFactorScale->SetParent(this->LODScalesFrame);
     this->ReductionFactorScale->Create(app,
                                         "-orient horizontal");
-    this->ReductionFactorScale->SetRange(2, 5);
+    this->ReductionFactorScale->SetRange(2, 20);
     this->ReductionFactorScale->SetResolution(1);
     this->ReductionFactorScale->SetValue(this->ReductionFactor);
     this->ReductionFactorScale->SetCommand(this, "ReductionFactorScaleCallback");
