@@ -113,6 +113,10 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
                                  int vtkNotUsed(y)) {}
   virtual void AShiftButtonRelease(int vtkNotUsed(num), int vtkNotUsed(x), 
                                    int vtkNotUsed(y)) {}
+  virtual void AControlButtonPress(int vtkNotUsed(num), int vtkNotUsed(x),
+                                   int vtkNotUsed(y)) {}
+  virtual void AControlButtonRelease(int vtkNotUsed(num), int vtkNotUsed(x), 
+                                     int vtkNotUsed(y)) {}
   virtual void AKeyPress(char vtkNotUsed(key), int vtkNotUsed(x), 
                          int vtkNotUsed(y)) {}
   virtual void Button1Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
@@ -121,6 +125,9 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void ShiftButton1Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
   virtual void ShiftButton2Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
   virtual void ShiftButton3Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
+  virtual void ControlButton1Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
+  virtual void ControlButton2Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
+  virtual void ControlButton3Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
   virtual void Exposed() {}
   virtual void Enter(int x, int y);
 

@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.82");
+vtkCxxRevisionMacro(vtkKWView, "1.83");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -222,10 +222,19 @@ vtkKWView::~vtkKWView()
     this->Script("bind %s <Expose> {}",wname);
     this->Script("bind %s <Any-ButtonPress> {}",wname);
     this->Script("bind %s <Any-ButtonRelease> {}",wname);
+    this->Script("bind %s <Shift-Any-ButtonPress> {}",wname);
+    this->Script("bind %s <Shift-Any-ButtonRelease> {}",wname);
+    this->Script("bind %s <Control-Any-ButtonPress> {}", wname);
+    this->Script("bind %s <Control-Any-ButtonRelease> {}",wname);
     this->Script("bind %s <B1-Motion> {}",wname);
     this->Script("bind %s <B2-Motion> {}",wname);
     this->Script("bind %s <B3-Motion> {}",wname);
     this->Script("bind %s <Shift-B1-Motion> {}",wname);
+    this->Script("bind %s <Shift-B2-Motion> {}",wname);
+    this->Script("bind %s <Shift-B3-Motion> {}",wname);
+    this->Script("bind %s <Control-B1-Motion> {}",wname);
+    this->Script("bind %s <Control-B2-Motion> {}",wname);
+    this->Script("bind %s <Control-B3-Motion> {}",wname);
     this->Script("bind %s <KeyPress> {}",wname);
     this->Script("bind %s <Enter> {}",wname);
     }
@@ -1224,6 +1233,14 @@ void vtkKWView::SetupBindings()
     "bind %s <Shift-Any-ButtonRelease> {%s AShiftButtonRelease %%b %%x %%y}",
     wname, tname);
 
+  this->Script(
+    "bind %s <Control-Any-ButtonPress> {%s AControlButtonPress %%b %%x %%y}",
+    wname, tname);
+
+  this->Script(
+    "bind %s <Control-Any-ButtonRelease> {%s AControlButtonRelease %%b %%x %%y}",
+    wname, tname);
+
   this->Script("bind %s <B1-Motion> {%s Button1Motion %%x %%y}",
                wname, tname);
 
@@ -1240,6 +1257,15 @@ void vtkKWView::SetupBindings()
                wname, tname);
   
   this->Script("bind %s <Shift-B3-Motion> {%s ShiftButton3Motion %%x %%y}", 
+               wname, tname);
+
+  this->Script("bind %s <Control-B1-Motion> {%s ControlButton1Motion %%x %%y}",
+               wname, tname);
+
+  this->Script("bind %s <Control-B2-Motion> {%s ControlButton2Motion %%x %%y}",
+               wname, tname);
+  
+  this->Script("bind %s <Control-B3-Motion> {%s ControlButton3Motion %%x %%y}",
                wname, tname);
 
   this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y}", 
@@ -1445,7 +1471,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.82 $");
+  this->ExtractRevision(os,"$Revision: 1.83 $");
 }
 
 //----------------------------------------------------------------------------
