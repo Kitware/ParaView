@@ -38,6 +38,7 @@ class vtkStringList;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
+class vtkSocketController;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkKWObject
 {
@@ -211,6 +212,11 @@ public:
 
   static vtkPVProcessModule* GetProcessModule();
   static void SetProcessModule(vtkPVProcessModule* pm);
+
+  // Description:
+  // This is a socket controller used to communicate
+  // between the client and process 0 of the server.
+  vtkSocketController* GetSocketController() { return 0; }
 
 protected:
   vtkPVProcessModule();
