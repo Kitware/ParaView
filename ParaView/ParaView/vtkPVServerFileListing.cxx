@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined(_WIN32)
 # include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
 # include <direct.h>    // _getcwd
+# include <sys/stat.h>  // stat
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
 # include <sys/types.h> // DIR, struct dirent, struct stat
@@ -65,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
