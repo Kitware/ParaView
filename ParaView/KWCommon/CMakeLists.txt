@@ -7,7 +7,13 @@ vtkKWProcessStatistics.cxx
 vtkKWRegisteryUtilities.cxx
 vtkKWSerializer.cxx
 vtkKWDirectoryUtilities.cxx
+vtkQueue.cxx
 )
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkQueue
+  WRAP_EXCLUDE
+  )
 
 IF (WIN32)
   SET( KWCommon_SRCS ${KWCommon_SRCS}
@@ -27,7 +33,7 @@ ELSE (WIN32)
     WRAP_EXCLUDE
     )
 ENDIF (WIN32)
-  
+
 VTK_WRAP_TCL(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
 ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
 
