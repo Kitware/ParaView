@@ -36,30 +36,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "Test"=.\Test\Test.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "TestExe"=.\Test\TestExe.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "Widgets"=.\Widgets\Widgets.dsp - Package Owner=<4>
 
 Package=<5>
