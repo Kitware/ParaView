@@ -70,6 +70,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkParaViewInstantiator.h"
 
+static void ParaViewEnableMSVCDebugHook();
+
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
 {
@@ -78,6 +80,7 @@ int MyMain(int argc, char *argv[])
   int myId = 0;
   vtkPVProcessModule *pm;
   vtkPVApplication *app;
+  ParaViewEnableMSVCDebugHook();
 
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
@@ -332,5 +335,28 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 int main(int argc, char *argv[])
 {
   return MyMain(argc, argv);
+}
+#endif
+
+// For a DEBUG build on MSVC, add a hook to prevent error dialogs when
+// being run from DART.
+#if defined(_MSC_VER) && defined(_DEBUG)
+# include <crtdbg.h>
+static int ParaViewDebugReport(int, char* message, int*)
+{
+  fprintf(stderr, message);
+  exit(1);
+  return 0;
+}
+void ParaViewEnableMSVCDebugHook()
+{
+  if(getenv("DART_TEST_FROM_DART"))
+    {
+    _CrtSetReportHook(ParaViewDebugReport);
+    }
+}
+#else
+void ParaViewEnableMSVCDebugHook()
+{
 }
 #endif
