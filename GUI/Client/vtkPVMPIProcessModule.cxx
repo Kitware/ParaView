@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.25");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.26");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -425,7 +425,7 @@ int vtkPVMPIProcessModule::LoadModuleInternal(const char* name,
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myid = this->Controller->GetLocalProcessId();
   int* results = new int[numProcs];
-  communicator->Gather(&localResult, results, numProcs, 0);
+  communicator->Gather(&localResult, results, 1, 0);
 
   int globalResult = 1;
   if(myid == 0)
