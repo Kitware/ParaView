@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.4");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -120,9 +120,9 @@ void vtkKWLabeledWidget::SetLabel(const char *text)
 //----------------------------------------------------------------------------
 void vtkKWLabeledWidget::SetLabelWidth(int width)
 {
-  if (this->IsCreated() && this->Label)
+  if (this->Label)
     {
-    this->Script("%s configure -width %d", this->Label->GetWidgetName(), width);
+    this->Label->SetWidth(width);
     }
 }
 
