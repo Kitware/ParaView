@@ -119,8 +119,12 @@ public:
   void AcceptCallback();
   
   // Description:
-  // Called when the accept button is pressed.
+  // Called when the cancel button is pressed.
   void CancelCallback();
+
+  // Description:
+  // Called when the delete button is pressed.
+  void DeleteCallback();
 
   // Description:
   // This method resets the UI values (Widgets added with the following methods).
@@ -226,11 +230,13 @@ protected:
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *CancelButton;
-
+  vtkKWPushButton *DeleteButton;
+  
   vtkPVSelectionList *LastSelectionList;
 
   vtkPVCommandList *AcceptCommands;
   vtkPVCommandList *CancelCommands;
+  vtkPVCommandList *DeleteCommands;
 };
 
 #endif

@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkKWLabeledEntry.h"
+#include "vtkKWMessageDialog.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
@@ -63,12 +64,14 @@ vtkPVSource::vtkPVSource()
   this->ParameterFrame = vtkKWLabeledFrame::New();
   this->AcceptButton = vtkKWPushButton::New();
   this->CancelButton = vtkKWPushButton::New();
+  this->DeleteButton = vtkKWPushButton::New();
   
   this->Widgets = vtkKWWidgetCollection::New();
   this->LastSelectionList = NULL;
   
   this->AcceptCommands = vtkPVCommandList::New();
   this->CancelCommands = vtkPVCommandList::New();
+  this->DeleteCommands = vtkPVCommandList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -122,6 +125,9 @@ vtkPVSource::~vtkPVSource()
   this->CancelButton->Delete();
   this->CancelButton = NULL;  
   
+  this->DeleteButton->Delete();
+  this->DeleteButton = NULL;
+  
   if (this->LastSelectionList)
     {
     this->LastSelectionList->UnRegister(this);
@@ -132,6 +138,8 @@ vtkPVSource::~vtkPVSource()
   this->AcceptCommands = NULL;  
   this->CancelCommands->Delete();
   this->CancelCommands = NULL;
+  this->DeleteCommands->Delete();
+  this->DeleteCommands = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -349,6 +357,12 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->CancelButton->GetWidgetName());
 
+  this->DeleteButton->SetParent(frame);
+  this->DeleteButton->Create(this->Application, "-text Delete");
+  this->DeleteButton->SetCommand(this, "DeleteCallback");
+  this->Script("pack %s -side left -fill x -expand t",
+               this->DeleteButton->GetWidgetName());
+  
   // Every source has a name.
   this->AddLabeledEntry("Name:", "SetName", "GetName", this);
 
@@ -1314,6 +1328,7 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *ge
   // We need to change this into a PVWidget.
   return sl;
 }
+
 //----------------------------------------------------------------------------
 void vtkPVSource::AddModeListItem(char *name, int value)
 {
@@ -1324,9 +1339,6 @@ void vtkPVSource::AddModeListItem(char *name, int value)
     }
   this->LastSelectionList->AddItem(name, value);
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
@@ -1366,7 +1378,6 @@ void vtkPVSource::AcceptCallback()
   this->GetView()->Render();
   window->GetSourceList()->Update();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::CancelCallback()
@@ -1413,6 +1424,79 @@ void vtkPVSource::CancelCallback()
   else
     {
     this->UpdateParameterWidgets();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::DeleteCallback()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
+  vtkPVSource *prev;
+  int i;
+  
+  if (this->PVOutput == NULL)
+    {
+    // Accept button hasn't been clicked yet, so this is the same
+    // functionality as hitting Cancel under these circumstances.
+    this->CancelCallback();
+    }
+  else if (this->PVOutput->GetPVSourceUsers()->GetNumberOfItems() == 0)
+    {
+    // Need to remove the data connected with this source from the list of
+    // inputs, but not sure how to do that since the PVData is NULL at this
+    // point.
+    
+    for (i = 0; i < this->GetNumberOfInputs(); i++)
+      {
+      this->GetNthInput(i)->RemovePVSourceFromUsers(this);
+      }
+    
+    // We need to unpack the notebook for this source and pack the one for the
+    // source of this source (if there is one).
+
+    prev = this->GetWindow()->GetPreviousSource();
+    this->GetWindow()->SetCurrentSource(prev);
+    if (prev)
+      {
+      prev->ShowProperties();
+      }
+    
+    // We need to remove this source from the Source List.    
+    this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
+    this->GetWindow()->GetSourceList()->Update();    
+
+    // Delete the source on the other processes.  Removing it from the
+    // view's list of composites amounts to deleting the source on the
+    // local processor because it's the last thing that has a reference to it.
+    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+      {
+      pvApp->BroadcastScript("%s Delete", this->GetTclName());
+      pvApp->BroadcastScript("%s Delete", this->GetVTKSourceTclName());
+      }
+    this->GetVTKSource()->Delete();
+    this->PVOutput->GetActorComposite()->VisibilityOff();
+    if (prev)
+      {
+      prev->GetPVData()->GetActorComposite()->VisibilityOn();
+      }
+    this->SetPVData(NULL);
+    this->GetView()->Render();
+    this->GetWindow()->GetMainView()->RemoveComposite(this);
+    }
+  else
+    {
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetStyleToYesNo();
+    dlg->Create(this->GetApplication(),"");
+    ostrstream str;
+    str << "This will delete all filters from here to the end of the pipeline.  Continue?" << ends;
+    dlg->SetText(str.str());
+    int ret = dlg->Invoke();  
+    dlg->Delete();
+    if (ret)
+      {
+      vtkWarningMacro("about to delete all filters from here to the end of the pipeline");
+      }
     }
 }
 
