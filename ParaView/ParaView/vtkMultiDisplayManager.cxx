@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.15");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.16");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -405,7 +405,7 @@ void vtkMultiDisplayManager::SatelliteStartRender()
 {
   vtkPVMultiDisplayInfo info;
 
-  this->SocketController->Receive((double*)(&info), 24, 0, 
+  this->Controller->Receive((double*)(&info), 24, 0, 
                                   vtkMultiDisplayManager::INFO_TAG);
   this->InternalSatelliteStartRender(info);
 }
