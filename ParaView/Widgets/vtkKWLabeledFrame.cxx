@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.1");
 
 
 
@@ -144,24 +144,50 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     }
 }
 
-void vtkKWLabeledFrame::SetMargin(int m)
+void vtkKWLabeledFrame::AdjustMargin()
 {
   if (this->Application)
     {
-    this->Script("%s configure -height %d", 
-                 this->Border2->GetWidgetName(), m);
-    }
-}
+    // Get the height of the label frame, and share it between
+    // the two borders (frame).
 
-int vtkKWLabeledFrame::GetMargin()
-{
-  if (this->Application)
-    {
-    this->Script("%s cget -height", 
-                 this->Border2->GetWidgetName());  
-    return vtkKWObject::GetIntegerResult(this->Application);
+    int height = atoi(this->Script("winfo reqheight %s", 
+                                   this->LabelFrame->GetWidgetName()));
+
+    // If the frame has not been packed yet, reqheight will return 1,
+    // so try the hard way by checking what's inside the pack, provided
+    // that it's simple (i.e. packed in a single row or column)
+
+    if (height <= 1) 
+      {
+      int width;
+      vtkKWTkUtilities::GetPackSlavesBbox(this->Application->GetMainInterp(),
+                                          this->LabelFrame->GetWidgetName(),
+                                          &width, &height);
+      }
+
+    // Don't forget the show/hide collapse icon, it might be bigger than
+    // the LabelFrame contents (really ?)
+
+    if (vtkKWLabeledFrame::AllowShowHide && this->ShowHideFrame &&
+        height < this->IconData->GetHeight())
+      {
+      height = this->IconData->GetHeight();
+      }
+
+    this->Script("%s configure -height %d", 
+                 this->Border->GetWidgetName(), height / 2 + 1);
+    this->Script("%s configure -height %d", 
+                 this->Border2->GetWidgetName(), height / 2);
+
+    if ( vtkKWLabeledFrame::AllowShowHide && this->ShowHideFrame )
+      {
+      this->Script("place %s -relx 1 -x -13 -rely 0 -y %d -anchor center",
+                   this->Icon->GetWidgetName(),
+                   height / 2 + 1 + 1);    
+      this->Script("raise %s", this->Icon->GetWidgetName());
+      }
     }
-  return 0;
 }
 
 void vtkKWLabeledFrame::Create(vtkKWApplication *app)
@@ -181,17 +207,18 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat",wname);
 
-  this->Border->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
+  this->Border->Create(app,"frame","-borderwidth 0 -relief flat");
 
   this->Groove->Create(app,"frame","-borderwidth 2 -relief groove");
 
-  this->Border2->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
+  this->Border2->Create(app,"frame","-borderwidth 0 -relief flat");
 
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
 
-  this->LabelFrame->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->LabelFrame->Create(app,"frame","-borderwidth 0 -padx 2 -relief flat");
 
-  this->Label->Create(app,"label","");
+  this->Label->Create(app,"label"," -bd 0 -pady 0 -padx 2");
+
   if (vtkKWLabeledFrame::BoldLabel)
     {
     vtkKWTkUtilities::ChangeFontToBold(this->Application->GetMainInterp(),
@@ -216,13 +243,12 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
 
   if ( vtkKWLabeledFrame::AllowShowHide && this->ShowHideFrame )
     {
-    this->Script("place %s -relx 1 -x -5 -y 2 -anchor ne",
-                 this->Icon->GetWidgetName());    
     this->Script("bind %s <ButtonRelease-1> { %s PerformShowHideFrame }",
                  this->Icon->GetWidgetName(),
                  this->GetTclName());
-    this->Script("raise %s", this->Icon->GetWidgetName());
     }
+
+  this->AdjustMargin();
 }
 
 void vtkKWLabeledFrame::PerformShowHideFrame()
