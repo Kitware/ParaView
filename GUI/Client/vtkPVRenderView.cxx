@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.363");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.364");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1118,13 +1118,9 @@ void vtkPVRenderView::CreateViewProperties()
   this->UseLightButton->SetText("Use Light Kit");
   this->UseLightButton->SetCommand(this, "UseLightCallback");
   this->UseLightButton->SetBalloonHelpString( 
-    "Allow full control to a LightKit. This is designed to make general purpose" 
+    "Allow control over LightKit, designed to make general purpose" 
     "lighting of scenes simple, flexible, and attractive.  Use a LightKit when you want"
-    "more control over your lighting than you can get with the default"
-    "light, which is a headlight located at the camera. (HeadLights"
-    "are very simple to use, but they don't show the shape of objects very"
-    "well, don't give a good sense of UP and DOWN, and don't evenly"
-    "light the object." );
+    "more control over your lighting than you can get with the default light.");
  
 
   // Set every different lights from the light kit
@@ -1133,16 +1129,13 @@ void vtkPVRenderView::CreateViewProperties()
   this->KeyLightLabel->SetText("Key :");
   this->KeyLightLabel->SetWidth(4);
   this->KeyLightLabel->SetBalloonHelpString(
-     "The main light is the key light.  It is usually"
-     "positioned so that it appears like an overhead light (like the sun,"
-     "or a ceiling light).  It is generally positioned to shine down on the"
+     "The key light is the main light, it is usually"
+     "positioned so that it appears like an overhead light."
+     "It is generally positioned to shine down on the"
      "scene from about a 45 degree angle vertically and at least a little"
-     "offset side to side.  The key light usually at least about twice as"
+     "offset side to side.  The key light is usually at least about twice as"
      "bright as the total of all other lights in the scene to provide good"
      "modeling of object features.");
-//    "Set the intensity of the key light.  The key light is the"
-//    "brightest light in the scene.  The intensities of the other two"
-//    "lights are ratios of the key light's intensity." );
 
   this->FillLightLabel->SetParent(this->LightParameterFrame->GetFrame());
   this->FillLightLabel->Create(this->GetApplication(), 0);
@@ -1189,63 +1182,34 @@ void vtkPVRenderView::CreateViewProperties()
   // This structure has to be kept synchronize with LightKitSubType
   const char *LightTypeDocumentation[] = {
     "Set the warmth of each the lights.  Warmth is a parameter that "
-    "varies from 0 to 1, where 0 is \"cold\" (looks icy or lit by a very "
-    "blue sky), 1 is \"warm\" (the red of a very red sunset, or the "
-    "embers of a campfire), and 0.5 is a neutral white.  The warmth "
+    "varies from 0 to 1, where 0 is \"cold\", "
+    "1 is \"warm\" , and 0.5 is a neutral white.  The warmth "
     "scale is non-linear. Warmth values close to 0.5 are subtly "
     "\"warmer\" or \"cooler,\" much like a warmer tungsten incandescent "
     "bulb, a cooler halogen, or daylight (cooler still). Moving "
     "further away from 0.5, colors become more quickly varying towards "
-    "blues and reds.  With regards to aesthetics, extremes of warmth "
-    "should be used sparingly.", //Warmth
-    "Set/Get the intensity of the key light.  The key light is the "
-    "brightest light in the scene.  The intensities of the other two "
+    "blues and reds.", //Warmth
+    "Set the intensity of the key light. The key light is the "
+    "brightest light in the scene. The intensities of the other two "
     "lights are ratios of the key light's intensity.", //Intensity
     "Set the position of the key, fill, and back lights "
-    "using angular methods.  Elevation corresponds to latitude."
-    "It is recommended that the key light "
-    "always be on the viewer's side of the object and above the "
-    "object, while the fill light generally lights the part of the object "
-    "not lit by the fill light.  The headlight, which is always located "
-    "at the viewer, can then be used to reduce the contrast in the image."
-    "There are a pair of back lights.  They are located at the same "
-    "elevation and at opposing azimuths (ie, one to the left, and one to "
-    "the right).  They are generally set at the equator (elevation = 0),"
-    "and at approximately 120 degrees (lighting from each side and behind).", //Elevation
+    "using angular methods. Elevation corresponds to latitude." , //Elevation
     "Set the position of the key, fill, and back lights "
-    "using angular methods.  Azimuth corresponds to longitude."
-    "It is recommended that the key light "
-    "always be on the viewer's side of the object and above the "
-    "object, while the fill light generally lights the part of the object "
-    "not lit by the fill light.  The headlight, which is always located "
-    "at the viewer, can then be used to reduce the contrast in the image."
-    "There are a pair of back lights.  They are located at the same "
-    "elevation and at opposing azimuths (ie, one to the left, and one to "
-    "the right).  They are generally set at the equator (elevation = 0),"
-    "and at approximately 120 degrees (lighting from each side and behind).", //Azimuth,
+    "using angular methods.  Azimuth corresponds to longitude." , //Azimuth,
     "Set the key-to-fill ratio.  This ratio controls "
     "how bright the fill light is compared to the key light: larger "
     "values correspond to a dimmer fill light.  The purpose of the "
     "fill light is to light parts of the object not lit by the key "
-    "light, while still maintaining constrast.  This type of lighting "
-    "may correspond to indirect illumination from the key light, bounced "
-    "off a wall, floor, or other object.  The fill light should never "
-    "be brighter than the key light:  a good range for the key-to-fill "
-    "ratio is between 2 and 10.", //KFRatio,
+    "light, while still maintaining constrast.", //KFRatio,
     "Set the key-to-back light ratio.  This ratio controls "
     "how bright the back lights are compared to the key light: larger "
     "values correspond to dimmer back lights.  The back lights fill "
-    "in the remaining high-contrast regions behind the object."
-    "Values between 2 and 10 are good.", //KBRatio,
+    "in the remaining high-contrast regions behind the object.", //KBRatio,
     "Set the key-to-headlight ratio.  Similar to the key-to-fill "
     "ratio, this ratio controls how bright the headlight light is "
     "compared to the key light: larger values correspond to a dimmer "
     "headlight light.  The headlight is special kind of fill light,"
-    "lighting only the parts of the object that the camera can see."
-    "As such, a headlight tends to reduce the contrast of a scene.  It "
-    "can be used to fill in \"shadows\" of the object missed by the key "
-    "and fill lights.  The headlight should always be significantly "
-    "dimmer than the key light:  ratios of 2 to 15 are typical." //KHRatio
+    "lighting only the parts of the object that the camera can see." //KHRatio
     };
   char command[100];
   char endcommand[100];
@@ -1258,7 +1222,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->KeyLightScale[cc]->DisplayEntry();
     this->KeyLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->KeyLightScale[cc]->ExpandEntryOn();
-    this->KeyLightScale[cc]->GetEntry()->SetWidth(5);
+    this->KeyLightScale[cc]->SetEntryWidth(4);
     this->KeyLightScale[cc]->DisplayLabel ( 
       vtkLightKit::GetShortStringFromSubType( KeyLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TKeyLight, KeyLightSubType[cc]);
@@ -1278,7 +1242,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->FillLightScale[cc]->DisplayEntry();
     this->FillLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->FillLightScale[cc]->ExpandEntryOn();
-    this->FillLightScale[cc]->GetEntry()->SetWidth(5);
+    this->FillLightScale[cc]->SetEntryWidth(4);
     this->FillLightScale[cc]->DisplayLabel ( 
       vtkLightKit::GetShortStringFromSubType( FillLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TFillLight, FillLightSubType[cc]);
@@ -1298,7 +1262,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->BackLightScale[cc]->DisplayEntry();
     this->BackLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->BackLightScale[cc]->ExpandEntryOn();
-    this->BackLightScale[cc]->GetEntry()->SetWidth(5);
+    this->BackLightScale[cc]->SetEntryWidth(4);
     this->BackLightScale[cc]->DisplayLabel (
       vtkLightKit::GetShortStringFromSubType( BackLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TBackLight, BackLightSubType[cc]);
@@ -1320,7 +1284,7 @@ void vtkPVRenderView::CreateViewProperties()
       this->HeadLightScale[cc]->DisplayEntry();
       this->HeadLightScale[cc]->DisplayEntryAndLabelOnTopOff();
       this->HeadLightScale[cc]->ExpandEntryOn();
-      this->HeadLightScale[cc]->GetEntry()->SetWidth(5);
+      this->HeadLightScale[cc]->SetEntryWidth(4);
       this->HeadLightScale[cc]->DisplayLabel (
         vtkLightKit::GetShortStringFromSubType( HeadLightSubType[cc] ));
       sprintf(command,   "LightCallback %d %d", vtkLightKit::THeadLight, HeadLightSubType[cc]);
