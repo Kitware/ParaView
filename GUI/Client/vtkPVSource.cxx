@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.382");
+vtkCxxRevisionMacro(vtkPVSource, "1.383");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -860,7 +860,12 @@ void vtkPVSource::UnGrabFocus()
     this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
     }
   this->SourceGrabbed = 0;
-  this->GetPVWindow()->UpdateEnableState();
+  if (this->Initialized)
+    {
+    // UpdateEnableState causes a call to CreateParts which updates the source.
+    // We do not want to do this if the user is deleting before they accept.
+    this->GetPVWindow()->UpdateEnableState();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1420,7 +1425,12 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
 
-  this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
+  this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();\
+  
+  // Make sure the buttons and filter menu reflect the new current source.
+  // This did not happen when the source was selected because it was
+  // not initialized.
+  this->GetPVWindow()->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -1601,6 +1611,12 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
 
+  if (this->GetNumberOfPVConsumers() > 0 )
+    {
+    vtkErrorMacro("An output is used.  We cannot delete this source.");
+    return;
+    }
+
   window->GetAnimationInterface()->DeleteSource(this);
 
   if (this->GetDisplayGUI())
@@ -1619,21 +1635,10 @@ void vtkPVSource::DeleteCallback()
     {
     // Remove the local grab
     this->UnGrabFocus();
-
     this->Script("update");   
     this->Initialized = 1;
     }
-  else
-    {
-    this->GetPVWindow()->UpdateEnableState();
-    }
-  
-  if (this->GetNumberOfPVConsumers() > 0 )
-    {
-    vtkErrorMacro("An output is used.  We cannot delete this source.");
-    return;
-    }
-  
+    
   // Save this action in the trace file.
   this->GetPVApplication()->AddTraceEntry("$kw(%s) DeleteCallback",
                                           this->GetTclName());
@@ -1740,6 +1745,10 @@ void vtkPVSource::DeleteCallback()
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
   window->SetCurrentPVSourceCallback(current);
+
+  // Make sure the menus reflect this change.
+  // I could also use UpdateFilterMenu.  
+  window->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
