@@ -14,6 +14,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
+  vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIdTypeVectorProperty.cxx

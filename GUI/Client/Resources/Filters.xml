@@ -232,7 +232,7 @@ The Connectivity filter assigns a region id to connected components of the input
                input_name="Input"/>
     <ExtentEntry label="Extent to crop"
                  trace_name="OutputWholeExtent"
-                 variable="OutputWholeExtent"
+                 property="OutputWholeExtent"
                  input_menu="im"
                  help="Set the min/max extents in each dimension of the output"/>
     <Documentation>
@@ -2226,8 +2226,9 @@ This filter operates on any type of data set, provided it has point-centered vec
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ExtentEntry variable="VOI"
+    <ExtentEntry label="VOI"
                  trace_name="VOI"
+                 property="VOI"
                  input_menu="im"
                  help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
     <ContainerWidget pack_direction="left" trace_name="SampleRate">

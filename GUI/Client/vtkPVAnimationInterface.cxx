@@ -182,7 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.136");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -960,7 +960,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
         else if (smProp && smDomain)
           {
           this->Script(entry->GetTimeEquation());
-          smDomain->SetAnimationValue(smProp, 0,
+          smDomain->SetAnimationValue(smProp, entry->GetAnimationElement(),
                                       vtkKWObject::GetFloatResult(pvApp));
           if (entry->GetPVSource() && entry->GetPVSource()->GetProxy())
             {
@@ -1004,6 +1004,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
           vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
         if (entry->GetPVSource())
           {
+          entry->GetPVSource()->SetAcceptButtonColorToModified();
           entry->GetPVSource()->AcceptCallback();
           vtkKWMenu *menu = entry->GetPVSource()->GetPVWindow()->GetMenuView();
           menu->CheckRadioButton(menu, "Radio", VTK_PV_ANIMATION_MENU_INDEX);

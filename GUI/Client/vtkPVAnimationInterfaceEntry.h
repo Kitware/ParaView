@@ -89,6 +89,9 @@ public:
   vtkGetMacro(TimeStart, float);
   vtkGetMacro(TimeEnd, float);
 
+  void SetAnimationElement(int elem);
+  vtkGetMacro(AnimationElement, int);
+  
   void SetTimeEquationStyle( int s );
   void SetTimeEquationPhase( float p );
   void SetTimeEquationFrequency( float f );
@@ -249,6 +252,8 @@ protected:
   float TimeStart;
   float TimeEnd;
 
+  int AnimationElement;
+  
   int TimeEquationStyle;
   float TimeEquationPhase;
   float TimeEquationFrequency;

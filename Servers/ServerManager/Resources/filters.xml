@@ -228,7 +228,11 @@
         name="OutputWholeExtent" 
         command="SetOutputWholeExtent" 
         number_of_elements="6"> 
-       <IntRangeDomain name="range"/>
+       <ExtentDomain name="extent">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ExtentDomain>
      </IntVectorProperty>
    <!-- End ImageClip -->
    </SourceProxy>
@@ -2012,7 +2016,13 @@
      <IntVectorProperty 
         name="VOI" 
         command="SetVOI"
-        number_of_elements="6"/>
+        number_of_elements="6">
+       <ExtentDomain name="extent">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ExtentDomain>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateI" 
