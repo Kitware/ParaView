@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.7");
+vtkCxxRevisionMacro(vtkPVOptions, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -330,6 +330,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
   os << indent << "GroupFileName: " << (this->GroupFileName?this->GroupFileName:"(none)") << endl;
 
+  // Everything after this line will be showned in Help/About dialog
   os << indent << "Runtime information:" << endl; //important please leave it here, for more info: vtkPVApplication::AddAboutText
 
   if (this->ClientMode)
@@ -380,44 +381,29 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
       }
     }
 
-  if (this->UseSoftwareRendering)
-    {
-    os << indent << "Using Software Rendering\n";
-    }
-  if (this->UseSatelliteSoftwareRendering)
-    {
-    os << indent << "Using SatelliteSoftwareRendering\n";
-    }
-  if(this->UseStereoRendering)
-    {
-    os << indent << "Using Stereo Rendering\n";
-    }
-  if(this->UseOffscreenRendering)
-    {
-    os << indent << "Using Offscreen Rendering\n"; 
-    }
+  os << indent << "Software Rendering: " << (this->UseSoftwareRendering?"Enabled":"Disabled") << endl;
+
+  os << indent << "Satellite Software Rendering: " << (this->UseSatelliteSoftwareRendering?"Enabled":"Disabled") << endl;
+
+  os << indent << "Stereo Rendering: " << (this->UseStereoRendering?"Enabled":"Disabled") << endl;
+
+  os << indent << "Offscreen Rendering: " << (this->UseOffscreenRendering?"Enabled":"Disabled") << endl;
+
+  os << indent << "Tiled Display: " << (this->UseTiledDisplay?"Enabled":"Disabled") << endl;
   if (this->UseTiledDisplay)
     { 
-    os << indent << "Using Tiled Display" << endl;
     os << indent << "With Tile Dimensions: " << this->TileDimensions[0]
        << ", " << this->TileDimensions[1] << endl;
     }
-  if(this->UseRenderingGroup)
-    {
-    os << indent << "Using RenderingGroup: Enabled\n";
-    }
-  if( this->RenderModuleName )
-    {
-    os << indent << "Render Module: " << this->RenderModuleName << endl;
-    }
-  if(this->MachinesFileName)
-    {
-    os << indent << "Network configuration: " << this->MachinesFileName << endl;
-    }
-  if(this->CaveConfigurationFileName)
-    {
-    os << indent << "Specify cave configuration: " << this->CaveConfigurationFileName << endl;
-    }
-  os << indent << "Composite is: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
+
+  os << indent << "Using RenderingGroup: " << (this->UseRenderingGroup?"Enabled":"Disabled") << endl;
+
+  os << indent << "Render Module Used: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
+
+  os << indent << "Network Configuration: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
+
+  os << indent << "Cave Configuration: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
+
+  os << indent << "Compositing: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
 
 }
