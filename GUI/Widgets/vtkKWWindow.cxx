@@ -42,7 +42,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.217");
+vtkCxxRevisionMacro(vtkKWWindow, "1.218");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -383,8 +383,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->ProgressGauge->SetParent(this->ProgressFrame);
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(
-      app->GetMainInterp(), this->StatusImageName) - 4);
+    vtkKWTkUtilities::GetPhotoHeight(app, this->StatusImageName) - 4);
   this->ProgressGauge->Create(app, "");
 
   this->Script("pack %s -side right -padx 2 -pady 2",
@@ -544,11 +543,11 @@ void vtkKWWindow::SaveWindowGeometry()
 {
   if (this->IsCreated())
     {
-    this->Script("wm geometry %s", this->GetWidgetName());
+    const char *res = this->Script("wm geometry %s", this->GetWidgetName());
 
     this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
-      this->GetApplication()->GetMainInterp()->result);
+      res);
 
     this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 

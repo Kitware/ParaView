@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.34");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.35");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -728,9 +728,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
   // Extract the -in parameter from the pack info
 
   ostrstream in_str;
-  if (!vtkKWTkUtilities::GetPackSlaveIn(
-        widget->GetApplication()->GetMainInterp(), 
-        widget->GetWidgetName(), in_str))
+  if (!vtkKWTkUtilities::GetMasterInPack(widget, in_str))
     {
     return 0;
     }
@@ -754,10 +752,9 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
   ostrstream prev_slave_str;
   ostrstream next_slave_str;
 
-  if (vtkKWTkUtilities::GetPreviousAndNextSlave(
-        widget->GetApplication()->GetMainInterp(),
-        this->Notebook->GetFrame(page_id)->GetWidgetName(),
-        widget->GetWidgetName(),
+  if (vtkKWTkUtilities::GetPreviousAndNextSlaveInPack(
+        this->Notebook->GetFrame(page_id),
+        widget,
         prev_slave_str,
         next_slave_str))
     {
@@ -824,9 +821,7 @@ vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
       if (label && !strcmp(label, widget_label))
         {
         ostrstream in_str;
-        if (vtkKWTkUtilities::GetPackSlaveIn(
-              child->GetApplication()->GetMainInterp(), 
-              child->GetWidgetName(), in_str))
+        if (vtkKWTkUtilities::GetMasterInPack(child, in_str))
           {
           in_str << ends;
           int cmp = strcmp(in_str.str(), page->GetWidgetName());
@@ -1350,10 +1345,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     if (sibbling != widget &&
         this->CanWidgetBeDragAndDropped(sibbling, &anchor) &&
         sibbling->IsMapped() && 
-        vtkKWTkUtilities::ContainsCoordinates(
-          sibbling->GetApplication()->GetMainInterp(),
-          sibbling->GetWidgetName(),
-          x, y))
+        vtkKWTkUtilities::ContainsCoordinates(sibbling, x, y))
       {
       vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
       to_loc.PageId = from_loc.PageId;
