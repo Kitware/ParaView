@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.284");
+vtkCxxRevisionMacro(vtkPVSource, "1.285");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2363,7 +2363,7 @@ int vtkPVSource::InitializeData()
         {
         sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
         pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
-        pvApp->BroadcastScript("$%s SetExtentTranslator %s",
+        pvApp->BroadcastScript("${%s} SetExtentTranslator %s",
                                dataName, translatorTclName);
         }
 
@@ -2374,7 +2374,7 @@ int vtkPVSource::InitializeData()
         // Translator has to be set on source because it is propagated.
         // Original source is set after transmit so reference
         // loop can be broken when pvPart is deleted.
-        pvApp->BroadcastScript("%s SetOriginalSource $%s",
+        pvApp->BroadcastScript("%s SetOriginalSource ${%s}",
                                translatorTclName, dataName);
         pvApp->BroadcastScript("%s Delete", translatorTclName);
         }
@@ -2604,7 +2604,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.284 $");
+  this->ExtractRevision(os,"$Revision: 1.285 $");
 }
 
 //----------------------------------------------------------------------------
