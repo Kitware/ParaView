@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8.2.2");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8.2.3");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -379,7 +379,7 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
     mit != this->Internals->GridList.end(); 
     ++mit )
     {
-    *file << "$kw(" << this->GetTclName() << ") EnableGrid " << mit->first.c_str() << endl;
+    *file << "$kw(" << this->GetTclName() << ") EnableGrid {" << mit->first.c_str() << "}" << endl;
     }
   *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "ReadFileInformation $kw(" << this->GetTclName() << ") \""
