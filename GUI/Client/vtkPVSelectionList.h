@@ -52,6 +52,13 @@ public:
   const char *GetLabel();
 
   // Description:
+  // Show/Hide the label.
+  void SetLabelVisibility(int visible);
+  vtkGetMacro(LabelVisibility, int);
+  void ShowLabel() { this->SetLabelVisibility(1); }
+  void HideLabel() { this->SetLabelVisibility(0); }
+
+  // Description:
   // This is how the user can query the state of the selection.
   // Warning:  Setting the current value will not change vtk ivar.
   vtkGetMacro(CurrentValue, int);
@@ -125,6 +132,7 @@ protected:
   vtkKWOptionMenu *Menu;
   char *Command;
 
+  int LabelVisibility;
   int OptionWidth;
 
   int CurrentValue;

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.51");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.52");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -46,6 +46,7 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->Names = vtkStringList::New();
 
   this->OptionWidth = 0;
+  this->LabelVisibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -119,7 +120,10 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 
   this->Label->SetParent(this);
   this->Label->Create(app, "-width 18 -justify right");
-  this->Script("pack %s -side left", this->Label->GetWidgetName());
+  if (this->LabelVisibility)
+    {
+    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    }
 
   this->Menu->SetParent(this);
   if (this->OptionWidth > 0)
@@ -170,6 +174,28 @@ void vtkPVSelectionList::SetLabel(const char* label)
     }
 }
   
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::SetLabelVisibility(int visible)
+{
+  if (!this->IsCreated())
+    {
+    this->LabelVisibility = visible;
+    return;
+    }
+  
+  if (visible && !this->Label->IsPacked())
+    {
+    this->Script("pack forget %s", this->Menu->GetWidgetName()); 
+    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->Script("pack %s -side left", this->Menu->GetWidgetName());
+    }
+  else if (!visible && this->Label->IsPacked())
+    {
+    this->Script("pack forget %s", this->Label->GetWidgetName());
+    }
+  this->LabelVisibility = visible;
+}
+
 //----------------------------------------------------------------------------
 const char *vtkPVSelectionList::GetLabel()
 {
@@ -408,4 +434,5 @@ void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CurrentName: " << (this->CurrentName?this->CurrentName:"none") << endl;
   os << indent << "CurrentValue: " << this->CurrentValue << endl;
   os << indent << "OptionWidth: " << this->OptionWidth << endl;
+  os << indent << "LabelVisibility: " << this->LabelVisibility << endl;
 }
