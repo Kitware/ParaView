@@ -44,6 +44,7 @@ SET(PROJECT_TESTS
   Extrusion
   ExtractGrid
   ExtractPart
+  Flow
   Glyph
   Group
   Transform
