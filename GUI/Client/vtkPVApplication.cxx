@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.337");
+vtkCxxRevisionMacro(vtkPVApplication, "1.338");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1036,7 +1036,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->OutputWindow->SetWindowCollection( this->Windows );
 
   this->Script(
-    "proc smGet {group source property {index 0}} {\n"
+    "proc smGet {group source property {index 0} {form s}} {\n"
     "    vtkSMObject smGetTemp\n"
     "    set proxyManager [smGetTemp GetProxyManager]\n"
     "    smGetTemp Delete\n"
@@ -1059,7 +1059,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     "    }\n"
     "    set retVal [smGetAdaptor GetRangeValue $index]\n"
     "    smGetAdaptor Delete\n"
-    "    return $retVal\n"
+    "    return [format %$form $retVal]\n"
     "}\n");
 
   // Check if there is an existing ParaViewTrace file.
