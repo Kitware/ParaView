@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.7");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -474,9 +474,7 @@ void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
 
 float* vtkKWRenderWidget::GetCornerTextColor()
 {
-  float rgb[3];
-  this->CornerAnnotation->GetTextProperty()->GetColor(rgb);
-  return rgb;
+  return this->CornerAnnotation->GetTextProperty()->GetColor();
 }
 
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
