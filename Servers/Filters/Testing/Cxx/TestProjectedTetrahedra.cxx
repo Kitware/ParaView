@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
   vtkStdString filename;
   filename = data_root;
   filename += "/Data/ironProt.vtk";
+  cout << "Loading " << filename.c_str() << endl;
   vtkStructuredPointsReader *reader = vtkStructuredPointsReader::New();
   reader->SetFileName(filename.c_str());
 
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
   // displayed as a polygonal mesh.
   filename = data_root;
   filename += "/Data/neghip.slc";
+  cout << "Loading " << filename.c_str() << endl;
   vtkSLCReader *reader2 = vtkSLCReader::New();
   reader2->SetFileName(filename.c_str());
 
