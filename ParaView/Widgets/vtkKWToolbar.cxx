@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.16");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.17");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -138,7 +138,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   // Create the main frame for this widget
 
   this->Script("frame %s ", this->GetWidgetName());
-  this->Script("pack %s -side left -anchor nw -expand y -fill both -ipadx 0 -padx 2",
+  this->Script("pack %s -side left -anchor nw -expand y -fill both",
                this->GetWidgetName());
   
   this->Script("bind %s <Configure> {%s ScheduleResize}",
@@ -238,7 +238,9 @@ void vtkKWToolbar::Pack()
 {
   if (this->FlatAspect)
     {
-    this->Script("%s config -relief flat -bd 0 -padx 0 -pady 0", 
+    this->Script("%s config -relief flat -bd 0", 
+                 this->GetWidgetName());
+    this->Script("pack %s -padx 0 -pady 0", 
                  this->GetWidgetName());
     this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 2",
                  this->Frame->GetWidgetName());
@@ -248,9 +250,12 @@ void vtkKWToolbar::Pack()
     }
   else
     {
-    this->Script("%s config -relief raised -bd 1 -padx 3 -pady 2", 
+    this->Script("%s config -relief raised -bd 1", 
                  this->GetWidgetName());
-    this->Script("pack forget %s", this->Separator->GetWidgetName());
+    this->Script("pack %s -padx 3 -pady 2", 
+                 this->GetWidgetName());
+    this->Script("pack forget %s", 
+                 this->Separator->GetWidgetName());
     this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 0",
                  this->Frame->GetWidgetName());
     }
