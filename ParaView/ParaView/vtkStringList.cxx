@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.12");
+vtkCxxRevisionMacro(vtkStringList, "1.13");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -61,6 +61,10 @@ void vtkStringList::RemoveAllItems()
 //----------------------------------------------------------------------------
 int vtkStringList::GetIndex(const char* str)
 {
+  if ( !str )
+    {
+    return -1;
+    }
   int idx;
   for ( idx = 0; idx < this->NumberOfStrings; ++idx )
     {
@@ -86,6 +90,11 @@ const char *vtkStringList::GetString(int idx)
 //----------------------------------------------------------------------------
 void vtkStringList::AddString(const char* str)
 {
+  if ( !str )
+    {
+    return;
+    }
+
   // Check to see if we need to extent to array of commands.
   if (this->StringArrayLength <= this->NumberOfStrings)
     {
