@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkXMLCameraWriter);
-vtkCxxRevisionMacro(vtkXMLCameraWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLCameraWriter, "1.3");
 
 vtkCxxSetObjectMacro(vtkXMLCameraWriter, Camera, vtkCamera);
 
@@ -66,12 +66,13 @@ int vtkXMLCameraWriter::Write(ostream &os, vtkIndent vtkNotUsed(indent))
 {
   if (!this->Camera)
     {
+    vtkWarningMacro(<< "The Camera is not set!");
     return 0;
     }
 
   double *dptr;
 
-  os << "<Camera Version=\"$Revision: 1.2 $\"";
+  os << "<Camera Version=\"$Revision: 1.3 $\"";
 
   os << " ParallelProjection=\"" << this->Camera->GetParallelProjection()<< "\"";
 

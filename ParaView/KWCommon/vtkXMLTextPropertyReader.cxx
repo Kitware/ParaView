@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 
 vtkStandardNewMacro(vtkXMLTextPropertyReader);
-vtkCxxRevisionMacro(vtkXMLTextPropertyReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLTextPropertyReader, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLTextPropertyReader, TextProperty, vtkTextProperty);
 
@@ -64,7 +64,13 @@ vtkXMLTextPropertyReader::~vtkXMLTextPropertyReader()
 //----------------------------------------------------------------------------
 void vtkXMLTextPropertyReader::StartElement(const char *name, const char **args)
 {
-  if (!this->TextProperty || strcmp(name, "TextProperty"))
+  if (!this->TextProperty)
+    {
+    vtkWarningMacro(<< "The TextProperty is not set!");
+    return;
+    }
+
+  if (strcmp(name, "TextProperty"))
     {
     return;
     }

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkXMLCameraReader);
-vtkCxxRevisionMacro(vtkXMLCameraReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLCameraReader, "1.3");
 
 vtkCxxSetObjectMacro(vtkXMLCameraReader, Camera, vtkCamera);
 
@@ -64,7 +64,13 @@ vtkXMLCameraReader::~vtkXMLCameraReader()
 //----------------------------------------------------------------------------
 void vtkXMLCameraReader::StartElement(const char *name, const char **args)
 {
-  if (!this->Camera || strcmp(name, "Camera"))
+  if (!this->Camera)
+    {
+    vtkWarningMacro(<< "The Camera is not set!");
+    return;
+    }
+
+  if (strcmp(name, "Camera"))
     {
     return;
     }

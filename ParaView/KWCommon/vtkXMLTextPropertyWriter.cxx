@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 
 vtkStandardNewMacro(vtkXMLTextPropertyWriter);
-vtkCxxRevisionMacro(vtkXMLTextPropertyWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLTextPropertyWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkXMLTextPropertyWriter, TextProperty, vtkTextProperty);
 
@@ -66,12 +66,13 @@ int vtkXMLTextPropertyWriter::Write(ostream &os, vtkIndent vtkNotUsed(indent))
 {
   if (!this->TextProperty)
     {
+    vtkWarningMacro(<< "The TextProperty is not set!");
     return 0;
     }
 
   float *fptr;
 
-  os << "<TextProperty Version=\"$Revision: 1.1 $\"";
+  os << "<TextProperty Version=\"$Revision: 1.2 $\"";
 
   fptr = this->TextProperty->GetColor();
   if (fptr)
