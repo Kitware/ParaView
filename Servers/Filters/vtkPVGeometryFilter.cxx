@@ -44,8 +44,9 @@
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkGenericDataSet.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.49");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.50");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -157,7 +158,7 @@ int vtkPVGeometryFilter::RequestInformation(
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteBlock(
-  vtkDataSet* input, vtkPolyData* output, int doCommunicate)
+  vtkDataObject* input, vtkPolyData* output, int doCommunicate)
 {
   if (input->IsA("vtkImageData"))
     {
@@ -206,6 +207,12 @@ void vtkPVGeometryFilter::ExecuteBlock(
     this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
+  if (input->IsA("vtkGenericDataSet"))
+    {
+    this->GenericDataSetExecute(static_cast<vtkGenericDataSet*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(output, doCommunicate);
+    return;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -227,10 +234,15 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     info->Get(vtkDataObject::DATA_OBJECT()));
   if (!output) {return 0;}
 
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
+  vtkDataObject *input = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (!input) {return 0;}
-
+  if (!input)
+    {
+    input = vtkGenericDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (!input) {return 0;}
+    }
+  
   this->ExecuteBlock(input, output, 1);
 
   return 1;
@@ -393,6 +405,78 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::DataSetExecute(
   vtkDataSet* input, vtkPolyData* output, int doCommunicate)
+{
+  double bds[6];
+  int procid = 0;
+  int numProcs = 1;
+
+  if (!doCommunicate && input->GetNumberOfPoints() == 0)
+    {
+    return;
+    }
+
+  if (this->Controller )
+    {
+    procid = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }
+
+  input->GetBounds(bds);
+
+  if ( procid && doCommunicate )
+    {
+    // Satellite node
+    this->Controller->Send(bds, 6, 0, 792390);
+    }
+  else
+    {
+    int idx;
+    double tmp[6];
+    
+    if (doCommunicate)
+      {
+      for (idx = 1; idx < numProcs; ++idx)
+        {
+        this->Controller->Receive(tmp, 6, idx, 792390);
+        if (tmp[0] < bds[0])
+          {
+          bds[0] = tmp[0];
+          }
+        if (tmp[1] > bds[1])
+          {
+          bds[1] = tmp[1];
+          }
+        if (tmp[2] < bds[2])
+          {
+          bds[2] = tmp[2];
+          }
+        if (tmp[3] > bds[3])
+          {
+          bds[3] = tmp[3];
+          }
+        if (tmp[4] < bds[4])
+          {
+          bds[4] = tmp[4];
+          }
+        if (tmp[5] > bds[5])
+          {
+          bds[5] = tmp[5];
+          }
+        }
+      }
+
+    // only output in process 0.
+    this->OutlineSource->SetBounds(bds);
+    this->OutlineSource->Update();
+    
+    output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
+    output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::GenericDataSetExecute(
+  vtkGenericDataSet* input, vtkPolyData* output, int doCommunicate)
 {
   double bds[6];
   int procid = 0;

@@ -25,6 +25,7 @@
 class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
+class vtkGenericDataSet;
 class vtkImageData;
 class vtkInformationVector;
 class vtkCTHData;
@@ -91,9 +92,12 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  void ExecuteBlock(vtkDataSet* input, vtkPolyData* output, int doCommunicate);
+  void ExecuteBlock(vtkDataObject* input, vtkPolyData* output, int doCommunicate);
 
-  void DataSetExecute(vtkDataSet* input, vtkPolyData* output, int doCommunicate);
+  void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
+                      int doCommunicate);
+  void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
+                             int doCommunicate);
   void ImageDataExecute(vtkImageData* input, vtkPolyData* output);
   void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
   void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
@@ -103,7 +107,8 @@ protected:
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  void CTHDataExecute(vtkCTHData *input, vtkPolyData* output, int doCommunicate);
+  void CTHDataExecute(vtkCTHData *input, vtkPolyData* output,
+                      int doCommunicate);
 
   int OutlineFlag;
   int UseOutline;
