@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.1");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -980,18 +980,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 //----------------------------------------------------------------------------
 void vtkPVSource::ResetCallback()
 {
-  if ( ! this->Initialized)
-    { // Accept has not been called yet.  Delete the object.
-    // What about the local grab?
-    this->DeleteCallback();
-    return;
-    }
-
   this->UpdateParameterWidgets();
-  this->GetPVRenderView()->EventuallyRender();
-  this->Script("update");
+  if (this->Initialized)
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    this->Script("update");
 
-  this->SetAcceptButtonColorToWhite();
+    this->SetAcceptButtonColorToWhite();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -2065,7 +2061,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.1 $");
 }
 
 //----------------------------------------------------------------------------
