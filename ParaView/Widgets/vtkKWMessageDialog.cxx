@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.58");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.59");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -337,7 +337,7 @@ int vtkKWMessageDialog::Invoke()
       this->OtherButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
       }
     }
-  if (this->Options & vtkKWMessageDialog::YesDefault)
+  if (this->Options & vtkKWMessageDialog::InvokeAtPointer)
     {
     this->InvokeAtPointerOn();
     }
