@@ -438,14 +438,14 @@
           module_type="Reader"
           extensions=".g .e .ex2 .exo .gen .0 .00 .000 .0000"
           file_description="Exodus">
+    <Source class="vtkPExodusReader"/>
+
     <StringEntry property="FilePrefix"
                  label="File prefix"
-                 init_source="FilePrefix"
                  trace_name="file_prefix"
                  help="Set the file root. Used with file pattern to format a file name." />
     <StringEntry property="FilePattern"
                  label="File Pattern"
-                 init_source="FilePattern"
                  trace_name="file_pattern"
                  help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
 
@@ -456,9 +456,9 @@
             max_label="Last Index"
             min_help="Choose the index of the first file to be read"
             max_help="Choose the index of the last file to be read"/>
+
     <StringEntry property="XMLFileName"
                  label="XML File"
-                 init_source="XMLFileName"
                  trace_name="xml_file"
                  help="An XML file containing part and material descriptions and mapping to element blocks." />
 
@@ -467,7 +467,7 @@
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."
            range_source="TimeStepRange" />
-    <Source class="vtkPExodusReader"/>
+
     <ArraySelection trace_name="cell_array_sel"
                     property="CellArrayStatus"
                     attribute_name="Cell"
@@ -499,23 +499,27 @@
 						label_text="Hierarchy"/>
       </Item>
     </SelectWidget>
-	<LabeledToggle label="Apply Displacements"
+
+    <LabeledToggle label="Apply Displacements"
                    property="ApplyDisplacements"
                    trace_name="apply_displacements"
                    help="Select whether the reader automatically applies displacements"/>
-	<VectorEntry label="Displacement Scale"
+    <VectorEntry label="Displacement Scale"
                  trace_name="DisplacementMagnitude"
                  property="DisplacementMagnitude"
                  type="float"
                  help="The magnitude of the applied displacement."/>
+
     <LabeledToggle label="Block Ids"
                    property="GenerateBlockIdCellArray"
                    trace_name="block_ids"
                    help="Select whether the reader generates block ids"/>
+
     <LabeledToggle label="Global Node Ids"
                    property="GenerateGlobalNodeIdArray"
                    trace_name="global_node_ids"
                    help="Select whether the reader generates global node ids"/>
+
     <LabeledToggle label="Global Element Ids"
                    property="GenerateGlobalElementIdArray"
                    trace_name="global_element_ids"

@@ -147,7 +147,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
            trace_name="Tolerance"
            property="Tolerance"
            help="The tolerance in terms of fraction of bounding box length."
-           resolution="0.01" range="0 1"
+           resolution="0.01"
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
     <ThumbWheel label="Absolute tolerance"
@@ -285,7 +285,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
            trace_name="TargetReduction"
            property="TargetReduction"
            help="Value between 0 and 1. Desired reduction of the total number of triangles."
-           resolution="0.01" range="0 1"
+           resolution="0.01"
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
     <LabeledToggle label="Preserve topology"
@@ -296,7 +296,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
            trace_name="FeatureAngle"
            property="FeatureAngle"
            help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges."
-           resolution="0.01" range="0 180"
+           resolution="0.01"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -601,7 +601,6 @@ The Calculator filter is available on the Toolbar.
            property="FeatureAngle"
            help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).."
            resolution="0.01"
-           range="0 180"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -752,7 +751,7 @@ The Piece invariant check box determines whether the output will be the same reg
            trace_name="NumberOfSubdivisions"
            property="NumberOfSubdivisions"
            help="Each subdivision changes single triangles into four triangles."
-           resolution="1" range="1 4"
+           resolution="1"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -849,7 +848,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
            trace_name="FeatureAngle"
            property="FeatureAngle"
            help="Points are duplicated along features over this angle (0->180)"
-           resolution="0.01" range="0 180"
+           resolution="0.01"
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
     <LabeledToggle label="Splitting"
@@ -948,7 +947,6 @@ The Outline filter generates an axis-aligned bounding box for the input data set
            property="CornerFactor"
            help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)"
            resolution="0.001"
-           range="0.001 0.5"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1192,7 +1190,6 @@ The Reflection filter reflects the input data set across the specified plane. If
            property="Angle"
            help="The offset angle of the ribbon from the line normal (0->360)."
            resolution="0.01"
-           range="0 360"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1280,7 +1277,6 @@ The Capping check box controls whether to close the open ends of the swept surfa
            property="ShrinkFactor"
            help="Set the amount to shrink by"
            resolution="0.01"
-           range="0 1"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1334,7 +1330,6 @@ The Shrink filter causes the individual cells of a data set to break apart from 
            property="Convergence"
            help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)."
            resolution="0.01"
-           range="0 1"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1361,7 +1356,6 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
            property="MaximumLength"
            help="Stop stripping after this many triangles."
            resolution="1"
-           range="4 100000"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1379,7 +1373,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
            property="NumberOfSubdivisions"
            help="Set the number of subdivisions"
            resolution="1"
-           range="1 4"
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
@@ -1407,7 +1400,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
            property="OutputDimension"
            help="Maximum dimensionality of output tessellation. Cells of higher dimension will be reduced to their boundaries."
            display_entry="0" entry_and_label_on_top="1" display_value="1"
-           range="1 3"/>
+           />
     <VectorEntry label="Max Chord Error"
                  trace_name="ChordError"
                  property="ChordError" type="float"

@@ -77,7 +77,6 @@ The output of the 3D Text source is polygonal data.
                property="TipResolution"
                help="Set the number of faces on the tip."
                resolution="1"
-               range="1 128"
                display_entry="1"
                entry_and_label_on_top="0"
                display_value="0"/>
@@ -85,7 +84,6 @@ The output of the 3D Text source is polygonal data.
                property="TipRadius"
                help="Set the radius of the widest part of the tip."
                resolution="0.01"
-               range="0 10"
                display_entry="1"
                entry_and_label_on_top="0"
                display_value="0"/>
@@ -93,7 +91,6 @@ The output of the 3D Text source is polygonal data.
                property="TipLength"
                help="Set the length of the tip (the whole arrow is length 1)"
                resolution="0.01"
-               range="0 1"
                display_entry="1"
                entry_and_label_on_top="0"
                display_value="0"/>
@@ -101,7 +98,6 @@ The output of the 3D Text source is polygonal data.
                property="ShaftResolution"
                help="Set the number of faces on shaft"
                resolution="1"
-               range="0 128"
                display_entry="1"
                entry_and_label_on_top="0"
                display_value="0"/>
@@ -109,7 +105,6 @@ The output of the 3D Text source is polygonal data.
                property="ShaftRadius"
                help="Set the radius of the shaft"
                resolution="0.01"
-               range="0 5"
                display_entry="1"
                entry_and_label_on_top="0"
                display_value="0"/>
@@ -178,7 +173,7 @@ The output of the Box source is polygonal data containing both normals and textu
         short_help="Create a 3D cone of a given radius and height">
   <Source class="vtkConeSource"/>
   <Scale label="Resolution" trace_name="Resolution" property="Resolution"
-               resolution="1" range="0 512"
+               resolution="1"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the number of faces on this cone" />
   <ThumbWheel label="Radius" trace_name="Radius" property="Radius"
@@ -205,7 +200,7 @@ The output of the Cone source is polygonal data.
         short_help="Create a 3D cylinder of a given radius and height">
   <Source class="vtkCylinderSource"/>
   <Scale label="Resolution" trace_name="Resolution" property="Resolution"
-               resolution="1" range="2 512"
+               resolution="1"
                display_entry="1" entry_and_label_on_top="0" display_value="0"
                help="The number of facets used to define the cylinder." />
   <ThumbWheel label="Height" trace_name="Height" property="Height"
@@ -272,7 +267,7 @@ The output of the Line source is polygonal data.
                help="Set the inaginary and real values for the world size of the volume for C (constant) and X (initial value)" />
   <Scale label="Max. iterations" trace_name="MaxIterations" 
                property="MaximumNumberOfIterations"
-               resolution="1" range="1 5000"
+               resolution="1"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
   <Documentation>
@@ -367,29 +362,29 @@ The output of the Plane source is polygonal data.
               help="Set the radius of the sphere" />
   <Scale label="Theta Resolution" trace_name="Theta Resolution" 
                property="ThetaResolution"
-               resolution="1" range="3 1024" 
+               resolution="1"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)" />
   <Scale label="Start Theta" trace_name="Start Theta" 
                property="StartTheta"
-               resolution="0.01" range="0 360" 
+               resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the starting angle in the longitude direction" />
   <Scale label="End Theta" trace_name="End Theta" property="EndTheta" 
-               resolution="0.01" range="0 360"
+               resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the ending angle in the longitude direction" />
   <Scale label="Phi Resolution" trace_name="Phi Resolution" 
                property="PhiResolution" resolution="1"
-               range="3 1024" display_entry="1" display_value="0"
+               display_entry="1" display_value="0"
                entry_and_label_on_top="0"
                help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" />
   <Scale label="Start Phi" trace_name="Start Phi" property="StartPhi" 
-               resolution="0.01" range="0 180" 
+               resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the starting angle in the latitude direction" />
   <Scale label="End Phi" trace_name="End Phi" property="EndPhi" 
-               resolution="0.01" range="0 180" 
+               resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the ending angle in the latitude direction" />
   <Documentation>
@@ -419,24 +414,24 @@ The output of the Sphere source is polygonal data with point normals defined.
                help="Set the scale of the superquadric" />
   <Scale label="Theta resolution" trace_name="ThetaResolution" 
                property="ThetaResolution" resolution="1"
-               range="8 1024" display_entry="1" display_value="0"
+               display_entry="1" display_value="0"
                entry_and_label_on_top="0"
                help="The number of points in the longitude direction."/>
   <Scale label="Phi resolution" property="PhiResolution" 
                trace_name="PhiResolution" resolution="1"
-               range="4 1024" display_entry="1" display_value="0"
+               display_entry="1" display_value="0"
                entry_and_label_on_top="0"
                help="The number of points in the latitude direction." />
   <Scale label="Thickness" trace_name="Thickness" property="Thickness"
-               resolution="0.001" range="0.0001 1"
+               resolution="0.001"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Changing thickness maintains the outside diameter of the toroid."/>
   <Scale label="Theta roundness" trace_name="ThetaRoundness" 
-               property="ThetaRoundness" resolution="0.01" range="0.01 10"
+               property="ThetaRoundness" resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order." />
   <Scale label="Phi roundness" trace_name="PhiRoundness" 
-               property="PhiRoundness" resolution="0.01" range="0.01 10"
+               property="PhiRoundness" resolution="0.01"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
   <VectorEntry label="Size" property="Size" trace_name="Size"
