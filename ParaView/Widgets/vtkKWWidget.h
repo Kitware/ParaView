@@ -404,14 +404,14 @@ protected:
   virtual void DeleteDragAndDropTargets();
 
   // Encoding methods
-  static const char* GetCharacterEncodingAsString(int);
+  static const char* GetTclCharacterEncodingAsString(int);
 
   // Description:
-  // Convert a Tk string (stored internally as UTF-8/Unicode) to another
+  // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
   // internal format (given the widget's application CharacterEncoding), 
   // and vice-versa.
-  const char* ConvertTkStringToInternalString(const char *str);
-  const char* ConvertInternalStringToTkString(const char *str);
+  const char* ConvertTclStringToInternalString(const char *str);
+  const char* ConvertInternalStringToTclString(const char *str);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

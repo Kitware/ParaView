@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.81");
+vtkCxxRevisionMacro(vtkKWWidget, "1.82");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.81 $");
+  this->ExtractRevision(os,"$Revision: 1.82 $");
 }
 
 //----------------------------------------------------------------------------
@@ -592,7 +592,7 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::GetCharacterEncodingAsString(int encoding)
+const char* vtkKWWidget::GetTclCharacterEncodingAsString(int encoding)
 {
   switch (encoding)
     {
@@ -659,7 +659,7 @@ const char* vtkKWWidget::GetCharacterEncodingAsString(int encoding)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertInternalStringToTkString(const char *str)
+const char* vtkKWWidget::ConvertInternalStringToTclString(const char *str)
 {
   if (!str || !this->IsCreated())
     {
@@ -675,22 +675,29 @@ const char* vtkKWWidget::ConvertInternalStringToTkString(const char *str)
     return str;
     }
 
-  // Otherwise try to encode/decode
+  // Get the Tcl encoding name
 
-  const char *tk_encoding = 
-    vtkKWWidget::GetCharacterEncodingAsString(app_encoding);
+  const char *tcl_encoding_name = 
+    vtkKWWidget::GetTclCharacterEncodingAsString(app_encoding);
 
-  return this->Script(
-    "if {[catch {encoding convertfrom %s {%s}} __foo__]} {"
-    "  encoding convertfrom identity {%s} "
-    "} { "
-    "  set __foo__ "
-    "}", 
-    tk_encoding, str, str);
+  // Check if we have that encoding
+
+  Tcl_Encoding tcl_encoding = 
+    Tcl_GetEncoding(this->Application->GetMainInterp(), tcl_encoding_name);
+  if (tcl_encoding == NULL)
+    {
+    return str;
+    }
+
+  Tcl_FreeEncoding(tcl_encoding);
+
+  // Convert from that encoding
+
+  return this->Script("encoding convertfrom %s {%s}", tcl_encoding_name, str);
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertTkStringToInternalString(const char *str)
+const char* vtkKWWidget::ConvertTclStringToInternalString(const char *str)
 {
   if (!str || !this->IsCreated())
     {
@@ -719,7 +726,7 @@ void vtkKWWidget::SetTextOption(const char *str, const char *option)
     return;
     }
 
-  const char *val = this->ConvertInternalStringToTkString(str);
+  const char *val = this->ConvertInternalStringToTclString(str);
   this->Script("%s configure %s {%s}", this->GetWidgetName(), option, val);
 }
 
@@ -732,7 +739,7 @@ const char* vtkKWWidget::GetTextOption(const char *option)
     }
 
   const char *val = this->Script("%s cget %s", this->GetWidgetName(), option);
-  return this->ConvertTkStringToInternalString(val);
+  return this->ConvertTclStringToInternalString(val);
 }
 
 //----------------------------------------------------------------------------
