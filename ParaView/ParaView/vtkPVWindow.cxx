@@ -144,7 +144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.13");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.14");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -209,9 +209,9 @@ vtkPVWindow::vtkPVWindow()
   this->CenterZLabel = vtkKWLabel::New();
   this->CenterZEntry = vtkKWEntry::New();
   
-  this->CenterSourceTclName = NULL;
-  this->CenterMapperTclName = NULL;
-  this->CenterActorTclName = NULL;
+  this->CenterSourceID.ID = 0;
+  this->CenterMapperID.ID = 0;
+  this->CenterActorID.ID = 0;
     
   this->CurrentPVSource = NULL;
 
@@ -293,7 +293,6 @@ vtkPVWindow::vtkPVWindow()
   this->UserInterfaceManager = 0;
   this->ApplicationSettingsInterface = 0;
 
-//  this->InteractorTclName = 0;
   this->InteractorID.ID = 0;
 }
 
@@ -410,25 +409,24 @@ void vtkPVWindow::CloseNoPrompt()
 void vtkPVWindow::PrepareForDelete()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (pvApp && this->CenterSourceTclName)
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  if (pvApp && this->CenterSourceID.ID)
     {
-    pvApp->BroadcastScript("%s Delete", this->CenterSourceTclName);
+    pm->DeleteStreamObject(this->CenterSourceID);
     }
-  this->SetCenterSourceTclName(NULL);
-
-  if (pvApp && this->CenterMapperTclName)
+  this->CenterSourceID.ID = 0;
+  if (pvApp && this->CenterMapperID.ID)
     {
-    pvApp->BroadcastScript("%s Delete", this->CenterMapperTclName);
+    pm->DeleteStreamObject(this->CenterMapperID);
     }
-  this->SetCenterMapperTclName(NULL);
+  this->CenterMapperID.ID = 0;
 
-  if (pvApp && this->CenterActorTclName)
+  if (pvApp && this->CenterActorID.ID)
     {
-    pvApp->BroadcastScript("%s Delete", this->CenterActorTclName);
+    pm->DeleteStreamObject(this->CenterActorID);
     }
-  this->SetCenterActorTclName(NULL);
-
+  this->CenterActorID.ID = 0;
 
   if (this->AnimationInterface)
     {
@@ -594,6 +592,7 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu->Delete();
     this->GlyphMenu = NULL;
     }
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -933,25 +932,32 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
     }
   this->InitializeInteractorInterfaces(app);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Creating the center of rotation actor here because we have
   // the application here.
   // We do not need to broadcast.  We need Send to root method.
   // Not local for client server option.
-  this->SetCenterSourceTclName("pvCenterSource");
-  pvApp->BroadcastScript("vtkAxes %s", this->CenterSourceTclName);
-  pvApp->BroadcastScript("%s SymmetricOn", this->CenterSourceTclName);
-  pvApp->BroadcastScript("%s ComputeNormalsOff", this->CenterSourceTclName);
-  this->SetCenterMapperTclName("pvMapperSource");
-  pvApp->BroadcastScript("vtkPolyDataMapper %s", this->CenterMapperTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->CenterMapperTclName,
-                         this->CenterSourceTclName);
-  this->SetCenterActorTclName("pvActorSource");
-  pvApp->BroadcastScript("vtkActor %s", this->CenterActorTclName);
-  pvApp->BroadcastScript("%s SetMapper %s", this->CenterActorTclName,
-                         this->CenterMapperTclName);
-  pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
+  this->CenterSourceID = pm->NewStreamObject("vtkAxes");
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
+                  << "SymmetricOn" << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
+                  << "ComputeNormalsOff" << vtkClientServerStream::End;
+  
+  this->CenterMapperID = pm->NewStreamObject("vtkPolyDataMapper");
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
+                    << "GetOutput" << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterMapperID
+                  << "SetInput" << vtkClientServerStream::LastResult 
+                  << vtkClientServerStream::End;
+  this->CenterActorID = pm->NewStreamObject("vtkActor");
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                  << "SetMapper" <<  this->CenterMapperID
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                  << "VisibilityOff" 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   // -------------------------
 
   this->PickCenterToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
@@ -1043,11 +1049,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       this->HideCenterActor();
       }
     }
-#if 0  
-  pvApp->BroadcastScript("%s AddActor %s", pvApp->GetRenderModule()->GetRendererTclName(),
-                         this->CenterActorTclName);
-#endif
-  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << pvApp->GetRenderModule()->GetRendererID()
+                  << "AddActor" << this->CenterActorID 
+                  << vtkClientServerStream::End;
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create a dummy interactor on the satellites so they han have 3d widgets.
@@ -1300,14 +1305,16 @@ void vtkPVWindow::CenterEntryCallback()
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
   this->CenterXEntry->SetValue(x);
   this->CenterYEntry->SetValue(y);
   this->CenterZEntry->SetValue(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
-  pvApp->BroadcastScript("%s SetPosition %f %f %f", 
-                         this->CenterActorTclName,
-                         x, y, z);
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                  << "SetPosition" << x << y << z
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->MainView->EventuallyRender();
 }
 
@@ -1315,25 +1322,32 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 void vtkPVWindow::HideCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->Script("%s configure -image PVShowCenterButton", 
                this->HideCenterButton->GetWidgetName() );
   this->HideCenterButton->SetBalloonHelpString(
     "Show the center of rotation to the center of the current data set.");
-  pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                  << "VisibilityOff"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (this->CenterActorVisibility)
     {
     this->Script("%s configure -image PVHideCenterButton", 
                  this->HideCenterButton->GetWidgetName() );
     this->HideCenterButton->SetBalloonHelpString(
       "Hide the center of rotation to the center of the current data set.");
-    pvApp->BroadcastScript("%s VisibilityOn", this->CenterActorTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                    << "VisibilityOn"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -1390,6 +1404,7 @@ void vtkPVWindow::ResetCenterCallback()
 void vtkPVWindow::ResizeCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int first = 1;
   double bounds[6];
   double tmp[6];
@@ -1431,16 +1446,21 @@ void vtkPVWindow::ResizeCenterActor()
   if ((! first) && (bounds[0] <= bounds[1]) && 
       (bounds[2] <= bounds[3]) && (bounds[4] <= bounds[5]))
     {
-    pvApp->BroadcastScript("%s SetScale %f %f %f", this->CenterActorTclName,
-                           0.25 * (bounds[1]-bounds[0]),
-                           0.25 * (bounds[3]-bounds[2]),
-                           0.25 * (bounds[5]-bounds[4]));
+    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                    << "SetScale" 
+                    <<  0.25 * (bounds[1]-bounds[0])
+                    << 0.25 * (bounds[3]-bounds[2])
+                    << 0.25 * (bounds[5]-bounds[4])
+                    << vtkClientServerStream::End;
     }
   else
     {
-    pvApp->BroadcastScript("%s SetScale 1 1 1", this->CenterActorTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
+                    << "SetScale" << 1 << 1 << 1
+                    << vtkClientServerStream::End;
     this->MainView->ResetCamera();
     }
+  pm->SendStreamToClientAndServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -2087,7 +2107,7 @@ void vtkPVWindow::WriteData()
     }
 //  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
 //  pm->GatherInformation(part->GetClassNameInformation(),
-//                        part->GetVTKDataTclName());
+//                        part->GetVTKDataID());
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
   if (strcmp(dataClassName, "vtkImageData") == 0)
@@ -2700,15 +2720,15 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
           sprintf(fileName, "%s/%s%sP%d", 
                   filePath, fileRoot, sourceName, partIdx);
           }
-        //*file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
-        //*file << "if {$numberOfProcs > 1} {\n";
-        //*file << "\tGeometryWriter SetFileName {" << fileName << ".pvtp}\n";
-        //*file << "} else {\n";
-        //*file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
-        //*file << "}\n";
-        //*file << "GeometryWriter Write\n";
+        *file << "GeometryWriter SetInput [pvTemp" << part->GetGeometryID() << " GetOutput]\n";
+        *file << "if {$numberOfProcs > 1} {\n";
+        *file << "\tGeometryWriter SetFileName {" << fileName << ".pvtp}\n";
+        *file << "} else {\n";
+        *file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
+        *file << "}\n";
+        *file << "GeometryWriter Write\n";
 
-//        *file << "CollectionFilter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
+        *file << "CollectionFilter SetInput [pvTemp" << part->GetGeometryID() << " GetOutput]\n";
         *file << "[CollectionFilter GetOutput] Update\n";
         *file << "TempPolyData ShallowCopy [CollectionFilter GetOutput]\n";
         *file << "if {$myProcId == 0} {\n";

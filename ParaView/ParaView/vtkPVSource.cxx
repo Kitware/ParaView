@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.13");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.14");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1865,9 +1865,9 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   numSources = this->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-//    *file << this->GetVTKSource(sourceIdx)->GetClassName()
-//    *file << this->GetSourceClassName()
-//          << " " << this->GetVTKSourceTclName(sourceIdx) << "\n";
+    *file << this->GetVTKSource(sourceIdx)->GetClassName()
+    *file << this->GetSourceClassName()
+          << " pvTemp" << this->GetVTKSourceID(sourceIdx) << "\n";
     }
 
   // Handle this here.
@@ -1893,7 +1893,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
     {
     for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
       {
-//      *file << this->GetVTKSourceTclName(sourceIdx) << " Update\n";
+      *file << "pvTemp" << this->GetVTKSourceID(sourceIdx) << " Update\n";
       }
     }
 
@@ -2028,8 +2028,8 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         vtkPVPart* part = pvs->GetPart(partIdx);
         
         *file << "\t";
-        *file << sourceTclName << " Add" << inputName  << " [" 
-              << pvs->GetVTKSourceTclName(part->GetVTKSourceIndex()) 
+        *file << sourceTclName << " Add" << inputName  << " [pvTemp" 
+              << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
               << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
         }      
       }
@@ -2049,8 +2049,8 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         int partIdx = sourceIdx % numParts;
         vtkPVPart* part = pvs->GetPart(partIdx);
         *file << "\t";
-        *file << sourceTclName << " Set" << inputName << " [" 
-              << pvs->GetVTKSourceTclName(part->GetVTKSourceIndex()) 
+        *file << sourceTclName << " Set" << inputName << " [pvTemp" 
+              << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
               << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
 
         }

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.4");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.5");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -397,7 +397,7 @@ void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
   for (idx = 0; idx < num; ++idx)
     {
     arrayName = this->SelectedArrayNames->GetString(idx);
-    *file << "\t" << this->PVSource->GetVTKSourceTclName(0) 
+    *file << "\tpvTemp" << this->PVSource->GetVTKSourceID(0) 
           << " AddVolumeArrayName {" << arrayName << "}\n";  
     }
 }

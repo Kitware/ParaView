@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -85,8 +85,11 @@ int vtkPVEnSightReaderModule::InitializeData()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for(i = 0; i < numSources; ++i)
     {
-    pm->ServerScript("%s Update", this->GetVTKSourceTclName(i));
+    pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(i)
+                    << "Update" 
+                    << vtkClientServerStream::End;
     }
+  pm->SendStreamToClientAndServer();
   return this->Superclass::InitializeData();
 }
 

@@ -554,14 +554,9 @@ protected:
   vtkKWEntry *CenterZEntry;
     
   //vtkAxes *CenterSource;
-  char *CenterSourceTclName;
-  vtkSetStringMacro(CenterSourceTclName);
-  //vtkPolyDataMapper *CenterMapper;
-  char *CenterMapperTclName;
-  vtkSetStringMacro(CenterMapperTclName);
-  //vtkActor *CenterActor;
-  char *CenterActorTclName;
-  vtkSetStringMacro(CenterActorTclName);
+  vtkClientServerID CenterSourceID;
+  vtkClientServerID CenterMapperID;
+  vtkClientServerID CenterActorID;
 
   void ResizeCenterActor();
   

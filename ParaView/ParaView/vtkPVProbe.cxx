@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.4");
+vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.5");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -141,9 +141,9 @@ void vtkPVProbe::CreateProperties()
   vtkPVApplication* pvApp = this->GetPVApplication();
   
   this->vtkPVSource::CreateProperties();
-
-  pvApp->GetProcessModule()->ServerScript(
-    "%s SetSpatialMatch 2", this->GetVTKSourceTclName());
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+                  << "SetSpatialMatch" << 2
+                  << vtkClientServerStream::End;
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -412,21 +412,21 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     }
   
 //  *file << this->GetVTKSource()->GetClassName() << " "
-  *file << this->GetSourceClassName() << " "
-        << this->GetVTKSourceTclName() << "\n";
+  *file << this->GetSourceClassName() << " pvTemp"
+        << this->GetVTKSourceID() << "\n";
   if (this->GetDimensionality() == 0)
     {
-    *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput" 
+    *file << "\tpvTemp" << this->GetVTKSourceID() << " SetInput probeInput" 
           << this->InstanceCount << "\n";
     }
   else
     {
-    *file << "\t" << this->GetVTKSourceTclName()
+    *file << "\tpvTemp" << this->GetVTKSourceID()
           << " SetInput [line" << this->InstanceCount << " GetOutput]\n";
     }
   
-  *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
-  *file << this->GetPVInput(0)->GetVTKSourceTclName()
+  *file << "\tpvTemp" << this->GetVTKSourceID() << " SetSource [pvTemp";
+  *file << this->GetPVInput(0)->GetVTKSourceID()
         << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)
@@ -447,8 +447,8 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
       *file << "\t" << this->XYPlotTclName << " SetXTitle \"" 
             << xyp->GetXTitle() << "\" \n";
       *file << "\t" << this->XYPlotTclName << " RemoveAllInputs" << endl;
-      *file << "\t" << this->XYPlotTclName << " AddInput [ " 
-            << this->GetVTKSourceTclName() << " GetOutput ]" << endl;
+      *file << "\t" << this->XYPlotTclName << " AddInput [ pvTemp" 
+            << this->GetVTKSourceID() << " GetOutput ]" << endl;
 
       *file << "Ren1" << " AddActor "
             << this->XYPlotTclName << endl;

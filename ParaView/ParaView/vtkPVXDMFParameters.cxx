@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.4");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -348,7 +348,7 @@ void vtkPVXDMFParameters::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSour
   vtkPVXDMFParameters* pvs = vtkPVXDMFParameters::SafeDownCast(clone);
   if (pvs)
     {
-    pvs->SetVTKReaderTclName(pvSource->GetVTKSourceTclName());
+    pvs->SetVTKReaderID(pvSource->GetVTKSourceID());
     //float min, max;
     //this->Scale->GetRange(min, max);
     //pvs->SetRange(min, max);

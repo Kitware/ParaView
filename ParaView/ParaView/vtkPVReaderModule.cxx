@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.3");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.4");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -229,8 +229,9 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 
   // Update the reader's information.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s UpdateInformation", this->GetVTKSourceTclName());
-
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+                  << "UpdateInformation" << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   return VTK_OK;
 }
 

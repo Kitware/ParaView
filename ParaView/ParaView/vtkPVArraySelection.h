@@ -86,11 +86,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // This is the name of the VTK reader.
-//  vtkSetStringMacro(VTKReaderTclName);
-//  vtkGetStringMacro(VTKReaderTclName);
-    
-  // Description:
   // Callback for the AllOn and AllOff buttons.
   void AllOnCallback();
   void AllOffCallback();

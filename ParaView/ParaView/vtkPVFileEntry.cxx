@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.7");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.8");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -533,7 +533,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     this->Timestep->SetValue(med);
     this->TimeStep = med;
     ostrstream str;
-    str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files {";
+    str << "set pvTemp" << this->GetPVSource()->GetVTKSourceID() << "_files {";
     char* name = new char [ this->FileNameLength ];
     for ( cc = min; cc <= max; cc ++ )
       {

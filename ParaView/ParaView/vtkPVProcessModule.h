@@ -180,10 +180,8 @@ public:
   void DeleteStreamObject(vtkClientServerID);
   
   // Description:
-  // Return the vtk object associated with the given id.
-  // If this is running in client/server mode then 0 is returned.
-  // If the client and server are in the same process the object pointer
-  // will be returned.
+  // Return the vtk object associated with the given id for the client.
+  // If the id is for an object on the server then 0 is returned.
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
   
   // Description:
