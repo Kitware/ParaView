@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.24");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.25");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -80,6 +80,8 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
   this->Displayed = 1;
   this->ShowHideFrame = 0;
+
+  this->DragAndDropAnchor = this->Label;
 }
 
 //----------------------------------------------------------------------------

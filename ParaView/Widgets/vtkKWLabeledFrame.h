@@ -128,6 +128,7 @@ public:
   static void BoldLabelOff();
 
 protected:
+
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
 
