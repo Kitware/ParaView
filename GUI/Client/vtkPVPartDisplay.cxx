@@ -38,17 +38,17 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkPVRenderView.h"
-
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkUnstructuredGridVolumeRayCastMapper.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.40");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.41");
 
 
 //----------------------------------------------------------------------------
@@ -689,7 +689,8 @@ void vtkPVPartDisplay::VolumeRenderModeOff()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *info)
+void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *arrayInfo,
+                                                   vtkPVDataInformation *dataInfo )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -701,17 +702,29 @@ void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *info)
   // need to initialize only if there are no points in the function
   if ( opacityFunc->GetSize() == 0 )
     {
-    this->ResetTransferFunctions(info);
+    this->ResetTransferFunctions(arrayInfo, dataInfo);
     }
   
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
+void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo, 
+                                              vtkPVDataInformation *dataInfo)
 {
   double range[2];
+  arrayInfo->GetComponentRange(0, range);
   
-  info->GetComponentRange(0, range);
+    
+  double bounds[6];
+  dataInfo->GetBounds(bounds);
+  double diameter = 
+    sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+          (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+          (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+  
+  int numCells = dataInfo->GetNumberOfCells();
+  double linearNumCells = pow( (double) numCells, (1.0/3.0) );
+  double unitDistance = diameter / linearNumCells;
   
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -725,6 +738,8 @@ void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
          << "AddPoint" << range[1] << 1.0 << vtkClientServerStream::End;
   
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "RemoveAllPoints" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
          << "AddHSVPoint" << range[0] << 0.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
@@ -732,6 +747,9 @@ void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
          << "SetColorSpaceToHSVNoWrap" << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke << this->VolumePropertyID
+         << "SetScalarOpacityUnitDistance" << unitDistance << vtkClientServerStream::End;
   
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }

@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.293");
+vtkCxxRevisionMacro(vtkPVData, "1.294");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1508,7 +1508,7 @@ void vtkPVData::UpdatePropertiesInternal()
     for (idx = 0; idx < num; ++idx)
       {
       part = this->GetPVSource()->GetPart(idx);
-      part->GetPartDisplay()->InitializeTransferFunctions(volRenArray);
+      part->GetPartDisplay()->InitializeTransferFunctions(volRenArray, dataInfo);
       }
     }
 }
@@ -1668,7 +1668,7 @@ void vtkPVData::VolumeRenderPointField(const char *name)
     for (idx = 0; idx < num; ++idx)
       {
       part = this->GetPVSource()->GetPart(idx);
-      part->GetPartDisplay()->ResetTransferFunctions(arrayInfo);
+      part->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
       }
 
     this->VolumeScalarsMenu->SetValue(str);

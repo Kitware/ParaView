@@ -84,6 +84,9 @@ public:
   
   void ScalarOpacityRampChanged();
   void ScalarOpacityRampChangedInternal();
+  
+  void ScalarOpacityUnitDistanceChanged();
+  void ScalarOpacityUnitDistanceChangedInternal();
 
   void ColorRampChanged();
   void ColorRampChangedInternal();
@@ -104,6 +107,8 @@ protected:
   vtkKWScale             *ScalarOpacityStartValueScale;
   vtkKWLabel             *ScalarOpacityEndValueLabel;
   vtkKWScale             *ScalarOpacityEndValueScale;
+  vtkKWLabel             *ScalarOpacityUnitDistanceLabel;
+  vtkKWScale             *ScalarOpacityUnitDistanceScale;
   
   vtkKWLabel             *ColorRampLabel;
   vtkKWRange             *ColorRampRange;

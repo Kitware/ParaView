@@ -36,10 +36,12 @@
 #include "vtkKWChangeColorButton.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkKWWidget.h"
+#include "vtkPVDataInformation.h"
+#include "vtkVolumeProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.9");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.10");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -53,31 +55,33 @@ vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
   // Don't actually create any of the widgets 
   // This allows a subclass to replace this one
 
-  this->ScalarOpacityFrame           = NULL;
-  this->ColorFrame                   = NULL;
-  this->BackButton                   = NULL;
+  this->ScalarOpacityFrame             = NULL;
+  this->ColorFrame                     = NULL;
+  this->BackButton                     = NULL;
   
-  this->ScalarOpacityRampLabel       = NULL;
-  this->ScalarOpacityRampRange       = NULL;  
-  this->ScalarOpacityStartValueLabel = NULL;
-  this->ScalarOpacityStartValueScale = NULL;
-  this->ScalarOpacityEndValueLabel   = NULL;
-  this->ScalarOpacityEndValueScale   = NULL;
+  this->ScalarOpacityRampLabel         = NULL;
+  this->ScalarOpacityRampRange         = NULL;  
+  this->ScalarOpacityStartValueLabel   = NULL;
+  this->ScalarOpacityStartValueScale   = NULL;
+  this->ScalarOpacityEndValueLabel     = NULL;
+  this->ScalarOpacityEndValueScale     = NULL;
+  this->ScalarOpacityUnitDistanceLabel = NULL;
+  this->ScalarOpacityUnitDistanceScale = NULL;
   
-  this->ColorRampLabel               = NULL;
-  this->ColorRampRange               = NULL;
-  this->ColorEditorFrame                = NULL;
-  this->ColorStartValueButton        = NULL;
-  this->ColorEndValueButton          = NULL;
-  this->ColorMapLabel                = NULL;
+  this->ColorRampLabel                 = NULL;
+  this->ColorRampRange                 = NULL;
+  this->ColorEditorFrame               = NULL;
+  this->ColorStartValueButton          = NULL;
+  this->ColorEndValueButton            = NULL;
+  this->ColorMapLabel                  = NULL;
   
-  this->ScalarRange[0]               = 0.0;
-  this->ScalarRange[1]               = 1.0;
+  this->ScalarRange[0]                 = 0.0;
+  this->ScalarRange[1]                 = 1.0;
   
-  this->MapData                      = NULL;
-  this->MapDataSize                  = 0;
-  this->MapHeight                    = 25;
-  this->MapWidth                     = 20;
+  this->MapData                        = NULL;
+  this->MapDataSize                    = 0;
+  this->MapHeight                      = 25;
+  this->MapWidth                       = 20;
 }
 
 //----------------------------------------------------------------------------
@@ -137,6 +141,18 @@ vtkPVVolumeAppearanceEditor::~vtkPVVolumeAppearanceEditor()
     this->ScalarOpacityEndValueScale = NULL;    
     }
 
+  if ( this->ScalarOpacityUnitDistanceLabel )
+    {
+    this->ScalarOpacityUnitDistanceLabel->Delete();
+    this->ScalarOpacityUnitDistanceLabel = NULL;
+    }
+  
+  if ( this->ScalarOpacityUnitDistanceScale )
+    {
+    this->ScalarOpacityUnitDistanceScale->Delete();
+    this->ScalarOpacityUnitDistanceScale = NULL;
+    }
+  
   if ( this->ColorRampLabel )
     {
     this->ColorRampLabel->Delete();
@@ -240,6 +256,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->ScalarOpacityStartValueScale->DisplayEntry();
   this->ScalarOpacityStartValueScale->DisplayEntryAndLabelOnTopOff();
   this->ScalarOpacityStartValueScale->SetEndCommand( this, "ScalarOpacityRampChanged" );
+  this->ScalarOpacityStartValueScale->SetEntryCommand( this, "ScalarOpacityRampChanged" );
   
   this->ScalarOpacityEndValueLabel = vtkKWLabel::New();
   this->ScalarOpacityEndValueLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
@@ -254,8 +271,26 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->ScalarOpacityEndValueScale->DisplayEntry();
   this->ScalarOpacityEndValueScale->DisplayEntryAndLabelOnTopOff();
   this->ScalarOpacityEndValueScale->SetEndCommand( this, "ScalarOpacityRampChanged" );
+  this->ScalarOpacityEndValueScale->SetEntryCommand( this, "ScalarOpacityRampChanged" );
 
-
+  this->ScalarOpacityUnitDistanceLabel = vtkKWLabel::New();
+  this->ScalarOpacityUnitDistanceLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
+  this->ScalarOpacityUnitDistanceLabel->Create( this->GetApplication(), "" );
+  this->ScalarOpacityUnitDistanceLabel->SetLabel("Unit Distance");
+  
+  this->ScalarOpacityUnitDistanceScale = vtkKWScale::New();
+  this->ScalarOpacityUnitDistanceScale->SetParent( this->ScalarOpacityFrame->GetFrame() );
+  this->ScalarOpacityUnitDistanceScale->Create( this->GetApplication(), "" );
+  this->ScalarOpacityUnitDistanceScale->SetRange( 1.0, 10.0 );
+  this->ScalarOpacityUnitDistanceScale->SetResolution( 0.1 );
+  this->ScalarOpacityUnitDistanceScale->DisplayEntry();
+  this->ScalarOpacityUnitDistanceScale->DisplayEntryAndLabelOnTopOff();
+  this->ScalarOpacityUnitDistanceScale->SetEndCommand(this,"ScalarOpacityUnitDistanceChanged");
+  this->ScalarOpacityUnitDistanceScale->SetEntryCommand(this,"ScalarOpacityUnitDistanceChanged");
+  this->ScalarOpacityUnitDistanceScale->SetBalloonHelpString(
+    "Set the unit distance on which the scalar opacity transfer function "
+    "is defined.");  
+    
   this->Script("grid %s %s -sticky nsew -padx 2 -pady 2", 
                this->ScalarOpacityRampLabel->GetWidgetName(),  
                this->ScalarOpacityRampRange->GetWidgetName() );
@@ -267,6 +302,10 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->Script("grid %s %s -sticky nsew -padx 2 -pady 2", 
                this->ScalarOpacityEndValueLabel->GetWidgetName(),
                this->ScalarOpacityEndValueScale->GetWidgetName() );
+
+  this->Script("grid %s %s -sticky nsew -padx 2 -pady 2", 
+               this->ScalarOpacityUnitDistanceLabel->GetWidgetName(),
+               this->ScalarOpacityUnitDistanceScale->GetWidgetName() );
 
   this->ColorRampLabel = vtkKWLabel::New();
   this->ColorRampLabel->SetParent( this->ColorFrame->GetFrame() );
@@ -464,8 +503,10 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     pvApp =
       vtkPVApplication::SafeDownCast(this->GetApplication());    
     }
+
+  vtkPVDataInformation* dataInfo = source->GetDataInformation();
   
-  if ( this->PVSource && this->ArrayInfo && pvApp &&
+  if ( this->PVSource && this->ArrayInfo && pvApp && dataInfo &&
        this->PVSource->GetNumberOfParts() > 0 )
     {
     // as a side effect, reset the GUI for the current data
@@ -499,8 +540,8 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
       }
     
     double *ptr = opacityFunc->GetDataPointer();
-    this->ScalarOpacityRampRange->SetRange(ptr[0], ptr[2]);
     this->ScalarOpacityRampRange->SetResolution( (ptr[2]-ptr[0])/10000.0 );
+    this->ScalarOpacityRampRange->SetRange(ptr[0], ptr[2]);
     this->ScalarOpacityStartValueScale->SetValue( ptr[1] );
     this->ScalarOpacityEndValueScale->SetValue( ptr[3] );    
     
@@ -512,11 +553,35 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
       }
     ptr = colorFunc->GetDataPointer();
     
-    this->ColorRampRange->SetRange(ptr[0], ptr[4]);
     this->ColorRampRange->SetResolution( (ptr[4]-ptr[0])/10000.0 );
+    this->ColorRampRange->SetRange(ptr[0], ptr[4]);
     
     this->ColorStartValueButton->SetColor( ptr[1], ptr[2], ptr[3] );
     this->ColorEndValueButton->SetColor(   ptr[5], ptr[6], ptr[7] );
+    
+    double bounds[6];
+    dataInfo->GetBounds(bounds);
+    
+    double diameter = 
+      sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+            (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+            (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+    
+    int numCells = dataInfo->GetNumberOfCells();
+    double linearNumCells = pow( (double) numCells, 1.0/3.0 );
+    
+    this->ScalarOpacityUnitDistanceScale->SetResolution( diameter / (linearNumCells * 10.0) );
+    this->ScalarOpacityUnitDistanceScale->SetRange( diameter / (linearNumCells * 10.0),
+                                                    diameter / (linearNumCells / 10.0) );
+
+    vtkVolumeProperty *volumeProperty = 
+      vtkVolumeProperty::SafeDownCast(
+        pvApp->GetProcessModule()->
+        GetObjectFromID(part->GetPartDisplay()->
+                        GetVolumePropertyID()));
+    
+    double unitDistance = volumeProperty->GetScalarOpacityUnitDistance();
+    this->ScalarOpacityUnitDistanceScale->SetValue( unitDistance );
     }
 }
 
@@ -571,6 +636,52 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
     this->RenderView();
     }
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChanged()
+{
+  this->ScalarOpacityUnitDistanceChangedInternal();
+  this->AddTraceEntry("$kw(%s) ScalarOpacityUnitDistanceChanged", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChangedInternal()
+{
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
+    double unitDistance = this->ScalarOpacityUnitDistanceScale->GetValue();
+
+    int numParts = this->PVSource->GetNumberOfParts();
+    int i;
+    vtkPVPart *part;
+    
+    for (i = 0; i < numParts; i++)
+      {
+      part =  this->PVSource->GetPart(i);
+      vtkClientServerID volumePropertyID;
+      
+      volumePropertyID = part->GetPartDisplay()->GetVolumePropertyID();
+      
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      
+      stream << vtkClientServerStream::Invoke << volumePropertyID 
+             << "SetScalarOpacityUnitDistance" << unitDistance << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      }
+    this->RenderView();
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::ColorButtonCallback( float vtkNotUsed(r), 
