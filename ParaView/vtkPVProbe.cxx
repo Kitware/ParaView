@@ -536,9 +536,9 @@ void vtkPVProbe::AcceptCallback()
                  this->ChangeScalarsFilterTclName);
     
     this->Script("%s AddActor %s",
-		 this->GetWindow()->GetMainView()->GetRendererTclName(),
+		 window->GetMainView()->GetRendererTclName(),
 		 this->XYPlotTclName);
-    this->GetWindow()->GetMainView()->Render();
+    window->GetMainView()->Render();
     }
 }
 
@@ -946,7 +946,6 @@ void vtkPVProbe::UpdateScalarsMenu()
 void vtkPVProbe::UpdateScalars()
 {
   char *newScalars = this->ScalarOperationMenu->GetValue();
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (strcmp(newScalars, "") == 0)
     {
