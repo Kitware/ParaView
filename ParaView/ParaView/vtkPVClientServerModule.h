@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVProcessModule.h"
 
+class vtkKWRemoteExecute;
+class vtkMapper;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkPVApplication;
@@ -160,6 +162,7 @@ protected:
   int Port;
   
   vtkSetStringMacro(RootResult);
+  vtkKWRemoteExecute* RemoteExecution;
   
   // Result from last RootScript.
   char* RootResult;

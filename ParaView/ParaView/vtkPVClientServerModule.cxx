@@ -69,6 +69,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkMapper.h"
+#include "vtkString.h"
+#include "vtkStringList.h"
+#include "vtkTclUtil.h"
+
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWRemoteExecute.h"
+#include "vtkPVWindow.h"
+#include <unistd.h>
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -196,7 +207,7 @@ private:
   void operator=(const vtkPVClientServerModuleConnectDialog&);
 };
 vtkStandardNewMacro(vtkPVClientServerModuleConnectDialog);
-vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.26");
+vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.27");
 //============================================================================
 //----------------------------------------------------------------------------
 
@@ -301,7 +312,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.27");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -321,6 +332,8 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 
   this->Hostname = 0;
   this->Port = 0;
+
+  this->RemoteExecution = vtkKWRemoteExecute::New();
 }
 
 //----------------------------------------------------------------------------
@@ -343,6 +356,8 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->SetRootResult(0);
 
   this->SetHostname(0);
+
+  this->RemoteExecution->Delete();
 }
 
 
@@ -389,7 +404,40 @@ void vtkPVClientServerModule::Initialize()
     // Establish connection
     while (!comm->ConnectTo(this->Hostname, this->Port))
       {
+      char buffer[1024];
+      sprintf(buffer, "Cannot connect to the server %s:%d.\n"
+        "Do you want to start ParaView on the remote server?",
+        this->Hostname, this->Port);
       this->Script("wm withdraw .");
+      int start = vtkKWMessageDialog::PopupYesNo(
+        this->Application, this->GetPVApplication()->GetMainWindow(),
+        "ParaView Connection Failed",
+        buffer,
+        vtkKWMessageDialog::YesDefault | vtkKWMessageDialog::WarningIcon
+      );
+      if ( start )
+        {
+        char* args[4];
+        args[0] = vtkString::Duplicate("/home/andy/vtk/ParaView-gcc/bin/ParaView");
+        args[1] = vtkString::Duplicate("--server");
+        args[2] = vtkString::Duplicate("--port=XXXXXX");
+        args[3] = 0;
+        sprintf(args[2], "--port=%d", this->Port);
+        cout << "Code missing for starting remote server" << endl;
+        this->RemoteExecution->SetRemoteHost(this->Hostname);
+        this->RemoteExecution->RunRemoteCommand((const char**)args);
+#ifdef _WIN32
+        Sleep(5000);
+#else
+        sleep(5);
+#endif
+        int cc;
+        for ( cc = 0; cc < 4; cc ++ )
+          {
+          delete [] args[cc];
+          }
+        continue;
+        }
       vtkPVClientServerModuleConnectDialog* dialog = 
         vtkPVClientServerModuleConnectDialog::New();
       dialog->SetHostname(this->Hostname);
