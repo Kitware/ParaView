@@ -13,6 +13,7 @@ SET (files
   lib/tk8.4/focus.tcl
   lib/tk8.4/listbox.tcl
   lib/tk8.4/menu.tcl
+  lib/tk8.4/msgbox.tcl
   lib/tk8.4/optMenu.tcl
   lib/tk8.4/panedwindow.tcl
   lib/tk8.4/scale.tcl
