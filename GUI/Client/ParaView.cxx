@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notice for more information.
  */
 #include "vtkCommonInstantiator.h"
 #include "vtkFilteringInstantiator.h"
+#include "vtkGenericFilteringInstantiator.h"
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"
 #include "vtkGraphicsInstantiator.h"
@@ -63,6 +64,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
+
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
+#include "vtkPVAdaptor.h"
+#endif
+        
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
 #ifdef PARAVIEW_ENABLE_FPE
@@ -163,8 +169,12 @@ int MyMain(int argc, char *argv[])
   helper->SetProcessModule(pm);
   pm->SetGUIHelper(helper);
   helper->Delete();
-
+  
   pm->Initialize();
+
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorInitialize();
+#endif
   ParaViewInitializeInterpreter(pm);
 
   // Start the application's event loop.  This will enable
@@ -187,8 +197,13 @@ int MyMain(int argc, char *argv[])
 #ifdef VTK_USE_MPI
   MPI_Finalize();
 #endif
-  options->Delete();
 
+  options->Delete();
+  
+#ifdef PARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorDispose();
+#endif
+  
   return (retVal?retVal:startVal);
 }
 
@@ -323,6 +338,7 @@ int main(int argc, char *argv[])
 // ClientServer wrapper initialization functions.
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
@@ -350,6 +366,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());
   vtkFilteringCS_Initialize(pm->GetInterpreter());
+  vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
   vtkImagingCS_Initialize(pm->GetInterpreter());
   vtkGraphicsCS_Initialize(pm->GetInterpreter());
   vtkIOCS_Initialize(pm->GetInterpreter());
