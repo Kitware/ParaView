@@ -46,7 +46,6 @@ vtkPVExtentEntry.cxx
 vtkPVExtentTranslator.cxx 
 vtkPVExtractGeometryByScalar.cxx
 vtkPVExtractPartsWidget.cxx
-vtkPVFieldMenu.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGhostLevelDialog.cxx
