@@ -272,6 +272,7 @@ public:
   // Description:
   // Play the demo.
   void PlayDemo();
+  void PlayDemo(int fromDashboard);
 
   // Description:
   // Callback from the ExtractGrid button.

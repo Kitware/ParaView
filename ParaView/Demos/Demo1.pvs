@@ -3703,6 +3703,10 @@ if ![info exists DemoDir] {
             if $pvDemoShouldStop {
                 break
             }
+
+            if $pvDemoFromDashboard {
+                break
+            }
         }
 
     }

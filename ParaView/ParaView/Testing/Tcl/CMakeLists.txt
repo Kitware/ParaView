@@ -39,6 +39,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                ScalarSelection
                ScalarsSphereClip
                SphereTest
+               TestDemo
 	       TestPackage
                Threshold
                ThresholdAttrMode
@@ -62,6 +63,7 @@ IF(RUN_WITH_MPI)
                -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
                   ${VTK_MPI_POSTFLAGS})
   ENDFOREACH(tfile)
+
 ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE} --disable-registry
