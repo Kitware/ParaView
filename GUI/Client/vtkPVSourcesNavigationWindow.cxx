@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVSourcesNavigationWindow.h"
 
+#include "vtkProperty.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWLabeledFrame.h"
@@ -21,13 +22,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkPVWindow.h"
+#include "vtkPVRenderView.h"
 
 #include <stdarg.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.18");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -37,6 +40,7 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->Canvas    = vtkKWCanvas::New();
   this->ScrollBar = vtkKWWidget::New();
   this->PopupMenu = vtkKWMenu::New();
+  this->PopupModule = 0;
   this->AlwaysShowName = 0;
   this->CreateSelectionBindings = 1;
 }
@@ -179,20 +183,42 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
   this->PopupMenu->Create(this->GetApplication(), "-tearoff 0");
-  this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
-                              "Delete current widget");
+  this->PopupMenu->AddCommand("Delete", this, "PopupDeleteCallback", 0, 
+       "Delete the module.  Module that are used by filters cannot be deleted.");
   char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-  this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
-                                  "Set visibility for the current object");  
+  this->PopupMenu->AddCheckButton("Visibility", var, 
+                                  this, "PopupVisibilityCallback", 0,
+                                  "Set the visibility for this module.");  
   delete [] var;
-  this->PopupMenu->AddCascade("Representation", 0, 0);
-  this->PopupMenu->AddCascade("Interpolation", 0, 0);
-  /*
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-  this->PopupMenu->AddCascade(
-    "VTK Filters", pvApp->GetMainWindow()->GetFilterMenu(),
-    4, "Choose a filter from a list of VTK filters");
-  */
+
+  // Representation
+  this->PopupMenu->AddSeparator();
+  var = this->PopupMenu->CreateRadioButtonVariable(this, "Representation");
+  this->PopupMenu->AddRadioButton(VTK_OUTLINE, "Outline", var, 
+      this, "PopupOutlineRepresentationCallback",
+      "Outline is edges of the bounding box.");
+  this->PopupMenu->AddRadioButton(VTK_SURFACE, "Surface", var,
+      this, "PopupSurfaceRepresentationCallback",
+      "Only external (non shared) faces of cells are displayed.");
+  this->PopupMenu->AddRadioButton(VTK_WIREFRAME, "Wireframe of Surface", var,
+      this, "PopupWireframeRepresentationCallback",
+      "Wirefrace of surface (non shared) faces.");
+  this->PopupMenu->AddRadioButton(VTK_POINTS, "Points of Surface", var,
+      this, "PopupPointsRepresentationCallback",
+      "Points of surface (non shared) faces.");
+  delete [] var;
+
+  // Interpolation
+  this->PopupMenu->AddSeparator();
+  var = this->PopupMenu->CreateRadioButtonVariable(this, "Interpolation");
+  this->PopupMenu->AddRadioButton(VTK_FLAT, "Flat", var, 
+                                  this, "PopupFlatInterpolationCallback",
+                                  "Flat shading makes the surfaace look faceted.");
+  this->PopupMenu->AddRadioButton(VTK_GOURAUD, "Gouraud", var,
+      this, "PopupGouraudInterpolationCallback",
+      "When the data has normals, Gouraud shading make the surface look smooth.");
+  delete [] var;
+  
   this->ChildCreate();
 }
 
@@ -266,66 +292,91 @@ void vtkPVSourcesNavigationWindow::HighlightObject(const char* widget, int onoff
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module, 
-                                                   int x, int y)
+void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module, 
+                                                          int x, int y)
 {
-  //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
+  // Do not use reference counting.  This reference is short lived.
+  this->PopupModule = module;
+
   vtkKWApplication *app = this->GetApplication();
-  ostrstream str;
-  if ( app->EvaluateBooleanExpression("%s IsDeletable", module) )
+  if ( module->IsDeletable())
     {
-    str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
-    this->PopupMenu->SetEntryCommand("Delete", this, str.str());
     this->PopupMenu->SetState("Delete", vtkKWMenu::Normal);
     }
   else
     {
     this->PopupMenu->SetState("Delete", vtkKWMenu::Disabled);
     }
-  str.rdbuf()->freeze(0);
-  ostrstream str1;
-  if ( !app->EvaluateBooleanExpression("%s GetHideDisplayPage", module) )
-    {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Normal);
-    char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-    str1 << " " << module << " SetVisibility $" 
-         << var << ";"
-         << "[ [ $Application GetMainWindow ] GetMainView ] EventuallyRender" 
-         <<  ends;
-    this->PopupMenu->SetEntryCommand("Visibility", str1.str());
-    if ( app->EvaluateBooleanExpression("%s GetVisibility", module) )
-      {
-      this->Script("set %s 1", var);
-      }
-    else
-      {
-      this->Script("set %s 0", var);
-      }
-    delete [] var;
-    this->Script("%s SetCascade [ %s GetIndex \"Representation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
 
-    this->Script("%s SetCascade [ %s GetIndex \"Interpolation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
-                 
+  this->PopupMenu->CheckCheckButton(this, "Visibility", 
+                                    module->GetVisibility());
+
+  this->PopupMenu->CheckRadioButton(this, "Interpolation", 
+            module->GetPartDisplay()->GetInterpolation());
+
+  // Set the value of the representation radio button.
+  this->PopupMenu->CheckRadioButton(this, "Representation", 
+            module->GetPartDisplay()->GetRepresentation());
+
+  // Show the popup menu in correct location (x, y is cursor position).
+  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupDeleteCallback()
+{
+  this->PopupModule->DeleteCallback();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupVisibilityCallback()
+{
+  if (this->PopupMenu->GetCheckButtonValue(this, "Visibility"))
+    {
+    this->PopupModule->SetVisibility(1);
     }
   else
     {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Disabled);
+    this->PopupModule->SetVisibility(0);
     }
-  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
-  str1.rdbuf()->freeze(0);
 }
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetInterpolation(VTK_FLAT);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupGouraudInterpolationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetInterpolation(VTK_GOURAUD);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupOutlineRepresentationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_OUTLINE);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupSurfaceRepresentationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_SURFACE);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupWireframeRepresentationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_WIREFRAME);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+//-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::PopupPointsRepresentationCallback()
+{
+  this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_POINTS);
+  this->PopupModule->GetPVRenderView()->EventuallyRender();
+}
+
+
 
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(

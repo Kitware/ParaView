@@ -59,8 +59,19 @@ public:
 
   // Description:
   // Display the module popup menu
-  void DisplayModulePopupMenu(const char*, int x, int y);
+  void DisplayModulePopupMenu(vtkPVSource* module, int x, int y);
 
+  // Description:
+  // Callbacks for the popup menu.
+  void PopupDeleteCallback();
+  void PopupVisibilityCallback();
+  void PopupFlatInterpolationCallback();
+  void PopupGouraudInterpolationCallback();
+  void PopupOutlineRepresentationCallback();
+  void PopupSurfaceRepresentationCallback();
+  void PopupWireframeRepresentationCallback();
+  void PopupPointsRepresentationCallback();
+  
   // Description:
   // Execute a command on module.
   void ExecuteCommandOnModule(const char* module, const char* command);
@@ -137,6 +148,8 @@ protected:
   vtkKWCanvas* Canvas;
   vtkKWWidget* ScrollBar;
   vtkKWMenu* PopupMenu;
+  // Set while the popup is active so we know which module to modify.
+  vtkPVSource* PopupModule;
 
   int AlwaysShowName;
   int CreateSelectionBindings;
