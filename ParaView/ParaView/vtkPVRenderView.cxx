@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
-#include "vtkKWEventNotifier.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"

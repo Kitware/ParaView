@@ -57,7 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWView.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkTreeComposite.h"
 
