@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.163");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.164");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1420,6 +1420,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   this->StopButton->SetEnabled(1);
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer = 0;
+  (void)aspectRatio;
 #ifdef PARAVIEW_PLUS_BUILD
   vtkKWGenericMovieWriter* awriter = 0;
 #endif
