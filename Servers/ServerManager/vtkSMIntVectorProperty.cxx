@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.11");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.12");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -154,16 +154,19 @@ int vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
     return 0;
     }
 
-  int numArgs = this->GetNumberOfElements();
-  memcpy(&this->Internals->UncheckedValues[0], 
-         &this->Internals->Values[0], 
-         numArgs*sizeof(int));
-
-  this->SetUncheckedElement(idx, value);
-  if (!this->IsInDomains())
+  if ( vtkSMProperty::GetCheckDomains() )
     {
-    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-    return 0;
+    int numArgs = this->GetNumberOfElements();
+    memcpy(&this->Internals->UncheckedValues[0], 
+           &this->Internals->Values[0], 
+           numArgs*sizeof(int));
+    
+    this->SetUncheckedElement(idx, value);
+    if (!this->IsInDomains())
+      {
+      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+      return 0;
+      }
     }
   
   if (idx >= this->GetNumberOfElements())
@@ -209,12 +212,16 @@ int vtkSMIntVectorProperty::SetElements(const int* values)
     }
 
   int numArgs = this->GetNumberOfElements();
-  memcpy(&this->Internals->UncheckedValues[0], 
-         values, 
-         numArgs*sizeof(int));
-  if (!this->IsInDomains())
+
+  if ( vtkSMProperty::GetCheckDomains() )
     {
-    return 0;
+    memcpy(&this->Internals->UncheckedValues[0], 
+           values, 
+           numArgs*sizeof(int));
+    if (!this->IsInDomains())
+      {
+      return 0;
+      }
     }
 
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(int));
@@ -223,11 +230,12 @@ int vtkSMIntVectorProperty::SetElements(const int* values)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMIntVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
+                                              vtkPVXMLElement* element)
 {
   int retVal;
 
-  retVal = this->Superclass::ReadXMLAttributes(element);
+  retVal = this->Superclass::ReadXMLAttributes(parent, element);
   if (!retVal)
     {
     return retVal;

@@ -1,5 +1,4 @@
 <ServerManagerConfiguration>
-<!-- TODO need input requirements -->
   <ProxyGroup name="filters">
    <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
       <InputProperty
@@ -11,6 +10,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
       </InputProperty>
          
    <!-- End AppendAttributes -->
@@ -26,6 +29,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
       </InputProperty>
    <!-- End AppendPolyData -->
    </SourceProxy>
@@ -40,6 +47,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
       </InputProperty>
    <!-- End AppendDataSet -->
    </SourceProxy>
@@ -52,6 +63,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
      <IntVectorProperty 
         name="VertexCells" 
@@ -71,6 +85,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="cell"/>
       </InputProperty>
      <IntVectorProperty 
         name="PassCellData" 
@@ -90,6 +108,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
      <IntVectorProperty 
         name="PieceInvariant" 
@@ -164,6 +185,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkUnstructuredGrid"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End CleanUnstructuredGrid -->
    </SourceProxy>
@@ -176,6 +200,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
@@ -188,6 +215,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
       </InputProperty>
      <IntVectorProperty 
         name="OutputWholeExtent" 
@@ -205,6 +235,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
      <IntVectorProperty 
         name="InvertMeanCurvature" 
@@ -235,6 +268,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -279,6 +315,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -316,6 +355,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -328,15 +370,15 @@
       <DoubleVectorProperty
          name="LowPoint"
          command="SetLowPoint"
-         number_of_elements="1"
-         default_values="0" >
+         number_of_elements="3"
+         default_values="0 0 0" >
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
          name="HighPoint"
          command="SetHighPoint"
-         number_of_elements="1"
-         default_values="1" >
+         number_of_elements="3"
+         default_values="0 0 1" >
       </DoubleVectorProperty>
    <!-- End ElevationFilter -->
    </SourceProxy>
@@ -349,6 +391,11 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkRectilinearGrid"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="cell" 
+                             number_of_components="1"/>
       </InputProperty>
 
      <ProxyProperty name="ClipPlane" command="SetClipPlane">
@@ -374,6 +421,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End ExtractEdges -->
    </SourceProxy>
@@ -388,6 +438,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
       </InputProperty>
 
      <IntVectorProperty 
@@ -407,6 +461,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
@@ -419,6 +476,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array"/>
       </InputProperty>
 
      <StringVectorProperty 
@@ -470,6 +531,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -530,12 +594,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point" 
+                             number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
      <IntVectorProperty 
         name="Dimensionality" 
         command="SetDimensionality" 
@@ -557,12 +632,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point" 
+                             number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
      <IntVectorProperty 
         name="Dimensionality" 
         command="SetDimensionality" 
@@ -586,6 +672,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End GroupParts -->
    </SourceProxy>
@@ -598,6 +687,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <DoubleVectorProperty
@@ -640,6 +732,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -660,6 +755,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -712,12 +810,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point" 
+                             number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="KernelSize" 
@@ -736,6 +845,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <DoubleVectorProperty 
@@ -804,6 +916,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End  OutlineFilter -->
    </SourceProxy>
@@ -816,6 +931,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <DoubleVectorProperty
@@ -838,6 +956,10 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="multiple"/>
       </InputProperty>
    <!-- End  PartScalars -->
    </SourceProxy>
@@ -850,6 +972,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -870,6 +995,11 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"/>
+           <FixedTypeDomain name="fixed_type"/>
       </InputProperty>
 
      <IntVectorProperty 
@@ -890,6 +1020,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -940,6 +1073,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <DoubleVectorProperty 
@@ -955,7 +1091,7 @@
         command="SetMaximumSpeed" 
         number_of_elements="1"
         default_values="0" > 
-       <DoubleRangeDomain name="range" min="0" />
+       <DoubleRangeDomain name="range" min="0"/>
      </DoubleVectorProperty>
    <!-- End BrownianPoints -->
    </SourceProxy>
@@ -968,6 +1104,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1005,17 +1144,34 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty> 
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SelectInputVectors" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="Width"
@@ -1066,6 +1222,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1115,6 +1274,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -1135,6 +1297,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1163,6 +1328,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1183,6 +1351,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1203,6 +1374,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
@@ -1215,6 +1389,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPointSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <ProxyProperty name="Transform" command="SetTransform">
@@ -1233,6 +1410,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End TriangleFilter -->
    </SourceProxy>
@@ -1245,6 +1425,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1299,12 +1482,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPointSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
       <DoubleVectorProperty
          name="ScaleFactor"
@@ -1346,12 +1540,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPointSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SelectInputVectors" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty> 
 
       <DoubleVectorProperty
          name="ScaleFactor"
@@ -1371,6 +1576,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction">
@@ -1399,6 +1607,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <ProxyProperty name="ClipFunction" command="SetClipFunction">
@@ -1418,7 +1629,13 @@
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty> 
 
      <DoubleVectorProperty
         name="Value"
@@ -1437,12 +1654,22 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty> 
 
      <IntVectorProperty 
         name="AttributeMode" 
@@ -1477,12 +1704,23 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="1"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="ContourValues"
@@ -1529,6 +1767,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <InputProperty
@@ -1537,17 +1778,32 @@
            <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SelectInputVectors" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="SetOrient" 
@@ -1609,6 +1865,12 @@
            <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+             <DataType value="vtkRectilinearGrid"/>
+             <DataType value="vtkStructuredPoints"/>
+             <DataType value="vtkStructuredGrid"/>
+           </DataTypeDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -1648,6 +1910,11 @@
            <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <NumberOfPartsDomain name="multi_group" multiplicity="single"/>
+           <InputArrayDomain name="input_array" attribute_type="point"/>
       </InputProperty>
 
      <InputProperty
@@ -1669,12 +1936,23 @@
            <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
       </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 
         command="SelectInputVectors" 
-        number_of_elements="1" /> 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="MaximumPropagationUnit" 
@@ -1806,6 +2084,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
       </InputProperty>
 
       <DoubleVectorProperty

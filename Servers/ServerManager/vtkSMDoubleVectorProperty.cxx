@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.11");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.12");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -154,16 +154,20 @@ int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
     {
     return 0;
     }
-  int numArgs = this->GetNumberOfElements();
-  memcpy(&this->Internals->UncheckedValues[0], 
-         &this->Internals->Values[0], 
-         numArgs*sizeof(double));
 
-  this->SetUncheckedElement(idx, value);
-  if (!this->IsInDomains())
+  if ( vtkSMProperty::GetCheckDomains() )
     {
-    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-    return 0;
+    int numArgs = this->GetNumberOfElements();
+    memcpy(&this->Internals->UncheckedValues[0], 
+           &this->Internals->Values[0], 
+           numArgs*sizeof(double));
+    
+    this->SetUncheckedElement(idx, value);
+    if (!this->IsInDomains())
+      {
+      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+      return 0;
+      }
     }
   
   if (idx >= this->GetNumberOfElements())
@@ -208,12 +212,16 @@ int vtkSMDoubleVectorProperty::SetElements(const double* values)
     }
 
   int numArgs = this->GetNumberOfElements();
-  memcpy(&this->Internals->UncheckedValues[0], 
-         values, 
-         numArgs*sizeof(double));
-  if (!this->IsInDomains())
+
+  if ( vtkSMProperty::GetCheckDomains() )
     {
-    return 0;
+    memcpy(&this->Internals->UncheckedValues[0], 
+           values, 
+           numArgs*sizeof(double));
+    if (!this->IsInDomains())
+      {
+      return 0;
+      }
     }
 
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(double));
@@ -222,11 +230,12 @@ int vtkSMDoubleVectorProperty::SetElements(const double* values)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
+                                                 vtkPVXMLElement* element)
 {
   int retVal;
 
-  retVal = this->Superclass::ReadXMLAttributes(element);
+  retVal = this->Superclass::ReadXMLAttributes(proxy, element);
   if (!retVal)
     {
     return retVal;

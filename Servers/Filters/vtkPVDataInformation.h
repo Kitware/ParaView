@@ -79,6 +79,10 @@ public:
   // Name stored in field data.
   vtkGetStringMacro(Name);
 
+  // Description:
+  // ClassName of the data represented by information object.
+  vtkGetStringMacro(DataClassName);
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
@@ -95,12 +99,17 @@ protected:
   int            MemorySize;
   double         Bounds[6];
   int            Extent[6];
+
   char*          Name;
   vtkSetStringMacro(Name);
+
+  char*          DataClassName;
+  vtkSetStringMacro(DataClassName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
 
+private:
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented
 };

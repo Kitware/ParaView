@@ -84,6 +84,28 @@ public:
   // internal domain iterator.
   virtual void UnRegister(vtkObjectBase* obj);
 
+  // Description:
+  vtkSMDomainIterator* NewDomainIterator();
+
+  // Description:
+  // Returns a domain give a name. 
+  vtkSMDomain* GetDomain(const char* name);
+
+  // Description:
+  // Calls Update() on all domains contained by the property
+  // as well as all dependant domains. This is usually called
+  // after SetUncheckedXXX() to tell all dependant domains to
+  // update themselves according to the new value.
+  void UpdateDependantDomains();
+
+  // Description:
+  static int GetCheckDomains();
+  static void SetCheckDomains(int check);
+
+  // Description:
+  static int GetModifiedAtCreation();
+  static void SetModifiedAtCreation(int check);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -94,6 +116,7 @@ protected:
   friend class vtkSMSubPropertyIterator;
   friend class vtkSMDomainIterator;
   friend class vtkSMSourceProxy;
+  friend class vtkSMDomain;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).
@@ -106,7 +129,8 @@ protected:
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
   // Description:
   // Update all proxies referred by this property (if any). Overwritten
@@ -120,13 +144,10 @@ protected:
   void AddDomain(const char* name, vtkSMDomain* dom);
 
   // Description:
-  // Returns a domain give a name. 
-  vtkSMDomain* GetDomain(const char* name);
-
-  // Description:
-  // The name assigned by the xnl parser. Used to get the property
+  // The name assigned by the xml parser. Used to get the property
   // from a proxy.
   vtkSetStringMacro(XMLName);
+  vtkGetStringMacro(XMLName);
 
   // Description:
   void AddSubProperty(const char* name, vtkSMProperty* proxy);
@@ -136,6 +157,15 @@ protected:
 
   // Description:
   vtkSetMacro(IsReadOnly, int);
+
+  // Description:
+  vtkSMProperty* NewProperty(const char* name);
+
+  // Description:
+  void AddDependant(vtkSMDomain* dom);
+
+  // Description:
+  void RemoveAllDependants();
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
@@ -150,6 +180,12 @@ protected:
   char* XMLName;
 
   vtkSMDomainIterator* DomainIterator;
+
+  static int CheckDomains;
+  static int ModifiedAtCreation;
+
+  void SetProxy(vtkSMProxy* proxy);
+  vtkSMProxy* Proxy;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.3");
 
 struct vtkSMStringListDomainInternals
 {
@@ -58,6 +58,25 @@ const char* vtkSMStringListDomain::GetString(unsigned int idx)
 void vtkSMStringListDomain::AddString(const char* string)
 {
   this->SLInternals->Strings.push_back(string);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringListDomain::RemoveString(const char* string)
+{
+  if (!string)
+    {
+    return;
+    }
+  vtkstd::vector<vtkStdString>::iterator iter =
+    this->SLInternals->Strings.begin();
+  for(; iter != this->SLInternals->Strings.end(); iter++)
+    {
+    if (strcmp(string, iter->c_str()) == 0)
+      {
+      this->SLInternals->Strings.erase(iter);
+      break;
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -114,8 +133,10 @@ int vtkSMStringListDomain::IsInDomain(const char* val, unsigned int& idx)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringListDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+  this->Superclass::ReadXMLAttributes(prop, element);
+
   // Loop over the top-level elements.
   unsigned int i;
   for(i=0; i < element->GetNumberOfNestedElements(); ++i)
@@ -123,9 +144,7 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkPVXMLElement* element)
     vtkPVXMLElement* selement = element->GetNestedElement(i);
     if ( strcmp("String", selement->GetName()) != 0 )
       {
-      vtkErrorMacro(<< "Unknown element type: " << selement->GetName()
-                    << ". Can not parse domain xml.");
-      return 0;
+      continue;
       }
     const char* value = selement->GetAttribute("value");
     if (!value)

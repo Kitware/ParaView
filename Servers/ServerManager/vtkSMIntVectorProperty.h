@@ -121,7 +121,8 @@ protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();
 
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
   vtkSMIntVectorPropertyInternals* Internals;
 

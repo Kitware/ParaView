@@ -70,7 +70,7 @@ protected:
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 

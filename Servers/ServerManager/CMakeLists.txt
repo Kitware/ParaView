@@ -2,16 +2,21 @@ PROJECT(ServerManager)
 
 SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
+  vtkSMArrayListDomain.cxx
   vtkSMBooleanDomain.cxx
+  vtkSMDataTypeDomain.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
+  vtkSMFixedTypeDomain.cxx
+  vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLookupTableProxy.cxx
+  vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMPart.cxx
   vtkSMProperty.cxx

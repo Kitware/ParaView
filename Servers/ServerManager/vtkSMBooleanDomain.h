@@ -39,11 +39,6 @@ protected:
   vtkSMBooleanDomain();
   ~vtkSMBooleanDomain();
 
-  // Description:
-  // Set the appropriate ivars from the xml element. Should
-  // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
-
 private:
   vtkSMBooleanDomain(const vtkSMBooleanDomain&); // Not implemented
   void operator=(const vtkSMBooleanDomain&); // Not implemented

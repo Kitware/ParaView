@@ -30,6 +30,10 @@ class vtkPVInformation;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
+class vtkDataObject;
+//BTX
+struct vtkProcessModuleInternals;
+//ETX
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
@@ -54,6 +58,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
+  // Description:
+  // Returns a data object of the given type. This is a utility
+  // method used to increase performance. The first time the
+  // data object of a given type is requested, it is instantiated
+  // and put in map. The following calls do not cause instantiation.
+  // Used while comparing data types for input matching.
+  vtkDataObject* GetDataObjectOfType(const char* classname);
+
   // Description:
   // This is going to be a generic method of getting/gathering 
   // information form the server.
@@ -219,6 +231,8 @@ protected:
   int ReportInterpreterErrors;
 
   static vtkProcessModule* ProcessModule;
+
+  vtkProcessModuleInternals* Internals;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

@@ -93,7 +93,8 @@ protected:
 
   // Description:
   // Set the appropriate ivars from the xml element.
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
 private:
   vtkSMVectorProperty(const vtkSMVectorProperty&); // Not implemented

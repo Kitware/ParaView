@@ -27,6 +27,9 @@
 
 class vtkSMProperty;
 class vtkPVXMLElement;
+//BTX
+struct vtkSMDomainInternals;
+//ETX
 
 class VTK_EXPORT vtkSMDomain : public vtkSMObject
 {
@@ -39,6 +42,11 @@ public:
   // sub-classes.
   virtual int IsInDomain(vtkSMProperty* property) = 0;
 
+  // Description:
+  // Update self checking the "unchecked" values of all required
+  // properties. Overwritten by sub-classes.
+  virtual void Update() {};
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
@@ -48,9 +56,15 @@ protected:
 //ETX
 
   // Description:
+  unsigned int GetNumberOfRequiredProperties();
+
+  // Description:
+  vtkSMProperty* GetRequiredProperty(unsigned int idx);
+
+  // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkPVXMLElement*) {return 1;};
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
 
   char* XMLName;
 
@@ -59,6 +73,8 @@ protected:
   // configuration. Can be used to figure out the origin of the
   // domain.
   vtkSetStringMacro(XMLName);
+
+  vtkSMDomainInternals* Internals;
 
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented

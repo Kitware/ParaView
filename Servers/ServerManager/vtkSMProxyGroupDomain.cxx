@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.6");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -52,21 +52,26 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
     {
     return 0;
     }
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
-  if (pp)
-    {
-    unsigned int numProxies = pp->GetNumberOfProxies();
-    for (unsigned int i=0; i<numProxies; i++)
-      {
-      if (!this->IsInDomain(pp->GetProxy(i)))
-        {
-        return 0;
-        }
-      }
-    return 1;
-    }
+  // TODO this should be enabled again. Once ParaView client uses proxies
+  // in 3d widgets too
 
-  return 0;
+//   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
+//   if (pp)
+//     {
+//     unsigned int numProxies = pp->GetNumberOfUncheckedProxies();
+//     for (unsigned int i=0; i<numProxies; i++)
+//       {
+//       if (!this->IsInDomain(pp->GetUncheckedProxy(i)))
+//         {
+//         return 0;
+//         }
+//       }
+//     return 1;
+//     }
+
+//   return 0;
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -112,8 +117,10 @@ const char* vtkSMProxyGroupDomain::GetGroup(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyGroupDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMProxyGroupDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+  this->Superclass::ReadXMLAttributes(prop, element);
+
   int found=0;
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {

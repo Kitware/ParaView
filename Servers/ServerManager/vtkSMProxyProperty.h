@@ -41,7 +41,7 @@ public:
   
   // Description:
   // Add a proxy to the list of proxies.
-  void AddProxy(vtkSMProxy* proxy);
+  int AddProxy(vtkSMProxy* proxy);
 
   // Description:
   // Add a proxy to the list of proxies without calling Modified
@@ -49,7 +49,13 @@ public:
   // is true but it is more efficient to avoid calling Update until
   // the last proxy is added. To do this, add all proxies with modify=false
   // and call Modified after the last.
-  void AddProxy(vtkSMProxy* proxy, int modify);
+  int AddProxy(vtkSMProxy* proxy, int modify);
+
+  // Description:
+  void AddUncheckedProxy(vtkSMProxy* proxy);
+
+  // Description:
+  void RemoveAllUncheckedProxies();
 
   // Description:
   // Remove all proxies from the list.
@@ -60,8 +66,16 @@ public:
   unsigned int GetNumberOfProxies();
 
   // Description:
+  // Returns the number of unchecked proxies.
+  unsigned int GetNumberOfUncheckedProxies();
+
+  // Description:
   // Return a proxy. No bounds check is performed.
   vtkSMProxy* GetProxy(unsigned int idx);
+
+  // Description:
+  // Return a proxy. No bounds check is performed.
+  vtkSMProxy* GetUncheckedProxy(unsigned int idx);
 
 protected:
   vtkSMProxyProperty();
@@ -91,7 +105,7 @@ protected:
   void AddPreviousProxy(vtkSMProxy* proxy);
 
   // Description:
-  void ClearPreviousProxies();
+  void RemoveAllPreviousProxies();
 
   // Description:
   void RemoveConsumers(vtkSMProxy* proxy);

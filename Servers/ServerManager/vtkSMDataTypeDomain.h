@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMEnumerationDomain.h
+  Module:    vtkSMDataTypeDomain.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,51 +12,48 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMEnumerationDomain -
+// .NAME vtkSMDataTypeDomain -
 // .SECTION Description
 // .SECTION See Also
 // vtkSMDomain 
 
-#ifndef __vtkSMEnumerationDomain_h
-#define __vtkSMEnumerationDomain_h
+#ifndef __vtkSMDataTypeDomain_h
+#define __vtkSMDataTypeDomain_h
 
 #include "vtkSMDomain.h"
 
+class vtkSMSourceProxy;
 //BTX
-struct vtkSMEnumerationDomainInternals;
+struct vtkSMDataTypeDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
+class VTK_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
 {
 public:
-  static vtkSMEnumerationDomain* New();
-  vtkTypeRevisionMacro(vtkSMEnumerationDomain, vtkSMDomain);
+  static vtkSMDataTypeDomain* New();
+  vtkTypeRevisionMacro(vtkSMDataTypeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Returns true if the value of the propery is in the domain.
-  // The propery has to be a vtkSMIntVectorProperty. If all 
-  // vector values are in the domain, it returns 1. It returns
-  // 0 otherwise.
+  // The propery has to be a vtkSMProxyProperty which points
+  // to a vtkSMSourceProxy. If all data types of the input's
+  // parts are in the domain, it returns. It returns 0 otherwise.
   virtual int IsInDomain(vtkSMProperty* property);
 
   // Description:
-  // Returns true if the int is in the domain. If value is
-  // in domain, it's index is return in idx.
-  int IsInDomain(int val, unsigned int& idx);
+  // Returns true if all parts of the source proxy are in the domain.
+  int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
-  unsigned int GetNumberOfEntries();
+  unsigned int GetNumberOfDataTypes();
 
   // Description:
-  int GetEntryValue(unsigned int idx);
-
-  // Description:
-  const char* GetEntryText(unsigned int idx);
+  const char* GetDataType(unsigned int idx);
 
 protected:
-  vtkSMEnumerationDomain();
-  ~vtkSMEnumerationDomain();
+  vtkSMDataTypeDomain();
+  ~vtkSMDataTypeDomain();
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -65,11 +62,11 @@ protected:
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
-  vtkSMEnumerationDomainInternals* EInternals;
+  vtkSMDataTypeDomainInternals* DTInternals;
 
 private:
-  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&); // Not implemented
-  void operator=(const vtkSMEnumerationDomain&); // Not implemented
+  vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
+  void operator=(const vtkSMDataTypeDomain&); // Not implemented
 };
 
 #endif

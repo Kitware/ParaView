@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMEnumerationDomain.h
+  Module:    vtkSMNumberOfPartsDomain.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,51 +12,54 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMEnumerationDomain -
+// .NAME vtkSMNumberOfPartsDomain -
 // .SECTION Description
 // .SECTION See Also
 // vtkSMDomain 
 
-#ifndef __vtkSMEnumerationDomain_h
-#define __vtkSMEnumerationDomain_h
+#ifndef __vtkSMNumberOfPartsDomain_h
+#define __vtkSMNumberOfPartsDomain_h
 
 #include "vtkSMDomain.h"
 
-//BTX
-struct vtkSMEnumerationDomainInternals;
-//ETX
+class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
+class VTK_EXPORT vtkSMNumberOfPartsDomain : public vtkSMDomain
 {
 public:
-  static vtkSMEnumerationDomain* New();
-  vtkTypeRevisionMacro(vtkSMEnumerationDomain, vtkSMDomain);
+  static vtkSMNumberOfPartsDomain* New();
+  vtkTypeRevisionMacro(vtkSMNumberOfPartsDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Returns true if the value of the propery is in the domain.
-  // The propery has to be a vtkSMIntVectorProperty. If all 
-  // vector values are in the domain, it returns 1. It returns
-  // 0 otherwise.
+  // The propery has to be a vtkSMProxyProperty which points
+  // to a vtkSMSourceProxy. If the number of parts contained by
+  // the source matches the criteria set in the domain, returns 1.
+  // Returns 0 otherwise.
   virtual int IsInDomain(vtkSMProperty* property);
 
   // Description:
-  // Returns true if the int is in the domain. If value is
-  // in domain, it's index is return in idx.
-  int IsInDomain(int val, unsigned int& idx);
+  // If the number of parts contained by
+  // the source matches the criteria set in the domain, returns 1.
+  // Returns 0 otherwise.
+  int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
-  unsigned int GetNumberOfEntries();
+  vtkSetMacro(PartMultiplicity, unsigned char);
+  vtkGetMacro(PartMultiplicity, unsigned char);
 
-  // Description:
-  int GetEntryValue(unsigned int idx);
-
-  // Description:
-  const char* GetEntryText(unsigned int idx);
+//BTX
+  enum NumberOfParts
+  {
+    SINGLE = 0,
+    MULTIPLE = 1
+  };
+//ETX
 
 protected:
-  vtkSMEnumerationDomain();
-  ~vtkSMEnumerationDomain();
+  vtkSMNumberOfPartsDomain();
+  ~vtkSMNumberOfPartsDomain();
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -65,11 +68,11 @@ protected:
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
-  vtkSMEnumerationDomainInternals* EInternals;
+  unsigned char PartMultiplicity;
 
 private:
-  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&); // Not implemented
-  void operator=(const vtkSMEnumerationDomain&); // Not implemented
+  vtkSMNumberOfPartsDomain(const vtkSMNumberOfPartsDomain&); // Not implemented
+  void operator=(const vtkSMNumberOfPartsDomain&); // Not implemented
 };
 
 #endif

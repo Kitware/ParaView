@@ -120,7 +120,8 @@ protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();
 
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
 //BTX  
   // Description:

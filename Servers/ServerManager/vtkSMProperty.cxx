@@ -20,6 +20,8 @@
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInstantiator.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSmartPointer.h"
 
@@ -28,7 +30,12 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMProperty, "1.11");
+
+vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
+
+int vtkSMProperty::CheckDomains = 1;
+int vtkSMProperty::ModifiedAtCreation = 1;
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -41,6 +48,7 @@ vtkSMProperty::vtkSMProperty()
   this->IsReadOnly = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
+  this->Proxy = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -50,6 +58,7 @@ vtkSMProperty::~vtkSMProperty()
   delete this->PInternals;
   this->SetXMLName(0);
   this->DomainIterator->Delete();
+  this->SetProxy(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -117,6 +126,45 @@ vtkSMDomain* vtkSMProperty::GetDomain(const char* name)
 }
 
 //---------------------------------------------------------------------------
+vtkSMDomainIterator* vtkSMProperty::NewDomainIterator()
+{
+  vtkSMDomainIterator* iter = vtkSMDomainIterator::New();
+  iter->SetProperty(this);
+  return iter;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::AddDependant(vtkSMDomain* dom)
+{
+  this->PInternals->Dependants.push_back(dom);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::RemoveAllDependants()
+{
+  this->PInternals->Dependants.erase(
+    this->PInternals->Dependants.begin(), this->PInternals->Dependants.end());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::UpdateDependantDomains()
+{
+  this->DomainIterator->Begin();
+  while(!this->DomainIterator->IsAtEnd())
+    {
+    this->DomainIterator->GetDomain()->Update();
+    this->DomainIterator->Next();
+    }
+
+  vtkSMPropertyInternals::DependantsVector::iterator iter =
+    this->PInternals->Dependants.begin();
+  for (; iter != this->PInternals->Dependants.end(); iter++)
+    {
+    iter->GetPointer()->Update();
+    }
+}
+
+//---------------------------------------------------------------------------
 vtkSMProperty* vtkSMProperty::GetSubProperty(const char* name)
 {
   vtkSMPropertyInternals::PropertyMap::iterator it =
@@ -131,7 +179,7 @@ vtkSMProperty* vtkSMProperty::GetSubProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::AddSubProperty(const char* name, vtkSMProperty* proxy)
+void vtkSMProperty::AddSubProperty(const char* name, vtkSMProperty* property)
 {
   // Check if the proxy already exists. If it does, we will
   // replace it
@@ -143,7 +191,7 @@ void vtkSMProperty::AddSubProperty(const char* name, vtkSMProperty* proxy)
     vtkWarningMacro("Property " << name  << " already exists. Replacing");
     }
 
-  this->PInternals->SubProperties[name] = proxy;
+  this->PInternals->SubProperties[name] = property;
 }
 
 //---------------------------------------------------------------------------
@@ -173,8 +221,21 @@ void vtkSMProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 {
+  if (!this->Proxy)
+    {
+    return 0;
+    }
+  return this->Proxy->NewProperty(name);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
+                                     vtkPVXMLElement* element)
+{
+  this->SetProxy(proxy);
+
   const char* xmlname = element->GetAttribute("name");
   if(xmlname) 
     { 
@@ -212,7 +273,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
     vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
     if (domain)
       {
-      if (domain->ReadXMLAttributes(domainEl))
+      if (domain->ReadXMLAttributes(this, domainEl))
         {
         const char* dname = domainEl->GetAttribute("name");
         if (dname)
@@ -225,6 +286,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
       }
     }
 
+  this->SetProxy(0);
   return 1;
 }
 
@@ -241,6 +303,29 @@ void vtkSMProperty::SaveState(const char* name, ofstream* file, vtkIndent indent
     delete[] dname.str();
     this->DomainIterator->Next();
     }
+}
+//---------------------------------------------------------------------------
+void vtkSMProperty::SetCheckDomains(int check)
+{
+  vtkSMProperty::CheckDomains = check;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::GetCheckDomains()
+{
+  return vtkSMProperty::CheckDomains;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SetModifiedAtCreation(int check)
+{
+  vtkSMProperty::ModifiedAtCreation = check;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::GetModifiedAtCreation()
+{
+  return vtkSMProperty::ModifiedAtCreation;
 }
 
 //---------------------------------------------------------------------------

@@ -15,18 +15,33 @@
 #include "vtkProcessModule.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkClientServerInterpreter.h"
+#include "vtkClientServerStream.h"
+#include "vtkDataObject.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
+#include "vtkInstantiator.h"
 #include "vtkToolkits.h"
-#include "vtkClientServerStream.h"
-#include "vtkClientServerInterpreter.h"
+
+#include <vtkstd/map>
+
+#include "vtkSmartPointer.h"
+#include "vtkStdString.h"
 
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
+struct vtkProcessModuleInternals
+{
+  typedef 
+  vtkstd::map<vtkStdString, vtkSmartPointer<vtkDataObject> > DataTypesType;
+  
+  DataTypesType DataTypes;
+};
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.8");
+vtkCxxRevisionMacro(vtkProcessModule, "1.9");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -38,6 +53,7 @@ vtkProcessModule::vtkProcessModule()
   this->Interpreter = 0;
   this->InterpreterObserver = 0;
   this->ReportInterpreterErrors = 1;
+  this->Internals = new vtkProcessModuleInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +68,8 @@ vtkProcessModule::~vtkProcessModule()
     this->Controller->Delete();
     this->Controller = NULL;
     }
+
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -162,6 +180,7 @@ int vtkProcessModule::SendStreamToClient(vtkClientServerStream& stream)
   return 0;
 }
 
+//----------------------------------------------------------------------------
 // send a stream to the data server
 int vtkProcessModule::SendStreamToDataServer(vtkClientServerStream&)
 {
@@ -169,6 +188,7 @@ int vtkProcessModule::SendStreamToDataServer(vtkClientServerStream&)
   return -1;
 }
 
+//----------------------------------------------------------------------------
 // send a stream to the data server root mpi process
 int vtkProcessModule::SendStreamToDataServerRoot(vtkClientServerStream&)
 {
@@ -177,6 +197,7 @@ int vtkProcessModule::SendStreamToDataServerRoot(vtkClientServerStream&)
   return -1;
 }
 
+//----------------------------------------------------------------------------
 // send a stream to the render server
 int vtkProcessModule::SendStreamToRenderServer(vtkClientServerStream&)
 {
@@ -185,6 +206,7 @@ int vtkProcessModule::SendStreamToRenderServer(vtkClientServerStream&)
   return -1;
 }
 
+//----------------------------------------------------------------------------
 // send a stream to the render server root mpi process
 int vtkProcessModule::SendStreamToRenderServerRoot(vtkClientServerStream&)
 {
@@ -280,6 +302,49 @@ vtkClientServerID vtkProcessModule::GetProcessModuleID()
 {
   vtkClientServerID id = {2};
   return id;
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkProcessModule::GetDataObjectOfType(const char* classname)
+{
+  if (!classname)
+    {
+    return 0;
+    }
+
+  // Since we can not instantiate these classes, we'll replace
+  // them with a subclass
+  if (strcmp(classname, "vtkDataSet") == 0)
+    {
+    classname = "vtkImageData";
+    }
+  else if (strcmp(classname, "vtkPointSet") == 0)
+    {
+    classname = "vtkPolyData";
+    }
+
+  vtkProcessModuleInternals::DataTypesType::iterator it =
+    this->Internals->DataTypes.find(classname);
+  if (it != this->Internals->DataTypes.end())
+    {
+    return it->second.GetPointer();
+    }
+
+  vtkObject* object = vtkInstantiator::CreateInstance(classname);
+  vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
+  if (!dobj)
+    {
+    if (object)
+      {
+      object->Delete();
+      }
+    return 0;
+    }
+
+  this->Internals->DataTypes[classname] = dobj;
+  dobj->Delete();
+
+  return dobj;
 }
 
 //----------------------------------------------------------------------------

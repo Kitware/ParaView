@@ -19,7 +19,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMBooleanDomain);
-vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMBooleanDomain::vtkSMBooleanDomain()
@@ -45,12 +45,6 @@ int vtkSMBooleanDomain::IsInDomain(vtkSMProperty* property)
     }
 
   return 0;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMBooleanDomain::ReadXMLAttributes(vtkPVXMLElement* /*element*/)
-{
-  return 1;
 }
 
 //---------------------------------------------------------------------------

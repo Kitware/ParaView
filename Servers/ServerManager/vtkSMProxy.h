@@ -36,8 +36,10 @@
 //BTX
 struct vtkSMProxyInternals;
 //ETX
+class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMPropertyIterator;
+class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -56,7 +58,10 @@ public:
   // Description:
   // Return the property with the given name. If no property is found
   // NULL is returned.
-  vtkSMProperty* GetProperty(const char* name);
+  vtkSMProperty* GetProperty(const char* name) 
+    {
+      return this->GetProperty(name, 0);
+    }
 
   // Description:
   // Update the VTK object on the server by pushing the values of
@@ -121,6 +126,7 @@ protected:
   // public interface exposed by vtkSMProxy. Each of these classes
   // use a small subset of protected methods. This should be kept
   // as such.
+  friend class vtkSMProperty;
   friend class vtkSMProxyManager;
   friend class vtkSMInputProperty;
   friend class vtkSMProxyProperty;
@@ -247,6 +253,9 @@ protected:
                    vtkSMProperty* prop);
 
   // Description:
+  void RemoveProperty(const char* name);
+
+  // Description:
   // Add a property to self.
   void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
 
@@ -274,6 +283,17 @@ protected:
   // Description:
   virtual void MarkConsumersAsModified();
 
+  // Description:
+  // Creates a new proxy and initializes it by calling ReadXMLAttributes()
+  // with the right XML element.
+  vtkSMProperty* NewProperty(const char* name);
+
+  // Description:
+  vtkSMProperty* GetProperty(const char* name, int selfOnly);
+
+  // Description:
+  int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
@@ -281,6 +301,9 @@ protected:
   vtkTypeUInt32 Servers;
 
   vtkClientServerID SelfID;
+
+  void SetXMLElement(vtkPVXMLElement* element);
+  vtkPVXMLElement* XMLElement;
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 

@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.3");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -221,8 +221,10 @@ void vtkSMIntRangeDomain::SaveState(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntRangeDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+  this->Superclass::ReadXMLAttributes(prop, element);
+
   const int MAX_NUM = 128;
   int values[MAX_NUM];
 

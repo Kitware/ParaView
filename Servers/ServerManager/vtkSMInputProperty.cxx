@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.6");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.7");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -84,7 +84,7 @@ void vtkSMInputProperty::AppendCommandToStream(
     }
 
   this->RemoveConsumers(cons);
-  this->ClearPreviousProxies();
+  this->RemoveAllPreviousProxies();
 
   if (this->CleanCommand)
     {
@@ -120,9 +120,10 @@ void vtkSMInputProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMInputProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMInputProperty::ReadXMLAttributes(vtkSMProxy* parent,
+                                          vtkPVXMLElement* element)
 {
-  this->Superclass::ReadXMLAttributes(element);
+  this->Superclass::ReadXMLAttributes(parent, element);
 
   int multiple_input;
   int retVal = element->GetScalarAttribute("multiple_input", &multiple_input);

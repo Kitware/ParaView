@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.3");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -133,8 +133,10 @@ void vtkSMEnumerationDomain::SaveState(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMEnumerationDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+  this->Superclass::ReadXMLAttributes(prop, element);
+
   // Loop over the top-level elements.
   unsigned int i;
   for(i=0; i < element->GetNumberOfNestedElements(); ++i)

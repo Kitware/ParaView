@@ -17,17 +17,22 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
+#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyManager.h"
 
 #include "vtkSMProxyInternals.h"
 
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMProxy, "1.15");
+
+vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -118,6 +123,7 @@ vtkSMProxy::vtkSMProxy()
     pm->GetInterpreter()->ClearLastResult();
     }
 
+  this->XMLElement = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -128,10 +134,19 @@ vtkSMProxy::~vtkSMProxy()
     this->UnRegisterVTKObjects();
     }
   this->RemoveAllObservers();
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.begin();
+  // To remove cyclic dependancy
+  for(; it != this->Internals->Properties.end(); it++)
+    {
+    it->second.Property.GetPointer()->RemoveAllDependants();
+    }
   delete this->Internals;
   this->SetVTKClassName(0);
   this->SetXMLGroup(0);
   this->SetXMLName(0);
+  this->SetXMLElement(0);
 }
 
 //---------------------------------------------------------------------------
@@ -237,20 +252,27 @@ void vtkSMProxy::SetID(unsigned int idx, vtkClientServerID id)
 }
 
 //---------------------------------------------------------------------------
-vtkSMProperty* vtkSMProxy::GetProperty(const char* name)
+vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
 {
+  if (!name)
+    {
+    return 0;
+    }
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.find(name);
   if (it == this->Internals->Properties.end())
     {
-    vtkSMProxyInternals::ProxyMap::iterator it2 =
-      this->Internals->SubProxies.begin();
-    for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    if (!selfOnly)
       {
-      vtkSMProperty* prop = it2->second.GetPointer()->GetProperty(name);
-      if (prop)
+      vtkSMProxyInternals::ProxyMap::iterator it2 =
+        this->Internals->SubProxies.begin();
+      for( ; it2 != this->Internals->SubProxies.end(); it2++)
         {
-        return prop;
+        vtkSMProperty* prop = it2->second.GetPointer()->GetProperty(name);
+        if (prop)
+          {
+          return prop;
+          }
         }
       }
     return 0;
@@ -281,6 +303,24 @@ void vtkSMProxy::RemoveAllObservers()
 void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 {
   this->AddProperty(0, name, prop);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RemoveProperty(const char* name)
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->RemoveProperty(name);
+    }
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.find(name);
+  if (it != this->Internals->Properties.end())
+    {
+    this->Internals->Properties.erase(it);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -694,6 +734,115 @@ void vtkSMProxy::MarkConsumersAsModified()
       cons->MarkConsumersAsModified();
       }
     }
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
+{
+  vtkSMProperty* property = this->GetProperty(name, 1);
+  if (property)
+    {
+    return property;
+    }
+
+  vtkPVXMLElement* element = this->XMLElement;
+  if (!element)
+    {
+    return 0;
+    }
+
+  vtkPVXMLElement* propElement = 0;
+  for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
+    {
+    propElement = element->GetNestedElement(i);
+    if (strcmp(propElement->GetName(), "SubProxy") != 0)
+      {
+      const char* pname = propElement->GetAttribute("name");
+      if (pname && strcmp(name, pname) == 0)
+        {
+        break;
+        }
+      }
+    }
+
+  if (!propElement)
+    {
+    return 0;
+    }
+
+  vtkObject* object = 0;
+  ostrstream cname;
+  cname << "vtkSM" << propElement->GetName() << ends;
+  object = vtkInstantiator::CreateInstance(cname.str());
+  delete[] cname.str();
+
+  property = vtkSMProperty::SafeDownCast(object);
+  if (property)
+    {
+    if (!property->ReadXMLAttributes(this, propElement))
+      {
+      vtkErrorMacro("Could not parse property: " << propElement->GetName());
+      return 0;
+      }
+    this->AddProperty(name, property);
+    property->Delete();
+    }
+  else
+    {
+    vtkErrorMacro("Could not instantiate property: " << propElement->GetName());
+    }
+
+  return property;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  this->SetXMLElement(element);
+
+  const char* className = element->GetAttribute("class");
+  if(className)
+    {
+    this->SetVTKClassName(className);
+    }
+
+  const char* xmlname = element->GetAttribute("name");
+  if(xmlname)
+    {
+    this->SetXMLName(xmlname);
+    }
+
+  // Create all sub-proxies and properties
+  for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* propElement = element->GetNestedElement(i);
+    if (strcmp(propElement->GetName(), "SubProxy")==0)
+      {
+      vtkPVXMLElement* subElement = propElement->GetNestedElement(0);
+      if (subElement)
+        {
+        const char* name = subElement->GetAttribute("name");
+        if (name)
+          {
+          vtkSMProxy* subproxy = pm->NewProxy(subElement, 0);
+          this->AddSubProxy(name, subproxy);
+          subproxy->Delete();
+          }
+        }
+      }
+    else
+      {
+      const char* name = propElement->GetAttribute("name");
+      if (name)
+        {
+        this->NewProperty(name);
+        }
+      }
+    }
+
+  this->SetXMLElement(0);
+  return 1;
 }
 
 //---------------------------------------------------------------------------

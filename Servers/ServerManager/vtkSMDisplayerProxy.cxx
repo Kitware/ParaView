@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.12");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -49,6 +49,12 @@ void vtkSMDisplayerProxy::SetColor(double r, double g, double b)
     {
     vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
                   "the configuration file defines it.");
+    return;
+    }
+  if ( propProxy->GetNumberOfIDs() < 1 )
+    {
+    vtkWarningMacro("The property sub-proxy contains no ids. The displayer "
+                    "must have been connected wrong.");
     return;
     }
   vtkClientServerID propertyID = propProxy->GetID(0);
@@ -93,6 +99,12 @@ void vtkSMDisplayerProxy::SetScalarVisibility(int vis)
     return;
     }
 
+  if ( propertyProxy->GetNumberOfIDs() < 1 )
+    {
+    vtkWarningMacro("The property sub-proxy contains no ids. The displayer "
+                    "must have been connected wrong.");
+    return;
+    }
   vtkClientServerID propertyID = propertyProxy->GetID(0);
   if (vis)
     {
@@ -150,6 +162,13 @@ void vtkSMDisplayerProxy::DrawWireframe()
     return;
     }
 
+  if ( propertyProxy->GetNumberOfIDs() < 1 )
+    {
+    vtkWarningMacro("The property sub-proxy contains no ids. The displayer "
+                    "must have been connected wrong.");
+    return;
+    }
+
   vtkClientServerStream stream;
   stream 
     << vtkClientServerStream::Invoke 
@@ -180,6 +199,13 @@ void vtkSMDisplayerProxy::DrawPoints()
     return;
     }
 
+  if ( propertyProxy->GetNumberOfIDs() < 1 )
+    {
+    vtkWarningMacro("The property sub-proxy contains no ids. The displayer "
+                    "must have been connected wrong.");
+    return;
+    }
+
   vtkClientServerStream stream;
   stream 
     << vtkClientServerStream::Invoke 
@@ -207,6 +233,13 @@ void vtkSMDisplayerProxy::DrawSurface()
     {
     vtkErrorMacro("No property sub-proxy was defined. Please make sure that "
                   "the configuration file defines it.");
+    return;
+    }
+
+  if ( propertyProxy->GetNumberOfIDs() < 1 )
+    {
+    vtkWarningMacro("The property sub-proxy contains no ids. The displayer "
+                    "must have been connected wrong.");
     return;
     }
 

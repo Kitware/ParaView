@@ -99,6 +99,9 @@ public:
   // format is still evolving.
   void SaveState(const char* filename);
 
+  // Description:
+  void InstantiateGroupPrototypes(const char* groupName);
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -109,25 +112,21 @@ protected:
   void AddElement(
     const char* groupName, const char* name, vtkPVXMLElement* element);
 
-  // Description:
-  // Creates a new proxy and initializes it by calling ReadXMLAttributes()
-  // with the right XML element.
-  vtkSMProperty* NewProperty(vtkPVXMLElement* pelement);
-
-  // Description:
-  // Given an XML element and group name create a proxy 
-  // and all of it's properties.
-  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname);
-
 //BTX
   friend class vtkSMXMLParser;
   friend class vtkSMProxyIterator;
+  friend class vtkSMProxy;
 //ETX
 
   // Description:
   // Saves the state of the object in XML format. Should
   // be overwritten by proxies and properties.
   virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+
+  // Description:
+  // Given an XML element and group name create a proxy 
+  // and all of it's properties.
+  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname);
 
 private:
   vtkSMProxyManagerInternals* Internals;

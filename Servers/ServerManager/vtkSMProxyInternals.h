@@ -37,7 +37,18 @@ struct vtkSMProxyInternals
 {
   struct PropertyInfo
   {
-    PropertyInfo() : ModifiedFlag(1),  ObserverTag(0) {};
+    PropertyInfo()
+      {
+        if (vtkSMProperty::GetModifiedAtCreation())
+          {
+          this->ModifiedFlag = 1;
+          }
+        else
+          {
+          this->ModifiedFlag = 0;
+          }
+        this->ObserverTag = 0;
+      };
     vtkSmartPointer<vtkSMProperty> Property;
     int ModifiedFlag;
     unsigned int ObserverTag;

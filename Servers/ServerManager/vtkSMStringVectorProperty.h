@@ -112,7 +112,8 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 

@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.10");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -193,16 +193,24 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
     return 0;
     }
 
-  for(unsigned int i=0; i<this->GetNumberOfElements(); i++)
+  if (!value)
     {
-    this->SetUncheckedElement(i, this->GetElement(i));
+    value = "";
     }
 
-  this->SetUncheckedElement(idx, value);
-  if (!this->IsInDomains())
+  if ( vtkSMProperty::GetCheckDomains() )
     {
-    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-    return 0;
+    for(unsigned int i=0; i<this->GetNumberOfElements(); i++)
+      {
+      this->SetUncheckedElement(i, this->GetElement(i));
+      }
+    
+    this->SetUncheckedElement(idx, value);
+    if (!this->IsInDomains())
+      {
+      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+      return 0;
+      }
     }
   
   if (idx >= this->GetNumberOfElements())
@@ -215,11 +223,12 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
+                                                 vtkPVXMLElement* element)
 {
   int retVal;
 
-  retVal = this->Superclass::ReadXMLAttributes(element);
+  retVal = this->Superclass::ReadXMLAttributes(proxy, element);
   if (!retVal)
     {
     return retVal;

@@ -16,7 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMInstantiator.h"
+#include "vtkInstantiator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.12");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -44,6 +44,37 @@ vtkSMProxyManager::~vtkSMProxyManager()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
+{
+  if (!groupName)
+    {
+    return;
+    }
+
+  ostrstream newgroupname;
+  newgroupname << groupName << "_prototypes" << ends;
+  // Find the XML elements from which the proxies can be instantiated and
+  // initialized
+  vtkSMProxyManagerInternals::GroupMapType::iterator it =
+    this->Internals->GroupMap.find(groupName);
+  if (it != this->Internals->GroupMap.end())
+    {
+    vtkSMProxyManagerElementMapType::iterator it2 =
+      it->second.begin();
+
+    for(; it2 != it->second.end(); it2++)
+      {
+      vtkPVXMLElement* element = it2->second.GetPointer();
+      vtkSMProxy* proxy = this->NewProxy(element, groupName);
+      this->RegisterProxy(newgroupname.str(), it2->first.c_str(), proxy);
+      proxy->Delete();
+      }
+
+    }
+  delete[] newgroupname.str();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMProxyManager::AddElement(const char* groupName, 
                                    const char* name,
                                    vtkPVXMLElement* element)
@@ -51,32 +82,6 @@ void vtkSMProxyManager::AddElement(const char* groupName,
   vtkSMProxyManagerElementMapType& elementMap = 
     this->Internals->GroupMap[groupName];
   elementMap[name] = element;
-}
-
-//----------------------------------------------------------------------------
-vtkSMProperty* vtkSMProxyManager::NewProperty(vtkPVXMLElement* pelement)
-{
-  vtkObject* object = 0;
-  ostrstream name;
-  name << "vtkSM" << pelement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(name.str());
-  delete[] name.str();
-
-  vtkSMProperty* property = vtkSMProperty::SafeDownCast(object);
-  if (property)
-    {
-    if (!property->ReadXMLAttributes(pelement))
-      {
-      vtkErrorMacro("Could not parse property: " << pelement->GetName());
-      property->Delete();
-      return 0;
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Could not instantiate property: " << pelement->GetName());
-    }
-  return property;
 }
 
 //----------------------------------------------------------------------------
@@ -118,51 +123,8 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)
     {
-    const char* className = pelement->GetAttribute("class");
-    if(className)
-      {
-      proxy->SetVTKClassName(className);
-      }
-
-    const char* xmlname = pelement->GetAttribute("name");
-    if(xmlname)
-      {
-      proxy->SetXMLName(xmlname);
-      }
+    proxy->ReadXMLAttributes(this, pelement);
     proxy->SetXMLGroup(groupname);
-
-    // Create all sub-proxies and properties
-    for(unsigned int i=0; i < pelement->GetNumberOfNestedElements(); ++i)
-      {
-      vtkPVXMLElement* propElement = pelement->GetNestedElement(i);
-      if (strcmp(propElement->GetName(), "SubProxy")==0)
-        {
-        vtkPVXMLElement* subElement = propElement->GetNestedElement(0);
-        if (subElement)
-          {
-          const char* name = subElement->GetAttribute("name");
-          if (name)
-            {
-            vtkSMProxy* subproxy = this->NewProxy(subElement, 0);
-            proxy->AddSubProxy(name, subproxy);
-            subproxy->Delete();
-            }
-          }
-        }
-      else
-        {
-        const char* name = propElement->GetAttribute("name");
-        if (name)
-          {
-          vtkSMProperty* prop = this->NewProperty(propElement);
-          if (prop)
-            {
-            proxy->AddProperty(name, prop);
-            prop->Delete();
-            }
-          }
-        }
-      }
     }
   return proxy;
 }
@@ -319,9 +281,25 @@ void vtkSMProxyManager::SaveState(const char* filename)
     {
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
-    for (; it2 != it->second.end(); it2++)
+
+    // Do not save the state of prototypes.
+    const char* protstr = "_prototypes";
+    int do_group = 1;
+    if (strlen(it->first.c_str()) > strlen(protstr))
       {
-      it2->second->SaveState(it2->first.c_str(), &os, indent);
+      const char* newstr = it->first.c_str() + strlen(it->first.c_str()) -
+        strlen(protstr);
+      if (strcmp(newstr, protstr) == 0)
+        {
+        do_group = 0;
+        }
+      }
+    if (do_group)
+      {
+      for (; it2 != it->second.end(); it2++)
+        {
+        it2->second->SaveState(it2->first.c_str(), &os, indent);
+        }
       }
     }
 
@@ -330,16 +308,31 @@ void vtkSMProxyManager::SaveState(const char* filename)
   it = this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
-    os << indent 
-       << "<ProxyCollection name=\"" << it->first.c_str() << "\">" << endl;
-    vtkSMProxyManagerProxyMapType::iterator it2 =
-      it->second.begin();
-    for (; it2 != it->second.end(); it2++)
+    // Do not save the state of prototypes.
+    const char* protstr = "_prototypes";
+    int do_group = 1;
+    if (strlen(it->first.c_str()) > strlen(protstr))
       {
-      os << indent.GetNextIndent()
-         << "<Item name=\"" << it2->first.c_str() << "\" />" << endl;
+      const char* newstr = it->first.c_str() + strlen(it->first.c_str()) -
+        strlen(protstr);
+      if (strcmp(newstr, protstr) == 0)
+        {
+        do_group = 0;
+        }
       }
-    os << indent << "</ProxyCollection>" << endl;
+    if (do_group)
+      {
+      os << indent 
+         << "<ProxyCollection name=\"" << it->first.c_str() << "\">" << endl;
+      vtkSMProxyManagerProxyMapType::iterator it2 =
+        it->second.begin();
+      for (; it2 != it->second.end(); it2++)
+        {
+        os << indent.GetNextIndent()
+           << "<Item name=\"" << it2->first.c_str() << "\" />" << endl;
+        }
+      os << indent << "</ProxyCollection>" << endl;
+      }
     }
 }
 
