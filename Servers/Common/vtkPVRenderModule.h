@@ -197,6 +197,7 @@ protected:
 
   vtkPVRenderModuleObserver* Observer;
 
+private:
   vtkPVRenderModule(const vtkPVRenderModule&); // Not implemented
   void operator=(const vtkPVRenderModule&); // Not implemented
 };

@@ -42,46 +42,46 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.26");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.27");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
 {
   this->GeometryInformation = vtkPVGeometryInformation::New();
   this->GeometryInformationIsValid = 0;
-  
+
   this->Visibility = 1;
-  
+
   this->PropVisibilityProperty = vtkSMIntVectorProperty::New();
   this->PropVisibilityProperty->SetCommand("SetVisibility");
   this->PropVisibilityProperty->SetNumberOfElements(1);
   this->PropVisibilityProperty->SetElement(0,1);
-  
+
   this->VolumeVisibilityProperty = vtkSMIntVectorProperty::New();
   this->VolumeVisibilityProperty->SetCommand("SetVisibility");
   this->VolumeVisibilityProperty->SetNumberOfElements(1);
   this->VolumeVisibilityProperty->SetElement(0,0);
-  
+
   this->ScalarVisibilityProperty = vtkSMIntVectorProperty::New();
   this->ScalarVisibilityProperty->SetCommand("SetScalarVisibility");
   this->ScalarVisibilityProperty->SetNumberOfElements(1);
   this->ScalarVisibilityProperty->SetElement(0,0);
-    
+ 
   this->UseTriangleStripsProperty = vtkSMIntVectorProperty::New();
   this->UseTriangleStripsProperty->SetCommand("SetUseStrips");
   this->UseTriangleStripsProperty->SetNumberOfElements(1);
   this->UseTriangleStripsProperty->SetElement(0,0);
-    
+
   this->UseImmediateModeProperty = vtkSMIntVectorProperty::New();
   this->UseImmediateModeProperty->SetCommand("SetImmediateModeRendering");
   this->UseImmediateModeProperty->SetNumberOfElements(1);
   this->UseImmediateModeProperty->SetElement(0,0);
-    
+
   this->DirectColorFlagProperty = vtkSMIntVectorProperty::New();
   this->DirectColorFlagProperty->SetCommand("SetColorMode");
   this->DirectColorFlagProperty->SetNumberOfElements(1);
   this->DirectColorFlagProperty->SetElement(0, VTK_COLOR_MODE_DEFAULT);
-    
+
   this->InterpolateColorsFlagProperty = vtkSMIntVectorProperty::New();
   this->InterpolateColorsFlagProperty->SetCommand("SetInterpolateScalarsBeforeMapping");
   this->InterpolateColorsFlagProperty->SetNumberOfElements(1);
@@ -91,12 +91,12 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   this->LineWidthProperty->SetCommand("SetLineWidth");
   this->LineWidthProperty->SetNumberOfElements(1);
   this->LineWidthProperty->SetElement(0, 1.0);
-  
+ 
   this->PointSizeProperty = vtkSMDoubleVectorProperty::New();
   this->PointSizeProperty->SetCommand("SetPointSize");
   this->PointSizeProperty->SetNumberOfElements(1);
   this->PointSizeProperty->SetElement(0, 1.0);
-  
+ 
   this->InterpolationProperty = vtkSMIntVectorProperty::New();
   this->InterpolationProperty->SetCommand("SetInterpolation");
   this->InterpolationProperty->SetNumberOfElements(1);
@@ -106,35 +106,35 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   this->OpacityProperty->SetCommand("SetOpacity");
   this->OpacityProperty->SetNumberOfElements(1);
   this->OpacityProperty->SetElement(0, 1.0);
-  
+ 
   this->ScaleProperty = vtkSMDoubleVectorProperty::New();
   this->ScaleProperty->SetCommand("SetScale");
   this->ScaleProperty->SetNumberOfElements(3);
   this->ScaleProperty->SetElement(0, 1.0);
   this->ScaleProperty->SetElement(1, 1.0);
   this->ScaleProperty->SetElement(2, 1.0);
-  
+ 
   this->TranslateProperty = vtkSMDoubleVectorProperty::New();
   this->TranslateProperty->SetCommand("SetPosition");
   this->TranslateProperty->SetNumberOfElements(3);
   this->TranslateProperty->SetElement(0, 0.0);
   this->TranslateProperty->SetElement(1, 0.0);
   this->TranslateProperty->SetElement(2, 0.0);
-  
+ 
   this->OrientationProperty = vtkSMDoubleVectorProperty::New();
   this->OrientationProperty->SetCommand("SetOrientation");
   this->OrientationProperty->SetNumberOfElements(1);
   this->OrientationProperty->SetElement(0, 0.0);
   this->OrientationProperty->SetElement(1, 0.0);
   this->OrientationProperty->SetElement(2, 0.0);
-  
+ 
   this->OriginProperty = vtkSMDoubleVectorProperty::New();
   this->OriginProperty->SetCommand("SetOrigin");
   this->OriginProperty->SetNumberOfElements(1);
   this->OriginProperty->SetElement(0, 0.0);
   this->OriginProperty->SetElement(1, 0.0);
   this->OriginProperty->SetElement(2, 0.0);
-  
+ 
   this->ColorProperty = vtkSMDoubleVectorProperty::New();
   this->ColorProperty->SetCommand("SetColor");
   this->ColorProperty->SetNumberOfElements(1);
@@ -146,7 +146,7 @@ vtkSMPartDisplay::vtkSMPartDisplay()
 
   this->Source = 0;
   this->ColorMap = 0;
-  
+ 
   this->PropProxy =0;
   this->PropertyProxy =0;
   this->MapperProxy = 0;
@@ -165,7 +165,7 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   this->Volume                 = 0;
   this->VolumeColor            = 0;
   this->VolumeOpacity          = 0;
-  
+ 
   this->OpacityUnitDistance    = 0;
   this->VolumeRenderMode       = 0;
   this->VolumeRenderField      = NULL;

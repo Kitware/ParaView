@@ -164,6 +164,7 @@ protected:
   friend class vtkSMPlotDisplay;
   friend class vtkSMCubeAxesDisplay;
   friend class vtkSMBoxWidgetProxy;
+  friend class vtkPVRenderView;
 //ETX
 
   // Description:

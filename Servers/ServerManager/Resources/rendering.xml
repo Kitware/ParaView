@@ -361,6 +361,128 @@
      </SubProxy>
     </DisplayWindowProxy>
 
+    <!-- New proxy for modifying the lights in ParaView -->
+    <!-- All the default domains/values where taken from the documention of LightKit -->
+    <Proxy name="LightKit" class="vtkLightKit">
+      <!-- Leave the ProxyProperty here, eventhough it is not used right now, -->
+      <!-- see vtkPVRenderView -->
+      <ProxyProperty name="LightsToRenderer" 
+                     command="AddLightsToRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- Key Light -->
+      <DoubleVectorProperty
+        name="KeyLightWarmth"
+        command="SetKeyLightWarmth"
+        number_of_elements="1"
+        default_values="0.60" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="KeyLightIntensity"
+        command="SetKeyLightIntensity"
+        number_of_elements="1"
+        default_values="0.75" >
+        <DoubleRangeDomain name="range" min="0" max="2" resolution="0.05"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="KeyLightElevation"
+        command="SetKeyLightElevation"
+        number_of_elements="1"
+        default_values="50.0" >
+        <DoubleRangeDomain name="range" min="0" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="KeyLightAzimuth"
+        command="SetKeyLightAzimuth"
+        number_of_elements="1"
+        default_values="10.0" >
+        <DoubleRangeDomain name="range" min="-90" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+      <!-- Fill Light -->
+      <DoubleVectorProperty
+        name="FillLightWarmth"
+        command="SetFillLightWarmth"
+        number_of_elements="1"
+        default_values="0.40" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="FillLightK:F Ratio"
+        command="SetKeyToFillRatio"
+        number_of_elements="1"
+        default_values="3.0" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="FillLightElevation"
+        command="SetFillLightElevation"
+        number_of_elements="1"
+        default_values="-75.0" >
+        <DoubleRangeDomain name="range" min="-90" max="10" resolution="1"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="FillLightAzimuth"
+        command="SetFillLightAzimuth"
+        number_of_elements="1"
+        default_values="-10.0" >
+        <DoubleRangeDomain name="range" min="-90" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+      <!-- Back Light -->
+      <DoubleVectorProperty
+        name="BackLightWarmth"
+        command="SetBackLightWarmth"
+        number_of_elements="1"
+        default_values="0.50" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="BackLightK:B Ratio"
+        command="SetKeyToBackRatio"
+        number_of_elements="1"
+        default_values="3.5" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="BackLightElevation"
+        command="SetBackLightElevation"
+        number_of_elements="1"
+        default_values="0.0" >
+        <DoubleRangeDomain name="range" min="-45" max="45" resolution="1"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="BackLightAzimuth"
+        command="SetBackLightAzimuth"
+        number_of_elements="1"
+        default_values="110.0" >
+        <DoubleRangeDomain name="range" min="60" max="170" resolution="1"/>
+      </DoubleVectorProperty>    
+      <!-- Head Light -->
+      <DoubleVectorProperty
+        name="HeadLightWarmth"
+        command="SetHeadLightWarmth"
+        number_of_elements="1"
+        default_values="0.50" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="HeadLightK:H Ratio"
+        command="SetKeyToHeadRatio"
+        number_of_elements="1"
+        default_values="3.0" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+      <!-- Maintain Luminance -->
+     <IntVectorProperty
+        name="MaintainLuminance"
+        command="SetMaintainLuminance"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+    </Proxy>
    </ProxyGroup>
 
  </ServerManagerConfiguration>

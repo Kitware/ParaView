@@ -50,7 +50,7 @@ public:
   virtual int IsInDomain(vtkSMProperty* property);
 
   // Description:
-  // Returns true if the int is in the domain. If value is
+  // Returns true if the double (val) is in the domain. If value is
   // in domain, it's index is return in idx.
   // A value is in the domain if it is between (min, max)
   int IsInDomain(unsigned int idx, double val);
@@ -62,10 +62,16 @@ public:
   double GetMinimum(unsigned int idx, int& exists);
 
   // Description:
-  // Return a max. value if it exists. If the min. exists
+  // Return a max. value if it exists. If the max. exists
   // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified max. is equivalent to inf
+  // An unspecified max. is equivalent to +inf
   double GetMaximum(unsigned int idx, int& exists);
+
+  // Description:
+  // Return a resolution. value if it exists. If the resolution. exists
+  // exists is set to 1. Otherwise, it is set to 0.
+  // An unspecified max. is equivalent to 1
+  double GetResolution(unsigned int idx, int& exists);
 
   // Description:
   // Set a min. of a given index.
@@ -92,6 +98,19 @@ public:
   // Description:
   // Clear all maximum values.
   void RemoveAllMaxima();
+
+  // Description:
+  // Set a resolution. of a given index.
+  void AddResolution(unsigned int idx, double value);
+
+  // Description:
+  // Remove a resolution. of a given index.
+  // An unspecified resolution. is equivalent to 1
+  void RemoveResolution(unsigned int idx);
+
+  // Description:
+  // Clear all resolution values.
+  void RemoveAllResolutions();
 
   // Description:
   // Set the value of an element of a property from the animation editor.
@@ -124,7 +143,8 @@ protected:
   enum
   {
     MIN = 0,
-    MAX = 1
+    MAX = 1,
+    RESOLUTION = 2
   };
 //ETX
 

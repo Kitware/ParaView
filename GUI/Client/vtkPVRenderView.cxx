@@ -76,7 +76,16 @@
 #include "vtkClientServerStream.h"
 #include "vtkPVOptions.h"
 #include "vtkPVTraceHelper.h"
-
+#include "vtkKWEntry.h"
+#include "vtkLightKit.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleRangeDomain.h"
+  
+#include <vtkstd/string>
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -132,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.359");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.360");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -202,6 +211,20 @@ vtkPVRenderView::vtkPVRenderView()
   this->InterfaceSettingsFrame = vtkKWFrameLabeled::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
+  // Light
+  this->LightParameterFrame = vtkKWFrameLabeled::New();
+  this->UseLightButton      = vtkKWCheckButton::New();
+  this->KeyLightLabel       = vtkKWLabel::New();
+  this->FillLightLabel      = vtkKWLabel::New();
+  this->BackLightLabel      = vtkKWLabel::New();
+  this->HeadLightLabel      = vtkKWLabel::New();
+  this->MaintainLuminanceButton   = vtkKWCheckButton::New(); 
+
+  // Create a new proxy light
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  this->LightKitProxy = proxm->NewProxy("rendering", "LightKit");
+  this->LightKitProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER );
+
   this->OrientationAxesFrame = vtkKWFrameLabeled::New();
   this->OrientationAxesCheck = vtkKWCheckButton::New();
   this->OrientationAxesInteractiveCheck = vtkKWCheckButton::New();
@@ -209,8 +232,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationAxesTextColor = vtkKWChangeColorButton::New();
   this->OrientationAxes = vtkPVAxesWidget::New();
 
-  int cc;
-  for ( cc = 0; cc < 6; cc ++ )
+  for ( int cc = 0; cc < 6; cc ++ )
     {
     this->CameraIcons[cc] = vtkPVCameraIcon::New();
     }
@@ -344,6 +366,22 @@ vtkPVRenderView::~vtkPVRenderView()
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
 
+  this->LightParameterFrame->Delete();
+  this->UseLightButton->Delete();
+  this->KeyLightLabel->Delete();
+  this->FillLightLabel->Delete();
+  this->BackLightLabel->Delete();
+  this->HeadLightLabel->Delete();
+  for ( int cc = 0; cc < 4; cc ++ )
+    {
+    this->KeyLightScale[cc]->Delete();
+    this->FillLightScale[cc]->Delete();
+    this->BackLightScale[cc]->Delete();
+    this->HeadLightScale[cc]->Delete();
+    }
+  this->MaintainLuminanceButton->Delete(); 
+  this->LightKitProxy->Delete();
+
   this->OrientationAxesFrame->Delete();
   this->OrientationAxesCheck->Delete();
   this->OrientationAxesInteractiveCheck->Delete();
@@ -421,8 +459,7 @@ vtkPVRenderView::~vtkPVRenderView()
   
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
-  int cc;
-  for ( cc = 0; cc < 6; cc ++ )
+  for ( int cc = 0; cc < 6; cc ++ )
     {
     if ( this->CameraIcons[cc] )
       {
@@ -552,7 +589,7 @@ void vtkPVRenderView::PrepareForDelete()
     this->SelectionWindow->Delete();
     this->SelectionWindow = 0;
     }
-//----------------------------------------------------------------------------
+
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
     {
@@ -887,6 +924,7 @@ void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
     }
 }
 
+void InitializeScale(vtkKWScale *scale, vtkSMProperty *prop);
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CreateViewProperties()
 {
@@ -1032,6 +1070,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
 
+
   // Interface settings: 3D widgets
 
   this->Display3DWidgets->SetParent(
@@ -1059,6 +1098,221 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
                this->Display3DWidgets->GetWidgetName());
+
+
+
+
+  // Light Parameter frame
+  // 
+  // Setup the frame
+  this->LightParameterFrame->SetParent(this->GeneralProperties->GetFrame());
+  this->LightParameterFrame->ShowHideFrameOn();
+  this->LightParameterFrame->Create(this->GetApplication(),0);
+  this->LightParameterFrame->SetLabelText("Light Parameter");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->LightParameterFrame->GetWidgetName());
+
+  // First thing to do is a check button, so that we can remove it (make all paraview tests pass)
+  this->UseLightButton->SetParent(this->LightParameterFrame->GetFrame()); 
+  this->UseLightButton->Create(this->GetApplication(), 0);
+  this->UseLightButton->SetText("Use Light");
+  this->UseLightButton->SetBalloonHelpString( "Light.");
+  this->UseLightButton->SetCommand(this, "UseLightCallback");
+ 
+
+  // Set every different lights from the light kit
+  this->KeyLightLabel->SetParent(this->LightParameterFrame->GetFrame());
+  this->KeyLightLabel->Create(this->GetApplication(), 0);
+  this->KeyLightLabel->SetText("Key Light:");
+  this->KeyLightLabel->SetBalloonHelpString(
+    "Set the key light.");
+
+  this->FillLightLabel->SetParent(this->LightParameterFrame->GetFrame());
+  this->FillLightLabel->Create(this->GetApplication(), 0);
+  this->FillLightLabel->SetText("Fill Light:");
+  this->FillLightLabel->SetBalloonHelpString(
+    "Set the fill light.");
+
+  this->BackLightLabel->SetParent(this->LightParameterFrame->GetFrame());
+  this->BackLightLabel->Create(this->GetApplication(), 0);
+  this->BackLightLabel->SetText("Back Light:");
+  this->BackLightLabel->SetBalloonHelpString(
+    "Set the back light.");
+
+  this->HeadLightLabel->SetParent(this->LightParameterFrame->GetFrame());
+  this->HeadLightLabel->Create(this->GetApplication(), 0);
+  this->HeadLightLabel->SetText("Head Light:");
+  this->HeadLightLabel->SetBalloonHelpString(
+    "Set the head light.");
+
+  const vtkLightKit::LightKitSubType KeyLightSubType[]  = { vtkLightKit::Warmth, 
+                                                            vtkLightKit::Intensity, 
+                                                            vtkLightKit::Elevation, 
+                                                            vtkLightKit::Azimuth };
+  const double KeyLightResolution[]  = { 0.01, 0.05, 1, 1 };
+  const vtkLightKit::LightKitSubType FillLightSubType[] = { vtkLightKit::Warmth, 
+                                                            vtkLightKit::KFRatio, 
+                                                            vtkLightKit::Elevation, 
+                                                            vtkLightKit::Azimuth };
+  const double FillLightResolution[]  = { 0.01, 0.1, 1, 1 };
+  const vtkLightKit::LightKitSubType BackLightSubType[] = { vtkLightKit::Warmth, 
+                                                            vtkLightKit::KBRatio, 
+                                                            vtkLightKit::Elevation, 
+                                                            vtkLightKit::Azimuth };
+  const double BackLightResolution[]  = { 0.01, 0.1, 1, 1 };
+  const vtkLightKit::LightKitSubType HeadLightSubType[] = { vtkLightKit::Warmth, 
+                                                            vtkLightKit::KHRatio };
+  const double HeadLightResolution[]  = { 0.01, 0.1 };
+  char command[100];
+  char endcommand[100];
+  vtkstd::string p;
+  for ( int cc = 0; cc < 4; cc ++ )
+    {
+    this->KeyLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
+    this->KeyLightScale[cc]->PopupScaleOn();
+    this->KeyLightScale[cc]->Create(this->GetApplication(), 0);
+    this->KeyLightScale[cc]->SetResolution(KeyLightResolution[cc]);
+    this->KeyLightScale[cc]->DisplayEntry();
+    this->KeyLightScale[cc]->DisplayEntryAndLabelOnTopOff();
+    this->KeyLightScale[cc]->ExpandEntryOn();
+    this->KeyLightScale[cc]->GetEntry()->SetWidth(5);
+    this->KeyLightScale[cc]->DisplayLabel ( 
+      vtkLightKit::GetStringFromSubType( KeyLightSubType[cc] ));
+    sprintf(command,   "LightCallback %d %d", vtkLightKit::TKeyLight, KeyLightSubType[cc]);
+    sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TKeyLight, KeyLightSubType[cc]);
+    this->KeyLightScale[cc]->SetCommand(this, command);
+    this->KeyLightScale[cc]->SetEndCommand(this, endcommand);
+    this->KeyLightScale[cc]->SetEntryCommand(this, endcommand);
+    this->KeyLightScale[cc]->SetBalloonHelpString( "Set Key Light.");
+
+    p = vtkLightKit::GetStringFromType( vtkLightKit::TKeyLight );
+    p += vtkLightKit::GetStringFromSubType( KeyLightSubType[cc] );
+    InitializeScale(this->KeyLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+
+    this->FillLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
+    this->FillLightScale[cc]->PopupScaleOn();
+    this->FillLightScale[cc]->Create(this->GetApplication(), 0);
+    this->FillLightScale[cc]->SetResolution(FillLightResolution[cc]);
+    this->FillLightScale[cc]->DisplayEntry();
+    this->FillLightScale[cc]->DisplayEntryAndLabelOnTopOff();
+    this->FillLightScale[cc]->ExpandEntryOn();
+    this->FillLightScale[cc]->GetEntry()->SetWidth(5);
+    this->FillLightScale[cc]->DisplayLabel ( 
+      vtkLightKit::GetStringFromSubType( FillLightSubType[cc] ));
+    sprintf(command,   "LightCallback %d %d", vtkLightKit::TFillLight, FillLightSubType[cc]);
+    sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TFillLight, FillLightSubType[cc]);
+    this->FillLightScale[cc]->SetCommand(this, command);
+    this->FillLightScale[cc]->SetEndCommand(this, endcommand);
+    this->FillLightScale[cc]->SetEntryCommand(this, endcommand);
+    this->FillLightScale[cc]->SetBalloonHelpString( "Set Fill Light.");
+
+    p = vtkLightKit::GetStringFromType( vtkLightKit::TFillLight );
+    p += vtkLightKit::GetStringFromSubType( FillLightSubType[cc] );
+    InitializeScale(this->FillLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+
+    this->BackLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
+    this->BackLightScale[cc]->PopupScaleOn();
+    this->BackLightScale[cc]->Create(this->GetApplication(), 0);
+    this->BackLightScale[cc]->SetResolution(BackLightResolution[cc]);
+    this->BackLightScale[cc]->DisplayEntry();
+    this->BackLightScale[cc]->DisplayEntryAndLabelOnTopOff();
+    this->BackLightScale[cc]->ExpandEntryOn();
+    this->BackLightScale[cc]->GetEntry()->SetWidth(5);
+    this->BackLightScale[cc]->DisplayLabel (
+      vtkLightKit::GetStringFromSubType( BackLightSubType[cc] ));
+    sprintf(command,   "LightCallback %d %d", vtkLightKit::TBackLight, BackLightSubType[cc]);
+    sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TBackLight, BackLightSubType[cc]);
+    this->BackLightScale[cc]->SetCommand(this, command);
+    this->BackLightScale[cc]->SetEndCommand(this, endcommand);
+    this->BackLightScale[cc]->SetEntryCommand(this, endcommand);
+    this->BackLightScale[cc]->SetBalloonHelpString( "Set Back Light.");
+
+    p = vtkLightKit::GetStringFromType( vtkLightKit::TBackLight );
+    p += vtkLightKit::GetStringFromSubType( BackLightSubType[cc] );
+    InitializeScale(this->BackLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+
+    if( cc < 2 )
+      {
+      this->HeadLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
+      this->HeadLightScale[cc]->PopupScaleOn();
+      this->HeadLightScale[cc]->Create(this->GetApplication(), 0);
+      this->HeadLightScale[cc]->SetResolution(HeadLightResolution[cc]);
+      this->HeadLightScale[cc]->DisplayEntry();
+      this->HeadLightScale[cc]->DisplayEntryAndLabelOnTopOff();
+      this->HeadLightScale[cc]->ExpandEntryOn();
+      this->HeadLightScale[cc]->GetEntry()->SetWidth(5);
+      this->HeadLightScale[cc]->DisplayLabel (
+        vtkLightKit::GetStringFromSubType( HeadLightSubType[cc] ));
+      sprintf(command,   "LightCallback %d %d", vtkLightKit::THeadLight, HeadLightSubType[cc]);
+      sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::THeadLight, HeadLightSubType[cc]);
+      this->HeadLightScale[cc]->SetCommand(this, command);
+      this->HeadLightScale[cc]->SetEndCommand(this, endcommand);
+      this->HeadLightScale[cc]->SetEntryCommand(this, endcommand);
+      this->HeadLightScale[cc]->SetBalloonHelpString( "Set Head Light.");
+
+      p = vtkLightKit::GetStringFromType( vtkLightKit::THeadLight );
+      p += vtkLightKit::GetStringFromSubType( HeadLightSubType[cc] );
+      InitializeScale(this->HeadLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+      }
+    }
+
+  // Maintain Luminance
+  this->MaintainLuminanceButton->SetParent(this->LightParameterFrame->GetFrame()); 
+  this->MaintainLuminanceButton->Create(this->GetApplication(), 0);
+  this->MaintainLuminanceButton->SetText("Maintain Luminance");
+  this->MaintainLuminanceButton->SetBalloonHelpString( "Maintain Luminance.");
+  this->MaintainLuminanceButton->SetCommand(this, "MaintainLuminanceCallback");
+  // This would be nice if there was an InitializeScale'function like for KWCheckButton too
+ 
+  this->Script("grid %s -sticky nws",
+               this->UseLightButton->GetWidgetName());
+
+  int button_pady = 1;
+  this->Script("grid %s %s %s %s %s -sticky news -pady %d",
+               this->KeyLightLabel->GetWidgetName(),
+               this->KeyLightScale[0]->GetWidgetName(),
+               this->KeyLightScale[1]->GetWidgetName(),
+               this->KeyLightScale[2]->GetWidgetName(),
+               this->KeyLightScale[3]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->KeyLightLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s %s -sticky news -pady %d",
+               this->FillLightLabel->GetWidgetName(),
+               this->FillLightScale[0]->GetWidgetName(),
+               this->FillLightScale[1]->GetWidgetName(),
+               this->FillLightScale[2]->GetWidgetName(),
+               this->FillLightScale[3]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->FillLightLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s %s -sticky news -pady %d",
+               this->BackLightLabel->GetWidgetName(),
+               this->BackLightScale[0]->GetWidgetName(),
+               this->BackLightScale[1]->GetWidgetName(),
+               this->BackLightScale[2]->GetWidgetName(),
+               this->BackLightScale[3]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->BackLightLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->HeadLightLabel->GetWidgetName(),
+               this->HeadLightScale[0]->GetWidgetName(),
+               this->HeadLightScale[1]->GetWidgetName(),
+               this->MaintainLuminanceButton->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->HeadLightLabel->GetWidgetName());
+
+ 
+
 
   // Orientation axes settings
   
@@ -1275,14 +1529,13 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Camera: stored camera position
 
-  int cc;
   this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
   this->CameraIconsFrame->Create(this->GetApplication(), 0);
   this->CameraIconsFrame->SetLabelText("Stored Camera Positions");
 
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
-  for ( cc = 0; cc < 6; cc ++ )
+  for ( int cc = 0; cc < 6; cc ++ )
     {
     int x, y;
     this->CameraIcons[cc]->SetRenderView(this);
@@ -1520,6 +1773,7 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::ForceRender()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1853,6 +2107,279 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   this->GetPVApplication()->GetProcessModule()->SetUseImmediateMode(state);
 
   this->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+double vtkPVRenderView::GetLight(int /*vtkLightKit::LightKitType*/ type, 
+                                 int /*vtkLightKit::LightKitSubType*/ subtype)
+{
+  double value;
+  switch ( type )
+    {
+    case vtkLightKit::TKeyLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          value = this->KeyLightScale[0]->GetValue();
+          break;
+        case vtkLightKit::Intensity:
+          value = this->KeyLightScale[1]->GetValue();
+          break;
+        case vtkLightKit::Elevation:
+          value = this->KeyLightScale[2]->GetValue();
+          break;
+        case vtkLightKit::Azimuth:
+          value = this->KeyLightScale[3]->GetValue();
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::TFillLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          value = this->FillLightScale[0]->GetValue();
+          break;
+        case vtkLightKit::KFRatio:
+          value = this->FillLightScale[1]->GetValue();
+          break;
+        case vtkLightKit::Elevation:
+          value = this->FillLightScale[2]->GetValue();
+          break;
+        case vtkLightKit::Azimuth:
+          value = this->FillLightScale[3]->GetValue();
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::TBackLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          value = this->BackLightScale[0]->GetValue();
+          break;
+        case vtkLightKit::KBRatio:
+          value = this->BackLightScale[1]->GetValue();
+          break;
+        case vtkLightKit::Elevation:
+          value = this->BackLightScale[2]->GetValue();
+          break;
+        case vtkLightKit::Azimuth:
+          value = this->BackLightScale[3]->GetValue();
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::THeadLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          value = this->HeadLightScale[0]->GetValue();
+          break;
+        case vtkLightKit::KHRatio:
+          value = this->HeadLightScale[1]->GetValue();
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    default:
+      vtkErrorMacro("Error");
+    }
+
+  return value;
+}
+
+//----------------------------------------------------------------------------
+// Helper function to down cast to double vector sm property and set value
+inline int DoubleVectSetElement(vtkSMProperty *prop, double value)
+{
+  vtkSMDoubleVectorProperty *dp = vtkSMDoubleVectorProperty::SafeDownCast( prop );
+  return dp->SetElements1(value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLightNoTrace(int type, int subtype, double value)
+{
+  // Both GUI settings and acu
+  switch ( type )
+    {
+    case vtkLightKit::TKeyLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          this->KeyLightScale[0]->SetValue(value);
+          break;
+        case vtkLightKit::Intensity:
+          this->KeyLightScale[1]->SetValue(value);
+          break;
+        case vtkLightKit::Elevation:
+          this->KeyLightScale[2]->SetValue(value);
+          break;
+        case vtkLightKit::Azimuth:
+          this->KeyLightScale[3]->SetValue(value);
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::TFillLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          this->FillLightScale[0]->SetValue(value);
+          break;
+        case vtkLightKit::KFRatio:
+          this->FillLightScale[1]->SetValue(value);
+          break;
+        case vtkLightKit::Elevation:
+          this->FillLightScale[2]->SetValue(value);
+          break;
+        case vtkLightKit::Azimuth:
+          this->FillLightScale[3]->SetValue(value);
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::TBackLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          this->BackLightScale[0]->SetValue(value);
+          break;
+        case vtkLightKit::KBRatio:
+          this->BackLightScale[1]->SetValue(value);
+          break;
+        case vtkLightKit::Elevation:
+          this->BackLightScale[2]->SetValue(value);
+          break;
+        case vtkLightKit::Azimuth:
+          this->BackLightScale[3]->SetValue(value);
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    case vtkLightKit::THeadLight:
+      switch ( subtype )
+        {
+        case vtkLightKit::Warmth:
+          this->HeadLightScale[0]->SetValue(value);
+          break;
+        case vtkLightKit::KHRatio:
+          this->HeadLightScale[1]->SetValue(value);
+          break;
+        default:
+          vtkErrorMacro("Error");
+          break;
+        }
+      break;
+    default:
+      vtkErrorMacro("Error");
+    }
+
+  vtkstd::string s;
+  s = vtkLightKit::GetStringFromType(type);
+  s += vtkLightKit::GetStringFromSubType(subtype);
+  DoubleVectSetElement(this->LightKitProxy->GetProperty(s.c_str()), value);
+  this->LightKitProxy->UpdateVTKObjects();
+
+  // Do not render here (do it in the callback, since it could be either
+  // Render or EventuallyRender depending on the interaction)
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLight(int type, int subtype, double value)
+{
+  this->SetLightNoTrace(type, subtype, value);
+  this->EventuallyRender();
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLight %d %d %f",
+                      this->GetTclName(), type, subtype, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::LightCallback(int /*LightKitType*/ type, int /*LightKitSubType*/ subtype)
+{
+  double value = this->GetLight(type, subtype);
+  this->SetLightNoTrace(type, subtype, value);
+  this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::LightEndCallback(int type, int subtype)
+{
+  double value = this->GetLight(type, subtype);
+  this->SetLight(type, subtype, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::MaintainLuminanceCallback()
+{
+  int val = this->MaintainLuminanceButton->GetState();
+  this->SetMaintainLuminance(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetMaintainLuminance(int s)
+{
+  // Set the GUI
+  this->MaintainLuminanceButton->SetState(s);
+  vtkSMProperty *prop = this->LightKitProxy->GetProperty("MaintainLuminance");
+  vtkSMIntVectorProperty *dp = vtkSMIntVectorProperty::SafeDownCast( prop );
+  dp->SetElements1(s);
+  this->LightKitProxy->UpdateVTKObjects();
+  this->EventuallyRender();
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetMaintainLuminance %d",
+                      this->GetTclName(), s);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UseLightCallback()
+{
+  int val = this->UseLightButton->GetState();
+  this->SetUseLight(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetUseLight(int s)
+{
+  // Set the GUI
+  this->UseLightButton->SetState(s);
+  vtkProcessModule *pm = this->RenderModule->GetProcessModule();
+  if( s )
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->LightKitProxy->GetID(0)
+      << "AddLightsToRenderer" << this->RenderModule->GetRendererID() 
+      << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
+    }
+  else
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->LightKitProxy->GetID(0)
+      << "RemoveLightsFromRenderer" << this->RenderModule->GetRendererID() 
+      << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
+    }
+    
+
+  this->EventuallyRender();
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetUseLight %d", this->GetTclName(), s);
 }
 
 //----------------------------------------------------------------------------
@@ -2490,6 +3017,23 @@ void vtkPVRenderView::UpdateEnableState()
   this->PropagateEnableState(this->RenderModuleUI);
   this->PropagateEnableState(this->InterfaceSettingsFrame);
   this->PropagateEnableState(this->Display3DWidgets);
+  //Light
+  this->PropagateEnableState(this->LightParameterFrame);
+  this->PropagateEnableState(this->UseLightButton);
+  this->PropagateEnableState(this->KeyLightLabel);
+  this->PropagateEnableState(this->FillLightLabel);
+  this->PropagateEnableState(this->BackLightLabel);
+  this->PropagateEnableState(this->HeadLightLabel);
+  for ( int cc = 0; cc < 4; cc ++ )
+    {
+    this->KeyLightScale[cc] = vtkKWScale::New();
+    this->FillLightScale[cc] = vtkKWScale::New();
+    this->BackLightScale[cc] = vtkKWScale::New();
+    this->HeadLightScale[cc] = vtkKWScale::New();
+    }
+  this->PropagateEnableState(this->MaintainLuminanceButton);
+
+
   this->PropagateEnableState(this->OrientationAxesFrame);
   this->PropagateEnableState(this->OrientationAxesCheck);
   this->PropagateEnableState(this->OrientationAxesInteractiveCheck);
@@ -2506,8 +3050,7 @@ void vtkPVRenderView::UpdateEnableState()
   this->PropagateEnableState(this->ManipulatorControl3D);
   this->PropagateEnableState(this->CameraControlFrame);
   this->PropagateEnableState(this->CameraIconsFrame);
-  int cc;
-  for ( cc = 0; cc < 6; cc ++ )
+  for ( int cc = 0; cc < 6; cc ++ )
     {
     this->PropagateEnableState(this->CameraIcons[cc]);
     }
@@ -2552,3 +3095,29 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
 }
+
+//----------------------------------------------------------------------------
+// Special method to enforce the relationship between a GUI element / vtkSMproxy
+// in our case only do the relationship vtkKWScale / vtkSMProperty
+void InitializeScale(vtkKWScale *scale, vtkSMProperty *prop)
+{
+  // First set the domain(=range) of the KWScale
+  vtkSMDoubleRangeDomain *domain = 
+    vtkSMDoubleRangeDomain::SafeDownCast( prop->GetDomain("range") );
+  int index, exist;
+  index = 0; // In our case this is always true
+
+  double min = domain->GetMinimum(index, exist);
+  double max = domain->GetMaximum(index, exist);
+  scale->SetRange(min, max);
+
+  // Then set the resolution of the KWScale
+  double res = domain->GetResolution(index, exist);
+  scale->SetResolution(res);
+
+  // Now try to access the default values, this is tricky since they are not saved anywhere
+  vtkSMDoubleVectorProperty *dprop = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+  double value = dprop->GetElement(0);
+  scale->SetValue(value);
+}
+

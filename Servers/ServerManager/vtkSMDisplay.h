@@ -70,6 +70,7 @@ protected:
   // PVSource calls this when it gets modified.
   virtual void InvalidateGeometry() = 0;
 
+private:
   vtkSMDisplay(const vtkSMDisplay&); // Not implemented
   void operator=(const vtkSMDisplay&); // Not implemented
 };

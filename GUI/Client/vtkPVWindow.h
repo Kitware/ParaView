@@ -67,7 +67,6 @@ class vtkKWPushButtonWithMenu;
 class vtkKWMenuButton;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
-class vtkKWScale;
 class vtkKWToolbar;
 class vtkKWUserInterfaceNotebookManager;
 class vtkPVAnimationInterface;

@@ -56,6 +56,7 @@ class vtkPVRenderModuleUI;
 class vtkPVRenderViewObserver;
 class vtkPVRenderModule;
 class vtkTimerLog;
+class vtkSMProxy;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
 
@@ -318,6 +319,31 @@ public:
   vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   //ETX
 
+  // Description:
+  // Callback when modifying the light kit via a slider
+  void              LightCallback(int type, int subtype);
+
+  // Description:
+  // Callback when done modifying the light kit (end of slider event)
+  void              LightEndCallback(int type, int subtype);
+
+  // Description:
+  // Callback for setting/removing the luminance
+  void              MaintainLuminanceCallback();
+  void              SetMaintainLuminance(int s);
+
+  // Description:
+  // Callback for setting/remove the kit light from the renderer (usefull for the test suite)
+  void              UseLightCallback();
+  void              SetUseLight(int s);
+  
+  // Description:
+  // Used for the callback / and the trace
+  double            GetLight(int type, int subtype);
+  void              SetLightNoTrace(int type, int subtype, double value);
+  void              SetLight(int type, int subtype, double value);
+
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -346,6 +372,21 @@ protected:
 
   vtkKWFrameLabeled *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
+
+  // Lighting stuff:
+  vtkKWFrameLabeled *LightParameterFrame;
+  vtkKWCheckButton  *UseLightButton;
+  vtkKWLabel        *KeyLightLabel;
+  vtkKWLabel        *FillLightLabel;
+  vtkKWLabel        *BackLightLabel;
+  vtkKWLabel        *HeadLightLabel;
+  vtkKWScale        *KeyLightScale[4];
+  vtkKWScale        *FillLightScale[4];
+  vtkKWScale        *BackLightScale[4];
+  vtkKWScale        *HeadLightScale[4];
+  vtkKWCheckButton  *MaintainLuminanceButton;
+  // Main proxy to access the vtkLightKit
+  vtkSMProxy        *LightKitProxy;
 
   vtkKWFrameLabeled *OrientationAxesFrame;
   vtkKWCheckButton *OrientationAxesCheck;

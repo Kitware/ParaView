@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.11");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -29,10 +29,12 @@ struct vtkSMDoubleRangeDomainInternals
   {
     double Min;
     double Max;
+    double Resolution;
     int MinSet;
     int MaxSet;
+    int ResolutionSet;
     
-    EntryType() : Min(0), Max(0), MinSet(0), MaxSet(0) {}
+    EntryType() : Min(0), Max(0), Resolution(0), MinSet(0), MaxSet(0), ResolutionSet(0) {}
   };
   vtkstd::vector<EntryType> Entries;
 };
@@ -82,6 +84,7 @@ int vtkSMDoubleRangeDomain::IsInDomain(vtkSMProperty* property)
 //---------------------------------------------------------------------------
 int vtkSMDoubleRangeDomain::IsInDomain(unsigned int idx, double val)
 {
+  // User has not put any condition so domains is always valid
   if (idx >= this->DRInternals->Entries.size())
     {
     return 1;
@@ -97,6 +100,12 @@ int vtkSMDoubleRangeDomain::IsInDomain(unsigned int idx, double val)
     {
     return 0;
     }
+  
+  if ( this->DRInternals->Entries[idx].ResolutionSet )
+    {
+    // Ambiguous case
+    }
+  //else the resolution is not taken into account
 
   return 1;
 }
@@ -146,6 +155,22 @@ double vtkSMDoubleRangeDomain::GetMaximum(unsigned int idx, int& exists)
 }
 
 //---------------------------------------------------------------------------
+double vtkSMDoubleRangeDomain::GetResolution(unsigned int idx, int& exists)
+{
+  exists = 0;
+  if (idx >= this->DRInternals->Entries.size())
+    {
+    return 0;
+    }
+  if (this->DRInternals->Entries[idx].ResolutionSet)
+    {
+    exists=1;
+    return this->DRInternals->Entries[idx].Resolution;
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleRangeDomain::AddMinimum(unsigned int idx, double val)
 {
   this->SetEntry(idx, vtkSMDoubleRangeDomain::MIN, 1, val);
@@ -190,14 +215,36 @@ void vtkSMDoubleRangeDomain::RemoveAllMaxima()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::AddResolution(unsigned int idx, double val)
+{
+  this->SetEntry(idx, vtkSMDoubleRangeDomain::RESOLUTION, 1, val);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::RemoveResolution(unsigned int idx)
+{
+  this->SetEntry(idx, vtkSMDoubleRangeDomain::RESOLUTION, 0, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::RemoveAllResolutions()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMDoubleRangeDomain::RESOLUTION, 0, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleRangeDomain::SetEntry(
-  unsigned int idx, int minOrMax, int set, double value)
+  unsigned int idx, int minOrMaxOrRes, int set, double value)
 {
   if (idx >= this->DRInternals->Entries.size())
     {
     this->DRInternals->Entries.resize(idx+1);
     }
-  if (minOrMax == MIN)
+  if (minOrMaxOrRes == MIN)
     {
     if (set)
       {
@@ -209,7 +256,7 @@ void vtkSMDoubleRangeDomain::SetEntry(
       this->DRInternals->Entries[idx].MinSet = 0;
       }
     }
-  else
+  else if(minOrMaxOrRes == MAX)
     {
     if (set)
       {
@@ -219,6 +266,18 @@ void vtkSMDoubleRangeDomain::SetEntry(
     else
       {
       this->DRInternals->Entries[idx].MaxSet = 0;
+      }
+    }
+  else //if (minOrMaxOrRes == RESOLUTION)
+    {
+    if (set)
+      {
+      this->DRInternals->Entries[idx].ResolutionSet = 1;
+      this->DRInternals->Entries[idx].Resolution = value;
+      }
+    else
+      {
+      this->DRInternals->Entries[idx].ResolutionSet = 0;
       }
     }
 }
@@ -285,6 +344,17 @@ int vtkSMDoubleRangeDomain::ReadXMLAttributes(
     for (unsigned int i=0; i<(unsigned int)numRead; i++)
       {
       this->AddMaximum(i, values[i]);
+      }
+    }
+
+  numRead = element->GetVectorAttribute("resolution",
+                                        MAX_NUM,
+                                        values);
+  if (numRead > 0)
+    {
+    for (unsigned int i=0; i<(unsigned int)numRead; i++)
+      {
+      this->AddResolution(i, values[i]);
       }
     }
 
