@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.30");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.31");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -374,46 +374,6 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   flip->Delete();
 #endif
   return res;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWTkUtilities::SetImageOption(Tcl_Interp *interp,
-                                     const char *widget,
-                                     vtkKWIcon *icon, 
-                                     const char *image_name_suffix)
-{
-  if (!interp || 
-      !widget || !*widget || 
-      !icon || 
-      !image_name_suffix || !*image_name_suffix)
-    {
-    return 0;
-    }
-
-
-  ostrstream image_name;
-  image_name << widget << image_name_suffix << ends;
-
-  if (!vtkKWTkUtilities::UpdatePhoto(
-        interp,
-        image_name.str(), 
-        icon->GetData(), 
-        icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize(), 
-        icon->GetWidth() * icon->GetHeight() * icon->GetPixelSize(), 
-        widget))
-    {
-    image_name.rdbuf()->freeze(0);
-    return 0;
-    }
-
-  ostrstream config;
-  config << widget << " config -image " << image_name.str() << ends;
-  int res = Tcl_GlobalEval(interp, config.str());
-  config.rdbuf()->freeze(0);
-
-  image_name.rdbuf()->freeze(0);
-
-  return (res != TCL_OK ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
