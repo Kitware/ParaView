@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.4");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.5");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -48,7 +48,7 @@ void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
 {
   // Skip over LOD res and threshold.
   
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("RenderModuleUI already created");
     return;
