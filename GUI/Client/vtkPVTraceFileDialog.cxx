@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.8");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -31,9 +31,13 @@ vtkPVTraceFileDialog::vtkPVTraceFileDialog()
 {
   this->SaveFrame = vtkKWFrame::New();
   this->SaveFrame->SetParent(this->ButtonFrame);
-
   this->SaveButton = vtkKWPushButton::New();
   this->SaveButton->SetParent(this->SaveFrame);
+
+  this->RetraceFrame = vtkKWFrame::New();
+  this->RetraceFrame->SetParent(this->ButtonFrame);
+  this->RetraceButton = vtkKWPushButton::New();
+  this->RetraceButton->SetParent(this->RetraceFrame);
 
   this->SetStyleToOkCancel();
   this->SetOptions(
@@ -49,6 +53,8 @@ vtkPVTraceFileDialog::~vtkPVTraceFileDialog()
 {
   this->SaveFrame->Delete();
   this->SaveButton->Delete();
+  this->RetraceFrame->Delete();
+  this->RetraceButton->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -83,6 +89,24 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
                             "configure -relief flat");
     this->SaveButton->SetBind(this, "<Return>", "Save");
     }
+  this->RetraceFrame->Create(app, "-bd 3 -relief flat");
+
+  this->RetraceButton->Create(app, "-text Retrace -width 16");
+  this->RetraceButton->SetCommand(this, "Retrace");
+
+  this->Script("pack %s -side left -expand yes",
+               this->RetraceButton->GetWidgetName());
+  this->Script("pack %s -side left -padx 4 -expand yes",
+               this->RetraceFrame->GetWidgetName());
+
+  if ( this->RetraceButton->GetApplication() )
+    {
+    this->RetraceButton->SetBind("<FocusIn>", this->RetraceFrame->GetWidgetName(), 
+                            "configure -relief groove");
+    this->RetraceButton->SetBind("<FocusOut>", this->RetraceFrame->GetWidgetName(), 
+                            "configure -relief flat");
+    this->RetraceButton->SetBind(this, "<Return>", "Retrace");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +115,14 @@ void vtkPVTraceFileDialog::Save()
   this->Script("wm withdraw %s",this->GetWidgetName());
   this->Script("grab release %s",this->GetWidgetName());
   this->Done = 3;  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTraceFileDialog::Retrace()
+{
+  this->Script("wm withdraw %s",this->GetWidgetName());
+  this->Script("grab release %s",this->GetWidgetName());
+  this->Done = 4;  
 }
 
 //----------------------------------------------------------------------------

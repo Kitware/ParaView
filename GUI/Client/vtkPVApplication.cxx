@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.320");
+vtkCxxRevisionMacro(vtkPVApplication, "1.321");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1059,6 +1059,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->SplashScreen->Hide();
     }
 
+  const char* loadedTraceName = 0;
+
   // If there is already an existing trace file, ask the
   // user what she wants to do with it.
   if (foundTrace && ! this->Options->GetParaViewScriptName()) 
@@ -1084,7 +1086,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
     dlg2->SetIcon();
     int shouldSave = dlg2->Invoke();
     dlg2->Delete();
-    if (shouldSave == 2)
+    if ( shouldSave == 3 )
+      {
+      loadedTraceName = traceName;
+      }
+    else if (shouldSave == 2)
       {
       this->SaveTraceFile(traceName);
       }
@@ -1143,7 +1149,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Some scripts were hanging due to event loop issues.
   // This update prevents such problems.
   this->Script("update");
-  if (this->Options->GetParaViewScriptName())
+  if (loadedTraceName)
+    {
+    this->LoadScript(loadedTraceName);
+    }
+  else if (this->Options->GetParaViewScriptName())
     {
     this->LoadScript(this->Options->GetParaViewScriptName());
     }

@@ -43,6 +43,7 @@ public:
   // Description:
   // Sets the save flag.
   virtual void Save();
+  virtual void Retrace();
 
 protected:
   vtkPVTraceFileDialog();
@@ -50,6 +51,8 @@ protected:
 
   vtkKWPushButton *SaveButton;
   vtkKWFrame  *SaveFrame;
+  vtkKWPushButton *RetraceButton;
+  vtkKWFrame  *RetraceFrame;
 
 private:
   vtkPVTraceFileDialog(const vtkPVTraceFileDialog&); // Not implemented
