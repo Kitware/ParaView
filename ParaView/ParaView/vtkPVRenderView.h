@@ -64,6 +64,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // I wanted to get rid of these methods, but they are used
+  // for corner annotation to work.
+  void Add2DComposite(vtkKWComposite *c);
+  void Remove2DComposite(vtkKWComposite *c);
+
+  // Description:
   // Set the application right after construction.
   void CreateRenderObjects(vtkPVApplication *pvApp);
   

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.304");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.305");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -225,6 +225,42 @@ vtkPVRenderView::vtkPVRenderView()
   this->Observer = vtkPVRenderViewObserver::New();
   this->Observer->PVRenderView = this;
 }
+
+
+
+//----------------------------------------------------------------------------
+// Only used for corner annotation.
+void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)  
+{  
+  //int fixme;  // this should be in render module.  
+   
+  c->SetView(this);  
+  // never allow a composite to be added twice  
+  if (this->Composites->IsItemPresent(c))  
+    {  
+    return;  
+    }  
+  this->Composites->AddItem(c);  
+  if (c->GetProp() != NULL)  
+    {  
+    this->GetRenderer2D()->AddProp(c->GetProp());  
+    }  
+}  
+   
+//----------------------------------------------------------------------------
+// Only used for corner annotation.
+void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)  
+{  
+  
+  c->SetView(NULL);  
+  this->GetRenderer2D()->RemoveProp(c->GetProp());  
+  this->Composites->RemoveItem(c);  
+}  
+
+
+
+
+
 
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
