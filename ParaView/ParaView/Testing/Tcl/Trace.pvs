@@ -85,10 +85,8 @@ $pv(vtkTemp1) ResetCameraCallback
 set kw(vtkTemp327) [$pv(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp328) [$kw(vtkTemp327) GetPVWidget {Clip Function}]
 set kw(vtkTemp334) [$kw(vtkTemp328) GetPVWidget {Plane}]
-set kw(vtkTemp335) [$kw(vtkTemp334) GetCenterEntry]
-$kw(vtkTemp335) SetValue 0 16 0
-set kw(vtkTemp336) [$kw(vtkTemp334) GetNormalEntry]
-$kw(vtkTemp336) SetValue 0.57546 0.76627 -0.28578
+$kw(vtkTemp334) SetCenter 0 16 0
+$kw(vtkTemp334) SetNormal 0.57546 0.76627 -0.28578
 set kw(vtkTemp337) [$kw(vtkTemp327) GetPVWidget {Offset}]
 $kw(vtkTemp337) SetValue 1
 $kw(vtkTemp327) AcceptCallback

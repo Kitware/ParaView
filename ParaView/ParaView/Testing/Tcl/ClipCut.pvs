@@ -44,10 +44,8 @@ $pv(vtkTemp250) AcceptCallback
 set pv(vtkTemp294) [$pv(vtkTemp1) CreatePVSource Clip]
 set pv(vtkTemp296) [$pv(vtkTemp294) GetPVWidget {Clip Function}]
 set pv(vtkTemp295) [$pv(vtkTemp296) GetPVWidget {Plane}]
-set pv(vtkTemp303) [$pv(vtkTemp295) GetCenterEntry]
-$pv(vtkTemp303) SetValue 0.150 0.650 0.500
-set pv(vtkTemp307) [$pv(vtkTemp295) GetNormalEntry]
-$pv(vtkTemp307) SetValue 0 0 -1
+$pv(vtkTemp295) SetCenter 0.150 0.650 0.500
+$pv(vtkTemp295) SetNormal 0 0 -1
 $pv(vtkTemp294) AcceptCallback
 
 set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
@@ -59,10 +57,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp366) [$pv(vtkTemp1) CreatePVSource Clip]
 set pv(vtkTemp368) [$pv(vtkTemp366) GetPVWidget {Clip Function}]
 set pv(vtkTemp367) [$pv(vtkTemp368) GetPVWidget {Plane}]
-set pv(vtkTemp375) [$pv(vtkTemp367) GetCenterEntry]
-$pv(vtkTemp375) SetValue -1.150 0.650 0.500
-set pv(vtkTemp379) [$pv(vtkTemp367) GetNormalEntry]
-$pv(vtkTemp379) SetValue -0.54203 0.35221 -0.76299
+$pv(vtkTemp367) SetCenter -1.150 0.650 0.500
+$pv(vtkTemp367) SetNormal -0.54203 0.35221 -0.76299
 set pv(vtkTemp383) [$pv(vtkTemp366) GetPVWidget {Offset}]
 $pv(vtkTemp383) SetValue 0.2
 $pv(vtkTemp366) AcceptCallback
@@ -76,8 +72,7 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
 set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
-set pv(vtkTemp425) [$pv(vtkTemp417) GetCenterEntry]
-$pv(vtkTemp425) SetValue 0.150 -0.650 0.500
+$pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
 $pv(vtkTemp416) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
@@ -86,10 +81,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp446) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp449) [$pv(vtkTemp446) GetPVWidget {Cut Function}]
 set pv(vtkTemp448) [$pv(vtkTemp449) GetPVWidget {Plane}]
-set pv(vtkTemp455) [$pv(vtkTemp448) GetCenterEntry]
-$pv(vtkTemp455) SetValue -1.1 -0.650 0.500
-set pv(vtkTemp459) [$pv(vtkTemp448) GetNormalEntry]
-$pv(vtkTemp459) SetValue 0.58440 0.58807 -0.55914
+$pv(vtkTemp448) SetCenter -1.1 -0.650 0.500
+$pv(vtkTemp448) SetNormal 0.58440 0.58807 -0.55914
 set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Cut Values}]
 $pv(vtkTemp463) RemoveAllValues
 $pv(vtkTemp463) AddValue 0.1
