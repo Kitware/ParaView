@@ -16,6 +16,11 @@ if {[info exists argc]} {
     }
 } 
 
+# Fix the size of the image.
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
+update
+
 $kw(vtkTemp18) SetOrientationAxesVisibility 0
 
 # create superquadric
@@ -41,429 +46,339 @@ $kw(vtkTemp937) SetState 1
 $kw(vtkTemp897) AcceptCallback
 
 # Pan
-$kw(vtkTemp4) SetInteractorEventInformation 255 303 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 152 151 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 256 303 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 153 151 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 256 302 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 152 150 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 256 301 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 152 149 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 255 300 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 151 148 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 255 298 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 150 148 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 253 297 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 150 147 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 253 296 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 149 146 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 252 295 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 148 144 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 251 293 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 147 143 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 249 290 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 147 142 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 249 289 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 145 142 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 248 287 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 145 140 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 247 286 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 144 139 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 244 285 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 143 138 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 244 282 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 142 136 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 242 280 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 141 136 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 240 278 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 140 135 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 239 274 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 140 133 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 238 273 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 138 132 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 236 272 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 137 131 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 235 268 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 137 130 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 233 266 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 135 129 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 231 263 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 134 127 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 230 261 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 134 125 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 227 259 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 132 125 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 226 256 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 131 124 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 225 252 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 131 123 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 223 251 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 130 121 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 221 249 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 129 120 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 220 247 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 128 119 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 218 243 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 127 118 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 217 242 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 126 117 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 215 239 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 125 116 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 214 237 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 125 115 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 212 235 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 124 114 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 211 233 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 123 114 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 210 231 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 123 113 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 208 230 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 208 229 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 207 229 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 207 228 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 207 228 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 123 113 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonReleaseEvent"
 
 # Roll
-$kw(vtkTemp4) SetInteractorEventInformation 370 85 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 42 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 370 86 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 43 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 370 87 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 44 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 370 89 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 45 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 370 90 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 221 45 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 90 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 221 46 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 91 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 221 47 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 92 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 48 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 94 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 49 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 97 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 50 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 99 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 52 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 374 101 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 53 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 374 104 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 54 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 374 106 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 55 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 374 109 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 56 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 375 110 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 58 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 375 113 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 61 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 117 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 62 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 122 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 64 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 124 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 67 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 129 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 70 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 134 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 72 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 141 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 74 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 144 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 78 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 149 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 81 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 156 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 82 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 163 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 85 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 165 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 90 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 170 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 93 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 177 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 96 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 180 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 98 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 186 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 99 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 193 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 102 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 196 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 105 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 198 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 107 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 376 206 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 108 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 211 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 110 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 215 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 111 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 217 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 113 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 221 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 114 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 224 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 117 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 227 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 118 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 229 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 120 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 235 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 122 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 237 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 124 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 241 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 125 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 246 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 126 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 249 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 128 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 250 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 129 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 252 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 130 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 253 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 131 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 258 0 1 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 259 0 1 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 262 0 1 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 263 0 1 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 377 263 0 1 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 224 131 0 1 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # Choose center of rotation
 $kw(vtkTemp4) ChangeInteractorStyle 4
-$kw(vtkTemp4) SetInteractorEventInformation 234 273 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 139 136 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 $kw(vtkTemp4) ChangeInteractorStyle 1
 
 # Rotate
-$kw(vtkTemp4) SetInteractorEventInformation 197 228 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 113 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 230 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 114 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 231 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 115 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 232 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 116 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 233 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 117 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 234 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 118 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 235 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 119 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 236 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 120 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 238 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 121 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 239 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 240 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 241 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 242 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 243 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 244 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 245 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 249 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 252 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 256 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 258 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 264 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 269 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 274 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 278 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 282 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 285 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 286 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 289 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 198 291 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 293 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 197 295 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 196 297 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 196 298 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 195 300 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 195 304 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 193 307 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 193 308 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 191 312 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 191 313 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 190 314 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 190 314 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 117 121 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # Zoom
-$kw(vtkTemp4) SetInteractorEventInformation 371 109 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 54 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "RightButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 110 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 55 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 111 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 56 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 112 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 57 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 113 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 58 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 114 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 59 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 115 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 60 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 117 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 61 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 118 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 63 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 120 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 64 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 121 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 65 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 123 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 66 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 126 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 67 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 128 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 69 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 129 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 220 70 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 130 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 221 72 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 133 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 221 76 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 135 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 78 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 138 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 82 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 371 140 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 83 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 145 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 86 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 372 152 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 90 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 157 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 92 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 164 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 97 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 168 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 100 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 173 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 102 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 180 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 106 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 185 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 109 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 195 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 111 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 200 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 115 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 206 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 118 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 213 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 121 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 220 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 123 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 224 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 125 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 231 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 126 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 238 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 129 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 243 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 131 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 248 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 132 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 251 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 134 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 254 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 135 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 259 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 137 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 264 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 222 138 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 265 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 138 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 269 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 272 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 275 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 276 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 373 277 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 375 278 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 375 278 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 223 138 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "RightButtonReleaseEvent"
 
 # Move
-[$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
-$kw(vtkTemp4) SetInteractorEventInformation 196 240 0 0 0 0 0
+#[$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
+$kw(vtkTemp4) SetInteractorEventInformation 116 119 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 196 241 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 116 120 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 196 243 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 116 121 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 189 254 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 112 126 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 180 266 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 107 132 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 166 282 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 99 140 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 155 297 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 92 148 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 145 317 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 86 158 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 134 343 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 80 171 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 129 357 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 77 178 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 126 368 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 75 183 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 119 395 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 71 197 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 118 397 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 70 198 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 118 397 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 70 198 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 
 # parallel projection (pan and zoom work differently with parallel and
@@ -471,160 +386,117 @@ $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonReleaseEvent"
 $kw(vtkTemp18) ParallelProjectionOn
 
 # pan
-$kw(vtkTemp4) SetInteractorEventInformation 134 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 80 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 135 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 80 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 136 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 81 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 137 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 84 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 142 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 86 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 145 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 91 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 154 345 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 97 170 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 164 342 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 105 169 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 176 339 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 110 168 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 185 337 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 119 166 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 200 334 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 129 164 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 217 330 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 141 161 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 238 324 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 249 322 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 269 319 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 286 315 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 298 312 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 307 311 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 310 309 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 312 309 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 312 309 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 141 161 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MiddleButtonReleaseEvent"
 
 # zoom
-$kw(vtkTemp4) SetInteractorEventInformation 103 373 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 186 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "RightButtonPressEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 372 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 185 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 371 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 184 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 370 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 183 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 367 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 182 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 366 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 181 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 365 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 180 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 364 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 179 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 363 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 178 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 362 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 177 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 360 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 176 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 359 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 175 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 358 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 174 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 356 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 173 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 355 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 172 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 354 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 171 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 351 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 170 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 350 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 169 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 349 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 168 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 348 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 166 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 347 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 163 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 346 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 162 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 345 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 160 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 343 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 159 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 342 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 158 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 340 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 157 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 338 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 155 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 334 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 154 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 333 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 153 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 328 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 151 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 325 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 150 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 321 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 149 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 320 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 147 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 317 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 146 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 315 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 145 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 312 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 144 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 311 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 143 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 309 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 141 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 307 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 140 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 304 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 139 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 301 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 300 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 296 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 294 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 292 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 289 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 288 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 287 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 284 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 283 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 281 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 280 0 0 0 0 0
-$kw(vtkTemp4) InvokeInteractorEvent "MouseMoveEvent"
-$kw(vtkTemp4) SetInteractorEventInformation 103 280 0 0 0 0 0
+$kw(vtkTemp4) SetInteractorEventInformation 61 139 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "RightButtonReleaseEvent"
 
-# Fix the size of the image.
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 
