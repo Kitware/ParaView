@@ -262,6 +262,9 @@ protected:
 
 private:
 
+vtkPVLookmarkManager(const vtkPVLookmarkManager&); // Not implemented
+void operator=(const vtkPVLookmarkManager&); // Not implemented
+
 //BTX
   vtkVector<vtkPVLookmark*> *PVLookmarks;
   vtkVector<vtkKWLookmark*> *KWLookmarks;

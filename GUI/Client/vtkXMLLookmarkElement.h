@@ -37,7 +37,8 @@ class vtkXMLDataParser;
 class VTK_IO_EXPORT vtkXMLLookmarkElement : public vtkXMLDataElement
 {
 public:
-  vtkTypeRevisionMacro(vtkXMLLookmarkElement,vtkObject);
+
+  vtkTypeRevisionMacro(vtkXMLLookmarkElement, vtkXMLDataElement)
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkXMLLookmarkElement* New();
 
