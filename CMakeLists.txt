@@ -1,18 +1,25 @@
 PROJECT(PARAVIEW) 
 
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
+
 # load in the values from VTK if found
 IF ( VTK_BINARY_DIR )
   LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
-                               BUILD_SHARED_LIBS
-                               BUILD_TESTING)
+                                BUILD_SHARED_LIBS
+                                BUILD_TESTING
+                                LIBRARY_OUTPUT_PATH
+                                EXECUTABLE_OUTPUT_PATH
+                               INCLUDE_INTERNALS
+                                VTK_BINARY_PATH
+                                VTK_LIBRARY_PATH)
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
   SUBDIRS(Widgets ParaView)
   SUBDIR_DEPENDS(ParaView Widgets)
 ENDIF (VTK_BINARY_DIR )
 
+OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
+OPTION(BUILD_EXAMPLES "Build VTK examples." OFF)
 
-INCLUDE (${CMAKE_ROOT}/Modules/FindMPI.cmake)
 IF (MPI_LIBRARY)
   LINK_LIBRARIES (${MPI_LIBRARY})
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
@@ -33,9 +40,12 @@ ${PARAVIEW_BINARY_DIR}/Widgets
 ${PARAVIEW_BINARY_DIR}/ParaView
 )
 
+LINK_DIRECTORIES(
+${VTK_LIBRARY_PATH}
+)
+
 IF (UNIX)
   LINK_LIBRARIES(${THREAD_LIBS} ${DL_LIBS} -lm)
-  FIND_LIBRARY( OPTIONAL_MPI_LIB mpi++ /opt/mpt/mpt_default/usr/lib64 )
 ENDIF (UNIX)
 
 IF (WIN32)
@@ -57,10 +67,10 @@ IF (HTML_HELP_LIBRARY)
 ENDIF (HTML_HELP_LIBRARY)
 ENDIF (WIN32)
 
+SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/ParaView)
+
 # Include the standard Dart testing module
 INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
-
-SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/ParaView)
 
 # Add the testing directories
 IF(BUILD_TESTING)
