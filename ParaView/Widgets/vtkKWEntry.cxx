@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.15");
+vtkCxxRevisionMacro(vtkKWEntry, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -97,10 +97,13 @@ void vtkKWEntry::SetValue(const char *s)
     this->SetEnabled(1);
     }
 
-  this->Script("%s delete 0 end", this->GetWidgetName());
-  if (s)
+  if (this->IsCreated())
     {
-    this->Script("%s insert 0 {%s}", this->GetWidgetName(),s);
+    this->Script("%s delete 0 end", this->GetWidgetName());
+    if (s)
+      {
+      this->Script("%s insert 0 {%s}", this->GetWidgetName(),s);
+      }
     }
 
   if (was_disabled)
