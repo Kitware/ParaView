@@ -466,6 +466,20 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "    return 1;\n"
             "    }\n");
     }
+  /* Add the special form of AddObserver to vtkObject. */
+  if (!strcmp("vtkObject",data->ClassName))
+    {
+    fprintf(fp,
+            "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
+            "    {\n"
+            "    const char* event;\n"
+            "    vtkClientServerStream css;\n"
+            "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
+            "      {\n"
+            "      return arlu->NewObserver(op, event, css);\n"
+            "      }\n"
+            "    }\n");
+    }
   fprintf(fp,
           "  vtkOStrStreamWrapper vtkmsg;\n"
           "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"

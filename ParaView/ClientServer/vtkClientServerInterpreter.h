@@ -33,6 +33,7 @@ template<class KeyType, class DataType> class vtkHashMap;
 //ETX
 
 class vtkClientServerInterpreter;
+class vtkClientServerInterpreterCommand;
 class vtkClientServerInterpreterInternals;
 class vtkClientServerStream;
 class vtkTimerLog;
@@ -102,6 +103,12 @@ public:
   int NewInstance(vtkObjectBase* obj, vtkClientServerID id);
 
   // Description:
+  // Called by generated code to add an observer to a wrapped object.
+  // Do not call directly.
+  int NewObserver(vtkObject* obj, const char* event,
+                  const vtkClientServerStream& css);
+
+  // Description:
   // Add a command function for a class.
   void AddCommandFunction(const char* cname,
                           vtkClientServerCommandFunction func);
@@ -160,6 +167,7 @@ private:
   // Internal implementation details.
   vtkClientServerInterpreterInternals* Internal;
 
+  friend class vtkClientServerInterpreterCommand;
 private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&);  // Not implemented.
   void operator=(const vtkClientServerInterpreter&);  // Not implemented.

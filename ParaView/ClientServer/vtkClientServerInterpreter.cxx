@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.13");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.14");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -667,6 +667,43 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
   vtkClientServerStream* entry =
     new vtkClientServerStream(*this->LastResultMessage);
   this->IDToMessageMap->SetItem(id.ID, entry);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+class vtkClientServerInterpreterCommand: public vtkCommand
+{
+public:
+  static vtkClientServerInterpreterCommand* New()
+    { return new vtkClientServerInterpreterCommand; }
+  void Execute(vtkObject*, unsigned long, void *)
+    { this->Interpreter->ProcessStream(this->Stream); }
+
+  vtkClientServerStream Stream;
+  vtkClientServerInterpreter* Interpreter;
+protected:
+  vtkClientServerInterpreterCommand() {}
+  ~vtkClientServerInterpreterCommand() {}
+private:
+  vtkClientServerInterpreterCommand(const vtkClientServerInterpreterCommand&);
+  void operator=(const vtkClientServerInterpreterCommand&);
+};
+
+int vtkClientServerInterpreter::NewObserver(vtkObject* obj, const char* event,
+                                            const vtkClientServerStream& css)
+{
+  // Create the command object and add the observer.
+  vtkClientServerInterpreterCommand* cmd =
+    vtkClientServerInterpreterCommand::New();
+  cmd->Stream = css;
+  cmd->Interpreter = this;
+  unsigned long id = obj->AddObserver(event, cmd);
+  cmd->Delete();
+
+  // Store the observer id as the last result.
+  this->LastResultMessage->Reset();
+  *this->LastResultMessage
+    << vtkClientServerStream::Reply << id << vtkClientServerStream::End;
   return 1;
 }
 
