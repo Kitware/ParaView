@@ -54,10 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdarg.h>
 
-#ifdef USE_INSTALLED_TCLTK_PACKAGES
-static Tcl_Interp *Et_Interp = 0;
-#else
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 #include "kwinit.h"
+#else
+static Tcl_Interp *Et_Interp = 0;
 #endif
 
 #ifdef _WIN32
@@ -70,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.122");
+vtkCxxRevisionMacro(vtkKWApplication, "1.123");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -216,7 +217,7 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
 //----------------------------------------------------------------------------
 void vtkKWApplication::FindApplicationInstallationDirectory()
 {
-  const char *nameofexec = this->Script("info nameofexecutable");
+  const char *nameofexec = Tcl_GetNameOfExecutable();
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
     char directory[1024];
@@ -461,7 +462,8 @@ void vtkKWApplication::Exit()
   return;
 }
     
-#ifndef USE_INSTALLED_TCLTK_PACKAGES
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 /* The following constants define internal paths (not on disk)   */
 /* for Tcl/Tk to use when looking for initialization scripts     */
 /* which are in this file. They do not represent any hardwired   */
@@ -476,12 +478,31 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   char *args;
   char buf[100];
 
-#ifndef USE_INSTALLED_TCLTK_PACKAGES
+  Tcl_FindExecutable(argv[0]);
+
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES)
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
   putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+#else
+  const char *nameofexec = Tcl_GetNameOfExecutable();
+  if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
+    {
+    char directory[1024], tcl_library[1024], tk_library[1024], buffer[1024];
+    vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
+    util->GetFilenamePath(nameofexec, directory);
+    strcpy(directory, util->ConvertToUnixSlashes(directory));
+    util->Delete();
+
+    sprintf(buffer, "TCL_LIBRARY=%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+    putenv(buffer);
+
+    sprintf(buffer, "TK_LIBRARY=%s/TclTk/lib/tk%s", directory, TK_VERSION);
+    putenv(buffer);
+    }
 #endif
-  
-  Tcl_FindExecutable(argv[0]);
+#endif
+
   interp = Tcl_CreateInterp();
   args = Tcl_Merge(argc-1, argv+1);
   Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
@@ -491,7 +512,30 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
-#ifdef USE_INSTALLED_TCLTK_PACKAGES
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+
+  // It seems the environment is not propagated correctly to the interpreter,
+  // so set the env explicitly
+
+  if (getenv("TCL_LIBRARY"))
+    {
+    Tcl_SetVar(interp, 
+               "env(TCL_LIBRARY)", getenv("TCL_LIBRARY"), TCL_GLOBAL_ONLY);
+    }
+  if (getenv("TK_LIBRARY"))
+    {
+    Tcl_SetVar(interp, 
+               "env(TK_LIBRARY)", getenv("TK_LIBRARY"), TCL_GLOBAL_ONLY);
+    }
+#endif
+ 
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
+
+  Et_DoInit(interp);
+
+#else
 
   Et_Interp = interp;
 
@@ -513,8 +557,6 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
 
   Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
 
-#else
-  Et_DoInit(interp);
 #endif
   
   // create the SetApplicationIcon command
