@@ -25,9 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWWidget
+// .NAME vtkKWWidgetCollection - a collection of widgets
 // .SECTION DescriptionCollection
-// A simple collection class for holding vtkKWWidgets.
+// vtkKWWidgetCollection represents and provides methods to manipulate a list 
+// of widgets. The list is unsorted and duplicate entries are not prevented.
 
 #ifndef __vtkKWWidgetC_h
 #define __vtkKWWidgetC_h
