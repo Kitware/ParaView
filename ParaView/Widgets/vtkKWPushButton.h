@@ -51,18 +51,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
+  // Description:
+  // Convenience method to set the contents label.
   void SetLabel(const char *label);
 
   // Description:
-  // This will configures the state of the button to Disable or Normal.
-  // I did not like the method name SetState because it conflicts 
-  // with check buttons.
-  void Disable();
-  void Enable();
-
+  // Convenience method to set the label width.
+  void SetLabelWidth(int width);
+  
 protected:
   vtkKWPushButton();
   ~vtkKWPushButton();

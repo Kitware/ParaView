@@ -37,23 +37,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 
-
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.12");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.13");
 
-
+//----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
 {
   this->ButtonLabel = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWPushButton::~vtkKWPushButton()
 {
   this->SetButtonLabel(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -68,59 +68,42 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 
   this->SetApplication(app);
 
-  // create the top level
+  // Create the button
+
   wname = this->GetWidgetName();
-  if (this->ButtonLabel)
-    {
-    this->Script("button %s %s -text {%s}", wname,(args?args:""),
-                 (this->ButtonLabel?this->ButtonLabel:""));
-    }
-  else
-    {
-    this->Script("button %s %s", wname,(args?args:""));
-    }
+
+  this->Script("button %s -text {%s} %s", 
+               wname, 
+               (this->ButtonLabel ? this->ButtonLabel : ""), 
+               (args ? args : ""));
 
   // Update enable state
 
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWPushButton::SetLabel( const char *name )
 {
-  if ( this->Application )
-    {
-    this->Script("%s configure -text {%s}", this->GetWidgetName(), name );
-    }
   this->SetButtonLabel(name);
-}
 
-
-void vtkKWPushButton::Disable()
-{
-  if (this->Application == NULL)
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Widget not created yet.");
-    return;
+    this->Script("%s configure -text {%s}", this->GetWidgetName(), name);
     }
-
-  this->Script("%s configure -state disabled", this->GetWidgetName());
 }
 
-void vtkKWPushButton::Enable()
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetLabelWidth(int width)
 {
-  if (this->Application == NULL)
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Widget not created yet.");
-    return;
+    this->Script("%s configure -width %d", this->GetWidgetName(), width);
     }
-
-  this->Script("%s configure -state normal", this->GetWidgetName());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWPushButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
-
