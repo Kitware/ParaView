@@ -51,6 +51,13 @@
   int vtkClientServerStreamValueFromString(const char* str, type* value) \
   { return sscanf(str, "%" format, value)?1:0; }
 
+// Intel C++ 8.0 produces a false warning about %hhd and %hhu in the
+// sscanf conversions.  Disable the warning.  This is fixed in 8.1.
+#if defined(__INTEL_COMPILER) && __INTEL_COMPILER==800
+# pragma warning (push)
+# pragma warning (disable:269)
+#endif
+
 VTK_CSS_VALUE_FROM_STRING(vtkTypeInt8, VTK_TYPE_FORMAT_INT8)
 VTK_CSS_VALUE_FROM_STRING(vtkTypeInt16, VTK_TYPE_FORMAT_INT16)
 VTK_CSS_VALUE_FROM_STRING(vtkTypeInt32, VTK_TYPE_FORMAT_INT32)
@@ -61,6 +68,10 @@ VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt32, VTK_TYPE_FORMAT_UINT32)
 VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt64, VTK_TYPE_FORMAT_UINT64)
 VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat32, VTK_TYPE_FORMAT_FLOAT32)
 VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat64, VTK_TYPE_FORMAT_FLOAT64)
+
+#if defined(__INTEL_COMPILER) && __INTEL_COMPILER==800
+# pragma warning (pop)
+#endif
 
 #undef VTK_CSS_VALUE_FROM_STRING
 
