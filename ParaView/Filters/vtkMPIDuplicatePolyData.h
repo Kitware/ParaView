@@ -1,11 +1,11 @@
 /*=========================================================================
 
-  Program:   ParaView
+  Program:   Visualization Toolkit
   Module:    vtkMPIDuplicatePolyData.h
 
-  Copyright (c) Kitware, Inc.
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -55,11 +55,26 @@ public:
   vtkGetMacro(ClientFlag,int);
 
   // Description:
+  // Turn the filter on or off.  ParaView disable this filter when it will
+  // use compositing instead of local rendering.  This flag is off by default.
+  vtkSetMacro(PassThrough,int);
+  vtkGetMacro(PassThrough,int);
+  vtkBooleanMacro(PassThrough,int);
+
+  // Description:
+  // This flag should be set on all processes when MPI root
+  // is used as client.
+  vtkSetMacro(ZeroEmpty,int);
+  vtkGetMacro(ZeroEmpty,int);
+  vtkBooleanMacro(ZeroEmpty,int);
+
+  // Description:
   // This returns to size of the output (on this process).
   // This method is not really used.  It is needed to have
   // the same API as vtkCollectPolyData.
-  vtkGetMacro(MemorySize, unsigned long);
-
+  //vtkGetMacro(MemorySize, unsigned long);
+  
+  
 protected:
   vtkMPIDuplicatePolyData();
   ~vtkMPIDuplicatePolyData();
@@ -67,11 +82,11 @@ protected:
   // Data generation method
   void ComputeInputUpdateExtents(vtkDataObject *output);
   void Execute();
-  void RootExecute(vtkMPICommunicator* com, vtkPolyDataReader* reader, 
-                   vtkPolyDataWriter* writer);
-  void SateliteExecute(vtkMPICommunicator* com, vtkPolyDataReader* reader, 
-                       vtkPolyDataWriter* writer);
+  void ServerExecute(vtkMPICommunicator* com, vtkPolyDataReader* reader, 
+                     vtkPolyDataWriter* writer);
   void ClientExecute(vtkPolyDataReader* reader);
+  void ReconstructOutput(vtkPolyDataReader* reader, int numProcs,
+                         char* recv, int* recvLengths, int* recvOffsets);
   void ExecuteInformation();
 
   vtkMultiProcessController *Controller;
@@ -80,7 +95,10 @@ protected:
   vtkSocketController *SocketController;
   int ClientFlag;
 
-  unsigned long MemorySize;
+  //unsigned long MemorySize;
+  int PassThrough;
+  int ZeroEmpty;
+
 
 private:
   vtkMPIDuplicatePolyData(const vtkMPIDuplicatePolyData&); // Not implemented
