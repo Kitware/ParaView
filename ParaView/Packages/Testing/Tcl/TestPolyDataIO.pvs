@@ -34,18 +34,18 @@ $kw(vtkTemp295) AcceptCallback
 set kw(vtkTemp1000) [Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
-set fileName "testPolyData.vtp"
-if {$nprocs > 1} { set fileName "testPolyData.pvtp" }
+set ext "vtp"
+if {$nprocs > 1} { set ext "pvtp" }
 
 # Write the vtkPolyData.
-$kw(vtkTemp1) WriteVTKFile $fileName
+$kw(vtkTemp1) WriteVTKFile "testPolyData.$ext"
 
 # Delete the old pipeline.
 $kw(vtkTemp295) DeleteCallback
 $kw(vtkTemp243) DeleteCallback
 
 # Read the vtkPolyData from the temporary file.
-$kw(vtkTemp1) Open $fileName
+$kw(vtkTemp1) Open "testPolyData.$ext"
 set kw(vtkTemp337) [vtkTemp1 GetCurrentPVSource]
 update
 
@@ -62,4 +62,11 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 # Delete the temporary file.
-catch { file delete -force $fileName }
+catch { file delete -force "testPolyData.$ext" }
+
+if {$nprocs > 1} {
+  # Delete the temporary file's pieces.
+  for {set i 0} { $i < $nprocs } { incr i } {
+  catch { file delete -force "testPolyData$i.vtp" }
+  }
+}

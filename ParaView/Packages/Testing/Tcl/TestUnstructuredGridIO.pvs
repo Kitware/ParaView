@@ -24,18 +24,18 @@ $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp1000) [Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
-set fileName "testUnstructuredGrid.vtu"
-if {$nprocs > 1} { set fileName "testUnstructuredGrid.pvtu" }
+set ext "vtu"
+if {$nprocs > 1} { set ext "pvtu" }
 
 # Write the vtkUnstructuredGrid.
-$kw(vtkTemp1) WriteVTKFile $fileName
+$kw(vtkTemp1) WriteVTKFile "testUnstructuredGrid.$ext"
 
 # Delete the old pipeline.
 set kw(vtkTemp257) [$kw(vtkTemp1) GetCurrentPVSource]
 $kw(vtkTemp257) DeleteCallback
 
 # Read the vtkUnstructuredGrid from the temporary file.
-$kw(vtkTemp1) Open $fileName
+$kw(vtkTemp1) Open "testUnstructuredGrid.$ext"
 set kw(vtkTemp291) [vtkTemp1 GetCurrentPVSource]
 update
 
@@ -52,4 +52,11 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 # Delete the temporary file.
-catch { file delete -force $fileName }
+catch { file delete -force "testUnstructuredGrid.$ext" }
+
+if {$nprocs > 1} {
+  # Delete the temporary file's pieces.
+  for {set i 0} { $i < $nprocs } { incr i } {
+  catch { file delete -force "testUnstructuredGrid$i.vtu" }
+  }
+}
