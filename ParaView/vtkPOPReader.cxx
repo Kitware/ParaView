@@ -267,7 +267,7 @@ void vtkPOPReader::Execute()
         {
         vtkErrorMacro("FileDimensionality can only be 2 or 3.");
         reader->Delete();
-        wrap->New();
+        wrap->Delete();
         return;
         }
       reader->SetHeaderSize(this->ArrayOffsets[i] * 4 
@@ -651,7 +651,7 @@ void vtkPOPReader::ReadFlow()
   ext[5] = this->DepthValues->GetNumberOfTuples()-1;
 
   vtkImageReader *reader = vtkImageReader::New();
-  reader->SetFileDimensionality(3);
+  reader->SetFileDimensionality(this->ArrayFileDimensionality);
   reader->SetDataExtent(ext);
   reader->SetDataByteOrderToBigEndian();
   reader->SetNumberOfScalarComponents(1);
@@ -691,7 +691,23 @@ void vtkPOPReader::ReadFlow()
     }
 
   uImage = vtkImageData::New();
-  reader->SetFileName(this->UFlowFileName);
+  // Set up the reader with the appropriate filename.
+      if (this->ArrayFileDimensionality == 3)
+        {
+        reader->SetFileName(this->UFlowFileName);
+        }
+      else if (this->ArrayFileDimensionality == 2)
+        {
+        reader->SetFilePattern("%s.%02d");
+        reader->SetFilePrefix(this->UFlowFileName);
+        }
+      else
+        {
+        vtkErrorMacro("FileDimensionality can only be 2 or 3.");
+        reader->Delete();
+        wrap->Delete();
+        return;
+        }
   reader->SetHeaderSize(this->UFlowFileOffset * 4 
                   * this->Dimensions[0] * this->Dimensions[1]);
   wrap->SetOutput(uImage);
@@ -699,7 +715,23 @@ void vtkPOPReader::ReadFlow()
   uImage->Update();
 
   vImage = vtkImageData::New();
-  reader->SetFileName(this->VFlowFileName);
+  // Set up the reader with the appropriate filename.
+      if (this->ArrayFileDimensionality == 3)
+        {
+        reader->SetFileName(this->VFlowFileName);
+        }
+      else if (this->ArrayFileDimensionality == 2)
+        {
+        reader->SetFilePattern("%s.%02d");
+        reader->SetFilePrefix(this->VFlowFileName);
+        }
+      else
+        {
+        vtkErrorMacro("FileDimensionality can only be 2 or 3.");
+        reader->Delete();
+        wrap->Delete();
+        return;
+        }
   reader->SetHeaderSize(this->VFlowFileOffset * 4 
                   * this->Dimensions[0] * this->Dimensions[1]);
   wrap->SetOutput(vImage);
@@ -747,13 +779,13 @@ void vtkPOPReader::ReadFlow()
         v0 = v2 = w0 = 0.0;
         u0 = pu[-uvInc0];
         u2 = pu[uvInc0];
-        if (v > vMin)
-          {
-          v0 = pv[-uvInc1];
-          }
         if (v < vMax)
           {
-          v2 = pv[uvInc0];
+          v0 = pv[uvInc0];
+          }
+        if (v > vMin)
+          {
+          v2 = pv[-uvInc1];
           }
         if (w < wMax)
           {
@@ -762,7 +794,14 @@ void vtkPOPReader::ReadFlow()
         // Now fill the vector for this point.
         pf[0] =  *pu;
         pf[1] =  *pv;
-        pf[2] = w0 - 0.5 * (u0 - u2 + v0 - v2);
+        pf[2] = w0 + 0.5 * (u0 - u2 + v0 - v2);
+
+        if (u == 878 && v == 891)
+          {
+          vtkErrorMacro(<< pf[2]);
+          }
+
+        pf[2] = 0.0;
         // Move to the next point.
         pf += 3;
         pu += 1;
@@ -775,6 +814,73 @@ void vtkPOPReader::ReadFlow()
   // Delete 
   uImage->Delete();
   vImage->Delete();
+
+  // Now use points to perform the coordinate transformation.
+  vtkPoints *pts = output->GetPoints();
+  float *pp = pts->GetPoint(0);
+  int vInc = 3*(updateExt[1]-updateExt[0]+1);
+  float nv[3], axisW[3], axisV[3], axisU[3];
+  pv = (float*)fImage->GetScalarPointer();
+  for (w = updateExt[4]; w <= updateExt[5]; ++w)
+    {
+    for (v = updateExt[2]; v <= updateExt[3]; ++v)
+      {
+      for (u = updateExt[0]; u <= updateExt[1]; ++u)
+        {
+        // Find the coordinate transform.
+        // W is just the noramlize vector 0->p.
+        axisW[0] = pp[0];
+        axisW[1] = pp[1];
+        axisW[2] = pp[2];
+        vtkMath::Normalize(axisW);
+        // Ignore curvature of earth surface. Handle boundaries.
+        if (v == updateExt[2])
+          {
+          axisV[0] = pp[0] - pp[vInc];
+          axisV[1] = pp[1] - pp[1+vInc];
+          axisV[2] = pp[2] - pp[2+vInc];
+          }
+        else
+          {
+          axisV[0] = pp[-vInc] - pp[0];
+          axisV[1] = pp[1-vInc] - pp[1];
+          axisV[2] = pp[2-vInc] - pp[2];
+          }
+        vtkMath::Normalize(axisV);
+        // Last U axis.
+        if (u == updateExt[0])
+          {
+          axisU[0] =  pp[3] - pp[0];
+          axisU[1] =  pp[4] - pp[1];
+          axisU[2] =  pp[5] - pp[2];
+          }
+        else
+          {
+          axisU[0] =  pp[0] - pp[-3];
+          axisU[1] =  pp[1] - pp[-2];
+          axisU[2] =  pp[2] - pp[-1];
+          }
+        vtkMath::Normalize(axisU);
+        // Now compute the vector in the new coordinate system.
+        nv[0] = axisU[0]*pv[0] + axisV[0]*pv[1] + axisW[0]*pv[2];
+        nv[1] = axisU[1]*pv[0] + axisV[1]*pv[1] + axisW[1]*pv[2];
+        nv[2] = axisU[2]*pv[0] + axisV[2]*pv[1] + axisW[2]*pv[2];
+        pv[0] = nv[0];
+        pv[1] = nv[1];
+        pv[2] = nv[2];
+
+        //if (u == 190 && v == 260)
+        if (u == 150 && v == 150)
+          {
+          //vtkErrorMacro(<< pv[0] << ", " << pv[1] << ", " << pv[2]);
+          }
+
+        // Increment pointers to the next position.
+        pv += 3;
+        pp += 3;
+        }
+      }
+    }
 
   array = fImage->GetPointData()->GetScalars()->GetData();
   array->SetName("Flow");

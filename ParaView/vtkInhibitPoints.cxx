@@ -74,30 +74,27 @@ void vtkInhibitPoints::Execute()
 {
   vtkPoints *newPts;
   vtkPointData *pd;
-  float *x, *x0, *n0;
-  float m0;
-  float *v, mv;
+  float *x, *xp, *v;
+  float mv2, rp2, d2;
   int ptId, id, j;
   vtkPolyData *output = this->GetOutput();
   vtkPointData *outputPD = output->GetPointData();
   vtkDataSet *input= this->GetInput();
   int numPts=input->GetNumberOfPoints();
-  vtkFloatArray *passed = vtkFloatArray::New();
+  vtkFloatArray *passedRad2 = vtkFloatArray::New();
   int numPassed = 0;
   int passedFlag;
-  float tmp, majorD, minorD2;
-  float lateralScaleSquared;
+  float tmp, thresh2;
   vtkVectors *inVects = input->GetPointData()->GetVectors();
 
   if (inVects == NULL)
     {
     vtkWarningMacro("No Vectors for suppression.");
-    passed->Delete();
+    passedRad2->Delete();
     return;
     }
 
-  lateralScaleSquared = this->LateralScale * this->Scale;
-  lateralScaleSquared = lateralScaleSquared * lateralScaleSquared;
+  thresh2 = this->MagnitudeThreshold * this->MagnitudeThreshold;
 
   // Check input
   //
@@ -109,8 +106,8 @@ void vtkInhibitPoints::Execute()
     return;
     }
 
-  // Assume ~1/4 points pass. 7 floats per passes point are kept.
-  passed->Allocate(numPts*2);
+  // Assume ~1/4 points pass.
+  passedRad2->Allocate(numPts/4);
 
   pd = input->GetPointData();
   id = 0;
@@ -118,7 +115,7 @@ void vtkInhibitPoints::Execute()
   // Allocate space
   //
   newPts = vtkPoints::New();
-  newPts->Allocate(numPts);
+  newPts->Allocate(numPts/4);
   outputPD->CopyAllocate(pd);
 
   // Traverse points and copy
@@ -133,33 +130,25 @@ void vtkInhibitPoints::Execute()
     x =  input->GetPoint(ptId);
     passedFlag = 1;
     v = inVects->GetVector(ptId);
-    mv = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    if (mv < this->MagnitudeThreshold)
+    mv2 = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+    if (mv2 < thresh2)
       {
       passedFlag = 0;
       }
 
     for (j = 0; j < numPassed && passedFlag; ++j)
       {
-      // Compute major/minor distances.
-      x0 = passed->GetPointer(7*j);
-      n0 = x0 + 3;
-      m0 = n0[3];
-      // Compute distance from normal and the two points.
-      majorD = (x[0]-x0[0])*n0[0] + (x[1]-x0[1])*n0[1] 
-                  + (x[2]-x0[2])*n0[2];
-      // Compute prependicular distance squared.
-      tmp = x[0] - x0[0] + n0[0]*majorD;
-      minorD2 = tmp * tmp;
-      tmp = x[1] - x0[1] + n0[1]*majorD;
-      minorD2 += tmp * tmp;
-      tmp = x[2] - x0[2] + n0[2]*majorD;
-      minorD2 += tmp * tmp;
-      // Scale here to avoid two multiplies in condition.
-      majorD = majorD * m0;
-      if (majorD < this->ForwardScale*this->Scale && 
-          majorD > -this->BackwardScale*this->Scale &&
-          minorD2 * m0 * m0 < lateralScaleSquared)
+      // Get center and radius of inhibition sphere. (From previous point).
+      xp = newPts->GetPoint(j);
+      rp2 = passedRad2->GetValue(j);
+      // Get the distance squared between the two points.
+      tmp = x[0] - xp[0];
+      d2 = tmp*tmp;
+      tmp = x[1] - xp[1];
+      d2 += tmp*tmp;
+      tmp = x[2] - xp[2];
+      d2 += tmp*tmp;
+      if (d2 < rp2)
         { // The point failed this test.
         passedFlag = 0;
         }
@@ -168,15 +157,8 @@ void vtkInhibitPoints::Execute()
       { // The new point passed all the tests.
       // It was not inhibited by any points that passed already.
       // Save information used to suppress new points.        
-      passed->InsertNextValue(x[0]);
-      passed->InsertNextValue(x[1]);
-      passed->InsertNextValue(x[2]);
-      passed->InsertNextValue(v[0]/mv);
-      passed->InsertNextValue(v[1]/mv);
-      passed->InsertNextValue(v[2]/mv);
-      passed->InsertNextValue(mv);
+      passedRad2->InsertNextValue(mv2 * this->Scale * this->Scale);
       ++numPassed;
-
       // Now update the output stuff.
       id = newPts->InsertNextPoint(x);
       outputPD->CopyData(pd,ptId,id);
@@ -194,9 +176,9 @@ void vtkInhibitPoints::Execute()
   if ( this->GenerateVertices )
     {
     vtkCellArray *verts = vtkCellArray::New();
-    verts->Allocate(verts->EstimateSize(1,id+1));
-    verts->InsertNextCell(id+1);
-    for ( ptId=0; ptId<(id+1) && !abort; ptId++)
+    verts->Allocate(verts->EstimateSize(1,numPassed));
+    verts->InsertNextCell(numPassed);
+    for ( ptId=0; ptId<numPassed && !abort; ptId++)
       {
       if ( ! (ptId % progressInterval) ) //abort/progress
         {
@@ -215,6 +197,7 @@ void vtkInhibitPoints::Execute()
   newPts->Delete();
   
   output->Squeeze();
+  passedRad2->Delete();
 }
 
 
