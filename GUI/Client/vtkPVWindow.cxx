@@ -129,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.601");
+vtkCxxRevisionMacro(vtkPVWindow, "1.602");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2697,7 +2697,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   *file << endl;
 
   *file << "set saveState 0" << endl;
-  *file << "for {set i  1} {$i < [expr $argc - 1]} {incr i} {" << endl;
+  *file << "for {set i  0} {$i < [expr $argc - 1]} {incr i} {" << endl;
   *file << "  if {[lindex $argv $i] == \"-XML\"} {" << endl;
   *file << "    set saveState 1" << endl;
   *file << "    set stateName [lindex $argv [expr $i + 1]]" << endl;
