@@ -65,7 +65,7 @@ public:
   // Description:
   // Handle the callback, this is called internally when one of the 
   // sliders has been moved.
-  void ExtentSelected();
+  void ExtentChangedCallback();
 
   // Description:
   // A method to set callback functions on objects.  The first argument is

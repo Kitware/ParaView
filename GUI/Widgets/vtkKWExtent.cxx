@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.29");
+vtkCxxRevisionMacro(vtkKWExtent, "1.30");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -77,7 +77,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->XRange->ShowLabelOn();
   this->XRange->ShowEntriesOn();
   this->XRange->Create(app, "");
-  this->XRange->SetCommand(this, "ExtentSelected");
+  this->XRange->SetCommand(this, "ExtentChangedCallback");
   this->XRange->AdjustResolutionOn();
   this->XRange->SetLabel("X (Units)");
   
@@ -86,7 +86,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->YRange->ShowEntriesOn();
   this->YRange->Create(app, "");
   this->YRange->AdjustResolutionOn();
-  this->YRange->SetCommand(this, "ExtentSelected");
+  this->YRange->SetCommand(this, "ExtentChangedCallback");
   this->YRange->SetLabel("Y (Units)");
 
   this->ZRange->SetParent(this);
@@ -94,7 +94,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->ZRange->ShowEntriesOn();
   this->ZRange->Create(app, "");
   this->ZRange->AdjustResolutionOn();
-  this->ZRange->SetCommand(this, "ExtentSelected");
+  this->ZRange->SetCommand(this, "ExtentChangedCallback");
   this->ZRange->SetLabel("Z (Units)");
   
   // Pack the label and the option menu
@@ -157,7 +157,7 @@ void vtkKWExtent::Pack()
 //----------------------------------------------------------------------------
 void vtkKWExtent::SetExtentRange(double er[6])
 {
-  this->SetExtentRange(er[0],er[1],er[2],er[3],er[4],er[5]);
+  this->SetExtentRange(er[0], er[1], er[2], er[3], er[4], er[5]);
 }
 
 //----------------------------------------------------------------------------
@@ -166,9 +166,10 @@ void vtkKWExtent::SetExtentRange(double x1, double x2,
                                  double z1, double z2)
 {
   double res = 512.0;
-  this->XRange->SetResolution((x2<x1)?((x1-x2)/res):((x2-x1)/res));
-  this->YRange->SetResolution((y2<y1)?((y1-y2)/res):((y2-y1)/res));
-  this->ZRange->SetResolution((y2<y1)?((y1-y2)/res):((y2-y1)/res));
+
+  this->XRange->SetResolution((x2<x1) ? ((x1-x2) / res) : ((x2-x1) / res));
+  this->YRange->SetResolution((y2<y1) ? ((y1-y2) / res) : ((y2-y1) /res));
+  this->ZRange->SetResolution((y2<y1) ? ((y1-y2) / res) : ((y2-y1) /res));
   
   this->XRange->SetWholeRange(x1, x2);
   this->YRange->SetWholeRange(y1, y2);
@@ -201,6 +202,13 @@ void vtkKWExtent::SetExtent(double x1, double x2,
     return;
     }
 
+  this->Extent[0] = x1;
+  this->Extent[1] = x2;
+  this->Extent[2] = y1;
+  this->Extent[3] = y2;
+  this->Extent[4] = z1;
+  this->Extent[5] = z2;
+
   this->XRange->SetRange(x1, x2);
   this->YRange->SetRange(y1, y2);
   this->ZRange->SetRange(z1, z2);
@@ -209,7 +217,7 @@ void vtkKWExtent::SetExtent(double x1, double x2,
 //----------------------------------------------------------------------------
 void vtkKWExtent::SetExtent(double er[6])
 {
-  this->SetExtent(er[0],er[1],er[2],er[3],er[4],er[5]);
+  this->SetExtent(er[0], er[1], er[2], er[3], er[4], er[5]);
 }
 
 //----------------------------------------------------------------------------
@@ -252,11 +260,12 @@ void vtkKWExtent::SetShowZExtent(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::ExtentSelected()
+void vtkKWExtent::ExtentChangedCallback()
 {
   // first check to see if anything changed.
   // Normally something should have changed, but 
   // on initialization this isn;t the case.
+
   if (this->Extent[0] == this->XRange->GetRange()[0] &&
       this->Extent[1] == this->XRange->GetRange()[1] &&
       this->Extent[2] == this->YRange->GetRange()[0] &&
