@@ -23,7 +23,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
@@ -75,7 +75,6 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
     {
     pm->SendStream(this->Servers,str,0);
     }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
 }
 
 //----------------------------------------------------------------------------

@@ -56,10 +56,6 @@ protected:
 
   double Center[3];
   double Radius;
-  double LastCenter[3];
-  double LastRadius;
-  vtkSetVector3Macro(LastCenter,double);
-  vtkSetMacro(LastRadius,double);
 
 private:
   vtkSMSphereWidgetProxy(const vtkSMSphereWidgetProxy&);// Not implemented
