@@ -541,7 +541,15 @@ protected:
   // we remeber the raised page to restore when the source is selected.
   // This ivar is set and used by vtkPVWindow.
   int SavedRaisedNotebookPageId;
-  
+
+//BTX  
+  friend class vtkPVWindow;
+//ETX  
+
+  char* SourceList;
+  vtkSetStringMacro(SourceList);
+  vtkGetStringMacro(SourceList);
+
   // The name is just for display.
   char      *Name;
   char      *MenuName;

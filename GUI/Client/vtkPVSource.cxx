@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.407");
+vtkCxxRevisionMacro(vtkPVSource, "1.408");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -95,6 +95,7 @@ vtkPVSource::vtkPVSource()
   this->MenuName = 0;
   this->ShortHelp = 0;
   this->LongHelp  = 0;
+  this->SourceList = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
@@ -170,6 +171,11 @@ vtkPVSource::~vtkPVSource()
   if (proxm && this->GetName())
     {
     proxm->UnRegisterProxy(this->GetName());
+    const char* proxyName = proxm->GetProxyName("animateable", this->Proxy);
+    if (proxyName)
+      {
+      proxm->UnRegisterProxy("animateable", proxyName);
+      }
     }
   this->SetProxy(0);
 
@@ -178,6 +184,7 @@ vtkPVSource::~vtkPVSource()
   delete[] this->Name;
   delete[] this->Label;
 
+  this->SetSourceList(0);
   this->SetMenuName(0);
   this->SetShortHelp(0);
   this->SetLongHelp(0);
@@ -1059,6 +1066,16 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     pDisp->SetInput(this->GetProxy());
     // Render module keeps a list of all the displays.
     rm->AddDisplay(pDisp);
+
+    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+    ostrstream animName_with_warning_C4701;
+    animName_with_warning_C4701 << this->GetSourceList() << ";" 
+                                << this->GetName() << ";"
+                                << "Display"
+                                << ends;
+    proxm->RegisterProxy(
+      "animateable", animName_with_warning_C4701.str(), pDisp);
+    delete[] animName_with_warning_C4701.str();
 
     // Hookup cube axes display.
     this->CubeAxesDisplay->SetInput(this->Proxy);
@@ -2149,6 +2166,17 @@ void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
   proxm->RegisterProxy(module_group, clone->GetName(), clone->Proxy);
 
+  if (!sourceList)
+    {
+    sourceList = "Sources";
+    }
+  ostrstream animName_with_warning_C4701;
+  animName_with_warning_C4701 << sourceList << ";" 
+                              << clone->GetName()
+                              << ends;
+  proxm->RegisterProxy(
+    "animateable", animName_with_warning_C4701.str(), clone->Proxy);
+  delete[] animName_with_warning_C4701.str();
 }
 
 //----------------------------------------------------------------------------

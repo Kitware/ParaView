@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.640");
+vtkCxxRevisionMacro(vtkPVWindow, "1.641");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -786,7 +786,6 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->MainView)
     {
-    this->MainView->PrepareForDelete();
     this->MainView->Delete();
     }
 
@@ -1522,7 +1521,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       this->HideCenterActor();
       }
     }
-  vtkPVRenderViewProxyImplementation* proxy = vtkPVRenderViewProxyImplementation::New();
+  vtkPVRenderViewProxyImplementation* proxy = 
+    vtkPVRenderViewProxyImplementation::New();
   proxy->SetPVRenderView(this->MainView);
   this->Interactor->SetPVRenderView(proxy);
   proxy->Delete();
@@ -4277,6 +4277,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       if ( col )
         {
         col->AddItem(clone);
+        clone->SetSourceList(sourceList);
         }
       else
         {
@@ -4288,6 +4289,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     else
       {
       this->AddPVSource("Sources", clone);
+      clone->SetSourceList("Sources");
       }
     clone->Delete();
     }
