@@ -78,6 +78,7 @@
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
+#include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
 
 
@@ -135,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.307");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.308");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1925,8 +1926,9 @@ void vtkPVRenderView::SaveAsImage(const char* filename)
     }
   
   // first get the file name
-  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
-  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetRenderWindow());
+  w2i->ShouldRerenderOff();
   w2i->Update();
   
   int success = 1;
@@ -2236,23 +2238,31 @@ void vtkPVRenderView::PrintView()
   this->Superclass::PrintView();
 #else
   
-  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   float DPI=0;
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
     DPI = this->GetParentWindow()->GetPrintTargetDPI();
     }
-//  TODO: SetMagnification should work in vtkPVWindowToImageFilter
-//  if (DPI >= 150.0)
-//    {
-//    w2i->SetMagnification(2);
-//    }
-//  if (DPI >= 300.0)
-//    {
-//    w2i->SetMagnification(3);
-//    }
-  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+//  TODO: SetMagnification should work in client/server mode
+  if (!this->GetPVApplication()->GetClientMode())
+    {
+    if (DPI >= 150.0)
+      {
+      w2i->SetMagnification(2);
+      }
+    if (DPI >= 300.0)
+      {
+      w2i->SetMagnification(3);
+      }
+    }
+  else
+    {
+    w2i->ShouldRerenderOff();
+    }
+
+  w2i->SetInput(this->GetRenderWindow());
   w2i->Update();
   
   this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
