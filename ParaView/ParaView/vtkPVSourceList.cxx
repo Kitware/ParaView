@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.27.2.3");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.27.2.4");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -249,7 +249,10 @@ void vtkPVSourceList::Pick(int compIdx)
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
   // I believe just setting the current source shows its properties.
-  comp->GetPVWindow()->SetCurrentPVSourceCallback(comp);
+  if (comp)
+    {
+    comp->GetPVWindow()->SetCurrentPVSourceCallback(comp);
+    }
 }
 
 //----------------------------------------------------------------------------
