@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.6");
+vtkCxxRevisionMacro(vtkPickFilter, "1.7");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -39,6 +39,7 @@ vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPickFilter::vtkPickFilter ()
 {
+  this->SetNumberOfInputPorts(1);
   this->PickCell = 0;
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
