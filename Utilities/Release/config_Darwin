@@ -1,5 +1,5 @@
 PLATFORM="darwin"
 CC="cc"
 CXX="c++"
-CMAKE="/Users/kitware/Nightly/CMakeRelease-install/bin/cmake"
+CMAKE="/Users/kitware/Nightly/CMake18-install/bin/cmake"
 DISPLAY=

@@ -1,7 +1,7 @@
 PLATFORM="sparc-sunos57"
 CC="cc"
 CXX="CC"
-CMAKE="/space/berk/Dashboards/CMake-CC/bin/cmake"
+CMAKE="/space/kitware/Dashboards/CMake19/CMakeBin/bin/cmake"
 DISPLAY=:0.0
 export DISPLAY
 
