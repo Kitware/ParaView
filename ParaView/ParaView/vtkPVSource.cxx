@@ -84,6 +84,7 @@ vtkPVSource::vtkPVSource()
 
   // The notebook which holds Parameters and Display pages.
   this->Notebook = vtkKWNotebook::New();
+  this->Notebook->AlwaysShowTabsOn();
 
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
@@ -990,9 +991,12 @@ void vtkPVSource::UpdateProperties()
 //----------------------------------------------------------------------------
 int vtkPVSource::IsDeletable()
 {
-  return !( (this->GetPVOutput(0) 
-	     && this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0) ||
-	    this->IsPermanent);
+  if (this->IsPermanent || this->GetNumberOfPVConsumers() > 0 )
+    {
+    return 0;
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
