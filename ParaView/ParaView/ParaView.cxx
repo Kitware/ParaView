@@ -137,7 +137,7 @@ int MyMain(int argc, char *argv[])
          << err.str() << endl;
 #endif
     err.rdbuf()->freeze(0);
-    return 0;
+    return 1;
     }
   err.rdbuf()->freeze(0);
 
