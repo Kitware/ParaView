@@ -1,0 +1,63 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetSetSubclass.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkKW@WidgetType@Set - a concrete set of vtkKW@WidgetType@
+// .SECTION Description
+// A composite widget to conveniently store a set of vtkKW@WidgetType@. 
+// Each vtkKW@WidgetType@ is created, removed or queried based
+// on a unique ID provided by the user (ids are *not* handled by the class
+// since it is likely that they will be defined as enum's or #define by
+// the user for easier retrieval).
+// Widgets are packed (gridded) in the order they were added.
+// .SECTION See Also
+// vtkKWWidgetSet
+
+#ifndef __vtkKW@WidgetType@Set_h
+#define __vtkKW@WidgetType@Set_h
+
+#include "vtkKWWidgetSet.h"
+
+class vtkKW@WidgetType@;
+
+class VTK_EXPORT vtkKW@WidgetType@Set : public vtkKWWidgetSet
+{
+public:
+  static vtkKW@WidgetType@Set* New();
+  vtkTypeRevisionMacro(vtkKW@WidgetType@Set,vtkKWWidgetSet);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Add a vtkKW@WidgetType@ to the set.
+  // The id has to be unique among the set.
+  // Return a pointer to the vtkKW@WidgetType@, or NULL on error.
+  virtual vtkKW@WidgetType@* AddWidget(int id);
+
+  // Description:
+  // Get a vtkKW@WidgetType@ from the set, given its unique id.
+  // Return a pointer to the vtkKW@WidgetType@, or NULL on error.
+  virtual vtkKW@WidgetType@* GetWidget(int id);
+
+protected:
+  vtkKW@WidgetType@Set();
+  ~vtkKW@WidgetType@Set() {};
+
+  // Helper methods
+
+  virtual vtkKWWidget* AllocateAndCreateWidget();
+
+private:
+  vtkKW@WidgetType@Set(const vtkKW@WidgetType@Set&); // Not implemented
+  void operator=(const vtkKW@WidgetType@Set&); // Not implemented
+};
+
+#endif

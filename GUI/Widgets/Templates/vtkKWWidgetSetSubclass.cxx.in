@@ -1,0 +1,66 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetSetSubclass.cxx.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "vtkKW@WidgetType@Set.h"
+
+#include "vtkKW@WidgetType@.h"
+#include "vtkObjectFactory.h"
+
+//----------------------------------------------------------------------------
+
+vtkStandardNewMacro(vtkKW@WidgetType@Set);
+vtkCxxRevisionMacro(vtkKW@WidgetType@Set, "1.1");
+
+int vtkKW@WidgetType@SetCommand(ClientData cd, Tcl_Interp *interp,
+                                int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@Set::vtkKW@WidgetType@Set()
+{
+  this->CommandFunction = vtkKW@WidgetType@SetCommand;
+}
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@* vtkKW@WidgetType@Set::GetWidget(int id)
+{
+  vtkKW@WidgetType@Set::WidgetSlot *widget_slot = 
+    this->GetWidgetSlot(id);
+  if (!widget_slot)
+    {
+    return NULL;
+    }
+
+  return static_cast<vtkKW@WidgetType@*>(widget_slot->Widget);
+}
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@* vtkKW@WidgetType@Set::AddWidget(int id)
+{
+  return static_cast<vtkKW@WidgetType@*>(this->AddWidgetInternal(id));
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKW@WidgetType@Set::AllocateAndCreateWidget()
+{
+  vtkKW@WidgetType@ *widget = vtkKW@WidgetType@::New();
+  widget->SetParent(this);
+  widget->Create(this->GetApplication(), 0);
+  return static_cast<vtkKWWidget*>(widget);
+}
+
+//----------------------------------------------------------------------------
+void vtkKW@WidgetType@Set::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

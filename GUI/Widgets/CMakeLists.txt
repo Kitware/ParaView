@@ -94,6 +94,7 @@ SET( KWWidgets_SRCS
   vtkKWWidget.cxx 
   vtkKWWidgetCollection.cxx 
   vtkKWWidgetLabeled.cxx 
+  vtkKWWidgetSet.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowCollection.cxx 
   )
@@ -111,10 +112,10 @@ FOREACH (WidgetType
     )
   SET (WidgetType ${WidgetType})
   CONFIGURE_FILE (
-    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSet.h.in 
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSetSubclass.h.in 
     ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.h IMMEDIATE)
   CONFIGURE_FILE (
-    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSet.cxx.in 
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSetSubclass.cxx.in 
     ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx IMMEDIATE)
   SET (KWWidgets_SRCS 
     ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx)
@@ -178,6 +179,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
+  vtkKWWidgetSet.cxx
   ABSTRACT
   )
 
