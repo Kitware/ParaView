@@ -396,6 +396,10 @@ public:
   // Propagates the center to the manipulators.
   void SetCenterOfRotation(float x, float y, float z);
 
+  // Description:
+  // This method is for testing only.
+  void SaveSessionFile(const char* path);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

@@ -404,12 +404,6 @@ int vtkPVApplication::AcceptEvaluation()
 }
 
 //----------------------------------------------------------------------------
-int VerifyKey(unsigned long vtkNotUsed(key), const char* vtkNotUsed(name), int vtkNotUsed(id))
-{
- return 1;
-}
-
-//----------------------------------------------------------------------------
 int vtkPVApplication::PromptRegistration(char* vtkNotUsed(name), 
                                          char* vtkNotUsed(IDS))
 {
@@ -580,6 +574,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 
 #ifdef VTK_MANGLE_MESA
+  
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-s",

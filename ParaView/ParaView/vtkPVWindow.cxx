@@ -3087,6 +3087,15 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   return cm;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveSessionFile(const char* path)
+{
+  ostream *fptr;
+  fptr = new ofstream(path, ios::out);
+  vtkIndent indent;
+  this->Serialize(*fptr,indent);
+  delete fptr;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)

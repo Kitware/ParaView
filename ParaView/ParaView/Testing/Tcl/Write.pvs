@@ -23,14 +23,9 @@ if { [catch {
   file delete -force vtkParaViewWriteTestGhost.vtk
   $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
   file delete -force vtkParaViewWriteTest.tcl
-  $pvWindow ErrorMessage "This is an error"
-  $pvWindow WarningMessage "This is a warning"
 } res ] != 0 } {
 	puts "Error: $res"
 	Application SetExitStatus 1
 }
 
-Application StartRecordingScript none.pvs
-Application AcceptLicense
-Application AcceptEvaluation
 Application Exit
