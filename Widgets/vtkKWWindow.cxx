@@ -121,7 +121,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->SupportHelp = 1;
 
-  this->SetWindowClass("Kitware");
+  this->SetWindowClass("KitwareWidget");
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -821,5 +821,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.27.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.27.2.2 $");
 }
