@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.10");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.10.2.1");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -215,11 +215,14 @@ int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax,
 //
 // Algorithm comes from Graphics Gems IV
 //
+extern "C" 
+{
+  int vtkPointsProjectedHullIncrVertAxis(const void *p1, const void *p2);
+  int vtkPointsProjectedHullCCW(const void *p1, const void *p2);
+}
 int vtkPointsProjectedHull::grahamScanAlgorithm(int dir)
 {
 int horizAxis = 0, vertAxis = 0;
-int incrVertAxis(const void *p1, const void *p2);
-int ccw(const void *p1, const void *p2);
 int i,j;
 
   if ((this->Npts == 0) || (this->GetMTime() > this->PtsTime))
@@ -255,7 +258,7 @@ int i,j;
     hullPts[i*2 + 1] = this->Pts[i*3 + vertAxis];
     }
 
-  qsort(hullPts, this->Npts, sizeof(double) * 2, incrVertAxis);
+  qsort(hullPts, this->Npts, sizeof(double) * 2, vtkPointsProjectedHullIncrVertAxis);
 
   int firstId = 0;
 
@@ -280,7 +283,7 @@ int i,j;
     hullPts[1] = firstPt[1];
     }
   // If there are duplicates of the first point in the
-  // projection, the ccw sort will fail.
+  // projection, the vtkPointsProjectedHullCCW sort will fail.
 
   int dups = 0;
 
@@ -312,7 +315,7 @@ int i,j;
   //   P2 makes a greater angle than P1 if it is left of the line
   //   formed by firstPt - P1.
 
-  qsort(hullPts+2, nHullPts - 1, sizeof(double)*2, ccw);
+  qsort(hullPts+2, nHullPts - 1, sizeof(double)*2, vtkPointsProjectedHullCCW);
 
   // Remove sequences of duplicate points, and remove interior
   //   points on the same ray from the initial point
@@ -674,9 +677,11 @@ int vtkPointsProjectedHull::rectangleOutside1DPolygon(double hmin, double hmax,
 
 // The sort functions
 
-int incrVertAxis(const void *p1, const void *p2)
+extern "C"
 {
-double *a, *b;
+  int vtkPointsProjectedHullIncrVertAxis(const void *p1, const void *p2)
+  {
+  double *a, *b;
 
     a = (double *)p1;
     b = (double *)p2;
@@ -684,11 +689,12 @@ double *a, *b;
     if (a[1] < b[1])       return -1;
     else if (a[1] == b[1]) return 0;
     else                   return 1;
-}
-int ccw(const void *p1, const void *p2)
-{
-double *a, *b;
-double val;
+  }
+
+  int vtkPointsProjectedHullCCW(const void *p1, const void *p2)
+  {
+  double *a, *b;
+  double val;
 
     a = (double *)p1;
     b = (double *)p2;
@@ -700,7 +706,9 @@ double val;
     if (val < 0)       return 1;   // b is right of line firstPt->a
     else if (val == 0) return 0;   // b is on line firstPt->a
     else               return -1;  // b is left of line firstPt->a
+  }
 }
+
 void vtkPointsProjectedHull::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

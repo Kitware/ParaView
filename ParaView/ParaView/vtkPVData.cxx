@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.246");
+vtkCxxRevisionMacro(vtkPVData, "1.246.2.1");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2764,116 +2764,6 @@ void vtkPVData::SaveState(ofstream *file)
   
   *file << "$kw(" << this->GetTclName() << ") SetVisibility "
         << this->GetVisibility() << endl;
-  
-  const char *colorBy = this->ColorMenu->GetValue();
-  const char *subStr;
-  char *arrayName;
-  int pos, pos2, numComps;
-  vtkPVSource *src = this->GetPVSource();
-  vtkPVArrayInformation *arrayInfo;
-  
-  if (strcmp(colorBy, "Property") == 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") ColorByProperty" << endl;
-    }
-  else if (strncmp(colorBy, "Point", 5) == 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") ColorByPointField ";
-    subStr = strrchr(colorBy, ')');
-    pos = static_cast<int>(subStr - colorBy + 1);
-    if (pos == static_cast<int>(strlen(colorBy)))
-      {
-      subStr = strrchr(colorBy, '(');
-      pos2 = static_cast<int>(subStr - colorBy + 1);
-      if (pos2 < pos)
-        {
-        subStr = colorBy+pos2-1;
-        if (sscanf(subStr, "(%d)", &numComps) != 0)
-          {
-          arrayName = new char[pos2];
-          strncpy(arrayName, colorBy+6, pos2);
-          if (src)
-            {
-            arrayInfo = src->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(arrayName);
-            if (arrayInfo && arrayInfo->GetNumberOfComponents() == numComps)
-              {
-              *file << "{" << arrayName << "} " << numComps << endl;
-              }
-            else
-              {
-              *file << "{" << colorBy+6 << "} 1" << endl;
-              }
-            }
-          else
-            {
-            *file << "{" << colorBy+6 << "} 1" << endl;
-            }
-          delete [] arrayName;
-          }
-        else
-          {
-          *file << "{" << colorBy+6 << "} 1" << endl;
-          }
-        }
-      else
-        {
-        *file << "{" << colorBy+6 << "} 1" << endl;
-        }
-      }
-    else
-      {
-      *file << "{" << colorBy+6 << "} 1" << endl;
-      }
-    }
-  else if (strncmp(colorBy, "Cell", 4) == 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") ColorByCellField ";
-    subStr = strrchr(colorBy, ')');
-    pos = static_cast<int>(subStr - colorBy + 1);
-    if (pos == static_cast<int>(strlen(colorBy)))
-      {
-      subStr = strrchr(colorBy, '(');
-      pos2 = static_cast<int>(subStr - colorBy + 1);
-      if (pos2 < pos)
-        {
-        subStr = colorBy+pos2-1;
-        if (sscanf(subStr, "(%d)", &numComps) != 0)
-          {
-          arrayName = new char[pos2];
-          strncpy(arrayName, colorBy+5, pos2);
-          if (src)
-            {
-            arrayInfo = src->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(arrayName);
-            if (arrayInfo && arrayInfo->GetNumberOfComponents() == numComps)
-              {
-              *file << "{" << subStr << "} " << numComps << endl;
-              }
-            else
-              {
-              *file << "{" << colorBy+5 << "} 1" << endl;
-              }
-            }
-          else
-            {
-            *file << "{" << colorBy+5 << "} 1" << endl;
-            }
-          delete [] arrayName;
-          }
-        else
-          {
-          *file << "{" << colorBy+5 << "} 1" << endl;
-          }
-        }
-      else
-        {
-        *file << "{" << colorBy+5 << "} 1" << endl;
-        }
-      }
-    else
-      {
-      *file << "{" << colorBy+5 << "} 1" << endl;
-      }
-    }
 }
 
 //----------------------------------------------------------------------------

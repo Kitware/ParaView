@@ -44,14 +44,14 @@ public:
 
   // Description:
   // Set/Get the value of the thumbwheel.
-  virtual void SetValue(float v);
-  vtkGetMacro(Value, float);
+  virtual void SetValue(double v);
+  vtkGetMacro(Value, double);
 
   // Description:
   // Set/Get the minimum value. The current value will be clamped only if
   // ClampMinimumValue is true.
-  vtkSetMacro(MinimumValue, float);
-  vtkGetMacro(MinimumValue, float);
+  vtkSetMacro(MinimumValue, double);
+  vtkGetMacro(MinimumValue, double);
   vtkSetMacro(ClampMinimumValue, int);
   vtkGetMacro(ClampMinimumValue, int);
   vtkBooleanMacro(ClampMinimumValue, int);  
@@ -59,8 +59,8 @@ public:
   // Description:
   // Set/Get the maximum value. The current value will be clamped only if
   // ClampMaximumValue is true.
-  vtkSetMacro(MaximumValue, float);
-  vtkGetMacro(MaximumValue, float);
+  vtkSetMacro(MaximumValue, double);
+  vtkGetMacro(MaximumValue, double);
   vtkSetMacro(ClampMaximumValue, int);
   vtkGetMacro(ClampMaximumValue, int);
   vtkBooleanMacro(ClampMaximumValue, int);  
@@ -68,8 +68,8 @@ public:
   // Description:
   // Set/Get the resolution of the thumbwheel. Moving the thumbwheel will
   // increase/decrease the value by an amount proportional to this resolution.
-  virtual void SetResolution(float r);
-  vtkGetMacro(Resolution, float);
+  virtual void SetResolution(double r);
+  vtkGetMacro(Resolution, double);
   
   // Description:
   // Set the interaction modes (mode 0 is left button, 1 is middle, 2 is right). 
@@ -93,15 +93,15 @@ public:
   // Example: if the threshold is 0.1, the current width is 100 pixels and
   // the resolution is 2, then the mouse must be moved 10 pixels to "the right"
   // to add 2 to the current value.
-  vtkSetMacro(LinearThreshold, float);
-  vtkGetMacro(LinearThreshold, float);
+  vtkSetMacro(LinearThreshold, double);
+  vtkGetMacro(LinearThreshold, double);
 
   // Description:
   // Set/Get the maximum multiplier in non-linear mode. This bounds the 
   // scaling factor applied to the resolution when the thumbwheel is reaching
   // its maximum left or right position.
-  vtkSetMacro(NonLinearMaximumMultiplier, float);
-  vtkGetMacro(NonLinearMaximumMultiplier, float);
+  vtkSetMacro(NonLinearMaximumMultiplier, double);
+  vtkGetMacro(NonLinearMaximumMultiplier, double);
 
   // Description:
   // Set/Get the width and height of the thumbwheel. Can't be smaller than 5x5.
@@ -129,8 +129,8 @@ public:
   vtkSetMacro(DisplayThumbWheelPositionIndicator, int);
   vtkGetMacro(DisplayThumbWheelPositionIndicator, int);
   vtkBooleanMacro(DisplayThumbWheelPositionIndicator, int);  
-  vtkSetVector3Macro(ThumbWheelPositionIndicatorColor, float);
-  vtkGetVectorMacro(ThumbWheelPositionIndicatorColor, float, 3);
+  vtkSetVector3Macro(ThumbWheelPositionIndicatorColor, double);
+  vtkGetVectorMacro(ThumbWheelPositionIndicatorColor, double, 3);
 
   // Description:
   // Display/Hide a centrer indicator so that the user can easily find the
@@ -144,8 +144,8 @@ public:
   // Set/Get the average size (in pixels) of the notches on the visible part of 
   // the thumbwheel. Can be a decimal value, since it's only used to compute
   // the number of notches to display depending on the current thumbwheel size.
-  virtual void SetSizeOfNotches(float v);
-  vtkGetMacro(SizeOfNotches, float);
+  virtual void SetSizeOfNotches(double v);
+  vtkGetMacro(SizeOfNotches, double);
 
   // Description:
   // Display/Hide an entry field (optional).
@@ -236,19 +236,19 @@ protected:
   vtkKWThumbWheel();
   ~vtkKWThumbWheel();
 
-  float       Value;
-  float       MinimumValue;
+  double      Value;
+  double      MinimumValue;
   int         ClampMinimumValue;
-  float       MaximumValue;
+  double      MaximumValue;
   int         ClampMaximumValue;
-  float       Resolution;
-  float       NonLinearMaximumMultiplier;
-  float       LinearThreshold;
+  double      Resolution;
+  double      NonLinearMaximumMultiplier;
+  double      LinearThreshold;
 
   int         ThumbWheelWidth;
   int         ThumbWheelHeight;
-  float       SizeOfNotches;
-  float       ThumbWheelPositionIndicatorColor[3];
+  double      SizeOfNotches;
+  double      ThumbWheelPositionIndicatorColor[3];
 
   int         ResizeThumbWheel;
   int         DisplayLabel;
@@ -264,7 +264,7 @@ protected:
   char        *EndCommand;
   char        *EntryCommand;
 
-  float       ThumbWheelShift;
+  double      ThumbWheelShift;
 
   int         InteractionModes[3];
 
@@ -276,10 +276,10 @@ protected:
 
   void CreateEntry();
   void CreateLabel();
-  void UpdateThumbWheelImage(float pos = -1.0);
+  void UpdateThumbWheelImage(double pos = -1.0);
   void PackWidget();
   void UpdateEntryResolution();
-  float GetMousePositionInThumbWheel();
+  double GetMousePositionInThumbWheel();
 
   //BTX
 
@@ -293,17 +293,17 @@ protected:
   class LinearMotionState
   {
   public:
-    float Value;
-    float ThumbWheelShift;
-    float MousePosition;
+    double Value;
+    double ThumbWheelShift;
+    double MousePosition;
     int InPerform;
   };
 
   class NonLinearMotionState
   {
   public:
-    float Value;
-    float Increment;
+    double Value;
+    double Increment;
     int InPerform;
   };
   //ETX
@@ -312,6 +312,8 @@ protected:
   NonLinearMotionState StartNonLinearMotionState;
 
   int InInvokeCommand;
+
+  void RefreshValue();
 
 private:
   vtkKWThumbWheel(const vtkKWThumbWheel&); // Not implemented

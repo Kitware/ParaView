@@ -156,6 +156,10 @@ public:
   // valiad if the source is present.
   int IsActionValid(int has_source = 0);
 
+  // Description:
+  // Convenience method.
+  vtkPVApplication* GetPVApplication();
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();

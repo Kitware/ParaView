@@ -42,7 +42,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.19.2.1");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -168,9 +168,6 @@ void vtkPVBoxWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
-  this->ScaleKeyPressCallback();
-  this->TranslateKeyPressCallback();
-  this->OrientationKeyPressCallback();
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
     {
@@ -495,6 +492,15 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 
   this->Script("grid %s -sticky nws",
                this->OrientationLabel->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 0 -weight 0", 
+               this->ControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 1 -weight 2", 
+               this->ControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 2 -weight 2", 
+               this->ControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 3 -weight 2", 
+               this->ControlFrame->GetFrame()->GetWidgetName());
 
   this->Script("pack %s -fill x -expand t -pady 2",
     this->ControlFrame->GetWidgetName());

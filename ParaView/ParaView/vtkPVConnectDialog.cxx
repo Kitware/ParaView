@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.14");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.14.2.1");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -119,14 +119,12 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
       if ( servers[cc] == ',' )
         {
         servers[cc] = 0;
-        cout << "Found server: [" << server << "]" << endl;
         this->Hostname->GetEntry()->AddValue(server);
         server = servers + cc + 1;
         }
       }
     if ( strlen(server) )
       {
-      cout << "Last server: " << server << endl;
       this->Hostname->GetEntry()->AddValue(server);
       }
     }
@@ -155,10 +153,8 @@ void vtkPVConnectDialog::OK()
   for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
     {
     servers += ",";
-    cout << "Store server: " << this->Hostname->GetEntry()->GetValueFromIndex(cc) << endl;
     servers += this->Hostname->GetEntry()->GetValueFromIndex(cc);
     }
-  cout << "Servers: " << servers.c_str() << endl;
   this->Application->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
 
   this->Superclass::OK();
@@ -249,7 +245,6 @@ vtkPVConnectDialog::~vtkPVConnectDialog()
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::SetListOfServers(const char* list)
 {
-  std::cout << "vtkPVConnectDialog::SetListOfServers(" << list << ")" << endl;
   vtkstd::string cserv;
   vtkstd::string::size_type cc;
   for ( cc = 0; list[cc]; cc ++ )
@@ -271,7 +266,6 @@ void vtkPVConnectDialog::SetListOfServers(const char* list)
   int kk;
   for ( kk = 0; kk < this->Servers->GetLength(); kk ++ )
     {
-    cout << "Add to the entry: " << this->Servers->GetString(kk) << endl;
     this->Hostname->GetEntry()->AddValue(this->Servers->GetString(kk));
     }
 }
@@ -279,7 +273,6 @@ void vtkPVConnectDialog::SetListOfServers(const char* list)
 //----------------------------------------------------------------------------
 const char* vtkPVConnectDialog::GetListOfServers()
 {
-  cout << "GetListOfServers" << endl;
   vtkstd::string servlist;
   int cc;
 
@@ -287,7 +280,6 @@ const char* vtkPVConnectDialog::GetListOfServers()
   for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
     {
     const char* server = this->Hostname->GetEntry()->GetValueFromIndex(cc);
-    cout << "Add server: " << server << endl;
     this->Servers->AddUniqueString(server);
     }
 

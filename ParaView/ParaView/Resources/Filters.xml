@@ -1942,6 +1942,7 @@
           module_type="Filter"
           button_image="PVExtractGridButton"
           replace_input="0"
+          button_help="Extract a subgrid or subsample."
           long_help="Extract a subgrid from a structured grid with the option of setting subsample strides."
           short_help="Extract a subgrid or subsample.">
     <Filter class="vtkPVExtractVOI">

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.49");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.49.2.1");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -671,7 +671,6 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvam->SetFieldSelection(this->FieldSelection);
     pvam->SetAttributeType(this->AttributeType);
     pvam->SetLabel(this->Label->GetLabel());
-    // TODO: Why is the first source used? Is this a bug?
     if (this->InputMenu)
       {
       // This will either clone or return a previously cloned

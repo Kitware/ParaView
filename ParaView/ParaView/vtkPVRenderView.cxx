@@ -95,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.293");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.1");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -229,6 +229,12 @@ void vtkPVRenderView::StartRenderEvent()
     {
     this->Renderer2D->GetActiveCamera()->SetClippingRange(
       this->Renderer->GetActiveCamera()->GetClippingRange());
+    this->Renderer2D->GetActiveCamera()->SetPosition(
+      this->Renderer->GetActiveCamera()->GetPosition());
+    this->Renderer2D->GetActiveCamera()->SetFocalPoint(
+      this->Renderer->GetActiveCamera()->GetFocalPoint());
+    this->Renderer2D->GetActiveCamera()->SetViewUp(
+      this->Renderer->GetActiveCamera()->GetViewUp());
     }
 }
 
