@@ -633,12 +633,18 @@ void vtkPVActorComposite::UpdateProperties()
   int currentColorByFound = 0;
   float time;
   int validBounds = 1;
+  vtkKWWindow *window;
   
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
     {
     return;
     }
   this->UpdateTime.Modified();
+
+  window = this->GetView()->GetParentWindow();
+  this->Script("update");
+  this->Script("%s configure -cursor watch", window->GetWidgetName());
+  this->Script("update");
 
   vtkDebugMacro( << "Start timer");
   vtkTimerLog *timer = vtkTimerLog::New();
@@ -654,7 +660,7 @@ void vtkPVActorComposite::UpdateProperties()
     {
     sprintf(tmp, "%s : took %f seconds", 
             this->PVData->GetVTKDataTclName(), time); 
-    this->GetView()->GetParentWindow()->SetStatusText(tmp);
+    window->SetStatusText(tmp);
     pvApp->AddLogEntry(this->PVData->GetVTKDataTclName(), time);
     pvApp->AddLogEntry("NumCells", this->PVData->GetVTKData()->GetNumberOfCells());
     }
@@ -677,6 +683,12 @@ void vtkPVActorComposite::UpdateProperties()
 
 
   timer->Delete(); 
+
+#ifdef _WIN32
+  this->Script("%s configure -cursor arrow", window->GetWidgetName());
+#else
+  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
+#endif
   
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
@@ -1179,13 +1191,23 @@ void vtkPVActorComposite::Initialize()
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
   if ((array =
-       this->PVData->GetVTKData()->GetPointData()->GetActiveScalars()) &&
+       this->Mapper->GetInput()->GetPointData()->GetActiveScalars()) &&
       (array->GetName()))
     {
     char *arrayName = (char*)array->GetName();
     char tmp[350];
     sprintf(tmp, "Point %s", arrayName);
     this->ColorByPointFieldComponent(arrayName, 0);
+    this->ColorMenu->SetValue(tmp);
+    }
+  else if ((array =
+            this->Mapper->GetInput()->GetCellData()->GetActiveScalars()) &&
+            (array->GetName()))
+    {
+    char *arrayName = (char*)array->GetName();
+    char tmp[350];
+    sprintf(tmp, "Cell %s", arrayName);
+    this->ColorByCellFieldComponent(arrayName, 0);
     this->ColorMenu->SetValue(tmp);
     }
   else

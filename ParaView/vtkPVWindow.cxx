@@ -934,7 +934,7 @@ void vtkPVWindow::Open()
     sInt->SetDataFileName(openFileName);
     sInt->SetRootName(rootName);
 	  sInt->CreateCallback();
-	  }
+    }
 }
 
 void vtkPVWindow::WriteData()
@@ -1223,7 +1223,6 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
   
   if (this->CurrentPVData)
     {
-    this->EnableFilterButtons();
     this->CurrentPVData->UnRegister(this);
     this->CurrentPVData = NULL;
     // Remove all of the entries from the filter menu.
@@ -1232,12 +1231,9 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
       this->FilterMenu->DeleteAllMenuItems();
       }
     }
-  else
-    {
-    this->DisableFilterButtons();
-    }
   if (pvd)
     {
+    this->EnableFilterButtons();
     pvd->Register(this);
     this->CurrentPVData = pvd;
     // Add all the appropriate filters to the filter menu.
@@ -1249,6 +1245,10 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
         this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
         }
       }
+    }
+  else
+    {
+    this->DisableFilterButtons();
     }
 }
 
@@ -1356,6 +1356,10 @@ void vtkPVWindow::EnableFilterButtons()
 {
   this->Script("%s configure -state normal",
                this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state normal",
+               this->CutPlaneButton->GetWidgetName());
+  this->Script("%s configure -state normal",
+               this->ClipPlaneButton->GetWidgetName());
   this->Script("%s configure -state normal",
                this->ThresholdButton->GetWidgetName());
   this->Script("%s configure -state normal",

@@ -342,16 +342,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->PVWindow->GetMenu()->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->PVWindow->GetCalculatorButton()->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->PVWindow->GetThresholdButton()->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->PVWindow->GetContourButton()->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->PVWindow->GetGlyphButton()->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->PVWindow->GetProbeButton()->GetWidgetName());  
   
   return pvs;
 } 

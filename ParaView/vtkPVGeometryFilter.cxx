@@ -250,8 +250,8 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid *input)
   for (id = 0; id < numCells && this->OutlineFlag == 0; ++id)
     {
     type = input->GetCellType(id);
-    if (type != VTK_TETRA || type != VTK_VOXEL || type != VTK_HEXAHEDRON
-        || type != VTK_WEDGE || type != VTK_PYRAMID)
+    if (type == VTK_TETRA || type == VTK_VOXEL || type == VTK_HEXAHEDRON
+        || type == VTK_WEDGE || type == VTK_PYRAMID)
       {
       this->OutlineFlag = 1;
       } 

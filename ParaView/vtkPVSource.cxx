@@ -904,9 +904,6 @@ void vtkPVSource::AcceptCallback()
   
   window = this->GetWindow();
 
-  this->Script("%s configure -cursor watch", window->GetWidgetName());
-  this->Script("update");
-  
 #ifdef _WIN32
   this->Script("%s configure -background SystemButtonFace",
                this->AcceptButton->GetWidgetName());
@@ -986,14 +983,7 @@ void vtkPVSource::AcceptCallback()
     this->GetNthPVOutput(0)->UpdateProperties();
     }
 
-  this->Script("update");
-  
-#ifdef _WIN32
-  this->Script("%s configure -cursor arrow", window->GetWidgetName());
-#else
-  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
-#endif
-
+  this->Script("update");  
 
   this->Script("%s index end", window->GetMenu()->GetWidgetName());
   numMenus = atoi(pvApp->GetMainInterp()->result);
@@ -1003,20 +993,6 @@ void vtkPVSource::AcceptCallback()
     this->Script("%s entryconfigure %d -state normal",
                  window->GetMenu()->GetWidgetName(), i);
     }
-  this->Script("%s configure -state normal",
-               window->GetCalculatorButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetCutPlaneButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetClipPlaneButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetThresholdButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetContourButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetGlyphButton()->GetWidgetName());
-  this->Script("%s configure -state normal",
-               window->GetProbeButton()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1137,7 +1113,6 @@ void vtkPVSource::DeleteCallback()
     this->Script("%s entryconfigure %d -state normal",
                  window->GetMenu()->GetWidgetName(), i);
     }
-  window->EnableFilterButtons();
 
   // This should delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
