@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.8");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -111,40 +111,43 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
 
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::Trace(ofstream *file, const char* root)
+void vtkPVComponentSelection::Trace(ofstream *file)
 {
   int i;
   
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetState "
+    *file << "$kw(" << this->GetTclName() << ") SetState "
           << i << " " << this->GetState(i) << endl;
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::Accept()
+void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   int i;
   
   if (this->ModifiedFlag)
     {
-    pvApp->BroadcastScript("%s RemoveAllValues", this->ObjectTclName);
+    pvApp->BroadcastScript("%s RemoveAllValues", sourceTclName);
     for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
       {
-      this->AddTraceEntry("$kw(%s) SetState %d %d", this->GetTclName(),
-                          i, this->GetState(i));
       if (this->GetState(i))
         {
         pvApp->BroadcastScript("%s Set%s %d %d",
-                               this->ObjectTclName, this->VariableName,
+                               sourceTclName, this->VariableName,
                                i, i);
         }
       else
         {
         pvApp->BroadcastScript("%s Set%s %d %d",
-                               this->ObjectTclName, this->VariableName,
+                               sourceTclName, this->VariableName,
                                i, -1);
         }
       }
@@ -155,7 +158,7 @@ void vtkPVComponentSelection::Accept()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::Reset()
+void vtkPVComponentSelection::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -173,7 +176,7 @@ void vtkPVComponentSelection::Reset()
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
     this->Script("%s SetState %d [expr [%s GetValue %d]+1]",
-                 this->GetTclName(), i, this->PVSource->GetVTKSourceTclName(),
+                 this->GetTclName(), i, sourceTclName,
                  i);
     }
   

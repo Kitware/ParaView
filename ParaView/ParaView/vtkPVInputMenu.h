@@ -89,15 +89,6 @@ public:
   vtkSetStringMacro(InputName);
   
   // Description:
-  // Gets called when the accept button is pressed.
-  // This method may add an entry to the trace file.
-  virtual void Accept(const char* sourceTclName);
-
-  // Description:
-  // Gets called when the reset button is pressed.
-  virtual void Reset(const char* sourceTclName);
-
-  // Description:
   // This method gets called when the user changes the widgets value,
   // or a script changes the widgets value.  Ideally, this method should 
   // be protected.  Input menus have the specifie behaviour that
@@ -140,12 +131,22 @@ public:
 //ETX
 
   // Description:
+  // Gets called when the accept button is pressed.
+  // This method may add an entry to the trace file.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // Gets called when the reset button is pressed.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
+
 
   char* InputName;
   

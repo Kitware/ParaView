@@ -34,6 +34,9 @@ class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkMultiProcessController;
 class vtkRenderer;
+class vtkTiledDisplaySchedule;
+class vtkFloatArray;
+class vtkUnsignedCharArray;
 
 class VTK_EXPORT vtkTiledDisplayManager : public vtkObject
 {
@@ -81,6 +84,13 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
+  // Description:
+  // Set the total number of processes.
+  // Will be replaced by MPI num procs eventually.
+  vtkSetMacro(NumberOfProcesses,int);
+  vtkGetMacro(NumberOfProcesses,int);
+
+
 //BTX
   enum Tags {
     RENDER_RMI_TAG=12721,
@@ -88,6 +98,34 @@ public:
     REN_INFO_TAG=22135
   };
 //ETX
+
+
+
+  //============================================================
+  // New compositing methods.
+
+  // Description:
+  // This create all of the buffer objects as well as create the 
+  // composite schedule.  Set TileDimensions, TileProcesses and
+  // NumberOfProcesses before calling this method.
+  void InitializeBuffers();
+
+  // Description:
+  // Tile processes are probably going to be 0, 1, 2 ...
+  //void SetTileProcesses(int idx, int id);
+
+
+  // This keeps processes 0 out of the rendering composite group.
+  vtkSetMacro(ZeroEmpty, int);
+  vtkGetMacro(ZeroEmpty, int);
+  vtkBooleanMacro(ZeroEmpty, int);
+
+  void InitializeSchedule();
+  int ShuffleLevel(int level, int numTiles, 
+                   vtkTiledDisplaySchedule** tileSchedules);
+
+
+
 
 protected:
   vtkTiledDisplayManager();
@@ -109,8 +147,33 @@ protected:
 
   vtkObject *RenderView;
 
+  // Any processes can display the tiles.
+  // There can be more processes than tiles.
   int TileDimensions[2];
-  
+  //vtkIntArray* TileProcesses;
+  int NumberOfProcesses;
+  // We have a z and color buffer for each tile.
+  int NumberOfTiles;
+  vtkFloatArray** TileZData;
+  vtkUnsignedCharArray** TilePData;
+
+  // We have two spare set of buffers for receiving and compositing.
+  vtkFloatArray* ZData;
+  vtkUnsignedCharArray*  PData;  
+  vtkFloatArray* ZData2;
+  vtkUnsignedCharArray*  PData2;  
+
+  void SetPDataSize(int x, int y);
+  int PDataSize[2];
+
+  vtkTiledDisplaySchedule* Schedule;
+  int ZeroEmpty;
+
+  // On: Composite, Off, assume geometry copied to all tile procs.
+  int CompositeFlag;
+
+  void Composite();
+
 private:
   vtkTiledDisplayManager(const vtkTiledDisplayManager&); // Not implemented
   void operator=(const vtkTiledDisplayManager&); // Not implemented

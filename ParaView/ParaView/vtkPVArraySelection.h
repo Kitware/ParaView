@@ -64,6 +64,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Methods for setting the value of the VTKReader from the widget.
+  // User internally when user hits Accept.
+  virtual void Accept();
+
+  // Description:
+  // Methods for setting the value of the widget from the VTKReader.
+  // User internally when user hits Reset.
+  virtual void Reset();
+
+  // Description:
   // This specifies whether to ues Cell or Point data.
   // Options are "Cell" or "Point".  Possible "Field" in the future.
   vtkSetStringMacro(AttributeName);
@@ -78,18 +88,6 @@ public:
   vtkSetStringMacro(VTKReaderTclName);
   vtkGetStringMacro(VTKReaderTclName);
     
-  // Description:
-  // Methods for setting the value of the VTKReader from the widget.
-  // User internally when user hits Accept.
-  virtual void Accept();
-  virtual void Accept(const char* sourceTclName);
-
-  // Description:
-  // Methods for setting the value of the widget from the VTKReader.
-  // User internally when user hits Reset.
-  virtual void Reset();
-  virtual void Reset(const char* sourceTclName);
-
   // Description:
   // Callback for the AllOn and AllOff buttons.
   void AllOnCallback();
@@ -119,13 +117,12 @@ public:
   // Ingore parts for thsi reader specific widget. 
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
-
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();
+
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file);
 
   char* AttributeName;
   char* VTKReaderTclName;

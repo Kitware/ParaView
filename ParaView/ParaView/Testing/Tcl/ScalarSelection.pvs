@@ -206,6 +206,8 @@ set pv(vtkTemp356) [$pv(vtkTemp336) GetPVWidget {UseNormal}]
 set pv(vtkTemp359) [$pv(vtkTemp336) GetPVWidget {XYPlane}]
 $pv(vtkTemp336) AcceptCallback
 
+$pv(vtkTemp136) SetVisibility 1
+
 $pv(vtkTemp1) ResetCameraCallback
 
 # Fix the size of the image.

@@ -28,6 +28,8 @@ vtkPVClientServerModule.cxx
 vtkPVClipDataSet.cxx
 vtkPVColorMap.cxx
 vtkPVComponentSelection.cxx
+vtkPVCompositeBuffer.cxx
+vtkPVCompositeUtilities.cxx
 vtkPVConnectivityFilter.cxx
 vtkPVContainerWidget.cxx
 vtkPVContour.cxx 
@@ -39,6 +41,7 @@ vtkPVDataSetAttributesInformation.cxx
 vtkPVDataSetFileEntry.cxx
 vtkPVDataSetReaderModule.cxx
 vtkPVDummyWidget.cxx
+vtkPVDuplicatePolyData.cxx
 vtkPVEnSightArraySelection.cxx
 vtkPVEnSightReaderModule.cxx
 vtkPVErrorLogDisplay.cxx
@@ -46,6 +49,7 @@ vtkPVExtentEntry.cxx
 vtkPVExtentTranslator.cxx 
 vtkPVExtractGeometryByScalar.cxx
 vtkPVExtractPartsWidget.cxx
+vtkPVFieldMenu.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGhostLevelDialog.cxx
@@ -133,7 +137,7 @@ vtkPickDataSetFilter.cxx
 vtkRedistributePolyData.cxx
 vtkSelectInputs.cxx
 vtkStringList.cxx 
-vtkTiledDisplayManager.cxx
+vtkTiledDisplaySchedule.cxx
 vtkWeightedRedistributePolyData.cxx
 vtkXDMFReaderModule.cxx
 )

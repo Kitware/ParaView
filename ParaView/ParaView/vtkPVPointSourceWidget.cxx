@@ -49,14 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int vtkPVPointSourceWidget::InstanceCount = 0;
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.7");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVPointSourceWidget::vtkPVPointSourceWidget()
 {
   this->CommandFunction = vtkPVPointSourceWidgetCommand;
@@ -81,7 +81,7 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   this->ModifiedFlag = 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 {
   this->PointWidget->Delete();
@@ -90,7 +90,7 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 {
   float pt[3];
@@ -117,7 +117,7 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
@@ -191,7 +191,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVPointSourceWidget::GetModifiedFlag()
 {
   if (this->ModifiedFlag)
@@ -208,79 +208,56 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
 }
  
 
-//----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Reset(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::ResetInternal(const char* sourceTclName)
 {
   // Ignore the source passed in.  We are updating our
   // own point source.
-  this->PointWidget->Reset(this->SourceTclName);
-  this->RadiusWidget->Reset(this->SourceTclName);
-  this->NumberOfPointsWidget->Reset(this->SourceTclName);
+  this->PointWidget->ResetInternal(this->SourceTclName);
+  this->RadiusWidget->ResetInternal(this->SourceTclName);
+  this->NumberOfPointsWidget->ResetInternal(this->SourceTclName);
   this->ModifiedFlag = 0;
 }
-//----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Reset()
-{
-  this->Reset(this->SourceTclName);
-}
 
-
-//----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Accept(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::AcceptInternal(const char* sourceTclName)
 {
   // Ignore the source passed in.  We are updating our
   // own point source.
   if (this->GetModifiedFlag())
     {
-    this->PointWidget->Accept(this->SourceTclName);
-    this->RadiusWidget->Accept(this->SourceTclName);
-    this->NumberOfPointsWidget->Accept(this->SourceTclName);
+    this->PointWidget->AcceptInternal(this->SourceTclName);
+    this->RadiusWidget->AcceptInternal(this->SourceTclName);
+    this->NumberOfPointsWidget->AcceptInternal(this->SourceTclName);
     }
   this->ModifiedFlag = 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Accept()
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::Trace(ofstream *file)
 {
-  this->Accept(this->SourceTclName);
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  this->RadiusWidget->Trace(file);
+  this->NumberOfPointsWidget->Trace(file);
 }
 
-//---------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Trace(ofstream *file, const char* root)
-{
-  *file << "set " << root << "(" << this->PointWidget->GetTclName() << ") "
-        << "[$" << root << "(" << this->GetTclName() << ") "
-        << "GetPVWidget {" << this->PointWidget->GetTraceName() << "}]" 
-        << endl;
-  this->PointWidget->Trace(file, root);
-
-  *file << "set " << root << "(" << this->RadiusWidget->GetTclName() << ") "
-        << "[$" << root << "(" << this->GetTclName() << ") "
-        << "GetPVWidget {" << this->RadiusWidget->GetTraceName() << "}]" 
-        << endl;
-  this->RadiusWidget->Trace(file, root);
-
-  *file << "set " 
-        << root << "(" << this->NumberOfPointsWidget->GetTclName() << ") "
-        << "[$" << root << "(" << this->GetTclName() << ") "
-        << "GetPVWidget {" << this->NumberOfPointsWidget->GetTraceName() 
-        << "}]" << endl;
-  this->NumberOfPointsWidget->Trace(file, root);
-}
-
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Select()
 {
   this->PointWidget->Select();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Deselect()
 {
   this->PointWidget->Deselect();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

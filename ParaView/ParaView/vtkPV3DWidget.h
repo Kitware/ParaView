@@ -69,20 +69,6 @@ public:
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
-  virtual void Accept(const char* sourceTclName);
-  
-  // Description:
-  // Called when the reset button is pushed.
-  // Sets widget's value to the object-variable's value.
-  // Side effect is to turn the modified flag off.
-  virtual void Reset();
-  virtual void Reset(const char* sourceTclName);
-
-  // Description:
   // Set the widget visibility.
   void SetVisibility();
   void SetVisibility(int val);
@@ -122,12 +108,18 @@ public:
   // Internal method used only to get the widget pointer.
   void InitializeObservers(vtk3DWidget* widget3D); 
 
+  // Description:
+  // Move widget state to VTK object or back.
+  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void ResetInternal(const char* sourceTclName);
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
 
   void Render();
   
+
   vtkPV3DWidgetObserver* Observer;
 
   // Description:

@@ -73,6 +73,12 @@ public:
   virtual int GetIsValidInput(vtkPVData* pvd, vtkPVSource* pvs);
 
   // Description:
+  // This are used by the field menu to determine is a field
+  // should be selectable.
+  virtual int GetIsValidField(int field, 
+                              vtkPVDataSetAttributesInformation* info);
+
+  // Description:
   // Called by vtkPVXMLPackageParser to configure the widget from XML
   // attributes.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,

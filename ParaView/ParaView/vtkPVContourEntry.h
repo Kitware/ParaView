@@ -72,17 +72,6 @@ public:
   const char* GetLabel();
   
   // Description:
-  // Gets called when the accept button is pressed.
-  // This method may add an entry to the trace file.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Accept();
-
-  // Description:
-  // Gets called when the reset button is pressed.
-  virtual void Reset(const char* sourceTclName);
-  virtual void Reset();
-
-  // Description:
   // Access to this widget from a script.
   void AddValue(char* val);
   void RemoveAllValues();
@@ -118,8 +107,16 @@ public:
 //ETX
 
   // Description:
+  // Gets called when the accept button is pressed.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // Gets called when the reset button is pressed.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVContourEntry();

@@ -126,14 +126,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_PV_SAVE_DATA_MENU_LABEL "Save Data"
 #define VTK_PV_SELECT_SOURCE_MENU_LABEL "Select"
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.414");
+vtkCxxRevisionMacro(vtkPVWindow, "1.415");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
   this->Interactor = 0;
@@ -282,7 +282,7 @@ vtkPVWindow::vtkPVWindow()
   this->InteractorTclName = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
   if (this->InteractorTclName)
@@ -366,7 +366,7 @@ vtkPVWindow::~vtkPVWindow()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::CloseNoPrompt()
 {
   if (this->TimerLogDisplay )
@@ -386,7 +386,7 @@ void vtkPVWindow::CloseNoPrompt()
   this->vtkKWWindow::CloseNoPrompt();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -606,7 +606,7 @@ void vtkPVWindow::PrepareForDelete()
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 {
   // Add view options.
@@ -765,7 +765,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                      1, "Delete all sources currently created in ParaView");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
   this->InteractorToolbar->SetParent(this->GetToolbarFrame());
@@ -778,7 +778,7 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->Toolbar->Pack("-side left");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 {
   // Set up the button to reset the camera.
@@ -835,7 +835,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->MainView->ResetCamera();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Keep a list of the toolbar buttons so that they can be 
 // disabled/enabled in certain situations.
 void vtkPVWindow::AddToolbarButton(const char* buttonName, 
@@ -865,14 +865,14 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
 {
   // Do not bother referencing.
   this->Interactor = interactor;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
@@ -1244,7 +1244,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // The prototypes for source and filter modules. Instances are 
 // created by calling CloneAndInitialize() on these.
 void vtkPVWindow::AddPrototype(const char* name, vtkPVSource* proto)
@@ -1252,7 +1252,7 @@ void vtkPVWindow::AddPrototype(const char* name, vtkPVSource* proto)
   this->Prototypes->SetItem(name, proto);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Keep a list of all loaded packages (Tcl libraries) so that
 // they can be written out when writing Tcl scripts.
 void vtkPVWindow::AddPackageName(const char* name)
@@ -1288,7 +1288,7 @@ void vtkPVWindow::CenterEntryCloseCallback()
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::CenterEntryCallback()
 {
   float x = this->CenterXEntry->GetValueAsFloat();
@@ -1297,7 +1297,7 @@ void vtkPVWindow::CenterEntryCallback()
   this->SetCenterOfRotation(x, y, z);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1312,7 +1312,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   this->MainView->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::HideCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1323,7 +1323,7 @@ void vtkPVWindow::HideCenterActor()
   pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1338,7 +1338,7 @@ void vtkPVWindow::ShowCenterActor()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ToggleCenterActorCallback()
 {
   if (this->CenterActorVisibility)
@@ -1357,7 +1357,7 @@ void vtkPVWindow::ToggleCenterActorCallback()
   this->MainView->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ResetCenterCallback()
 {
   if ( ! this->CurrentPVData)
@@ -1381,13 +1381,13 @@ void vtkPVWindow::ResetCenterCallback()
   this->MainView->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // void vtkPVWindow::FlySpeedScaleCallback()
 // {
 //   this->FlyStyle->SetSpeed(this->FlySpeedScale->GetValue());
 // }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1444,7 +1444,7 @@ void vtkPVWindow::ResizeCenterActor()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
   this->PickCenterToolbar->Unpack();
@@ -1479,7 +1479,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
   this->MainView->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
@@ -1555,7 +1555,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::Configure(int width, int height)
 {
   this->MainView->Configured();
@@ -1563,7 +1563,7 @@ void vtkPVWindow::Configure(int width, int height)
   this->Interactor->ConfigureEvent();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, char* sourcename)
 {
   vtkPVSourceCollection* col = this->GetSourceList(listname);
@@ -1588,7 +1588,7 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, char* sourcename)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 {
   vtkPVRenderView *view;
@@ -1630,7 +1630,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo()
 {
   int found=0;
@@ -1731,7 +1731,7 @@ void vtkPVWindow::PlayDemo()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Try to open a file for reading, return error on failure.
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
@@ -1749,7 +1749,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Prompts the user for a filename and calls Open().
 void vtkPVWindow::OpenCallback()
 {
@@ -1834,7 +1834,7 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
   return this->ApplicationSettingsInterface;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetShowSourcesLongHelp(int v)
 {
   vtkPVApplicationSettingsInterface *asi = 
@@ -1868,7 +1868,7 @@ void vtkPVWindow::SetShowSourcesLongHelp(int v)
   cit->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::Open(char *openFileName, int store)
 {
   if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
@@ -1965,7 +1965,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
   return VTK_ERROR;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVReaderModule* vtkPVWindow::InitializeReadCustom(const char* proto,
                                                      const char* fileName)
 {
@@ -1993,7 +1993,7 @@ vtkPVReaderModule* vtkPVWindow::InitializeReadCustom(const char* proto,
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // N.B. The order in which the traces are added should not be changed.
 // The custom reader modules rely on this order to add their own traces
 // correctly.
@@ -2012,7 +2012,7 @@ vtkPVReaderModule* vtkPVWindow::InitializeRead(vtkPVReaderModule* proto,
   return clone;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // N.B. The order in which the traces are added should not be changed.
 // The custom reader modules rely on this order to add their own traces
 // correctly.
@@ -2031,7 +2031,7 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
   return retVal;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // N.B. The order in which the traces are added should not be changed.
 // The custom reader modules rely on this order to add their own traces
 // correctly.
@@ -2044,7 +2044,7 @@ int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
   return clone->Finalize(fileName);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
 {
   if ( !reader || vtkString::Length(reader) == 0 || 
@@ -2071,7 +2071,7 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
   return VTK_ERROR;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::OpenWithReader(const char *fileName, 
                                 vtkPVReaderModule* reader)
 {
@@ -2095,7 +2095,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
 {
   if(!this->CurrentPVData)
@@ -2153,7 +2153,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                 numParts, ghostLevel);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::WriteData()
 {
   // Make sure there are data to write.
@@ -2275,7 +2275,7 @@ void vtkPVWindow::WriteData()
   saveDialog->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
 {
   // Find the writer that supports this file name and data type.
@@ -2301,7 +2301,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   return writer;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveBatchScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
@@ -2321,7 +2321,7 @@ void vtkPVWindow::SaveBatchScript()
   exportDialog->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 {
   if (!fname)
@@ -2342,7 +2342,7 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveBatchScript(const char* filename)
 {
   vtkPVSource *pvs;
@@ -2550,7 +2550,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
   delete file;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveState()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
@@ -2569,7 +2569,7 @@ void vtkPVWindow::SaveState()
     }
   exportDialog->Delete();
 }
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveState(const char* filename)
 {
   vtkPVSource *pvs;
@@ -2662,13 +2662,13 @@ void vtkPVWindow::SaveState(const char* filename)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Not implemented yet.
 void vtkPVWindow::SaveWorkspace()
 {
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSourceMenu()
 {
   if (!this->SourceMenu)
@@ -2727,7 +2727,7 @@ void vtkPVWindow::UpdateSourceMenu()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateFilterMenu()
 {
   if (!this->FilterMenu)
@@ -2819,7 +2819,7 @@ void vtkPVWindow::UpdateFilterMenu()
   
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
 {
   if (this->CurrentPVData)
@@ -2836,7 +2836,7 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
   this->UpdateFilterMenu();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetPreviousPVSource(int idx)
 {
   vtkPVSourceCollection* col = GetSourceList("Sources");
@@ -2848,7 +2848,7 @@ vtkPVSource* vtkPVWindow::GetPreviousPVSource(int idx)
   return 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 {
   this->SetCurrentPVSource(pvs);
@@ -2856,7 +2856,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
   if (pvs)
     {
     pvs->SetAcceptButtonColorToWhite();
-    if (pvs->InitializeTrace())
+    if (pvs->InitializeTrace(NULL))
       {
       this->GetPVApplication()->AddTraceEntry(
         "$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
@@ -2870,7 +2870,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 {
 
@@ -2926,7 +2926,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
 {
   if (pvs == NULL)
@@ -2941,7 +2941,7 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
 { 
   if (pvs)
@@ -2956,7 +2956,7 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSourceCollection* vtkPVWindow::GetSourceList(const char* listname)
 {
   vtkPVSourceCollection* col=0;
@@ -2968,7 +2968,7 @@ vtkPVSourceCollection* vtkPVWindow::GetSourceList(const char* listname)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
 
@@ -2978,7 +2978,7 @@ void vtkPVWindow::ResetCameraCallback()
   this->MainView->EventuallyRender();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSelectMenu()
 {
   if (!this->SelectMenu)
@@ -3046,7 +3046,7 @@ void vtkPVWindow::UpdateSelectMenu()
   this->EnableSelectMenu();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Disable or enable the select menu. Checks if there are any valid
 // entries in the menu, disables the menu if there none, enables it
 // otherwise.
@@ -3088,19 +3088,19 @@ void vtkPVWindow::EnableSelectMenu()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::EnableNavigationWindow()
 {
   this->MainView->GetNavigationFrame()->EnabledOff();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DisableNavigationWindow()
 {
   this->MainView->GetNavigationFrame()->EnabledOn();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
   if (this->MenusDisabled)
@@ -3121,7 +3121,7 @@ void vtkPVWindow::DisableMenus()
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::EnableMenus()
 {
   if (!this->MenusDisabled)
@@ -3133,7 +3133,7 @@ void vtkPVWindow::EnableMenus()
   this->MenusDisabled = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButtons()
 {
   this->ToolbarButtonsDisabled = 1;
@@ -3151,7 +3151,7 @@ void vtkPVWindow::DisableToolbarButtons()
   it->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButton(const char* buttonName)
 {
   vtkKWPushButton *button = 0;
@@ -3162,7 +3162,7 @@ void vtkPVWindow::EnableToolbarButton(const char* buttonName)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 {
   vtkKWPushButton *button = 0;
@@ -3173,7 +3173,7 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
   if (this->CurrentPVData == NULL)
@@ -3208,7 +3208,7 @@ void vtkPVWindow::EnableToolbarButtons()
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSource *vtkPVWindow::ExtractGridCallback()
 {
   if (this->CurrentPVData == NULL)
@@ -3233,7 +3233,7 @@ vtkPVSource *vtkPVWindow::ExtractGridCallback()
   return NULL;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 {
   this->GetPVApplication()->AddTraceEntry(
@@ -3242,7 +3242,7 @@ void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
   this->ShowCurrentSourceProperties();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
   // Bring up the properties panel
@@ -3268,7 +3268,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   this->GetCurrentPVSource()->RaiseSourcePage();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
   this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowAnimationProperties",
@@ -3302,14 +3302,14 @@ void vtkPVWindow::ShowAnimationProperties()
                this->AnimationInterface->GetWidgetName());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVApplication *vtkPVWindow::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowTimerLog()
 {
   if ( ! this->TimerLogDisplay )
@@ -3323,14 +3323,14 @@ void vtkPVWindow::ShowTimerLog()
   this->TimerLogDisplay->Display();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ShowErrorLog()
 {
   this->CreateErrorLogDisplay();  
   this->ErrorLogDisplay->Display();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::CreateErrorLogDisplay()
 {
   if ( ! this->ErrorLogDisplay )
@@ -3342,7 +3342,7 @@ void vtkPVWindow::CreateErrorLogDisplay()
     }  
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
@@ -3362,7 +3362,7 @@ void vtkPVWindow::SaveTrace()
   exportDialog->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::SaveTrace(const char* filename)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
@@ -3400,7 +3400,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Create a new data object/source by cloning a module prototype.
 vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
                                          const char* sourceList,
@@ -3504,7 +3504,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
   return clone;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::LoadScript(const char *name)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
@@ -3514,7 +3514,7 @@ void vtkPVWindow::LoadScript(const char *name)
   pvApp->SetRunningParaViewScript(0);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::OpenPackage()
 {
   int res = 0;
@@ -3534,7 +3534,7 @@ int vtkPVWindow::OpenPackage()
   return res;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWindow::OpenPackage(const char* openFileName)
 {
   if ( this->CheckIfFileIsReadable(openFileName) != VTK_OK )
@@ -3568,7 +3568,7 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
   return VTK_OK;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ReadSourceInterfaces()
 {
   // Add special sources.
@@ -3614,7 +3614,7 @@ void vtkPVWindow::ReadSourceInterfaces()
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ReadSourceInterfacesFromString(const char* str)
 {
   // Setup our built in source interfaces.
@@ -3628,7 +3628,7 @@ void vtkPVWindow::ReadSourceInterfacesFromString(const char* str)
   this->Toolbar->UpdateWidgets();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ReadSourceInterfacesFromFile(const char* file)
 {
   vtkPVXMLPackageParser* parser = vtkPVXMLPackageParser::New();
@@ -3644,7 +3644,7 @@ void vtkPVWindow::ReadSourceInterfacesFromFile(const char* file)
   this->Toolbar->UpdateWidgets();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Walk through the list of .xml files in the given directory and
 // parse each one for sources and filters.  Returns whether the
 // directory was found.
@@ -3681,7 +3681,7 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::WizardCallback()
 {
   return;
@@ -3698,7 +3698,7 @@ void vtkPVWindow::WizardCallback()
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddFileType(const char *description, const char *ext,
                               vtkPVReaderModule* prototype)
 {
@@ -3795,14 +3795,14 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddFileWriter(vtkPVWriter* writer)
 {
   writer->SetApplication(this->GetPVApplication());
   this->FileWriterList->AppendItem(writer);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::WarningMessage(const char* message)
 {
   this->Script("bell");
@@ -3814,7 +3814,7 @@ void vtkPVWindow::WarningMessage(const char* message)
   this->SetErrorIcon(2);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ErrorMessage(const char* message)
 {  
   this->Script("bell");
@@ -3826,14 +3826,14 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->SetErrorIcon(2);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::ProcessErrorClick()
 {
   this->Superclass::ProcessErrorClick();
   this->ShowErrorLog();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName, 
                                           int numberOfComponents)
 {
@@ -3875,7 +3875,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   return cm;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveSessionFile(const char* path)
 {
   ostream *fptr;
@@ -3885,7 +3885,7 @@ void vtkPVWindow::SaveSessionFile(const char* path)
   delete fptr;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::LoadSessionFile(const char* path)
 {
   if ( this->NamesToSources )
@@ -3904,15 +3904,15 @@ void vtkPVWindow::LoadSessionFile(const char* path)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.414 $");
+  this->ExtractRevision(os,"$Revision: 1.415 $");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeSelf(os, indent);
@@ -3961,7 +3961,7 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
   scit->Delete();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent, 
                                   vtkPVSource* source,
                                   vtkArrayMap<void*,int>* writtenMap)
@@ -3998,7 +3998,7 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 {
   int cc;
@@ -4098,7 +4098,7 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddManipulator(const char* rotypes, const char* name, 
                                  vtkPVCameraManipulator* pcm)
 {
@@ -4138,8 +4138,8 @@ void vtkPVWindow::AddManipulator(const char* rotypes, const char* name,
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name, 
+//-----------------------------------------------------------------------------
+void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
                                          const char* variable, 
                                          vtkPVWidget* widget)
 {
@@ -4181,7 +4181,7 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddToNamesToSources(const char* name, vtkPVSource* source)
 {
   if ( !this->NamesToSources )
@@ -4191,7 +4191,7 @@ void vtkPVWindow::AddToNamesToSources(const char* name, vtkPVSource* source)
   this->NamesToSources->SetItem(name, source);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetSourceFromName(const char* name)
 {
   if ( !this->NamesToSources )
@@ -4203,7 +4203,7 @@ vtkPVSource* vtkPVWindow::GetSourceFromName(const char* name)
   return source;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
 {
   if ( !source )
@@ -4221,7 +4221,7 @@ void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
   source->DeleteCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSourcesCallback()
 {
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
@@ -4240,7 +4240,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSources()
 {
   vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
@@ -4257,7 +4257,7 @@ void vtkPVWindow::DeleteAllSources()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SetInteraction(int s)
 {
   this->Interaction = s;
@@ -4279,7 +4279,7 @@ void vtkPVWindow::SetInteraction(int s)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

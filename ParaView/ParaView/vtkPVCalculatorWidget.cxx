@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.6");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -676,7 +676,7 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
 
 
 //---------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Trace(ofstream *file, const char* root)
+void vtkPVCalculatorWidget::Trace(ofstream *file)
 {
   int num, idx;
   vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));
@@ -684,13 +684,18 @@ void vtkPVCalculatorWidget::Trace(ofstream *file, const char* root)
   char* arrayName;
   int   component;
 
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   num = calc->GetNumberOfScalarArrays();
   for (idx = 0; idx < num; ++ idx)
     {
     variableName = calc->GetScalarVariableName(idx);
     arrayName = calc->GetScalarArrayName(idx);
     component = calc->GetSelectedScalarComponent(idx);
-    *file << "$" << root << "(" << this->GetTclName() << ") AddScalarVariable {"
+    *file << "$kw(" << this->GetTclName() << ") AddScalarVariable {"
           << variableName << "} {" << arrayName << "} " << component << endl;
     }
 
@@ -699,36 +704,19 @@ void vtkPVCalculatorWidget::Trace(ofstream *file, const char* root)
     {
     variableName = calc->GetVectorVariableName(idx);
     arrayName = calc->GetVectorArrayName(idx);
-    *file << "$" << root << "(" << this->GetTclName() << ") AddVectorVariable {"
+    *file << "$kw(" << this->GetTclName() << ") AddVectorVariable {"
           << variableName << "} {" << arrayName << "}" << endl;
     }
 
-  *file << "$" << root << "(" << this->GetTclName() << ") SetFunctionLabel {"
+  *file << "$kw(" << this->GetTclName() << ") SetFunctionLabel {"
         << this->FunctionLabel->GetLabel() << "}" << endl;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Accept()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Accept(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Accept(const char* vtkSourceTclName)
+void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {
-    // The calculator UI is not a widget so we have to manage it here.
-    this->AddTraceEntry("$kw(%s) SetFunctionLabel {%s}",
-                         this->GetTclName(), this->FunctionLabel->GetLabel());
-    }
 
   // Format a command to move value from widget to vtkObjects (on all
   // processes).  The VTK objects do not yet have to have the same Tcl
@@ -740,18 +728,7 @@ void vtkPVCalculatorWidget::Accept(const char* vtkSourceTclName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Reset()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Reset(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Reset(const char* vtkSourceTclName)
+void vtkPVCalculatorWidget::ResetInternal(const char* vtkSourceTclName)
 {
   if ( this->FunctionLabel->IsCreated() )
     {

@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.264");
+vtkCxxRevisionMacro(vtkPVSource, "1.265");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1376,7 +1376,7 @@ void vtkPVSource::UpdateParameterWidgets()
     // Do not try to reset the widget if it is not initialized
     if (pvw->GetApplication())
       {
-      pvw->Reset(this->GetVTKSourceTclName(0));
+      pvw->Reset();
       }
     it->GoToNextItem();
     }
@@ -1394,7 +1394,6 @@ void vtkPVSource::RaiseSourcePage()
 void vtkPVSource::UpdateVTKSourceParameters()
 {
   vtkPVWidget *pvw;
-  int numSources, idx;
   vtkCollectionIterator *it;
 
   it = this->Widgets->NewIterator();
@@ -1404,18 +1403,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
     if (pvw->GetModifiedFlag())
       {
-      // This is not a bad solution to having multiple VTK sources for each 
-      // PV source: Loop over all sources and pass tcl name to widget.
-      // Unfortunately, only "ObjectWidgets" use the source tclname.
-      // Other widgets (like bounds display) only execute accept when
-      // the widget is modified.
-      // Maybe the PVSource should be passed and the Object widgets
-      // should iterate over the VTK sources them selves. 
-      numSources = this->GetNumberOfVTKSources();
-      for (idx = 0; idx < numSources; ++idx)
-        {
-        pvw->Accept(this->GetVTKSourceTclName(idx));
-        }
+      pvw->Accept();
       }
     it->GoToNextItem();
     }
@@ -1829,7 +1817,7 @@ void vtkPVSource::SaveState(ofstream *file)
       *file << "set pv(" << widget->GetTclName() << ") "
             << "[$pv(" << this->GetTclName() << ") GetPVWidget {"
             << widget->GetTraceName() << "}]" << endl;
-      widget->Trace(file, "pv");
+      widget->SaveState(file);
       }
     }
 
@@ -2514,7 +2502,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.264 $");
+  this->ExtractRevision(os,"$Revision: 1.265 $");
 }
 
 //----------------------------------------------------------------------------

@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVData;
 class vtkCollection;
 class vtkPVInputRequirement;
+class vtkPVDataSetAttributesInformation;
 class vtkPVSource;
 
 class VTK_EXPORT vtkPVInputProperty : public vtkObject
@@ -73,6 +74,11 @@ public:
   // The pvSource pointer is only used by one requirement so far.
   // vtkDataToDataSetFilters cannot change input types.
   int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+
+  // Description:
+  // This are used by the field menu to determine is a field
+  // should be selectable.
+  int GetIsValidField(int field, vtkPVDataSetAttributesInformation* info);
 
   // Description:
   // The name is used to construct methods for setting/adding/getting the input.

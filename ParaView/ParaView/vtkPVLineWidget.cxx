@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -290,73 +290,31 @@ void vtkPVLineWidget::SetResolution()
   this->ValueChanged = 0; 
 }
 
-
-
-//----------------------------------------------------------------------------
-void vtkPVLineWidget::Accept()
+//---------------------------------------------------------------------------
+void vtkPVLineWidget::Trace(ofstream *file)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-
-  // Start the trace entry and the accept command.
-  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
+  if ( ! this->InitializeTrace(file))
     {
-    this->Trace(traceFile, "kw");
+    return;
     }
 
-  this->Superclass::Accept();
-  this->SuppressReset = 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkPVLineWidget::Trace(ofstream *file, const char* root)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  *file << "$" << root << "(" << this->GetTclName() << ") SetPoint1 "
+  *file << "$kw(" << this->GetTclName() << ") SetPoint1 "
         << this->Point1[0]->GetValue() << " "
         << this->Point1[1]->GetValue() << " "
         << this->Point1[2]->GetValue() << endl;
-  *file << "$" << root << "(" << this->GetTclName() << ") SetPoint2 "
+  *file << "$kw(" << this->GetTclName() << ") SetPoint2 "
         << this->Point2[0]->GetValue() << " "
         << this->Point2[1]->GetValue() << " "
         << this->Point2[2]->GetValue() << endl;
-  *file << "$" << root << "(" << this->GetTclName() << ") SetResolution "
+  *file << "$kw(" << this->GetTclName() << ") SetResolution "
         << this->ResolutionEntry->GetValue() << endl;
 }
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::Accept(const char* sourceTclName)
+void vtkPVLineWidget::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
-
-  // Start the trace entry and the accept command.
-
-  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
-    {
-    traceFlag = 1;
-    }
-
-  if (traceFlag)
-    {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint1 "
-               << this->Point1[0]->GetValue() << " "
-               << this->Point1[1]->GetValue() << " "
-               << this->Point1[2]->GetValue() << endl;
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint2 "
-               << this->Point2[0]->GetValue() << " "
-               << this->Point2[1]->GetValue() << " "
-               << this->Point2[2]->GetValue() << endl;
-    *traceFile << "$kw(" << this->GetTclName() << ") SetResolution "
-               << this->ResolutionEntry->GetValue() << endl;
-    }
-
   this->UpdateVTKObject(sourceTclName);
-  this->Superclass::Accept(sourceTclName);
+  this->Superclass::AcceptInternal(sourceTclName);
 }
-
-
 
 
 //----------------------------------------------------------------------------
@@ -471,7 +429,7 @@ void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
 
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::Reset(const char* sourceTclName)
+void vtkPVLineWidget::ResetInternal(const char* sourceTclName)
 {
   if (this->SuppressReset)
     {
@@ -499,13 +457,7 @@ void vtkPVLineWidget::Reset(const char* sourceTclName)
                  this->GetTclName(), sourceTclName, 
                  this->ResolutionVariable);
     }
-  this->Superclass::Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLineWidget::Reset()
-{
-  this->Reset(this->ObjectTclName);
+  this->Superclass::ResetInternal(sourceTclName);
 }
 
 //----------------------------------------------------------------------------

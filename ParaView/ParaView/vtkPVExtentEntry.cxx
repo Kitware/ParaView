@@ -59,13 +59,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.16");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
 {
   this->LabeledFrame = vtkKWLabeledFrame::New();
@@ -81,7 +81,7 @@ vtkPVExtentEntry::vtkPVExtentEntry()
   this->InputMenu = 0;
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVExtentEntry::~vtkPVExtentEntry()
 {
   this->LabeledFrame->Delete();
@@ -101,7 +101,7 @@ vtkPVExtentEntry::~vtkPVExtentEntry()
     }
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Update()
 {
   this->Superclass::Update();
@@ -155,7 +155,7 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
     }
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
@@ -227,23 +227,10 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 }
 
 
-//---------------------------------------------------------------------------
-void vtkPVExtentEntry::Accept(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
-
-  // Start the trace entry and the accept command.
-  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
-    {
-    traceFlag = 1;
-    }
-
-  if (traceFlag)
-    {
-    this->Trace(traceFile, "kw");
-    }
 
   pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
                          sourceTclName, this->VariableName,
@@ -256,17 +243,16 @@ void vtkPVExtentEntry::Accept(const char* sourceTclName)
 
   this->ModifiedFlag = 0;  
 }
-//---------------------------------------------------------------------------
-void vtkPVExtentEntry::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
 
-
-//---------------------------------------------------------------------------
-void vtkPVExtentEntry::Trace(ofstream *file, const char* root)
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetValue ";
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetValue ";
   for(int i=0; i<3; i++)
     {
     *file << this->MinMax[i]->GetMinValue() << " "
@@ -275,10 +261,8 @@ void vtkPVExtentEntry::Trace(ofstream *file, const char* root)
   *file << endl;
 }
 
-
-
-//---------------------------------------------------------------------------
-void vtkPVExtentEntry::Reset(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -290,14 +274,8 @@ void vtkPVExtentEntry::Reset(const char* sourceTclName)
 
   this->ModifiedFlag = 0;
 }
-//---------------------------------------------------------------------------
-void vtkPVExtentEntry::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
 
-
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SetRange(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
@@ -308,7 +286,7 @@ void vtkPVExtentEntry::SetRange(int v0, int v1, int v2,
   this->ModifiedCallback();
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SetValue(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
@@ -376,7 +354,7 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                  vtkPVAnimationInterface *ai)
 {
@@ -405,14 +383,14 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   return;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
                                              int mode)
 {
   char script[500];
   int ext[6];
 
-  if (ai->InitializeTrace())
+  if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
                         this->GetTclName(), ai->GetTclName(), mode);
@@ -498,7 +476,7 @@ void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
@@ -539,7 +517,7 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

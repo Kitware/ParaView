@@ -76,16 +76,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // These methods are going to replace the Accept/Reset with no arguments.
-  // We need the widgets to control multiple sources.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Reset(const char* sourceTclName);
-  virtual void Reset();
-
-  // Description:
-  // The methods get called when the Accept button is pressed. 
-  // It sets the VTK objects value using this widgets value.
+  // These methods are called when the Accept and Reset buttons are pressed.
+  // The copy state from VTK/PV objects to the widget and back.
+  // Most subclasses do not have to implement these methods.  They implement
+  // AcceptInternal and ResetInternal instead.
+  // Only methods that copy state from PV object need 
+  // to override these methods.
+  // Accept needs to add to the trace (call trace), but AcceptInternal does not.
   virtual void Accept();
+  virtual void Reset();
 
   // Description:
   // The methods get called when reset is called.  
@@ -149,14 +148,20 @@ public:
   vtkPVApplication *GetPVApplication();
 
   // Description:
-  // Save this widget to a file.  
+  // Save this widget to a file.
+  // Most widgets do not need to supply this method.
+  // Only widgets which manipulate PV objects need to implement this method.
+  // Widgets which interact with vtk objects can supply a
+  // private "SaveInBatchScriptForPart" method.  
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
-  // Used by PVSource to save this widgets state.
-  // It does not initialize trace or check modified.
-  virtual void Trace(ofstream *file, const char* root) = 0;
-  
+  // This method calls "Trace" to save this widget into a state file.
+  // This method is not virtual and sublclasses do not have to implement 
+  // this method.  Subclasses define the interal "Trace" which works for
+  // saving state and tracing.
+  void SaveState(ofstream *file);
+
   // Description:
   // This mehtod is used by the animation editor to access all the animation 
   // scripts available to modify the object.  The menu commands set the
@@ -227,6 +232,16 @@ public:
   };
 //ETX
 
+  // Description:
+  // Used by subclasses to save this widgets state into a PVScript.
+  // This method does not initialize trace variable or check modified.
+  virtual void Trace(ofstream *file) = 0;  
+
+  // Description:
+  // Most subclasses implement these methods to move state from VTK objects
+  // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
+  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void ResetInternal(const char* sourceTclName);
 
 protected:
   vtkPVWidget();
@@ -253,6 +268,8 @@ protected:
   int SuppressReset;
 
   vtkPVSource* PVSource;
+
+
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

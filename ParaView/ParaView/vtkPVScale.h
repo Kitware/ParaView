@@ -60,18 +60,6 @@ public:
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
-  
-  // Description:
-  // Called when the reset button is pushed.
-  // Sets widget's value to the object-variable's value.
-  // Side effect is to turn the modified flag off.
-  virtual void Reset();
-
-  // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(float val);
   float GetValue();
@@ -108,13 +96,26 @@ public:
 //ETX
 
   // Description:
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Side effect is to turn modified flag off.
+  virtual void AcceptInternal(const char* sourceTclName);
+  
+  // Description:
+  // Called when the reset button is pushed.
+  // Sets widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVScale();
   ~vtkPVScale();
   
+
   vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;
 

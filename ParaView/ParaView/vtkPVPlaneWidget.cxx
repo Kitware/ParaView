@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.33");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -75,21 +75,9 @@ vtkPVPlaneWidget::~vtkPVPlaneWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlaneWidget::Reset()
-{
-  this->Superclass::Reset();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVPlaneWidget::ActualPlaceWidget()
 {
   this->Superclass::ActualPlaceWidget();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPlaneWidget::Accept()
-{
-  this->Superclass::Accept();
 }
 
 

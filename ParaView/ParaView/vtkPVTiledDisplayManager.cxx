@@ -25,14 +25,14 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkFloatArray.h"
 #include "vtkCompressCompositer.h"
-#include "vtkCompositeManager.h"
+#include "vtkPVCompositeBuffer.h"
+#include "vtkPVCompositeUtilities.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.2");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.3");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -52,7 +52,7 @@ vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
 // Here is a structure to help create and store a compositing schedule.
 
 // Elemnent representing communication step of compositing.
-class vtkTiledDisplayElement 
+class vtkPVTiledDisplayElement 
 {
 public:
   int TileId;
@@ -63,22 +63,22 @@ public:
   int OtherProcessId;
 };
 
-class vtkTiledDisplayProcess 
+class vtkPVTiledDisplayProcess 
 {
 public:
-  vtkTiledDisplayProcess();
-  ~vtkTiledDisplayProcess();
+  vtkPVTiledDisplayProcess();
+  ~vtkPVTiledDisplayProcess();
   int TileId; // not necessary
   int CompositeId;
   int Length;
-  vtkTiledDisplayElement** Elements;
+  vtkPVTiledDisplayElement** Elements;
 };
 
-class vtkTiledDisplaySchedule 
+class vtkPVTiledDisplaySchedule 
 {
 public:
-  vtkTiledDisplaySchedule();
-  ~vtkTiledDisplaySchedule();
+  vtkPVTiledDisplaySchedule();
+  ~vtkPVTiledDisplaySchedule();
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void InitializeForTile(int tileId, int tileProcess, int numProcs, int zeroEmtpy);
@@ -89,11 +89,11 @@ public:
   void ComputeElementOtherProcessIds();
 
   int NumberOfProcesses; // Same as global number of processe.
-  vtkTiledDisplayProcess** Processes;
+  vtkPVTiledDisplayProcess** Processes;
 };
 
 //-------------------------------------------------------------------------
-vtkTiledDisplayProcess::vtkTiledDisplayProcess()
+vtkPVTiledDisplayProcess::vtkPVTiledDisplayProcess()
 {
   this->TileId = -1;
   this->CompositeId = -1;
@@ -102,7 +102,7 @@ vtkTiledDisplayProcess::vtkTiledDisplayProcess()
 }
 
 //-------------------------------------------------------------------------
-vtkTiledDisplayProcess::~vtkTiledDisplayProcess()
+vtkPVTiledDisplayProcess::~vtkPVTiledDisplayProcess()
 {
   int idx;
 
@@ -123,14 +123,14 @@ vtkTiledDisplayProcess::~vtkTiledDisplayProcess()
 }
 
 //-------------------------------------------------------------------------
-vtkTiledDisplaySchedule::vtkTiledDisplaySchedule()
+vtkPVTiledDisplaySchedule::vtkPVTiledDisplaySchedule()
 {
   this->NumberOfProcesses = 0;
   this->Processes = NULL;
 }
 
 //-------------------------------------------------------------------------
-vtkTiledDisplaySchedule::~vtkTiledDisplaySchedule()
+vtkPVTiledDisplaySchedule::~vtkPVTiledDisplaySchedule()
 {
   int idx;
 
@@ -155,15 +155,15 @@ vtkTiledDisplaySchedule::~vtkTiledDisplaySchedule()
 // Only worry about power of 2 processes for now.
 // Set up the scedule for a single tile.  Final results
 // endup on process "tileProcess".
-void vtkTiledDisplaySchedule::InitializeForTile(int tileId, 
+void vtkPVTiledDisplaySchedule::InitializeForTile(int tileId, 
                                                 int tileProcess, 
                                                 int numProcs,
                                                 int zeroEmpty)
 {
   int pIdx, pIdxSend;
-  vtkTiledDisplayProcess* p;
+  vtkPVTiledDisplayProcess* p;
   int eIdx;
-  vtkTiledDisplayElement* e;
+  vtkPVTiledDisplayElement* e;
   int maxLevels;
   int level;
 
@@ -172,15 +172,15 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
   maxLevels = (int)(ceil(log((double)(numProcs))/log(2.0)));
 
   this->NumberOfProcesses = numProcs;
-  this->Processes = new vtkTiledDisplayProcess*[numProcs];
+  this->Processes = new vtkPVTiledDisplayProcess*[numProcs];
 
   // Just allocate all of the schedule process objects.
   for (pIdx = 0; pIdx < numProcs; ++ pIdx)
     {
-    p = new vtkTiledDisplayProcess;
+    p = new vtkPVTiledDisplayProcess;
     this->Processes[pIdx] = p;
     // Initialize process
-    p->Elements = new vtkTiledDisplayElement*[maxLevels];
+    p->Elements = new vtkPVTiledDisplayElement*[maxLevels];
     for (eIdx = 0; eIdx < maxLevels; ++eIdx)
       {
       p->Elements[eIdx] = NULL;
@@ -207,7 +207,7 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
       pIdxSend = pIdx+numProcs;
       // Receiving process    
       p = this->Processes[pIdx+zeroEmpty];
-      e = new vtkTiledDisplayElement;
+      e = new vtkPVTiledDisplayElement;
       p->Elements[p->Length] = e;
       e->ReceiveFlag = 1;
       e->VoidFlag = 0;
@@ -222,7 +222,7 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
         }
       // Sending process
       p = this->Processes[pIdxSend+zeroEmpty];
-      e = new vtkTiledDisplayElement;
+      e = new vtkPVTiledDisplayElement;
       p->Elements[p->Length] = e;
       e->ReceiveFlag = 0;
       e->VoidFlag = 0;
@@ -249,11 +249,11 @@ void vtkTiledDisplaySchedule::InitializeForTile(int tileId,
 }
 
 //-------------------------------------------------------------------------
-int vtkTiledDisplaySchedule::SwapIfApproporiate(int pid1, int pid2,
+int vtkPVTiledDisplaySchedule::SwapIfApproporiate(int pid1, int pid2,
                                                 int* totalProcessLengths)
 {
-  vtkTiledDisplayProcess* p1;
-  vtkTiledDisplayProcess* p2;
+  vtkPVTiledDisplayProcess* p1;
+  vtkPVTiledDisplayProcess* p2;
   int max;
   int t1, t2;
 
@@ -302,12 +302,12 @@ int vtkTiledDisplaySchedule::SwapIfApproporiate(int pid1, int pid2,
 }
 
 //-------------------------------------------------------------------------
-void vtkTiledDisplaySchedule::ComputeElementOtherProcessIds()
+void vtkPVTiledDisplaySchedule::ComputeElementOtherProcessIds()
 {
   int pIdx, cIdx, eIdx;
   int* map = new int[this->NumberOfProcesses];
-  vtkTiledDisplayProcess* p;
-  vtkTiledDisplayElement* e;
+  vtkPVTiledDisplayProcess* p;
+  vtkPVTiledDisplayElement* e;
 
   // Initialize the map just in case something went wrong.
   for (pIdx = 0; pIdx < this->NumberOfProcesses; ++pIdx)
@@ -336,11 +336,11 @@ void vtkTiledDisplaySchedule::ComputeElementOtherProcessIds()
 }
 
 //-------------------------------------------------------------------------
-void vtkTiledDisplaySchedule::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTiledDisplaySchedule::PrintSelf(ostream& os, vtkIndent indent)
 {
   int pIdx, eIdx;
-  vtkTiledDisplayProcess* p;
-  vtkTiledDisplayElement* e;
+  vtkPVTiledDisplayProcess* p;
+  vtkPVTiledDisplayElement* e;
   vtkIndent i2 = indent.GetNextIndent();
 
   os << indent << "Schedule: (" << this << ")\n";
@@ -386,16 +386,16 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
   int sum, max;
   int  numberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
   int* totalProcessLengths;
-  vtkTiledDisplaySchedule* ts;
-  vtkTiledDisplayProcess* p;
+  vtkPVTiledDisplaySchedule* ts;
+  vtkPVTiledDisplayProcess* p;
   int i, j;
 
   // Create a schedule for each tile.
-  vtkTiledDisplaySchedule** tileSchedules;
-  tileSchedules = new vtkTiledDisplaySchedule* [numberOfTiles];
+  vtkPVTiledDisplaySchedule** tileSchedules;
+  tileSchedules = new vtkPVTiledDisplaySchedule* [numberOfTiles];
   for (tIdx = 0; tIdx < numberOfTiles; ++tIdx)
     {
-    ts = new vtkTiledDisplaySchedule;
+    ts = new vtkPVTiledDisplaySchedule;
     tileSchedules[tIdx] = ts;
     // This assumes that the first n processes are displaying tiles.
     ts->InitializeForTile(tIdx, tIdx, this->NumberOfProcesses, this->ZeroEmpty);
@@ -459,13 +459,13 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
     }
   // Create the schedule and processes 
   // (Elements added later by shuffle).
-  this->Schedule = new vtkTiledDisplaySchedule;
+  this->Schedule = new vtkPVTiledDisplaySchedule;
   this->Schedule->NumberOfProcesses = this->NumberOfProcesses;
   this->Schedule->Processes = 
-           new vtkTiledDisplayProcess*[this->NumberOfProcesses];
+           new vtkPVTiledDisplayProcess*[this->NumberOfProcesses];
   for (pIdx = 0; pIdx < this->NumberOfProcesses; ++pIdx)
     {
-    p = new vtkTiledDisplayProcess;
+    p = new vtkPVTiledDisplayProcess;
     this->Schedule->Processes[pIdx] = p;
     // Hard coded zeroEmpty
     p->TileId = -1;
@@ -477,7 +477,7 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
     // Length is the actual number of elements in the process
     // not the length of the array.  No array bounds checking.
     p->Length = 0;
-    p->Elements = new vtkTiledDisplayElement*[max];
+    p->Elements = new vtkPVTiledDisplayElement*[max];
     for (i = 0; i < max; ++i)
       {
       p->Elements[i] = NULL;
@@ -507,14 +507,14 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
 // I am just going to try brute force adding one level at a time.
 // Returns 0 when all leves are finished.
 int vtkPVTiledDisplayManager::ShuffleLevel(int level, int numTiles, 
-                                    vtkTiledDisplaySchedule** tileSchedules)
+                                    vtkPVTiledDisplaySchedule** tileSchedules)
 {
   int flag = 0;
   int tIdx, pIdx, eIdx;
-  vtkTiledDisplaySchedule* ts;
-  vtkTiledDisplayProcess* p;
-  vtkTiledDisplayElement* e;
-  vtkTiledDisplayProcess* p2;
+  vtkPVTiledDisplaySchedule* ts;
+  vtkPVTiledDisplayProcess* p;
+  vtkPVTiledDisplayElement* e;
+  vtkPVTiledDisplayProcess* p2;
 
   for (tIdx = 0; tIdx < numTiles; ++tIdx)
     {
@@ -541,104 +541,20 @@ int vtkPVTiledDisplayManager::ShuffleLevel(int level, int numTiles,
 }
 
 
-//-------------------------------------------------------------------------
-void vtkPVTiledDisplayManager::InitializeBuffers()
-{
-  int idx;
-
-  this->ZData = vtkFloatArray::New();
-  this->PData = vtkUnsignedCharArray::New();  
-  this->PData->SetNumberOfComponents(3);
-  this->ZData2 = vtkFloatArray::New();
-  this->PData2 = vtkUnsignedCharArray::New();  
-  this->PData2->SetNumberOfComponents(3);
-
-  this->NumberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
-  this->TileZData = new vtkFloatArray*[this->NumberOfTiles];
-  this->TilePData = new vtkUnsignedCharArray*[this->NumberOfTiles];
-  for (idx = 0; idx < this->NumberOfTiles; ++idx)
-    {
-    this->TileZData[idx] = vtkFloatArray::New();
-    this->TilePData[idx] = vtkUnsignedCharArray::New();  
-    this->TilePData[idx]->SetNumberOfComponents(3);
-    }
-}
-
-//-------------------------------------------------------------------------
-void vtkPVTiledDisplayManager::SetPDataSize(int x, int y)
-{
-  int numPixels;
-  int numComps;
-  int idx;
-
-  if (this->PData == NULL)
-    {
-    this->InitializeBuffers();
-    }
-
-  if (x < 0)
-    {
-    x = 0;
-    }
-  if (y < 0)
-    {
-    y = 0;
-    }
-
-  if (this->PDataSize[0] == x && this->PDataSize[1] == y)
-    {
-    return;
-    }
-
-  this->PDataSize[0] = x;
-  this->PDataSize[1] = y;
-
-  numPixels = x * y;
-
-  vtkCompositeManager::ResizeFloatArray(
-      static_cast<vtkFloatArray*>(this->ZData), 
-      1, numPixels);
-  vtkCompositeManager::ResizeFloatArray(
-      static_cast<vtkFloatArray*>(this->ZData2), 
-      1, numPixels);
-  for (idx = 0; idx < this->NumberOfTiles; ++idx)
-    {
-    vtkCompositeManager::ResizeFloatArray(
-        static_cast<vtkFloatArray*>(this->TileZData[idx]), 
-        1, numPixels);
-    }
-
-  numComps = 3;
-  
-  vtkCompositeManager::ResizeUnsignedCharArray(
-      static_cast<vtkUnsignedCharArray*>(this->PData), 
-      numComps, numPixels);
-  vtkCompositeManager::ResizeUnsignedCharArray(
-      static_cast<vtkUnsignedCharArray*>(this->PData2), 
-      numComps, numPixels);
-  for (idx = 0; idx < this->NumberOfTiles; ++idx)
-    {
-    vtkCompositeManager::ResizeUnsignedCharArray(
-        static_cast<vtkUnsignedCharArray*>(this->TilePData[idx]), 
-        numComps, numPixels);
-    }
-}
-
-
 //==========================================================================
 // End of schedule object stuff.
 //==========================================================================
 
 
 // Structures to communicate render info.
-struct vtkTiledDisplayRenderWindowInfo 
+struct vtkPVTiledDisplayRenderWindowInfo 
 {
   int Size[2];
   int NumberOfRenderers;
   float DesiredUpdateRate;
 };
 
-struct vtkTiledDisplayRendererInfo 
+struct vtkPVTiledDisplayRendererInfo 
 {
   float CameraPosition[3];
   float CameraFocalPoint[3];
@@ -671,8 +587,9 @@ struct vtkTiledDisplayRendererInfo
 //-------------------------------------------------------------------------
 vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
 {
+  this->ReductionFactor = 1;
+
   this->RenderWindow = NULL;
-  this->RenderWindowInteractor = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
 
   if (this->Controller)
@@ -681,8 +598,6 @@ vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
     }
 
   this->StartTag = this->EndTag = 0;
-  this->StartInteractorTag = 0;
-  this->EndInteractorTag = 0;
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
   this->RenderView = NULL;
@@ -691,16 +606,7 @@ vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
   this->ZeroEmpty = 1;
   this->CompositeFlag = 1;
 
-  this->PDataSize[0] = 0;
-  this->PDataSize[1] = 0;
-
   this->NumberOfTiles = 0;
-  this->PData = NULL;
-  this->ZData = NULL;
-  this->PData2 = NULL;
-  this->ZData2 = NULL;
-  this->TilePData = NULL;
-  this->TileZData = NULL;
 }
 
   
@@ -720,51 +626,6 @@ vtkPVTiledDisplayManager::~vtkPVTiledDisplayManager()
   if (this->Schedule)
     {
     delete this->Schedule;
-    }
-
-  if (this->ZData)
-    {
-    this->ZData->Delete();
-    this->ZData = NULL;
-    }
-  if (this->PData)
-    {
-    this->PData->Delete();
-    this->PData = NULL;
-    }
-  if (this->ZData2)
-    {
-    this->ZData2->Delete();
-    this->ZData2 = NULL;
-    }
-  if (this->PData2)
-    {
-    this->PData2->Delete();
-    this->PData2 = NULL;
-    }
-
-  for (idx = 0; idx < this->NumberOfTiles; ++idx)
-    {
-    if (this->TilePData && this->TilePData[idx])
-      {
-      this->TilePData[idx]->Delete();
-      this->TilePData[idx] = NULL;
-      }
-    if (this->TileZData && this->TileZData[idx])
-      {
-      this->TileZData[idx]->Delete();
-      this->TileZData[idx] = NULL;
-      }
-    }
-  if (this->TilePData)
-    {
-    delete [] this->TilePData;
-    this->TilePData = NULL;
-    }
-  if (this->TileZData)
-    {
-    delete [] this->TileZData;
-    this->TileZData = NULL;
     }
 }
 
@@ -801,17 +662,6 @@ void vtkPVTiledDisplayManagerEndRender(vtkObject *caller,
   self->EndRender();
 }
 
-
-//-------------------------------------------------------------------------
-void vtkPVTiledDisplayManagerExitInteractor(vtkObject *vtkNotUsed(o),
-                                       unsigned long vtkNotUsed(event), 
-                                       void *clientData, void *)
-{
-  vtkPVTiledDisplayManager *self = (vtkPVTiledDisplayManager *)clientData;
-
-  self->ExitInteractor();
-}
-
 //----------------------------------------------------------------------------
 void vtkPVTiledDisplayManagerRenderRMI(void *arg, void *, int, int)
 {
@@ -842,13 +692,11 @@ void vtkPVTiledDisplayManager::SetRenderWindow(vtkRenderWindow *renWin)
     // Delete the reference.
     this->RenderWindow->UnRegister(this);
     this->RenderWindow =  NULL;
-    this->SetRenderWindowInteractor(NULL);
     }
   if (renWin)
     {
     renWin->Register(this);
     this->RenderWindow = renWin;
-    this->SetRenderWindowInteractor(renWin->GetInteractor());
     if (this->Controller)
       {
       if (this->Controller && this->Controller->GetLocalProcessId() == 0)
@@ -896,48 +744,6 @@ void vtkPVTiledDisplayManager::SetController(vtkMultiProcessController *mpc)
   this->Controller = mpc;
 }
 
-//-------------------------------------------------------------------------
-// Only satellite processes process interactor loops specially.
-// We only setup callbacks in those processes (not process 0).
-void vtkPVTiledDisplayManager::SetRenderWindowInteractor(
-                                           vtkRenderWindowInteractor *iren)
-{
-  if (this->RenderWindowInteractor == iren)
-    {
-    return;
-    }
-
-  if (this->Controller == NULL)
-    {
-    return;
-    }
-  
-  if (this->RenderWindowInteractor)
-    {
-    if (!this->Controller->GetLocalProcessId())
-      {
-      this->RenderWindowInteractor->RemoveObserver(this->EndInteractorTag);
-      }
-    this->RenderWindowInteractor->UnRegister(this);
-    this->RenderWindowInteractor =  NULL;
-    }
-  if (iren)
-    {
-    iren->Register(this);
-    this->RenderWindowInteractor = iren;
-    
-    if (!this->Controller->GetLocalProcessId())
-      {
-      vtkCallbackCommand *cbc;
-      cbc= vtkCallbackCommand::New();
-      cbc->SetCallback(vtkPVTiledDisplayManagerExitInteractor);
-      cbc->SetClientData((void*)this);
-      // IRen will delete the cbc when the observer is removed.
-      this->EndInteractorTag = iren->AddObserver(vtkCommand::ExitEvent,cbc);
-      cbc->Delete();
-      }
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVTiledDisplayManager::RenderRMI()
@@ -951,13 +757,10 @@ void vtkPVTiledDisplayManager::RenderRMI()
     renWin->SwapBuffersOff();  
     }
 
-  // This renders all frames
+  // Synchronizes
   this->SatelliteStartRender();
-
-  if (this->CompositeFlag)
-    {
-    this->Composite();
-    }
+  // Renders and composites
+  this->Composite();
 
   // Force swap buffers here.
   if (this->Controller)
@@ -975,60 +778,151 @@ void vtkPVTiledDisplayManager::Composite()
 {
   int myId = this->Controller->GetLocalProcessId();
   int numProcs = this->NumberOfProcesses;
-  vtkTiledDisplayProcess *tdp;
-  vtkTiledDisplayElement *tde;
+  vtkPVTiledDisplayProcess *tdp;
+  vtkPVTiledDisplayElement *tde;
   int i;
   int uncompressedLength = this->ZData->GetNumberOfTuples();
   int bufSize=0;
   int numComps = this->PData->GetNumberOfComponents();
   int tileId = this->Schedule->Processes[myId]->TileId;
+  vtkFloatArray*        zData;
+  vtkUnsignedCharArray* pData;
+  vtkPVCompositeBuffer* buf;
+  vtkPVCompositeBuffer* buf2;
+  vtkPVCompositeBuffer* buf3;
+  int size[2];
+  vtkPVCompositeBuffer* tileBuffers;
 
-  //this->Timer->StartTimer();
+  // This flag should really be transmitted from the root.
+  // This is a place holder until I activate the feature.
+  if ( ! this->CompositeFlag)
+    { // Just set up this one tile and render.
+    // Figure out the tile indexes.
+    i = this->Controller->GetLocalProcessId() - 1;
+    y = i/this->TileDimensions[0];
+    x = i - y*this->TileDimensions[0];
+    cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
+                         1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
+    renWin->Render();
+    return;
+    }
+
+  int front = 0;
+
+  this->RenderWindow->GetSize(size);
+  size[0] = (int)((float)size[0] / (float)(this->ReductionFactor));
+  size[1] = (int)((float)size[0] / (float)(this->ReductionFactor));
+
+  pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+  zData = this->CompositeUtilities->NewFloatArray(size[0]*size[1], 3);
+  tdp = this->Schedule->Processes[myId];
 
   // We allocated with special mpiPro new so we do not need to copy.
 #ifdef MPIPROALLOC
   vtkCommunicator::SetUseCopy(0);
 #endif
-  tdp = this->Schedule->Processes[myId];
-  for (i = 0; i < tdp->Length; i++) 
+
+  // Allocate an array of buffers for the tiles (not all will be used.)
+  tileBuffers = new vtkPVCompositeBuffer* [this->NumberOfTiles];
+  for (int idx = 0; idx < this->NumberOfTiles; ++idx)
+    {
+    tileBuffers[idx] = NULL;
+    }  
+
+  // Intermix the first n (numTiles) compositing steps with rendering.
+  // Each of these stages is dedicated to one (corresponding) tile.
+  // Since half of these processes immediately send the buffer,
+  // It would be a waste to store the buffer and not reuse it.
+  // All this rendering will be done in the back buffer without any swaps.
+  for (int idx = 0; idx < this->NumberOfTiles; ++idx)
+    {
+    // Figure out the tile indexes.
+    y = idx/this->TileDimensions[0];
+    x = idx - y*this->TileDimensions[0];
+    // Setup the camera for this tile.
+    cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
+                         1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
+    renWin->Render();
+    // Get the color buffer (RGB).
+    this->RenderWindow->GetPixelData(
+             0,0,size[0]-1, size[1]-1, 
+             front,pData));
+    // Get the z buffer.
+    this->RenderWindow->GetZbufferData(0,0, size[0]-1, size[1]-1,
+                                       this->ZData);  
+    // Compress the buffer.
+    // I could reuse the buffer here (inplace) !!!!!!!
+    buf = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+    vtkCompressCompositer::Compress(zData, pData, buf);
+
+    // One stage of compositing.
+    tde = tdp->Elements[i];
+    // make sure the correct tile is being composited.
+    if (tde->TileId != idx)
+      {
+      vtkErrorMacro("Wrong tile rendered!");
+      }
+    if ( ! tde->ReceiveFlag)
+      {
+      // Send and recycle the buffer.
+      vtkPVCompositeUtilities::SendBuffer(this->Controller, buf,
+                                          tde->OtherProcessId, 98);
+      buf->Delete();
+      buf = NULL;          
+      }
+    else
+      {
+      // Receive a buffer.
+      buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
+                                                 tde->OtherProcessId, 98);
+      // This buffer has to be full size because 
+      // we do not know how large the result will be.
+      buf3 = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+      // Buf1 was allocated as full size.
+      vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
+      tileBuffers[idx] = buf3;
+      buf3 = NULL;
+      buf->Delete();
+      buf = NULL;
+      buf2->Delete();
+      buf2 = NULL;
+      }
+    }
+
+  // Delete these so the memory can be used during compositing.
+  pData->Delete();
+  zData->Delete();
+  
+  // Do the rest of the compositing steps.
+  for (i = this->NumberOfTiles; i < tdp->Length; i++) 
     {
     tde = tdp->Elements[i];
-    if (tde->ReceiveFlag)
+    if ( ! tde->ReceiveFlag)
       {
-      this->Controller->Receive(&bufSize, 1, tde->OtherProcessId, 98);
-      this->Controller->Receive(this->ZData->GetPointer(0), bufSize, 
-                                tde->OtherProcessId, 99);
-      // Couldn't I compute the second bufSize (3*bufSize) !!!!!!!!!!!!!!!
-      this->Controller->Receive(&bufSize, 1, tde->OtherProcessId, 98);
-      this->Controller->Receive(reinterpret_cast<unsigned char*>
-                                      (this->PData->GetVoidPointer(0)), 
-                                      bufSize, tde->OtherProcessId, 99);
-      // The result is stored in the second local buffer.
-      vtkCompressCompositer::CompositeImagePair(this->TileZData[tde->TileId], 
-                                 this->TilePData[tde->TileId], 
-                                 this->ZData, this->PData,
-                                 this->ZData2, this->PData2);
-
-      // Swap the temp buffers with tile buffers.
-      vtkFloatArray *zTemp = this->ZData2;
-      vtkUnsignedCharArray *pTemp = this->PData2;
-      this->ZData2 = this->TileZData[tde->TileId];
-      this->PData2 = this->TilePData[tde->TileId];
-      this->TileZData[tde->TileId] = zTemp;
-      this->TilePData[tde->TileId] = pTemp;
+      // Send and recycle the buffer.
+      buf = tileBuffers[tde->TileId];
+      tileBuffers[tde->TileId] = NULL;
+      vtkPVCompositeUtilities::SendBuffer(this->Controller, buf, 
+                                          tde->OtherProcessId, 99);
+      buf->Delete();          
+      buf = NULL;
       }
-    else 
+    else
       {
-      bufSize = this->TileZData[tde->TileId]->GetNumberOfTuples();
-      this->Controller->Send(&bufSize, 1, tde->OtherProcessId, 98);
-      this->Controller->Send(this->TileZData[tde->TileId]->GetPointer(0), 
-                             bufSize, tde->OtherProcessId, 99);
-      bufSize = this->TilePData[tde->TileId]->GetNumberOfTuples() * numComps;
-      this->Controller->Send(&bufSize, 1, tde->OtherProcessId, 98);
-      this->Controller->Send(reinterpret_cast<unsigned char*>
-                             (this->TilePData[tde->TileId]->GetVoidPointer(0)), 
-                             bufSize, tde->OtherProcessId, 99);
-          
+      buf = tileBuffers[tde->TileId];
+      tileBuffers[tde->TileId] = NULL;
+      // Receive a buffer.
+      buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
+                                                 tde->OtherProcessId, 99);
+      // This buffer has to be full size because 
+      // we do not know how large the result will be.
+      buf3 = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+      // Buf1 was allocated as full size.
+      vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
+      tileBuffers[idx] = buf3;
+      buf3 = NULL;
+      buf->Delete();
+      buf2->Delete();
       }
     }
 
@@ -1038,24 +932,66 @@ void vtkPVTiledDisplayManager::Composite()
 
   if (tileId >= 0)
     {
+    buf = tileBuffers[tdp->TileId];
+    tileBuffers[tdp->TileId] = NULL;
+
+    // Recreate a buffer to hold the color data.
+    pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+
     // Now we want to decompress into the original buffers.
     // Ignore z because it is not used by composite manager.
-    vtkCompressCompositer::Uncompress(this->TileZData[tileId], 
-                     this->TilePData[tileId], 
-                     this->PData, uncompressedLength);
+    vtkCompressCompositer::Uncompress(buf, pData);
+    buf->Delete();
+    buf = NULL;
+
+    if (this->ReductionFactor > 1)
+      {
+      vtkUnsignedCharArray* pData2;
+      pData2 = pData;
+      pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
+
+      vtkTimerLog::MarkStartEvent("Magnify Buffer");
+      this->MagnifyBuffer(pData2, pData);
+      vtkTimerLog::MarkEndEvent("Magnify Buffer");
+      pData2->Delete();
+      pData2 = NULL;
+
+      // I do not know if this is necessary !!!!!!!
+      vtkRenderer* renderer =
+          ((vtkRenderer*)
+          this->RenderWindow->GetRenderers()->GetItemAsObject(0));
+      renderer->SetViewport(0, 0, 1.0, 1.0);
+      renderer->GetActiveCamera()->UpdateViewport(renderer);
+      }
+
+    int* size = this->RenderWindow->GetSize();
     this->RenderWindow->SetPixelData(0, 0, 
-                                     this->PDataSize[0]-1, 
-                                     this->PDataSize[1]-1, 
-                                     this->PData, 0);
+                                     size[0]-1, 
+                                     size[1]-1, 
+                                     pData, 0);
+    pData->Delete();
+    pData = NULL;
     }
+  
+  // They should all already be gone, but ...
+  for (idx = 0; idx < this->NumberOfTiles; ++idx)
+    {
+    if (tileBuffers[idx])
+      {
+      vtkErrorMacro("Expecting all buffers to be deleted all ready.");
+      tileBuffers[idx]->Delete();
+      tileBuffers[idx] = NULL;
+      }
+    }
+  delete [] tileBuffers;
 }
 
 //-------------------------------------------------------------------------
 void vtkPVTiledDisplayManager::SatelliteStartRender()
 {
   int i;
-  vtkTiledDisplayRenderWindowInfo winInfo;
-  vtkTiledDisplayRendererInfo renInfo;
+  vtkPVTiledDisplayRenderWindowInfo winInfo;
+  vtkPVTiledDisplayRendererInfo renInfo;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
   vtkCamera *cam = 0;
@@ -1072,109 +1008,72 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
 
   // Receive the window size.
   controller->Receive((char*)(&winInfo), 
-                      sizeof(struct vtkTiledDisplayRenderWindowInfo), 0, 
+                      sizeof(struct vtkPVTiledDisplayRenderWindowInfo), 0, 
                       vtkPVTiledDisplayManager::WIN_INFO_TAG);
   renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
 
-  // We ignore the window size because we are always full screen.
-  int* size = renWin->GetSize();
-  // We may do reduction in the future.
-  this->SetPDataSize(size[0], size[1]);
+  if (winInfo.DesiredUpdateRate > 2.0)
+    {
+    this->ReductionFactor = 2;
+    }
+  else
+    {
+    this->ReductionFactor = 1;
+    }
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
   rens->InitTraversal();
 
   // This loop is really dumb,  tile will have only one renderer.
-  for (i = 0; i < winInfo.NumberOfRenderers; ++i)
+  // Receive the camera information.
+
+  // We put this before receive because we want the pipeline to be
+  // updated the first time if the camera does not exist and we want
+  // it to happen before we block in receive
+  ren = rens->GetNextItem();
+  if (ren)
     {
-    // Receive the camera information.
+    cam = ren->GetActiveCamera();
+    }
 
-    // We put this before receive because we want the pipeline to be
-    // updated the first time if the camera does not exist and we want
-    // it to happen before we block in receive
-    ren = rens->GetNextItem();
-    if (ren)
-      {
-      cam = ren->GetActiveCamera();
-      }
+  controller->Receive((char*)(&renInfo), 
+                      sizeof(struct vtkPVTiledDisplayRendererInfo), 
+                      0, vtkPVTiledDisplayManager::REN_INFO_TAG);
+  if (ren == NULL)
+    {
+    vtkErrorMacro("Renderer mismatch.");
+    }
+  else
+    {
+    lc = ren->GetLights();
+    lc->InitTraversal();
+    light = lc->GetNextItem();
+    int i, x, y;
 
-    controller->Receive((char*)(&renInfo), 
-                        sizeof(struct vtkTiledDisplayRendererInfo), 
-                        0, vtkPVTiledDisplayManager::REN_INFO_TAG);
-    if (ren == NULL)
+    // Setup tile independant stuff
+    cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TileDimensions[0])) * 360.0 / 3.1415926);
+    cam->SetPosition(renInfo.CameraPosition);
+    cam->SetFocalPoint(renInfo.CameraFocalPoint);
+    cam->SetViewUp(renInfo.CameraViewUp);
+    cam->SetClippingRange(renInfo.CameraClippingRange);
+    if (renInfo.ParallelScale != 0.0)
       {
-      vtkErrorMacro("Renderer mismatch.");
+      cam->ParallelProjectionOn();
+      cam->SetParallelScale(renInfo.ParallelScale/(double)(this->TileDimensions[0]));
       }
     else
       {
-      lc = ren->GetLights();
-      lc->InitTraversal();
-      light = lc->GetNextItem();
-      int i, x, y;
-
-      // Setup tile independant stuff
-      cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TileDimensions[0])) * 360.0 / 3.1415926);
-      cam->SetPosition(renInfo.CameraPosition);
-      cam->SetFocalPoint(renInfo.CameraFocalPoint);
-      cam->SetViewUp(renInfo.CameraViewUp);
-      cam->SetClippingRange(renInfo.CameraClippingRange);
-      if (renInfo.ParallelScale != 0.0)
-        {
-        cam->ParallelProjectionOn();
-        cam->SetParallelScale(renInfo.ParallelScale/(double)(this->TileDimensions[0]));
-        }
-      else
-        {
-        cam->ParallelProjectionOff();   
-        }
-      if (light)
-        {
-        light->SetPosition(renInfo.LightPosition);
-        light->SetFocalPoint(renInfo.LightFocalPoint);
-        }
-      ren->SetBackground(renInfo.Background);
-
-      // This flag should really be transmitted from the root.
-      // This is a place holder until I activate the feature.
-      if ( ! this->CompositeFlag)
-        { // Just set up this one tile and render.
-        // Figure out the tile indexes.
-        i = this->Controller->GetLocalProcessId() - 1;
-        y = i/this->TileDimensions[0];
-        x = i - y*this->TileDimensions[0];
-
-        cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
-                             1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
-        renWin->Render();
-        }
-      else
-        {
-        int front = 0;
-        // All this rendering will be done in the back buffer without any swaps.
-        for (int idx = 0; idx < this->NumberOfTiles; ++idx)
-          {
-          // Figure out the tile indexes.
-          y = idx/this->TileDimensions[0];
-          x = idx - y*this->TileDimensions[0];
-
-          cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
-                               1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
-          renWin->Render();
-          // This is specific to RGB char pixels.
-          this->RenderWindow->GetPixelData(
-                   0,0,this->PDataSize[0]-1, this->PDataSize[1]-1, 
-                   front,static_cast<vtkUnsignedCharArray*>(this->PData));
-          this->RenderWindow->GetZbufferData(0,0,
-                                            this->PDataSize[0]-1, 
-                                            this->PDataSize[1]-1,
-                                            this->ZData);  
-          // Copy the buffers into the tile array and compress at the same time.
-          vtkCompressCompositer::Compress(this->ZData, this->PData,
-                       this->TileZData[idx], this->TilePData[idx]);
-          }
-        }
+      cam->ParallelProjectionOff();   
       }
+    if (light)
+      {
+      light->SetPosition(renInfo.LightPosition);
+      light->SetFocalPoint(renInfo.LightFocalPoint);
+      }
+    ren->SetBackground(renInfo.Background);
+    ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
+                     1.0/(float)this->ReductionFactor);
     }
 }
 
@@ -1199,62 +1098,16 @@ void vtkPVTiledDisplayManager::InitializeRMIs()
 
 }
 
-//-------------------------------------------------------------------------
-// This is only called in the satellite processes (not 0).
-void vtkPVTiledDisplayManager::StartInteractor()
-{
-  if (this->Controller == NULL)
-    {
-    vtkErrorMacro("Missing Controller.");
-    return;
-    }
 
-  this->InitializeRMIs();
 
-  if (!this->Controller->GetLocalProcessId())
-    {
-    if (!this->RenderWindowInteractor)
-      {
-      vtkErrorMacro("Missing interactor.");
-      this->ExitInteractor();
-      return;
-      }
-    this->RenderWindowInteractor->Initialize();
-    this->RenderWindowInteractor->Start();
-    }
-  else
-    {
-    this->Controller->ProcessRMIs();
-    }
-}
-
-//-------------------------------------------------------------------------
-// This is only called in process 0.
-void vtkPVTiledDisplayManager::ExitInteractor()
-{
-  int numProcs, id;
-  
-  if (this->Controller == NULL)
-    {
-    vtkErrorMacro("Missing Controller.");
-    return;
-    }
-
-  numProcs = this->Controller->GetNumberOfProcesses();
-  for (id = 1; id < numProcs; ++id)
-    {
-    this->Controller->TriggerRMI(id, 
-                                 vtkMultiProcessController::BREAK_RMI_TAG);
-    }
-}
 
 
 //-------------------------------------------------------------------------
 // Only called in process 0.
 void vtkPVTiledDisplayManager::StartRender()
 {
-  struct vtkTiledDisplayRenderWindowInfo winInfo;
-  struct vtkTiledDisplayRendererInfo renInfo;
+  struct vtkPVTiledDisplayRenderWindowInfo winInfo;
+  struct vtkPVTiledDisplayRendererInfo renInfo;
   int id, numProcs;
   int *size;
   vtkRendererCollection *rens;
@@ -1273,6 +1126,16 @@ void vtkPVTiledDisplayManager::StartRender()
     return;
     }
 
+  if (updateRate > 2.0)
+    {
+    this->ReductionFactor = 2;
+    }
+  else
+    {
+    this->ReductionFactor = 1;
+    }
+ 
+
   // Make sure they all swp buffers at the same time.
   renWin->SwapBuffersOff();
 
@@ -1280,9 +1143,11 @@ void vtkPVTiledDisplayManager::StartRender()
   rens = this->RenderWindow->GetRenderers();
   numProcs = this->Controller->GetNumberOfProcesses();
   size = this->RenderWindow->GetSize();
-  winInfo.Size[0] = size[0];
-  winInfo.Size[1] = size[1];
+  // This does nothing because tiles are full screen.
+  winInfo.Size[0] = size[0]/this->ReductionFactor;
+  winInfo.Size[1] = size[1]/this->ReductionFactor;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
+  // We should send the reduction factor !!!
   winInfo.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   for (id = 1; id < numProcs; ++id)
@@ -1292,7 +1157,7 @@ void vtkPVTiledDisplayManager::StartRender()
 
     // Synchronize the size of the windows.
     controller->Send((char*)(&winInfo), 
-                     sizeof(vtkTiledDisplayRenderWindowInfo), id, 
+                     sizeof(vtkPVTiledDisplayRenderWindowInfo), id, 
                      vtkPVTiledDisplayManager::WIN_INFO_TAG);
     }
   
@@ -1329,7 +1194,7 @@ void vtkPVTiledDisplayManager::StartRender()
     for (id = 1; id < numProcs; ++id)
       {
       controller->Send((char*)(&renInfo),
-                       sizeof(struct vtkTiledDisplayRendererInfo), id, 
+                       sizeof(struct vtkPVTiledDisplayRendererInfo), id, 
                        vtkPVTiledDisplayManager::REN_INFO_TAG);
       }
     }

@@ -80,18 +80,6 @@ public:
   virtual int GetModifiedFlag();
 
   // Description:
-  // The methods get called when the Accept button is pressed. 
-  // It sets the VTK objects value using this widgets value.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Accept();
-
-  // Description:
-  // The methods get called when the Reset button is pressed. 
-  // It sets this widgets value using the VTK objects value.
-  virtual void Reset(const char* sourceTclName);
-  virtual void Reset();
-
-  // Description:
   // This method is called when the source that contains this widget
   // is selected.
   virtual void Select();
@@ -107,12 +95,23 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
+  // The methods get called when the Accept button is pressed. 
+  // It sets the VTK objects value using this widgets value.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // The methods get called when the Reset button is pressed. 
+  // It sets this widgets value using the VTK objects value.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();
+
 
   vtkPVPointWidget* PointWidget;
 

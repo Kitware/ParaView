@@ -69,24 +69,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp);
-  
-  // Description:
-  // These methods are going to replace the Accept/Reset with no arguments.
-  // We need the widgets to control multiple sources.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Reset(const char* sourceTclName);
-
-  // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
-  
-  // Description:
-  // Called when the reset button is pushed.
-  // Sets widget's value to the object-variable's value.
-  // Side effect is to turn the modified flag off.
-  virtual void Reset();
 
   // Description:
   // I will eventually remove access to internal widgets once I figure
@@ -179,8 +161,13 @@ public:
 //ETX
 
   // Description:
+  // Move widget state to vtk object or back.
+  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVVectorEntry();

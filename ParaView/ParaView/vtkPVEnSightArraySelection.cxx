@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightArraySelection);
-vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.5");
+vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.6");
 
 //-------------------------------------------------------------------------
 int vtkPVEnSightArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -65,13 +65,6 @@ vtkPVEnSightArraySelection::~vtkPVEnSightArraySelection()
 //----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::Accept()
 {
-  this->Accept(this->VTKReaderTclName);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
-{
   vtkKWCheckButton *check;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int attributeType;
@@ -86,7 +79,7 @@ void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
     }
   
   // Create new check buttons.
-  if (sourceTclName == NULL)
+  if (this->VTKReaderTclName == NULL)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -96,7 +89,7 @@ void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
     return;
     }
 
-  pvApp->BroadcastScript("%s RemoveAll%sVariableNames", sourceTclName,
+  pvApp->BroadcastScript("%s RemoveAll%sVariableNames", this->VTKReaderTclName,
                          this->AttributeName);
   
   this->ArrayCheckButtons->InitTraversal();
@@ -105,36 +98,35 @@ void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
     if (check->GetState())
       {
       pvApp->BroadcastScript("%s AddVariableName {%s} %d",
-                             sourceTclName, check->GetText(),
+                             this->VTKReaderTclName, check->GetText(),
                              attributeType);
       }
     }
 
-  this->Trace(pvApp->GetTraceFile(), "kw");
+  this->Trace(pvApp->GetTraceFile());
 }
 
 
 //---------------------------------------------------------------------------
-void vtkPVEnSightArraySelection::Trace(ofstream *file, const char* root)
+void vtkPVEnSightArraySelection::Trace(ofstream *file)
 {
   vtkKWCheckButton *check;
+
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
 
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetArrayStatus {"
+    *file << "$kw(" << this->GetTclName() << ") SetArrayStatus {"
           << check->GetText() << "} " << check->GetState() << endl;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::Reset()
-{
-  this->Reset(this->VTKReaderTclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
 {
   vtkKWCheckButton* checkButton;
   int row = 0;
@@ -155,16 +147,16 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
   this->ArrayCheckButtons->RemoveAllItems();
   
   // Create new check buttons.
-  if (sourceTclName)
+  if (this->VTKReaderTclName)
     {
     int numArrays, idx;
-    this->Script("%s GetNumberOfVariables", sourceTclName);
+    this->Script("%s GetNumberOfVariables", this->VTKReaderTclName);
     numArrays = this->GetIntegerResult(this->Application);
     
     for (idx = 0; idx < numArrays; ++idx)
       {
       this->Script("%s GetVariableType %d",
-                   sourceTclName, idx);
+                   this->VTKReaderTclName, idx);
       variableType = vtkKWObject::GetIntegerResult(this->Application);
       switch (attributeType)
         {
@@ -186,7 +178,7 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
       checkButton->SetParent(this->CheckFrame);
       checkButton->Create(this->Application, "");
       this->Script("%s SetText [%s GetDescription %d]", 
-                   checkButton->GetTclName(), sourceTclName, idx);
+                   checkButton->GetTclName(), this->VTKReaderTclName, idx);
       this->Script("grid %s -row %d -sticky w",
                    checkButton->GetWidgetName(), row);
       ++row;
@@ -195,13 +187,13 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
       checkButton->Delete();
       }
 
-    this->Script("%s GetNumberOfComplexVariables", sourceTclName);
+    this->Script("%s GetNumberOfComplexVariables", this->VTKReaderTclName);
     numArrays = this->GetIntegerResult(this->Application);
     
     for (idx = 0; idx < numArrays; ++idx)
       {
       this->Script("%s GetComplexVariableType %d",
-                   sourceTclName, idx);
+                   this->VTKReaderTclName, idx);
       variableType = vtkKWObject::GetIntegerResult(this->Application);
       switch (attributeType)
         {
@@ -222,7 +214,8 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
       checkButton->SetParent(this->CheckFrame);
       checkButton->Create(this->Application, "");
       this->Script("%s SetText [%s GetComplexDescription %d]", 
-                   checkButton->GetTclName(), sourceTclName, idx);
+                   checkButton->GetTclName(), 
+                   this->VTKReaderTclName, idx);
       this->Script("grid %s -row %d -sticky w",
                    checkButton->GetWidgetName(), row);
       ++row;
@@ -236,12 +229,13 @@ void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
   this->ArrayCheckButtons->InitTraversal();
   while ( (checkButton = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    this->Script("%s IsRequestedVariable {%s} %d", sourceTclName,
+    this->Script("%s IsRequestedVariable {%s} %d", this->VTKReaderTclName,
                  checkButton->GetText(), attributeType);
     checkButton->SetState(this->GetIntegerResult(this->Application));
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::SaveInBatchScript(ofstream *file)
 {
   vtkKWCheckButton *check;
@@ -280,6 +274,7 @@ void vtkPVEnSightArraySelection::SaveInBatchScript(ofstream *file)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

@@ -53,14 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.20");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.21");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVContourEntry::vtkPVContourEntry()
 {
   this->CommandFunction = vtkPVContourEntryCommand;
@@ -74,7 +74,7 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->DeleteValueButton = vtkKWPushButton::New();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
   this->ContourValuesLabel->Delete();
@@ -95,7 +95,7 @@ vtkPVContourEntry::~vtkPVContourEntry()
   this->SetPVSource(NULL);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::SetLabel(const char* str)
 {
   this->ContourValuesLabel->SetLabel(str);
@@ -108,7 +108,7 @@ void vtkPVContourEntry::SetLabel(const char* str)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
@@ -181,7 +181,7 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::SetBalloonHelpString(const char *str)
 {
 
@@ -215,7 +215,7 @@ void vtkPVContourEntry::SetBalloonHelpString(const char *str)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AddValueCallback()
 {
   if (strcmp(this->NewValueEntry->GetValue(), "") == 0)
@@ -228,7 +228,7 @@ void vtkPVContourEntry::AddValueCallback()
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::DeleteValueCallback()
 {
   int index;
@@ -269,22 +269,22 @@ void vtkPVContourEntry::DeleteValueCallback()
   this->NewValueEntry->SetValue("");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AddValue(char *val)
 {
   this->ContourValuesList->AppendUnique(val);
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::RemoveAllValues()
 {
   this->ContourValuesList->DeleteAll();
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVContourEntry::Accept(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 {
   int i;
   float value;
@@ -305,11 +305,6 @@ void vtkPVContourEntry::Accept(const char* sourceTclName)
     }
   numContours = this->ContourValuesList->GetNumberOfItems();
 
-  if (this->ModifiedFlag)
-    {  
-    this->AddTraceEntry("$kw(%s) RemoveAllValues", 
-                         this->GetTclName());
-    }
 
   pvApp->BroadcastScript("%s SetNumberOfContours %d",
                          sourceTclName, numContours);
@@ -319,45 +314,33 @@ void vtkPVContourEntry::Accept(const char* sourceTclName)
     value = atof(this->ContourValuesList->GetItem(i));
     pvApp->BroadcastScript("%s SetValue %d %f",
                            sourceTclName, i, value);
-    if (this->ModifiedFlag)
-      {
-      this->AddTraceEntry("$kw(%s) AddValue %f", 
-                           this->GetTclName(), value);
-      }
     }
 }
 
 
-//---------------------------------------------------------------------------
-void vtkPVContourEntry::Trace(ofstream *file, const char* root)
+//-----------------------------------------------------------------------------
+void vtkPVContourEntry::Trace(ofstream *file)
 {
   int i, numContours;
   float value;
 
-  *file << "$" << root << "(" << this->GetTclName() << ") RemoveAllValues \n";
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") RemoveAllValues \n";
 
   numContours = this->ContourValuesList->GetNumberOfItems();
   for (i = 0; i < numContours; i++)
     {
     value = atof(this->ContourValuesList->GetItem(i));
-    *file << "$" << root << "(" << this->GetTclName() << ") AddValue "
+    *file << "$kw(" << this->GetTclName() << ") AddValue "
           << value << endl;
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVContourEntry::Accept()
-{
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource not set.");
-    return;
-    }
-
-  this->Accept(this->PVSource->GetVTKSourceTclName(0));
-}
-
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
                                                  const char* sourceTclName)
 {
@@ -376,10 +359,10 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // If we had access to the ContourValues object of the filter,
 // this would be much easier.  We would not have to rely on Tcl calls.
-void vtkPVContourEntry::Reset(const char* sourceTclName)
+void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
 {
   int i;
   int numContours;
@@ -407,20 +390,7 @@ void vtkPVContourEntry::Reset(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVContourEntry::Reset()
-{
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource not set.");
-    return;
-    }
-
-  this->Reset(this->PVSource->GetVTKSourceTclName(0));
-}
-
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                   vtkPVAnimationInterface *ai)
 {
@@ -430,12 +400,12 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 {
   char script[500];
   
-  if (ai->InitializeTrace())
+  if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
@@ -447,7 +417,7 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
   ai->SetLabelAndScript(this->GetTraceName(), script);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -471,7 +441,7 @@ void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
                                          vtkPVXMLPackageParser* parser)
 {
@@ -488,13 +458,13 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVContourEntry::GetLabel() 
 {
   return this->ContourValuesLabel->GetLabel();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

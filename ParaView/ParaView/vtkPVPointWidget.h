@@ -70,17 +70,6 @@ public:
   void PositionResetCallback();
 
   // Description:
-  // Called when the PVSources reset button is called.
-  virtual void Reset(const char* sourceTclName);
-  virtual void Reset();
-    
-  // Description:
-  // Called when the PVSources accept button is called.
-  // It can also puts an entry in the trace file.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Accept();
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 
@@ -103,12 +92,21 @@ public:
   virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
 
   // Description:
+  // Called when the PVSources reset button is called.
+  virtual void ResetInternal(const char* sourceTclName);
+    
+  // Description:
+  // Called when the PVSources accept button is called.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVPointWidget();
   ~vtkPVPointWidget();
+
 
   // Description:
   // Call creation on the child.

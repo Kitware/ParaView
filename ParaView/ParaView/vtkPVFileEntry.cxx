@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.24");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -217,24 +217,23 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVFileEntry::Trace(ofstream *file, const char* root)
+void vtkPVFileEntry::Trace(ofstream *file)
 {
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   // I assume the quotes are for eveluating an output tcl variable.
-  *file << "$" << root << "(" << this->GetTclName() << ") SetValue \""
+  *file << "$kw(" << this->GetTclName() << ") SetValue \""
         << this->GetValue() << "\"" << endl;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Accept(const char* sourceTclName)
+void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {  
-    this->AddTraceEntry("$kw(%s) SetValue \"%s\"", this->GetTclName(), 
-                         this->GetValue());
-    }
 
   const char* fname = this->Entry->GetValue();
 
@@ -254,31 +253,19 @@ void vtkPVFileEntry::Accept(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVFileEntry::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Reset(const char* sourceTclName)
+void vtkPVFileEntry::ResetInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
                 sourceTclName, this->VariableName); 
 
-  // The supper does nothing but turn the modified flag off.
-  this->vtkPVWidget::Reset(sourceTclName);
+  this->ModifiedFlag = 0;
 }
+
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
-
-
 vtkPVFileEntry* vtkPVFileEntry::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -286,6 +273,7 @@ vtkPVFileEntry* vtkPVFileEntry::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVFileEntry::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -331,6 +319,7 @@ int vtkPVFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPVFileEntry::GetValue() 
 {
   return this->Entry->GetValue();

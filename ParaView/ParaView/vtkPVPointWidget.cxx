@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.17");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -121,7 +121,7 @@ void vtkPVPointWidget::PositionResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::Reset(const char* sourceTclName)
+void vtkPVPointWidget::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -134,53 +134,31 @@ void vtkPVPointWidget::Reset(const char* sourceTclName)
                  this->GetTclName(), sourceTclName, 
                  this->VariableName);
     }
-  this->Superclass::Reset(sourceTclName);
-}
-//----------------------------------------------------------------------------
-void vtkPVPointWidget::Reset()  
-{
-  this->Reset(this->ObjectTclName);
+  this->Superclass::ResetInternal(sourceTclName);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::Accept(const char* sourceTclName)  
+void vtkPVPointWidget::AcceptInternal(const char* sourceTclName)  
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
-
-  // Start the trace entry and the accept command.
-  // Modified flag is used to keep from having multiple traces with 
-  // multiple sources.
-  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
-    {
-    traceFlag = 1;
-    }
-
   this->SetPosition(this->PositionEntry[0]->GetValueAsFloat(),
                     this->PositionEntry[1]->GetValueAsFloat(),
                     this->PositionEntry[2]->GetValueAsFloat());
 
-  if (traceFlag)
-    {
-    this->Trace(traceFile, "kw");
-    }
   this->UpdateVTKObject();
   
-  this->Superclass::Accept(sourceTclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPointWidget::Accept()  
-{
-  this->Accept(this->ObjectTclName);
+  this->Superclass::AcceptInternal(sourceTclName);
 }
 
 //---------------------------------------------------------------------------
-void vtkPVPointWidget::Trace(ofstream *file, const char* root)
+void vtkPVPointWidget::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetPosition "
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetPosition "
         << this->PositionEntry[0]->GetValue() << " "
         << this->PositionEntry[1]->GetValue() << " "
         << this->PositionEntry[2]->GetValue() << endl;

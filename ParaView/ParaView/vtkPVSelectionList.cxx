@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.32");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.33");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -204,19 +204,13 @@ const char *vtkPVSelectionList::GetLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::Accept()
+void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag)
-    {  
-    this->AddTraceEntry("$kw(%s) SetCurrentValue {%d}", this->GetTclName(), 
-                         this->GetCurrentValue());
-    }
-
   // Command to update the UI.
   pvApp->BroadcastScript("%s Set%s %d",
-                         this->ObjectTclName,
+                         sourceTclName,
                          this->VariableName,
                          this->CurrentValue); 
 
@@ -225,20 +219,25 @@ void vtkPVSelectionList::Accept()
 
 
 //---------------------------------------------------------------------------
-void vtkPVSelectionList::Trace(ofstream *file, const char* root)
+void vtkPVSelectionList::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue {"
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetCurrentValue {"
         << this->GetCurrentValue() << "}" << endl;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::Reset()
+void vtkPVSelectionList::ResetInternal(const char* sourceTclName)
 {
 
   this->Script("%s SetCurrentValue [%s Get%s]",
                this->GetTclName(),
-               this->ObjectTclName,
+               sourceTclName,
                this->VariableName);
 
   this->ModifiedFlag = 0;

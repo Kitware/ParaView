@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.3");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -167,20 +167,8 @@ void vtkPVExtractPartsWidget::Inactivate()
     }
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Accept()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Accept(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Accept(const char* vtkSourceTclName)
+void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
 {
   int num, idx;
   int state;
@@ -192,8 +180,6 @@ void vtkPVExtractPartsWidget::Accept(const char* vtkSourceTclName)
   if (this->ModifiedFlag)
     {
     this->Inactivate();
-    //this->AddTraceEntry("$kw(%s) SetFunctionLabel",
-    //                     this->GetTclName());
     }
 
   // Now loop through the input mask setting the selection states.
@@ -216,31 +202,25 @@ void vtkPVExtractPartsWidget::SetSelectState(int idx, int val)
 
 
 //---------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Trace(ofstream *file, const char* root)
+void vtkPVExtractPartsWidget::Trace(ofstream *file)
 {
   int idx, num;
+
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
 
   num = this->PartSelectionList->GetNumberOfItems();
   for (idx = 0; idx < num; ++idx)
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetSelectState "
+    *file << "$kw(" << this->GetTclName() << ") SetSelectState "
           << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Reset()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Reset(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Reset(const char* vtkSourceTclName)
+void vtkPVExtractPartsWidget::ResetInternal(const char* vtkSourceTclName)
 {
   vtkPVData *input;
   vtkPVPart *part;

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputArrayRequirement);
-vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.1");
+vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputArrayRequirement::vtkPVInputArrayRequirement()
@@ -164,6 +164,30 @@ int vtkPVInputArrayRequirement::GetIsValidInput(vtkPVData* pvd, vtkPVSource*)
   return 0;
 }
 
+//----------------------------------------------------------------------------
+int vtkPVInputArrayRequirement::GetIsValidField(int field, 
+                                 vtkPVDataSetAttributesInformation* fieldInfo)
+{  
+  // If attribute does not match ???
+  if (this->Attribute != -1 && this->Attribute != field)
+    {
+    return 1;
+    } 
+
+  if (field == vtkDataSet::POINT_DATA_FIELD)
+    {
+    return this->AttributeInfoContainsArray(fieldInfo);
+    }  
+  if (field == vtkDataSet::CELL_DATA_FIELD)
+    {
+    return this->AttributeInfoContainsArray(fieldInfo);
+    }  
+  if (field == vtkDataSet::DATA_OBJECT_FIELD)
+    {
+    vtkErrorMacro("Field restriction not implemented yet.");
+    return 1;
+    }  
+}
 
 //----------------------------------------------------------------------------
 int vtkPVInputArrayRequirement::AttributeInfoContainsArray(

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabel);
-vtkCxxRevisionMacro(vtkPVLabel, "1.6");
+vtkCxxRevisionMacro(vtkPVLabel, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()
@@ -64,6 +64,7 @@ vtkPVLabel::~vtkPVLabel()
   this->Label = NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabel::SetBalloonHelpString(const char *str)
 {
 
@@ -123,25 +124,8 @@ void vtkPVLabel::Create(vtkKWApplication *pvApp)
   this->Script("pack %s -side left", this->Label->GetWidgetName());  
 }
 
-//----------------------------------------------------------------------------
-void vtkPVLabel::Accept()
-{
-  this->ModifiedFlag = 0;
-
-}
 
 //----------------------------------------------------------------------------
-void vtkPVLabel::Reset()
-{
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
-  this->ModifiedFlag = 0;
-
-}
-
 vtkPVLabel* vtkPVLabel::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -149,6 +133,7 @@ vtkPVLabel* vtkPVLabel::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVLabel::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabel::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

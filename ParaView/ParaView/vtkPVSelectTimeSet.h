@@ -124,12 +124,12 @@ public:
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVSelectTimeSet();
   ~vtkPVSelectTimeSet();
-  
+
   vtkPVSelectTimeSet(const vtkPVSelectTimeSet&); // Not implemented
   void operator=(const vtkPVSelectTimeSet&); // Not implemented
 

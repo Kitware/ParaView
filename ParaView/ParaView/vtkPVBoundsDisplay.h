@@ -107,7 +107,7 @@ public:
 
   // Description:
   // Empty method to keep superclass from complaining.
-  virtual void Trace(ofstream *file, const char *root) {};
+  virtual void Trace(ofstream *file) {};
 
 protected:
   vtkPVBoundsDisplay();

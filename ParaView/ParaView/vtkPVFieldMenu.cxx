@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkKWLabel.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.1");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.2");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -104,6 +105,19 @@ void vtkPVFieldMenu::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Value: Cell Data. \n";
     }
 }
+
+//----------------------------------------------------------------------------
+vtkPVInputProperty* vtkPVFieldMenu::GetInputProperty()
+{
+  if (this->PVSource == NULL)
+    {
+    return NULL;
+    }
+
+  // Should we get the input name from the input menu?
+  return this->PVSource->GetInputProperty("Input");
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::Create(vtkKWApplication *app)
@@ -192,6 +206,11 @@ void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  if (sourceTclName == NULL)
+    {
+    return;
+    }
+
   if (this->Value == vtkDataSet::POINT_DATA_FIELD ||
       this->Value == vtkDataSet::CELL_DATA_FIELD)
     {
@@ -250,19 +269,18 @@ void vtkPVFieldMenu::SaveInBatchScriptForPart(ofstream *file,
 void vtkPVFieldMenu::Update()
 {
   int cellFlag, pointFlag;
-
-  // This updates any array menu dependent on this widget.
-  this->vtkPVWidget::Update();
+  vtkPVInputProperty* inProp = this->GetInputProperty();
 
   this->FieldMenu->ClearEntries();
-  if (this->InputMenu == NULL)
+  if (this->InputMenu == NULL || inProp == NULL )
     {
     // Add both.
     this->FieldMenu->AddEntryWithCommand("Point Data", this,
-                                         "SetValue 0");
+                                         "SetValue 1");
     this->FieldMenu->AddEntryWithCommand("Cell Data", this,
-                                                 "SetValue 1");
+                                         "SetValue 2");
     this->FieldMenu->SetCurrentEntry("Point Data");
+    this->vtkPVWidget::Update();
     return;
     }  
 
@@ -278,35 +296,49 @@ void vtkPVFieldMenu::Update()
     }
   
   pointFlag = cellFlag = 0;
-  if (this->CheckField(dataInfo->GetPointDataInformation()))
+  if (inProp->GetIsValidField(vtkDataSet::POINT_DATA_FIELD,
+                              dataInfo->GetPointDataInformation()))
     {
     this->FieldMenu->AddEntryWithCommand("Point Data", this,
-                                         "SetValue 0");
+                                         "SetValue 1");
     pointFlag = 1;
     }
 
-  if (this->CheckField(dataInfo->GetCellDataInformation()))
+  if (inProp->GetIsValidField(vtkDataSet::CELL_DATA_FIELD,
+                              dataInfo->GetCellDataInformation()))
     {
     this->FieldMenu->AddEntryWithCommand("Cell Data", this,
-                                         "SetValue 1");
+                                         "SetValue 2");
     cellFlag = 1;
     }
-  if (pointFlag)
+  if (! cellFlag && ! pointFlag)
+    {
+    vtkErrorMacro("No valid fields.");
+    this->FieldMenu->SetCurrentEntry("None");
+    }
+  if (! cellFlag)
+    {
+    this->FieldMenu->SetCurrentEntry("Point Data");
+    this->Value = vtkDataSet::POINT_DATA_FIELD;
+    }
+  else if (! pointFlag)
+    {
+    this->FieldMenu->SetCurrentEntry("Cell Data");
+    this->Value = vtkDataSet::CELL_DATA_FIELD;
+    }
+  else if (this->Value == vtkDataSet::POINT_DATA_FIELD)
     {
     this->FieldMenu->SetCurrentEntry("Point Data");
     }
-  else if (cellFlag)
+  else
     {
     this->FieldMenu->SetCurrentEntry("Cell Data");
     }
+
+  // This updates any array menu dependent on this widget.
+  this->vtkPVWidget::Update();
 }
 
-
-//----------------------------------------------------------------------------
-int vtkPVFieldMenu::CheckField(vtkPVDataSetAttributesInformation* info)
-{
-  return 1;
-}
 
 //----------------------------------------------------------------------------
 vtkPVFieldMenu* vtkPVFieldMenu::ClonePrototype(vtkPVSource* pvSource,

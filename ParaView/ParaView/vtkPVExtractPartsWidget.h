@@ -73,28 +73,26 @@ public:
   void SaveInBatchScript(ofstream *file);
 
   // Description:
-  // Called when the Accept button is pressed.  It moves the widget values to the 
-  // VTK calculator filter.
-  virtual void Accept();
-  virtual void Accept(const char* vtkSourceTclName);
-  
-  // Description:
-  // This method resets the widget values from the VTK filter.
-  virtual void Reset();
-  virtual void Reset(const char* vtkSourceTclName);
-
-  // Description:
   // Button callbacks.
   void AllOnCallback();
   void AllOffCallback();
 
   // Description:
-  // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
-
-  // Description:
   // Access metod necessary for scripting.
   void SetSelectState(int idx, int val);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file);
+
+  // Description:
+  // Called when the Accept button is pressed.  It moves the widget values to the 
+  // VTK calculator filter.
+  virtual void AcceptInternal(const char* vtkSourceTclName);
+  
+  // Description:
+  // This method resets the widget values from the VTK filter.
+  virtual void ResetInternal(const char* vtkSourceTclName);
 
 protected:
   vtkPVExtractPartsWidget();

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.17");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -162,29 +162,22 @@ void vtkPVLabeledToggle::Disable()
                this->CheckButton->GetWidgetName());
 }
 
-//----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
 //---------------------------------------------------------------------------
-void vtkPVLabeledToggle::Trace(ofstream *file, const char* root)
+void vtkPVLabeledToggle::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetState "
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetState "
         << this->GetState() << endl;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Accept(const char* sourceTclName)
+void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {
-    this->AddTraceEntry("$kw(%s) SetState %d", this->GetTclName(), 
-                        this->GetState());
-    }
 
   pvApp->BroadcastScript("%s Set%s %d", sourceTclName, 
                          this->VariableName, this->GetState());
@@ -194,12 +187,7 @@ void vtkPVLabeledToggle::Accept(const char* sourceTclName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
-//----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Reset(const char* sourceTclName)
+void vtkPVLabeledToggle::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {

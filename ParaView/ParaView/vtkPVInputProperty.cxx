@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.1");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -149,6 +149,26 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs)
     }
   return 0;
 }
+
+//----------------------------------------------------------------------------
+int vtkPVInputProperty::GetIsValidField(int field, 
+                                 vtkPVDataSetAttributesInformation* fieldInfo)
+{
+  vtkPVInputRequirement *ir;
+
+  // First check the field has the correct arrays.
+  this->Requirements->InitTraversal();
+  while ( (ir = (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
+    {
+    if ( ! ir->GetIsValidField(field, fieldInfo) )
+      {
+      return 0;
+      }
+    }
+
+  return 1;
+}
+
 
 
 //----------------------------------------------------------------------------

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.59");
+vtkCxxRevisionMacro(vtkPVContour, "1.60");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -90,10 +90,7 @@ void vtkPVContour::CreateProperties()
   vtkPVWidget* input = this->GetPVWidget("Input");
   if (input)
     {
-    // Input menu does not use the source name.
-    // I was planning to get rid of all "ObjectTclName" ivar.
-    // Maybe I should rethink "Reset"
-    input->Reset(NULL);
+    input->Reset();
     }
   this->VerifyInput();
 }

@@ -53,11 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.15");
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVSelectTimeSet);
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.16");
+
+//-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 {
   
@@ -80,7 +81,7 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
   this->FrameLabel = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
 {
   this->LabeledFrame->Delete();
@@ -94,10 +95,10 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->SetFrameLabel(0);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkPVSelectTimeSet, Reader, vtkGenericEnSightReader);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetLabel(const char* label)
 {
   this->SetFrameLabel(label);
@@ -107,13 +108,13 @@ void vtkPVSelectTimeSet::SetLabel(const char* label)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVSelectTimeSet::GetLabel()
 {
   return this->GetFrameLabel();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
@@ -168,7 +169,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeValue(float time)
 {
   if (this->TimeValue != time) 
@@ -182,7 +183,7 @@ void vtkPVSelectTimeSet::SetTimeValue(float time)
     } 
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
 {
   if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
@@ -214,7 +215,7 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
 {
   if (!this->Application)
@@ -225,7 +226,7 @@ void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
                name, text);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name, 
                                       const char* text, const char* data)
 {
@@ -238,7 +239,7 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -258,15 +259,20 @@ void vtkPVSelectTimeSet::Accept()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Trace(ofstream *file, const char* root)
+void vtkPVSelectTimeSet::Trace(ofstream *file)
 {
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   this->Script("%s selection get", this->Tree->GetWidgetName());
-  *file << "$" << root << "(" << this->GetTclName() << ") SetTimeValueCallback {"
+  *file << "$kw(" << this->GetTclName() << ") SetTimeValueCallback {"
         << this->Application->GetMainInterp()->result << "}" << endl;
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Reset()
 {
   if ( ! this->ModifiedFlag)
@@ -344,7 +350,7 @@ void vtkPVSelectTimeSet::Reset()
   this->ModifiedFlag = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                    vtkPVAnimationInterface *ai)
 {
@@ -357,14 +363,14 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // What a pain.  I need this method for tracing.
 // Maybe the animation should call PVwidget methods and not vtk object methods.
 void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 {
   char script[500];
 
-  if (ai->InitializeTrace())
+  if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
@@ -379,7 +385,7 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -387,7 +393,7 @@ vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVSelectTimeSet::SafeDownCast(clone);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone, 
                                       vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -405,7 +411,7 @@ void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
@@ -421,7 +427,7 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

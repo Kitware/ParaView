@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.23");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -213,6 +213,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 {
   if (this->FileEntry)
     {
+    this->FileEntry->SetValue(fname);
     this->Script("%s Set%s {%s}", this->GetVTKSourceTclName(), 
                  this->FileEntry->GetVariableName(), fname);
     
@@ -274,6 +275,16 @@ const char* vtkPVReaderModule::GetExtension(vtkIdType i)
   const char* result = 0;
   if(this->Extensions->GetItem(i, result) != VTK_OK) { result = 0; }
   return result;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVReaderModule::SaveState(ofstream *file)
+{
+  *file << "$pv(" << this->GetPVWindow()->GetTclName() << ") OpenCustom {" 
+        << this->GetModuleName() << "} {" 
+        << this->FileEntry->GetValue() << "}\n"; 
+  *file << "set $pv(" << this->GetTclName() << ") [$pv("
+        << this->GetPVWindow()->GetTclName() << "GetCurrentPVSource]\n";
 }
 
 

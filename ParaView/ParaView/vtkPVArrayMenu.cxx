@@ -56,20 +56,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplication.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVFieldMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.35");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
+vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu::vtkPVArrayMenu()
 {
   this->FieldSelection = vtkDataSet::POINT_DATA_FIELD;
-  this->ShowFieldMenu = 0;
 
   this->ArrayName = NULL;
   this->ArrayNumberOfComponents = 1;
@@ -83,11 +84,11 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ObjectTclName = NULL;
 
   this->Label = vtkKWLabel::New();
-  this->FieldMenu = vtkKWOptionMenu::New();
   this->ArrayMenu = vtkKWOptionMenu::New();
   this->ComponentMenu = vtkKWOptionMenu::New();
 
   this->InputMenu = NULL;
+  this->FieldMenu = NULL;
 
 }
 
@@ -101,14 +102,22 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->Label->Delete();
   this->Label = NULL;
-  this->FieldMenu->Delete();
-  this->FieldMenu = NULL;
-  this->ArrayMenu->Delete();
-  this->ArrayMenu = NULL;
+  if (this->FieldMenu)
+    {
+    this->FieldMenu->Delete();
+    this->FieldMenu = NULL;
+    }
+  if (this->ArrayMenu)
+    {
+    this->ArrayMenu->Delete();
+    this->ArrayMenu = NULL;
+    }
+
   this->ComponentMenu->Delete();
   this->ComponentMenu = NULL;
 
   this->SetInputMenu(NULL);
+  this->SetFieldMenu(NULL);
 
 }
 
@@ -140,51 +149,9 @@ void vtkPVArrayMenu::SetFieldSelection(int field)
     }
   this->ModifiedCallback();
 
-  switch (field)
-    {
-    case vtkDataSet::DATA_OBJECT_FIELD:
-      vtkErrorMacro("We do not handle data object fields yet.");
-      return;
-    case vtkDataSet::POINT_DATA_FIELD:
-      this->FieldMenu->SetValue("Point");
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      this->FieldMenu->SetValue("Cell");
-      break;
-    default:
-      vtkErrorMacro("Unknown field.");
-      return;
-    }
-
   this->Update();
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVArrayMenu::SetShowFieldMenu(int flag)
-{
-  if (this->ShowFieldMenu == flag)
-    {
-    return;
-    }
-  this->Modified();
-
-  this->ShowFieldMenu = flag;
-
-  if (this->Application)
-    {
-    if (flag)
-      {
-      this->Script("pack %s -after %s -side left", 
-                   this->FieldMenu->GetWidgetName(),
-                   this->Label->GetWidgetName());
-      }
-    else
-      {
-      this->Script("pack forget %s", this->FieldMenu->GetWidgetName()); 
-      }
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetNumberOfComponents(int num)
@@ -244,33 +211,6 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
   this->Label->SetParent(extraFrame);
   this->Label->Create(app, "-width 18 -justify right");
   this->Script("pack %s -side left", this->Label->GetWidgetName());
-
-  this->FieldMenu->SetParent(extraFrame);
-  this->FieldMenu->Create(app, "");
-  // Easier to hard code the field enum 
-  // than to sprintf into a method and arg string
-  this->FieldMenu->AddEntryWithCommand("Point", this, "SetFieldSelection 1");
-  this->FieldMenu->AddEntryWithCommand("Cell", this, "SetFieldSelection 2");
-  switch (this->FieldSelection)
-    {
-    case vtkDataSet::DATA_OBJECT_FIELD:
-      vtkErrorMacro("We do not handle data object fields yet.");
-      return;
-    case vtkDataSet::POINT_DATA_FIELD:
-      this->FieldMenu->SetValue("Point");
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      this->FieldMenu->SetValue("Cell");
-      break;
-    default:
-      vtkErrorMacro("Unknown field.");
-      return;
-    }
-
-  if (this->ShowFieldMenu)
-    {
-    this->Script("pack %s -side left", this->FieldMenu->GetWidgetName());
-    }
 
   this->ArrayMenu->SetParent(extraFrame);
   this->ArrayMenu->Create(app, "");
@@ -333,36 +273,56 @@ void vtkPVArrayMenu::SetValue(const char* name)
   this->Update();
 }
 
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
+{
+
+  if (this->FieldMenu)
+    {
+    return this->FieldMenu->GetFieldInformation();
+    }
+  if (this->ArrayMenu)
+    {
+    vtkPVData *pvd;
+    pvd = this->InputMenu->GetPVData();
+    if (pvd == NULL)
+      {
+      return NULL;
+      }
+    switch (this->FieldSelection)
+      {
+      case vtkDataSet::DATA_OBJECT_FIELD:
+        vtkErrorMacro("We do not handle data object fields yet.");
+        return NULL;
+      case vtkDataSet::POINT_DATA_FIELD:
+        return pvd->GetDataInformation()->GetPointDataInformation();
+        break;
+      case vtkDataSet::CELL_DATA_FIELD:
+        return pvd->GetDataInformation()->GetCellDataInformation();
+        break;
+      }
+    vtkErrorMacro("Unknown field.");
+    return NULL; 
+    }
+
+  vtkErrorMacro("No input menu or field menu.");
+  return NULL;
+}
+
+
 //----------------------------------------------------------------------------
 vtkPVArrayInformation *vtkPVArrayMenu::GetArrayInformation()
 {
-  vtkPVData *pvd;
+  vtkPVDataSetAttributesInformation* fieldInfo;
 
-  if (this->InputMenu == NULL)
-    {
-    return NULL;
-    }
-  pvd = this->InputMenu->GetPVData();
-  if (pvd == NULL)
+  fieldInfo = this->GetFieldInformation();
+  if (fieldInfo == NULL)
     {
     return NULL;
     }
 
-  switch (this->FieldSelection)
-    {
-    case vtkDataSet::DATA_OBJECT_FIELD:
-      vtkErrorMacro("We do not handle data object fields yet.");
-      return NULL;
-    case vtkDataSet::POINT_DATA_FIELD:
-      return pvd->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(this->ArrayName);
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      return pvd->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(this->ArrayName);
-      break;
-    }
-
-  vtkErrorMacro("Unknown field.");
-  return NULL; 
+  return fieldInfo->GetArrayInformation(this->ArrayName);
 }
 
 //----------------------------------------------------------------------------
@@ -383,7 +343,7 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
  
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Accept(const char* sourceTclName)
+void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   const char* attributeName;
@@ -409,12 +369,6 @@ void vtkPVArrayMenu::Accept(const char* sourceTclName)
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    if (this->ModifiedFlag)
-      {  // Trace the first source.
-      this->AddTraceEntry("$kw(%s) SetValue {%s}", 
-                          this->GetTclName(), 
-                          this->ArrayName);
-      }
     }
   else
     {
@@ -422,10 +376,6 @@ void vtkPVArrayMenu::Accept(const char* sourceTclName)
                            sourceTclName,
                            this->InputName,
                            attributeName);
-    if (this->ModifiedFlag)
-      {  // Trace the first source.
-      this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
-      }
     }
 
   if (this->ShowComponentMenu)
@@ -435,37 +385,32 @@ void vtkPVArrayMenu::Accept(const char* sourceTclName)
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
-    this->AddTraceEntry("$kw(%s) SetSelectedComponent {%s}", 
-                        this->GetTclName(), 
-                        this->SelectedComponent);
     }
 
   this->ModifiedFlag = 0;
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVArrayMenu::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
 //---------------------------------------------------------------------------
-void vtkPVArrayMenu::Trace(ofstream *file, const char* root)
+void vtkPVArrayMenu::Trace(ofstream *file)
 {
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   if (this->ArrayName)
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetValue {"
+    *file << "$kw(" << this->GetTclName() << ") SetValue {"
           << this->ArrayName << "}" << endl;
     }
   else
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetValue {}\n";
+    *file << "$kw(" << this->GetTclName() << ") SetValue {}\n";
     }
 
   if (this->ShowComponentMenu)
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") "
+    *file << "$kw(" << this->GetTclName() << ") "
           << "SetSelectedComponent " << this->SelectedComponent << endl;
     }
 
@@ -473,7 +418,7 @@ void vtkPVArrayMenu::Trace(ofstream *file, const char* root)
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Reset(const char* sourceTclName)
+void vtkPVArrayMenu::ResetInternal(const char* sourceTclName)
 {
   const char* attributeName;
 
@@ -513,11 +458,6 @@ void vtkPVArrayMenu::Reset(const char* sourceTclName)
   this->Update();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVArrayMenu::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
@@ -572,7 +512,6 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   int arrayFound = 0;
   const char *first = NULL;
   const char* attributeName;
-  vtkPVData *pvd;
 
   attributeName = 
     vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
@@ -585,39 +524,11 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   // Regenerate the menu, and look for the specified array.
   this->ArrayMenu->ClearEntries();
 
-  // We have to get the data set incase an input has changed.   
-  if (this->InputMenu == NULL)
+  attrInfo = this->GetFieldInformation();
+  if (attrInfo == NULL)
     {
-    this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("Input menu has not been set.");
     return;
-    } 
-
-  pvd = this->InputMenu->GetPVData();
-  if (pvd == NULL)
-    {
-    this->SetArrayName(NULL);
-    this->ArrayMenu->SetValue("None");
-    //vtkErrorMacro("Could not get data set from input menu.");
-    return;
-    }
-
-  if (this->FieldSelection != vtkDataSet::POINT_DATA_FIELD &&
-      this->FieldSelection != vtkDataSet::CELL_DATA_FIELD)
-    {
-    vtkErrorMacro("Unknown field type.");
-    return;
-    }
-
-  // It would be a little more elegant to have AttributeInformation ...
-  if (this->FieldSelection == vtkDataSet::POINT_DATA_FIELD)
-    {
-    attrInfo = pvd->GetDataInformation()->GetPointDataInformation();
-    }
-  else
-    {
-    attrInfo = pvd->GetDataInformation()->GetCellDataInformation();
     }
 
   num = attrInfo->GetNumberOfArrays();
@@ -682,18 +593,14 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 }
 
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::UpdateComponentMenu()
 {
   int i;
   char methodAndArgs[1024];
   char label[124];
-  vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *ai;
   int currentComponent;
-  vtkPVData *pvd;
 
   if (this->Application == NULL)
     {
@@ -706,45 +613,13 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->ArrayNumberOfComponents = 1;
   this->SelectedComponent = 0;
 
-  // We have to get the data set incase an input has changed.   
-  if (this->InputMenu == NULL)
-    {
-    this->SetArrayName(NULL);
-    this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("Input menu has not been set.");
-    return;
-    } 
-  pvd = this->InputMenu->GetPVData();
-  if (pvd == NULL)
-    {
-    this->SetArrayName(NULL);
-    this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("COuld not get datra set from input menu.");
-    return;
-    }
-
-  // Point or cell data.
-  if (this->FieldSelection != vtkDataSet::POINT_DATA_FIELD &&
-      this->FieldSelection != vtkDataSet::CELL_DATA_FIELD)
-    {
-    vtkErrorMacro("Unknown field type.");
-    return;
-    }
-
-  if (this->FieldSelection == vtkDataSet::POINT_DATA_FIELD)
-    {
-    attrInfo = pvd->GetDataInformation()->GetPointDataInformation();
-    }
-  else
-    {
-    attrInfo = pvd->GetDataInformation()->GetCellDataInformation();
-    }
-  ai = attrInfo->GetArrayInformation(this->ArrayName);
-
+  ai = this->GetArrayInformation();
   if (ai == NULL)
     {
+    this->SelectedComponent = 0;
     return;
     }
+
   this->ArrayNumberOfComponents = ai->GetNumberOfComponents();
 
   if ( ! this->ShowComponentMenu || this->ArrayNumberOfComponents == 1)
@@ -778,6 +653,7 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->ComponentMenu->SetValue(label);
 }
 
+//----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -785,6 +661,7 @@ vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVArrayMenu::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVArrayMenu::ClonePrototypeInternal(vtkPVSource* pvSource,
                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -819,6 +696,7 @@ vtkPVWidget* vtkPVArrayMenu::ClonePrototypeInternal(vtkPVSource* pvSource,
   return pvWidget;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -838,6 +716,14 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       // object.
       vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
       pvam->SetInputMenu(im);
+      im->Delete();
+      }
+    if (this->FieldMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVFieldMenu* im = this->FieldMenu->ClonePrototype(pvSource, map);
+      pvam->SetFieldMenu(im);
       im->Delete();
       }
     }
@@ -864,24 +750,39 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   
   // Setup the InputMenu.
   const char* input_menu = element->GetAttribute("input_menu");
-  if(!input_menu)
+  if (input_menu)
     {
-    vtkErrorMacro("No input_menu attribute.");
-    return 0;
+    vtkPVXMLElement* ime = element->LookupElement(input_menu);
+    vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
+    vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+    if(!imw)
+      {
+      if(w) { w->Delete(); }
+      vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+      return 0;
+      }
+    imw->AddDependent(this);
+    this->SetInputMenu(imw);
+    imw->Delete();
     }
-  
-  vtkPVXMLElement* ime = element->LookupElement(input_menu);
-  vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
-  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
-  if(!imw)
+
+  // Setup the FieldMenu.
+  const char* field_menu = element->GetAttribute("field_menu");
+  if (field_menu)
     {
-    if(w) { w->Delete(); }
-    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
-    return 0;
+    vtkPVXMLElement* ime = element->LookupElement(field_menu);
+    vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
+    vtkPVFieldMenu* imw = vtkPVFieldMenu::SafeDownCast(w);
+    if(!imw)
+      {
+      if(w) { w->Delete(); }
+      vtkErrorMacro("Couldn't get FieldMenu widget " << field_menu);
+      return 0;
+      }
+    imw->AddDependent(this);
+    this->SetFieldMenu(imw);
+    imw->Delete();
     }
-  imw->AddDependent(this);
-  this->SetInputMenu(imw);
-  imw->Delete();
   
   // Setup the NumberOfComponents.
   if(!element->GetScalarAttribute("number_of_components",
@@ -966,7 +867,21 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ObjectTclName?this->ObjectTclName:"none") << endl;
   os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
   os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
-  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu() << endl;
-  os << indent << "InputMenu: " << this->InputMenu << endl;
+  if (this->InputMenu)
+    {
+    os << indent << "InputMenu: " << this->InputMenu << endl;
+    }
+  else
+    {
+    os << indent << "InputMenu: NULL\n";
+    }
+  if (this->FieldMenu)
+    {
+    os << indent << "FieldMenu: " << this->FieldMenu << endl;
+    }
+  else
+    {
+    os << indent << "FieldMenu: NULL\n";
+    }
 }
 

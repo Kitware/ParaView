@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDummyWidget);
-vtkCxxRevisionMacro(vtkPVDummyWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVDummyWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDummyWidget::vtkPVDummyWidget()
@@ -72,6 +72,7 @@ void vtkPVDummyWidget::Create(vtkKWApplication *app)
 
 }
 
+//----------------------------------------------------------------------------
 vtkPVDummyWidget* vtkPVDummyWidget::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -80,6 +81,7 @@ vtkPVDummyWidget* vtkPVDummyWidget::ClonePrototype(vtkPVSource* pvSource,
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVDummyWidget::CopyProperties(vtkPVWidget* clone, 
                                       vtkPVSource* pvSource,
                                       vtkArrayMap<vtkPVWidget*, 

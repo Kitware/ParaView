@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.21");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -130,7 +130,7 @@ void vtkPVSphereWidget::CenterResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::Reset(const char* sourceTclName)
+void vtkPVSphereWidget::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -143,12 +143,7 @@ void vtkPVSphereWidget::Reset(const char* sourceTclName)
     this->Script("eval %s SetRadius [ %s GetRadius ]", 
                  this->GetTclName(), this->SphereTclName);
     }
-  this->Superclass::Reset(sourceTclName);
-}
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::Reset()
-{
-  this->Reset(this->ObjectTclName);
+  this->Superclass::ResetInternal(sourceTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -169,7 +164,7 @@ void vtkPVSphereWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::Accept(const char* sourceTclName)  
+void vtkPVSphereWidget::AcceptInternal(const char* sourceTclName)  
 {
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
@@ -191,40 +186,36 @@ void vtkPVSphereWidget::Accept(const char* sourceTclName)
     this->SetRadius(rad);
     pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
                            val[0], val[1], val[2]);
-    this->AddTraceEntry("$kw(%s) SetCenter %f %f %f", 
-                        this->GetTclName(), val[0], val[1], val[2]);
     pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
                            rad);
-    this->AddTraceEntry("$kw(%s) SetRadius %f", 
-                        this->GetTclName(), rad);
     }
-  this->Superclass::Accept(sourceTclName);
-}
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::Accept()  
-{
-  this->Accept(this->ObjectTclName);
+  this->Superclass::AcceptInternal(sourceTclName);
 }
 
 
 //---------------------------------------------------------------------------
-void vtkPVSphereWidget::Trace(ofstream *file, const char* root)
+void vtkPVSphereWidget::Trace(ofstream *file)
 {
   float rad;
   float val[3];
   int cc;
   
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
   for ( cc = 0; cc < 3; cc ++ )
     {
     val[cc] = atof( this->CenterEntry[cc]->GetValue() );
     }
-  *file << "$" << root << "(" << this->GetTclName() << ") SetCenter "
+  *file << "$kw(" << this->GetTclName() << ") SetCenter "
         << val[0] << " " << val[1] << " " << val[2] << endl;
 
   rad = atof(this->RadiusEntry->GetValue());
   this->AddTraceEntry("$kw(%s) SetRadius %f", 
                       this->GetTclName(), rad);
-  *file << "$" << root << "(" << this->GetTclName() << ") SetRadius "
+  *file << "$kw(" << this->GetTclName() << ") SetRadius "
         << rad << endl;
 }
 

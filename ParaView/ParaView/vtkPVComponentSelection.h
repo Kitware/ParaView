@@ -55,19 +55,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   virtual void Create(vtkKWApplication *pvApp);
-  
-  // Description:
-  // Called when accept button is pushed.
-  // Sets object's variable to the widget's value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
-  
-  // Description:
-  // Called then the reset button is pushed.
-  // Sets the widget's value to the object-variable's value.
-  // Side effect is to turn the modified flag off.
-  virtual void Reset();
-  
+    
   // Description:
   // Set/Get the state of the ith checkbutton.
   void SetState(int i, int state);
@@ -89,13 +77,25 @@ public:
 //ETX
 
   // Description:
+  // Called when accept button is pushed.
+  // Sets object's variable to the widget's value.
+  // Side effect is to turn modified flag off.
+  virtual void AcceptInternal(const char* sourceTclName);
+  
+  // Description:
+  // Called then the reset button is pushed.
+  // Sets the widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVComponentSelection();
   ~vtkPVComponentSelection();
-  
+
   vtkKWWidgetCollection *CheckButtons;
   int Initialized;
 

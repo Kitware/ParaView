@@ -134,6 +134,11 @@ public:
   // Get the file entry.
   vtkGetObjectMacro(FileEntry, vtkPVFileEntry);
 
+  // Description:
+  // Saves the pipeline in a ParaView script.  This is similar
+  // to saveing a trace, except only the last state is stored.
+  virtual void SaveState(ofstream *file);
+
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();

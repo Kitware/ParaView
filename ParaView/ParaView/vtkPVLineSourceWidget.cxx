@@ -50,7 +50,7 @@ int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.6");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -137,42 +137,31 @@ int vtkPVLineSourceWidget::GetModifiedFlag()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Reset(const char* sourceTclName)
+void vtkPVLineSourceWidget::ResetInternal(const char* sourceTclName)
 {
   this->ModifiedFlag = 0;
   // Ignore the source passed in.  Modify our one source.
-  this->LineWidget->Reset(this->SourceTclName);
+  this->LineWidget->ResetInternal(this->SourceTclName);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Reset()
-{
-  this->Reset(this->SourceTclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Accept(const char* sourceTclName)
+void vtkPVLineSourceWidget::AcceptInternal(const char* sourceTclName)
 {
   // Ignore the source passed in.  Modify our one source.
-  this->LineWidget->Accept(this->SourceTclName);
+  this->LineWidget->AcceptInternal(this->SourceTclName);
   
   this->ModifiedFlag = 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Accept()
-{
-  this->Accept(this->SourceTclName);
-}
-
 //---------------------------------------------------------------------------
-void vtkPVLineSourceWidget::Trace(ofstream *file, const char* root)
+void vtkPVLineSourceWidget::Trace(ofstream *file)
 {
-  *file << "set " << root << "(" << this->LineWidget->GetTclName() << ") "
-        << "[$" << root << "(" << this->GetTclName() << ") "
-        << "GetPVWidget {" << this->LineWidget->GetTraceName() << "}]" 
-        << endl;
-  this->LineWidget->Trace(file, root);
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  this->LineWidget->Trace(file);
 }
 
 //----------------------------------------------------------------------------

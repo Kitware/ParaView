@@ -51,15 +51,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.22");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
 {
   this->CommandFunction = vtkPVSelectWidgetCommand;
@@ -76,7 +76,7 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->UseWidgetCommand = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSelectWidget::~vtkPVSelectWidget()
 {
   this->LabeledFrame->Delete();
@@ -92,7 +92,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
   this->SetEntryLabel(0);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
@@ -153,7 +153,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetLabel(const char* label) 
 {
   // For getting the widget in a script.
@@ -174,7 +174,7 @@ void vtkPVSelectWidget::SetLabel(const char* label)
 
 
   
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVSelectWidget::GetModifiedFlag()
 {
   if (this->ModifiedFlag)
@@ -192,18 +192,10 @@ int vtkPVSelectWidget::GetModifiedFlag()
 }
 
   
-//----------------------------------------------------------------------------
-void vtkPVSelectWidget::Accept(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {
-    // We cannot call Trace(...) here because it does not 
-    // check modified or initialize and it calles trace on sub widgets.
-    this->AddTraceEntry("$kw(%s) SetCurrentValue {%s}", this->GetTclName(), 
-                         this->GetCurrentValue());
-    }
 
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
@@ -218,39 +210,33 @@ void vtkPVSelectWidget::Accept(const char* sourceTclName)
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
-    pvw->Accept(sourceTclName);
+    pvw->AcceptInternal(sourceTclName);
     }
 
   this->ModifiedFlag = 0;
 }
 
-//---------------------------------------------------------------------------
-void vtkPVSelectWidget::Trace(ofstream *file, const char* root)
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
-        << this->GetCurrentValue() << endl;
+  if ( ! this->InitializeTrace(file) )
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetCurrentValue {"
+        << this->GetCurrentValue() << "}" << endl;
 
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
-    *file << "set " << root << "(" << pvw->GetTclName() << ") "
-          << "[$" << root << "(" << this->GetTclName() << ") "
-          << "GetPVWidget {" << pvw->GetTraceName() << "}]" << endl;
-
-    pvw->Trace(file, root);
+    pvw->Trace(file);
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVSelectWidget::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSelectWidget::Reset(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::ResetInternal(const char* sourceTclName)
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
@@ -292,18 +278,13 @@ void vtkPVSelectWidget::Reset(const char* sourceTclName)
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
-    pvw->Reset(sourceTclName);
+    pvw->ResetInternal(sourceTclName);
     }
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVSelectWidget::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetCurrentValue(const char *val)
 {
   int idx;
@@ -317,7 +298,7 @@ void vtkPVSelectWidget::SetCurrentValue(const char *val)
   this->SetCurrentIndex(idx);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVSelectWidget::GetCurrentValue()
 {
   return this->Menu->GetValue();
@@ -362,13 +343,13 @@ const char* vtkPVSelectWidget::GetVTKValue(int index)
   return 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVSelectWidget::GetCurrentVTKValue()
 {
   return this->GetVTKValue(this->CurrentIndex);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw, 
                                 const char* vtkVal)
 {
@@ -403,7 +384,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
   pvw->SetTraceReferenceCommand(str);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget *vtkPVSelectWidget::GetPVWidget(const char* label)
 {
   int idx;
@@ -412,7 +393,7 @@ vtkPVWidget *vtkPVSelectWidget::GetPVWidget(const char* label)
   return (vtkPVWidget*)(this->Widgets->GetItemAsObject(idx));
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::MenuCallback()
 {
   int idx;
@@ -427,7 +408,7 @@ void vtkPVSelectWidget::MenuCallback()
   this->SetCurrentIndex(idx);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVSelectWidget::FindIndex(const char* str, vtkStringList *list)
 {
   int idx, num;
@@ -451,7 +432,7 @@ int vtkPVSelectWidget::FindIndex(const char* str, vtkStringList *list)
   return -1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetCurrentIndex(int idx)
 {
   vtkPVWidget *pvw;
@@ -473,13 +454,13 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   // Pack the new widget.
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
-  pvw->Reset(this->ObjectTclName);
+  pvw->Reset();
   pvw->Select();
 
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
   vtkPVWidget *pvw;
@@ -490,7 +471,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
   this->Superclass::SaveInBatchScript(file);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file, 
                                                  const char* sourceTclName)
 {
@@ -503,7 +484,7 @@ void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSelectWidget* vtkPVSelectWidget::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -511,7 +492,7 @@ vtkPVSelectWidget* vtkPVSelectWidget::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVSelectWidget::SafeDownCast(clone);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -564,7 +545,7 @@ vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
   return pvWidget;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone, 
                                        vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -582,7 +563,7 @@ void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Select()
 {
   vtkPVWidget *pvw;
@@ -593,7 +574,7 @@ void vtkPVSelectWidget::Select()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Deselect()
 {
   vtkPVWidget *pvw;
@@ -604,7 +585,7 @@ void vtkPVSelectWidget::Deselect()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                          vtkPVXMLPackageParser* parser)
 {
@@ -659,13 +640,13 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget *vtkPVSelectWidget::GetFrame() 
 {
   return this->LabeledFrame->GetFrame();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSelectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

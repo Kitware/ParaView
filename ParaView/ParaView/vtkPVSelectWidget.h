@@ -92,18 +92,6 @@ public:
   void SetLabel(const char *label);
 
   // Description:
-  // Called when accept button is pushed.
-  // Adds to the trace file and sets the objects variable from UI.
-  virtual void Accept();
-  virtual void Accept(const char* sourceTclName);
-
-  // Description:
-  // Called when reset button is pushed.
-  // Sets UI current value from objects variable.
-  virtual void Reset();
-  virtual void Reset(const char* sourceTclName);
-
-  // Description:
   // Looks at children to determine modified state.
   virtual int GetModifiedFlag();
 
@@ -168,12 +156,23 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
+  // Called when accept button is pushed.
+  // Sets the objects variable from UI.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // Called when reset button is pushed.
+  // Sets UI current value from objects variable.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
+
 
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);

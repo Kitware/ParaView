@@ -53,11 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkStringList.h"
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.30");
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVVectorEntry);
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.31");
+
+//-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
 {
   this->LabelWidget  = vtkKWLabel::New();
@@ -80,7 +81,7 @@ vtkPVVectorEntry::vtkPVVectorEntry()
     }
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVVectorEntry::~vtkPVVectorEntry()
 {
   this->Entries->Delete();
@@ -161,7 +162,7 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
     }
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
@@ -237,7 +238,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 {
   int found = 0;
@@ -283,19 +284,12 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
     }
 }
 
-//---------------------------------------------------------------------------
-void vtkPVVectorEntry::Accept(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkKWEntry *entry;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
   char acceptCmd[1024];
-
-  // Start the trace entry and the accept command.
-  if (traceFile && this->InitializeTrace())
-    {
-    this->Trace(traceFile, "kw");
-    }
 
   sprintf(acceptCmd, "%s Set%s ", sourceTclName, this->VariableName);
 
@@ -311,13 +305,17 @@ void vtkPVVectorEntry::Accept(const char* sourceTclName)
   this->ModifiedFlag = 0;  
 }
 
-//---------------------------------------------------------------------------
-void vtkPVVectorEntry::Trace(ofstream *file, const char* root)
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::Trace(ofstream *file)
 {
   vtkKWEntry *entry;
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
-  *file << "$" << root << "(" << this->GetTclName() << ") SetValue";
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetValue";
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
@@ -330,8 +328,8 @@ void vtkPVVectorEntry::Trace(ofstream *file, const char* root)
 
 
 
-//---------------------------------------------------------------------------
-void vtkPVVectorEntry::Reset(const char* sourceTclName)
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
 {
   int count = 0;
 
@@ -351,74 +349,7 @@ void vtkPVVectorEntry::Reset(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-//---------------------------------------------------------------------------
-void vtkPVVectorEntry::Accept()
-{
-  vtkKWEntry *entry;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
-  char acceptCmd[1024];
-
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
-  // Start the trace entry and the accept command.
-  if (traceFile && this->InitializeTrace())
-    {
-    traceFlag = 1;
-    }
-
-  if (traceFlag)
-    {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetValue";
-    }
-  sprintf(acceptCmd, "%s Set%s ", this->ObjectTclName, this->VariableName);
-
-  // finish all the arguments for the trace file and the accept command.
-  this->Entries->InitTraversal();
-  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
-    {
-    if (traceFlag)
-      {
-      *traceFile << " " << entry->GetValue();
-      }
-    strcat(acceptCmd, entry->GetValue());
-    strcat(acceptCmd, " ");
-    }
-  if (traceFlag)
-    {
-    *traceFile << endl;
-    }
-  pvApp->BroadcastScript(acceptCmd);
-
-  this->ModifiedFlag = 0;  
-}
-
-//---------------------------------------------------------------------------
-void vtkPVVectorEntry::Reset()
-{
-  int count = 0;
-
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
-  // Set each entry to the appropriate value.
-  for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
-    {
-    this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
-                 this->GetTclName(), count, this->ObjectTclName, 
-                 this->VariableName, count); 
-    }
-
-  this->ModifiedFlag = 0;
-}
-
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
 {
   if ( index < 0 || index >= this->Entries->GetNumberOfItems() )
@@ -433,7 +364,7 @@ void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
   this->EntryValues[index] = vtkString::Duplicate(value);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
 {
   if (idx > this->SubLabels->GetNumberOfItems())
@@ -443,7 +374,7 @@ vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
   return ((vtkKWLabel*)this->SubLabels->GetItemAsObject(idx));
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
 {
   if (idx > this->Entries->GetNumberOfItems())
@@ -453,7 +384,7 @@ vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
   return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char** values, int num)
 {
   int idx;
@@ -477,7 +408,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
   this->ModifiedCallback();
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(float* values, int num)
 {
   int idx;
@@ -501,7 +432,7 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
   this->ModifiedCallback();
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::GetValue(float *values, int num)
 {
   int idx;
@@ -519,7 +450,7 @@ void vtkPVVectorEntry::GetValue(float *values, int num)
     }
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0)
 {
   char* vals[1];
@@ -527,7 +458,7 @@ void vtkPVVectorEntry::SetValue(char *v0)
   this->SetValue(vals, 1);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1)
 {
   char* vals[2];
@@ -536,7 +467,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1)
   this->SetValue(vals, 2);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2)
 {
   char* vals[3];
@@ -546,7 +477,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2)
   this->SetValue(vals, 3);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3)
 {
   char* vals[4];
@@ -557,7 +488,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3)
   this->SetValue(vals, 4);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4)
 {
   char* vals[5];
@@ -569,7 +500,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4
   this->SetValue(vals, 5);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, 
                                 char *v3, char *v4, char *v5)
 {
@@ -583,7 +514,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
   this->SetValue(vals, 6);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
                                                 const char* sourceTclName)
 {
@@ -597,7 +528,7 @@ void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file,
   *file << " " << this->ScriptValue << "\n";
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                  vtkPVAnimationInterface *ai)
 {
@@ -606,16 +537,16 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   if (this->Entries->GetNumberOfItems() == 1)
     {
     sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-    menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0, "");
+    menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 {
   char script[500];
   
-  if (ai->InitializeTrace())
+  if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
@@ -639,7 +570,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
   // What if there are more than one entry?
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -683,7 +614,7 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {

@@ -45,6 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // represents a VTK object's variable.  It has ivars for the VTK objects
 // name and its variable name.  The Reset and Accept commands can format
 // scripts from these variables.  The name of this class may not be the best.
+// .NOTE
+// Since we have created the AcceptInternal method that has the object tcl
+// name as an argument, many classes do not need this superclass or
+// use its ivar ObjectTclName.  I have not removed the class because I believe
+// some widgets use this class when the object is a PV object and not a VTK object.
+// I will have to clean this up later
+
+//!!!!!!!!!!!!!!
 
 #ifndef __vtkPVObjectWidget_h
 #define __vtkPVObjectWidget_h

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.15");
+vtkCxxRevisionMacro(vtkPVScale, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -188,20 +188,14 @@ void vtkPVScale::SetValue(float val)
 
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Accept()
+void vtkPVScale::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag)
-    {  
-    this->AddTraceEntry("$kw(%s) SetValue %f", this->GetTclName(), 
-                         this->Scale->GetValue());
-    }
-
-  if (this->ObjectTclName && this->VariableName)
+  if (sourceTclName && this->VariableName)
     {
     pvApp->BroadcastScript("%s Set%s %d", 
-                           this->ObjectTclName,
+                           sourceTclName,
                            this->VariableName, 
                            this->GetValue());
     }
@@ -210,22 +204,22 @@ void vtkPVScale::Accept()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVScale::Trace(ofstream *file, const char* root)
+void vtkPVScale::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetValue "
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetValue "
         << this->Scale->GetValue() << endl;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Reset()
+void vtkPVScale::ResetInternal(const char* sourceTclName)
 {
-  if ( ! this->ModifiedFlag)
-    {  
-    return;
-    }
-
-  if (this->ObjectTclName && this->VariableName)
+  if (sourceTclName && this->VariableName)
     {
     this->Script("%s SetValue [%s Get%s]", this->Scale->GetTclName(),
                   this->ObjectTclName, this->VariableName);
@@ -234,6 +228,7 @@ void vtkPVScale::Reset()
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVScale* vtkPVScale::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -241,6 +236,7 @@ vtkPVScale* vtkPVScale::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVScale::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

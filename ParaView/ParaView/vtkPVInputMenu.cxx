@@ -60,15 +60,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.39");
-vtkCxxSetObjectMacro(vtkPVInputMenu,InputProperty,vtkPVInputProperty);
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.40");
 
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
 {
   this->InputName = NULL;
-  this->InputProperty = NULL;
   this->Sources = NULL;
   this->CurrentValue = NULL;
 
@@ -80,7 +78,6 @@ vtkPVInputMenu::vtkPVInputMenu()
 vtkPVInputMenu::~vtkPVInputMenu()
 {
   this->SetInputName(NULL);
-  this->SetInputProperty(NULL);
   this->Sources = NULL;
 
   this->Label->Delete();
@@ -337,16 +334,11 @@ int vtkPVInputMenu::GetPVInputIndex()
 //----------------------------------------------------------------------------
 vtkPVInputProperty* vtkPVInputMenu::GetInputProperty()
 {
-  if (this->InputProperty == NULL)
-    {
-    this->SetInputProperty(this->PVSource->GetInputProperty(this->InputName));
-    }
-
-  return this->InputProperty; 
+  return this->PVSource->GetInputProperty(this->InputName);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Accept(const char* sourceTclName)
+void vtkPVInputMenu::AcceptInternal(const char* sourceTclName)
 {
   // Since this is done on PVSource and not vtk source,
   // We can ignore the sourceTclName and return after the first call.
@@ -365,20 +357,11 @@ void vtkPVInputMenu::Accept(const char* sourceTclName)
     this->Script("%s SetPVInput %d %s", this->PVSource->GetTclName(), 
                  this->GetPVInputIndex(),
                  this->CurrentValue->GetPVOutput()->GetTclName());
-    if (this->CurrentValue->InitializeTrace())
-      {
-      // I could use the trace method ....
-      this->AddTraceEntry("$kw(%s) SetCurrentValue $kw(%s)", 
-                           this->GetTclName(), 
-                           this->CurrentValue->GetTclName());
-      }
     }
   else
     {
     this->Script("%s SetPVInput %d {}", this->PVSource->GetTclName(), 
                  this->GetPVInputIndex());
-    this->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
-                         this->GetTclName());
     }
 
   // ??? used to be set to one ???
@@ -387,16 +370,21 @@ void vtkPVInputMenu::Accept(const char* sourceTclName)
 
 
 //---------------------------------------------------------------------------
-void vtkPVInputMenu::Trace(ofstream *file, const char* root)
+void vtkPVInputMenu::Trace(ofstream *file)
 {
-  if (this->CurrentValue)
+  if ( ! this->InitializeTrace(file))
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
-          << "$" << root << "(" << this->CurrentValue->GetTclName() << ")\n";
+    return;
+    }
+
+  if (this->CurrentValue && this->CurrentValue->InitializeTrace(file))
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetCurrentValue "
+          << "$kw(" << this->CurrentValue->GetTclName() << ")\n";
     }
   else
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetCurrentValue "
+    *file << "$kw(" << this->GetTclName() << ") SetCurrentValue "
           << "{}\n";
     }
 }
@@ -404,7 +392,7 @@ void vtkPVInputMenu::Trace(ofstream *file, const char* root)
 
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Reset(const char* sourceTclName)
+void vtkPVInputMenu::ResetInternal(const char* sourceTclName)
 {
   if (this->PVSource == NULL)
     {

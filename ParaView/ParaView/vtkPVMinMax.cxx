@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.17");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -275,17 +275,9 @@ void vtkPVMinMax::SetMaxValue(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Accept(const char* sourceTclName)
+void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {  
-    this->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
-                         this->MaxScale->GetValue());
-    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
-                         this->MinScale->GetValue());
-    }
 
   pvApp->BroadcastScript("%s %s %f %f",
                          sourceTclName, this->SetCommand,
@@ -294,31 +286,24 @@ void vtkPVMinMax::Accept(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVMinMax::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
 //---------------------------------------------------------------------------
-void vtkPVMinMax::Trace(ofstream *file, const char* root)
+void vtkPVMinMax::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetMaxValue "
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  *file << "$kw(" << this->GetTclName() << ") SetMaxValue "
         << this->MaxScale->GetValue() << endl;
-  *file << "$" << root << "(" << this->GetTclName() << ") SetMinValue "
+  *file << "$kw(" << this->GetTclName() << ") SetMinValue "
         << this->MinScale->GetValue() << endl;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Reset(const char* sourceTclName)
+void vtkPVMinMax::ResetInternal(const char* sourceTclName)
 {
-  if (this->SuppressReset)
-    {
-    return;
-    }
-
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
@@ -330,11 +315,6 @@ void vtkPVMinMax::Reset(const char* sourceTclName)
   this->ModifiedFlag = 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVMinMax::Reset()
-{
-  this->Reset(this->ObjectTclName);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Update()
@@ -376,7 +356,7 @@ void vtkPVMinMax::Update()
     }
 
   // Find the place value resolution.
-  int place = (int)(log10((double)(range[1]-range[2])) - 1.5);
+  int place = (int)(floor(log10((double)(range[1]-range[2])) - 1.5));
   double resolution = pow(10.0, (double)(place));
   // Now find the range at resolution values.
   range[0] = (float)(floor((double)(range[0]) / resolution) * resolution);

@@ -79,16 +79,6 @@ public:
   const char *GetLabel();
 
   // Description:
-  // Called when accept button is pushed.
-  // Adds to the trace file and sets the objects variable from UI.
-  virtual void Accept();
-
-  // Description:
-  // Called when reset button is pushed.
-  // Sets UI current value from objects variable.
-  virtual void Reset();
-
-  // Description:
   // This is how the user can query the state of the selection.
   // Warning:  Setting the current value will not change vtk ivar.
   vtkGetMacro(CurrentValue, int);
@@ -125,8 +115,18 @@ public:
 //ETX
 
   // Description:
+  // Called when accept button is pushed.
+  // Sets the objects variable from UI.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // Called when reset button is pushed.
+  // Sets UI current value from objects variable.
+  virtual void ResetInternal(const char* sourceTclName);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVSelectionList();

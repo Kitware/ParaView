@@ -78,17 +78,6 @@ public:
   void NormalZCallback();
 
   // Description:
-  // Called when the PVSources reset button is called.
-  virtual void Reset();
-  virtual void Reset(const char* sourceTclName);
-    
-  // Description:
-  // Called when the PVSources accept button is called.
-  // It can also puts an entry in the trace file.
-  virtual void Accept();
-  virtual void Accept(const char* sourceTclName);
-
-  // Description:
   // The Tcl name of the VTK implicit plane.
   vtkGetStringMacro(PlaneTclName);
 
@@ -124,17 +113,26 @@ public:
   // One plane object is create for all parts.
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
-
   // Description: 
   // Called when the input chages (before accept).
   virtual void Update();
 
+  // Description:
+  // Called when the PVSources reset button is called.
+  virtual void ResetInternal(const char* sourceTclName);
+    
+  // Description:
+  // Called when the PVSources accept button is called.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Description:
+  // This serves a dual purpose.  For tracing and for saving state.
+  virtual void Trace(ofstream *file);
+
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
+
 
   // Description:
   // Call creation on the child.

@@ -59,13 +59,6 @@ public:
   vtkTypeRevisionMacro(vtkPVDataSetFileEntry, vtkPVFileEntry);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept(const char* sourceTclName);
-  virtual void Accept();
-
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -81,6 +74,11 @@ protected:
   vtkPVDataSetFileEntry();
   ~vtkPVDataSetFileEntry();
   
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
+  virtual void AcceptInternal(const char* sourceTclName);
+
   vtkPDataSetReader *TypeReader;
   int Type;
 

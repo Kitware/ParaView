@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.13");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -136,7 +136,7 @@ int vtkPVContainerWidget::GetModifiedFlag()
 
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::Accept(const char* sourceTclName)
+void vtkPVContainerWidget::AcceptInternal(const char* sourceTclName)
 {
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
@@ -146,36 +146,34 @@ void vtkPVContainerWidget::Accept(const char* sourceTclName)
     it->GetData(widget);
     if (widget)
       {
-      widget->Accept(sourceTclName);
+      widget->AcceptInternal(sourceTclName);
       }
     it->GoToNextItem();
     }
   it->Delete();
 
   this->ModifiedFlag = 0;
-}
-//----------------------------------------------------------------------------
-void vtkPVContainerWidget::Accept()
-{
-  vtkErrorMacro("Accept requires a source name.");
 }
 
 //---------------------------------------------------------------------------
-void vtkPVContainerWidget::Trace(ofstream *file, const char* root)
+void vtkPVContainerWidget::Trace(ofstream *file)
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkLinkedListIterator<vtkPVWidget*>* it;
   vtkPVWidget* widget;
+
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
+
+  it = this->Widgets->NewIterator();
   while ( !it->IsDoneWithTraversal() )
     {
     widget = 0;
     it->GetData(widget);
     if (widget)
       {
-      *file << "set " << root << "(" << widget->GetTclName() << ") "
-            << "[$" << root << "(" << this->GetTclName() << ") "
-            << "GetPVWidget {" << widget->GetTraceName() << "}]" << endl;
-
-      widget->Trace(file, root);
+      widget->Trace(file);
       }
     it->GoToNextItem();
     }
@@ -184,7 +182,7 @@ void vtkPVContainerWidget::Trace(ofstream *file, const char* root)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::Reset(const char* sourceTclName)
+void vtkPVContainerWidget::ResetInternal(const char* sourceTclName)
 {
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
@@ -195,18 +193,13 @@ void vtkPVContainerWidget::Reset(const char* sourceTclName)
     it->GetData(widget);
     if (widget)
       {
-      widget->Reset(sourceTclName);
+      widget->ResetInternal(sourceTclName);
       }
     it->GoToNextItem();
     }
   it->Delete();
 
   this->ModifiedFlag = 0;
-}
-//----------------------------------------------------------------------------
-void vtkPVContainerWidget::Reset()
-{
-  vtkErrorMacro("Reset requires a source name.");
 }
 
 //----------------------------------------------------------------------------

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPushButton);
-vtkCxxRevisionMacro(vtkPVPushButton, "1.7");
+vtkCxxRevisionMacro(vtkPVPushButton, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVPushButton::vtkPVPushButton()
@@ -145,17 +145,6 @@ void vtkPVPushButton::Create(vtkKWApplication *pvApp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPushButton::Accept()
-{
-  this->ModifiedFlag = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPushButton::Reset()
-{
-  this->ModifiedFlag = 0;
-}
-
 vtkPVPushButton* vtkPVPushButton::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -163,6 +152,7 @@ vtkPVPushButton* vtkPVPushButton::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVPushButton::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPushButton::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -170,12 +160,6 @@ void vtkPVPushButton::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVPushButton* pvs = vtkPVPushButton::SafeDownCast(clone);
   if (pvs)
     {
-    /*
-    float min, max;
-    this->Scale->GetRange(min, max);
-    pvs->SetRange(min, max);
-    pvs->SetResolution(this->Scale->GetResolution());
-    */
     pvs->SetLabel(this->EntryLabel);
     }
   else 

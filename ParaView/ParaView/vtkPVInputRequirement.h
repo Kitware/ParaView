@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVData;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
+class vtkPVDataSetAttributesInformation;
 class vtkPVSource;
 
 #include "vtkObject.h"
@@ -69,6 +70,12 @@ public:
   // The pvSource pointer is only used by one requirement so far.
   // vtkDataToDataSetFilters cannot change input types.
   virtual int GetIsValidInput(vtkPVData *pvd, vtkPVSource *pvs);
+
+  // Description:
+  // This are used by the field menu to determine is a field
+  // should be selectable.
+  virtual int GetIsValidField(int field, 
+                              vtkPVDataSetAttributesInformation* info);
 
   // Description:
   // Called by vtkPVXMLPackageParser to configure the widget from XML

@@ -224,13 +224,13 @@ public:
   vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
 
   // Description:
-  // Save the renderer and render window to a file.
-  // The "vtkFlag" argument is only set when regression testing.
-  // It causes the actors to b e added to the ParaView renderer. 
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
   virtual void SaveInBatchScript(ofstream *file);
-  // SaveState is similar to save batch in its recursive traversal
-  // of the sources.  It is similar to trace for widgets.
-  // After it is completed, I will try to share code ...
+
+  // Description:
+  // Saves the pipeline in a ParaView script.  This is similar
+  // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);
 
   // Description:

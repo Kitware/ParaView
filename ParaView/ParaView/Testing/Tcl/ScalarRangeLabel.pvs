@@ -69,6 +69,10 @@ $kw(vtkTemp277) RemoveAllValues
 $kw(vtkTemp277) AddValue 5.000000
 $kw(vtkTemp267) AcceptCallback
 
+set kw(vtkTemp1254) [$kw(vtkTemp267) GetPVOutput]
+$kw(vtkTemp1254) ColorByProperty
+
+
 puts $fp [$ScalarRangeLabel GetRange]
 
 set kw(vtkTemp273) [$kw(vtkTemp267) GetPVWidget {Input}]

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.8");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -67,7 +67,7 @@ vtkPVDataSetFileEntry::~vtkPVDataSetFileEntry()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetFileEntry::Accept(const char* sourceTclName)
+void vtkPVDataSetFileEntry::AcceptInternal(const char* sourceTclName)
 {
   int newType;
 
@@ -78,7 +78,7 @@ void vtkPVDataSetFileEntry::Accept(const char* sourceTclName)
     {
     this->GetPVApplication()->GetMainWindow()->WarningMessage(
       "Could not read file.");
-    this->Reset();
+    this->ResetInternal(sourceTclName);
     return;
     }
   if (this->Type == -1)
@@ -89,21 +89,15 @@ void vtkPVDataSetFileEntry::Accept(const char* sourceTclName)
     {
     this->GetPVApplication()->GetMainWindow()->WarningMessage(
       "Output type does not match previous file.");
-    this->Reset();
+    this->ResetInternal(sourceTclName);
     return;
     }
 
-  this->vtkPVFileEntry::Accept(sourceTclName);
+  this->vtkPVFileEntry::AcceptInternal(sourceTclName);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetFileEntry::Accept()
-{
-  this->Accept(this->ObjectTclName);
-}
-
-
 vtkPVDataSetFileEntry* vtkPVDataSetFileEntry::ClonePrototype(
   vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

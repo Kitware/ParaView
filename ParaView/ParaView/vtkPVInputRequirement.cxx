@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputRequirement);
-vtkCxxRevisionMacro(vtkPVInputRequirement, "1.1");
+vtkCxxRevisionMacro(vtkPVInputRequirement, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,15 @@ int vtkPVInputRequirement::GetIsValidInput(vtkPVData*, vtkPVSource*)
 
   return 0;
 }
+
+//----------------------------------------------------------------------------
+int vtkPVInputRequirement::GetIsValidField(int field, 
+                                 vtkPVDataSetAttributesInformation* fieldInfo)
+{
+  // Assume most requirements do not concern arrays.
+  return 1;
+}
+
 
 
 //----------------------------------------------------------------------------

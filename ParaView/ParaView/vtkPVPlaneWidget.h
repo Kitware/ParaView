@@ -66,15 +66,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Called when the PVSources reset button is called.
-  virtual void Reset();
-    
-  // Description:
-  // Called when the PVSources accept button is called.
-  // It can also puts an entry in the trace file.
-  virtual void Accept();
-
-  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 

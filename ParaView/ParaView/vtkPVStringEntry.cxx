@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.17");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -180,23 +180,11 @@ void vtkPVStringEntry::SetValue(const char* fileName)
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVStringEntry::Accept()
-{
-  // We could use PVSource here to loop through all of the correct sources.
-  this->Accept(this->ObjectTclName);
-}
   
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::Accept(const char* sourceTclName)
+void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ModifiedFlag)
-    {
-    this->AddTraceEntry("$kw(%s) SetValue {%s}", this->GetTclName(), 
-                         this->GetValue());
-    }
 
   pvApp->BroadcastScript("%s Set%s {%s}",
                          sourceTclName, this->VariableName,
@@ -206,21 +194,18 @@ void vtkPVStringEntry::Accept(const char* sourceTclName)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVStringEntry::Trace(ofstream *file, const char* root)
+void vtkPVStringEntry::Trace(ofstream *file)
 {
-  *file << "$" << root << "(" << this->GetTclName() << ") SetValue {"
-        << this->GetValue() << "}" << endl;
+  if (this->InitializeTrace(file))
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetValue {"
+          << this->GetValue() << "}" << endl;
+    }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVStringEntry::Reset()
-{
-  // We could use PVSource here to loop through all of the correct sources.
-  this->Reset(this->ObjectTclName);
-}
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::Reset(const char* sourceTclName)
+void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {

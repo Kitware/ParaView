@@ -124,16 +124,16 @@ static unsigned char image_goto_end[] =
   "v7G98xNy/55lvJB3FlnEo7fbagas9Yv+4O9dh3laGw==";
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.34");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
 int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVAnimationInterface::vtkPVAnimationInterface()
 {
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
@@ -200,7 +200,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->ControlledWidget = NULL;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVAnimationInterface::~vtkPVAnimationInterface()
 {
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
@@ -320,7 +320,7 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
   this->SetWindow(NULL);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 {  
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
@@ -686,7 +686,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->UpdateInterface();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateInterface()
 {
   if (this->PlayButton && this->PlayButton->IsCreated())
@@ -798,7 +798,7 @@ void vtkPVAnimationInterface::UpdateInterface()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeStart(float t)
 {
   if (this->TimeStart == t)
@@ -822,13 +822,13 @@ void vtkPVAnimationInterface::SetTimeStart(float t)
                       this->GetTclName(), this->TimeStart);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeStartEntryCallback()
 {
   this->SetTimeStart(this->TimeStartEntry->GetValueAsFloat());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeEnd(float t)
 {
   if (this->TimeEnd == t)
@@ -852,13 +852,13 @@ void vtkPVAnimationInterface::SetTimeEnd(float t)
                       this->GetTclName(), this->TimeEnd);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeEndEntryCallback()
 {
   this->SetTimeEnd(this->TimeEndEntry->GetValueAsFloat());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeStep(float t)
 {
   if (this->TimeStep == t)
@@ -882,13 +882,13 @@ void vtkPVAnimationInterface::SetTimeStep(float t)
                       this->GetTclName(), this->TimeStep);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeStepEntryCallback()
 {
   this->SetTimeStep(this->TimeStepEntry->GetValueAsFloat());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::EntryCallback()
 {
   this->TimeStartEntryCallback();
@@ -896,7 +896,7 @@ void vtkPVAnimationInterface::EntryCallback()
   this->TimeStepEntryCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetLoop(int v)
 {
   if (this->Loop == v)
@@ -910,13 +910,13 @@ void vtkPVAnimationInterface::SetLoop(int v)
                       this->GetTclName(), this->GetLoop());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::LoopCheckButtonCallback()
 {
   this->SetLoop(this->LoopCheckButton->GetState());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::ScriptCheckButtonCallback()
 {
   if (this->ScriptCheckButton->GetState())
@@ -935,7 +935,7 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetScriptCheckButtonState(int val)
 {
   if (this->ScriptCheckButton->GetState() == val)
@@ -947,7 +947,7 @@ void vtkPVAnimationInterface::SetScriptCheckButtonState(int val)
   this->ScriptCheckButtonCallback();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Actually does the work.
 void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
 {
@@ -973,7 +973,7 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
     //source->Register(this);
     this->PVSource = source;
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
-    if (source->InitializeTrace())
+    if (source->InitializeTrace(NULL))
       {
       this->AddTraceEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
                           source->GetTclName());
@@ -988,13 +988,13 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
   this->UpdateMethodMenu();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 float vtkPVAnimationInterface::GetCurrentTime()
 {
   return this->TimeScale->GetValue();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetCurrentTime(float time)
 {  
   this->TimeScale->SetValue(time);
@@ -1025,13 +1025,13 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeScaleCallback()
 {
   this->SetCurrentTime(this->TimeScale->GetValue());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Play()
 {  
   // If playing, do not do anything
@@ -1101,25 +1101,25 @@ void vtkPVAnimationInterface::Play()
   this->UnRegister(this);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Stop()
 {  
   this->StopFlag = 1;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToBeginning()
 {  
   this->SetCurrentTime(this->GetTimeStart());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToEnd()
 {  
   this->SetCurrentTime(this->GetTimeEnd());
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateSourceMenu()
 {
   char methodAndArgString[1024];
@@ -1158,7 +1158,7 @@ void vtkPVAnimationInterface::UpdateSourceMenu()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::ScriptEditorCallback()
 {
   // If some one is typing in the script editor, then the method
@@ -1166,14 +1166,14 @@ void vtkPVAnimationInterface::ScriptEditorCallback()
   this->MethodMenuButton->SetButtonText("None");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetScript(const char* script)
 {
   this->ScriptEditor->SetValue(script);
   this->MethodMenuButton->SetButtonText("None");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
                                                 const char* script)
 {
@@ -1189,13 +1189,13 @@ void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
   //  }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVAnimationInterface::GetScript()
 {
   return this->ScriptEditor->GetValue();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateMethodMenu()
 {
   vtkPVWidgetCollection *pvWidgets;
@@ -1218,19 +1218,19 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
 {
   this->Window = window;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 {
   this->View = renderView;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* fileRoot,
                                                 const char* extension,
@@ -1292,7 +1292,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1305,3 +1305,8 @@ void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "View: " << this->GetView();
   os << indent << "Window: " << this->GetWindow();
 }
+
+
+
+
+

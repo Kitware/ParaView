@@ -59,7 +59,7 @@ class vtkKWWidget;
 class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkPVInputMenu;
-class vtkPVLabeledToggle;
+class vtkPVInputProperty;
 class vtkPVDataSetAttributesInformation;
 
 class VTK_EXPORT vtkPVFieldMenu : public vtkPVWidget
@@ -130,6 +130,9 @@ protected:
   vtkKWOptionMenu* FieldMenu;
   vtkPVInputMenu* InputMenu;
 
+  // Description:
+  // The property filters the allowable values of this menu..
+  vtkPVInputProperty* GetInputProperty();
 
   int Value;
 
@@ -139,8 +142,6 @@ protected:
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-
-  int CheckField(vtkPVDataSetAttributesInformation* info);
 
   vtkPVFieldMenu(const vtkPVFieldMenu&); // Not implemented
   void operator=(const vtkPVFieldMenu&); // Not implemented

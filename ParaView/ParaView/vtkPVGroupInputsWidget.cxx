@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.3");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -136,20 +136,8 @@ void vtkPVGroupInputsWidget::Inactivate()
     }
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Accept()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Accept(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Accept(const char* vtkSourceTclName)
+void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
 {
   int numParts, partIdx;
   int num, idx, count;
@@ -169,10 +157,9 @@ void vtkPVGroupInputsWidget::Accept(const char* vtkSourceTclName)
 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag && this->InitializeTrace())
+  if (this->ModifiedFlag)
     {
     this->Inactivate();
-    this->Trace(pvApp->GetTraceFile(), "kw");
     }
 
   // Now loop through the input mask setting the selection states.
@@ -217,31 +204,25 @@ void vtkPVGroupInputsWidget::SetSelectState(int idx, int val)
 
 
 //---------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Trace(ofstream *file, const char* root)
+void vtkPVGroupInputsWidget::Trace(ofstream *file)
 {
   int idx, num;
+
+  if ( ! this->InitializeTrace(file))
+    {
+    return;
+    }
 
   num = this->PartSelectionList->GetNumberOfItems();
   for (idx = 0; idx < num; ++idx)
     {
-    *file << "$" << root << "(" << this->GetTclName() << ") SetSelectState "
+    *file << "$kw(" << this->GetTclName() << ") SetSelectState "
           << idx << " " << this->PartSelectionList->GetSelectState(idx) << endl;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Reset()
-{
-  int num, idx;
-  num = this->PVSource->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++idx)
-    {
-    this->Reset(this->PVSource->GetVTKSourceTclName(idx));
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Reset(const char* vtkSourceTclName)
+void vtkPVGroupInputsWidget::ResetInternal(const char* vtkSourceTclName)
 {
   int idx;
   vtkPVWindow *pvWin;

@@ -66,10 +66,10 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 
 #endif
 
-//----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.29");
+//-----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkPVWidget, "1.30");
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
   this->ModifiedCommandObjectTclName = NULL;
@@ -88,7 +88,7 @@ vtkPVWidget::vtkPVWidget()
   this->SuppressReset = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
   this->SetModifiedCommandObjectTclName(NULL);
@@ -100,38 +100,8 @@ vtkPVWidget::~vtkPVWidget()
   this->Dependents = NULL;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWidget::Accept(const char* sourceTclName)
-{
-  //vtkErrorMacro("Multi source Accept not defined. " << this->GetClassName());
-  this->Accept();
-  this->SuppressReset = 0;
-}
 
-//----------------------------------------------------------------------------
-void vtkPVWidget::Reset(const char* sourceTclName)
-{
-  if (this->SuppressReset)
-    {
-    return;
-    }
-
-  this->Update();
-  // We want the modifiedCallbacks to occur before we reset this flag.
-  this->Script("update");
-  this->ModifiedFlag = 0;
-}
-
-//----------------------------------------------------------------------------
-// I have to think how to get rid of this method.
-void vtkPVWidget::Reset()
-{
-  vtkErrorMacro("Reset called with no source Tcl name." << this->GetClassName());
-  this->Reset(NULL);
-}
-
-
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
                                      const char* methodAndArgs)
 {
@@ -139,7 +109,7 @@ void vtkPVWidget::SetModifiedCommand(const char* cmdObject,
   this->SetModifiedCommandMethod(methodAndArgs);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SetAcceptedCommand(const char* cmdObject, 
                                      const char* methodAndArgs)
 {
@@ -147,13 +117,86 @@ void vtkPVWidget::SetAcceptedCommand(const char* cmdObject,
   this->SetAcceptedCommandMethod(methodAndArgs);
 }
 
-//----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 void vtkPVWidget::Accept()
 {
-  this->ModifiedFlag = 0;
+  int num, idx;
+
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("Superclass expect PVSource to be set. " 
+                  << this->GetClassName());
+    return;
+    }
+
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (this->GetModifiedFlag())
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->AcceptInternal(this->PVSource->GetVTKSourceTclName(idx));
+    }
+
+  // Suppress reset just allows the widget to set its own default value.
+  // After accept is called, we want to enable the reset.
+  this->SuppressReset = 0;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void vtkPVWidget::AcceptInternal(const char*)
+{
+  // Get rid of this eventually.  Display widgets (label) do not really
+  // need to implement this method.
+  //vtkErrorMacro("AcceptInternal not defined. " << this->GetClassName());
+}
+
+//-----------------------------------------------------------------------------
+// I have to think how to get rid of this method.
+void vtkPVWidget::Reset()
+{
+  if (this->SuppressReset)
+    {
+    return;
+    }
+
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("Superclass expect PVSource to be set. " 
+                  << this->GetClassName());
+    return;
+    }
+
+  if (this->PVSource->GetNumberOfVTKSources() < 1)
+    {
+    return;
+    }
+  this->ResetInternal(this->PVSource->GetVTKSourceTclName(0));
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWidget::ResetInternal(const char*)
+{
+  // Get rid of this eventually.  Display widgets (label) do not really
+  // need to implement this method.
+  //vtkErrorMacro("ResetInternal not defined. " << this->GetClassName());
+}
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
 void vtkPVWidget::Update()
 {
   vtkLinkedListIterator<void*>* it = this->Dependents->NewIterator();
@@ -169,7 +212,7 @@ void vtkPVWidget::Update()
   it->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::AddDependent(vtkPVWidget *pvw)
 {
   this->Dependents->AppendItem(pvw);  
@@ -190,7 +233,7 @@ void vtkPVWidget::RemoveAllDependents()
   this->Dependents->RemoveAllItems();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::ModifiedCallback()
 {
   this->ModifiedFlag = 1;
@@ -202,7 +245,7 @@ void vtkPVWidget::ModifiedCallback()
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::AcceptedCallback()
 {
   if (this->AcceptedCommandObjectTclName && this->AcceptedCommandMethod)
@@ -217,7 +260,7 @@ vtkPVApplication *vtkPVWidget::GetPVApplication()
   return vtkPVApplication::SafeDownCast(this->Application);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SaveInBatchScript(ofstream *file)
 {
   if (this->PVSource == NULL)
@@ -234,14 +277,14 @@ void vtkPVWidget::SaveInBatchScript(ofstream *file)
                   this->PVSource->GetVTKSourceTclName(sourceIdx));
     }
 }
-//----------------------------------------------------------------------------
-//void vtkPVWidget::Trace(ofstream *, const char* )
-//{
-//  vtkErrorMacro("Trace not define for widget " << this->GetClassName());
-//}
 
+//-----------------------------------------------------------------------------
+void vtkPVWidget::SaveState(ofstream *file)
+{
+  this->Trace(file);
+}
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
 {
   // Either SaveInBatchScript or SaveInBatchScriptForPart
@@ -250,7 +293,7 @@ void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
 }
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -275,7 +318,7 @@ vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
   return pvWidget;
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -326,13 +369,13 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                             "SetAcceptButtonColorToRed");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 static int vtkPVWidgetIsSpace(char c)
 {
   return isspace(c);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                    vtkPVXMLPackageParser* parser)
 {
@@ -382,34 +425,34 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::SerializeSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeSelf(os, indent);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
                                                 vtkPVXMLPackageParser* parser)
 {
   return parser->GetPVWidget(element);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
 {
   return parser->GetPVWindow();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

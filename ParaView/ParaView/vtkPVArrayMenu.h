@@ -54,12 +54,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 class vtkPVInputMenu;
+class vtkPVFieldMenu;
 class vtkCollection;
 class vtkDataArray;
+class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
 class vtkKWOptionMenu;
 class vtkKWLabel;
-class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
 {
@@ -77,14 +78,6 @@ public:
   // from a script.
   void SetLabel (const char* label);
   const char* GetLabel();
-
-  // Description:
-  // This option shows a menu that lets the user select which field to use:
-  // vtkDataSet::POINT_DATA_FIELD or vtkDataSet::CELL_DATA_FIELD.  
-  // vtkDataSet::DATA_OBJECT_FIELD is not an option.
-  void SetShowFieldMenu(int flag);
-  vtkGetMacro(ShowFieldMenu, int);
-  vtkBooleanMacro(ShowFieldMenu, int);
 
   // Description:
   // This is a method that the field menu calls.  The user can call
@@ -138,15 +131,9 @@ public:
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
   
   // Description:
-  // Gets called when the accept button is pressed.
-  // This method may add an entry to the trace file.
-  virtual void Accept();
-  virtual void Accept(const char* sourceTclName);
-
-  // Description:
-  // Gets called when the reset button is pressed.
-  virtual void Reset();
-  virtual void Reset(const char* sourceTclName);
+  // This menu can alternatively supply the data set.
+  virtual void SetFieldMenu(vtkPVFieldMenu*);
+  vtkGetObjectMacro(FieldMenu, vtkPVFieldMenu);
 
   // Description:
   // Set the menus value as a string.
@@ -182,7 +169,7 @@ public:
   void ComponentMenuEntryCallback(int comp);
 
   // Description:
-  // This is called to update the menus if soething (InputMenu) changes.
+  // This is called to update the menus if something (InputMenu) changes.
   virtual void Update();
 
 //BTX
@@ -195,13 +182,21 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file, const char *root);
+  virtual void Trace(ofstream *file);
 
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
+
+  vtkPVDataSetAttributesInformation *GetFieldInformation();
+
+  // Gets called when the accept button is pressed.
+  virtual void AcceptInternal(const char* sourceTclName);
+
+  // Gets called when the reset button is pressed.
+  virtual void ResetInternal(const char* sourceTclName);
+
 
   // The selected array name in the menu.  Current value of the widget.
   char *ArrayName;
@@ -211,11 +206,12 @@ protected:
   int NumberOfComponents;
   int ShowComponentMenu;
 
+  // Selection only used if no field menu.
   int FieldSelection;
-  int ShowFieldMenu;
 
   // This is where we get the data object arrays to populate our menu.
   vtkPVInputMenu *InputMenu;
+  vtkPVFieldMenu *FieldMenu;
 
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
@@ -224,7 +220,6 @@ protected:
 
   // Subwidgets.
   vtkKWLabel *Label;
-  vtkKWOptionMenu *FieldMenu;
   vtkKWOptionMenu *ArrayMenu;
   vtkKWOptionMenu *ComponentMenu;
 

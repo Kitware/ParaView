@@ -31,10 +31,9 @@
 #include "vtkObject.h"
 
 class vtkRenderWindow;
-class vtkRenderWindowInteractor;
 class vtkMultiProcessController;
 class vtkRenderer;
-class vtkTiledDisplaySchedule;
+class vtkPVTiledDisplaySchedule;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
 
@@ -53,8 +52,6 @@ public:
 
   // Description:
   // Callbacks that initialize and finish the compositing.
-  void StartInteractor();
-  void ExitInteractor();
   virtual void StartRender();
   virtual void EndRender();
   virtual void SatelliteStartRender();
@@ -99,30 +96,12 @@ public:
   };
 //ETX
 
-
-
   //============================================================
   // New compositing methods.
 
-  // Description:
-  // This create all of the buffer objects as well as create the 
-  // composite schedule.  Set TileDimensions, TileProcesses and
-  // NumberOfProcesses before calling this method.
-  void InitializeBuffers();
-
-  // Description:
-  // Tile processes are probably going to be 0, 1, 2 ...
-  //void SetTileProcesses(int idx, int id);
-
-
-  // This keeps processes 0 out of the rendering composite group.
-  vtkSetMacro(ZeroEmpty, int);
-  vtkGetMacro(ZeroEmpty, int);
-  vtkBooleanMacro(ZeroEmpty, int);
-
   void InitializeSchedule();
   int ShuffleLevel(int level, int numTiles, 
-                   vtkTiledDisplaySchedule** tileSchedules);
+                   vtkPVTiledDisplaySchedule** tileSchedules);
 
   // Description:
   // This flag is ignored (Not used at the moment).
@@ -132,47 +111,37 @@ public:
   vtkGetMacro(UseCompositing, int);
   vtkBooleanMacro(UseCompositing, int);
 
+  // Description:
+  // Reduction factor = 1 means normal (full sized) rendering
+  // and compositing.  When ReductionFactor > 1, a small window
+  // is rendered (subsampled) and composited.  This value is set 
+  // internally based on the render window's "DesiredUpdateRate".
+  vtkGetMacro(ReductionFactor, int);
 
 protected:
   vtkPVTiledDisplayManager();
   ~vtkPVTiledDisplayManager();
   
   vtkRenderWindow* RenderWindow;
-  vtkRenderWindowInteractor* RenderWindowInteractor;
   vtkMultiProcessController* Controller;
 
-  unsigned long StartInteractorTag;
-  unsigned long EndInteractorTag;
+  // For managing buffers.
+  vtkPVCompositeUtilities* CompositeUtilities;
+
+  int ReductionFactor;
+
   unsigned long StartTag;
   unsigned long EndTag;
   
-  // Convenience method used internally. It set up the start observer
-  // and allows the render window's interactor to be set before or after
-  // the compositer's render window (not exactly true).
-  void SetRenderWindowInteractor(vtkRenderWindowInteractor *iren);
-
   vtkObject *RenderView;
 
   // Any processes can display the tiles.
   // There can be more processes than tiles.
   int TileDimensions[2];
-  //vtkIntArray* TileProcesses;
   int NumberOfProcesses;
-  // We have a z and color buffer for each tile.
   int NumberOfTiles;
-  vtkFloatArray** TileZData;
-  vtkUnsignedCharArray** TilePData;
 
-  // We have two spare set of buffers for receiving and compositing.
-  vtkFloatArray* ZData;
-  vtkUnsignedCharArray*  PData;  
-  vtkFloatArray* ZData2;
-  vtkUnsignedCharArray*  PData2;  
-
-  void SetPDataSize(int x, int y);
-  int PDataSize[2];
-
-  vtkTiledDisplaySchedule* Schedule;
+  vtkPVTiledDisplaySchedule* Schedule;
   int ZeroEmpty;
 
   // On: Composite, Off, assume geometry copied to all tile procs.
