@@ -91,6 +91,8 @@ protected:
   char *MyText;
   char *VariableName;
 
+  void Configure();
+
 private:
   vtkKWCheckButton(const vtkKWCheckButton&); // Not implemented
   void operator=(const vtkKWCheckButton&); // Not Implemented
