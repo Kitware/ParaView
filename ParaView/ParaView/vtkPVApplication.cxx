@@ -539,9 +539,10 @@ int vtkPVApplication::IsParaViewScriptFile(const char* arg)
 
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SetEnvironmentVariable(const char* string)
+void vtkPVApplication::SetEnvironmentVariable(const char* str)
 {
-  putenv(string);
+  char* envstr = vtkString::Duplicate(str);
+  putenv(envstr);
 }
 
 //----------------------------------------------------------------------------
@@ -1357,8 +1358,17 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
   int error;
 
   this->BroadcastScript("%s %s", className, tclName);
-  o = (vtkObject *)(vtkTclGetPointerFromObject(tclName,
-                                  "vtkObject", this->GetMainInterp(), error));
+  return this->TclToVTKObject(tclName);
+}
+
+//----------------------------------------------------------------------------
+vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
+{
+  vtkObject *o;
+  int error;
+
+  o = (vtkObject *)(vtkTclGetPointerFromObject(
+                      tclName, "vtkObject", this->GetMainInterp(), error));
   
   if (o == NULL)
     {
@@ -1368,6 +1378,7 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
   return o;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
 {
   ostrstream str;

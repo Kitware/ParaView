@@ -122,12 +122,18 @@ public:
   void SetupTrapsForSignals(int nodeid);
   static void TrapsForSignals(int signal);
 
-  // This constructs a vtk object (type specified by class name)
-  // and uses the tclName for the tcl instance command.
-  // The user must cast to the correct type, and is responsible
-  // for deleting the object.
+  // Description:
+  // This constructs a vtk object (type specified by class name) and
+  // uses the tclName for the tcl instance command.  The user must
+  // cast to the correct type, and is responsible for deleting the
+  // object.
   vtkObject *MakeTclObject(const char *className,
                            const char *tclName);
+
+  // Description:
+  // This method returns pointer to the object specified as a tcl
+  // name.
+  vtkObject *TclToVTKObject(const char *tclName);
 
   // Description:
   // When ParaView needs to query data on other procs, it needs a way to
@@ -231,7 +237,9 @@ public:
   vtkMultiProcessController *NewController(int minId, int maxId);
 
   // Description:
-  // A method used to set environment variables in the satellite processes.
+  // A method used to set environment variables in the satellite
+  // processes. This method leaks memory and for now should be called
+  // only once.
   void SetEnvironmentVariable(const char* string);
 
 protected:
