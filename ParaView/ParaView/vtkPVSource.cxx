@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.306");
+vtkCxxRevisionMacro(vtkPVSource, "1.307");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1491,7 +1491,7 @@ void vtkPVSource::DeleteCallback()
     }
 
   current = window->GetCurrentPVSource();
-  if ( this == current )
+  if ( this == current || window->GetSourceList("Sources")->GetNumberOfItems() == 1)
     {
     current = prev;
   
