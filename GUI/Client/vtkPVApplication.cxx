@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.335");
+vtkCxxRevisionMacro(vtkPVApplication, "1.336");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1040,10 +1040,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
     "    vtkSMObject smGetTemp\n"
     "    set proxyManager [smGetTemp GetProxyManager]\n"
     "    smGetTemp Delete\n"
-    "    set proxyName \"$group;$source\"\n"
+    "    set proxyName \"$group.$source\"\n"
     "    set proxy [$proxyManager GetProxy animateable $proxyName]\n"
     "    if {$proxy == \"\"} {\n"
-    "        return \"?no proxy: $group;$source?\"\n"
+    "        return \"?no proxy: $group.$source?\"\n"
     "    }\n"
     "    set prop [$proxy GetProperty $property]\n"
     "    if {$prop == \"\"} {\n"
