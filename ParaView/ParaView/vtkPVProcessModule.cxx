@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.25");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.26");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -600,6 +600,8 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << endl;
+  os << indent << "ReportInterpreterErrors: "
+     << this->ReportInterpreterErrors << endl;
   if (this->RootResult)
     {
     os << indent << "RootResult: " << this->RootResult << endl;
