@@ -1913,3 +1913,85 @@
    fun:main 
 }
 
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z15vtkTclCreateNewP10Tcl_InterpPKcPFPvvEPFiS3_S0_iPPcE
+   fun:Vtkgraphicstcl_Init
+   fun:Tcl_AppInit
+   fun:Tk_MainEx
+   fun:main
+}
+
+{
+   <insert a suppression name here>
+   core:PThread
+   fun:pthread_error
+   fun:pthread_attr_setscope
+   fun:_ZN16vtkMultiThreader19SingleMethodExecuteEv
+   fun:_ZN21vtkImageToImageFilter11MultiThreadEP12vtkImageDataS1_
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Overlap
+   fun:strcpy
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:Tk_PhotoPutBlock
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:RebuildTable
+   fun:Tcl_CreateHashEntry
+   fun:Tk_Get3DBorder
+   fun:Tk_Alloc3DBorderFromObj
+   fun:DoObjConfig
+   fun:Tk_SetOptions
+   fun:ConfigureButton
+   fun:ButtonWidgetObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_Eval
+   fun:Tcl_GlobalEval
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclAllocateFreeObjects
+   fun:Tcl_NewListObj 
+   fun:GetConfigList 
+   fun:Tk_GetOptionInfo 
+   fun:ButtonWidgetObjCmd 
+   fun:TclEvalObjvInternal 
+   fun:Tcl_EvalEx 
+   fun:Tcl_Eval 
+   fun:Tcl_GlobalEval 
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclAllocateFreeObjects
+   fun:Tcl_NewObj 
+   fun:TclpInitLibraryPath 
+   fun:TclFindEncodings 
+   fun:Tcl_FindExecutable 
+}
+
