@@ -3043,4 +3043,22 @@ Tessellate a higher-order dataset.
   </Documentation>
  </Module>
 
+  <Module name="LevelScalars"
+          menu_name="Level Scalars"
+          root_name="LScalars"
+          module_type="Filter"
+          long_help="This filter uses colors to show levels of a hiearchical dataset."
+          short_help="Generate point scalars from level.">
+    <Filter class="vtkHierarchicalDataLevelFilter">
+      <Input name="Input"
+             class="vtkHierarchicalDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+    </Documentation>
+  </Module>
+
 </ModuleInterfaces>

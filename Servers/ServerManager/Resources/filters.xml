@@ -3247,5 +3247,20 @@
    <!-- End Tessellator -->
    </SourceProxy>
 
+   <SourceProxy name="LevelScalars" class="vtkHierarchicalDataLevelFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalDataSet"/>
+           </DataTypeDomain>
+     </InputProperty>
+   <!-- End LevelScalars -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
