@@ -487,7 +487,7 @@ void vtkKWCenterOfRotation::ResetCenterActorSize()
   vtkActorCollection *actors;
   vtkActor *a;
   float bounds[6], *temp;
-  int idx, firstFlag;
+  int idx;
   vtkRenderer *ren;
 
   if (this->RenderView == NULL)
@@ -500,36 +500,16 @@ void vtkKWCenterOfRotation::ResetCenterActorSize()
     return;
     }
   
-  firstFlag = 1;
   // loop through all visible actors
   actors = ren->GetActors();
   actors->InitTraversal();
-  while ((a = actors->GetNextItem()))
-    {
-    if (a->GetVisibility() && a->GetPickable())
-      {
-      temp = a->GetBounds();
-      for (idx = 0; idx < 3; ++idx)
-        {
-        if (firstFlag || temp[idx*2] < bounds[idx*2])
-          {
-          bounds[idx*2] = temp[idx*2];
-          }
-        if (firstFlag || temp[idx*2 + 1] > bounds[idx*2 + 1])
-          {
-          bounds[idx*2 + 1] = temp[idx*2 + 1];
-          }
-        }
-        firstFlag = 0;
-      }
-    }
 
-  // now use bounds to set the size fot the center cursor actor
-  if ( ! firstFlag)
+  this->RenderView->ComputeVisiblePropBounds(bounds);
+  if (bounds[0] < bounds[1])
     {
     this->CenterActor->SetScale(0.25 * (bounds[1]-bounds[0]), 
-                                0.25 * (bounds[3]-bounds[2]),
-                                0.25 * (bounds[5]-bounds[4]));
+				0.25 * (bounds[3]-bounds[2]),
+				0.25 * (bounds[5]-bounds[4]));
     }
 }
 
