@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVServerObject.h"
 
 class vtkClientServerStream;
+class vtkPVServerArraySelectionInternals;
 class vtkSource;
 
 class VTK_EXPORT vtkPVServerArraySelection : public vtkPVServerObject
@@ -67,7 +68,8 @@ protected:
   vtkPVServerArraySelection();
   ~vtkPVServerArraySelection();
 
-  vtkClientServerStream* Arrays;
+  // Internal implementation details.
+  vtkPVServerArraySelectionInternals* Internal;
 private:
   vtkPVServerArraySelection(const vtkPVServerArraySelection&); // Not implemented
   void operator=(const vtkPVServerArraySelection&); // Not implemented

@@ -50,18 +50,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.1.2.3");
+
+//----------------------------------------------------------------------------
+class vtkPVServerArraySelectionInternals
+{
+public:
+  vtkClientServerStream Result;
+};
 
 //----------------------------------------------------------------------------
 vtkPVServerArraySelection::vtkPVServerArraySelection()
 {
-  this->Arrays = new vtkClientServerStream;
+  this->Internal = new vtkPVServerArraySelectionInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerArraySelection::~vtkPVServerArraySelection()
 {
-  delete this->Arrays;
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
@@ -75,8 +82,8 @@ const vtkClientServerStream&
 vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
 {
   // Reset the stream for a new list of array names.
-  this->Arrays->Reset();
-  *this->Arrays << vtkClientServerStream::Reply;
+  this->Internal->Result.Reset();
+  this->Internal->Result << vtkClientServerStream::Reply;
 
   // Make sure we have a process module.
   if(this->ProcessModule && source)
@@ -143,7 +150,7 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
           }
 
         // Store the name/status pair in the result message.
-        *this->Arrays << name.c_str() << status;
+        this->Internal->Result << name.c_str() << status;
         }
       }
     else
@@ -165,6 +172,6 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
     }
 
   // End the message and return the stream.
-  *this->Arrays << vtkClientServerStream::End;
-  return *this->Arrays;
+  this->Internal->Result << vtkClientServerStream::End;
+  return this->Internal->Result;
 }
