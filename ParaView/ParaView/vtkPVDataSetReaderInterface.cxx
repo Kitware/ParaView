@@ -61,6 +61,11 @@ vtkPVDataSetReaderInterface::vtkPVDataSetReaderInterface()
   this->FileName = NULL;
 }
 
+vtkPVDataSetReaderInterface::~vtkPVDataSetReaderInterface()
+{
+  this->SetFileName(0);
+}
+
 //----------------------------------------------------------------------------
 vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 {

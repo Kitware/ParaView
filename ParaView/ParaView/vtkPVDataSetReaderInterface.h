@@ -66,7 +66,7 @@ public:
   
 protected:
   vtkPVDataSetReaderInterface();
-  ~vtkPVDataSetReaderInterface() {};
+  ~vtkPVDataSetReaderInterface();
   vtkPVDataSetReaderInterface(const vtkPVDataSetReaderInterface&) {};
   void operator=(const vtkPVDataSetReaderInterface&) {};
   
