@@ -18,7 +18,7 @@
   <InputMenu label="Input" 
              help="Redistribute polydata to a subset of processes."
              input_name="Input"/>
-  <VectorEntry trace_name="NumberOfProcesses" variable="NumberOfProcesses" type="int"/>
+  <VectorEntry trace_name="NumberOfProcesses" variable="NumberOfProcesses" type="int" default_value="1"/>
 </Module>
 
 <Module name="AppendAttributes" menu_name="Append Attributes" root_name="AppendAttr" module_type="Filter" 
@@ -67,7 +67,7 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Generate vertices" trace_name="VertexCells" variable="VertexCells" help="Generate vertex as geometry of just points."/>
+  <LabeledToggle label="Generate vertices" trace_name="VertexCells" variable="VertexCells" help="Generate vertex as geometry of just points." default_value="0"/>
 </Module>
 
 <Module name="CellDataToPointData" root_name="CellToPoint" module_type="Filter" 
@@ -81,7 +81,7 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Pass cell data" trace_name="PassCellData" variable="PassCellData" help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."/>
+  <LabeledToggle label="Pass cell data" trace_name="PassCellData" variable="PassCellData" help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output." default_value="0"/>
 </Module>
 
 <Module name="CleanPolyData" menu_name="Clean" root_name="CleanPD" module_type="Filter" 
@@ -92,14 +92,14 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this on to remove seams when running in parallel."/>
-  <VectorEntry variable="Tolerance" trace_name="Tolerance" type="float" help="The tolerance in terms of fraction of bounding box length."/>
-  <VectorEntry label="Absolute tolerance" variable="AbsoluteTolerance" trace_name="AbsoluteTolerance" type="float" help="The tolerance in absolute terms."/>
-  <LabeledToggle label="Tolerance is absolute" trace_name="ToleranceIsAbsolute" variable="ToleranceIsAbsolute" help="Turn this on to use the absolute tolerance."/>
-  <LabeledToggle label="Convert lines to points" trace_name="ConvertLinesToPoints" variable="ConvertLinesToPoints" help="Turn on/off conversion of degenerate lines to points."/>
-  <LabeledToggle label="Convert polys to lines" trace_name="ConvertPolysToLines" variable="ConvertPolysToLines" help="Turn on/off conversion of degenerate polys to lines."/>
-  <LabeledToggle label="Convert strips to polys" trace_name="ConvertStripsToPolys" variable="ConvertStripsToPolys" help="Turn on/off conversion of degenerate strips to polys."/>
-  <LabeledToggle label="Point merging" trace_name="PointMerging" variable="PointMerging" help="Turn this On to control wheter points merging is performed."/>
+  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this on to remove seams when running in parallel." default_value="1"/>
+  <VectorEntry variable="Tolerance" trace_name="Tolerance" type="float" help="The tolerance in terms of fraction of bounding box length." default_value="0.0"/>
+  <VectorEntry label="Absolute tolerance" variable="AbsoluteTolerance" trace_name="AbsoluteTolerance" type="float" help="The tolerance in absolute terms." default_value="1.0"/>
+  <LabeledToggle label="Tolerance is absolute" trace_name="ToleranceIsAbsolute" variable="ToleranceIsAbsolute" help="Turn this on to use the absolute tolerance." default_value="0"/>
+  <LabeledToggle label="Convert lines to points" trace_name="ConvertLinesToPoints" variable="ConvertLinesToPoints" help="Turn on/off conversion of degenerate lines to points." default_value="1"/>
+  <LabeledToggle label="Convert polys to lines" trace_name="ConvertPolysToLines" variable="ConvertPolysToLines" help="Turn on/off conversion of degenerate polys to lines." default_value="1"/>
+  <LabeledToggle label="Convert strips to polys" trace_name="ConvertStripsToPolys" variable="ConvertStripsToPolys" help="Turn on/off conversion of degenerate strips to polys." default_value="1"/>
+  <LabeledToggle label="Point merging" trace_name="PointMerging" variable="PointMerging" help="Turn this On to control wheter points merging is performed." default_value="1"/>
 </Module>
 
 <Module name="PVConnectivityFilter" menu_name="Connectivity" root_name="Connect" module_type="Filter" 
@@ -131,8 +131,8 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Invert mean curvature" trace_name="InvertMeanCurvature" variable="InvertMeanCurvature" help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals."/>
-  <SelectionList variable="CurvatureType" label="Curvature type" trace_name="CurvatureType" help="Select the curvature type.">
+  <LabeledToggle label="Invert mean curvature" trace_name="InvertMeanCurvature" variable="InvertMeanCurvature" help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals." default_value="0"/>
+  <SelectionList variable="CurvatureType" label="Curvature type" trace_name="CurvatureType" help="Select the curvature type." default_value="0">
     <Item name="Gaussian" value="0"/>
     <Item name="Mean" value="1"/>
   </SelectionList>
@@ -145,10 +145,10 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" type="float" help="Value between 0 and 1. Desired reduction of the total number of triangles."/>
-  <LabeledToggle label="Preserve topology" trace_name="PreserveTopology" variable="PreserveTopology" help="If off, better reduction can occur, but model may break up."/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges."/>
-  <LabeledToggle label="Boundary deletable" trace_name="BoundaryVertexDeletion" variable="BoundaryVertexDeletion" help="If off, decimate will not remove points on the boundary."/>
+  <VectorEntry label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" type="float" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90"/>
+  <LabeledToggle label="Preserve topology" trace_name="PreserveTopology" variable="PreserveTopology" help="If off, better reduction can occur, but model may break up." default_value="0"/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0"/>
+  <LabeledToggle label="Boundary deletable" trace_name="BoundaryVertexDeletion" variable="BoundaryVertexDeletion" help="If off, decimate will not remove points on the boundary." default_value="1"/>
 </Module>
 
   <Module name="Dialate"  root_name="Dialate" 
@@ -165,7 +165,8 @@
                help="Select the input scalars to process."/>
     <VectorEntry label="Kernel Size" variable="KernelSize" 
                  type="int" length="3" 
-                 help="Determines the dilation neighborhood."/>
+                 help="Determines the dilation neighborhood."
+                 default_value="1 1 1"/>
   </Module>
 
 <Module name="ElevationFilter" menu_name="Elevation" root_name="Elevation" module_type="Filter"
@@ -178,7 +179,7 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Scalar range" trace_name="ScalarRange" variable="ScalarRange" type="float" length="2" help="Set the range of scalar values to generate"/>
+  <VectorEntry label="Scalar range" trace_name="ScalarRange" variable="ScalarRange" type="float" length="2" help="Set the range of scalar values to generate" default_value="0.0 1.0"/>
   <LineWidget trace_name="Line" point1_variable="LowPoint" point2_variable="HighPoint"
               point1_label="Low Point" point2_label="High Point"
               use_label="0" show_resolution="0"
@@ -199,7 +200,8 @@
                help="Select the input scalars to process."/>
     <VectorEntry label="Kernel Size" variable="KernelSize" 
                  type="int" length="3" 
-                 help="Determines the erosion neighborhood."/>
+                 help="Determines the erosion neighborhood."
+                 default_value="1 1 1"/>
   </Module>
 
   <Module name="CTHPart" menu_name="Extract CTH Parts" root_name="CTHPart" 
@@ -243,13 +245,13 @@
         long_help="Extract a subgrid from a curvilinear grid with the option of setting subsample strides." 
         short_help="Extract a subgrid or subsample.">
   <Filter class="vtkExtractGrid">
-    <Input name="Input" class="vtkStructuredData" /> 
+    <Input name="Input" class="vtkStructuredGrid" />
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter."
              input_name="Input" />
   <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension"/>
-  <LabeledToggle label="Include boundary" variable="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output"/>
+  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
+  <LabeledToggle label="Include boundary" variable="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output" default_value="0"/>
 </Module>
 
 <Module name="ExtractParts" menu_name="Extract Parts" root_name="ExtractParts" module_type="Filter" 
@@ -272,7 +274,7 @@
   <InputMenu id="im" label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension"/>
+  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
 </Module>
 
 <Module name="ExtractRectilinearGrid" menu_name="Extract Grid" root_name="ExtractRGrid" module_type="Filter" replace_input="0"
@@ -284,8 +286,8 @@
   <InputMenu id="im" label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension"/>
-  <LabeledToggle label="Include boundary" variable="IncludeBoundary" trace_name="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output"/>
+  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
+  <LabeledToggle label="Include boundary" variable="IncludeBoundary" trace_name="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output" default_value="0"/>
 </Module>
 
 <Module name="DataSetSurfaceFilter" menu_name="Extract Surface" root_name="Surface" module_type="Filter"
@@ -322,7 +324,7 @@
     <InputMenu label="Input" help="Set the input to this filter."
                input_name="Input"/>
     <StringEntry variable="ResultArrayName" trace_name="ResultArray"
-help="Set the name of the array to hold the results of this computation"/>
+help="Set the name of the array to hold the results of this computation" default_value="Result"/>
     <CalculatorWidget trace_name="Equation" help="Enter the equation for the new array."/>
   </Module>
 <Module name="FeatureEdges" menu_name="Feature Edges" root_name="FeatureEdges" module_type="Filter" replace_input="0" 
@@ -333,11 +335,11 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Boundary edges" trace_name="BoundaryEdges" variable="BoundaryEdges" help="Turn this off if you do not want to extract boundary edges."/>
-  <LabeledToggle label="Feature edges" trace_name="FeatureEdges" variable="FeatureEdges" help="Turn this off if you do not want to extract feature edges."/>
-  <LabeledToggle label="Non-manifold edges" trace_name="NonManifoldEdges" variable="NonManifoldEdges" help="Turn this off if you do not want to extract non-manifold edges."/>
-  <LabeledToggle variable="Coloring" trace_name="Coloring" help="Turn this off if you do not want to color the edges by type."/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).."/>
+  <LabeledToggle label="Boundary edges" trace_name="BoundaryEdges" variable="BoundaryEdges" help="Turn this off if you do not want to extract boundary edges." default_value="1"/>
+  <LabeledToggle label="Feature edges" trace_name="FeatureEdges" variable="FeatureEdges" help="Turn this off if you do not want to extract feature edges." default_value="1"/>
+  <LabeledToggle label="Non-manifold edges" trace_name="NonManifoldEdges" variable="NonManifoldEdges" help="Turn this off if you do not want to extract non-manifold edges." default_value="1"/>
+  <LabeledToggle variable="Coloring" trace_name="Coloring" help="Turn this off if you do not want to color the edges by type." default_value="1"/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0"/>
 </Module>
 
 <!--
@@ -352,9 +354,9 @@ help="Set the name of the array to hold the results of this computation"/>
     <ArrayMenu input_name="Input" attribute_type="Scalars"
                label="Scalars" input_menu="im" number_of_components="1"
                help="Select the input scalars to process."/>
-    <VectorEntry label="Standard dev." trace_name="StandardDeviations" variable="StandardDeviations" type="float" length="3" help="Standard deviations for x, y and z axes."/>
-    <VectorEntry label="Radius factors" trace_name="RadiusFactors" variable="RadiusFactors" type="float" length="3" help="Kernel size is this factor times standard deviation."/>
-    <SelectionList variable="Dimensionality" trace_name="Dimensionality" help="Select whether to perform a 2d or 3d gradient">
+    <VectorEntry label="Standard dev." trace_name="StandardDeviations" variable="StandardDeviations" type="float" length="3" help="Standard deviations for x, y and z axes." default_value="2.0 2.0 2.0"/>
+    <VectorEntry label="Radius factors" trace_name="RadiusFactors" variable="RadiusFactors" type="float" length="3" help="Kernel size is this factor times standard deviation." default_value="1.5 1.5 1.5"/>
+    <SelectionList variable="Dimensionality" trace_name="Dimensionality" help="Select whether to perform a 2d or 3d gradient" default_value="3">
       <Item name="2" value="0"/>
       <Item name="3" value="1"/>
     </SelectionList>
@@ -372,7 +374,7 @@ help="Set the name of the array to hold the results of this computation"/>
   <ArrayMenu input_name="Input" attribute_type="Scalars"
              label="Scalars" input_menu="im" number_of_components="1"
              help="Select the input scalars to process."/>
-  <VectorEntry variable="Dimensionality" type="int" help="Pick a value 2 for XY images, 3 for volumes."/>
+  <VectorEntry variable="Dimensionality" type="int" help="Pick a value 2 for XY images, 3 for volumes." default_value="2"/>
 </Module>
 
 <Module name="GradientMagnitude" menu_name="Gradient Magnitude" root_name="GradM" module_type="Filter">
@@ -406,10 +408,10 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Set the extrusion scale factor"/>
-  <VectorEntry variable="Vector" trace_name="Vector" type="float" length="3" help="Set the direction for the extrusion"/>
-  <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps"/>
-  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do want to process ghost levels and do not mind seams."/>
+  <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Set the extrusion scale factor" default_value="1.0"/>
+  <VectorEntry variable="Vector" trace_name="Vector" type="float" length="3" help="Set the direction for the extrusion" default_value="0.0 0.0 1.0"/>
+  <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps" default_value="1"/>
+  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do want to process ghost levels and do not mind seams." default_value="0"/>
 </Module>
 
 <Module name="LoopSubdivisionFilter" menu_name="Loop Subdivision" root_name="LoopSubDiv" module_type="Filter" 
@@ -420,7 +422,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Number of divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles."/>
+  <VectorEntry label="Number of divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles." default_value="1"/>
 </Module>
 
 <Module name="MaskPoints" menu_name="Mask Points" root_name="MaskPts" module_type="Filter"
@@ -431,11 +433,11 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="On ratio" trace_name="OnRation" variable="OnRatio" type="int" help="The ratio of points retained."/>
-  <VectorEntry label="Max. points" trace_name="MaximumNumberOfPoints" variable="MaximumNumberOfPoints" type="int" help="Limit the number of points."/>
-  <VectorEntry variable="Offset" trace_name="Offset" type="int" help="Start with this point."/>
-  <LabeledToggle label="Random" trace_name="Random" variable="RandomMode" help="Select whether to randomly select points, or subsample regularly."/>
-  <LabeledToggle label="Generate vertices" trace_name="GenerateVertices" variable="GenerateVertices" help="Convienience feature to display points."/>
+  <VectorEntry label="On ratio" trace_name="OnRatio" variable="OnRatio" type="int" help="The ratio of points retained." default_value="2"/>
+  <VectorEntry label="Max. points" trace_name="MaximumNumberOfPoints" variable="MaximumNumberOfPoints" type="int" help="Limit the number of points." default_value="9223372036854775807"/>
+  <VectorEntry variable="Offset" trace_name="Offset" type="int" help="Start with this point." default_value="0"/>
+  <LabeledToggle label="Random" trace_name="Random" variable="RandomMode" help="Select whether to randomly select points, or subsample regularly." default_value="0"/>
+  <LabeledToggle label="Generate vertices" trace_name="GenerateVertices" variable="GenerateVertices" help="Convienience feature to display points." default_value="0"/>
 </Module>
 
   <Module name="Median"  root_name="Median" 
@@ -452,7 +454,8 @@ help="Set the name of the array to hold the results of this computation"/>
                help="Select the input scalars to process."/>
     <VectorEntry label="Kernel Size" trace_name="KernelSize" variable="KernelSize" 
                  type="int" length="3" 
-                 help="Determines the smoothing nieghborhood."/>
+                 help="Determines the smoothing nieghborhood."
+                 default_value="1 1 1"/>
   </Module>
 
 <Module name="PolyDataNormals" menu_name="Normals generation" root_name="PDNormals" module_type="Filter"
@@ -463,13 +466,13 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)"/>
-  <LabeledToggle variable="Splitting" trace_name="Splitting" help="Turn on/off the splitting of sharp edges."/>
-  <LabeledToggle variable="Consistency" trace_name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering."/>
-  <LabeledToggle label="Cell normals" trace_name="ComputeCellNormals" variable="ComputeCellNormals" help="Turn on/off the computation of cell normals."/>
-  <LabeledToggle label="Flip normals" trace_name="FlipNormals" variable="FlipNormals" help="Flipping reverves the meaning of front and back."/>
-  <LabeledToggle label="Non-manifold" trace_name="NonManifoldTraversal" variable="NonManifoldTraversal" help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."/>
-  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do not want to process ghost levels and do not mind seams."/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)" default_value="30.0"/>
+  <LabeledToggle variable="Splitting" trace_name="Splitting" help="Turn on/off the splitting of sharp edges." default_value="1"/>
+  <LabeledToggle variable="Consistency" trace_name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering." default_value="1"/>
+  <LabeledToggle label="Cell normals" trace_name="ComputeCellNormals" variable="ComputeCellNormals" help="Turn on/off the computation of cell normals." default_value="0"/>
+  <LabeledToggle label="Flip normals" trace_name="FlipNormals" variable="FlipNormals" help="Flipping reverves the meaning of front and back." default_value="0"/>
+  <LabeledToggle label="Non-manifold" trace_name="NonManifoldTraversal" variable="NonManifoldTraversal" help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops." default_value="1"/>
+  <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do not want to process ghost levels and do not mind seams." default_value="1"/>
 </Module>
 
 <Module name="StructuredGridOutlineFilter" menu_name="Outline (curvilinear)" root_name="GOutline" module_type="Filter">
@@ -499,7 +502,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)"/>
+  <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2"/>
 </Module>
 
 <Module name="PartScalars" menu_name="Part Id Scalars" root_name="ColorParts" module_type="Filter" 
@@ -522,7 +525,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Random" trace_name="RandomMode" variable="RandomMode" help="Select whether to use random colors for the various pieces"/>
+  <LabeledToggle label="Random" trace_name="RandomMode" variable="RandomMode" help="Select whether to use random colors for the various pieces" default_value="0"/>
 </Module>
 
 <!--
@@ -533,7 +536,7 @@ help="Set the name of the array to hold the results of this computation"/>
     <Filter class="vtkPickDataSetFilter">
       <Input name="Input" class="vtkDataSet" /> 
     </Filter>
-  <LabeledToggle label="Search cells" trace_name="SearchCells" variable="SearchCells" help="Set when cells are supposed to be searched. Otherwise points will be searched."/>
+  <LabeledToggle label="Search cells" trace_name="SearchCells" variable="SearchCells" help="Set when cells are supposed to be searched. Otherwise points will be searched." default_value/>
   <PointWidget variable="SamplePoint" help="Sample point that we are picking."/>
   </Module>
 -->
@@ -549,7 +552,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <LabeledToggle label="Pass point data" trace_name="PassPointData" variable="PassPointData" help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."/>
+  <LabeledToggle label="Pass point data" trace_name="PassPointData" variable="PassPointData" help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output." default_value="0"/>
 </Module>
 
 <Module name="QuadricClustering" menu_name="Quadric Clustering" root_name="QC" module_type="Filter" 
@@ -560,11 +563,11 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Spacing" trace_name="DivisionSpacing" variable="DivisionSpacing" type="float" length="3" help="Set the spacing of the bins in each dimension"/>
-  <LabeledToggle label="Use input points" trace_name="UseInputPoints" variable="UseInputPoints" help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin"/>
-  <LabeledToggle label="Use feature edges" trace_name="UseFeatureEdges" variable="UseFeatureEdges" help="Select whether to use feature edge quadrics to match up the boundaries between pieces"/>
-  <LabeledToggle label="Use feature points" trace_name="UseFeaturePoints" variable="UseFeaturePoints" help="Select whether to use feature point quadrics to align piece boundaries"/>
-  <LabeledToggle label="Copy cell data" trace_name="CopyCellData" variable="CopyCellData" help="Should cell data be copied from output to input?"/>
+  <VectorEntry label="Spacing" trace_name="DivisionSpacing" variable="DivisionSpacing" type="float" length="3" help="Set the spacing of the bins in each dimension" default_value="1.0 1.0 1.0"/>
+  <LabeledToggle label="Use input points" trace_name="UseInputPoints" variable="UseInputPoints" help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin" default_value="0"/>
+  <LabeledToggle label="Use feature edges" trace_name="UseFeatureEdges" variable="UseFeatureEdges" help="Select whether to use feature edge quadrics to match up the boundaries between pieces" default_value="0"/>
+  <LabeledToggle label="Use feature points" trace_name="UseFeaturePoints" variable="UseFeaturePoints" help="Select whether to use feature point quadrics to align piece boundaries" default_value="0"/>
+  <LabeledToggle label="Copy cell data" trace_name="CopyCellData" variable="CopyCellData" help="Should cell data be copied from output to input?" default_value="0"/>
 </Module>
 
 <Module name="BrownianPoints" menu_name="Random Vectors" root_name="BPts" module_type="Filter" 
@@ -575,8 +578,8 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Min. speed" trace_name="MinimumSpeed" variable="MinimumSpeed" type="float" help="The minimum size of the random point vectors generated."/>
-  <VectorEntry label="Max. speed" trace_name="MaximumSpeed" variable="MaximumSpeed" type="float" help="The maximum size of the random point vectors generated."/>
+  <VectorEntry label="Min. speed" trace_name="MinimumSpeed" variable="MinimumSpeed" type="float" help="The minimum size of the random point vectors generated." default_value="0.0"/>
+  <VectorEntry label="Max. speed" trace_name="MaximumSpeed" variable="MaximumSpeed" type="float" help="The maximum size of the random point vectors generated." default_value="1.0"/>
 </Module>
 
 <Module name="ReflectionFilter" menu_name="Reflection" root_name="Reflect" module_type="Filter" 
@@ -587,7 +590,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <SelectionList variable="Plane" trace_name="Plane" help="Select which plane of the bounding box to reflect across">
+  <SelectionList variable="Plane" trace_name="Plane" help="Select which plane of the bounding box to reflect across" default_value="0">
     <Item name="X" value="6"/>
     <Item name="Y" value="7"/>
     <Item name="Z" value="8"/>
@@ -599,7 +602,8 @@ help="Set the name of the array to hold the results of this computation"/>
     <Item name="Z Max" value="5"/>
   </SelectionList>
   <VectorEntry label="Center" trace_name="Center" variable="Center" type="float"
-               help="The center of the mirror plane."/>
+               help="The center of the mirror plane."
+               default_value="0.0"/>
 </Module>
 
 <Module name="RibbonFilter" menu_name="Ribbon" root_name="Ribbon" module_type="Filter" 
@@ -615,10 +619,10 @@ help="Set the name of the array to hold the results of this computation"/>
   <ArrayMenu input_name="Input" trace_name="Vectors" attribute_type="Vectors"
              label="Vectors" input_menu="im" number_of_components="3"
              help="Select the input normals to process."/>
-  <VectorEntry variable="Width" trace_name="Width" type="float" help="The half width of the ribbon (or minimum)."/>
-  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)."/>
-  <VectorEntry label="Default normal" trace_name="DefaultNormal" variable="DefaultNormal" type="float" length="3" help="When this option is on, default normals will be calculated if the input contains no normals"/>
-  <LabeledToggle label="Vary width" trace_name="VaryWidth" variable="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value."/>
+  <VectorEntry variable="Width" trace_name="Width" type="float" help="The half width of the ribbon (or minimum)." default_value="0.5"/>
+  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0"/>
+  <VectorEntry label="Default normal" trace_name="DefaultNormal" variable="DefaultNormal" type="float" length="3" help="When this option is on, default normals will be calculated if the input contains no normals" default_value="0.0 0.0 1.0"/>
+  <LabeledToggle label="Vary width" trace_name="VaryWidth" variable="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value." default_value="0"/>
 </Module>
 
 <Module name="RotationalExtrusionFilter" menu_name="Rotational Extrusion" root_name="RotExtrude" module_type="Filter" 
@@ -629,11 +633,11 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" type="int"/>
-  <LabeledToggle variable="Capping" trace_name="Capping" />
-  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="Set the angle of rotation."/>
-  <VectorEntry variable="Translation" trace_name="Translation" type="float" help="The total amount of translation along the z-axis."/>
-  <VectorEntry label="Delta radius" trace_name="DeltaRadius" variable="DeltaRadius" type="float" help="The change in radius during sweep process."/>
+  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" default_value="12"/>
+  <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"/>
+  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="Set the angle of rotation." default_value="360.0"/>
+  <VectorEntry variable="Translation" trace_name="Translation" type="float" help="The total amount of translation along the z-axis." default_value="0.0"/>
+  <VectorEntry label="Delta radius" trace_name="DeltaRadius" variable="DeltaRadius" type="float" help="The change in radius during sweep process." default_value="0.0"/>
 </Module>
 
 <Module name="ShrinkFilter" menu_name="Shrink" root_name="Shrink" module_type="Filter" 
@@ -644,7 +648,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by"/>
+  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5"/>
 </Module>
 
 <!--
@@ -656,7 +660,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by"/>
+  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5"/>
 </Module>
 -->
 
@@ -668,8 +672,8 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" type="int" help="Number of iterations. More iterations produces better smoothing."/>
-  <VectorEntry variable="Convergence" trace_name="Convergence" type="float" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)."/>
+  <VectorEntry label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" type="int" help="Number of iterations. More iterations produces better smoothing." default_value="20"/>
+  <VectorEntry variable="Convergence" trace_name="Convergence" type="float" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0"/>
 </Module>
 
 <Module name="Stripper" menu_name="Triangle Strips" root_name="Strip" module_type="Filter" 
@@ -680,7 +684,7 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Max. length" trace_name="MaximumLength" variable="MaximumLength" type="int" help="Stop stripping after this many triangles."/>
+  <VectorEntry label="Max. length" trace_name="MaximumLength" variable="MaximumLength" type="int" help="Stop stripping after this many triangles." default_value="1000"/>
 </Module>
 
   <Module name="Subdivide" root_name="Subdivide" 
@@ -689,7 +693,8 @@ help="Set the name of the array to hold the results of this computation"/>
           long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface." 
           short_help="Creates a surface with more triangles than the input.">
     <VectorEntry label="Num. divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" type="int" 
-                 help="Set the number of subdivisions"/>
+                 help="Set the number of subdivisions"
+                 default_value="1"/>
     <Filter class="vtkLinearSubdivisionFilter">
       <Input name="Input" class="vtkPolyData" /> 
     </Filter>
@@ -739,15 +744,15 @@ help="Set the name of the array to hold the results of this computation"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Num. sides" variable="NumberOfSides" trace_name="NumberOfSides" type="int" help="Set the number of sides for the tube"/>
-  <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps on the tube"/>
-  <VectorEntry variable="Radius" trace_name="Radius" type="float" help="Set the radius of the tube"/>
-  <SelectionList label="Vary radius" trace_name="VaryRadius" variable="VaryRadius" help="Select whether/how to vary the radius of the tube">
+  <VectorEntry label="Num. sides" variable="NumberOfSides" trace_name="NumberOfSides" type="int" help="Set the number of sides for the tube" default_value="3"/>
+  <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps on the tube" default_value="0"/>
+  <VectorEntry variable="Radius" trace_name="Radius" type="float" help="Set the radius of the tube" default_value="0.5"/>
+  <SelectionList label="Vary radius" trace_name="VaryRadius" variable="VaryRadius" help="Select whether/how to vary the radius of the tube" default_value="0">
     <Item name="Off" value="0"/>
     <Item name="ByScalar" value="1"/>
     <Item name="ByVector" value="2"/>
   </SelectionList>
-  <VectorEntry label="Radius factor" trace_name="RadiusFactor" variable="RadiusFactor" type="float" help="Set the maximum tube radius in terms of a multiple of the minimum radius"/>
+  <VectorEntry label="Radius factor" trace_name="RadiusFactor" variable="RadiusFactor" type="float" help="Set the maximum tube radius in terms of a multiple of the minimum radius" default_value="10"/>
 </Module>
 
 <Module name="WarpScalar" menu_name="Warp" root_name="WarpS" default="scalars" module_type="Filter" 
@@ -764,10 +769,10 @@ help="Set the name of the array to hold the results of this computation"/>
   <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" 
              label="Scalars" input_menu="im"
              help="Select the input scalars to process."/>
-  <VectorEntry label="Scale factor" variable="ScaleFactor" trace_name="ScaleFactor" type="float" help="Displacement is vector times scale."/>
-  <VectorEntry variable="Normal" trace_name="Normal" type="float" length="3" help="Warp direction."/>
-  <LabeledToggle label="Use normal" trace_name="UseNormal" variable="UseNormal" help="Use instance model normals rather than instance normal."/>
-  <LabeledToggle label="X-Y plane" trace_name="XYPlane" variable="XYPlane" help="Z value is used to warp the surface, scalars to color surface."/>
+  <VectorEntry label="Scale factor" variable="ScaleFactor" trace_name="ScaleFactor" type="float" help="Displacement is vector times scale." default_value="1.0"/>
+  <VectorEntry variable="Normal" trace_name="Normal" type="float" length="3" help="Warp direction." default_value="0.0 0.0 1.0"/>
+  <LabeledToggle label="Use normal" trace_name="UseNormal" variable="UseNormal" help="Use instance model normals rather than instance normal." default_value="0"/>
+  <LabeledToggle label="X-Y plane" trace_name="XYPlane" variable="XYPlane" help="Z value is used to warp the surface, scalars to color surface." default_value="0"/>
 </Module>
 
 <Module name="WarpVector" root_name="WarpV"
@@ -788,7 +793,7 @@ help="Set the name of the array to hold the results of this computation"/>
   <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" 
              label="Vectors" input_menu="im" number_of_components="3"
              help="Select the input vectors to process."/>
-  <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Displacement is vector times scale."/>
+  <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Displacement is vector times scale." default_value="1.0"/>
 </Module>
 
   <Module name="Cut" root_name="Cut" replace_input="0"
@@ -868,13 +873,15 @@ help="Set the name of the array to hold the results of this computation"/>
          <Item>
            <VectorEntry label="Clip value" trace_name="Offset"
                         type="float" variable="Value"
-                        help="Choose the scalar value to clip with"/>
+                        help="Choose the scalar value to clip with"
+                        default_value="0.0"/>
          </Item>
         </ContainerWidget>
       </Item>
     </SelectWidget>
     <LabeledToggle label="Inside Out" trace_name="InsideOut" variable="InsideOut"
-                   help="Switches which part to keep."/>
+                   help="Switches which part to keep."
+                   default_value="0"/>
   </Module>
   <Module name="Threshold" 
           root_name="Threshold" button_image="PVThresholdButton"
@@ -909,7 +916,8 @@ help="Set the name of the array to hold the results of this computation"/>
              set_command="ThresholdBetween"  />
     <LabeledToggle label="All Scalars" trace_name="AllScalars"
                    variable="AllScalars" 
-                   help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data." /> 
+                   help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."
+                   default_value="1"/> 
   </Module>
   <Module name="Contour" 
        root_name="Contour" button_image="PVContourButton"
@@ -944,13 +952,16 @@ help="Set the name of the array to hold the results of this computation"/>
                 help="List of current contour values. "/>
     <LabeledToggle label="Compute Normals"
                    variable="ComputeNormals" 
-                   help="Select whether to compute normals"/>
+                   help="Select whether to compute normals"
+                   default_value="1"/>
     <LabeledToggle label="Compute Gradients"
                    variable="ComputeGradients" 
-                   help="Select whether to compute gradients"/>
+                   help="Select whether to compute gradients"
+                   default_value="0"/>
     <LabeledToggle label="Compute Scalars"
                    variable="ComputeScalars" 
-                   help="Select whether to compute scalars"/>
+                   help="Select whether to compute scalars"
+                   default_value="0"/>
   </Module>
   <Module name="Glyph" root_name="Glyph" 
           module_type="Filter" button_image="PVGlyphButton"
@@ -992,7 +1003,7 @@ help="Set the name of the array to hold the results of this computation"/>
         <DummyWidget/>
       </Item>
     </SelectWidget>
-  <VectorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant"/>
+  <VectorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" default_value="1.0"/>
   </Module>
   <Module name="Probe" class="vtkPVProbe" 
           root_name="Probe" button_image="PVProbeButton"
@@ -1044,14 +1055,16 @@ help="Set the name of the array to hold the results of this computation"/>
       <Item>
         <SelectionList variable="MaximumPropagationUnit" trace_name="MaximumPropagationUnit" 
                        label="Max. Propagation" option_width="15"
-                       help="Maximum propagation">
+                       help="Maximum propagation"
+                       default_value="1">
           <Item name="Time" value="0"/>
           <Item name="Length" value="1"/>
         </SelectionList>
       </Item>
       <Item>
         <VectorEntry label="" variable="MaximumPropagation" type="float"
-                     trace_name="MaxPropLen" help="Maximum propagation"/>
+                     trace_name="MaxPropLen" help="Maximum propagation"
+                     default_value="1.0"/>
       </Item>
   </ContainerWidget>
 
@@ -1059,7 +1072,8 @@ help="Set the name of the array to hold the results of this computation"/>
       <Item>
         <SelectionList trace_name="InitialIntegrationStepUnit" variable="InitialIntegrationStepUnit" 
                        label="Init. Step Len."  option_width="15"
-                       help="Initial step length">
+                       help="Initial step length"
+                       default_value="2">
           <Item name="Time" value="0"/>
           <Item name="Length" value="1"/>
           <Item name="Cell Length" value="2"/>
@@ -1067,11 +1081,12 @@ help="Set the name of the array to hold the results of this computation"/>
       </Item>
       <Item>
         <VectorEntry label="" variable="InitialIntegrationStep" type="float"
-                     trace_name="InitLen" help="Initial step length"/>
+                     trace_name="InitLen" help="Initial step length"
+                     default_value="0.5"/>
       </Item>
   </ContainerWidget>
 
-  <SelectionList trace_name="IntegrationDirection" variable="IntegrationDirection"  option_width="15">
+  <SelectionList trace_name="IntegrationDirection" variable="IntegrationDirection"  option_width="15" default_value="0">
     <Item name="FORWARD"  value="0"/>
     <Item name="BACKWARD" value="1"/>
     <Item name="BOTH"     value="2"/>
@@ -1091,7 +1106,8 @@ help="Set the name of the array to hold the results of this computation"/>
         <Item>
          <SelectionList variable="MinimumIntegrationStepUnit" trace_name="MinimumIntegrationStepUnit" 
                        label="Min. Step Len."  option_width="15"
-                       help="Minimum step length used in the integation">
+                       help="Minimum step length used in the integation"
+                       default_value="2">
           <Item name="Time" value="0"/>
           <Item name="Length" value="1"/>
           <Item name="Cell Length" value="2"/>
@@ -1100,7 +1116,8 @@ help="Set the name of the array to hold the results of this computation"/>
         <Item>
          <VectorEntry label="" variable="MinimumIntegrationStep" type="float"
                       trace_name="MinLen"  
-                      help="Minimum step length  used in the integation"/>
+                      help="Minimum step length  used in the integation"
+                      default_value="0.01"/>
         </Item>
        </ContainerWidget>
       </Item>
@@ -1110,7 +1127,8 @@ help="Set the name of the array to hold the results of this computation"/>
         <Item>
          <SelectionList variable="MaximumIntegrationStepUnit" trace_name="MaximumIntegrationStepUnit" 
                         label="Max. Step Len."  option_width="15"
-                        help="Maximum step length used in the integration">
+                        help="Maximum step length used in the integration"
+                        default_value="2">
            <Item name="Time" value="0"/>
            <Item name="Length" value="1"/>
            <Item name="Cell Length" value="2"/>
@@ -1119,25 +1137,27 @@ help="Set the name of the array to hold the results of this computation"/>
         <Item>
          <VectorEntry label="" variable="MaximumIntegrationStep" type="float"
                       trace_name="MaxLen" 
-                      help="Maximum step length used in the integration"/>
+                      help="Maximum step length used in the integration"
+                      default_value="1.0"/>
         </Item>
        </ContainerWidget>
       </Item>
       <Item>
        <VectorEntry label="Maximum Error" trace_name="MaximumError" variable="MaximumError" 
                       type="float" 
-                      help="Maximum error allowed in the integration"/>
+                      help="Maximum error allowed in the integration"
+                      default_value="0.000001"/>
       </Item>
      </ContainerWidget>
     </Item>
   </SelectWidget>
   <VectorEntry label="Max. Steps" trace_name="MaximumNumberOfSteps" variable="MaximumNumberOfSteps" type="int"
-               help="Maximum number of steps."/>
+               help="Maximum number of steps."
+               default_value="2000"/>
   <VectorEntry label="Term. Speed" trace_name="TerminalSpeed" variable="TerminalSpeed" 
                type="float" 
-               help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"/>
-
-
+               help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"
+               default_value="0.000000000001"/>
  </Module>
 </ModuleInterfaces>
 

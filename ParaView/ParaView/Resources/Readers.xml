@@ -122,7 +122,8 @@
     <Source class="vtkGenericEnSightReader"/>
     <SelectionList label="Byte order" trace_name="ByteOrder"
                    variable="ByteOrder"
-           help="Select the byte order of the binary file">
+                   help="Select the byte order of the binary file"
+                   default_value="0">
       <Item name="big endian" value="0"/>
       <Item name="little endian" value="1"/>
     </SelectionList>
@@ -140,7 +141,8 @@
          file_description="HDF5 Raw ImageData Files">
   <Source class="vtkHDF5RawImageReader"/>
   <VectorEntry length="3" variable="Stride" trace_name="Stride" type="int" 
-               help="Read a subset of data spaced by the stride."/>
+               help="Read a subset of data spaced by the stride."
+               default_value="1 1 1"/>
   <ArraySelection attribute_name="Point"/>
  </Module>
  <Module name="vrmlreader" class="vtkPVReaderModule" root_name="VRML" 
@@ -158,7 +160,7 @@
           extensions=".xyz" file_description="XMol Molecule Files">
     <Source class="vtkXYZMolReader"/>
     <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
-                 help="Set the TimeStep"/>
+                 help="Set the TimeStep" default_value="0"/>
   </Module>
   <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
           root_name="Plot3D"
@@ -170,26 +172,33 @@
                help="Set the plot3d q file to read."/>
     <LabeledToggle label="Binary" trace_name="BinaryFile"
                    variable="BinaryFile" 
-                   help="Is this a binary file?"/>
+                   help="Is this a binary file?"
+                   default_value="1"/>
     <LabeledToggle label="Multi-block" trace_name="MultiGrid"
                    variable="MultiGrid" 
-                   help="Does this file have multiple block information"/>
+                   help="Does this file have multiple block information"
+                   default_value="0"/>
     <LabeledToggle label="Fortran byte count" trace_name="HasByteCount"
        variable="HasByteCount" 
-       help="Does this file use Fortran leading-trailing byte counts"/>
+       help="Does this file use Fortran leading-trailing byte counts"
+       default_value="0"/>
     <LabeledToggle label="I blanking" trace_name="IBlanking"
                     variable="IBlanking"
-                    help="Any visibility information?"/>
+                    help="Any visibility information?"
+                    default_value="0"/>
     <LabeledToggle label="2D geometry"
                    trace_name="TwoDimensionalGeometry"
                     variable="TwoDimensionalGeometry"
-                    help="Is there only data for two dimensions?"/>
+                    help="Is there only data for two dimensions?"
+                    default_value="0"/>
     <LabeledToggle label="Force read" trace_name="ForceRead"
                    variable="ForceRead"
-                   help="Read even if file looks corrupt?"/>
+                   help="Read even if file looks corrupt?"
+                   default_value="0"/>
   <SelectionList label="Byte order" trace_name="ByteOrder"
                  variable="ByteOrder"
-         help="Select the byte order of the binary file">
+                 help="Select the byte order of the binary file"
+                 default_value="0">
     <Item name="big endian" value="0"/>
     <Item name="little endian" value="1"/>
   </SelectionList>
@@ -209,9 +218,9 @@
           extensions=".cube" file_description="Gaussian Cube Files">
     <Source class="vtkGaussianCubeReader"/>
     <VectorEntry variable="HBScale" trace_name="HBScale" type="float" 
-                 help="Set the HB scale"/>
+                 help="Set the HB scale" default_value="1.0"/>
     <VectorEntry variable="BScale" trace_name="BScale" type="float" 
-                 help="Set the B scale"/>
+                 help="Set the B scale" default_value="1.0"/>
   </Module>
   <Module name="popreader" class="vtkPVAdvancedReaderModule" 
           root_name="POP" 
@@ -219,14 +228,16 @@
           extensions=".pop" file_description="POP Ocean Files">
     <Source class="vtkPOPReader"/>
     <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-                 help="Set the radius of the data set"/>
+                 help="Set the radius of the data set" defulat_value="60000"/>
     <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
                  length="6" trace_name="ClipExtent"
-                 help="For reading a smaller extent."/>
+                 help="For reading a smaller extent."
+                 default_value="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647"/>
     <VectorEntry label="Ghost Levels" trace_name="NumberOfGhostLevels"
                  variable="NumberOfGhostLevels" 
                  type="int" 
-                 help="Set the number of ghost levels to read."/>
+                 help="Set the number of ghost levels to read."
+                 default_value="1"/>
   </Module>
   <Module name="ensightMS" class="vtkPVEnSightReaderModule"
           root_name="Ensight" 
@@ -245,10 +256,12 @@
         short_help="Read raw regular rectilinear grid data from a file">
   <Source class="vtkImageReader"/>
   <StringEntry label="File pattern" trace_name="FilePattern" 
-               variable="FilePattern" help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"/>
+               variable="FilePattern" help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"
+               default_value="%s.%d"/>
   <SelectionList label="Data type" trace_name="DataScalarType" 
                  variable="DataScalarType" 
-                 help="Select the pixel type in the file: short, int, float ...">
+                 help="Select the pixel type in the file: short, int, float ..."
+                 default_value="4">
     <Item name="char" value="2"/>
     <Item name="unsigned char" value="3"/>
     <Item name="short" value="4"/>
@@ -263,28 +276,34 @@
   <SelectionList label="Byte order" trace_name="DataByteOrder" 
                  variable="DataByteOrder" 
                  help="Select the byte order of the binary file" 
-                 suppress_reset="1">
+                 suppress_reset="1"
+                 default_value="0">
     <Item name="big endian" value="0"/>
     <Item name="little endian" value="1"/>
   </SelectionList>
   <SelectionList label="File Dimensionality" trace_name="Dimensionality" 
                  variable="FileDimensionality" 
-                 help="The number of dimensions stored in a file.">
+                 help="The number of dimensions stored in a file."
+                 default_value="2">
     <Item name="2" value="2"/>
     <Item name="3" value="3"/>
   </SelectionList>
   <VectorEntry label="Origin" trace_name="Origin" variable="DataOrigin" 
                type="float" length="3" 
-               help="Set the position of the point with index (0,0,0)"/>
+               help="Set the position of the point with index (0,0,0)"
+               default_value="0.0 0.0 0.0"/>
   <VectorEntry label="Spacing" trace_name="Spacing" variable="DataSpacing" 
                type="float" length="3" 
-               help="Set the size of a voxel in each dimension."/>
+               help="Set the size of a voxel in each dimension."
+               default_value="1.0 1.0 1.0"/>
   <VectorEntry label="Extent" trace_name="Extent" variable="DataExtent" 
                type="int" length="6" 
-               help="Set the min and max values of the data in each dimension"/>
+               help="Set the min and max values of the data in each dimension"
+               default_value="0 0 0 0 0 0"/>
   <VectorEntry label="Num. components" trace_name="NumberOfScalarComponents" 
        variable="NumberOfScalarComponents" type="int" 
-       help="How many componenets does each pixel have. (i.e. RGB would be 3.)"/>
+       help="How many componenets does each pixel have. (i.e. RGB would be 3.)"
+       default_value="1"/>
 </Module>
 
 #ifdef PARAVIEW_LINK_XDMF
