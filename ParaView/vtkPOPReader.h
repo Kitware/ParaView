@@ -103,7 +103,7 @@ protected:
   
   void DeleteArrays();
   void AddArray(char *arrayName, char *fileName);
-  void AddArrayName(char *arrayName);
+  void AddArrayName(char *arrayName, char *fileName);
   int NumberOfArrays;
   int MaximumNumberOfArrays;
   char **ArrayNames;

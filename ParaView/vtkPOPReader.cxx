@@ -391,17 +391,19 @@ void vtkPOPReader::ReadInformationFile()
 
     else if (strcmp(str, "NumberOfArrays") == 0)
       {
+      char str2[256];
       *file >> num;
       for (i = 0; i < num; ++i)
         {
         *file >> str;
+        *file >> str2;
         if (file->fail())
           {
           vtkErrorMacro("Error reading array name " << i);    
           delete file;
           return;
           }
-        this->AddArrayName(str);
+        this->AddArrayName(str, str2);
         }
       }
 
@@ -441,16 +443,18 @@ void vtkPOPReader::SetGridName(char *name)
 }
 
 //----------------------------------------------------------------------------
-void vtkPOPReader::AddArrayName(char *name)
+// This will append the full path onto the file name. (using the grid path/
+void vtkPOPReader::AddArrayName(char *name, char *fileName)
 {
-  if (this->IsFileName(name))
+  char *tmp;
+
+  if (fileName[0] == '/' || fileName[1] == ':')
     {
-    vtkErrorMacro("We do not handle arrays in differnt directories yet.");
+    this->AddArray(name, fileName);
     return;
     }
   
-  char *tmp;
-  tmp = this->MakeFileName(name);
+  tmp = this->MakeFileName(fileName);
   this->AddArray(name, tmp);
   delete [] tmp;
 }
