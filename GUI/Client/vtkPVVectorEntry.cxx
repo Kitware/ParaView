@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.60");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.61");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -716,15 +716,21 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* type = element->GetAttribute("type");
   if(!type)
     {
-    vtkErrorMacro("No type attribute.");
-    return 0;
+    // I should not have to set the type of a scale factor entry (a subclass
+    // of vtkPVVectorEntry) because the only type it supports is float.
+    // Besides DataType is already initialized to this value in the
+    // constructor.
+    this->DataType = VTK_FLOAT;
     }
-  if(strcmp(type, "int") == 0) { this->DataType = VTK_INT; }
-  else if(strcmp(type, "float") == 0) { this->DataType = VTK_FLOAT; }
   else
     {
-    vtkErrorMacro("Unknown type " << type);
-    return 0;
+    if(strcmp(type, "int") == 0) { this->DataType = VTK_INT; }
+    else if(strcmp(type, "float") == 0) { this->DataType = VTK_FLOAT; }
+    else
+      {
+      vtkErrorMacro("Unknown type " << type);
+      return 0;
+      }
     }
 
   // Setup the Label.

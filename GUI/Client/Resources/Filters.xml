@@ -1171,7 +1171,6 @@ The Reflection filter reflects the input data set across the specified plane. If
                       property="Width"
                       input_menu="im"
                       trace_name="Width"
-                      type="float"
                       scale_factor="0.01"
                       help="The half width of the ribbon (or minimum)."/>
     <Scale label="Angle"
@@ -1508,7 +1507,6 @@ The Transform filter allows you to specify the position, size, and orientation o
                       property="Radius"
                       input_menu="im"
                       trace_name="Radius"
-                      type="float"
                       scale_factor="0.01"
                       help="Set the radius of the tube" />
     <SelectionList label="Vary radius"
@@ -2041,7 +2039,6 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Item>
         <ScaleFactorEntry label=""
                           property="MaximumPropagation"
-                          type="float"
                           trace_name="MaxPropLen"
                           scale_factor="1.0"
                           input_menu="im"
