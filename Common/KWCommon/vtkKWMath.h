@@ -75,6 +75,10 @@ public:
   // Return true if first extent is within second extent
   static int ExtentIsWithinOtherExtent(int extent1[6], int extent2[6]);
 
+  // Description:
+  static void LabToXYZ(double lab[3], double xyz[3]);
+  static void XYZToRGB(double xyz[3], double rgb[3]);
+
 protected:
   vtkKWMath() {};
   ~vtkKWMath() {};

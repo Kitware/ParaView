@@ -61,9 +61,10 @@
 #include "vtkSMProxy.h"
 #include "vtkKWEvent.h"
 #include "vtkMath.h"
+#include "vtkKWMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.109");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.110");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1427,11 +1428,11 @@ void vtkPVColorMap::SetColorSchemeToLabBlueRed()
 
   double rgb[3];
   double xyz[3];
-  this->LabToXYZ(startHSV,xyz);
-  this->XYZToRGB(xyz,rgb);
+  vtkKWMath::LabToXYZ(startHSV,xyz);
+  vtkKWMath::XYZToRGB(xyz,rgb);
   this->StartColorButton->SetColor(rgb[0],rgb[1],rgb[2]);
-  this->LabToXYZ(endHSV,xyz);
-  this->XYZToRGB(xyz,rgb);
+  vtkKWMath::LabToXYZ(endHSV,xyz);
+  vtkKWMath::XYZToRGB(xyz,rgb);
   this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);
 
 /*  this->SetHueRangeInternal(hr);
@@ -1493,8 +1494,8 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
   if (hsv[0] > 1.1)
     { // Detect the Sandia hack for changing the interpolation.
     double xyz[3];
-    this->LabToXYZ(hsv,xyz);
-    this->XYZToRGB(xyz,rgb);
+    vtkKWMath::LabToXYZ(hsv,xyz);
+    vtkKWMath::XYZToRGB(xyz,rgb);
     this->StartColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
     }
   else
@@ -1622,8 +1623,8 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
   if (hsv[0] > 1.1)
     { // Detect the Sandia hack for changing the interpolation.
     double xyz[3];
-    this->LabToXYZ(hsv,xyz);
-    this->XYZToRGB(xyz,rgb);
+    vtkKWMath::LabToXYZ(hsv,xyz);
+    vtkKWMath::XYZToRGB(xyz,rgb);
     this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
     }
   else
@@ -1931,69 +1932,6 @@ void vtkPVColorMap::ScalarRangeWidgetCallback()
     {
     this->GetPVRenderView()->EventuallyRender();
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::LabToXYZ(double Lab[3], double xyz[3])
-{
-  
-  //LAB to XYZ
-  double var_Y = ( Lab[0] + 16 ) / 116;
-  double var_X = Lab[1] / 500 + var_Y;
-  double var_Z = var_Y - Lab[2] / 200;
-    
-  if ( pow(var_Y,3) > 0.008856 ) var_Y = pow(var_Y,3);
-  else var_Y = ( var_Y - 16 / 116 ) / 7.787;
-                                                            
-  if ( pow(var_X,3) > 0.008856 ) var_X = pow(var_X,3);
-  else var_X = ( var_X - 16 / 116 ) / 7.787;
-
-  if ( pow(var_Z,3) > 0.008856 ) var_Z = pow(var_Z,3);
-  else var_Z = ( var_Z - 16 / 116 ) / 7.787;
-  double ref_X =  95.047;
-  double ref_Y = 100.000;
-  double ref_Z = 108.883;
-  xyz[0] = ref_X * var_X;     //ref_X =  95.047  Observer= 2° Illuminant= D65
-  xyz[1] = ref_Y * var_Y;     //ref_Y = 100.000
-  xyz[2] = ref_Z * var_Z;     //ref_Z = 108.883
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::XYZToRGB(double xyz[3], double rgb[3])
-{
-  
-  //double ref_X =  95.047;        //Observer = 2° Illuminant = D65
-  //double ref_Y = 100.000;
-  //double ref_Z = 108.883;
- 
-  double var_X = xyz[0] / 100;        //X = From 0 to ref_X
-  double var_Y = xyz[1] / 100;        //Y = From 0 to ref_Y
-  double var_Z = xyz[2] / 100;        //Z = From 0 to ref_Y
- 
-  double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
-  double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
-  double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
- 
-  if ( var_R > 0.0031308 ) var_R = 1.055 * ( pow(var_R, ( 1 / 2.4 )) ) - 0.055;
-  else var_R = 12.92 * var_R;
-  if ( var_G > 0.0031308 ) var_G = 1.055 * ( pow(var_G ,( 1 / 2.4 )) ) - 0.055;
-  else  var_G = 12.92 * var_G;
-  if ( var_B > 0.0031308 ) var_B = 1.055 * ( pow(var_B, ( 1 / 2.4 )) ) - 0.055;
-  else var_B = 12.92 * var_B;
-                                                                                                 
-  rgb[0] = var_R;
-  rgb[1] = var_G;
-  rgb[2] = var_B;
-  
-  //clip colors. ideally we would do something different for colors
-  //out of gamut, but not really sure what to do atm.
-  if (rgb[0]<0) rgb[0]=0;
-  if (rgb[1]<0) rgb[1]=0;
-  if (rgb[2]<0) rgb[2]=0;
-  if (rgb[0]>1) rgb[0]=1;
-  if (rgb[1]>1) rgb[1]=1;
-  if (rgb[2]>1) rgb[2]=1;
-
 }
 
 //----------------------------------------------------------------------------

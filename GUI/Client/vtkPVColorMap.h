@@ -299,9 +299,6 @@ protected:
   void UpdateInternalScalarBarVisibility();
   void ComputeScalarRangeForSource(vtkPVSource* pvs, double* range);
 
-  void LabToXYZ(double Lab[3], double xyz[3]);
-  void XYZToRGB(double xyz[3], double rgb[3]);
-
   vtkPVRenderView *PVRenderView;
 
   int Initialized;
