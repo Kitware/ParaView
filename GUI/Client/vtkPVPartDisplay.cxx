@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.33");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.34");
 
 
 //----------------------------------------------------------------------------
@@ -202,31 +202,32 @@ void vtkPVPartDisplay::SetInput(vtkPVPart* input)
   pm->SendStreamToServer();
   
   if ( input != NULL )
-  {
-  vtkPVClassNameInformation *info = vtkPVClassNameInformation::New();
-  pm->GatherInformation(info, input->GetVTKDataID());
-  char *className = info->GetVTKClassName();
-  
-  if (strcmp(className, "vtkUnstructuredGrid") == 0 )
     {
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterID
-           << "SetInput" << input->GetVTKDataID() << vtkClientServerStream::End;
+    vtkPVClassNameInformation *info = vtkPVClassNameInformation::New();
+    pm->GatherInformation(info, input->GetVTKDataID());
+    char *className = info->GetVTKClassName();
+  
+    if (strcmp(className, "vtkUnstructuredGrid") == 0 )
+      {
+      stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterID
+             << "SetInput" << input->GetVTKDataID()
+             << vtkClientServerStream::End;
     
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterID
-           << "GetOutput" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterID
-           << "SetInput" <<  vtkClientServerStream::LastResult 
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterID
-           << "GetOutput" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeMapperID
-           << "SetInput" <<  vtkClientServerStream::LastResult 
-           << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterID
+             << "GetOutput" << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterID
+             << "SetInput" <<  vtkClientServerStream::LastResult 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterID
+             << "GetOutput" << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->VolumeMapperID
+             << "SetInput" <<  vtkClientServerStream::LastResult 
+             << vtkClientServerStream::End;
 
-    pm->SendStreamToServer();
+      pm->SendStreamToServer();
+      }
+    info->Delete();
     }
-  info->Delete();
-  }
 }
 
 //----------------------------------------------------------------------------

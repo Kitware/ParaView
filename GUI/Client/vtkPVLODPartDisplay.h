@@ -57,10 +57,6 @@ public:
   virtual void ColorByArray(vtkPVColorMap *colorMap, int field);
 
   // Description:
-  // Connect the VTK data object to the display pipeline.
-  virtual void SetInput(vtkPVPart* input);
-
-  // Description:
   // This method updates the piece that has been assigned to this process.
   // It also gathers the data information.
   virtual void Update();

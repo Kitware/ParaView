@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.22");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.23");
 
 
 //----------------------------------------------------------------------------
@@ -75,32 +75,6 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
       }
     this->LODCollectID.ID = 0;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCompositePartDisplay::SetInput(vtkPVPart* input)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-
-  if (input == NULL)
-    {
-    vtkClientServerID nullID;
-    nullID.ID = 0;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->GeometryID << "SetInput" << nullID
-      << vtkClientServerStream::End;
-    }
-  else
-    {  
-    // The input of course is the geometry filter.
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->GeometryID << "SetInput" << input->GetVTKDataID()
-      << vtkClientServerStream::End;
-    }
-  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------

@@ -47,10 +47,6 @@ public:
   vtkGetMacro(LODCollectionDecision, int);
 
   // Description:
-  // Connect the VTK data object to the display pipeline.
-  virtual void SetInput(vtkPVPart* input);
-
-  // Description:
   // Collection filters for both levels of detail.
   vtkGetMacro(CollectID, vtkClientServerID);
   vtkGetMacro(LODCollectID, vtkClientServerID);
