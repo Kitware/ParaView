@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.139");
+vtkCxxRevisionMacro(vtkKWWindow, "1.140");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -789,7 +789,7 @@ void vtkKWWindow::OnPrint(int propagate, int res)
   if ( propagate )
     {
     float dpi = res;
-    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
+    this->InvokeEvent(vtkKWEvent::PrinterDPIChangedEvent, &dpi);
     }
   else
     {
@@ -1112,7 +1112,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.139 $");
+  this->ExtractRevision(os,"$Revision: 1.140 $");
 }
 
 int vtkKWWindow::ExitDialog()
