@@ -139,9 +139,15 @@ public:
   // information are updated.
   virtual void UpdateInformation();
   
+//BTX
+  // Description:
+  // Set server ids on self and sub-proxies.
+  void SetServers(vtkTypeUInt32 servers);
+ 
   // Description:
   // Return the servers.
   vtkTypeUInt32 GetServers();
+//ETX
 
   // Description:
   // Copy the values of all properties and sub-proxies.
@@ -162,33 +168,20 @@ protected:
   // public interface exposed by vtkSMProxy. Each of these classes
   // use a small subset of protected methods. This should be kept
   // as such.
+  friend class vtkSMDisplayWindowProxy;
   friend class vtkSMProperty;
   friend class vtkSMProxyManager;
   friend class vtkSMInputProperty;
   friend class vtkSMProxyProperty;
-  friend class vtkSMDisplayerProxy;
-  friend class vtkSMDisplayWindowProxy;
+  friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
-  friend class vtkSMPropertyIterator;
   friend class vtkSMPartDisplay;
   friend class vtkSMLODPartDisplay;
   friend class vtkSMCompositePartDisplay;
+  friend class vtkSMDisplayerProxy;
   friend class vtkSMPointLabelDisplay;
   friend class vtkSMPlotDisplay;
-  friend class vtkSMCubeAxesDisplayProxy;
-  friend class vtkSMBoxWidgetProxy;
-  friend class vtkSMSimpleDisplayProxy;
-  friend class vtkSMLODDisplayProxy;
-  friend class vtkSMCompositeDisplayProxy;
-  friend class vtkSMRenderModuleProxy;
-  friend class vtkSMMPIRenderModuleProxy;
-  friend class vtkSMCaveRenderModuleProxy;
-  friend class vtkSMCompositeRenderModuleProxy;
-  friend class vtkSMIceTRenderModuleProxy;
-  friend class vtkSMIceTDesktopRenderModuleProxy;
-  friend class vtkSMMultiDisplayRenderModuleProxy;
-  friend class vtkSMXYPlotDisplayProxy;
 //ETX
 
   // Description:
@@ -243,9 +236,6 @@ protected:
   // See vtkProcessModule.h for a list of all server types.
   // To add a server, OR it's value with the servers ivar.
 
-  // Description:
-  // Set server ids on self and sub-proxies.
-  void SetServers(vtkTypeUInt32 servers);
 
   // Description:
   // Set server ids on self
