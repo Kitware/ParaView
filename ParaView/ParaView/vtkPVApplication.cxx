@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.208");
+vtkCxxRevisionMacro(vtkPVApplication, "1.209");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1708,6 +1708,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
   os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off")
+     << endl; 
+  os << indent << "UseOffscreenRendering: " << (this->UseOffscreenRendering?"on":"off")
      << endl; 
   os << indent << "StartGUI: " << this->StartGUI << endl;
   if (this->UseTiledDisplay)
