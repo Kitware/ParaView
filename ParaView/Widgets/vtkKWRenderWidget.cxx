@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.14");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -543,7 +543,6 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
     this->CollapsingRenders = 0;
     if ( this->CollapsingRendersCount )
       {
-      cout << "With render" << endl;
       this->Render();
       }
     }
