@@ -130,6 +130,11 @@ public:
     unsigned long ID;
   };
 
+  // Description:
+  // Dynamically load a wrapper module into the interpreter.  Returns
+  // 1 for success and 0 for failure.
+  int Load(const char* moduleName);
+  int Load(const char* moduleName, const char*const* optionalPaths);
 protected:
   // Map from ID to message stream.
   typedef vtkHashMap<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
@@ -158,6 +163,9 @@ protected:
   // given argument index.
   int ExpandMessage(const vtkClientServerStream& in, int inIndex,
                     int startArgument, vtkClientServerStream& out);
+
+  // Load a module dynamically given the full path to it.
+  int LoadInternal(const char* moduleName, const char* fullPath);
 
 private:
 

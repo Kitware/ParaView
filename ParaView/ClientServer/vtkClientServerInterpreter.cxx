@@ -19,13 +19,16 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkDynamicLoader.h"
 #include "vtkHashMap.txx"
 #include "vtkObjectFactory.h"
 
+#include <vtkstd/string>
 #include <vtkstd/vector>
+#include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.16");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.17");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -744,4 +747,129 @@ vtkClientServerInterpreter
 ::AddNewInstanceFunction(vtkClientServerNewInstanceFunction f)
 {
   this->Internal->NewInstanceFunctions.push_back(f);
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::Load(const char* moduleName)
+{
+  return this->Load(moduleName, 0);
+}
+
+//----------------------------------------------------------------------------
+static
+void vtkClientServerInterpreterSplit(const char* path,
+                                     char split, char slash,
+                                     vtkstd::vector<vtkstd::string>& paths)
+{
+  vtkstd::string str = path?path:"";
+  std::string::size_type lpos = 0;
+  std::string::size_type rpos = str.npos;
+  while((rpos = str.find(split, lpos)) != str.npos)
+    {
+    if(lpos < rpos)
+      {
+      vtkstd::string dir = str.substr(lpos, rpos-lpos);
+      if(*(dir.end()-1) != slash)
+        {
+        dir += slash;
+        }
+      paths.push_back(dir);
+      }
+    lpos = rpos+1;
+    }
+  if(lpos < str.length())
+    {
+    vtkstd::string dir = str.substr(lpos);
+    if(*(dir.end()-1) != slash)
+      {
+      dir += slash;
+      }
+    paths.push_back(dir);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::Load(const char* moduleName,
+                                     const char*const* optionalPaths)
+{
+  // The library search path.
+  typedef vtkstd::vector<vtkstd::string> PathsType;
+  PathsType paths;
+
+  // Try user-specified paths if any.
+  if(optionalPaths)
+    {
+    for(const char*const* p = optionalPaths; *p; ++p)
+      {
+      paths.push_back(*p);
+      }
+    }
+
+  // Try system paths.
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  vtkClientServerInterpreterSplit(getenv("PATH"), ';', '\\', paths);
+#else
+  vtkClientServerInterpreterSplit(getenv("LD_LIBRARY_PATH"), ':', '/', paths);
+  vtkClientServerInterpreterSplit(getenv("PATH"), ':', '/', paths);
+  paths.push_back("/usr/lib/");
+  paths.push_back("/usr/lib/vtk/");
+  paths.push_back("/usr/local/lib/");
+  paths.push_back("/usr/local/lib/vtk/");
+#endif
+
+  // Search for the module.
+  vtkstd::string searched;
+  vtkstd::string libName = vtkDynamicLoader::LibPrefix();
+  libName += moduleName;
+  libName += vtkDynamicLoader::LibExtension();
+  for(PathsType::iterator p = paths.begin(); p != paths.end(); ++p)
+    {
+    struct stat data;
+    vtkstd::string fullPath = *p;
+    fullPath += moduleName;
+    if(stat(fullPath.c_str(), &data) == 0)
+      {
+      return this->LoadInternal(moduleName, fullPath.c_str());
+      }
+    searched += p->substr(0, p->length()-1);
+    searched += "\n";
+    }
+
+  vtkErrorMacro("Cannot find module \"" << libName.c_str() << "\".  "
+                << "The following paths were searched:\n"
+                << searched.c_str());
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::LoadInternal(const char* moduleName,
+                                             const char* fullPath)
+{
+  // The type of a module initializer function.
+  typedef void (*InitFunction)(vtkClientServerInterpreter*);
+
+  // Load the library dynamically.
+  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(fullPath);
+  if(!lib)
+    {
+    vtkErrorMacro("Cannot load module \"" << moduleName << "\" from \""
+                  << fullPath << "\".");
+    return 0;
+    }
+
+  // Get the init function.
+  vtkstd::string initFuncName = moduleName;
+  initFuncName += "_Initialize";
+  void* pfunc = vtkDynamicLoader::GetSymbolAddress(lib, initFuncName.c_str());
+  InitFunction func = *reinterpret_cast<InitFunction*>(&pfunc);
+  if(!func)
+    {
+    vtkErrorMacro("Cannot find function \"" << initFuncName.c_str()
+                  << "\" in \"" << fullPath << "\".");
+    return 0;
+    }
+
+  // Call the init function.
+  func(this);
+  return 1;
 }
