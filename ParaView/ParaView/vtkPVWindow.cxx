@@ -110,7 +110,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.342");
+vtkCxxRevisionMacro(vtkPVWindow, "1.343");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -151,19 +151,20 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
 
+  // Keep a list of the toolbar buttons so that they can be 
+  // disabled/enabled in certain situations.
+  this->ToolbarButtons = vtkArrayMap<const char*, vtkKWPushButton*>::New();
+
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   this->FlyStyle = vtkPVInteractorStyleFly::New();
-
-
   
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
   this->HideCenterButton = vtkKWPushButton::New();
-  this->CenterEntryOpenButton = vtkKWPushButton::New();
-  this->CenterEntryCloseButton = vtkKWPushButton::New();
+  this->CenterEntryOpenCloseButton = vtkKWPushButton::New();
   this->CenterEntryFrame = vtkKWWidget::New();
   this->CenterXLabel = vtkKWLabel::New();
   this->CenterXEntry = vtkKWEntry::New();
@@ -247,10 +248,6 @@ vtkPVWindow::vtkPVWindow()
   vtkPVSourceCollection* sources = vtkPVSourceCollection::New();
   this->SourceLists->SetItem("Sources", sources);
   sources->Delete();
-
-  // Keep a list of the toolbar buttons so that they can be 
-  // disabled/enabled in certain situations.
-  this->ToolbarButtons = vtkArrayMap<const char*, vtkKWPushButton*>::New();
 
   // Keep a list of all loaded packages (Tcl libraries) so that
   // they can be written out when writing Tcl scripts.
@@ -457,16 +454,10 @@ void vtkPVWindow::PrepareForDelete()
     this->HideCenterButton = NULL;
     }
   
-  if (this->CenterEntryOpenButton)
+  if (this->CenterEntryOpenCloseButton)
     {
-    this->CenterEntryOpenButton->Delete();
-    this->CenterEntryOpenButton = NULL;
-    }
-  
-  if (this->CenterEntryCloseButton)
-    {
-    this->CenterEntryCloseButton->Delete();
-    this->CenterEntryCloseButton = NULL;
+    this->CenterEntryOpenCloseButton->Delete();
+    this->CenterEntryOpenCloseButton = NULL;
     }
   
   if (this->CenterXLabel)
@@ -730,78 +721,95 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
   this->InteractorToolbar->SetParent(this->GetToolbarFrame());
   this->InteractorToolbar->Create(app);
+  this->InteractorToolbar->Pack("-side left");
 
   this->Toolbar->SetParent(this->GetToolbarFrame());
   this->Toolbar->Create(app);
-  
-  this->Script("pack %s -side left -pady 0 -anchor n -fill none -expand no",
-               this->InteractorToolbar->GetWidgetName());
-  this->Script("pack  %s -side left -pady 0 -fill both -expand yes",
-               this->Toolbar->GetWidgetName()); 
-  
+  this->Toolbar->ResizableOn();
+  this->Toolbar->Pack("-side left");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 {
   // Set up the button to reset the camera.
-  vtkKWWidget* pushButton = vtkKWWidget::New();
-  pushButton->SetParent(this->InteractorToolbar->GetFrame());
-  pushButton->Create(app, "button", "-image KWResetViewButton -bd 0");
-  pushButton->SetCommand(this, "ResetCameraCallback");
-  this->Script( "pack %s -side left -fill none -expand no",
-                pushButton->GetWidgetName());
-  pushButton->SetBalloonHelpString(
+  
+  vtkKWPushButton* reset_cam = vtkKWPushButton::New();
+  reset_cam->SetParent(this->InteractorToolbar->GetFrame());
+  reset_cam->Create(app, "-image KWResetViewButton");
+  reset_cam->SetCommand(this, "ResetCameraCallback");
+  reset_cam->SetBalloonHelpString(
     "Reset the view to show all the visible parts.");
-  pushButton->Delete();
-  pushButton = NULL;
+  this->InteractorToolbar->AddWidget(reset_cam);
+  reset_cam->Delete();
 
   // set up the interactor styles
   // The interactor styles (selection and events) add no trace entries.
   
-  // fly interactor style
-  this->FlyButton->SetParent(this->InteractorToolbar);
-  this->FlyButton->Create(app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton -bd 0");
+  // Fly interactor style
+
+  this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
+  this->FlyButton->Create(
+    app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton");
   this->FlyButton->SetBalloonHelpString(
     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
   this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
                this->FlyButton->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               this->FlyButton->GetWidgetName());
+  this->InteractorToolbar->AddWidget(this->FlyButton);
 
-  // rotate camera interactor style
-  this->RotateCameraButton->SetParent(this->InteractorToolbar);
-  this->RotateCameraButton->Create(app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton -bd 0");
-  this->RotateCameraButton->SetState(1);
+  // Rotate camera interactor style
+
+  this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
+  this->RotateCameraButton->Create(
+    app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton");
   this->RotateCameraButton->SetBalloonHelpString(
     "Rotate View Mode\n   Left Button: Rotate.\n  Shift + LeftButton: Z roll.\n   Right Button: Behaves like translate view mode.");
   this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
                this->RotateCameraButton->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               this->RotateCameraButton->GetWidgetName());
+  this->InteractorToolbar->AddWidget(this->RotateCameraButton);
+  this->RotateCameraButton->SetState(1);
 
-  // translate camera interactor style
-  this->TranslateCameraButton->SetParent(this->InteractorToolbar);
-  this->TranslateCameraButton->Create(app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton -bd 0");
+  // Translate camera interactor style
+
+  this->TranslateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
+  this->TranslateCameraButton->Create(
+    app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton");
   this->TranslateCameraButton->SetBalloonHelpString(
     "Translate View Mode\n   Left Button: Translate.\n   Right Button: Zoom.");
   this->Script("%s configure -command {%s ChangeInteractorStyle 2}", 
                this->TranslateCameraButton->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               this->TranslateCameraButton->GetWidgetName());
+  this->InteractorToolbar->AddWidget(this->TranslateCameraButton);
 
-  // trackball camera interactor style
-  //this->TrackballCameraButton->SetParent(this->InteractorStyleToolbar);
-  //this->TrackballCameraButton->Create(app, "-text Trackball");
-  //this->TrackballCameraButton->SetBalloonHelpString(
-  //  "Trackball Camera Mode\n   Left Button: Rotate.\n   Shift + Left Button: Pan.\n   Right Button: Zoom.  (Zoom direction is reversed from Translate View Mode)");
-  //this->Script("%s configure -command {%s ChangeInteractorStyle 3}",
-  //             this->TrackballCameraButton->GetWidgetName(), this->GetTclName());
-  //this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2",
-  //             this->TrackballCameraButton->GetWidgetName());
-  //this->TrackballCameraButton->SetState(1);
-  
   this->MainView->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+// Keep a list of the toolbar buttons so that they can be 
+// disabled/enabled in certain situations.
+void vtkPVWindow::AddToolbarButton(const char* buttonName, 
+                                   const char* imageName, 
+                                   const char* fileName,
+                                   const char* command,
+                                   const char* balloonHelp)
+{
+  if (fileName)
+    {
+    this->Script("image create photo %s -file {%s}", imageName, fileName);
+    }
+  vtkKWPushButton* button = vtkKWPushButton::New();
+  button->SetParent(this->Toolbar->GetFrame());
+  ostrstream opts;
+  opts << "-image " << imageName << ends;
+  button->Create(this->GetPVApplication(), opts.str());
+  opts.rdbuf()->freeze(0);
+  button->SetCommand(this, command);
+  if (balloonHelp)
+    {
+    button->SetBalloonHelpString(balloonHelp);
+    }
+  this->ToolbarButtons->SetItem(buttonName, button);
+  this->Toolbar->AddWidget(button);
+  button->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -835,6 +843,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->SetStatusText(version);
 
   this->InitializeMenus(app);
+
   this->InitializeToolbars(app);
 
   // Interface for the preferences.
@@ -858,40 +867,36 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
   this->PickCenterToolbar->Create(app);
   
-  this->PickCenterButton->SetParent(this->PickCenterToolbar);
-  this->PickCenterButton->Create(app, "-image KWPickCenterButton -bd 1");
+  this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
+  this->PickCenterButton->Create(app, "-image KWPickCenterButton");
   this->PickCenterButton->SetCommand(this, "ChangeInteractorStyle 4");
+  this->PickCenterToolbar->AddWidget(this->PickCenterButton);
   
-  this->ResetCenterButton->SetParent(this->PickCenterToolbar);
-  this->ResetCenterButton->Create(app, "-bd 1");
+  this->ResetCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
+  this->ResetCenterButton->Create(app, "");
   this->ResetCenterButton->SetLabel("Reset");
   this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
-  this->ResetCenterButton->SetBalloonHelpString("Reset the center of rotation to the center of the current data set.");
+  this->ResetCenterButton->SetBalloonHelpString(
+    "Reset the center of rotation to the center of the current data set.");
+  this->PickCenterToolbar->AddWidget(this->ResetCenterButton);
 
-  this->HideCenterButton->SetParent(this->PickCenterToolbar);
-  this->HideCenterButton->Create(app, "-bd 1");
+  this->HideCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
+  this->HideCenterButton->Create(app, "");
   this->HideCenterButton->SetLabel("Hide");
   this->HideCenterButton->SetCommand(this, "HideCenterCallback");
-  this->HideCenterButton->SetBalloonHelpString("Hide the center of rotation to the center of the current data set.");
+  this->HideCenterButton->SetBalloonHelpString(
+    "Hide the center of rotation to the center of the current data set.");
+  this->PickCenterToolbar->AddWidget(this->HideCenterButton);
   
-  this->CenterEntryOpenButton->SetParent(this->PickCenterToolbar);
-  this->CenterEntryOpenButton->Create(app, "-bd 1");
-  this->CenterEntryOpenButton->SetLabel(">");
-  this->CenterEntryOpenButton->SetCommand(this, "CenterEntryOpenCallback");
+  this->CenterEntryOpenCloseButton->SetParent(
+    this->PickCenterToolbar->GetFrame());
+  this->CenterEntryOpenCloseButton->Create(app, "");
+  this->CenterEntryOpenCloseButton->SetLabel(">");
+  this->CenterEntryOpenCloseButton->SetCommand(this, "CenterEntryOpenCallback");
+  this->PickCenterToolbar->AddWidget(this->CenterEntryOpenCloseButton);
   
-  this->Script("pack %s %s %s %s -side left -expand no -fill none -pady 2",
-               this->PickCenterButton->GetWidgetName(),
-               this->ResetCenterButton->GetWidgetName(),
-               this->HideCenterButton->GetWidgetName(),
-               this->CenterEntryOpenButton->GetWidgetName());
-  
-  this->CenterEntryFrame->SetParent(this->PickCenterToolbar);
+  this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
-  
-  this->CenterEntryCloseButton->SetParent(this->CenterEntryFrame);
-  this->CenterEntryCloseButton->Create(app, "-bd 1");
-  this->CenterEntryCloseButton->SetLabel("<");
-  this->CenterEntryCloseButton->SetCommand(this, "CenterEntryCloseCallback");
   
   this->CenterXLabel->SetParent(this->CenterEntryFrame);
   this->CenterXLabel->Create(app, "");
@@ -926,32 +931,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
   this->CenterZEntry->SetValue(0.0, 3);
 
-  this->Script("pack %s %s %s %s %s %s %s -side left",
+  this->Script("pack %s %s %s %s %s %s -side left",
                this->CenterXLabel->GetWidgetName(),
                this->CenterXEntry->GetWidgetName(),
                this->CenterYLabel->GetWidgetName(),
                this->CenterYEntry->GetWidgetName(),
                this->CenterZLabel->GetWidgetName(),
-               this->CenterZEntry->GetWidgetName(),
-               this->CenterEntryCloseButton->GetWidgetName());
+               this->CenterZEntry->GetWidgetName());
 
   this->MainView->GetRenderer()->AddActor(this->CenterActor);
   
   this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
   this->FlySpeedToolbar->Create(app);
   
-  this->FlySpeedLabel->SetParent(this->FlySpeedToolbar);
+  this->FlySpeedLabel->SetParent(this->FlySpeedToolbar->GetFrame());
   this->FlySpeedLabel->Create(app, "");
   this->FlySpeedLabel->SetLabel("Fly Speed");
+  this->FlySpeedToolbar->AddWidget(this->FlySpeedLabel);
   
-  this->FlySpeedScale->SetParent(this->FlySpeedToolbar);
+  this->FlySpeedScale->SetParent(this->FlySpeedToolbar->GetFrame());
   this->FlySpeedScale->Create(app, "");
   this->FlySpeedScale->SetRange(0.0, 50.0);
   this->FlySpeedScale->SetValue(20.0);
   this->FlySpeedScale->SetCommand(this, "FlySpeedScaleCallback");
-  this->Script("pack %s %s -side left", 
-               this->FlySpeedLabel->GetWidgetName(),
-               this->FlySpeedScale->GetWidgetName());
+  this->FlySpeedToolbar->AddWidget(this->FlySpeedScale);
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1112,49 +1115,23 @@ void vtkPVWindow::AddPackageName(const char* name)
   this->PackageNames->AppendItem(name);
 }
 
-//----------------------------------------------------------------------------
-// Keep a list of the toolbar buttons so that they can be 
-// disabled/enabled in certain situations.
-void vtkPVWindow::AddToolbarButton(const char* buttonName, 
-                                   const char* imageName, 
-                                   const char* fileName,
-                                   const char* command,
-                                   const char* balloonHelp)
-{
-  if (fileName)
-    {
-    this->Script("image create photo %s -file {%s}", imageName, fileName);
-    }
-  vtkKWPushButton* button = vtkKWPushButton::New();
-  button->SetParent(this->Toolbar->GetFrame());
-  ostrstream opts;
-  opts << "-image " << imageName << ends;
-  button->Create(this->GetPVApplication(), opts.str());
-  opts.rdbuf()->freeze(0);
-  button->SetCommand(this, command);
-  if (balloonHelp)
-    {
-    button->SetBalloonHelpString(balloonHelp);
-    }
-  this->ToolbarButtons->SetItem(buttonName, button);
-  this->Toolbar->AddWidget(button);
-  button->Delete();
-}
-
 void vtkPVWindow::CenterEntryOpenCallback()
 {
-  this->Script("catch {eval pack forget %s}",
-               this->CenterEntryOpenButton->GetWidgetName());
-  this->Script("pack %s -side left -expand no -fill none -pady 2",
-               this->CenterEntryFrame->GetWidgetName());
+  this->CenterEntryOpenCloseButton->SetLabel("<");
+  this->CenterEntryOpenCloseButton->SetCommand(
+    this, "CenterEntryCloseCallback");
+
+  this->PickCenterToolbar->InsertWidget(this->CenterEntryOpenCloseButton,
+                                        this->CenterEntryFrame);
 }
 
 void vtkPVWindow::CenterEntryCloseCallback()
 {
-  this->Script("catch {eval pack forget %s}",
-               this->CenterEntryFrame->GetWidgetName());
-  this->Script("pack %s -side left -expand no -fill none -pady 2",
-               this->CenterEntryOpenButton->GetWidgetName());
+  this->CenterEntryOpenCloseButton->SetLabel(">");
+  this->CenterEntryOpenCloseButton->SetCommand(
+    this, "CenterEntryOpenCallback");
+
+  this->PickCenterToolbar->RemoveWidget(this->CenterEntryFrame);
 }
 
 
@@ -1261,46 +1238,34 @@ void vtkPVWindow::ResizeCenterActor()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
-  this->Script("catch {eval pack forget %s}",
-               this->PickCenterToolbar->GetWidgetName());
-  this->Script("catch {eval pack forget %s}",
-               this->FlySpeedToolbar->GetWidgetName());
+  this->PickCenterToolbar->Unpack();
+  this->FlySpeedToolbar->Unpack();;
   
   switch (index)
     {
     case 0:
       this->RotateCameraButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      //this->TrackballCameraButton->SetState(0);
       this->CenterActor->VisibilityOff();
       this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
-      this->Script("pack %s -side left",
-                   this->FlySpeedToolbar->GetWidgetName());
+      this->FlySpeedToolbar->Pack("-side left");
       break;
     case 1:
       this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      //this->TrackballCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle3D);
-      this->Script("pack %s -side left",
-                   this->PickCenterToolbar->GetWidgetName());
+      this->PickCenterToolbar->Pack("-side left");
       this->ResizeCenterActor();
       this->CenterActor->VisibilityOn();
       break;
     case 2:
       this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
-      //this->TrackballCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle2D);
       this->CenterActor->VisibilityOff();
       break;
     case 3:
       vtkErrorMacro("Trackball no longer suported.");
-      //this->FlyButton->SetState(0);
-      //this->RotateCameraButton->SetState(0);
-      //this->TranslateCameraButton->SetState(0);
-      //this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
-      //this->CenterActor->VisibilityOff();
       break;
     case 4:
       this->GenericInteractor->SetInteractorStyle(this->CenterOfRotationStyle);
@@ -2886,8 +2851,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   this->GetMenuView()->CheckRadioButton(
     this->GetMenuView(), "Radio", VTK_PV_SOURCE_MENU_INDEX);
 
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->MainView->GetSplitFrame()->GetParent()->GetWidgetName());
+  this->MainView->GetSplitFrame()->UnpackSiblings();
 
   this->Script("pack %s -side top -fill both -expand t",
                this->MainView->GetSplitFrame()->GetWidgetName());
@@ -2928,8 +2892,8 @@ void vtkPVWindow::ShowAnimationProperties()
     this->GetMenuView(), "Radio", VTK_PV_ANIMATION_MENU_INDEX);
 
   // Get rid of the page already packed.
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->AnimationInterface->GetParent()->GetWidgetName());
+  this->AnimationInterface->UnpackSiblings();
+
   // Put our page in.
   this->Script("pack %s -anchor n -side top -expand t -fill x -ipadx 3 -ipady 3",
                this->AnimationInterface->GetWidgetName());
@@ -3508,7 +3472,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.342 $");
+  this->ExtractRevision(os,"$Revision: 1.343 $");
 }
 
 //----------------------------------------------------------------------------

@@ -501,8 +501,7 @@ protected:
   vtkKWPushButton *PickCenterButton;
   vtkKWPushButton *ResetCenterButton;
   vtkKWPushButton *HideCenterButton;
-  vtkKWPushButton *CenterEntryOpenButton;
-  vtkKWPushButton *CenterEntryCloseButton;
+  vtkKWPushButton *CenterEntryOpenCloseButton;
   vtkKWWidget *CenterEntryFrame;
   vtkKWLabel *CenterXLabel;
   vtkKWEntry *CenterXEntry;
