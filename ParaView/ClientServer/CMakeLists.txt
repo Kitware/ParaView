@@ -111,6 +111,7 @@ vtkCompositeManager
 vtkLinearTransform
 vtkHomogeneousTransform
 vtkAbstractTransform
+vtkAxes
 
 # paraview classes
 vtkGenericRenderWindowInteractor
