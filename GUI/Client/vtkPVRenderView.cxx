@@ -132,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.352");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.353");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1517,6 +1517,7 @@ void vtkPVRenderView::ForceRender()
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( pvApp )
     {
+    this->CornerAnnotation->UpdateCornerText();
     pvApp->GetProcessModule()->SetGlobalLODFlag(0);
     pvApp->GetProcessModule()->GetRenderModule()->StillRender();
     }

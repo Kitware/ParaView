@@ -107,6 +107,8 @@
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWToolbarSet.h"
 
+#include "vtkInteractorStyleTrackballCamera.h"
+
 #include "vtkPVAnimationManager.h"
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
@@ -140,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.658");
+vtkCxxRevisionMacro(vtkPVWindow, "1.659");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1879,9 +1881,17 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       break;
     }
 
+//   this->InteractiveRenderEnabledOn();
+
+//   vtkInteractorStyleTrackballCamera* style =
+//     vtkInteractorStyleTrackballCamera::New();
+//   this->Interactor->SetInteractorStyle(style);
+//   style->Delete();
+
   //this->Toolbars->SetToolbarVisibility(
   //  this->PickCenterToolbar, pick_toolbar_vis);
-  this->Superclass::SetToolbarVisibility(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
+  this->Superclass::SetToolbarVisibility(
+    this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
   this->MainView->EventuallyRender();
 }
 
@@ -1897,30 +1907,30 @@ void vtkPVWindow::MouseAction(int action,int button,
     {
     if (button == 1)
       {
-      this->Interactor->SatelliteLeftPress(x, y, control, shift);
+      this->Interactor->OnLeftPress(x, y, control, shift);
       }
     else if (button == 2)
       {
-      this->Interactor->SatelliteMiddlePress(x, y, control, shift);
+      this->Interactor->OnMiddlePress(x, y, control, shift);
       }
     else if (button == 3)
       {
-      this->Interactor->SatelliteRightPress(x, y, control, shift);
+      this->Interactor->OnRightPress(x, y, control, shift);
       }
     }
   else if ( action == 1 )
     {
     if (button == 1)
       {
-      this->Interactor->SatelliteLeftRelease(x, y, control, shift);
+      this->Interactor->OnLeftRelease(x, y, control, shift);
       }
     else if (button == 2)
       {
-      this->Interactor->SatelliteMiddleRelease(x, y, control, shift);
+      this->Interactor->OnMiddleRelease(x, y, control, shift);
       }
     else if (button == 3)
       {
-      this->Interactor->SatelliteRightRelease(x, y, control, shift);
+      this->Interactor->OnRightRelease(x, y, control, shift);
       }    
     vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
     //float* parallelScale = cam->GetParallelScale();
@@ -1938,7 +1948,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     }
   else
     { 
-    this->Interactor->SatelliteMove(x, y);
+    this->Interactor->OnMove(x, y);
     }
 }
 
@@ -1949,7 +1959,7 @@ void vtkPVWindow::KeyAction(char keyCode, int x, int y)
     {
     return;
     }
-  this->Interactor->SatelliteKeyPress(keyCode, x, y);
+  this->Interactor->OnKeyPress(keyCode, x, y);
 }
 
 //-----------------------------------------------------------------------------
