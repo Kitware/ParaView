@@ -610,10 +610,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3", 0);
   delete [] rbv;
   // add the Print option
-
-#ifdef _WIN32
   this->MenuFile->AddCascade("Page Setup", this->PageMenu,8);
-#endif
 
   this->MenuFile->AddSeparator();
   this->MenuFile->AddCommand("Close", this, "Close", 0);
@@ -913,7 +910,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.48 $");
+  this->ExtractRevision(os,"$Revision: 1.49 $");
 }
 
 int vtkKWWindow::ExitDialog()
