@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.15");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.16");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -255,6 +255,15 @@ void vtkKWTclInteractor::Evaluate()
   this->Script("%s yview end", this->DisplayText->GetWidgetName());
   
   this->CommandEntry->SetValue("");
+}
+
+void vtkKWTclInteractor::AppendText(const char* text)
+{
+  this->Script("%s insert end {%s}", 
+               this->DisplayText->GetWidgetName(),
+               text);
+  this->Script("%s insert end \\n", 
+               this->DisplayText->GetWidgetName());
 }
 
 void vtkKWTclInteractor::DownCallback()

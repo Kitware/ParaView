@@ -87,6 +87,12 @@ public:
   // system supports this)
   void SetMasterWindow(vtkKWWindow* win);
   
+  // Description:
+  // Append text to the display window. Can be used for sending
+  // debugging information to the command prompt when no standard
+  // output is available.
+  void AppendText(const char* text);
+
 protected:
   vtkKWTclInteractor();
   ~vtkKWTclInteractor();
