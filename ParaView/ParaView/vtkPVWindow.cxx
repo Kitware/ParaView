@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.347");
+vtkCxxRevisionMacro(vtkPVWindow, "1.348");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1045,7 +1045,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     this->ReadSourceInterfaces();
     
     // Create the extract grid button
-    vtkPVSource* extract;
+    vtkPVSource* extract = 0;
     if (this->Prototypes->GetItem("ExtractGrid", extract) == VTK_OK)
       {
       extract->SetToolbarModule(1);
@@ -3547,7 +3547,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.347 $");
+  this->ExtractRevision(os,"$Revision: 1.348 $");
 }
 
 //----------------------------------------------------------------------------
