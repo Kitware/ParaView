@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.42");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.43");
 
 
 
@@ -415,4 +415,6 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
                                        this->CancelButtonText:"none") << endl;
   os << indent << "DialogName: " << (this->DialogName?this->DialogName:"none")
      << endl;
+  os << indent << "TopFrame: " << (this->TopFrame?this->TopFrame:"none") << endl;
+  os << indent << "BottomFrame: " << (this->BottomFrame?this->BottomFrame:"none") << endl;
 }
