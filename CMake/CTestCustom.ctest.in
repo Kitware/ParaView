@@ -7,6 +7,7 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
 
   # These tests do not actually run any VTK code
   HeaderTesting-PVGUI-Client
+  HeaderTesting-PVServer-Filters
   PrintSelf-KWWidgets	
   PrintSelf-PVGUI-Client
   PrintSelf-PVServer-Common
