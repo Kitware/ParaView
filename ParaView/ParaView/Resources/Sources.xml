@@ -31,14 +31,14 @@
   <Source class="vtkCTHFractal"/>
 <!-- should use widget that keeps values non-negative -->
   <VectorEntry label="Dimension" trace_name="Dimension"
-               variable="Dimensions" type="int"
+               variable="Dimensions" type="int" default_value="10"
                help="XYZ cell dimensions of a block"/>
   <VectorEntry label="FractalValue" trace_name="FractalValue"
-               variable="FractalValue" type="float"
+               variable="FractalValue" type="float" default_value="9.5"
                help="Map this value to 0.5 for use as a volume fraction."/>
 <!-- should use widget that keeps value non-negative -->
   <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
-               variable="MaximumLevel" type="int"
+               variable="MaximumLevel" type="int" default_value="6"
                help="Determines how deep to refine the grid."/>
   <LabeledToggle variable="GhostLevels" trace_name="GhostLevels" 
                  default_value="0"
