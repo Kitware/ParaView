@@ -63,6 +63,8 @@ protected:
   int NumberOfProcesses;
   int UseMaskPoints;
   
+  virtual void ReportReferences(vtkGarbageCollector*);
+  virtual void RemoveReferences();
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
   void operator=(const vtkPVGlyphFilter&);  // Not implemented.
