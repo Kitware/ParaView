@@ -19,7 +19,10 @@
 
 #include "vtkCellData.h"
 #include "vtkCommand.h"
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkGeometryFilter.h"
+#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkHierarchicalBoxOutlineFilter.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -32,7 +35,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.14");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.15");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -40,59 +43,103 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 {
   this->OutlineFlag = 0;
   this->UseOutline = 1;
+  this->UseStrips = 0;
   this->NumberOfRequiredInputs = 0;
+  this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+  this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 {
+  this->DataSetSurfaceFilter->Delete();
+  this->HierarchicalBoxOutline->Delete();
 }
+
+//----------------------------------------------------------------------------
+// Specify the input data or filter.
+void vtkPVGeometryFilter::SetInput(vtkDataObject *input)
+{
+  this->vtkProcessObject::SetNthInput(0, input);
+}
+
+//----------------------------------------------------------------------------
+// Specify the input data or filter.
+vtkDataObject *vtkPVGeometryFilter::GetInput()
+{
+  if (this->NumberOfInputs < 1)
+    {
+    return NULL;
+    }
+  
+  return this->Inputs[0];
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::Execute()
 {
-  vtkDataSet *input = this->GetInput();
+  vtkDataObject *input = this->GetInput();
 
   if (input == NULL)
     {
     return;
     }
-  if (input->CheckAttributes())
-    {
-    return;
-    }
+//   if (input->CheckAttributes())
+//     {
+//     return;
+//     }
 
   if (input->IsA("vtkImageData"))
     {
-    this->ImageDataExecute((vtkImageData*)input);
+    this->ImageDataExecute(static_cast<vtkImageData*>(input));
     return;
     }
 
   if (input->IsA("vtkStructuredGrid"))
     {
-    this->StructuredGridExecute((vtkStructuredGrid*)input);
+    this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input));
     return;
     }
 
   if (input->IsA("vtkRectilinearGrid"))
     {
-    this->RectilinearGridExecute((vtkRectilinearGrid*)input);
+    this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input));
     return;
     }
 
   if (input->IsA("vtkUnstructuredGrid"))
     {
-    this->UnstructuredGridExecute((vtkUnstructuredGrid*)input);
+    this->UnstructuredGridExecute(static_cast<vtkUnstructuredGrid*>(input));
     return;
     }
   if (input->IsA("vtkPolyData"))
     {
-    this->PolyDataExecute((vtkPolyData*)input);
+    this->PolyDataExecute(static_cast<vtkPolyData*>(input));
     return;
     }
-
-  this->DataSetExecute(input);
+  if (input->IsA("vtkDataSet"))
+    {
+    this->DataSetExecute(static_cast<vtkDataSet*>(input));
+    return;
+    }
+  if (input->IsA("vtkHierarchicalBoxDataSet"))
+    {
+    this->HierarchicalBoxExecute(static_cast<vtkHierarchicalBoxDataSet*>(input));
+    return;
+    }
   return;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input)
+{
+  vtkHierarchicalBoxDataSet* ds = input->NewInstance();
+  ds->ShallowCopy(input);
+  this->HierarchicalBoxOutline->SetInput(ds);
+  ds->Delete();
+  this->HierarchicalBoxOutline->Update();
+  this->GetOutput()->ShallowCopy(this->HierarchicalBoxOutline->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +154,17 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
   output->SetPoints(outline->GetOutput()->GetPoints());
   output->SetLines(outline->GetOutput()->GetLines());
   outline->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet *input)
+{
+  vtkDataSet* ds = input->NewInstance();
+  ds->ShallowCopy(input);
+  this->DataSetSurfaceFilter->SetInput(ds);
+  ds->Delete();
+  this->DataSetSurfaceFilter->Update();
+  this->GetOutput()->ShallowCopy(this->DataSetSurfaceFilter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +183,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->vtkDataSetSurfaceFilter::Execute();
+    this->DataSetSurfaceExecute(input);
     this->OutlineFlag = 0;
     return;
     }  
@@ -170,7 +228,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->vtkDataSetSurfaceFilter::Execute();
+    this->DataSetSurfaceExecute(input);
     this->OutlineFlag = 0;
     return;
     }  
@@ -206,7 +264,7 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->vtkDataSetSurfaceFilter::Execute();
+    this->DataSetSurfaceExecute(input);
     this->OutlineFlag = 0;
     return;
     }  
@@ -234,7 +292,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
   if (!this->UseOutline)
     {
     this->OutlineFlag = 0;
-    this->vtkDataSetSurfaceFilter::Execute();
+    this->DataSetSurfaceExecute(input);
     return;
     }
   

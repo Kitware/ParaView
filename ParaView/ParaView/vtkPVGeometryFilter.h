@@ -23,18 +23,23 @@
 #ifndef __vtkPVGeometryFilter_h
 #define __vtkPVGeometryFilter_h
 
-#include "vtkDataSetSurfaceFilter.h"
+#include "vtkPolyDataSource.h"
 
+class vtkDataObject;
+class vtkDataSet;
+class vtkDataSetSurfaceFilter;
+class vtkHierarchicalBoxDataSet;
+class vtkHierarchicalBoxOutlineFilter;
 class vtkImageData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkPVGeometryFilter : public vtkDataSetSurfaceFilter
+class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataSource
 {
 public:
   static vtkPVGeometryFilter *New();
-  vtkTypeRevisionMacro(vtkPVGeometryFilter,vtkDataSetSurfaceFilter);
+  vtkTypeRevisionMacro(vtkPVGeometryFilter,vtkPolyDataSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,6 +51,19 @@ public:
   // Set/get whether to produce outline (vs. surface).
   vtkSetMacro(UseOutline, int);
   vtkGetMacro(UseOutline, int);
+
+  // Description:
+  // When input is structured data, this flag will generate faces with
+  // triangle strips.  This should render faster and use less memory, but no
+  // cell data is copied.  By default, UseStrips is Off.
+  vtkSetMacro(UseStrips, int);
+  vtkGetMacro(UseStrips, int);
+  vtkBooleanMacro(UseStrips, int);
+
+  // Description:
+  // Set / get the input data or filter.
+  virtual void SetInput(vtkDataObject *input);
+  vtkDataObject *GetInput();
   
 protected:
   vtkPVGeometryFilter();
@@ -58,9 +76,15 @@ protected:
   void RectilinearGridExecute(vtkRectilinearGrid *input);
   void UnstructuredGridExecute(vtkUnstructuredGrid *input);
   void PolyDataExecute(vtkPolyData *input);
+  void DataSetSurfaceExecute(vtkDataSet *input);
+  void HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input);
 
   int OutlineFlag;
   int UseOutline;
+  int UseStrips;
+
+  vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
+  vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
   
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.223");
+vtkCxxRevisionMacro(vtkPVData, "1.224");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1164,6 +1164,18 @@ void vtkPVData::UpdatePropertiesInternal()
       }
     this->ExtentDisplay->SetExtent(ext);
     this->Script("pack %s -fill x -expand t -pady 2", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_MULTI_BLOCK_DATA_SET)
+    {
+    type << "Multi-block composite";
+    this->Script("pack forget %s", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
+    {
+    type << "Hierarchical Uniform AMR";
+    this->Script("pack forget %s", 
                  this->ExtentDisplay->GetWidgetName());
     }
   else
