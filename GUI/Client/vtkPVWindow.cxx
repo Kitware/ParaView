@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.643");
+vtkCxxRevisionMacro(vtkPVWindow, "1.644");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -786,14 +786,16 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->MainView)
     {
-    this->MainView->PrepareForDelete();
     this->MainView->Delete();
     }
 
   if (this->GetApplication())
     {
-    this->GetApplication()->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
-                                         "%d", this->CenterActorVisibility);
+    this->GetApplication()->SetRegisteryValue(2, 
+                                              "RunTime", 
+                                              "CenterActorVisibility",
+                                              "%d", 
+                                              this->CenterActorVisibility);
     }
 
   if (this->SourceMenu)
