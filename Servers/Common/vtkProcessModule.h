@@ -215,9 +215,11 @@ public:
   // Execute event on callback
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 
+  //BTX
   // Description:
   // Get the observer.
   vtkCommand* GetObserver();
+  //ETX
 
   // Description:
   // Set the local progress. Subclass should overwrite it.

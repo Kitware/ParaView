@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.25");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -403,6 +403,10 @@ const char* vtkPVProcessModule::GetDemoPath()
 
 #else
 
+  if (!this->Options)
+    {
+    return 0;
+    }
   vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
   const char* selfPath = util->FindSelfPath(
     this->Options->GetArgv0());

@@ -96,6 +96,22 @@ ENDIF(VTK_USE_PATENTED)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Common/Utilities")
 PV_WRAP_VTK_CS(PVCommon PVFILTERS "${KIT_WRAP_DEPS}")
 
+# Create Tcl wrappers for common classes.
+IF (PARAVIEW_BUILD_GUI)
+  SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
+  SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
+  SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
+  INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
+  VTK_WRAP_TCL3(
+    vtkPVServerCommonTCL 
+    ServerCommonTCL_SRCS 
+    "${Common_SRCS};${CommonInst_SRCS}"
+    ""
+    )
+  ADD_LIBRARY(vtkPVServerCommonTCL ${ServerCommonTCL_SRCS})
+  TARGET_LINK_LIBRARIES (vtkPVServerCommonTCL vtkCommonTCL)
+ENDIF (PARAVIEW_BUILD_GUI)
+
 IF(BUILD_SHARED_LIBS)
   INSTALL_TARGETS(/lib vtkPVCommon vtkPVCommonCS)
 ENDIF(BUILD_SHARED_LIBS)

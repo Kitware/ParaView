@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -59,11 +59,12 @@ vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
 
   int num, idx;
   num = this->GetNumberOfArrays();
-  os << indent << "ArrayInformation " << num << endl;
+  os << indent << "ArrayInformation, number of arrays: " << num << endl;
   for (idx = 0; idx < num; ++idx)
     {
     ai = this->GetArrayInformation(idx);
     ai->PrintSelf(os, i2);
+    os << endl;
     }
 }
 

@@ -150,7 +150,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.25");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26");
 
 
 //----------------------------------------------------------------------------
@@ -957,7 +957,7 @@ void vtkPVClientServerModule::Exit()
 // Eliminate it if possible. !!!!!!!!
 int vtkPVClientServerModule::GetPartitionId()
 {
-  if (this->Options->GetClientMode())
+  if (this->Options && this->Options->GetClientMode())
     {
     return -1;
     }
@@ -972,7 +972,7 @@ int vtkPVClientServerModule::GetPartitionId()
 // This is used to determine which filters are available.
 int vtkPVClientServerModule::GetNumberOfPartitions()
 {
-  if (this->Options->GetClientMode())
+  if (this->Options && this->Options->GetClientMode())
     {
     return this->NumberOfServerProcesses;
     }

@@ -10,6 +10,7 @@ set exceptions {
   vtkXOpenGLRenderWindow-GetEventPending
   vtkXMesaRenderWindow-GetEventPending
   vtkMPICommunicator-GetWorldCommunicator
+  vtkMPIMToNSocketConnection-GetNumberOfConnections
   vtkIceTRenderManager-GetRenderTime
   vtkIceTRenderManager-GetImageProcessingTime
   vtkIceTClientCompositeManager-GetCompositeController

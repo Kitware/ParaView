@@ -62,13 +62,11 @@ public:
   // Returns the server manager application.
   vtkGetObjectMacro(SMApplication, vtkSMApplication);
 
-  //BTX
   // Description:
   // Process module contains all methods for managing 
   // processes and communication.
   void SetProcessModule(vtkPVProcessModule *module);
   vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
-  //ETX
 
   // Description:
   // Get a file selection dialog instance.

@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.334");
+vtkCxxRevisionMacro(vtkPVApplication, "1.335");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -157,16 +157,9 @@ private:
 
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
-#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
-extern "C" int Blt_Init(Tcl_Interp *interp);
-#endif
-
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
-extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
-#endif
-
 extern "C" int Vtkkwparaview_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvservermanagertcl_Init(Tcl_Interp *interp); 
+extern "C" int Vtkpvservercommontcl_Init(Tcl_Interp *interp); 
 
 vtkPVApplication* vtkPVApplication::MainApplication = 0;
 
@@ -381,6 +374,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
    
   Vtkkwparaview_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
+  Vtkpvservercommontcl_Init(interp); 
 
   char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
