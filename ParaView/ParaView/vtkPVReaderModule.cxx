@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.30");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.31");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -137,6 +137,8 @@ int vtkPVReaderModule::CloneAndInitialize(int makeCurrent,
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::CanReadFile(const char* fname)
 {
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+
   const char* ext = this->ExtractExtension(fname);
   const char* val = 0;
   this->Iterator->GoToFirstItem();
@@ -145,32 +147,23 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     this->Iterator->GetData(val);
     if (ext && strcmp(ext, val) == 0)
       {
-      // Trouble reading PLOT3D files, so disable Canread feature,
-      // and just go by extension.
-
       // The extension matches, see if the reader can read the file.
-      //this->Script("%s vtkPVReaderModuleCanReadFileTemp",
-      //             this->SourceClassName);
-
-      // First see if the reader has a CanRead method.
-      //this->Script("catch {vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}}",
-      //             fname);
-      //int result = this->GetIntegerResult(this->Application);
-      //if (result == 1)
-      //  {
-        // The reader does not have a CanReadFile method.
-        // Assume it can read the file because it has the correct extension.
-      //  return 1;
-      //  }
-
-      //this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
-      //             fname);
-      //result = this->GetIntegerResult(this->Application);
-      //this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
-      //if(result)
-      //  {
+      pm->RootScript(
+        "namespace eval ::paraview::vtkPVReaderModule {\n"
+        "  proc CanReadFileTest {reader fname} {\n"
+        "    $reader vtkPVReaderModuleCanReadFileTemp\n"
+        "    if {[catch {vtkPVReaderModuleCanReadFileTemp CanReadFile \"$fname\"} result]} {\n"
+        "      set result 1\n"
+        "    }\n"
+        "    vtkPVReaderModuleCanReadFileTemp Delete\n"
+        "    return $result\n"
+        "  }\n"
+        "  CanReadFileTest {%s} {%s}\n"
+        "}\n", this->SourceClassName, fname);
+      if(atoi(pm->GetRootResult()))
+        {
         return 1;
-      //  }
+        }
       }
     this->Iterator->GoToNextItem();
     }
