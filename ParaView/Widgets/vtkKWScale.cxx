@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.33");
+vtkCxxRevisionMacro(vtkKWScale, "1.34");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -190,7 +190,6 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
     ostrstream arrow;
     arrow << this->PopupPushButton->GetWidgetName() << ".arrowimg" << ends;
-    this->Script("image create photo %s", arrow.str());
     if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                        arrow.str(), 
                                        image_arrow, 
@@ -514,10 +513,6 @@ void vtkKWScale::WithdrawPopupScaleCallback()
     {
     return;
     }
-
-  // Generate/propagate the press event for the scale
-  
-  // this->InvokeEndCommand();
 
   // Withdraw the popup
 

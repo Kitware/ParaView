@@ -51,17 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 void vtkPVWindow::UpdateStatusImage()
 {
-  // Tcl/Tk 8.3 seems to have a bug if you update a photo that already
-  // contains pixels. Let's create a second photo and replace the existing
-  // one.
-
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  this->SetStatusImageName(this->Script("image create photo"));
-  this->Script("%s configure -image %s", 
-               this->StatusImage->GetWidgetName(),
-               this->StatusImageName);
-#endif
-
   // Update status image
   
   if (this->StatusImageName && this->GetPVApplication())

@@ -348,10 +348,6 @@ void vtkPVApplication::CreatePhoto(char *name,
     return;
     }
 
-  // Create the photo
-
-  this->Script("image create photo %s", name);
-
   // Otherwise try to find a PNG file with the same name in the Resources dir
 
   char buffer[1024];

@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.30");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -368,7 +368,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   ostrstream play;
   play << this->PlayButton->GetWidgetName() << ".playimg" << ends;
-  this->Script("image create photo %s", play.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      play.str(), 
                                      image_play, 
@@ -397,7 +396,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   ostrstream stop;
   stop << this->StopButton->GetWidgetName() << ".stopimg" << ends;
-  this->Script("image create photo %s", stop.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      stop.str(), 
                                      image_stop, 
@@ -427,7 +425,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   ostrstream goto_beginning;
   goto_beginning << this->GoToBeginningButton->GetWidgetName() 
                  << ".goto_beginningimg" << ends;
-  this->Script("image create photo %s", goto_beginning.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      goto_beginning.str(), 
                                      image_goto_beginning, 
@@ -458,7 +455,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   ostrstream goto_end;
   goto_end << this->GoToEndButton->GetWidgetName() 
                  << ".goto_endimg" << ends;
-  this->Script("image create photo %s", goto_end.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      goto_end.str(), 
                                      image_goto_end, 
@@ -489,7 +485,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   ostrstream loop;
   loop << this->LoopCheckButton->GetWidgetName() << ".loopimg" << ends;
-  this->Script("image create photo %s", loop.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      loop.str(), 
                                      image_loop, 

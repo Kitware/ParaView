@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.34");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.35");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -469,7 +469,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   ostrstream presets;
   presets << this->PresetsMenuButton->GetWidgetName() << ".presetsimg" << ends;
-  this->Script("image create photo %s", presets.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      presets.str(), 
                                      image_presets, 

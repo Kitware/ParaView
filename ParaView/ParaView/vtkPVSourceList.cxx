@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.28");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -194,7 +194,6 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream vison;
   vison << this->GetWidgetName() << ".visonimg" << ends;
-  this->Script("image create photo %s", vison.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      vison.str(), 
                                      image_eye_open, 
@@ -210,7 +209,6 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream visoff;
   visoff << this->GetWidgetName() << ".visoffimg" << ends;
-  this->Script("image create photo %s", visoff.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      visoff.str(), 
                                      image_eye_gray, 
@@ -226,7 +224,6 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream visnovis;
   visnovis << this->GetWidgetName() << ".visnovisimg" << ends;
-  this->Script("image create photo %s", visnovis.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      visnovis.str(), 
                                      image_eye_novis, 

@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.216");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.217");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -751,7 +751,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     VTK_PV_VIEW_MENU_LABEL ".");
   ostrstream viewprops;
   viewprops << this->PropertiesButton->GetWidgetName() << ".propsimg" << ends;
-  this->Script("image create photo %s", viewprops.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      viewprops.str(), 
                                      image_properties, 
@@ -2619,7 +2618,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.216 $");
+  this->ExtractRevision(os,"$Revision: 1.217 $");
 }
 
 //------------------------------------------------------------------------------

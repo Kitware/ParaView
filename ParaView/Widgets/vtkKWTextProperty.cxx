@@ -118,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.7");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.8");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -258,7 +258,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->BoldCheckButton->SetBalloonHelpString("Select bold style.");
   ostrstream bold;
   bold << this->BoldCheckButton->GetWidgetName() << ".boldimg" << ends;
-  this->Script("image create photo %s", bold.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      bold.str(), 
                                      image_bold, 
@@ -279,7 +278,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   bold.rdbuf()->freeze(0);
   ostrstream bold_s;
   bold_s << this->BoldCheckButton->GetWidgetName() << ".bold_simg" << ends;
-  this->Script("image create photo %s", bold_s.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      bold_s.str(), 
                                      image_bold, 
@@ -305,7 +303,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->ItalicCheckButton->SetBalloonHelpString("Select italic style.");
   ostrstream italic;
   italic << this->ItalicCheckButton->GetWidgetName() << ".italicimg" << ends;
-  this->Script("image create photo %s", italic.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      italic.str(), 
                                      image_italic, 
@@ -327,7 +324,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   ostrstream italic_s;
   italic_s << this->ItalicCheckButton->GetWidgetName() 
            << ".italic_simg" << ends;
-  this->Script("image create photo %s", italic_s.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      italic_s.str(), 
                                      image_italic, 
@@ -353,7 +349,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->ShadowCheckButton->SetBalloonHelpString("Select shadow style.");
   ostrstream shadow;
   shadow << this->ShadowCheckButton->GetWidgetName() << ".shadowimg" << ends;
-  this->Script("image create photo %s", shadow.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      shadow.str(), 
                                      image_shadow, 
@@ -375,7 +370,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   ostrstream shadow_s;
   shadow_s << this->ShadowCheckButton->GetWidgetName() 
            << ".shadow_simg" << ends;
-  this->Script("image create photo %s", shadow_s.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      shadow_s.str(), 
                                      image_shadow, 
@@ -420,7 +414,6 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->CopyButton->Create(this->Application, "");
   ostrstream copy;
   copy << this->CopyButton->GetWidgetName() << ".copyimg" << ends;
-  this->Script("image create photo %s", copy.str());
   if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
                                      copy.str(), 
                                      image_copy, 
