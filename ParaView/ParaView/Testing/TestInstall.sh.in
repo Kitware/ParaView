@@ -40,7 +40,7 @@ run_test()
     )
     echo "Running ParaView"
     (
-        echo "${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}"
+        cd "${CMAKE_INSTALL_PREFIX}"
         export LD_LIBRARY_PATH="${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}"
         "${PARAVIEW_COMMAND}" --disable-registry \
             "${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.pvs" \
