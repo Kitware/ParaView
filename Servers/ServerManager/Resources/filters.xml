@@ -2447,22 +2447,6 @@
            </ArrayListDomain>
      </StringVectorProperty>
 
-     <!-- This is a hack used to bypass the fact that ParaView
-          does not have special proxies for things like point sources.
-          It should be removed in the future -->
-     <DoubleVectorProperty
-        name="Radius"
-        number_of_elements="1"
-        default_values="0.1"
-        information_only="1">
-        <DoubleRangeDomain name="range"/>
-        <BoundsDomain name="bounds">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </BoundsDomain>
-     </DoubleVectorProperty>
-
      <IntVectorProperty
         name="NumberOfPoints"
         number_of_elements="1"
