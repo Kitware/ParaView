@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.7");
+vtkCxxRevisionMacro(vtkKWMath, "1.8");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
@@ -345,3 +345,23 @@ int vtkKWMath::FixTransferFunctionPointsOutOfRange(
   return 1;
 }
 
+//----------------------------------------------------------------------------
+int vtkKWMath::ExtentIsWithinOtherExtent(int extent1[6], int extent2[6])
+{
+  if (!extent1 || !extent2)
+    {
+    return 0;
+    }
+  
+  int i;
+  for (i = 0; i < 6; i += 2)
+    {
+    if (extent1[i]     < extent2[i] || extent1[i]     > extent2[i + 1] ||
+        extent1[i + 1] < extent2[i] || extent1[i + 1] > extent2[i + 1])
+      {
+      return 0;
+      }
+    }
+
+  return 1;
+}

@@ -103,6 +103,10 @@ public:
   static int FixTransferFunctionPointsOutOfRange(
     vtkColorTransferFunction *func, float range[2]);
  
+  // Description:
+  // Return true if first extent is within second extent
+  static int ExtentIsWithinOtherExtent(int extent1[6], int extent2[6]);
+
 protected:
   vtkKWMath() {};
   ~vtkKWMath() {};
