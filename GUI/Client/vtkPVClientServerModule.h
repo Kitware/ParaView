@@ -161,7 +161,7 @@ public:
 
   // Description:
   // Used internally.  Do not call.  Use LoadModule instead.
-  int LoadModuleInternal(const char* name);
+  virtual int LoadModuleInternal(const char* name, const char* directory);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

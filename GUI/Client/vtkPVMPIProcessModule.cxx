@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.24");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.25");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -407,7 +407,8 @@ vtkPVMPIProcessModule::GatherInformationInternal(const char* infoClassName,
 
 //----------------------------------------------------------------------------
 #ifdef VTK_USE_MPI
-int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name,
+                                              const char* directory)
 {
   // Make sure we have a communicator.
   vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
@@ -418,7 +419,7 @@ int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
     }
 
   // Try to load the module on the local process.
-  int localResult = this->Interpreter->Load(name);
+  int localResult = this->Superclass::LoadModuleInternal(name, directory);
 
   // Gather load results to process 0.
   int numProcs = this->Controller->GetNumberOfProcesses();
@@ -443,8 +444,9 @@ int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
   return globalResult;
 }
 #else
-int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name,
+                                              const char* directory)
 {
-  return this->Superclass::LoadModuleInternal(name);
+  return this->Superclass::LoadModuleInternal(name, directory);
 }
 #endif

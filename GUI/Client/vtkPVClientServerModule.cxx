@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.75");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.76");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1291,10 +1291,11 @@ void vtkPVClientServerModule::SendStreamToServerRootInternal()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVClientServerModule::LoadModuleInternal(const char* name)
+int vtkPVClientServerModule::LoadModuleInternal(const char* name,
+                                                const char* directory)
 {
   // Try to load the module on the local process.
-  int localResult = this->Interpreter->Load(name);
+  int localResult = this->Superclass::LoadModuleInternal(name, directory);
 
   // Make sure we have a communicator.
 #ifdef VTK_USE_MPI

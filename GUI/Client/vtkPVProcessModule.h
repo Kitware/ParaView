@@ -99,12 +99,13 @@ public:
   // Description:
   // Load a ClientServer wrapper module dynamically in the server
   // processes.  Returns 1 if all server nodes loaded the module and 0
-  // otherwise.
-  virtual int LoadModule(const char* name);
+  // otherwise.  The second argument may be used to specify a directory
+  // in which to look for the module.
+  virtual int LoadModule(const char* name, const char* directory);
 
   // Description:
   // Used internally.  Do not call.  Use LoadModule instead.
-  virtual int LoadModuleInternal(const char* name);
+  virtual int LoadModuleInternal(const char* name, const char* directory);
   vtkClientServerID GetMPIMToNSocketConnectionID() { return this->MPIMToNSocketConnectionID;}
 
   // Description:

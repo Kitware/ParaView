@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.46");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
@@ -271,11 +271,12 @@ void vtkPVProcessModule::FinalizeInterpreter()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVProcessModule::LoadModule(const char* name)
+int vtkPVProcessModule::LoadModule(const char* name, const char* directory)
 {
   this->GetStream()
     << vtkClientServerStream::Invoke
-    << this->GetProcessModuleID() << "LoadModuleInternal" << name
+    << this->GetProcessModuleID()
+    << "LoadModuleInternal" << name << directory
     << vtkClientServerStream::End;
   this->SendStreamToServer();
   int result = 0;
@@ -288,8 +289,9 @@ int vtkPVProcessModule::LoadModule(const char* name)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVProcessModule::LoadModuleInternal(const char* name)
+int vtkPVProcessModule::LoadModuleInternal(const char* name,
+                                           const char* directory)
 {
-  return this->Interpreter->Load(name);
+  const char* paths[] = {directory, 0};
+  return this->Interpreter->Load(name, paths);
 }
-

@@ -34,7 +34,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.32");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.33");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -652,6 +652,7 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
 //----------------------------------------------------------------------------
 int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
 {
+  // Get the library name.
   const char* name = le->GetAttribute("name");
   if(!name)
     {
@@ -659,10 +660,13 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
     return 0;
     }
 
+  // Check if a directory is specified.
+  const char* directory = le->GetAttribute("directory");
+
   // Load the module on the server nodes.
   vtkPVProcessModule* pm =
     this->Window->GetPVApplication()->GetProcessModule();
-  if(!pm->LoadModule(name))
+  if(!pm->LoadModule(name, directory))
     {
     vtkErrorMacro("Error loading Library component " << name);
     return 0;
