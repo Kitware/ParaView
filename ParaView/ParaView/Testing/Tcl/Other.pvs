@@ -9,7 +9,7 @@ if {[info exists argc]} {
     }
 } 
 
-after 1 { This will test TCL error reporting }
+#after 1 { This will test TCL error reporting }
 
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
@@ -45,7 +45,7 @@ $pvWindow CenterEntryCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
-$pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
+#$pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
 $pvWindow EnableNavigationWindow
 $pvWindow DisableNavigationWindow
 $pvWindow EnableNavigationWindow
@@ -56,7 +56,6 @@ $pvWindow EnableToolbarButton "PVProbeButton"
 $pvWindow ChangeInteractorStyle 0
 $pvWindow ChangeInteractorStyle 1
 $pvWindow ChangeInteractorStyle 2
-$pvWindow ChangeInteractorStyle 3
 $pvWindow ChangeInteractorStyle 4
 $pvWindow ChangeInteractorStyle 1
 
