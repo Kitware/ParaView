@@ -80,6 +80,13 @@ public:
   int SetElements3(double value0, double value1, double value2);
 
   // Description:
+  // Set the values of the first 4 elements. The vector is resized as necessary.
+  // Returns 0 if Set fails either because the property is read only
+  // or one or more of the values is not in all domains.
+  // Returns 1 otherwise.
+  int SetElements4(double value0, double value1, double value2, double value3);
+
+  // Description:
   // Returns the value of 1 element.
   double GetElement(unsigned int idx);
 
