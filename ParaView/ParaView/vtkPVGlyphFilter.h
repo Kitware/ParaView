@@ -21,6 +21,7 @@
 
 #include "vtkGlyph3D.h"
 
+class vtkMaskPoints;
 
 class VTK_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
 {
@@ -52,10 +53,30 @@ public:
   void SelectInputNormals(const char *fieldName) 
     {this->SetInputNormalsSelection(fieldName);}
 
+  // Description:
+  // Limit the number of points to glyph
+  vtkSetMacro(MaximumNumberOfPoints, int);
+  vtkGetMacro(MaximumNumberOfPoints, int);
+
+  // Description:
+  // Set the input to this filter.
+  virtual void SetInput(vtkDataSet *input);
+  
+  // Description:
+  // Set/get the number of processes used to run this filter.
+  vtkSetMacro(NumberOfProcesses, int);
+  vtkGetMacro(NumberOfProcesses, int);
+  
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
+  virtual void Execute();
+  
+  vtkMaskPoints *MaskPoints;
+  int MaximumNumberOfPoints;
+  int NumberOfProcesses;
+  
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
   void operator=(const vtkPVGlyphFilter&);  // Not implemented.

@@ -17,18 +17,42 @@
 =========================================================================*/
 #include "vtkPVGlyphFilter.h"
 
+#include "vtkMaskPoints.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.2");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.3");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 vtkPVGlyphFilter::vtkPVGlyphFilter()
 {
   this->SetColorModeToColorByScalar();
+  this->SetScaleModeToScaleByVector();
+  this->MaskPoints = vtkMaskPoints::New();
+  this->MaximumNumberOfPoints = 5000;
+  this->NumberOfProcesses = 1;
 }
 
 vtkPVGlyphFilter::~vtkPVGlyphFilter()
 {
+  this->MaskPoints->Delete();
+}
+
+void vtkPVGlyphFilter::SetInput(vtkDataSet *input)
+{
+  this->MaskPoints->SetInput(input);
+  this->Superclass::SetInput(this->MaskPoints->GetOutput());
+}
+
+void vtkPVGlyphFilter::Execute()
+{
+  vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
+  vtkIdType maxNumPts = this->MaximumNumberOfPoints / this->NumberOfProcesses;
+  maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
+  this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
+  this->MaskPoints->SetOnRatio(numPts / maxNumPts);
+  this->MaskPoints->Update();
+  this->Superclass::Execute();
 }
 
 void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
@@ -44,5 +68,8 @@ void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "InputNormalsSelection: " 
      << (this->InputNormalsSelection ? this->InputNormalsSelection : "(none)")
+     << endl;
+  
+  os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints()
      << endl;
 }

@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.481");
+vtkCxxRevisionMacro(vtkPVWindow, "1.482");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1145,6 +1145,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     
     // ===== Cone
     pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0, 0);
+    pvs->IsPermanentOn();
+    pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
+    pvs->Accept(1);
+    pvs->SetTraceReferenceObject(this);
+    {
+    ostrstream s;
+    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+    pvs->SetTraceReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
+    }
+    
+    // ==== Line
+    pvs = this->CreatePVSource("LineSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
     pvs->HideInformationPageOn();

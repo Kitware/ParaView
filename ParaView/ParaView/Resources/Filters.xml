@@ -1033,7 +1033,8 @@ help="Set the name of the array to hold the results of this computation"/>
         <DummyWidget/>
       </Item>
     </SelectWidget>
-  <VectorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant"/>
+  <ScaleFactorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" input_menu="im"/>
+  <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" variable="MaximumNumberOfPoints" type="int" help="Set the maximum number of points to glyph"/>
   </Module>
   <Module name="Probe" class="vtkPVProbe" 
           root_name="Probe" button_image="PVProbeButton"

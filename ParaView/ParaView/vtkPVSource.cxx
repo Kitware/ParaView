@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.316");
+vtkCxxRevisionMacro(vtkPVSource, "1.317");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2354,6 +2354,13 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       return VTK_ERROR;
       }
 
+    if (!strcmp(this->SourceClassName, "vtkPVGlyphFilter"))
+      {
+      pvApp->BroadcastScript(
+        "%s SetNumberOfProcesses %d",
+        tclName, pvApp->GetProcessModule()->GetNumberOfPartitions());
+      }
+    
     pvs->AddVTKSource(vtksource, tclName);
     }
 

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.214");
+vtkCxxRevisionMacro(vtkPVData, "1.215");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1151,7 +1151,7 @@ void vtkPVData::UpdatePropertiesInternal()
   numcells.rdbuf()->freeze(0);
 
   ostrstream numpts;
-  numcells << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
+  numpts << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
   this->NumPointsLabel->SetLabel(numpts.str());
   numpts.rdbuf()->freeze(0);
   

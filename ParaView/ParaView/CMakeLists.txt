@@ -133,6 +133,7 @@ SET( ParaView_SRCS
   vtkPVSaveBatchScriptDialog.cxx
   vtkPVScalarRangeLabel.cxx 
   vtkPVScale.cxx 
+  vtkPVScaleFactorEntry.cxx
   vtkPVSelectCTHArrays.cxx
   vtkPVSelectCustomReader.cxx
   vtkPVSelectTimeSet.cxx
