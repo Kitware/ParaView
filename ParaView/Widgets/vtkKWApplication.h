@@ -137,6 +137,11 @@ public:
   void BalloonHelpWithdraw();
 
   // Description:
+  // Set the delay for the balloon help in seconds.
+  // To disable balloon help, set it to 0.
+  vtkSetClampMacro(BalloonHelpDelay, int, 0, 5);
+
+  // Description:
   // This variable can be used to hide the user interface.  
   // When WidgetVisibility is off, The cherat methods of vtkKWWidgets 
   // should not create the TK widgets.
@@ -197,6 +202,7 @@ protected:
   ofstream *TraceFile;
 
   vtkKWRegisteryUtilities *Registery;
+  int BalloonHelpDelay;
 };
 
 #endif

@@ -78,9 +78,14 @@ public:
   vtkKWWidget *GetFrame(const char *name);
 
   // Description:
-  // Set/Get the number of pages in the notebook.
-  void AddPage(const char *title);
+  // Get the number of pages in the notebook.
   vtkGetMacro(NumberOfPages,int);
+
+  // Description:
+  // Add new page to the notebook. By setting balloon string, 
+  // the page will have balloon help.
+  void AddPage(const char *title, const char* balloon);
+  void AddPage(const char *title);
   
   // Description:
   // The notebook will automatically resize itself to fit its
