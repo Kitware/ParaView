@@ -44,46 +44,24 @@ int SetApplicationIconCmd(ClientData clientdata,
   LPVOID lpMsgBuf;
   HINSTANCE hInst = 0;
   int iconID, error, set_small;
-  char cmd[] = "wm frame .";
+  char cmd[1024];
 
-  // Check usage and get params
+  // Check usage
 
   if (argc < 3)
     {
     interp->result = "Usage: SetApplicationIcon app_name icon_res_id [small|big]";
     return TCL_ERROR;
     }
+  
+  // Get window handle (and convert it to Windows HWND)
 
-  error = Tcl_GetInt(interp, argv[2], &iconID);
-  if (error != TCL_OK)
-    {
-    return error;
-    }
-
-  set_small = 0;
-  if (argc > 3)
-    {
-    if (!strcmp(argv[3], "small"))
-      {
-      set_small = 1;
-      }
-    else if (strcmp(argv[3], "big"))
-      {
-      sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
-              argv[3]);
-      return TCL_ERROR;
-      }
-    }
-
-  // Get main window handle
-
+  sprintf(cmd, "wm frame .");
   error = Tcl_GlobalEval(interp, cmd);
   if (error != TCL_OK)
     {
     return error;
     }
-
-  // Convert main window handle to Windows HWND
 
   sscanf(interp->result, "0x%x", (int*)&winHandle);
 
@@ -107,6 +85,12 @@ int SetApplicationIconCmd(ClientData clientdata,
 
   // Load icon from its resource ID
 
+  error = Tcl_GetInt(interp, argv[2], &iconID);
+  if (error != TCL_OK)
+    {
+    return error;
+    }
+
   hIcon = LoadImage(hInst,
                     MAKEINTRESOURCE(iconID),
                     IMAGE_ICON,
@@ -129,6 +113,21 @@ int SetApplicationIconCmd(ClientData clientdata,
     }
 
   // Set icon
+
+  set_small = 0;
+  if (argc > 3)
+    {
+    if (!strcmp(argv[3], "small"))
+      {
+      set_small = 1;
+      }
+    else if (strcmp(argv[3], "big"))
+      {
+      sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
+              argv[3]);
+      return TCL_ERROR;
+      }
+    }
 
   SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
 
