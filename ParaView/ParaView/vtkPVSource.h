@@ -102,6 +102,7 @@ public:
   virtual void Select();
   virtual void Deselect() { this->Deselect(1); }
   virtual void Deselect(int doPackForget);
+  virtual void Pack();
 
   // Description: 
   // This flag turns the visibility of the prop on and off.
@@ -319,10 +320,6 @@ public:
   // Description:
   // Raise the current source page.
   void RaiseSourcePage();
-
-  // Description:
-  // Get notebook widget name.
-  const char* GetNotebookWidgetName();
 
   // Description:
   // Set or get the module name.
