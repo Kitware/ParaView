@@ -82,14 +82,13 @@ public:
 
   // Description:
   // Method to set/get the resolution of the slider.
-  // Note that it does not snap either the range or the value of the scale.
-  // The range and the value can be any floating point number, and the entry
-  // associated to the scale can be used to set the value to anything within
-  // the range, despite the resolution. Think of the range as a way to set
-  // a value interactively, while still allowing the user to enter a precise
-  // value that could not be reached given the resolution. The resolution
-  // only controls the scale slider behaviour, i.e. specifies a nice step
-  // to which values can be snapped.
+  // The range or the value of the scale are not snapped to this resolution.
+  // The range and the value can be any floating point number. 
+  // Think of the slider and the resolution as a way to set the value
+  // interactively using nice clean steps (power of 10 for example).
+  // The entry associated to the scale can be used to set the value to 
+  // anything within the range, despite the resolution, allowing the user
+  // to enter a precise value that could not be reached given the resolution.
   virtual void SetResolution(double r);
   vtkGetMacro(Resolution, double);
   
