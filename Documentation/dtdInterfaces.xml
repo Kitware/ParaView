@@ -1,0 +1,58 @@
+<!-- XML DTD specification for ParaView's source and filter interfaces.
+     See http://www.rpbourret.com/xml/xmldtd.htm for a description of
+     the DTD format.  -->
+
+<!DOCTYPE Interfaces [
+  <!ELEMENT Interfaces (Source | Filter)*>
+  <!ELEMENT Source (Boolean | Extent | File | Scalar | String | Selection | Vector)*>
+  <!ATTLIST Source  class  CDATA #REQUIRED
+                    root   CDATA #REQUIRED
+                    output CDATA #REQUIRED>
+  <!ELEMENT Filter (Boolean | Extent | File | Scalar | String | Selection | Vector)*>
+  <!ATTLIST Filter  class  CDATA #REQUIRED
+                    root   CDATA #REQUIRED
+                    input  CDATA #REQUIRED
+                    output CDATA #REQUIRED>
+  <!ELEMENT Boolean EMPTY>
+  <!ATTLIST Boolean  name CDATA #REQUIRED
+                     set  CDATA #IMPLIED
+                     get  CDATA #IMPLIED
+                     help CDATA #IMPLIED>
+  <!ELEMENT Extent EMPTY>
+  <!ATTLIST Extent  name CDATA #REQUIRED
+                    set  CDATA #IMPLIED
+                    get  CDATA #IMPLIED
+                    help CDATA #IMPLIED>
+  <!ELEMENT File EMPTY>
+  <!ATTLIST File  name      CDATA #REQUIRED
+                  extension CDATA #REQUIRED
+                  set       CDATA #IMPLIED
+                  get       CDATA #IMPLIED
+                  help      CDATA #IMPLIED>
+  <!ELEMENT Scalar EMPTY>
+  <!ATTLIST Scalar  name CDATA         #REQUIRED
+                    type (int | float) #REQUIRED
+                    set  CDATA         #IMPLIED
+                    get  CDATA         #IMPLIED
+                    help CDATA         #IMPLIED>
+  <!ELEMENT Selection (Choice)+>
+  <!ATTLIST Selection  name CDATA #REQUIRED
+                       set  CDATA #IMPLIED
+                       get  CDATA #IMPLIED
+                       help CDATA #IMPLIED> 
+    <!ELEMENT Choice EMPTY>
+    <!ATTLIST Choice  name  CDATA #REQUIRED
+                      value CDATA #REQUIRED>
+  <!ELEMENT String EMPTY>
+  <!ATTLIST String  name CDATA #REQUIRED
+                    set  CDATA #IMPLIED
+                    get  CDATA #IMPLIED
+                    help CDATA #IMPLIED>
+  <!ELEMENT Vector EMPTY>
+  <!ATTLIST Vector  name   CDATA         #REQUIRED
+                    type   (int | float) #REQUIRED
+                    length CDATA         #REQUIRED
+                    set    CDATA         #IMPLIED
+                    get    CDATA         #IMPLIED
+                    help   CDATA         #IMPLIED>
+]>
