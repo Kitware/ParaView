@@ -198,5 +198,5 @@ int vtkPVPushButton::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVPushButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "EntryLabel: " << this->EntryLabel << endl;
+  os << indent << "EntryLabel: " << (this->EntryLabel?this->EntryLabel:"none") << endl;
 }
