@@ -749,7 +749,7 @@ protected:
 
   int InteractiveRenderEnabled;
 
-  void UpdateStatusImage();
+  virtual void CreateStatusImage();
 
   // To avoid disabling menus multiple times.
   int MenusDisabled;

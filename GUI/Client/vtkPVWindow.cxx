@@ -108,6 +108,8 @@
 
 #include "vtkPVAnimationManager.h"
 
+#include "Resources/vtkPVLogoSmall.h"
+
 #ifndef _WIN32
 # include <unistd.h>
 #endif
@@ -140,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.671");
+vtkCxxRevisionMacro(vtkPVWindow, "1.672");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1218,9 +1220,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
           this->GetPVApplication()->GetMinorVersion());
   this->SetStatusText(version);
 
-  // Update status image (and gauge height to match)
+  // Update gauge height to match status image
   
-  this->UpdateStatusImage();
   this->ProgressGauge->SetHeight(
     vtkKWTkUtilities::GetPhotoHeight(this->GetApplication()->GetMainInterp(), 
                                      this->StatusImageName) - 4);
@@ -1614,6 +1615,38 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Script("pack %s -side right -anchor se", this->ToolbarMenuButton->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::CreateStatusImage()
+{
+  // Tcl/Tk 8.3 seems to have a bug if you update a photo that already
+  // contains pixels. Let's create a second photo and replace the existing
+  // one.
+
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
+  this->SetStatusImageName(this->Script("image create photo"));
+  this->Script("%s configure -image %s", 
+               this->StatusImage->GetWidgetName(),
+               this->StatusImageName);
+#endif
+
+  // Update status image
+  
+  if (this->StatusImageName && this->GetPVApplication())
+    {
+    if (!vtkKWTkUtilities::UpdatePhoto(
+      this->GetPVApplication()->GetMainInterp(),
+      this->StatusImageName,
+      image_PVLogoSmall, 
+      image_PVLogoSmall_width, 
+      image_PVLogoSmall_height,
+      image_PVLogoSmall_pixel_size,
+      image_PVLogoSmall_buffer_length))
+      {
+      vtkWarningMacro("Error updating status image!" << this->StatusImageName);
+      return;
+      }
+    }
+}
 //-----------------------------------------------------------------------------
 void vtkPVWindow::AcceptCurrentSource()
 {
