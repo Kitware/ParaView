@@ -49,6 +49,7 @@ protected:
                          char* argv[]=0);
   
   int StartServer(kwsysProcess* server, const char* name);
+  int OutputStringHasError(vtkstd::string& output);
 private:
   vtkstd::string ParaView;
   vtkstd::string MPIRun;
@@ -63,6 +64,7 @@ private:
   int TestRenderServer;
   int TestServer;
   int ArgStart;
+  int AllowErrorInOutput;
 };
 
 #endif

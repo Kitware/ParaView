@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
 
 pvTestDriver::pvTestDriver()
 {
+  this->AllowErrorInOutput = 0;
   this->RenderServerNumProcesses = 0;
   this->TimeOut = 300;
   this->TestRenderServer = 0;
@@ -108,6 +109,12 @@ void pvTestDriver::SeparateArguments(const char* str,
 
 void pvTestDriver::CollectConfiguredOptions()
 {
+  // try to make sure that this timesout before dart so it can kill all the processes
+  this->TimeOut = DART_TESTING_TIMEOUT - 10.0;
+  if(this->TimeOut < 0)
+    {
+    this->TimeOut = 1500;
+    }
   // Find the location of paraview
   this->ParaView = PARAVIEW_BINARY_DIR;
 #ifdef  CMAKE_INTDIR
@@ -175,8 +182,20 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       fprintf(stderr, "Test With one mpi process.\n");
       }
     }
+  // check for the Other.pvs test
+  // This test should allow error to be in the output of the test.
+  for(int i =1; i < argc; ++i)
+    {
+    int len = strlen(argv[i]) - 9;
+    if(len > 0 && strncmp(argv[i]+len, "Other.pvs", 9) == 0)
+      {
+      this->AllowErrorInOutput = 1;
+      }
+    }
+  
   return 1;
 }
+
 void 
 pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
                                 const char* paraviewFlags, 
@@ -236,18 +255,43 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name)
   return 1;
 }
 
+int pvTestDriver::OutputStringHasError(vtkstd::string& output)
+{
+  const char* possibleMPIErrors[] = {
+    "error",
+    "Missing:",
+    "core dumped",
+    "Segmentation fault",
+    "erroneous",
+    "ERROR:",
+    "Error:",
+    "mpirun can *only* be used with MPI programs",
+    "due to signal"
+    0
+  };
   
+  if(this->AllowErrorInOutput)
+    {
+    return 0;
+    }
+
+  for(int i =0; possibleMPIErrors[i]; ++i)
+    {
+    if(output.find(possibleMPIErrors[i]) != output.npos)
+      {
+      cerr << "***** Test will fail, because the string: \"" << possibleMPIErrors[i] 
+           << "\"\n***** was found in the following output from the program:\n\"" 
+           << output << "\"\n";
+      return 1;
+      }
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 int pvTestDriver::Main(int argc, char* argv[])
 {
   this->CollectConfiguredOptions();
-  // try to make sure that this timesout before dart so it can kill all the processes
-  this->TimeOut = DART_TESTING_TIMEOUT - 10.0;
-  if(this->TimeOut < 0)
-    {
-    this->TimeOut = 1500;
-    }
-  
   if(!this->ProcessCommandLine(argc, argv))
     {
     return 1;
@@ -359,21 +403,21 @@ int pvTestDriver::Main(int argc, char* argv[])
   while(clientPipe || serverPipe || renderServerPipe)
     {
     clientPipe = WaitForAndPrintData(client, 0.1, 0, &output);
-    if(output.find("error") != output.npos)
+    if(this->OutputStringHasError(output))
       {
       cerr << "Client had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
     serverPipe = WaitForAndPrintData(server, 0.1, 0, &output);
-    if(output.find("error") != output.npos)
+    if(this->OutputStringHasError(output))
       {
       cerr << "Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
     renderServerPipe = WaitForAndPrintData(renderServer, 0.1, 0, &output);
-    if(output.find("error") != output.npos)
+    if(this->OutputStringHasError(output))
       {
       cerr << "Render Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
