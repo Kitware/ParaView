@@ -22,6 +22,7 @@
 #include "vtkSMObject.h"
 class vtkSMVectorProperty;
 class vtkSMPropertyStatusManagerInternals;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkSMPropertyStatusManager : public vtkSMObject
 {
@@ -61,6 +62,8 @@ public:
   // Description:
   // Same as InitializeStatus except for a single property.
   void InitializePropertyStatus(vtkSMVectorProperty* property);
+
+  vtkSMVectorProperty* GetInternalProperty(vtkSMVectorProperty* property);
 
 protected:
   vtkSMPropertyStatusManager();

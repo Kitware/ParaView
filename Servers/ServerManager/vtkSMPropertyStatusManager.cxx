@@ -24,7 +24,7 @@
 
 #include <vtkstd/map>
 vtkStandardNewMacro(vtkSMPropertyStatusManager);
-vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.2");
+vtkCxxRevisionMacro(vtkSMPropertyStatusManager, "1.3");
 
 //*****************************************************************************
 class vtkSMPropertyStatusManagerInternals
@@ -98,6 +98,20 @@ void vtkSMPropertyStatusManager::InitializeStatus()
     {
     this->DuplicateProperty(iter->first, iter->second);
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMVectorProperty* vtkSMPropertyStatusManager::GetInternalProperty(
+  vtkSMVectorProperty* property)
+{
+  vtkSMPropertyStatusManagerInternals::PropertyToPropertyMap::iterator iter =
+    this->Internals->Properties.find(property);
+  if (iter == this->Internals->Properties.end())
+    {
+    vtkErrorMacro("Property is not registered with this property status manager.");
+    return 0;
+    }
+  return iter->second;
 }
 
 //-----------------------------------------------------------------------------
