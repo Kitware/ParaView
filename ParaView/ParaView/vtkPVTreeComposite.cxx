@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.47");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.48");
 
 
 //=========================================================================
@@ -460,9 +460,9 @@ void vtkPVTreeComposite::InternalStartRender()
     double vp[4];
     ren->GetViewport(vp);
     renInfoFloat.Viewport[0] = vp[0];
-    renInfoFloat.Viewport[1] = vp[2];
+    renInfoFloat.Viewport[1] = vp[1];
+    renInfoFloat.Viewport[2] = vp[2];
     renInfoFloat.Viewport[3] = vp[3];
-    renInfoFloat.Viewport[4] = vp[4];
     // -end fix
     if (this->ImageReductionFactor > 1)
       {
