@@ -425,11 +425,6 @@ public:
   vtkGetObjectMacro(CenterOfRotationStyle, vtkPVInteractorStyleCenterOfRotation);
   
   // Description:
-  // Get the source from a name. This is used for serialization.
-  vtkPVSource* GetSourceFromName(const char*);
-  void AddToNamesToSources(const char* name, vtkPVSource* source);
-
-  // Description:
   // These methods enable and disable the navigation window and
   // selection window.
   void EnableNavigationWindow();
@@ -663,10 +658,6 @@ protected:
 
   vtkClientServerID ServerFileListingID;
 private:
-
-//BTX
-  vtkArrayMap<const char*, vtkPVSource*> *NamesToSources;
-//ETX
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented

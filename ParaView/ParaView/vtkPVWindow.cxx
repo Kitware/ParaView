@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.526");
+vtkCxxRevisionMacro(vtkPVWindow, "1.527");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -139,7 +139,6 @@ vtkPVWindow::vtkPVWindow()
   this->Interactor = 0;
 
   this->InteractiveRenderEnabled = 0;
-  this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
   this->SetTitle("Kitware ParaView");
 
@@ -306,12 +305,6 @@ vtkPVWindow::~vtkPVWindow()
     pm->SendStreamToClientAndServer();
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
-    }
-
-  if ( this->NamesToSources )
-    {
-    this->NamesToSources->Delete();
-    this->NamesToSources = 0;
     }
 
   this->PrepareForDelete();
@@ -4260,28 +4253,6 @@ void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name,
     {
     this->MainView->UpdateCameraManipulators();
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::AddToNamesToSources(const char* name, vtkPVSource* source)
-{
-  if ( !this->NamesToSources )
-    {
-    this->NamesToSources = vtkArrayMap<const char*, vtkPVSource*>::New();
-    }
-  this->NamesToSources->SetItem(name, source);
-}
-
-//-----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetSourceFromName(const char* name)
-{
-  if ( !this->NamesToSources )
-    {
-    return 0;
-    }
-  vtkPVSource* source = 0;
-  this->NamesToSources->GetItem(name, source);
-  return source;
 }
 
 //-----------------------------------------------------------------------------
