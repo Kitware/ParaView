@@ -116,6 +116,7 @@ protected:
 
   vtkImageMapToWindowLevelColors *WindowLevel;
   vtkImageActor *ImageActor;
+  vtkImageActor *LastImageActor;
 
   char *CornerText[4];
   
@@ -127,7 +128,7 @@ protected:
   int MinimumFontSize;
   
   // search for replacable tokens and replace
-  void ReplaceText();
+  void ReplaceText(vtkImageActor *ia);
 private:
 };
 

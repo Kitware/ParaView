@@ -93,6 +93,7 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   this->TextMapper[3]->SetVerticalJustificationToTop();
 
   this->ImageActor = NULL;
+  this->LastImageActor = 0;
   this->WindowLevel = NULL;
 }
 
@@ -121,17 +122,17 @@ void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
     }
 }
 
-void vtkCornerAnnotation::ReplaceText()
+void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia)
 {
   int i;
   char *text, *text2;
   int image;
   char *rpos, *tmp;
   float window, level;
-  
-  if (this->ImageActor)
+    
+  if (ia)
     {
-    image = this->ImageActor->GetSliceNumber();
+    image = ia->GetSliceNumber();
     }
   if (this->WindowLevel)
     {
@@ -152,7 +153,7 @@ void vtkCornerAnnotation::ReplaceText()
       while (rpos)
         {
         *rpos = '\0';
-        if (this->ImageActor)
+        if (ia)
           {
           sprintf(text2,"%sImage: %i%s",text,image,rpos+7);
           }
@@ -169,7 +170,7 @@ void vtkCornerAnnotation::ReplaceText()
       while (rpos)
         {
         *rpos = '\0';
-        if (this->ImageActor)
+        if (ia)
           {
           sprintf(text2,"%sSlice: %i%s",text,image,rpos+7);
           }
@@ -186,7 +187,7 @@ void vtkCornerAnnotation::ReplaceText()
       while (rpos)
         {
         *rpos = '\0';
-        if (this->ImageActor)
+        if (ia)
           {
           sprintf(text2,"%sWindow: %.2f%s",text,window,rpos+8);
           }
@@ -203,7 +204,7 @@ void vtkCornerAnnotation::ReplaceText()
       while (rpos)
         {
         *rpos = '\0';
-        if (this->ImageActor)
+        if (ia)
           {
           sprintf(text2,"%sLevel: %.2f%s",text,level,rpos+7);
           }
@@ -260,9 +261,24 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       }
     }
   
+  
+  // is there an image actor ?
+  vtkImageActor *ia = 0;  
+  vtkPropCollection *pc = viewport->GetProps();
+  int numProps = pc->GetNumberOfItems();
+  for (i = 0; i < numProps; i++)
+    {
+    ia = vtkImageActor::SafeDownCast(pc->GetItemAsObject(i));
+    if (ia)
+      {
+      break;
+      }
+    }  
+
   // Check to see whether we have to rebuild everything
   if ( (this->GetMTime() > this->BuildTime) ||
-       (this->ImageActor && this->ImageActor->GetMTime() > this->BuildTime) ||
+       (ia && (ia != this->LastImageActor || 
+               ia->GetMTime() > this->BuildTime)) ||
        (this->WindowLevel && this->WindowLevel->GetMTime() > this->BuildTime))
     {
     int *vSize = viewport->GetSize();
@@ -270,7 +286,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     vtkDebugMacro(<<"Rebuilding text");
     
     // replace text
-    this->ReplaceText();
+    this->ReplaceText(ia);
     
     // get the viewport size in display coordinates
     this->LastSize[0] = vSize[0];
@@ -355,6 +371,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         }
       }
     this->BuildTime.Modified();
+    this->LastImageActor = ia;
     }
 
   // Everything is built, just have to render
