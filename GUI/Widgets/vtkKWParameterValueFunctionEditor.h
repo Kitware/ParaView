@@ -357,6 +357,24 @@ public:
   vtkBooleanMacro(ShowCanvasOutline, int);
   virtual void SetShowCanvasOutline(int);
   vtkGetMacro(ShowCanvasOutline, int);
+
+  // Description:
+  // Set the canvas outline style.
+  //BTX
+  enum 
+  {
+    CanvasOutlineStyleLeftSide        = 1,
+    CanvasOutlineStyleRightSide       = 2,
+    CanvasOutlineStyleHorizontalSides = 3,
+    CanvasOutlineStyleTopSide         = 4,
+    CanvasOutlineStyleBottomSide      = 8,
+    CanvasOutlineStyleVerticalSides   = 12,
+    CanvasOutlineStyleAllSides        = 15
+  };
+  //ETX
+  vtkBooleanMacro(CanvasOutlineStyle, int);
+  virtual void SetCanvasOutlineStyle(int);
+  vtkGetMacro(CanvasOutlineStyle, int);
   
   // Description:
   // Show/Hide the canvas background
@@ -898,6 +916,7 @@ protected:
   int   DisableCommands;
   int   SelectedPoint;
   int   ShowCanvasOutline;
+  int   CanvasOutlineStyle;
   int   ShowCanvasBackground;
   int   ShowParameterCursor;
   int   ShowFunctionLine;

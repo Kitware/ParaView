@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.23");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.24");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -88,6 +88,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->FirstPointStyle             = vtkKWParameterValueFunctionEditor::PointStyleDefault;
   this->LastPointStyle              = vtkKWParameterValueFunctionEditor::PointStyleDefault;
   this->ShowCanvasOutline           = 1;
+  this->CanvasOutlineStyle          = vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides;
   this->ShowParameterTicks          = 0;
   this->ShowValueTicks              = 0;
   this->ComputeValueTicksFromHistogram = 0;
@@ -2638,6 +2639,35 @@ void vtkKWParameterValueFunctionEditor::SetShowCanvasOutline(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetCanvasOutlineStyle(int arg)
+{
+  if (arg < vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
+    {
+    arg = vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide;
+    }
+  else if (arg > vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides)
+    {
+    arg = vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides;
+    }
+
+  if (this->CanvasOutlineStyle == arg)
+    {
+    return;
+    }
+
+  this->CanvasOutlineStyle = arg;
+
+  this->Modified();
+
+  // Remove the outline now. This will force the style to be re-created
+  // properly. 
+
+  this->CanvasRemoveTag(VTK_KW_PVFE_FRAME_FG_TAG);
+
+  this->RedrawRangeFrame();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetShowCanvasBackground(int arg)
 {
   if (this->ShowCanvasBackground == arg)
@@ -4088,12 +4118,32 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
     {
     if (this->ShowCanvasOutline)
       {
-      tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << " -tags {" << VTK_KW_PVFE_FRAME_FG_TAG << "}" << endl;
+      if (this->CanvasOutlineStyle & 
+          vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
+        {
+        tk_cmd << canv << " create line 0 0 0 0 "
+               << "-tags {framefg_l " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+        }
+      if (this->CanvasOutlineStyle & 
+          vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
+        {
+        tk_cmd << canv << " create line 0 0 0 0 "
+               << "-tags {framefg_r " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+        }
+      if (this->CanvasOutlineStyle & 
+          vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
+        {
+        tk_cmd << canv << " create line 0 0 0 0 "
+               << "-tags {framefg_t " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+        }
+      if (this->CanvasOutlineStyle & 
+          vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
+        {
+        tk_cmd << canv << " create line 0 0 0 0 "
+               << "-tags {framefg_b " << VTK_KW_PVFE_FRAME_FG_TAG << "}\n";
+        }
       tk_cmd << canv << " lower " << VTK_KW_PVFE_FRAME_FG_TAG
              << " {" << VTK_KW_PVFE_FUNCTION_TAG << "}" << endl;
-      tk_cmd << canv << " itemconfigure " << VTK_KW_PVFE_FRAME_FG_TAG 
-             << " -outline black -fill {}" << endl;
       }
     }
   else 
@@ -4162,12 +4212,39 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
 
   if (this->ShowCanvasOutline)
     {
-    tk_cmd << canv << " coords " << VTK_KW_PVFE_FRAME_FG_TAG 
-           << " " << p_w_range[0] * factors[0]
-           << " " << v_w_range[0] * factors[1]
-           << " " << p_w_range[1] * factors[0]
-           << " " << v_w_range[1] * factors[1] 
-           << endl;
+    double c1_x = p_w_range[0] * factors[0];
+    double c1_y = v_w_range[0] * factors[1];
+    double c2_x = p_w_range[1] * factors[0];
+    double c2_y = v_w_range[1] * factors[1];
+
+    if (this->CanvasOutlineStyle & 
+        vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
+      {
+      tk_cmd << canv << " coords framefg_l " 
+             << c1_x << " " << c2_y << " " 
+             << c1_x << " " << c1_y - LSTRANGE << endl;
+      }
+    if (this->CanvasOutlineStyle & 
+        vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
+      {
+      tk_cmd << canv << " coords framefg_r " 
+             << c2_x << " " << c2_y << " " 
+             << c2_x << " " << c1_y - LSTRANGE << endl;
+      }
+    if (this->CanvasOutlineStyle & 
+        vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
+      {
+      tk_cmd << canv << " coords framefg_t " 
+             << c2_x << " " << c1_y << " " 
+             << c1_x - LSTRANGE << " " << c1_y << endl;
+      }
+    if (this->CanvasOutlineStyle & 
+        vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
+      {
+      tk_cmd << canv << " coords framefg_b " 
+             << c2_x << " " << c2_y << " " 
+             << c1_x - LSTRANGE << " " << c2_y << endl;
+      }
     }
 
   if (this->ShowCanvasBackground)
@@ -4184,7 +4261,7 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
             (int)(this->FrameBackgroundColor[1] * 255.0),
             (int)(this->FrameBackgroundColor[2] * 255.0));
     tk_cmd << canv << " itemconfigure " << VTK_KW_PVFE_FRAME_BG_TAG 
-           << " -outline {} -fill " << color << endl;
+           << " -outline " << color << " -fill " << color << endl;
     }
 
   tk_cmd << ends;
@@ -6362,6 +6439,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "RescaleBetweenEndPoints: "
      << (this->RescaleBetweenEndPoints ? "On" : "Off") << endl;
   os << indent << "PointMarginToCanvas: " << this->PointMarginToCanvas << endl;
+  os << indent << "CanvasOutlineStyle: " << this->CanvasOutlineStyle << endl;
   os << indent << "DisableAddAndRemove: "
      << (this->DisableAddAndRemove ? "On" : "Off") << endl;
   os << indent << "ChangeMouseCursor: "
