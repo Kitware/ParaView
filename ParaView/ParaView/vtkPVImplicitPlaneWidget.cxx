@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -145,9 +145,9 @@ void vtkPVImplicitPlaneWidget::CenterResetCallback()
     return;
     }
   input->GetDataInformation()->GetBounds(bds);
-  this->CenterEntry[0]->SetValue(0.5*(bds[0]+bds[1]), 3);
-  this->CenterEntry[1]->SetValue(0.5*(bds[2]+bds[3]), 3);
-  this->CenterEntry[2]->SetValue(0.5*(bds[4]+bds[5]), 3);
+  this->CenterEntry[0]->SetValue(0.5*(bds[0]+bds[1]));
+  this->CenterEntry[1]->SetValue(0.5*(bds[2]+bds[3]));
+  this->CenterEntry[2]->SetValue(0.5*(bds[4]+bds[5]));
 
   this->SetCenter();
 }
@@ -636,12 +636,12 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     widget->GetOrigin(val); 
     for (cc=0; cc < 3; cc ++ )
       {
-      this->CenterEntry[cc]->SetValue(val[cc], 5);
+      this->CenterEntry[cc]->SetValue(val[cc]);
       }
     widget->GetNormal(val); 
     for (cc=0; cc < 3; cc ++ )
       {
-      this->NormalEntry[cc]->SetValue(val[cc], 5);
+      this->NormalEntry[cc]->SetValue(val[cc]);
       }
     if (!widget->GetDrawPlane())
       {
@@ -689,9 +689,9 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetCenterInternal(float x, float y, float z)
 {
-  this->CenterEntry[0]->SetValue(x, 3);
-  this->CenterEntry[1]->SetValue(y, 3);
-  this->CenterEntry[2]->SetValue(z, 3); 
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z); 
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
@@ -710,9 +710,9 @@ void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetNormalInternal(float x, float y, float z)
 {
-  this->NormalEntry[0]->SetValue(x, 3);
-  this->NormalEntry[1]->SetValue(y, 3);
-  this->NormalEntry[2]->SetValue(z, 3); 
+  this->NormalEntry[0]->SetValue(x);
+  this->NormalEntry[1]->SetValue(y);
+  this->NormalEntry[2]->SetValue(z); 
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();

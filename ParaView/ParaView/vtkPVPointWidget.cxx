@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.21");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -336,9 +336,9 @@ void vtkPVPointWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
 {
-  this->PositionEntry[0]->SetValue(x, 5);
-  this->PositionEntry[1]->SetValue(y, 5);
-  this->PositionEntry[2]->SetValue(z, 5);  
+  this->PositionEntry[0]->SetValue(x);
+  this->PositionEntry[1]->SetValue(y);
+  this->PositionEntry[2]->SetValue(z);  
   if ( this->Widget3DTclName )
     {
     this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",

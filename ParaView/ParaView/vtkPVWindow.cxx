@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.482");
+vtkCxxRevisionMacro(vtkPVWindow, "1.483");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -992,7 +992,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
   //this->CenterXEntry->SetValue(this->CameraStyle3D->GetCenter()[0], 3);
-  this->CenterXEntry->SetValue(0.0, 3);
+  this->CenterXEntry->SetValue(0.0);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
   this->CenterYLabel->Create(app, "");
@@ -1003,7 +1003,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
   //this->CenterYEntry->SetValue(this->CameraStyle3D->GetCenter()[1], 3);
-  this->CenterYEntry->SetValue(0.0, 3);
+  this->CenterYEntry->SetValue(0.0);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
   this->CenterZLabel->Create(app, "");
@@ -1014,7 +1014,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
   //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
-  this->CenterZEntry->SetValue(0.0, 3);
+  this->CenterZEntry->SetValue(0.0);
 
   this->Script("pack %s %s %s %s %s %s -side left",
                this->CenterXLabel->GetWidgetName(),
@@ -1290,9 +1290,9 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->CenterXEntry->SetValue(x, 4);
-  this->CenterYEntry->SetValue(y, 4);
-  this->CenterZEntry->SetValue(z, 4);
+  this->CenterXEntry->SetValue(x);
+  this->CenterYEntry->SetValue(y);
+  this->CenterZEntry->SetValue(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   pvApp->BroadcastScript("%s SetPosition %f %f %f", 
                          this->CenterActorTclName,
@@ -1362,9 +1362,9 @@ void vtkPVWindow::ResetCenterCallback()
   center[2] = (bounds[4]+bounds[5])/2.0;
 
   this->SetCenterOfRotation(center[0], center[1], center[2]);
-  this->CenterXEntry->SetValue(center[0], 3);
-  this->CenterYEntry->SetValue(center[1], 3);
-  this->CenterZEntry->SetValue(center[2], 3);
+  this->CenterXEntry->SetValue(center[0]);
+  this->CenterYEntry->SetValue(center[1]);
+  this->CenterZEntry->SetValue(center[2]);
   this->ResizeCenterActor();
   this->MainView->EventuallyRender();
 }
