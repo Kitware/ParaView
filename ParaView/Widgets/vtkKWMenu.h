@@ -221,14 +221,18 @@ public:
   int  GetState(const char* item);
 
   // Description:
+  // Convenience method to set the state of all entries.
+  void SetState(int state);
+
+  // Description:
   // Configure the item at given index.
   void ConfigureItem(int index, const char*);
 
-//BTX
+  //BTX
   enum { Normal = 0, Active, Disabled, Unknown };
-//ETX
+  //ETX
 
-//BTX
+  //BTX
   // Description:
   // The following two methods allows one to store and restore
   // the state of a menu. This can be used to, for example, to
@@ -237,7 +241,7 @@ public:
   // entries with labels are stored.
   void StoreMenuState(vtkArrayMap<const char*, int>* state);
   void RestoreMenuState(vtkArrayMap<const char*, int>* state);
-//ETX
+  //ETX
 
 protected:
   

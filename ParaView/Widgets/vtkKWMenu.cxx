@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.40");
+vtkCxxRevisionMacro(vtkKWMenu, "1.41");
 
 
 
@@ -797,7 +797,7 @@ void vtkKWMenu::SetState(int index, int state)
     {
     state = 0;
     }
-  this->Script("%s entryconfigure %d -state %s", 
+  this->Script("catch {%s entryconfigure %d -state %s}", 
                this->GetWidgetName(), index, stateStr[state] );
 }
 
@@ -810,6 +810,16 @@ void vtkKWMenu::SetState(const char* item, int state)
     }
   int index = this->GetIndex(item);
   this->SetState(index, state);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetState(int state)
+{
+  int nb_of_items = this->GetNumberOfItems();
+  for (int i = 0; i < nb_of_items; i++)
+    {
+    this->SetState(i, state);
+    }
 }
 
 //----------------------------------------------------------------------------
