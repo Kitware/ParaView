@@ -1034,6 +1034,7 @@ const char* vtkPVInitialize::StandardFilterInterfaces=
 "  <SelectionList trace_name=\"IntegrationDirection\" variable=\"IntegrationDirection\"  option_width=\"15\">\n"
 "    <Item name=\"FORWARD\"  value=\"0\"/>\n"
 "    <Item name=\"BACKWARD\" value=\"1\"/>\n"
+"    <Item name=\"BOTH\"     value=\"2\"/>\n"
 "  </SelectionList>\n"
 "\n"
 "  <SelectWidget variable=\"IntegratorType\" trace_name=\"IntegrationType\" >\n"
