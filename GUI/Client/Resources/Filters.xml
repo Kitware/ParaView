@@ -1329,7 +1329,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
       </Input>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
-               label="Input"
+               label="Input"  hide_gui="1"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>

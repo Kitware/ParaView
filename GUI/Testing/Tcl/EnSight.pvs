@@ -35,9 +35,9 @@ set pv(vtkTemp176) [$pv(vtkTemp159) GetPVWidget {Compute Normals}]
 $pv(vtkTemp176) SetState 0
 $pv(vtkTemp159) AcceptCallback
 
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp574)
+
 set pv(vtkTemp1254) [$pv(vtkTemp1) CreatePVSource PartScalars]
-set pv(vtkTemp1261) [$pv(vtkTemp1254) GetPVWidget {Input}]
-$pv(vtkTemp1261) SetCurrentValue $pv(vtkTemp574)
 $pv(vtkTemp1254) AcceptCallback
 
 source [file join [file dirname [info script]] Compare.tcl]
