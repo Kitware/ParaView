@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVValueList.h"
 
 class vtkPVArrayMenu;
-class vtkPVContourWidgetProperty;
+class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
 {
@@ -99,7 +99,6 @@ protected:
   
   int AcceptCalled;
   void UpdateProperty();
-  vtkPVContourWidgetProperty *Property;
 
   char *SetNumberCommand;
   char *SetContourCommand;

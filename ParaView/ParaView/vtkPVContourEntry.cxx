@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContourEntry.h"
 
 #include "vtkContourValues.h"
+#include "vtkKWListBox.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
@@ -54,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.39");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -70,8 +71,6 @@ vtkPVContourEntry::vtkPVContourEntry()
 
   this->SuppressReset = 1;
   
-  this->Property = NULL;
-  
   this->ArrayMenu = NULL;
   
   this->SetNumberCommand = NULL;
@@ -81,7 +80,6 @@ vtkPVContourEntry::vtkPVContourEntry()
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
-  this->SetProperty(NULL);
   this->SetArrayMenu(NULL);
   this->SetSetNumberCommand(NULL);
   this->SetSetContourCommand(NULL);
@@ -120,7 +118,7 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 
   this->Superclass::AcceptInternal(sourceTclName);
 
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = this->ContourValuesList->GetNumberOfItems();
 
   char **cmds = new char*[numContours+1];
   int *numScalars = new int[numContours+1];
@@ -158,11 +156,11 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
   float value;
   int numContours;
 
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
 
   for (i = 0; i < numContours; i++)
     {
-    value = this->ContourValues->GetValue(i);
+    value = this->Property->GetScalar(2*(i+1));
     *file << "\t";
     *file << sourceTclName << " SetValue " 
           << i << " " << value << endl;
@@ -188,12 +186,11 @@ void vtkPVContourEntry::ResetInternal()
   
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
-  this->ContourValues->SetNumberOfContours(0);
+  this->ContourValuesList->DeleteAll();
   for (i = 0; i < numContours; i++)
     {
-    this->AddValueInternal(scalars[2*(i+1)]);
+    this->AddValue(scalars[2*(i+1)]);
     }
-  this->Update();
 
   // Since the widget now matches the fitler, it is no longer modified.
   this->ModifiedFlag = 0;
@@ -283,7 +280,7 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::UpdateProperty()
 {
-  int numContours = this->ContourValues->GetNumberOfContours();
+  int numContours = this->ContourValuesList->GetNumberOfItems();
   float *scalars = new float[2*numContours+1];
   scalars[0] = numContours;
   int i;
@@ -291,7 +288,7 @@ void vtkPVContourEntry::UpdateProperty()
   for (i = 0; i < numContours; i++)
     {
     scalars[2*i+1] = i;
-    scalars[2*(i+1)] = this->ContourValues->GetValue(i);
+    scalars[2*(i+1)] = atof(this->ContourValuesList->GetItem(i));
     }
   this->Property->SetScalars(2*numContours+1, scalars);
   delete [] scalars;

@@ -56,8 +56,7 @@ class vtkKWListBox;
 class vtkKWPushButton;
 class vtkKWRange;
 class vtkKWScale;
-
-class vtkContourValues;
+class vtkPVContourWidgetProperty;
 
 class VTK_EXPORT vtkPVValueList : public vtkPVWidget
 {
@@ -78,7 +77,6 @@ public:
   
   // Description:
   // Access to this widget from a script.
-  void AddValueInternal(float val);
   void AddValue(float val);
   void RemoveAllValues();
 
@@ -109,19 +107,19 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // Update UI from ContourValues object. This is an internal
+  // Update UI from Property object. This is an internal
   // method to be only used by the tracing interface. Use at
   // your own risk.
   void Update();
-
+  
 protected:
   vtkPVValueList();
   ~vtkPVValueList();
 
   static const int MAX_NUMBER_ENTRIES;
 
-  vtkContourValues* ContourValues;
-
+  vtkPVContourWidgetProperty *Property;
+  
   vtkKWLabeledFrame* ContourValuesFrame;
   vtkKWFrame* ContourValuesFrame2;
   vtkKWListBox* ContourValuesList;

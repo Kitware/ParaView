@@ -55,13 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVContourWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.3");
+vtkCxxRevisionMacro(vtkPVValueList, "1.4");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -72,8 +73,6 @@ const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 vtkPVValueList::vtkPVValueList()
 {
   this->CommandFunction = vtkPVValueListCommand;
-
-  this->ContourValues = vtkContourValues::New();  
 
   this->ContourValuesFrame = vtkKWLabeledFrame::New();
   this->ContourValuesFrame2 = vtkKWFrame::New();
@@ -99,17 +98,14 @@ vtkPVValueList::vtkPVValueList()
   this->GenerateRangeLabel = vtkKWLabel::New();
   this->GenerateRangeWidget = vtkKWRange::New();
   
-  this->ContourValues->SetNumberOfContours(0);
   this->SuppressReset = 1;
-  
+
+  this->Property = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVValueList::~vtkPVValueList()
 {
-  this->ContourValues->Delete();
-  this->ContourValues = NULL;
-
   this->ContourValuesFrame->Delete();
   this->ContourValuesFrame = NULL;
   this->ContourValuesFrame2->Delete();
@@ -364,16 +360,17 @@ void vtkPVValueList::Update()
   int num, idx;
   char str[256];
 
-  if (this->Application == NULL)
+  if (this->Application == NULL || this->Property == NULL)
     {
     return;
     }
 
   this->ContourValuesList->DeleteAll();
-  num = this->ContourValues->GetNumberOfContours();
+  num = (this->Property->GetNumberOfScalars() - 1) / 2;
+
   for (idx = 0; idx < num; ++idx)
     {
-    sprintf(str, "%g", this->ContourValues->GetValue(idx));
+    sprintf(str, "%g", this->Property->GetScalar(2*(idx+1)));
     this->ContourValuesList->AppendUnique(str);
     }    
 
@@ -464,17 +461,16 @@ void vtkPVValueList::SetBalloonHelpString(const char *str)
 //-----------------------------------------------------------------------------
 void vtkPVValueList::AddValueCallback()
 {
-  this->ContourValues->SetValue(this->ContourValues->GetNumberOfContours(),
-                                this->NewValueEntry->GetValue());
-  this->Update();
+  char str[256];
+  sprintf(str, "%g", this->NewValueEntry->GetValue());
+  this->ContourValuesList->AppendUnique(str);
   this->ModifiedCallback();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVValueList::DeleteAllValuesCallback()
 {
-  this->ContourValues->SetNumberOfContours(0);
-  this->Update();
+  this->ContourValuesList->DeleteAll();
   this->ModifiedCallback();
 }
 
@@ -484,7 +480,7 @@ void vtkPVValueList::DeleteValueCallback()
   int index;
   int num, idx;
   
-  num = this->ContourValues->GetNumberOfContours();
+  num = this->ContourValuesList->GetNumberOfItems();
 
   // First look for selected values in the value list.
   index = this->ContourValuesList->GetSelectionIndex();
@@ -496,7 +492,7 @@ void vtkPVValueList::DeleteValueCallback()
     // this will just clear the entry and return.
     for (idx = 0; idx < num && index < 0; ++idx)
       {
-      if ( this->ContourValues->GetValue(idx) == val )
+      if ( atof(this->ContourValuesList->GetItem(idx)) == val )
         {
         index = idx;
         }
@@ -510,16 +506,9 @@ void vtkPVValueList::DeleteValueCallback()
   
   if ( index >= 0 )
     {
-    for (idx = index+1; idx < num; ++idx)
-      {
-      this->ContourValues->SetValue(idx-1,
-                              this->ContourValues->GetValue(idx));
-      }
-    this->ContourValues->SetNumberOfContours(num-1);
-    this->Update();
+    this->ContourValuesList->DeleteRange(index, index);
     this->ModifiedCallback();
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -539,6 +528,7 @@ void vtkPVValueList::GenerateValuesCallback()
     }
 
   int numContours = static_cast<int>(this->GenerateEntry->GetValue());
+  
   if (numContours == 1)
     {
     this->AddValue((range[1] + range[0])/2.0);
@@ -553,29 +543,21 @@ void vtkPVValueList::GenerateValuesCallback()
     {
     this->AddValue(i*step+range[0]);
     }
-  this->Update();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVValueList::AddValueInternal(float val)
-{
-  int num = this->ContourValues->GetNumberOfContours();
-
-  this->ContourValues->SetValue(num, val);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVValueList::AddValue(float val)
 {
-  this->AddValueInternal(val);
+  char str[256];
+  sprintf(str, "%g", val);
+  this->ContourValuesList->AppendUnique(str);
   this->ModifiedCallback();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVValueList::RemoveAllValues()
 {
-  this->ContourValues->SetNumberOfContours(0);
-  this->Update();
+  this->ContourValuesList->DeleteAll();
   this->ModifiedCallback();
 }
 
@@ -591,15 +573,15 @@ void vtkPVValueList::AcceptInternal(const char* sourceTclName)
 
   this->Superclass::AcceptInternal(sourceTclName);
   
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = this->ContourValuesList->GetNumberOfItems();
 
   if (numContours == 0)
     {
     // Hit the add value button incase the user forgot.
     // This does nothing if there is no value in there.
-    this->ContourValues->SetValue(this->ContourValues->GetNumberOfContours(),
-                                  this->NewValueEntry->GetValue());
-    this->Update();
+    char str[256];
+    sprintf(str, "%g", this->NewValueEntry->GetValue());
+    this->ContourValuesList->AppendUnique(str);
     numContours = 1;
     }
 }
@@ -618,10 +600,10 @@ void vtkPVValueList::Trace(ofstream *file)
 
   *file << "$kw(" << this->GetTclName() << ") RemoveAllValues \n";
 
-  numContours = this->ContourValues->GetNumberOfContours();
+  numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
   for (i = 0; i < numContours; i++)
     {
-    value = this->ContourValues->GetValue(i);
+    value = this->Property->GetScalar(2*(i+1));
     *file << "$kw(" << this->GetTclName() << ") AddValue "
           << value << endl;
     }
@@ -653,10 +635,10 @@ void vtkPVValueList::CopyProperties(
   if (pvce)
     {
     pvce->SetLabel(this->ContourValuesFrame->GetLabel()->GetLabel());
-    num = this->ContourValues->GetNumberOfContours();
+    num = this->ContourValuesList->GetNumberOfItems();
     for (idx = 0; idx < num; ++idx)
       {
-      pvce->AddValue(this->ContourValues->GetValue(idx));
+      pvce->AddValue(atof(this->ContourValuesList->GetItem(idx)));
       }
     }
   else 
