@@ -353,22 +353,24 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Geometry}}", 
-                         this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Geometry}}", 
-                         this->GeometryTclName);
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+			 "{Execute Geometry}}", this->GeometryTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+			 "{Execute Geometry}}", this->GeometryTclName);
 
 
+#ifdef VTK_USE_MPI
   sprintf(tclName, "Collect%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Collect}}", 
-                         this->CollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Collect}}", 
-                         this->CollectTclName);
 
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+			 "{Execute Collect}}", this->CollectTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+			 "{Execute Collect}}", this->CollectTclName);
+#endif
 
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
@@ -378,14 +380,21 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     }
   // Make a new tcl object.
   sprintf(tclName, "Mapper%d", this->InstanceCount);
-  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
+  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
+							  tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->CollectTclName);
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-  //                       this->GeometryTclName);
+  if (this->CollectTclName)
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+			   this->CollectTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+			   this->GeometryTclName);
+    }
   
   sprintf(tclName, "ScalarBar%d", this->InstanceCount);
   this->SetScalarBarTclName(tclName);
@@ -420,15 +429,17 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetNumberOfDivisions 50 50 50", 
                          this->LODDeciTclName);
 
+#ifdef VTK_USE_MPI
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+			 "{Execute LODCollect}}", this->LODCollectTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+			 "{Execute LODCollect}}", this->LODCollectTclName);
+#endif
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
@@ -1650,12 +1661,18 @@ void vtkPVData::Initialize()
 			       this->GetVTKDataTclName());
     }
   
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                         this->LODMapperTclName,
-                         this->LODCollectTclName);
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-  //                       this->LODMapperTclName,
-  //                       this->LODDeciTclName);
+  if (this->LODCollectTclName)
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+			   this->LODMapperTclName,
+			   this->LODCollectTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+			   this->LODMapperTclName,
+			   this->LODDeciTclName);
+    }
 
   vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();

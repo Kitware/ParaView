@@ -781,7 +781,13 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
+  // Avoid serialization.
+#ifdef VTK_USE_MPI
   this->GetComposite()->ResetCameraClippingRange(this->GetRenderer());
+#else
+  // If not parallel, forward to the renderer.
+  this->GetRenderer()->ResetCameraClippingRange();
+#endif
 }
 
 void vtkPVRenderView::AddBindings()
