@@ -61,6 +61,8 @@ class vtkCornerAnnotation;
 class vtkProp;
 class vtkRenderer;
 class vtkRenderWindow;
+class vtkTextActor;
+class vtkTextMapper;
 
 class VTK_EXPORT vtkKWRenderWidget : public vtkKWWidget
 {
@@ -154,15 +156,15 @@ public:
 
   // Description:
   // Get and control the header annotation.
-  virtual void SetHeaderAnnotationVisibility(int v) {};
-  virtual int  GetHeaderAnnotationVisibility() { return 0; };
-  virtual void SetHeaderTextColor(float r, float g, float b) {};
+  virtual void SetHeaderAnnotationVisibility(int v);
+  virtual int  GetHeaderAnnotationVisibility();
+  virtual void SetHeaderTextColor(float r, float g, float b);
   virtual void SetHeaderTextColor(float *rgb)
     { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
-  virtual float* GetHeaderTextColor() { return 0; };
-  virtual void SetHeaderText(const char*) {};
-  virtual char* GetHeaderText() { return 0; };
-      
+  virtual float* GetHeaderTextColor();
+  virtual void SetHeaderText(const char*);
+  virtual char* GetHeaderText();
+  
   // Description:
   // Set/Get the units that pixel sizes are measured in
   vtkSetStringMacro(Units);
@@ -227,7 +229,8 @@ protected:
   vtkKWWidget *VTKWidget;
 
   vtkCornerAnnotation *CornerAnnotation;
-
+  vtkTextActor        *HeaderProp;
+  
   vtkRenderer     *Renderer;
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;
