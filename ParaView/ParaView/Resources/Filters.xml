@@ -348,8 +348,13 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
     <StringEntry label="Global Id Array Name" variable="GlobalIdArrayName"
                  trace_name="GlobalIdArrayName"
                  help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
+    <LabeledToggle label="Minimal memory"
+                   trace_name="UseMinimalMemory" 
+                   variable="UseMinimalMemory" 
+                   help="Force communication routines to use minimal memory, which is slower"
+                   default_value="0"/>
     <Documentation>
-The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly on process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copies to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. The output of this filter is of type unstructured grid.
+The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly one process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copied to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. D3 will search for the array, or create it, if you don't provide the name. The output of this filter is of type unstructured grid.
     </Documentation>
   </Module>
   <Module name="ElevationFilter"
