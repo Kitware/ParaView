@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.37");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.37.2.1");
 
 //===========================================================================
 //***************************************************************************
@@ -100,6 +100,7 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
+  this->Widget3D = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -173,6 +174,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
                this->Visibility->GetWidgetName());
 
   this->ChildCreate(pvApp);
+
+  this->Widget3D = vtk3DWidget::SafeDownCast(pvApp->TclToVTKObject(this->Widget3DTclName));
 
   // Only initialize observers on the UI process.
   if (this->Widget3DTclName)
