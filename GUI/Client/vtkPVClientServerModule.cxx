@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.74");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.75");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -569,6 +569,15 @@ void vtkPVClientServerModule::ConnectToRemote()
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  this->SocketController = vtkSocketController::New();
+  this->SocketController->Initialize();
+  vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
+  
+  int port= pvApp->GetPort();
+  if(this->RenderServerMode)
+    {
+    port = pvApp->GetRenderServerPort();
+    }
   if ( this->ClientMode )
     {
     cout << "Waiting for server..." << endl;
@@ -581,15 +590,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
       }
     cout << "Waiting for client..." << endl;
     }
-  this->SocketController = vtkSocketController::New();
-  this->SocketController->Initialize();
-  vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
-  
-  int port= pvApp->GetPort();
-  if(this->RenderServerMode)
-    {
-    port = pvApp->GetRenderServerPort();
-    }
+
   // Establish connection
   if (!comm->WaitForConnection(port))
     {
