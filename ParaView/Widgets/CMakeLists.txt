@@ -12,7 +12,6 @@ vtkKWChangeColorButton.cxx
 vtkKWCheckButton.cxx 
 vtkKWCheckButtonSet.cxx 
 vtkKWCheckButtonWithChangeColor.cxx
-vtkKWColorTransferFunctionEditor.cxx
 vtkKWComposite.cxx 
 vtkKWCompositeCollection.cxx 
 vtkKWCornerAnnotation.cxx 
@@ -47,8 +46,6 @@ vtkKWNotebook.cxx
 vtkKWOKCancelDialog.cxx 
 vtkKWObject.cxx 
 vtkKWOptionMenu.cxx 
-vtkKWParameterValueFunctionEditor.cxx
-vtkKWPiecewiseFunctionEditor.cxx
 vtkKWPopupButton.cxx 
 vtkKWProgressGauge.cxx 
 vtkKWPushButton.cxx 
@@ -85,7 +82,6 @@ vtkKWXtEmbeddedWidget.cxx
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
-  vtkKWParameterValueFunctionEditor.cxx
   vtkKWRenderWidget.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWView.cxx
