@@ -1,8 +1,14 @@
 #include "vtkVector.txx"
+#include "vtkLinkedList.txx"
 
 int CheckName(const char *name, char **names)
 {
   int cc;
+  if ( !name )
+    {
+    cout << "Trying to compare with empty name" << endl;
+    return VTK_ERROR;
+    }
   for ( cc = 0; names[cc]; cc++ )
     {
     if ( !strncmp(names[cc], name, strlen(names[cc])) )
@@ -12,6 +18,8 @@ int CheckName(const char *name, char **names)
     }
   return VTK_ERROR;
 }
+
+#define C_ERROR(c) cout << "Container: " << c->GetClassName() << " "
 
 template<class DType>
 int TestList(DType*)
@@ -42,29 +50,31 @@ int TestList(DType*)
     {
     if ( strings->AppendItem( names[cc] ) != VTK_OK )
       {
-      cout << "Insert failed" << endl;
+      C_ERROR(strings) << "Append failed" << endl;
       error = 1;
       }
     }
+  //strings->DebugList();
 
-  for ( cc=0; cc < 11; cc++ )
+  for ( cc=0; cc < 13; cc++ )
     {
     char* name = 0;
     if ( cc < 10 )
       {
       if ( strings->GetItem(cc, name) != VTK_OK )
 	{
-	cout << "Problem accessing item: " << cc << endl;
+	C_ERROR(strings) << "Problem accessing item: " << cc << endl;
 	error = 1;
 	}
       if ( !name )
 	{
-	cout << "Name is null" << endl;
+	C_ERROR(strings) << "Name is null" << endl;
 	error = 1;
 	}
       if ( name && strcmp(name, names[cc]) )
 	{
-	cout << "Got name but it is not what it should be" << endl;
+	C_ERROR(strings) << "Got name but it is not what it should be" 
+			 << endl;
 	error = 1;
 	}
       }
@@ -72,11 +82,14 @@ int TestList(DType*)
       {
       if ( strings->GetItem(cc, name) == VTK_OK )
 	{
-	cout << "Should not be able to access item: " << cc << endl;
+	C_ERROR(strings) << "Should not be able to access item: " 
+			 << cc << endl;
+	C_ERROR(strings) << "Item: " << name << endl;
 	error = 1;
 	}
       }
     }
+  //strings->DebugList();
 
   for ( cc=1; cc<10; cc+= 2 )
     {
@@ -84,8 +97,10 @@ int TestList(DType*)
       {
       if ( strings->RemoveItem(cc) != VTK_OK )
 	{
-	cout << "Problem removing item: " << cc << endl;
-	cout << "Number of elements: " << strings->GetNumberOfItems() << endl;
+	C_ERROR(strings) << "Problem removing item: " << cc << endl;
+	C_ERROR(strings) << "Number of elements: " 
+			 << strings->GetNumberOfItems() 
+			 << endl;
 	error = 1;
 	}
       }
@@ -93,8 +108,11 @@ int TestList(DType*)
       {
       if ( strings->RemoveItem(cc) == VTK_OK )
 	{
-	cout << "Should not be able to remove item: " << cc << endl;
-	cout << "Number of elements: " << strings->GetNumberOfItems() << endl;
+	C_ERROR(strings) << "Should not be able to remove item: " 
+			 << cc << endl;
+	C_ERROR(strings) << "Number of elements: " 
+			 << strings->GetNumberOfItems() 
+	     << endl;
 	error = 1;
 	}
       }
@@ -108,17 +126,18 @@ int TestList(DType*)
       {
       if ( strings->GetItem(cc, name) != VTK_OK )
 	{
-	cout << "Problem accessing item: " << cc << endl;
+	C_ERROR(strings) << "Problem accessing item: " << cc << endl;
 	error = 1;
 	}
       if ( !name )
 	{
-	cout << "Name is null" << endl;
+	C_ERROR(strings) << "Name is null" << endl;
 	error = 1;
 	}
-      if ( !name && ::CheckName(name, names) != VTK_OK )
+      if ( !name || ::CheckName(name, names) != VTK_OK )
 	{
-	cout << "Got strange name at position: " << cc << endl;
+	C_ERROR(strings) << "Got strange name at position: " 
+			 << cc << endl;
 	error = 1;
 	}
       }
@@ -126,7 +145,9 @@ int TestList(DType*)
       {
       if ( strings->GetItem(cc, name) == VTK_OK )
 	{
-	cout << "Should not be able to access item: " << cc << endl;
+	C_ERROR(strings) << "Should not be able to access item: " 
+			 << cc << endl;
+	C_ERROR(strings) << "Item: " << name << endl;
 	error = 1;
 	}
       }
@@ -134,7 +155,8 @@ int TestList(DType*)
   
   if ( strings->GetNumberOfItems() != 7 )
     {
-    cout << "Number of elements left: " << strings->GetNumberOfItems() << endl;
+    C_ERROR(strings) << "Number of elements left: " 
+		     << strings->GetNumberOfItems() << endl;
     error = 1;
     }
 
@@ -142,7 +164,7 @@ int TestList(DType*)
     {
     if ( strings->PrependItem( separate ) != VTK_OK )
       {
-      cout << "Problem prepending item: " << cc << endl;
+      C_ERROR(strings) << "Problem prepending item: " << cc << endl;
       error = 1;
       }
     }
@@ -152,17 +174,17 @@ int TestList(DType*)
     char *name = 0;
     if ( strings->GetItem(cc, name) != VTK_OK )
       {
-      cout << "Problem accessing item: " << cc << endl;
+      C_ERROR(strings) << "Problem accessing item: " << cc << endl;
       error = 1;
       }
     if ( !name )
       {
-      cout << "Name is null" << endl;
+      C_ERROR(strings) << "Name is null" << endl;
       error = 1;
       }
     if ( !name && ::CheckName(name, names) != VTK_OK )
       {
-      cout << "Got strange name at position: " << cc << endl;
+      C_ERROR(strings) << "Got strange name at position: " << cc << endl;
       error = 1;
       }
     }
@@ -171,29 +193,34 @@ int TestList(DType*)
     {
     if ( strings->RemoveItem(0) != VTK_OK )
       {
-      cout << "Problem remove first element" << endl;
+      C_ERROR(strings) << "Problem remove first element" << endl;
       error = 1;
       }
     }
 
   if ( strings->GetNumberOfItems() != 0 )
     {
-    cout << "Number of elements left: " << strings->GetNumberOfItems() << endl;
+    C_ERROR(strings) << "Number of elements left: " 
+		     << strings->GetNumberOfItems() << endl;
     error = 1;
     }
 
   strings->Delete();
 
   strings = DType::New();
-  strings->SetSize(15);
+  unsigned long maxsize = 0;
+  if ( strings->SetSize(15) == VTK_OK )
+    {
+    maxsize = 15;
+    }
   for ( cc = 0; cc < 20; cc ++ )
     {
-    if ( cc < 15 )
+    if ( !maxsize || cc < maxsize )
       {
       if ( strings->InsertItem( 0, separate ) != VTK_OK )
 	{
-	cout << "Problem inserting item: " << cc << endl;
-	cout << "Size: " << strings->GetNumberOfItems() << endl;
+	C_ERROR(strings) << "Problem inserting item: " << cc << endl;
+	C_ERROR(strings) << "Size: " << strings->GetNumberOfItems() << endl;
 	error = 1;
 	}
       }
@@ -201,8 +228,9 @@ int TestList(DType*)
       {
       if ( strings->InsertItem( 0, separate ) == VTK_OK )
 	{
-	cout << "Should not be able to insert item: " << cc << endl;
-	cout << "Size: " << strings->GetNumberOfItems() << endl;
+	C_ERROR(strings) << "Should not be able to insert item: " 
+			 << cc << endl;
+	C_ERROR(strings) << "Size: " << strings->GetNumberOfItems() << endl;
 	error = 1;
 	}
       }
@@ -217,14 +245,15 @@ int main()
 {
   int res = 0;
 
+  //cout << "Vector: " << endl;
   vtkVector<char *> *vv = vtkVector<char *>::New();
   res += TestList(vv);
   vv->Delete();
 
-  // When linked list will be implemented
-  // vtkLinkedList<char *> *vl = vtkLinkedList<char *>::New();
-  // res += TestList(vl);
-  // vl->Delete();
+  //cout << "Linked List: " << endl;
+  vtkLinkedList<char *> *vl = vtkLinkedList<char *>::New();
+  res += TestList(vl);
+  vl->Delete();
 
   return res;
 }

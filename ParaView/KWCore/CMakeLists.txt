@@ -31,7 +31,6 @@ ENDIF (WIN32)
   
 WRAP_EXCLUDE_FILES(
   vtkKWHashTable 
-  vtkContainer
   vtkKWRegisteryUtilities
 )
 
