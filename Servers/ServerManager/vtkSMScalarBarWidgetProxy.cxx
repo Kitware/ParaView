@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.5");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -37,6 +37,7 @@ vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
   this->Position2[0] = 0.13;
   this->Position2[1] = 0.5;
   this->Orientation = VTK_ORIENT_VERTICAL;
+  this->SetVTKClassName("vtkScalarBarWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -52,10 +53,7 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->Superclass::CreateVTKObjects(numObjects);
-
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
   if (pm->GetRenderModule())
     {
     vtkClientServerID rendererID = pm->GetRenderModule()->GetRenderer2DID();
@@ -141,8 +139,8 @@ void vtkSMScalarBarWidgetProxy::SetLookupTable(vtkSMProxy *lut)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
 
-  unsigned cc;
-  unsigned  int numObjects = this->GetNumberOfIDs();
+  unsigned int cc;
+  unsigned int numObjects = this->GetNumberOfIDs();
   if (!lut)
     {
     return;
