@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.141");
+vtkCxxRevisionMacro(vtkPVData, "1.142");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1571,6 +1571,9 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
                          this->PropertyTclName, r, g, b);
   pvApp->BroadcastScript("%s SetAmbientColor 1.0 1.0 1.0",
                          this->PropertyTclName);
+  
+  this->ColorButton->SetColor(r, g, b);
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2860,7 +2863,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.141 $");
+  this->ExtractRevision(os,"$Revision: 1.142 $");
 }
 
 //----------------------------------------------------------------------------
