@@ -64,6 +64,9 @@ vtkKWWindow::vtkKWWindow()
   this->MenuHelp = vtkKWMenu::New();
   this->MenuHelp->SetParent(this->Menu);
   
+  this->PageMenu = vtkKWMenu::New();
+  this->PageMenu->SetParent(this->MenuFile);
+  
   this->ToolbarFrame = vtkKWWidget::New();
   this->ToolbarFrame->SetParent(this);  
 
@@ -95,6 +98,7 @@ vtkKWWindow::vtkKWWindow()
   this->MenuView = NULL;
   this->MenuProperties = NULL;
   this->NumberOfMRUFiles = 0;
+  this->PrintTargetDPI = 100;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -108,6 +112,7 @@ vtkKWWindow::~vtkKWWindow()
     this->Views = NULL;
     }
   this->Menu->Delete();
+  this->PageMenu->Delete();
   this->MenuFile->Delete();
   this->MenuHelp->Delete();
   this->ToolbarFrame->Delete();
@@ -366,6 +371,24 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->Create(app,"-tearoff 0");
   this->Menu->AddCascade("File", this->MenuFile, 0);
   this->MenuFile->AddCommand("Load Script", this, "LoadScript");
+
+  // add render quality setting
+  this->PageMenu->Create(this->Application,"-tearoff 0");
+
+  char* rbv = 
+    this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
+  // now add our own menu options 
+  this->Script( "set %s 0", rbv );
+  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1");
+  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2");
+  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3");
+  delete [] rbv;
+  // add the Print option
+
+#ifdef _WIN32
+  this->MenuFile->AddCascade("Page Setup", this->PageMenu,0);
+#endif
+
   this->MenuFile->AddSeparator();
   this->MenuFile->AddCommand("Close", this, "Close");
   this->MenuFile->AddCommand("Exit", this, "Exit");
@@ -376,12 +399,25 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp");
   this->MenuHelp->AddCommand("About", this, "DisplayAbout");
 
-  char *rbv = 
+  rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
   this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
                                             rbv, this, "HideProperties");
   delete [] rbv;
+}
+
+void vtkKWWindow::OnPrint1() 
+{
+  this->PrintTargetDPI = 100;
+}
+void vtkKWWindow::OnPrint2() 
+{
+  this->PrintTargetDPI = 150;
+}
+void vtkKWWindow::OnPrint3() 
+{
+  this->PrintTargetDPI = 300;
 }
 
 void vtkKWWindow::ShowProperties()
@@ -741,5 +777,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.18 $");
+  this->ExtractRevision(os,"$Revision: 1.19 $");
 }

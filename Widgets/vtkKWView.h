@@ -46,6 +46,7 @@ class vtkKWApplication;
 class vtkKWWindow;
 class vtkViewport;
 class vtkKWCornerAnnotation;
+class vtkKWMenu;
 #include "vtkWindow.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWEntry.h"
@@ -315,7 +316,6 @@ protected:
   char             *MenuPropertiesName;
   
   int Printing;
-  float PrintTargetDPI;
 };
 
 

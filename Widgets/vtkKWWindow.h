@@ -130,6 +130,13 @@ public:
   void InstallMenu(vtkKWMenu* menu);
 
   // Description:
+  // Callbacks used to set the print quality
+  void OnPrint1();
+  void OnPrint2();
+  void OnPrint3();
+  vtkGetMacro(PrintTargetDPI,float);
+  
+  // Description:
   // Allow access to the notebook object.
   vtkGetObjectMacro(Notebook,vtkKWNotebook);
 
@@ -171,6 +178,8 @@ protected:
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *ViewFrame;
   vtkKWWidget *ToolbarFrame;
+  float      PrintTargetDPI;
+  vtkKWMenu *PageMenu;
 };
 
 

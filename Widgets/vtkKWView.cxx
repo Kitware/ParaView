@@ -110,7 +110,6 @@ vtkKWView::vtkKWView()
   this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
 
   this->Printing = 0;
-  this->PrintTargetDPI = 100;
   
   this->MenuPropertiesName = NULL;
   this->SetMenuPropertiesName(" View");
@@ -498,9 +497,17 @@ void vtkKWView::Print()
   // get printer pixels per inch
   int cxInch = GetDeviceCaps(ghdc,LOGPIXELSX);
   int cyInch = GetDeviceCaps(ghdc,LOGPIXELSY);
-  // target DPI specified here
-  scale = cxInch/this->PrintTargetDPI;
 
+  // target DPI specified here
+  if (this->GetParentWindow())
+    {
+    scale = cxInch/this->GetParentWindow()->GetPrintTargetDPI();
+    }
+  else
+    {
+    scale = cxInch/100.0;
+    }
+  
 
   // Best Fit case -- create a rectangle which preserves
   // the DIB's aspect ratio, and fills the page horizontally.
@@ -717,10 +724,6 @@ void vtkKWView::Select(vtkKWWindow *pw)
   pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
                                    "Print", this, "Print");
   
-  // add the save as image option
-  pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                   "Save As Image",this, "SaveAsImage");
-  
 #ifdef _WIN32
   // add the edit copy option
   pw->GetMenuEdit()->AddCommand("Copy",this,"EditCopy");
@@ -734,6 +737,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     this->SelectedComposite->Select(this);
     }
+  
   
   // map the property sheet as needed
   if (this->SharedPropertiesParent)
@@ -1004,5 +1008,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.18 $");
+  this->ExtractRevision(os,"$Revision: 1.19 $");
 }
