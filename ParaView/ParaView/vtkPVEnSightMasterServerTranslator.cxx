@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerTranslator);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerTranslator, "1.1");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerTranslator, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightMasterServerTranslator::vtkPVEnSightMasterServerTranslator()
@@ -62,6 +62,8 @@ vtkPVEnSightMasterServerTranslator::~vtkPVEnSightMasterServerTranslator()
 void vtkPVEnSightMasterServerTranslator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ProcessId: " << this->ProcessId << "\n";
+  
 }
 
 //----------------------------------------------------------------------------

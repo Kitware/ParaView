@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.5");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6");
 
 #ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
@@ -102,6 +102,7 @@ vtkPVEnSightMasterServerReader::vtkPVEnSightMasterServerReader()
   this->Controller = 0;
   this->InformationError = 0;
   this->ExtentTranslator = vtkPVEnSightMasterServerTranslator::New();
+  this->NumberOfPieces = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +119,7 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << "\n";
   os << indent << "Error: " << this->InformationError << "\n";
+  os << indent << "NumberOfPieces: " << this->NumberOfPieces << endl;
 }
 
 //----------------------------------------------------------------------------
