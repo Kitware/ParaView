@@ -161,3 +161,21 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
   strcat(acceptCmd, "\"");
   this->AcceptCommands->AddString(acceptCmd);
 }
+
+vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
+{
+  if (idx > this->SubLabels->GetNumberOfItems())
+    {
+    return NULL;
+    }
+  return ((vtkKWLabel*)this->SubLabels->GetItemAsObject(idx));
+}
+
+vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
+{
+  if (idx > this->Entries->GetNumberOfItems())
+    {
+    return NULL;
+    }
+  return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
+}

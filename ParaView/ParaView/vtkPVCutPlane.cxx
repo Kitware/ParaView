@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVVectorEntry.h"
 
 int vtkPVCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -59,27 +60,17 @@ vtkPVCutPlane::vtkPVCutPlane()
 
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
 
-  this->CenterFrame = vtkKWWidget::New();
-  this->CenterLabel = vtkKWLabel::New();
-  this->CenterXEntry = vtkKWEntry::New();
-  this->CenterYEntry = vtkKWEntry::New(); 
-  this->CenterZEntry = vtkKWEntry::New();
+  this->CenterEntry = vtkPVVectorEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
 
-  this->NormalFrame = vtkKWWidget::New();
-  this->NormalLabel = vtkKWLabel::New();
-  this->NormalXEntry = vtkKWEntry::New();
-  this->NormalYEntry = vtkKWEntry::New(); 
-  this->NormalZEntry = vtkKWEntry::New();
+  this->NormalEntry = vtkPVVectorEntry::New();
   this->NormalButtonFrame = vtkKWWidget::New();
   this->NormalCameraButton = vtkKWPushButton::New();
   this->NormalXButton = vtkKWPushButton::New();
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
 
-  this->OffsetFrame = vtkKWWidget::New();
-  this->OffsetLabel = vtkKWLabel::New();
-  this->OffsetEntry = vtkKWEntry::New();
+  this->OffsetEntry = vtkPVVectorEntry::New();
 
   this->ReplaceInputOff();
 }
@@ -90,29 +81,13 @@ vtkPVCutPlane::~vtkPVCutPlane()
   this->BoundsDisplay->Delete();
   this->BoundsDisplay = NULL;
 
-  this->CenterFrame->Delete();
-  this->CenterFrame = NULL;
-  this->CenterLabel->Delete();
-  this->CenterLabel = NULL;
-  this->CenterXEntry->Delete();
-  this->CenterXEntry = NULL;
-  this->CenterYEntry->Delete(); 
-  this->CenterYEntry = NULL; 
-  this->CenterZEntry->Delete();
-  this->CenterZEntry = NULL;
+  this->CenterEntry->Delete();
+  this->CenterEntry = NULL;
   this->CenterResetButton->Delete();
   this->CenterResetButton = NULL;
 
-  this->NormalFrame->Delete();
-  this->NormalFrame = NULL;
-  this->NormalLabel->Delete();
-  this->NormalLabel = NULL;
-  this->NormalXEntry->Delete();
-  this->NormalXEntry = NULL;
-  this->NormalYEntry->Delete(); 
-  this->NormalYEntry = NULL; 
-  this->NormalZEntry->Delete();
-  this->NormalZEntry = NULL;
+  this->NormalEntry->Delete();
+  this->NormalEntry = NULL;
   this->NormalButtonFrame->Delete();
   this->NormalButtonFrame = NULL;
   this->NormalCameraButton->Delete();
@@ -124,10 +99,6 @@ vtkPVCutPlane::~vtkPVCutPlane()
   this->NormalZButton->Delete();
   this->NormalZButton = NULL;
 
-  this->OffsetFrame->Delete();
-  this->OffsetFrame = NULL;
-  this->OffsetLabel->Delete();
-  this->OffsetLabel = NULL;
   this->OffsetEntry->Delete();
   this->OffsetEntry = NULL;
 }
@@ -159,36 +130,13 @@ void vtkPVCutPlane::CreateProperties()
   this->Script("pack %s -side top -fill x",
                this->BoundsDisplay->GetWidgetName());
 
-  this->CenterFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->CenterFrame->Create(pvApp, "frame", "");
+  this->CenterEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  this->CenterEntry->SetPVSource(this);
+  this->CenterEntry->Create(this->Application, "Center:", 3, NULL, "SetOrigin",
+                            "GetOrigin", NULL, this->GetVTKSourceTclName());
+  this->Widgets->AddItem(this->CenterEntry);
   this->Script("pack %s -side top -fill x",
-               this->CenterFrame->GetWidgetName());
-
-  this->CenterLabel->SetParent(this->CenterFrame);
-  this->CenterLabel->Create(this->Application, "-width 18 -justify right");
-  this->CenterLabel->SetLabel("Center:");
-  this->Script("pack %s -side left", this->CenterLabel->GetWidgetName());
-
-  this->CenterXEntry->SetParent(this->CenterFrame);
-  this->CenterXEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->CenterXEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->CenterXEntry->GetWidgetName());
-
-  this->CenterYEntry->SetParent(this->CenterFrame);
-  this->CenterYEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->CenterYEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->CenterYEntry->GetWidgetName());
-
-  this->CenterZEntry->SetParent(this->CenterFrame);
-  this->CenterZEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->CenterZEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->CenterZEntry->GetWidgetName());
+               this->CenterEntry->GetWidgetName());
 
   this->CenterResetButton->SetParent(this->GetParameterFrame()->GetFrame());
   this->CenterResetButton->Create(this->Application, "");
@@ -197,55 +145,14 @@ void vtkPVCutPlane::CreateProperties()
   this->Script("pack %s -side top -fill x -padx 2",
                this->CenterResetButton->GetWidgetName());
 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 0]", 
-                                 this->CenterXEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetOrigin"); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 1]", 
-                                 this->CenterYEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetOrigin"); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 2]", 
-                                 this->CenterZEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetOrigin"); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), this->VTKSourceTclName, "SetOrigin",
-                        this->CenterXEntry->GetTclName(),
-                        this->CenterYEntry->GetTclName(), 
-                        this->CenterZEntry->GetTclName());
-
   // Normal -------------------------
-  this->NormalFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->NormalFrame->Create(pvApp, "frame", "");
+  this->NormalEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  this->NormalEntry->SetPVSource(this);
+  this->NormalEntry->Create(this->Application, "Normal:", 3, NULL, "SetNormal",
+                            "GetNormal", NULL, this->GetVTKSourceTclName());
+  this->Widgets->AddItem(this->NormalEntry);
   this->Script("pack %s -side top -fill x",
-               this->NormalFrame->GetWidgetName());
-
-  this->NormalLabel->SetParent(this->NormalFrame);
-  this->NormalLabel->Create(this->Application, "-width 18 -justify right");
-  this->NormalLabel->SetLabel("Normal:");
-  this->Script("pack %s -side left", this->NormalLabel->GetWidgetName());
-
-  this->NormalXEntry->SetParent(this->NormalFrame);
-  this->NormalXEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->NormalXEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->NormalXEntry->GetWidgetName());
-
-  this->NormalYEntry->SetParent(this->NormalFrame);
-  this->NormalYEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->NormalYEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->NormalYEntry->GetWidgetName());
-
-  this->NormalZEntry->SetParent(this->NormalFrame);
-  this->NormalZEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->NormalZEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->NormalZEntry->GetWidgetName());
+               this->NormalEntry->GetWidgetName());
 
   this->NormalButtonFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->NormalButtonFrame->Create(this->Application, "frame", "");
@@ -277,52 +184,14 @@ void vtkPVCutPlane::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t",
                this->NormalZButton->GetWidgetName());
 
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 0]", 
-                                 this->NormalXEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetNormal"); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 1]", 
-                                 this->NormalYEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetNormal"); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 2]", 
-                                 this->NormalZEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetNormal"); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), this->VTKSourceTclName, "SetNormal",
-                        this->NormalXEntry->GetTclName(),
-                        this->NormalYEntry->GetTclName(), 
-                        this->NormalZEntry->GetTclName());
-
-
   // Offset -------------------------
-  this->OffsetFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->OffsetFrame->Create(pvApp, "frame", "");
+  this->OffsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  this->OffsetEntry->SetPVSource(this);
+  this->OffsetEntry->Create(this->Application, "Offset:", 1, NULL, "SetOffset",
+                            "GetOffset", NULL, this->VTKSourceTclName);
+  this->Widgets->AddItem(this->OffsetEntry);
   this->Script("pack %s -side top -fill x",
-               this->OffsetFrame->GetWidgetName());
-
-  this->OffsetLabel->SetParent(this->OffsetFrame);
-  this->OffsetLabel->Create(this->Application, "-width 18 -justify right");
-  this->OffsetLabel->SetLabel("Offset:");
-  this->Script("pack %s -side left", this->OffsetLabel->GetWidgetName());
-
-  this->OffsetEntry->SetParent(this->OffsetFrame);
-  this->OffsetEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->OffsetEntry->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill x -expand t", 
                this->OffsetEntry->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]", 
-                                 this->OffsetEntry->GetTclName(), 
-                                 this->VTKSourceTclName, "GetOffset"); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-                        this->GetTclName(), this->VTKSourceTclName, "SetOffset",
-                        this->OffsetEntry->GetTclName());
 
   this->UpdateProperties();
   this->UpdateParameterWidgets();
@@ -343,9 +212,9 @@ void vtkPVCutPlane::CenterResetCallback()
     }
   input->GetBounds(bds);
 
-  this->CenterXEntry->SetValue(0.5*(bds[0]+bds[1]), 3);
-  this->CenterYEntry->SetValue(0.5*(bds[2]+bds[3]), 3);
-  this->CenterZEntry->SetValue(0.5*(bds[4]+bds[5]), 3);
+  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
+  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
+  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
 }
 
 
@@ -376,33 +245,33 @@ void vtkPVCutPlane::NormalCameraCallback()
     }
   cam->GetViewPlaneNormal(normal);
 
-  this->NormalXEntry->SetValue(-normal[0], 5);
-  this->NormalYEntry->SetValue(-normal[1], 5);
-  this->NormalZEntry->SetValue(-normal[2], 5);
+  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
+  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
+  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCutPlane::NormalXCallback()
 {
-  this->NormalXEntry->SetValue(1.0, 1);
-  this->NormalYEntry->SetValue(0.0, 1);
-  this->NormalZEntry->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCutPlane::NormalYCallback()
 {
-  this->NormalXEntry->SetValue(0.0, 1);
-  this->NormalYEntry->SetValue(1.0, 1);
-  this->NormalZEntry->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCutPlane::NormalZCallback()
 {
-  this->NormalXEntry->SetValue(0.0, 1);
-  this->NormalYEntry->SetValue(0.0, 1);
-  this->NormalZEntry->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
 }
 
 //----------------------------------------------------------------------------

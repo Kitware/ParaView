@@ -64,6 +64,9 @@ public:
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
   
+  vtkKWLabel* GetSubLabel(int idx);
+  vtkKWEntry* GetEntry(int idx);
+  
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();

@@ -81,18 +81,10 @@ protected:
 
   vtkKWBoundsDisplay *BoundsDisplay;
 
-  vtkKWWidget *CenterFrame;
-  vtkKWLabel *CenterLabel;
-  vtkKWEntry *CenterXEntry;
-  vtkKWEntry *CenterYEntry; 
-  vtkKWEntry *CenterZEntry;
+  vtkPVVectorEntry *CenterEntry;
   vtkKWPushButton *CenterResetButton;
 
-  vtkKWWidget *NormalFrame;
-  vtkKWLabel *NormalLabel;
-  vtkKWEntry *NormalXEntry;
-  vtkKWEntry *NormalYEntry; 
-  vtkKWEntry *NormalZEntry;
+  vtkPVVectorEntry *NormalEntry;
 
   vtkKWWidget *NormalButtonFrame;
   vtkKWPushButton *NormalCameraButton;
@@ -100,10 +92,7 @@ protected:
   vtkKWPushButton *NormalYButton;
   vtkKWPushButton *NormalZButton;
 
-  vtkKWWidget *OffsetFrame;
-  vtkKWLabel *OffsetLabel;
-  vtkKWEntry *OffsetEntry;
-
+  vtkPVVectorEntry *OffsetEntry;
 };
 
 #endif

@@ -203,7 +203,6 @@ void vtkPVClipPlane::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::CenterResetCallback()
 {
-  vtkKWEntry *entry;
   vtkPVData *input;
   float bds[6];
 
@@ -214,12 +213,9 @@ void vtkPVClipPlane::CenterResetCallback()
     }
   input->GetBounds(bds);
 
-  entry = (vtkKWEntry*)this->CenterEntry->GetEntries()->GetItemAsObject(0);
-  entry->SetValue(0.5*(bds[0]+bds[1]), 3);
-  entry = (vtkKWEntry*)this->CenterEntry->GetEntries()->GetItemAsObject(1);
-  entry->SetValue(0.5*(bds[2]+bds[3]), 3);
-  entry = (vtkKWEntry*)this->CenterEntry->GetEntries()->GetItemAsObject(2);
-  entry->SetValue(0.5*(bds[4]+bds[5]), 3);
+  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
+  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
+  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
 }
 
 
@@ -230,7 +226,6 @@ void vtkPVClipPlane::NormalCameraCallback()
   vtkRenderer *ren;
   vtkCamera *cam;
   double normal[3];
-  vtkKWEntry *entry;
 
   if (view == NULL)
     {
@@ -251,51 +246,33 @@ void vtkPVClipPlane::NormalCameraCallback()
     }
   cam->GetViewPlaneNormal(normal);
 
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(0);
-  entry->SetValue(-normal[0], 5);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(1);  
-  entry->SetValue(-normal[1], 5);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(2);
-  entry->SetValue(-normal[2], 5);
+  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
+  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
+  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::NormalXCallback()
 {
-  vtkKWEntry *entry;
-
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(0);
-  entry->SetValue(1.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(1);
-  entry->SetValue(0.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(2);
-  entry->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::NormalYCallback()
 {
-  vtkKWEntry *entry;
-
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(0);
-  entry->SetValue(0.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(1);
-  entry->SetValue(1.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(2);
-  entry->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::NormalZCallback()
 {
-  vtkKWEntry *entry;
-
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(0);
-  entry->SetValue(0.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(1);
-  entry->SetValue(0.0, 1);
-  entry = (vtkKWEntry*)this->NormalEntry->GetEntries()->GetItemAsObject(2);
-  entry->SetValue(1.0, 1);
+  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
+  this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
 }
 
 //----------------------------------------------------------------------------
