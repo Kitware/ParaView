@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.3");
 
 
 
@@ -318,7 +318,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // Compute reduction factor. 
-  if (this->Composite && ! localRender)
+  if (! localRender)
     {
     this->ComputeReductionFactor();
     }

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.3");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.4");
 
 
 
@@ -365,6 +365,11 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   
       // Do not let the width go below 150.
       maxReductionFactor = windowSize[0] / 150.0;
+      if (maxReductionFactor > this->ReductionFactor)
+        {
+        maxReductionFactor = this->ReductionFactor;
+        }
+
       if (newReductionFactor > maxReductionFactor)
         {
         newReductionFactor = maxReductionFactor;

@@ -61,14 +61,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.2");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.3");
 
 
 //----------------------------------------------------------------------------
 vtkPVCompositePartDisplay::vtkPVCompositePartDisplay()
 {
-  this->CollectionDecision = 1;
-  this->LODCollectionDecision = 1;
+  this->CollectionDecision = -1;
+  this->LODCollectionDecision = -1;
 
   this->CollectTclName = NULL;
   this->LODCollectTclName = NULL;

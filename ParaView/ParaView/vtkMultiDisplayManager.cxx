@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.1");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.2");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -322,7 +322,7 @@ void vtkMultiDisplayManager::ClientStartRender()
   // All this just gets information to send to the satellites.  
   if (updateRate > 2.0)
     {
-    this->ReductionFactor = 2;
+    this->ReductionFactor = this->LODReductionFactor;
     }
   else
     {
