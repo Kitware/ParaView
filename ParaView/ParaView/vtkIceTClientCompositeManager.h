@@ -36,7 +36,7 @@ class vtkRenderer;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
-class vtkIceTRenderManager;
+class vtkParallelRenderManager;
 
 class VTK_EXPORT vtkIceTClientCompositeManager : public vtkObject
 {
@@ -97,8 +97,8 @@ public:
   // Description:
   // This is the server (IceT) manager.
   // This is the way we propagate the parameters client->server.
-  void SetIceTManager(vtkIceTRenderManager *c);
-  vtkGetObjectMacro(IceTManager,vtkIceTRenderManager);
+  void SetIceTManager(vtkParallelRenderManager *c);
+  vtkGetObjectMacro(IceTManager,vtkParallelRenderManager);
 
   // Description:
   // These parameters allow this object to manage a tiled display.
@@ -147,7 +147,7 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* CompositeController;
   vtkSocketController* ClientController;
-  vtkIceTRenderManager *IceTManager;
+  vtkParallelRenderManager *IceTManager;
 
   int Tiled;
   int TiledDimensions[2];
