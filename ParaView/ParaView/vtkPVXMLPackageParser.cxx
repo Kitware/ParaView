@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.8");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.9");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -555,10 +555,11 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
     return 0;
     }
   
-  // Let Tcl find the library.
+  // Let Tcl find the library.  Add the executable's location to the
+  // list of possible paths.
   this->Window->GetPVApplication()->BroadcastScript(
-    "::paraview::load_component %s", name
-    );
+    "::paraview::load_component %s [file dirname [info nameofexecutable]]",
+    name);
   
   // Returns empty string if successful.
   const char* result =
