@@ -94,7 +94,7 @@ public:
   // The center of rotation picker needs the compositers zbuffer.
   // Remove this method.  Change picking the center of rotation.
   vtkPVTreeComposite *GetComposite() {return this->Composite;}
-  vtkGetStringMacro(CompositeTclName);
+  vtkGetMacro(CompositeID, vtkClientServerID);
 
   // Description:
   // These were originally for debugging.  I am planning on removing them !!!
@@ -134,8 +134,7 @@ protected:
   float CompositeThreshold;
 
   vtkPVTreeComposite *Composite;
-  char *CompositeTclName;
-  vtkSetStringMacro(CompositeTclName);
+  vtkClientServerID CompositeID;
 
   double StillCompositeTime;
   double InteractiveCompositeTime;
