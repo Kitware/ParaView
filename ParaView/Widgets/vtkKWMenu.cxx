@@ -520,3 +520,10 @@ void vtkKWMenu::SetEntryCommand(const char* item, vtkKWObject* object,
   this->SetEntryCommand(index, object, MethodAndArgString);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "TearOff: " << this->GetTearOff() << endl;
+}

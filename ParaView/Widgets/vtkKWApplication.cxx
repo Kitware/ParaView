@@ -839,3 +839,19 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
   return res;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ApplicationName: " << this->GetApplicationName() << endl;
+  os << indent << "ApplicationReleaseName: " 
+     << this->GetApplicationReleaseName() << endl;
+  os << indent << "ApplicationVersionName: " 
+     << this->GetApplicationVersionName() << endl;
+  os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
+  os << indent << "DialogUp: " << this->GetDialogUp() << endl;
+  os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
+  os << indent << "RegisteryLevel: " << this->GetRegisteryLevel() << endl;
+  os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
+     << endl;
+}

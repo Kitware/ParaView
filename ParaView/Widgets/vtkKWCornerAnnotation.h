@@ -62,6 +62,7 @@ class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
 public:
   static vtkKWCornerAnnotation* New();
   vtkTypeMacro(vtkKWCornerAnnotation,vtkKWLabeledFrame);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Displays and/or updates the property ui display

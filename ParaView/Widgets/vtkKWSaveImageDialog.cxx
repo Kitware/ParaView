@@ -127,3 +127,10 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
   this->SetApplication(app);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWSaveImageDialog::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "FileName: " << this->GetFileName() << endl;
+}

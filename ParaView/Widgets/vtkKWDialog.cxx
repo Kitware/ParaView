@@ -209,3 +209,10 @@ void vtkKWDialog::SetTitle( const char* title )
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWDialog::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Beep: " << this->GetBeep() << endl;
+  os << indent << "BeepType: " << this->GetBeepType() << endl;
+}

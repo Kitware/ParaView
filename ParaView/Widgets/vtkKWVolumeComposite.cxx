@@ -513,7 +513,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 
@@ -556,3 +556,34 @@ void vtkKWVolumeComposite::DeregisterIntermixIntersectingGeometry()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWVolumeComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CanDoHardwareCursor: " << this->GetCanDoHardwareCursor() 
+     << endl;
+  os << indent << "CanDoIntermixGeometry: " 
+     << this->GetCanDoIntermixGeometry() << endl;
+  os << indent << "HiResTextureID: " << this->GetHiResTextureID() << endl;
+  os << indent << "HiResTextureMapper: " << this->GetHiResTextureMapper() 
+     << endl;
+  os << indent << "LODVolume: " << this->GetLODVolume() << endl;
+  os << indent << "LowResTextureID: " << this->GetLowResTextureID() << endl;
+  os << indent << "LowResTextureMapper: " << this->GetLowResTextureMapper() 
+     << endl;
+  os << indent << "LowResVolumeProID: " << this->GetLowResVolumeProID() 
+     << endl;
+  os << indent << "MedResTextureID: " << this->GetMedResTextureID() << endl;
+  os << indent << "MedResTextureMapper: " << this->GetMedResTextureMapper() 
+     << endl;
+  os << indent << "RayCastID: " << this->GetRayCastID() << endl;
+  os << indent << "RayCastMapper: " << this->GetRayCastMapper() << endl;
+  os << indent << "RenderMethod: " << this->GetRenderMethod() << endl;
+  os << indent << "SoftwareMapperAvailable: " 
+     << this->GetSoftwareMapperAvailable() << endl;
+  os << indent << "VolumeProID: " << this->GetVolumeProID() << endl;
+  os << indent << "VolumeProMapper: " << this->GetVolumeProMapper() << endl;
+  os << indent << "VolumeProMapperAvailable: " 
+     << this->GetVolumeProMapperAvailable() << endl;
+  os << indent << "VolumeProperty: " << this->GetVolumeProperty() << endl;
+}

@@ -68,6 +68,7 @@ class VTK_EXPORT vtkKWVolumeComposite : public vtkKWComposite
 public:
   static vtkKWVolumeComposite* New();
   vtkTypeMacro(vtkKWVolumeComposite,vtkKWComposite);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the input data for this volume

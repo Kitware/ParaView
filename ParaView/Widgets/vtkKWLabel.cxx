@@ -130,6 +130,9 @@ void vtkKWLabel::SetLineType( int type )
   this->LineType = type;
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Width: " << this->GetWidth() << endl;
+}

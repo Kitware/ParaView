@@ -69,6 +69,7 @@ class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 public:
   static vtkKWWindow* New();
   vtkTypeMacro(vtkKWWindow,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -167,3 +167,10 @@ void vtkKWLabeledFrame::AllowShowHideOff()
 { 
   vtkKWLabeledFrame::AllowShowHide = 0; 
 }
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledFrame::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ShowHideFrame: " << this->GetShowHideFrame() << endl;
+}

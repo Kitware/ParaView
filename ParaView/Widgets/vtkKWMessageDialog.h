@@ -58,6 +58,7 @@ class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 public:
   static vtkKWMessageDialog* New();
   vtkTypeMacro(vtkKWMessageDialog,vtkKWDialog);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
   enum {Message = 0,

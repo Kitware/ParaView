@@ -71,6 +71,7 @@ class VTK_EXPORT vtkKWObject : public vtkObject
 public:
   static vtkKWObject* New();
   vtkTypeMacro(vtkKWObject,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get the name of the tcl object this instance represents.

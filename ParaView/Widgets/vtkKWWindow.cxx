@@ -993,7 +993,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.88 $");
+  this->ExtractRevision(os,"$Revision: 1.89 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1278,4 +1278,31 @@ void vtkKWWindow::PrintRecentFiles()
       cout << "Item: " << kc << endl;
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Menu: " << this->GetMenu() << endl;
+  os << indent << "MenuFile: " << this->GetMenuFile() << endl;
+  os << indent << "MenuPropertiesTitle: " << this->GetMenuPropertiesTitle() 
+     << endl;
+  os << indent << "Notebook: " << this->GetNotebook() << endl;
+  os << indent << "NumberOfRecentFiles: " << this->GetNumberOfRecentFiles() 
+     << endl;
+  os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
+  os << indent << "ProgressGauge: " << this->GetProgressGauge() << endl;
+  os << indent << "PromptBeforeClose: " << this->GetPromptBeforeClose() 
+     << endl;
+  os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
+  os << indent << "ScriptExtension: " << this->GetScriptExtension() << endl;
+  os << indent << "ScriptType: " << this->GetScriptType() << endl;
+  os << indent << "SelectedView: " << this->GetSelectedView() << endl;
+  os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
+  os << indent << "ToolbarFrame: " << this->GetToolbarFrame() << endl;
+  os << indent << "UseMenuProperties: " << this->GetUseMenuProperties() 
+     << endl;
+  os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
+  os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
 }

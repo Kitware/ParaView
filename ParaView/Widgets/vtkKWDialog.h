@@ -55,6 +55,7 @@ class VTK_EXPORT vtkKWDialog : public vtkKWWidget
 public:
   static vtkKWDialog* New();
   vtkTypeMacro(vtkKWDialog,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget
@@ -94,10 +95,12 @@ public:
   // Play beep when the dialog is displayed
   vtkSetClampMacro( Beep, int, 0, 1 );
   vtkBooleanMacro( Beep, int );
+  vtkGetMacro( Beep, int );
 
   // Description:
   // Sets the beep type
   vtkSetMacro( BeepType, int );
+  vtkGetMacro( BeepType, int );
 
   // Description:
   // Set the title of the dialog. Default is "Kitware Dialog".

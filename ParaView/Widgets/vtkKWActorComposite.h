@@ -62,6 +62,7 @@ class VTK_EXPORT vtkKWActorComposite : public vtkKWComposite
 public:
   static vtkKWActorComposite* New();
   vtkTypeMacro(vtkKWActorComposite,vtkKWComposite);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the properties object, called by UpdateProperties.

@@ -103,3 +103,10 @@ vtkProp *vtkKWActorComposite::GetProp()
 {
   return this->Actor;
 }
+
+//----------------------------------------------------------------------------
+void vtkKWActorComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Mapper: " << this->GetMapper() << endl;
+}

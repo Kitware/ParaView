@@ -386,13 +386,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
   return 1;
 }
 
-void vtkCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkActor2D::PrintSelf(os,indent);
-
-  os << indent << "MaximumLineHeight: " << this->MaximumLineHeight << endl;
-}
-
 void vtkCornerAnnotation::SetText(int i, const char *text)
 {
   if ( this->CornerText[i] && text && (!strcmp(this->CornerText[i],text))) 
@@ -403,4 +396,15 @@ void vtkCornerAnnotation::SetText(int i, const char *text)
   this->CornerText[i] = new char [strlen(text)+1];
   strcpy(this->CornerText[i],text);
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ImageActor: " << this->GetImageActor() << endl;
+  os << indent << "MinimumFontSize: " << this->GetMinimumFontSize() << endl;
+  os << indent << "WindowLevel: " << this->GetWindowLevel() << endl;
+  os << indent << "Mapper: " << this->GetMapper() << endl;
+  os << indent << "MaximumLineHeight: " << this->MaximumLineHeight << endl;
 }

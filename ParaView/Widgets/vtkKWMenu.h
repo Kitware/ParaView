@@ -56,7 +56,8 @@ class VTK_EXPORT vtkKWMenu : public vtkKWWidget
 public:
   static vtkKWMenu* New();
   vtkTypeMacro(vtkKWMenu,vtkKWWidget);
-  
+  void PrintSelf(ostream& os, vtkIndent indent);
+ 
   void Create(vtkKWApplication* app, const char* args);
   
   // Description: 

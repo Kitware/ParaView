@@ -550,3 +550,12 @@ void vtkKWNotebook::Resize()
 }
 
 
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "MinimumHeight: " << this->GetMinimumHeight() << endl;
+  os << indent << "MinimumWidth: " << this->GetMinimumWidth() << endl;
+  os << indent << "NumberOfPages: " << this->GetNumberOfPages() << endl;
+}

@@ -380,3 +380,12 @@ int vtkKWMessageDialog::GetRememberMessage()
   int res = this->CheckButton->GetState();
   return res;
 }
+
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "DialogName: " << this->GetDialogName() << endl;
+  os << indent << "Options: " << this->GetOptions() << endl;
+  os << indent << "Style: " << this->GetStyle() << endl;
+}

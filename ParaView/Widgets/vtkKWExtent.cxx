@@ -258,3 +258,10 @@ void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandStrin
 
   this->Command = command.str();
 }
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Extent: " << this->GetExtent() << endl;
+}

@@ -216,5 +216,15 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Notebook2: " << this->GetNotebook2() << endl;
+  os << indent << "Notebook: " << this->GetNotebook() << endl;
+  os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
+  os << indent << "View: " << this->GetView() << endl;
 }

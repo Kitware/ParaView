@@ -67,6 +67,7 @@ class VTK_EXPORT vtkKWApplication : public vtkKWObject
 public:
   static vtkKWApplication* New();
   vtkTypeMacro(vtkKWApplication,vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   virtual vtkKWApplication *GetApplication()  { return this;  }
   virtual void SetApplication (vtkKWApplication*) 
@@ -146,6 +147,7 @@ public:
   // Set the delay for the balloon help in seconds.
   // To disable balloon help, set it to 0.
   vtkSetClampMacro(BalloonHelpDelay, int, 0, 5);
+  vtkGetMacro(BalloonHelpDelay, int);
 
   // Description:
   // This variable can be used to hide the user interface.  

@@ -58,6 +58,7 @@ class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 public:
   static vtkKWNotebook* New();
   vtkTypeMacro(vtkKWNotebook,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -83,6 +83,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
   public:
   vtkTypeMacro(vtkKWView,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a View

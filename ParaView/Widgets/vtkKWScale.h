@@ -56,6 +56,7 @@ class VTK_EXPORT vtkKWScale : public vtkKWWidget
 public:
   static vtkKWScale* New();
   vtkTypeMacro(vtkKWScale,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

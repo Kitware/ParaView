@@ -55,6 +55,7 @@ class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidget
 public:
   static vtkKWChangeColorButton* New();
   vtkTypeMacro(vtkKWChangeColorButton,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

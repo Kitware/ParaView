@@ -1317,7 +1317,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.60 $");
+  this->ExtractRevision(os,"$Revision: 1.61 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1424,4 +1424,40 @@ vtkViewport *vtkKWView::GetViewport()
 void vtkKWView::Render() 
 {
   this->GetVTKWindow()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ControlFrame: " << this->GetControlFrame() << endl;
+  os << indent << "CornerAnnotation: " << this->GetCornerAnnotation() << endl;
+  os << indent << "HeaderButton: " << this->GetHeaderButton() << endl;
+  os << indent << "HeaderEntry: " << this->GetHeaderEntry() << endl;
+  os << indent << "InExpose: " << this->GetInExpose() << endl;
+  os << indent << "InteractiveUpdateRate: " 
+     << this->GetInteractiveUpdateRate() << endl;
+  os << indent << "LastPosition: " << this->GetLastPosition() << endl;
+  os << indent << "MenuPropertiesHelp: " << this->GetMenuPropertiesHelp() 
+     << endl;
+  os << indent << "MenuPropertiesName: " << this->GetMenuPropertiesName() 
+     << endl;
+  os << indent << "MenuPropertiesUnderline: " 
+     << this->GetMenuPropertiesUnderline() << endl;
+  os << indent << "Notebook: " << this->GetNotebook() << endl;
+  os << indent << "NumberOfStillUpdates: " << this->GetNumberOfStillUpdates()
+     << endl;
+  os << indent << "ParentWindow: " << this->GetParentWindow() << endl;
+  os << indent << "Printing: " << this->GetPrinting() << endl;
+  os << indent << "RenderMode: " << this->GetRenderMode() << endl;
+  os << indent << "RenderState: " << this->GetRenderState() << endl;
+  os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
+  os << indent << "Renderer: " << this->GetRenderer() << endl;
+  os << indent << "SelectedComposite: " << this->GetSelectedComposite() 
+     << endl;
+  os << indent << "SupportControlFrame: " << this->GetSupportControlFrame() 
+     << endl;
+  os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
+  os << indent << "SupportSaveAsImage: " << this->GetSupportSaveAsImage() 
+     << endl;
 }

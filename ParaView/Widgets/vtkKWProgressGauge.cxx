@@ -143,3 +143,13 @@ void vtkKWProgressGauge::SetValue(int value)
   // do an update
   this->Script("update idletasks");
 }
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "BackgroundColor: " << this->GetBackgroundColor() << endl;
+  os << indent << "BarColor: " << this->GetBarColor() << endl;
+  os << indent << "Height: " << this->GetHeight() << endl;
+  os << indent << "Length: " << this->GetLength() << endl;
+}

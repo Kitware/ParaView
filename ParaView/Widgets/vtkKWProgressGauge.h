@@ -55,15 +55,18 @@ class VTK_EXPORT vtkKWProgressGauge : public vtkKWWidget
 public:
   static vtkKWProgressGauge* New();
   vtkTypeMacro(vtkKWProgressGauge,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget
   void Create(vtkKWApplication *app, char *args);
 
   // Description:
-  // Set the length and width of the widget
+  // Set and get the length and width of the widget
   vtkSetMacro(Length, int);
+  vtkGetMacro(Length, int);
   vtkSetMacro(Height, int);
+  vtkGetMacro(Height, int);
   
   // Description:
   // Set the percentage displayed.  This number is forced to be in
@@ -72,9 +75,13 @@ public:
   
   // Description:
   // Set the color of the progress bar, the default is blue.
-  // Set the color of the background, the default is gray.
   vtkSetStringMacro(BarColor);
+  vtkGetStringMacro(BarColor);
+
+  // Description:
+  // Set get the color of the background, the default is gray.
   vtkSetStringMacro(BackgroundColor);
+  vtkGetStringMacro(BackgroundColor);
 
 protected:
   vtkKWProgressGauge();

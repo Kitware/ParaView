@@ -306,3 +306,16 @@ void vtkKWSplitFrame::Update()
                this->Frame2->GetWidgetName(), 
                this->Frame1Width+this->SeparatorWidth, this->Frame2Width);
 }
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Frame1MinimumWidth: " << this->GetFrame1MinimumWidth() 
+     << endl;
+  os << indent << "Frame1Width: " << this->GetFrame1Width() << endl;
+  os << indent << "Frame2MinimumWidth: " << this->GetFrame2MinimumWidth() 
+     << endl;
+  os << indent << "Frame2Width: " << this->GetFrame2Width() << endl;
+  os << indent << "SeparatorWidth: " << this->GetSeparatorWidth() << endl;
+}

@@ -349,7 +349,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.22 $");
+  this->ExtractRevision(os,"$Revision: 1.23 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -361,4 +361,12 @@ char *vtkKWCornerAnnotation::GetCornerText(int i)
 float *vtkKWCornerAnnotation::GetTextColor() 
 {
   return this->CornerProp->GetProperty()->GetColor();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CornerProp: " << this->GetCornerProp() << endl;
+  os << indent << "View: " << this->GetView() << endl;
 }

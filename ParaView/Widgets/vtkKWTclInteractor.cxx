@@ -284,3 +284,10 @@ void vtkKWTclInteractor::UpCallback()
                  this->CommandEntry->GetWidgetName());
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkKWTclInteractor::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Title: " << this->GetTitle() << endl;
+}

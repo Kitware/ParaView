@@ -55,10 +55,9 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 {
 public:
-  vtkKWToolbar();
-  ~vtkKWToolbar();
   static vtkKWToolbar* New();
-  const char *GetClassName() {return "vtkKWToolbar";};
+  vtkTypeMacro(vtkKWToolbar, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget
@@ -76,6 +75,8 @@ public:
 
 
 protected:
+  vtkKWToolbar();
+  ~vtkKWToolbar();
 
   // Height stuf is not working (ask ken)
   int Height;

@@ -112,3 +112,10 @@ void vtkKWToolbar::Resize()
   this->Expanding = 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Height: " << this->GetHeight() << endl;
+}

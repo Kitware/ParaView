@@ -59,6 +59,7 @@ class VTK_EXPORT vtkKWTclInteractor : public vtkKWWidget
 public:
   static vtkKWTclInteractor* New();
   vtkTypeMacro(vtkKWTclInteractor, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create a Tk widget
@@ -73,8 +74,9 @@ public:
   void Evaluate();
 
   // Description:
-  // Set the title of the TclInteractor to appear in the titlebar
+  // Set and get the title of the TclInteractor to appear in the titlebar
   vtkSetStringMacro(Title);
+  vtkGetStringMacro(Title);
   
   // Description:
   // Callback for the down arrow key

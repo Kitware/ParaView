@@ -143,3 +143,10 @@ void vtkKWEntry::SetWidth(int width)
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Width: " << this->GetWidth() << endl;
+}

@@ -320,3 +320,10 @@ void vtkKWScale::SetBalloonHelpJustification( int j )
     }
   
 }
+
+//----------------------------------------------------------------------------
+void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Resolution: " << this->GetResolution() << endl;
+}

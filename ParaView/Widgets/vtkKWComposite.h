@@ -60,6 +60,7 @@ class VTK_EXPORT vtkKWComposite : public vtkKWObject
 {
 public:
   vtkTypeMacro(vtkKWComposite,vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get the View for this class.
