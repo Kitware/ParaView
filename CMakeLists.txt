@@ -36,7 +36,7 @@ IF(USE_INCLUDED_TCLTK)
        "${ParaViewComplete_SOURCE_DIR}/tk8.3.2/unix/configure --disable-shared"
        ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix)
     ENDIF(RUN_CONFIGURE)
-  
+
     SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtcl8.3.a 
        CACHE FILEPATH "Path to tcl library")
     SET(TCL_STUB_LIBRARY 
@@ -56,7 +56,14 @@ IF(USE_INCLUDED_TCLTK)
         SET(CMAKE_ESCAPES_SC 1)
       ENDIF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
     ENDIF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
- 
+
+    # If using X with Tk, we need to link to X when we link
+    # to Tk in order to support static linking.
+    IF(CMAKE_HAS_X)
+      SET(TK_LIBRARY ${TK_LIBRARY} -lXt ${CMAKE_X_LIBS})
+       MESSAGE("TK: [${TK_LIBRARY}]")
+    ENDIF(CMAKE_HAS_X)
+
     IF (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
         cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix\; $(MAKE) )
