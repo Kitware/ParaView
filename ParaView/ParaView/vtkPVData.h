@@ -254,9 +254,6 @@ public:
   // Callback for the ResetColorRange button.
   void ResetColorRange();
 
-  // Set the color range from the entry widgets.
-  void ColorRangeEntryCallback();
-  
   // Description:
   // Called when the user presses the "Edit Color Map" button.
   void EditColorMapCallback();
@@ -401,7 +398,6 @@ protected:
   
   vtkKWScale *AmbientScale;
   
-  vtkKWLabeledFrame *ScalarBarFrame;
   vtkKWLabeledFrame *ColorFrame;
   vtkKWLabeledFrame *DisplayStyleFrame;
   vtkKWLabeledFrame *StatsFrame;
@@ -413,14 +409,11 @@ protected:
   vtkKWChangeColorButton *ColorButton;
   vtkKWPushButton *EditColorMapButton;
   
-  vtkKWWidget *RepresentationMenuFrame;
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
-  vtkKWWidget *InterpolationMenuFrame;
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWOptionMenu *InterpolationMenu;
 
-  vtkKWWidget *DisplayScalesFrame;
   vtkKWLabel *PointSizeLabel;
   vtkKWScale *PointSizeScale;
   vtkKWLabel *LineWidthLabel;
@@ -470,15 +463,8 @@ protected:
   // True if CreateProperties() has been called.
   int PropertiesCreated;
 
-  vtkKWWidget *ScalarBarCheckFrame;
   vtkKWCheckButton *ScalarBarCheck;
   
-  // Stuff for setting the range of the color map.
-  vtkKWWidget *ColorRangeFrame;
-  vtkKWPushButton *ColorRangeResetButton;
-  vtkKWLabeledEntry *ColorRangeMinEntry;
-  vtkKWLabeledEntry *ColorRangeMaxEntry;
-
   // For translating actor
   vtkKWLabeledFrame* ActorControlFrame;
   vtkKWLabel* TranslateLabel;

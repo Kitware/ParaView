@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWWidget.h"
 #include "vtkMultiProcessController.h"
@@ -76,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.1");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -125,7 +126,6 @@ vtkPVData::vtkPVData()
   this->Properties = vtkKWFrame::New();
   this->InformationFrame = vtkKWFrame::New();
 
-  this->ScalarBarFrame = vtkKWLabeledFrame::New();
   this->ColorFrame = vtkKWLabeledFrame::New();
   this->DisplayStyleFrame = vtkKWLabeledFrame::New();
   this->StatsFrame = vtkKWLabeledFrame::New();
@@ -146,27 +146,17 @@ vtkPVData::vtkPVData()
   
   this->ColorButton = vtkKWChangeColorButton::New();
 
-   // Stuff for setting the range of the color map.
-  this->ColorRangeFrame = vtkKWWidget::New();
-  this->ColorRangeResetButton = vtkKWPushButton::New();
-  this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
-  this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
-
-  this->RepresentationMenuFrame = vtkKWWidget::New();
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
-  this->InterpolationMenuFrame = vtkKWWidget::New();
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWOptionMenu::New();
   
-  this->DisplayScalesFrame = vtkKWWidget::New();
   this->PointSizeLabel = vtkKWLabel::New();
   this->PointSizeScale = vtkKWScale::New();
   this->LineWidthLabel = vtkKWLabel::New();
   this->LineWidthScale = vtkKWScale::New();
   
-  this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
 
@@ -256,16 +246,6 @@ vtkPVData::~vtkPVData()
   this->ColorButton->Delete();
   this->ColorButton = NULL;
   
-   // Stuff for setting the range of the color map.
-  this->ColorRangeFrame->Delete();
-  this->ColorRangeFrame = NULL;
-  this->ColorRangeResetButton->Delete();
-  this->ColorRangeResetButton = NULL;
-  this->ColorRangeMinEntry->Delete();
-  this->ColorRangeMinEntry = NULL;
-  this->ColorRangeMaxEntry->Delete();
-  this->ColorRangeMaxEntry = NULL;
-
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
@@ -276,11 +256,6 @@ vtkPVData::~vtkPVData()
   this->InterpolationMenu->Delete();
   this->InterpolationMenu = NULL;
   
-  this->RepresentationMenuFrame->Delete();
-  this->RepresentationMenuFrame = NULL;
-  this->InterpolationMenuFrame->Delete();
-  this->InterpolationMenuFrame = NULL;
-  
   this->PointSizeLabel->Delete();
   this->PointSizeLabel = NULL;
   this->PointSizeScale->Delete();
@@ -289,8 +264,6 @@ vtkPVData::~vtkPVData()
   this->LineWidthLabel = NULL;
   this->LineWidthScale->Delete();
   this->LineWidthScale = NULL;
-  this->DisplayScalesFrame->Delete();
-  this->DisplayScalesFrame = NULL;
 
   this->ActorControlFrame->Delete();
   this->TranslateLabel->Delete();
@@ -348,8 +321,6 @@ vtkPVData::~vtkPVData()
     this->SetLODDeciTclName(NULL);
     }
   
-  this->ScalarBarCheckFrame->Delete();
-  this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
   
@@ -403,8 +374,6 @@ vtkPVData::~vtkPVData()
     this->SetLODCollectTclName(NULL);
     }
 
-  this->ScalarBarFrame->Delete();
-  this->ScalarBarFrame = NULL;
   this->ColorFrame->Delete();
   this->ColorFrame = NULL;
   this->DisplayStyleFrame->Delete();
@@ -1062,152 +1031,25 @@ void vtkPVData::CreateProperties()
     }
   this->Properties->Create(this->Application, 1);
 
-  this->ScalarBarFrame->SetParent(this->Properties->GetFrame());
-  this->ScalarBarFrame->ShowHideFrameOn();
-  this->ScalarBarFrame->Create(this->Application);
-  this->ScalarBarFrame->SetLabel("Scalar Bar");
+  // We are going to 'grid' most of it, so let's define some const
 
-  this->ColorFrame->SetParent(this->Properties->GetFrame());
-  this->ColorFrame->ShowHideFrameOn();
-  this->ColorFrame->Create(this->Application);
-  this->ColorFrame->SetLabel("Color");
+  int col_1_padx = 2;
+  int button_pady = 1;
+  int col_0_weight = 0;
+  int col_1_weight = 1;
+  float col_0_factor = 1.5;
+  float col_1_factor = 1.0;
 
-  this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
-  this->DisplayStyleFrame->ShowHideFrameOn();
-  this->DisplayStyleFrame->Create(this->Application);
-  this->DisplayStyleFrame->SetLabel("Display Style");
+  // View frame
+
 
   this->ViewFrame->SetParent(this->Properties->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->Application);
   this->ViewFrame->SetLabel("View");
  
-  this->AmbientScale->SetParent(this->Properties->GetFrame());
-  this->AmbientScale->Create(this->Application, "-showvalue 1");
-  this->AmbientScale->DisplayLabel("Ambient Light");
-  this->AmbientScale->SetRange(0.0, 1.0);
-  this->AmbientScale->SetResolution(0.1);
-  this->AmbientScale->SetCommand(this, "AmbientChanged");
-  
-  this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
-  this->ColorMenuLabel->Create(this->Application, "");
-  this->ColorMenuLabel->SetLabel("Color by:");
-  
-  this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
-  this->ColorMenu->Create(this->Application, "");    
-
-  this->ColorButton->SetParent(this->ColorFrame->GetFrame());
-  this->ColorButton->Create(this->Application, "");
-  this->ColorButton->SetText("Actor Color");
-  this->ColorButton->SetCommand(this, "ChangeActorColor");
-  
-  this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
-
-  this->EditColorMapButton->SetParent(this->ScalarBarCheckFrame);
-  this->EditColorMapButton->Create(this->Application, "");
-  this->EditColorMapButton->SetLabel("Edit Color Map");
-  this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
-    
-  this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ColorRangeFrame->Create(this->Application, "frame", "");
-  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
-  this->ColorRangeResetButton->Create(this->Application, 
-                                      "-text {Reset Range}");
-  this->ColorRangeResetButton->SetCommand(this, "ResetColorRange");
-  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMinEntry->Create(this->Application);
-  this->ColorRangeMinEntry->SetLabel("Min:");
-  this->ColorRangeMinEntry->GetEntry()->SetWidth(7);
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName()); 
-  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMaxEntry->Create(this->Application);
-  this->ColorRangeMaxEntry->SetLabel("Max:");
-  this->ColorRangeMaxEntry->GetEntry()->SetWidth(7);
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->RepresentationMenuFrame->SetParent(
-    this->DisplayStyleFrame->GetFrame());
-  this->RepresentationMenuFrame->Create(this->Application, "frame", "");
-  
-  this->RepresentationMenuLabel->SetParent(this->RepresentationMenuFrame);
-  this->RepresentationMenuLabel->Create(this->Application, "");
-  this->RepresentationMenuLabel->SetLabel("Representation:");
-
-  this->RepresentationMenu->SetParent(this->RepresentationMenuFrame);
-  this->RepresentationMenu->Create(this->Application, "");
-  this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
-                                                "DrawWireframe");
-  this->RepresentationMenu->AddEntryWithCommand("Surface", this,
-                                                "DrawSurface");
-  this->RepresentationMenu->AddEntryWithCommand("Points", this,
-                                                "DrawPoints");
-  this->RepresentationMenu->SetValue("Surface");
-  
-  this->InterpolationMenuFrame->SetParent(this->DisplayStyleFrame->GetFrame());
-  this->InterpolationMenuFrame->Create(this->Application, "frame", "");
-
-  this->InterpolationMenuLabel->SetParent(this->InterpolationMenuFrame);
-  this->InterpolationMenuLabel->Create(this->Application, "");
-  this->InterpolationMenuLabel->SetLabel("Interpolation:");
-
-  this->InterpolationMenu->SetParent(this->InterpolationMenuFrame);
-  this->InterpolationMenu->Create(this->Application, "");
-  this->InterpolationMenu->AddEntryWithCommand("Flat", this,
-                                               "SetInterpolationToFlat");
-  this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
-                                               "SetInterpolationToGouraud");
-  this->InterpolationMenu->SetValue("Gouraud");
-
-  this->DisplayScalesFrame->SetParent(this->DisplayStyleFrame->GetFrame());
-  this->DisplayScalesFrame->Create(this->Application, "frame", "");
-  
-  this->PointSizeLabel->SetParent(this->DisplayScalesFrame);
-  this->PointSizeLabel->Create(this->Application, "");
-  this->PointSizeLabel->SetLabel("Point size");
-  
-  this->PointSizeScale->SetParent(this->DisplayScalesFrame);
-  this->PointSizeScale->Create(this->Application, "-showvalue 1");
-  this->PointSizeScale->SetRange(1, 5);
-  this->PointSizeScale->SetResolution(1);
-  this->PointSizeScale->SetValue(1);
-  this->PointSizeScale->SetCommand(this, "ChangePointSize");
-
-  this->LineWidthLabel->SetParent(this->DisplayScalesFrame);
-  this->LineWidthLabel->Create(this->Application, "");
-  this->LineWidthLabel->SetLabel("Line width");
-  
-  this->LineWidthScale->SetParent(this->DisplayScalesFrame);
-  this->LineWidthScale->Create(this->Application, "-showvalue 1");
-  this->LineWidthScale->SetRange(1, 5);
-  this->LineWidthScale->SetResolution(1);
-  this->LineWidthScale->SetValue(1);
-  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
-  
-  this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
-  this->ScalarBarCheck->Create(this->Application, "-text Visibility");
-  this->Application->Script(
-    "%s configure -command {%s ScalarBarCheckCallback}",
-    this->ScalarBarCheck->GetWidgetName(),
-    this->GetTclName());
-
-  this->CubeAxesCheck->SetParent(this->Properties->GetFrame());
-  this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
-  this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
-  
   this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
-  this->VisibilityCheck->Create(this->Application, "-text Visibility");
-  this->VisibilityCheck->SetState(1);
+  this->VisibilityCheck->Create(this->Application, "-text Data");
   this->Application->Script(
     "%s configure -command {%s VisibilityCheckCallback}",
     this->VisibilityCheck->GetWidgetName(),
@@ -1218,45 +1060,200 @@ void vtkPVData::CreateProperties()
   this->ResetCameraButton->Create(this->Application, "");
   this->ResetCameraButton->SetLabel("Set View to Data");
   this->ResetCameraButton->SetCommand(this, "CenterCamera");
+
+  this->ScalarBarCheck->SetParent(this->ViewFrame->GetFrame());
+  this->ScalarBarCheck->Create(this->Application, "-text {Scalar bar}");
+  this->Application->Script(
+    "%s configure -command {%s ScalarBarCheckCallback}",
+    this->ScalarBarCheck->GetWidgetName(),
+    this->GetTclName());
+
+  this->EditColorMapButton->SetParent(this->ViewFrame->GetFrame());
+  this->EditColorMapButton->Create(this->Application, "");
+  this->EditColorMapButton->SetLabel("Edit Color Map...");
+  this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
   
-  this->Script("pack %s %s -side left",
+  this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
+  this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
+  this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
+
+  this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
+
+  this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
-  this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
-  this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
-  this->Script("pack %s %s -side left",
-               this->ColorMenuLabel->GetWidgetName(),
-               this->ColorMenu->GetWidgetName());
-  this->Script("pack %s %s -side top -expand t -fill x",
-               this->ScalarBarCheckFrame->GetWidgetName(),
-               this->ColorRangeFrame->GetWidgetName());
-  this->Script("pack %s %s -side left",
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->ResetCameraButton->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid %s %s -sticky wns",
                this->ScalarBarCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
-  this->Script("pack %s -side left -expand f",
-               this->ColorRangeResetButton->GetWidgetName());
-  this->Script("pack %s %s -side left -expand t -fill x",
-               this->ColorRangeMinEntry->GetWidgetName(),
-               this->ColorRangeMaxEntry->GetWidgetName());
 
-  this->Script("pack %s %s %s -side top -fill x",
-               this->RepresentationMenuFrame->GetWidgetName(),
-               this->InterpolationMenuFrame->GetWidgetName(),
-               this->DisplayScalesFrame->GetWidgetName());
-  this->Script("pack %s %s -side left",
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->EditColorMapButton->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid %s -sticky wns",
+               this->CubeAxesCheck->GetWidgetName());
+  // Color
+
+  this->ColorFrame->SetParent(this->Properties->GetFrame());
+  this->ColorFrame->ShowHideFrameOn();
+  this->ColorFrame->Create(this->Application);
+  this->ColorFrame->SetLabel("Color");
+
+  this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
+  this->ColorMenuLabel->Create(this->Application, "");
+  this->ColorMenuLabel->SetLabel("Color by:");
+  
+  this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
+  this->ColorMenu->Create(this->Application, "");   
+
+  this->ColorButton->SetParent(this->ColorFrame->GetFrame());
+  this->ColorButton->Create(this->Application, "");
+  this->ColorButton->SetText("Actor Color");
+  this->ColorButton->SetCommand(this, "ChangeActorColor");
+  
+  this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
+
+  this->Script("grid %s %s -sticky wns",
+               this->ColorMenuLabel->GetWidgetName(),
+               this->ColorMenu->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->ColorMenu->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
+               this->ColorButton->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
+
+  // Display style
+
+  this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
+  this->DisplayStyleFrame->ShowHideFrameOn();
+  this->DisplayStyleFrame->Create(this->Application);
+  this->DisplayStyleFrame->SetLabel("Display Style");
+
+  this->AmbientScale->SetParent(this->Properties->GetFrame());
+  this->AmbientScale->Create(this->Application, "-showvalue 1");
+  this->AmbientScale->DisplayLabel("Ambient Light");
+  this->AmbientScale->SetRange(0.0, 1.0);
+  this->AmbientScale->SetResolution(0.1);
+  this->AmbientScale->SetCommand(this, "AmbientChanged");
+  
+  this->RepresentationMenuLabel->SetParent(
+    this->DisplayStyleFrame->GetFrame());
+  this->RepresentationMenuLabel->Create(this->Application, "");
+  this->RepresentationMenuLabel->SetLabel("Representation:");
+
+  this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->RepresentationMenu->Create(this->Application, "");
+  this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
+                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Surface", this,
+                                                "DrawSurface");
+  this->RepresentationMenu->AddEntryWithCommand("Points", this,
+                                                "DrawPoints");
+  this->RepresentationMenu->SetValue("Surface");
+
+  this->InterpolationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->InterpolationMenuLabel->Create(this->Application, "");
+  this->InterpolationMenuLabel->SetLabel("Interpolation:");
+
+  this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->InterpolationMenu->Create(this->Application, "");
+  this->InterpolationMenu->AddEntryWithCommand("Flat", this,
+                                               "SetInterpolationToFlat");
+  this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
+                                               "SetInterpolationToGouraud");
+  this->InterpolationMenu->SetValue("Gouraud");
+
+  this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointSizeLabel->Create(this->Application, "");
+  this->PointSizeLabel->SetLabel("Point size:");
+  
+  this->PointSizeScale->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointSizeScale->Create(this->Application, "");
+  this->PointSizeScale->SetRange(1, 5);
+  this->PointSizeScale->SetResolution(1);
+  this->PointSizeScale->SetValue(1);
+  this->PointSizeScale->DisplayEntry();
+  this->PointSizeScale->DisplayEntryAndLabelOnTopOff();
+  this->Script("%s configure -width 5", 
+               this->PointSizeScale->GetEntry()->GetWidgetName());
+  this->PointSizeScale->SetCommand(this, "ChangePointSize");
+
+  this->LineWidthLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->LineWidthLabel->Create(this->Application, "");
+  this->LineWidthLabel->SetLabel("Line width:");
+  
+  this->LineWidthScale->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->LineWidthScale->Create(this->Application, "");
+  this->LineWidthScale->SetRange(1, 5);
+  this->LineWidthScale->SetResolution(1);
+  this->LineWidthScale->SetValue(1);
+  this->LineWidthScale->DisplayEntry();
+  this->LineWidthScale->DisplayEntryAndLabelOnTopOff();
+  this->Script("%s configure -width 5", 
+               this->LineWidthScale->GetEntry()->GetWidgetName());
+  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
+
+  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
+  
+  this->Script("grid %s %s -sticky wns",
                this->RepresentationMenuLabel->GetWidgetName(),
                this->RepresentationMenu->GetWidgetName());
-  this->Script("pack %s %s -side left",
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->RepresentationMenu->GetWidgetName(), 
+               col_1_padx, button_pady);
+
+  this->Script("grid %s %s -sticky wns",
                this->InterpolationMenuLabel->GetWidgetName(),
                this->InterpolationMenu->GetWidgetName());
-  this->Script("pack %s %s %s %s -side left",
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->InterpolationMenu->GetWidgetName(),
+               col_1_padx, button_pady);
+  
+  this->Script("grid %s %s -sticky wns",
                this->PointSizeLabel->GetWidgetName(),
-               this->PointSizeScale->GetWidgetName(),
+               this->PointSizeScale->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d",
+               this->PointSizeScale->GetWidgetName(), col_1_padx);
+
+  this->Script("grid %s %s -sticky wns",
                this->LineWidthLabel->GetWidgetName(),
                this->LineWidthScale->GetWidgetName());
-  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
-  this->Script("pack %s",
-               this->CubeAxesCheck->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d",
+               this->LineWidthScale->GetWidgetName(), col_1_padx);
+
+  // Now synchronize all those grids to have them aligned
+
+  const char *widgets[3];
+  widgets[0] = this->ViewFrame->GetFrame()->GetWidgetName();
+  widgets[1] = this->ColorFrame->GetFrame()->GetWidgetName();
+  widgets[2] = this->DisplayStyleFrame->GetFrame()->GetWidgetName();
+
+  int weights[2];
+  weights[0] = col_0_weight;
+  weights[1] = col_1_weight;
+
+  float factors[2];
+  factors[0] = col_0_factor;
+  factors[1] = col_1_factor;
+
+  vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
+    this->GetPVApplication()->GetMainInterp(), 3, widgets, factors, weights);
+  
+  // Actor Control
 
   this->ActorControlFrame->SetParent(this->Properties->GetFrame());
   this->ActorControlFrame->ShowHideFrameOn();
@@ -1265,11 +1262,11 @@ void vtkPVData::CreateProperties()
 
   this->TranslateLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->TranslateLabel->Create(this->Application, 0);
-  this->TranslateLabel->SetLabel("Translate");
+  this->TranslateLabel->SetLabel("Translate:");
 
   this->ScaleLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->ScaleLabel->Create(this->Application, 0);
-  this->ScaleLabel->SetLabel("Scale");
+  this->ScaleLabel->SetLabel("Scale:");
 
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
@@ -1291,34 +1288,53 @@ void vtkPVData::CreateProperties()
 
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
-  this->OpacityLabel->SetLabel("Opacity");
+  this->OpacityLabel->SetLabel("Opacity:");
+
   this->Opacity->SetParent(this->ActorControlFrame->GetFrame());
   this->Opacity->Create(this->Application, 0);
   this->Opacity->SetRange(0, 1);
   this->Opacity->SetResolution(0.1);
   this->Opacity->SetValue(1);
+  this->Opacity->DisplayEntry();
+  this->Opacity->DisplayEntryAndLabelOnTopOff();
+  this->Script("%s configure -width 5", 
+               this->Opacity->GetEntry()->GetWidgetName());
   this->Opacity->SetCommand(this, "OpacityChangedCallback");
 
-  this->Script("grid %s %s %s %s -sticky ew",
+  this->Script("grid %s %s %s %s -sticky news",
                this->TranslateLabel->GetWidgetName(),
                this->TranslateEntry[0]->GetWidgetName(),
                this->TranslateEntry[1]->GetWidgetName(),
                this->TranslateEntry[2]->GetWidgetName());
-  this->Script("grid %s %s %s %s -sticky ew",
+
+  this->Script("grid %s -sticky nws",
+               this->TranslateLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s -sticky news",
                this->ScaleLabel->GetWidgetName(),
                this->ScaleEntry[0]->GetWidgetName(),
                this->ScaleEntry[1]->GetWidgetName(),
                this->ScaleEntry[2]->GetWidgetName());
-  this->Script("grid %s %s - -  -sticky ew",
+
+  this->Script("grid %s -sticky nws",
+               this->ScaleLabel->GetWidgetName());
+
+  this->Script("grid %s %s - -  -sticky news",
                this->OpacityLabel->GetWidgetName(),
                this->Opacity->GetWidgetName());
 
+  this->Script("grid %s -sticky nws",
+               this->OpacityLabel->GetWidgetName());
+
   this->Script("grid columnconfigure %s 0 -weight 0", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
+
   this->Script("grid columnconfigure %s 1 -weight 2", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
+
   this->Script("grid columnconfigure %s 2 -weight 2", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
+
   this->Script("grid columnconfigure %s 3 -weight 2", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
 
@@ -1434,9 +1450,6 @@ void vtkPVData::UpdateProperties()
 
   if (this->PVColorMap)
     {
-    float *range = this->PVColorMap->GetScalarRange();
-    this->ColorRangeMinEntry->SetValue(range[0], 5);
-    this->ColorRangeMaxEntry->SetValue(range[1], 5);
     if (this->PVColorMap->GetScalarBarVisibility())
       {
       this->ScalarBarCheck->SetState(1);
@@ -1627,15 +1640,7 @@ void vtkPVData::SetColorRange(float min, float max)
     vtkErrorMacro("Color map is missing.");
     }
 
-  if ( this->ColorRangeMinEntry->GetValueAsFloat() == min &&
-       this->ColorRangeMaxEntry->GetValueAsFloat() == max )
-    {
-    return;
-    }
   this->PVColorMap->SetScalarRange(min, max);
-
-  this->ColorRangeMinEntry->SetValue(min, 5);
-  this->ColorRangeMaxEntry->SetValue(max, 5);
 }
 
 //----------------------------------------------------------------------------
@@ -1648,9 +1653,6 @@ void vtkPVData::SetColorRangeInternal(float min, float max)
     }
 
   this->PVColorMap->SetScalarRangeInternal(min, max);
-
-  this->ColorRangeMinEntry->SetValue(min, 5);
-  this->ColorRangeMaxEntry->SetValue(max, 5);
 }
 
 //----------------------------------------------------------------------------
@@ -1664,27 +1666,6 @@ void vtkPVData::ResetColorRange()
 
   this->PVColorMap->ResetScalarRange();
   this->UpdateProperties();
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::ColorRangeEntryCallback()
-{
-  float min, max;
-
-  min = this->ColorRangeMinEntry->GetValueAsFloat();
-  max = this->ColorRangeMaxEntry->GetValueAsFloat();
-  
-  // Avoid the bad range error
-  if (max <= min)
-    {
-    max = min + 0.00001;
-    }
-
-  this->PVColorMap->SetScalarRange(min, max);
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1711,9 +1692,11 @@ void vtkPVData::ColorByPropertyInternal()
 
   this->SetPVColorMap(NULL);
 
-  this->Script("pack forget %s", this->ScalarBarFrame->GetWidgetName());
-  this->Script("pack %s -side left",
-               this->ColorButton->GetWidgetName());
+  this->Script("grid remove %s %s",
+               this->ScalarBarCheck->GetWidgetName(),
+               this->EditColorMapButton->GetWidgetName());
+
+  this->Script("grid %s", this->ColorButton->GetWidgetName());
 
   if (this->GetPVRenderView())
     {
@@ -1774,10 +1757,11 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
   pvApp->BroadcastScript("%s SelectColorArray {%s}",
                          this->LODMapperTclName, name);
   
-  this->Script("pack forget %s",
-               this->ColorButton->GetWidgetName());
-  this->Script("pack %s -after %s -fill x", this->ScalarBarFrame->GetWidgetName(),
-               this->ColorFrame->GetWidgetName());
+  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
+
+  this->Script("grid %s %s",
+               this->ScalarBarCheck->GetWidgetName(),
+               this->EditColorMapButton->GetWidgetName());
 
   // Synchronize the UI with the new color map.
   this->UpdateProperties();
@@ -1839,10 +1823,11 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
   pvApp->BroadcastScript("%s SelectColorArray {%s}",
                          this->LODMapperTclName, name);
   
-  this->Script("pack forget %s",
-               this->ColorButton->GetWidgetName());
-  this->Script("pack %s -after %s -fill x", this->ScalarBarFrame->GetWidgetName(),
-               this->ColorFrame->GetWidgetName());
+  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
+
+  this->Script("grid %s %s",
+               this->ScalarBarCheck->GetWidgetName(),
+               this->EditColorMapButton->GetWidgetName());
 
   if ( this->GetPVRenderView() )
     {
@@ -2787,7 +2772,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.1 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2799,8 +2784,8 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
   os << indent << "ColorBy " << this->ColorMenu->GetValue() << endl;
   if ( !vtkString::Equals(this->ColorMenu->GetValue(), "Property") )
     {
-    os << indent << "ColorRange " << this->ColorRangeMinEntry->GetValueAsFloat()
-       << " " << this->ColorRangeMaxEntry->GetValueAsFloat() << endl;
+    float *tmp = this->PVColorMap->GetScalarRange();
+    os << indent << "ColorRange " << tmp[0] << " " << tmp[1] << endl;
     }
 
   os << indent << "Representation " << this->RepresentationMenu->GetValue() << endl;
