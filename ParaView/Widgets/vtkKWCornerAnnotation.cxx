@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.9");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.10");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -275,7 +275,7 @@ float vtkKWCornerAnnotation::GetMaximumLineHeight()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
+void vtkKWCornerAnnotation::SetMaximumLineHeightNoTrace(float v)
 {
   if (this->MaximumLineHeightScale->IsCreated())
     {
@@ -290,24 +290,28 @@ void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
+{
+  this->SetMaximumLineHeightNoTrace(v);
+  this->AddTraceEntry("$kw(%s) SetMaximumLineHeight %f",
+                      this->GetTclName(), v);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::MaximumLineHeightCallback()
 {
   if (this->MaximumLineHeightScale->IsCreated())
     {
-    this->SetMaximumLineHeight(this->MaximumLineHeightScale->GetValue());
+    this->SetMaximumLineHeightNoTrace(this->MaximumLineHeightScale->GetValue());
     }
-
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::MaximumLineHeightEndCallback()
 {
-  this->MaximumLineHeightCallback();
   if (this->MaximumLineHeightScale->IsCreated())
     {
-    this->AddTraceEntry("$kw(%s) SetMaximumLineHeight %f",
-                        this->GetTclName(), 
-                        this->MaximumLineHeightScale->GetValue());
+    this->SetMaximumLineHeight(this->MaximumLineHeightScale->GetValue());
     }
 }
 
@@ -478,7 +482,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.29.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.29.2.10 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
