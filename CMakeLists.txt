@@ -29,6 +29,13 @@ INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkSelectStreamsLibrary.cmake)
 VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB
                            ${ParaView_SOURCE_DIR}/VTK)
 
+# Fix cxx flags
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  # A GCC compiler.  Quiet warning about strstream deprecation.
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+
 #########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaView Complete Testing" ON)
