@@ -89,6 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sys/stat.h>
 #include <stdarg.h>
+#include <signal.h>
 
 #ifdef _WIN32
 #include "htmlhelp.h"
@@ -99,6 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
+vtkPVApplication* vtkPVApplication::MainApplication = 0;
 
 static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
 				   unsigned long vtkNotUsed(event), 
@@ -239,6 +241,7 @@ int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->ProcessId = 0;
   this->RunningParaViewScript = 0;
 
   char name[128];
@@ -294,11 +297,13 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   if (c)
     {
     c->Register(this);
+    this->ProcessId = c->GetLocalProcessId();
     }
   if (this->Controller)
     {
     this->Controller->UnRegister(this);
     }
+  
 
   this->Controller = c;
 }
@@ -1253,6 +1258,104 @@ void vtkPVApplication::LogStartEvent(char* str)
 void vtkPVApplication::LogEndEvent(char* str)
 {
   vtkTimerLog::MarkEndEvent(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetupTrapsForSignals(int nodeid)
+{
+  vtkPVApplication::MainApplication = this;
+  signal(SIGHUP, vtkPVApplication::TrapsForSignals);
+  signal(SIGINT, vtkPVApplication::TrapsForSignals);
+  if ( nodeid == 0 )
+    {
+    signal(SIGQUIT, vtkPVApplication::TrapsForSignals);
+    signal(SIGILL,  vtkPVApplication::TrapsForSignals);
+    signal(SIGABRT, vtkPVApplication::TrapsForSignals);
+    signal(SIGSEGV, vtkPVApplication::TrapsForSignals);
+    signal(SIGPIPE, vtkPVApplication::TrapsForSignals);
+    signal(SIGBUS,  vtkPVApplication::TrapsForSignals);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::TrapsForSignals(int signal)
+{
+  if ( !vtkPVApplication::MainApplication )
+    {
+    exit(1);
+    }
+  
+  switch ( signal )
+    {
+    case SIGHUP:
+      return;
+      break;
+    case SIGINT:
+    case SIGQUIT: 
+      break;
+    case SIGILL:
+    case SIGABRT: 
+    case SIGSEGV:
+    case SIGPIPE:
+    case SIGBUS:
+      vtkPVApplication::ErrorExit(); 
+      break;      
+    }
+  
+  if ( vtkPVApplication::MainApplication->GetProcessId() )
+    {
+    return;
+    }
+  vtkPVWindow *win = vtkPVApplication::MainApplication->GetMainWindow();
+  if ( !win )
+    {
+    cout << "Call exit on application" << endl;
+    vtkPVApplication::MainApplication->Exit();
+    }
+  cout << "Call exit on window" << endl;
+  win->Exit();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ErrorExit()
+{
+  cout << "There was a major error! Trying to exit..." << endl;
+  char name[] = "ErrorApplication";
+  char *n = name;
+  char** args = &n;
+  Tcl_Interp *interp = vtkKWApplication::InitializeTcl(1, args);
+  ostrstream str;
+  char buffer[1024];
+  getcwd(buffer, 1023);
+
+  Tcl_GlobalEval(interp, "wm withdraw .");
+#ifdef _WIN32
+  str << "option add *font {{MS Sans Serif} 8}" << endl;
+#else
+  str << "option add *font "
+    "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1" << endl;
+  str << "option add *highlightThickness 0" << endl;
+  str << "option add *highlightBackground #ccc" << endl;
+  str << "option add *activeBackground #eee" << endl;
+  str << "option add *activeForeground #000" << endl;
+  str << "option add *background #ccc" << endl;
+  str << "option add *foreground #000" << endl;
+  str << "option add *Entry.background #ffffff" << endl;
+  str << "option add *Text.background #ffffff" << endl;
+  str << "option add *Button.padX 6" << endl;
+  str << "option add *Button.padY 3" << endl;
+#endif
+  str << "tk_messageBox -type ok -message {It looks like ParaView "
+      << "or one of its libraries performed an illegal opeartion and "
+      << "it will be terminated. Please report this error to "
+      << "bug-report@kitware.com. You may want to include a small "
+      << "description of what you did when this happened and your "
+      << "ParaView trace file: " << buffer
+      << "/ParaViewTrace.pvs} -icon error"
+      << ends;
+  Tcl_GlobalEval(interp, str.str());
+  str.rdbuf()->freeze(0);
+  exit(1);
 }
 
 //----------------------------------------------------------------------------

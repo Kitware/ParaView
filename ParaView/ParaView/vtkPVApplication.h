@@ -110,8 +110,17 @@ public:
   virtual void Exit();
   
   // Description:
+  // When error happens, try to exit as gracefully as you can.
+  static void ErrorExit();
+  
+  // Description:
   // class static method to initialize Tcl/Tk
   static Tcl_Interp *InitializeTcl(int argc, char *argv[]);  
+
+  // Description:
+  // Setup traps for signals that may kill ParaView.
+  void SetupTrapsForSignals(int nodeid);
+  static void TrapsForSignals(int signal);
 
   // This constructs a vtk object (type specified by class name)
   // and uses the tclName for the tcl instance command.
@@ -205,6 +214,10 @@ public:
 
   void DisplayTCLError(const char* message);
 
+  // Description:
+  // Get the process Id when running in MPI mode.
+  vtkGetMacro(ProcessId, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -216,6 +229,8 @@ protected:
 
   int MajorVersion;
   int MinorVersion;
+
+  int ProcessId;
 
   // Need to put a global flag that indicates interactive rendering.
   // All process must be consistent in choosing LODs because
@@ -240,6 +255,8 @@ protected:
   };
   static const char ArgumentList[vtkPVApplication::NUM_ARGS][128];
   //ETX
+
+  static vtkPVApplication* MainApplication;  
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
