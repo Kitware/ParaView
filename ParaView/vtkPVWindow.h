@@ -86,6 +86,8 @@ public:
   vtkKWCompositeCollection *GetSources();
     
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
+  vtkGetObjectMacro(SourceMenu, vtkKWMenu);
+  vtkGetObjectMacro(FilterMenu, vtkKWMenu);
   
   // Description:
   // Callback from the reset camera button.
