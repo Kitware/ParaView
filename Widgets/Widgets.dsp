@@ -25,7 +25,7 @@ CFG=Widgets - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
+CPP=xicl6.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -51,9 +51,9 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
+LINK32=xilink6.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"Release/vtkKWWidgetsTcl.dll" /libpath:"..\..\vtkbin\lib" /libpath:"C:\program files\html help workshop\lib"
+# ADD LINK32 ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"Release/vtkKWWidgetsTcl.dll" /libpath:"..\..\vtkbin\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
@@ -78,7 +78,7 @@ LINK32=link.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=link.exe
+LINK32=xilink6.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"Debug/vtkKWWidgetsTcl.dll" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
@@ -447,6 +447,15 @@ SOURCE=.\vtkKWActorComposite.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
 
+# Begin Custom Build
+InputPath=.\vtkKWActorComposite.h
+InputName=vtkKWActorComposite
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
 # Begin Custom Build
@@ -640,6 +649,15 @@ InputName=vtkKWCompositeCollection
 SOURCE=.\vtkKWCornerAnnotation.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWCornerAnnotation.h
+InputName=vtkKWCornerAnnotation
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
@@ -893,6 +911,15 @@ SOURCE=.\vtkKWMenu.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
 
+# Begin Custom Build
+InputPath=.\vtkKWMenu.h
+InputName=vtkKWMenu
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
 # Begin Custom Build
@@ -912,6 +939,15 @@ InputName=vtkKWMenu
 SOURCE=.\vtkKWMessageDialog.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWMessageDialog.h
+InputName=vtkKWMessageDialog
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
@@ -1194,6 +1230,15 @@ SOURCE=.\vtkKWText.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
 
+# Begin Custom Build
+InputPath=.\vtkKWText.h
+InputName=vtkKWText
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
 # Begin Custom Build
@@ -1213,6 +1258,15 @@ InputName=vtkKWText
 SOURCE=.\vtkKWToolbar.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWToolbar.h
+InputName=vtkKWToolbar
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
@@ -1436,6 +1490,15 @@ InputName=vtkKWWindowCollection
 SOURCE=.\vtkKWXtEmbeddedWidget.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWXtEmbeddedWidget.h
+InputName=vtkKWXtEmbeddedWidget
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
