@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.11");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.12");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -699,48 +699,48 @@ void vtkKWUserInterfaceNotebookManager::ParseVisiblePagesString(istream &is)
     return;
     }
 
-  char token[1024], panel_name[1024], page_title[1024], pinned[16];
+  char sep[256], panel_name[256], page_title[256], pinned[16];
 
   vtkKWSerializer::EatWhiteSpace(&is);
-  vtkKWSerializer::GetNextToken(&is, token);
+  vtkKWSerializer::GetNextToken(&is, sep);
   
   // Parse {panel name}{page title}{pinned}
 
-  while (token[0] == '{')
+  while (sep[0] == '{')
     {
     // Panel name
 
     vtkKWSerializer::GetNextToken(&is, panel_name);
-    vtkKWSerializer::GetNextToken(&is, token);
-    if (token[0] != '}')
+    vtkKWSerializer::GetNextToken(&is, sep);
+    if (sep[0] != '}')
       {
       break;
       }
 
     // Page title
 
-    vtkKWSerializer::GetNextToken(&is, token);
-    if (token[0] != '{')
+    vtkKWSerializer::GetNextToken(&is, sep);
+    if (sep[0] != '{')
       {
       break;
       }
     vtkKWSerializer::GetNextToken(&is, page_title);
-    vtkKWSerializer::GetNextToken(&is, token);
-    if (token[0] != '}')
+    vtkKWSerializer::GetNextToken(&is, sep);
+    if (sep[0] != '}')
       {
       break;
       }
 
     // Pinned ?
 
-    vtkKWSerializer::GetNextToken(&is, token);
-    if (token[0] != '{')
+    vtkKWSerializer::GetNextToken(&is, sep);
+    if (sep[0] != '{')
       {
       break;
       }
     vtkKWSerializer::GetNextToken(&is, pinned);
-    vtkKWSerializer::GetNextToken(&is, token);
-    if (token[0] != '}')
+    vtkKWSerializer::GetNextToken(&is, sep);
+    if (sep[0] != '}')
       {
       break;
       }
@@ -758,7 +758,7 @@ void vtkKWUserInterfaceNotebookManager::ParseVisiblePagesString(istream &is)
         }
       }
 
-    vtkKWSerializer::GetNextToken(&is, token);
+    vtkKWSerializer::GetNextToken(&is, sep);
     }
 }
 

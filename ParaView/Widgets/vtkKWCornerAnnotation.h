@@ -176,7 +176,7 @@ public:
   // Description:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is,const char token[1024]);
+  virtual void SerializeToken(istream& is, const char *token);
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:

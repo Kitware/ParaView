@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSerializer );
-vtkCxxRevisionMacro(vtkKWSerializer, "1.3");
+vtkCxxRevisionMacro(vtkKWSerializer, "1.4");
 
 //-----------------------------------------------------------------------------
 // Internal function used to consume whitespace when reading in
@@ -67,7 +67,7 @@ void vtkKWSerializer::EatWhiteSpace(istream *is)
 }
 
 //-----------------------------------------------------------------------------
-int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
+int vtkKWSerializer::GetNextToken(istream *is, char *result)
 {
   int success;
   success = 0;
@@ -106,7 +106,7 @@ int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
                                         result[count] = c;
           count++;
                                         }
-        if (count >= 1024)
+        if (count >= VTK_KWSERIALIZER_MAX_TOKEN_LENGTH)
           {
           result[count] ='\0';
           vtkGenericWarningMacro("A token exceeding the maximum token size was found! The token was: " << result);
@@ -132,7 +132,7 @@ int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
       success = 1;
       result[count] = c;
       count++;
-      if (count == 1024)
+      if (count == VTK_KWSERIALIZER_MAX_TOKEN_LENGTH)
         {
         result[count] ='\0';
         vtkGenericWarningMacro("A token exceeding the maximum token size was found! The token was: " << result);
@@ -147,7 +147,7 @@ int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
 //-----------------------------------------------------------------------------
 void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
 {
-  char token[1024];
+  char token[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
   int balance = 1;
   
   while (balance && vtkKWSerializer::GetNextToken(is,token))
@@ -172,7 +172,7 @@ void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
 void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
                                     vtkObject *obj)
 {
-  char result[1024];
+  char result[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
   if (!vtkKWSerializer::GetNextToken(is,result))
     {
     vtkGenericWarningMacro("Error trying to find token " << tok << " for object " << obj->GetClassName() );

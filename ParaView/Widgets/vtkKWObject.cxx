@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.33");
+vtkCxxRevisionMacro(vtkKWObject, "1.34");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -119,14 +119,14 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.33 $");
+  this->ExtractRevision(os,"$Revision: 1.34 $");
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWObject::Serialize(istream& is)
 {
-  char token[1024];
-  char tmp[1024];
+  char token[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
+  char tmp[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
 
   // get the class name
   this->VersionsLoaded = 0;
@@ -171,7 +171,7 @@ void vtkKWObject::Serialize(istream& is)
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWObject::SerializeToken(istream& /*is*/, const char * /*token[1024]*/)
+void vtkKWObject::SerializeToken(istream& /*is*/, const char * /*token*/)
 {
 }
 

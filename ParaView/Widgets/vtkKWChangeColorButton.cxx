@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.31");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.32");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -469,7 +469,7 @@ void vtkKWChangeColorButton::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SerializeToken(istream& is, const char token[1024])
+void vtkKWChangeColorButton::SerializeToken(istream& is, const char *token)
 {
   float clr[3];
   if (!strcmp(token,"Color"))
@@ -483,7 +483,7 @@ void vtkKWChangeColorButton::SerializeToken(istream& is, const char token[1024])
       }
     return;
     }
-  vtkKWWidget::SerializeToken(is,token);
+  vtkKWWidget::SerializeToken(is, token);
 }
 
 //----------------------------------------------------------------------------
@@ -491,7 +491,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
 }
 
 //----------------------------------------------------------------------------

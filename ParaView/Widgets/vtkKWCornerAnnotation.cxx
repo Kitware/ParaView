@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.57");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.58");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -929,11 +929,10 @@ void vtkKWCornerAnnotation::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SerializeToken(istream& is, 
-                                           const char token[1024])
+void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 {
   int i;
-  char tmp[1024];
+  char tmp[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
   
   if (!strcmp(token,"CornerVisibilityButton"))
     {
@@ -973,7 +972,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.57 $");
+  this->ExtractRevision(os,"$Revision: 1.58 $");
 }
 
 //----------------------------------------------------------------------------

@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObject.h"
 
+#define VTK_KWSERIALIZER_MAX_TOKEN_LENGTH 8000
+
 class VTK_EXPORT vtkKWSerializer : public vtkObject
 {
 public:
@@ -61,7 +63,7 @@ public:
   // The primary helper functions instances can invoke.
   static void FindClosingBrace(istream *is, vtkObject *obj);
   static void ReadNextToken(istream *is,const char *tok, vtkObject *obj);
-  static int GetNextToken(istream *is, char result[1024]);
+  static int GetNextToken(istream *is, char *result);
   static void WriteSafeString(ostream& os, const char *val);
   
   static void EatWhiteSpace(istream *is);

@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.37");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -972,11 +972,11 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 //------------------------------------------------------------------------------
-void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
+void vtkKWRenderWidget::SerializeToken(istream& is, const char *token)
 {
   float fval, fbuffer3[3];
   int i;
-  char buffer[1024];
+  char buffer[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
 
   // Background color
 
@@ -1127,7 +1127,7 @@ void vtkKWRenderWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWRenderWidget ";
-  this->ExtractRevision(os, "$Revision: 1.37 $");
+  this->ExtractRevision(os, "$Revision: 1.38 $");
 }
 
 //----------------------------------------------------------------------------

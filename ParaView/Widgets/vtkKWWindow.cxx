@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.149");
+vtkCxxRevisionMacro(vtkKWWindow, "1.150");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1128,7 +1128,7 @@ void vtkKWWindow::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 //------------------------------------------------------------------------------
-void vtkKWWindow::SerializeToken(istream& is, const char token[1024])
+void vtkKWWindow::SerializeToken(istream& is, const char *token)
 {
   // Properties visibility
 
@@ -1148,7 +1148,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os, "$Revision: 1.149 $");
+  this->ExtractRevision(os, "$Revision: 1.150 $");
 }
 
 int vtkKWWindow::ExitDialog()

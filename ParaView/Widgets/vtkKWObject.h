@@ -94,7 +94,7 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   virtual void Serialize(istream& is);
   virtual void SerializeSelf(ostream& /*os*/, vtkIndent /*indent*/) {};
-  virtual void SerializeToken(istream& is, const char token[1024]);
+  virtual void SerializeToken(istream& is, const char *token);
   virtual const char *GetVersion(const char *);
   virtual void AddVersion(const char *cname, const char *version);
   void ExtractRevision(ostream& os,const char *revIn);
