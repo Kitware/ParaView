@@ -105,21 +105,20 @@ each architecture you wish to build.<p>
 <h3><a name="compcompwin">Windows Installation</a></h3><p>
 The Windows build process uses the CMake GUI CMakeSetup. Then you use the 
 compiler make utility to compile as follows.
-<pre>
-1) Install ParaView Complete distribution by unzipping into the appropriate
-directory.
-
-2) Execute CMakeSetup. This will pop-up a little
-GUI that allows you to tailor the build. It then starts
-building .dsw and .dsp files for Microsoft, or makefiles for Borland.
-You'll have to tell CMakeSetup where you've placed your ParaViewComplete
-source code, and where to build the object code and dll's (we'll call it
-"paraviewbin").
-
-3) When CMakeSetup completes, start up msdev and load ParaViewComplete.dsw.
-Select ALL_BUILD project, and build it.
-
-</pre>
+<ol>
+  <li> Install ParaView Complete distribution by unzipping into the appropriate
+      directory.
+      
+  <li> Execute CMakeSetup. This will pop-up a little
+      GUI that allows you to tailor the build. It then starts
+      building .dsw and .dsp files for Microsoft, or makefiles for Borland.
+      You'll have to tell CMakeSetup where you've placed your ParaViewComplete
+      source code, and where to build the object code and dll's (we'll call it
+      "paraviewbin").
+      
+  <li> When CMakeSetup completes, start up msdev and load ParaViewComplete.dsw.
+      Select ALL_BUILD project, and build it.
+</ol>
 We recommend a 300MByte minimum swap size or you might have trouble
 during the link phase.<p>
 
