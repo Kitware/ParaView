@@ -166,11 +166,56 @@ void vtkPVThreshold::CreateProperties()
   this->UpdateParameterWidgets();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVThreshold::UpdateParameterWidgets()
+{
+  this->vtkPVSource::UpdateParameterWidgets();
+  this->UpdateMinMaxScale();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVThreshold::UpdateMinMaxScale()
+{
+  const char *mode;
+  float range[2];
+  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
+
+  mode = this->AttributeModeMenu->GetValue();
+  if (strcmp(mode, "Point Data") == 0)
+    {
+    if (thresholdInput->GetPointData()->GetScalars())
+      {
+      thresholdInput->GetPointData()->GetScalars()->GetRange(range);
+      }
+    else
+      {
+      range[0] = 0;
+      range[1] = 1;
+      }
+    }
+  else if (strcmp(mode, "Cell Data") == 0)
+    {
+    if (thresholdInput->GetCellData()->GetScalars())
+      {
+      thresholdInput->GetCellData()->GetScalars()->GetRange(range);
+      }
+    else
+      {
+      range[0] = 0;
+      range[1] = 1;
+      }
+    }
+
+  this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->MinMaxScale->SetRange(range[0], range[1]);
+  this->MinMaxScale->SetMaxValue(range[1]);
+  this->MinMaxScale->SetMinValue(range[0]);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 {
-  float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
-//  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
 
   if ( ! this->TraceInitialized)
     {
@@ -190,15 +235,6 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   
   if (strcmp(newMode, "point") == 0)
     {
-    //if (thresholdInput->GetPointData()->GetArray(arrayName))
-    //  {
-    //  thresholdInput->GetPointData()->GetArray(arrayName)->GetRange(range);
-    //  }
-    //else
-    //  {
-      range[0] = 0;
-      range[1] = 1;
-    //  }
     ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUsePointData();
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
@@ -206,27 +242,14 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    //if (thresholdInput->GetCellData()->GetArray(arrayName))
-    //  {
-    //  thresholdInput->GetCellData()->GetArray(arrayName)->GetRange(range);
-    //  }
-    //else
-    //  {
-      range[0] = 0;
-      range[1] = 1;
-    //  }
     ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUseCellData();
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
     //this->ScalarOperationMenu->UsePointDataOff();
     }
-
-  this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
-  this->MinMaxScale->SetRange(range[0], range[1]);
-  this->MinMaxScale->SetMaxValue(range[1]);
-  this->MinMaxScale->SetMinValue(range[0]);
   
   //this->ScalarOperationMenu->FillMenu();
+  this->UpdateMinMaxScale();
 }
 
 void vtkPVThreshold::UpdateScalars()

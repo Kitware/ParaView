@@ -153,6 +153,30 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RendererTclName = NULL;
   this->SetRendererTclName("Ren1");
   
+  //pvApp->BroadcastScript("vtkLight pvLight0");
+  //pvApp->BroadcastScript("pvLight0 SetPosition 0 0 1000");
+  //pvApp->BroadcastScript("pvLight0 SetFocalPoint 0 0 0");
+  //pvApp->BroadcastScript("pvLight0 SetIntensity 1.0");
+  //pvApp->BroadcastScript("pvLight0 SetLightTypeToHeadlight");
+  //pvApp->BroadcastScript("Ren1 AddLight pvLight0");
+  //pvApp->BroadcastScript("pvLight0 Delete");
+
+  //pvApp->BroadcastScript("vtkLight pvLight1");
+  //pvApp->BroadcastScript("pvLight1 SetPosition 0 0 -1000");
+  //pvApp->BroadcastScript("pvLight1 SetFocalPoint 0 0 0");
+  //pvApp->BroadcastScript("pvLight1 SetIntensity 1.0");
+  //pvApp->BroadcastScript("pvLight1 SetLightTypeToCameraLight");
+  //pvApp->BroadcastScript("Ren1 AddLight pvLight1");
+  //pvApp->BroadcastScript("pvLight1 Delete");
+
+  //pvApp->BroadcastScript("vtkLight pvLight2");
+  //pvApp->BroadcastScript("pvLight2 SetPosition 100 1000 -500");
+  //pvApp->BroadcastScript("pvLight2 SetFocalPoint 0 0 0");
+  //pvApp->BroadcastScript("pvLight2 SetIntensity 0.3");
+  //pvApp->BroadcastScript("pvLight2 SetLightTypeToCameraLight");
+  //pvApp->BroadcastScript("Ren1 AddLight pvLight2");
+  //pvApp->BroadcastScript("pvLight2 Delete");
+
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");

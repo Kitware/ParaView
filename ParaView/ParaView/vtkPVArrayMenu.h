@@ -75,12 +75,19 @@ public:
   const char* GetLabel() {return this->Label->GetLabel();}
 
   // Description:
-  // Only arrays with this number of components are added to the menu.
-  // If this value is 0 or less, then all arrays are added to the menu.
-  // The default value is 1.  If "ShowComponentMenu" is on, then all
-  // arrays are added to the menu.
-  void SetNumberOfComponents(int num);
-  vtkGetMacro(NumberOfComponents, int);
+  // This option shows a menu that lets the user select which field to use:
+  // vtkDataSet::POINT_DATA_FIELD or vtkDataSet::CELL_DATA_FIELD.  
+  // vtkDataSet::DATA_OBJECT_FIELD is not an option.
+  void SetShowFieldMenu(int flag);
+  vtkGetMacro(ShowFieldMenu, int);
+  vtkBooleanMacro(ShowFieldMenu, int);
+
+  // Description:
+  // This is a method that the field menu calls.  The user can call
+  // it also.  It determines whether the array menu has point or cell arrays
+  // to select.
+  void SetFieldSelection(int field);
+  int GetFieldSelection() {return this->FieldSelection;}
 
   // Description:
   // When NumberOfComponents is 1, this option allows components to
@@ -89,6 +96,14 @@ public:
   void SetShowComponentMenu(int flag);
   vtkGetMacro(ShowComponentMenu, int);
   vtkBooleanMacro(ShowComponentMenu, int);
+
+  // Description:
+  // Only arrays with this number of components are added to the menu.
+  // If this value is 0 or less, then all arrays are added to the menu.
+  // The default value is 1.  If "ShowComponentMenu" is on, then all
+  // arrays are added to the menu.
+  void SetNumberOfComponents(int num);
+  vtkGetMacro(NumberOfComponents, int);
 
   // Description:
   // This is one value that lets this widget interact with its associated 
@@ -179,6 +194,9 @@ protected:
   int NumberOfComponents;
   int ShowComponentMenu;
 
+  int FieldSelection;
+  int ShowFieldMenu;
+
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
   int         AttributeType;
@@ -186,8 +204,12 @@ protected:
 
   // Subwidgets.
   vtkKWLabel *Label;
+  vtkKWOptionMenu *FieldMenu;
   vtkKWOptionMenu *ArrayMenu;
   vtkKWOptionMenu *ComponentMenu;
+
+  // Resets the values based on the array.
+  void UpdateArrayMenu();
 
   // Resets the values based on the array.
   void UpdateComponentMenu();

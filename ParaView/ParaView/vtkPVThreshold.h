@@ -79,11 +79,18 @@ public:
   // Access to AttributeModeMenu from tcl
   vtkGetObjectMacro(AttributeModeMenu, vtkKWOptionMenu);
   
+  // Description:
+  // Set the widget values to reflect the vtk object.
+  virtual void UpdateParameterWidgets();
+
 protected:
   vtkPVThreshold();
   ~vtkPVThreshold();
   vtkPVThreshold(const vtkPVThreshold&) {};
   void operator=(const vtkPVThreshold&) {};
+
+  void UpdateMinMaxScale();
+
 
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
