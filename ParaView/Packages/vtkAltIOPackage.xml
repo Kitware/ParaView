@@ -11,4 +11,15 @@
   <FileEntry variable="FileName" extension="*" label="File name" 
                help="Set the file to be read."/>
  </Module>
+ <Module name="XMLUnstructuredGridReader"
+         root_name="XMLUnstructuredGridReader" 
+         output="vtkUnstructuredGrid" 
+         class="vtkPVReaderModule"
+         module_type="Reader"
+         extensions=".xml"
+         file_description="VTK XML">
+  <Source type="vtkXMLUnstructuredGridReader"/>
+  <FileEntry variable="FileName" extension="*" label="File name" 
+               help="Set the file to be read."/>
+ </Module>
 </ModuleInterfaces>
