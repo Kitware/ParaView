@@ -44,9 +44,8 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF(ParaViewComplete_BINARY_DIR)  
-  INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
-  LINK_DIRECTORIES(${VTK_LIBRARY_PATH})
-  INCLUDE(${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
+  INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/VTKConfig.cmake)
+  INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
 ELSE(ParaViewComplete_BINARY_DIR)
   # include module to find vtk
   INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
