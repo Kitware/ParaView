@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.54");
+vtkCxxRevisionMacro(vtkKWMenu, "1.55");
 
 
 
@@ -652,41 +652,43 @@ void vtkKWMenu::Invoke(const char* item)
 //----------------------------------------------------------------------------
 void vtkKWMenu::DeleteMenuItem(int position)
 {
-  this->Script("catch {%s delete %d}", this->GetWidgetName(), position);
-  this->Script("set {%sHelpArray([%s entrycget %d -label])} {}", 
-               this->GetWidgetName(), this->GetWidgetName(), 
-               position);
+  const char *wname = this->GetWidgetName();
+  this->Script(
+    "catch {%s delete %d} ; set {%sHelpArray([%s entrycget %d -label])} {}", 
+    wname, position, 
+    wname, wname, position);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::DeleteMenuItem(const char* menuitem)
 {
-  this->Script("catch {%s delete {%s}}", this->GetWidgetName(), menuitem);
-  this->Script("set {%sHelpArray(%s)} {}", this->GetWidgetName(), menuitem);
+  const char *wname = this->GetWidgetName();
+  this->Script("catch {%s delete {%s}} ; set {%sHelpArray(%s)} {}",
+               wname, menuitem, wname, menuitem);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::DeleteAllMenuItems()
 {
-  if ( !this->IsCreated() )
+  int nb_items = this->GetNumberOfItems();
+  if (!nb_items)
     {
     return;
     }
 
-  int i, last;
-  
-  this->Script("%s index end", this->GetWidgetName());
-  if (strcmp("none", this->GetApplication()->GetMainInterp()->result) == 0)
+  ostrstream tk_cmd;
+  const char *wname = this->GetWidgetName();
+
+  for (int i = nb_items - 1; i >= 0; --i)
     {
-    return;
+    tk_cmd << "catch {" << wname << " delete " << i << "}" << endl
+           << "set {" << wname << "HelpArray([" 
+           << wname << " entrycget " << i << " -label])} {}" << endl;
     }
-  
-  last = vtkKWObject::GetIntegerResult(this->GetApplication());
-  
-  for (i = last; i >= 0; --i)
-    {
-    this->DeleteMenuItem(i);
-    }
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -829,7 +831,7 @@ void vtkKWMenu::SetState(int index, int state)
   if (this->IsCreated())
     {
     char stateStr[][9] = { "normal", "active", "disabled" };
-    if (state <= vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
+    if (state < vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
       {
       state = 0;
       }
@@ -852,11 +854,30 @@ void vtkKWMenu::SetState(const char* item, int state)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(int state)
 {
-  int nb_of_items = this->GetNumberOfItems();
-  for (int i = 0; i < nb_of_items; i++)
+  int nb_items = this->GetNumberOfItems();
+  if (!nb_items)
     {
-    this->SetState(i, state);
+    return;
     }
+
+  ostrstream tk_cmd;
+  const char *wname = this->GetWidgetName();
+
+  char stateStr[][9] = { "normal", "active", "disabled" };
+  if (state < vtkKWMenu::Normal || state > vtkKWMenu::Disabled)
+    {
+    state = 0;
+    }
+
+  for (int i = 0; i < nb_items; i++)
+    {
+    tk_cmd << "catch {" << wname << " entryconfigure " << i 
+           << " -state " << stateStr[state] << "}" << endl;
+    }
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

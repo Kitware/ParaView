@@ -71,6 +71,7 @@ SET( KWWidgets_SRCS
   vtkKWScaleSet.cxx 
   vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
+  vtkKWSelectionFrameLayoutManager.cxx
   vtkKWSimpleEntryDialog.cxx
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
