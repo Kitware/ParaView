@@ -70,6 +70,10 @@ public:
   virtual void SendStreamToClientAndRenderServer();
   virtual void SendStreamToRenderServerAndServer();
   virtual void SendStreamToRenderServerClientAndServer();
+//BTX
+  virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);
+  virtual void SendStreamToServerTemp(vtkClientServerStream* stream);
+//ETX
   
   // Description:
   // A method for getting generic information from the server.
@@ -93,6 +97,10 @@ protected:
 
   virtual void SendStreamToServerNodeInternal(int remoteId);
   virtual void SendStreamToServerInternal();
+
+  virtual void SendStreamToServerNodeInternal(
+    int remoteId, vtkClientServerStream* stream);
+  virtual void SendStreamToServerInternal(vtkClientServerStream* stream);
 
   // To pass arguments through controller single method.
   int    ArgumentCount;

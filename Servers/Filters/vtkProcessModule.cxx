@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.3");
+vtkCxxRevisionMacro(vtkProcessModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -112,6 +112,20 @@ void vtkProcessModule::GatherInformationInternal(const char*,
 void vtkProcessModule::SendStreamToClient()
 {
   this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
+{
+  this->Interpreter->ProcessStream(*stream);
+  stream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SendStreamToServerRootTemp(vtkClientServerStream* stream)
+{
+  this->Interpreter->ProcessStream(*stream);
+  stream->Reset();
 }
 
 //----------------------------------------------------------------------------

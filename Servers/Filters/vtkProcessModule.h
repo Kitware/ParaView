@@ -111,6 +111,10 @@ public:
   virtual void SendStreamToClientAndRenderServer();
   virtual void SendStreamToRenderServerAndServer();
   virtual void SendStreamToRenderServerClientAndServer();
+//BTX
+  virtual void SendStreamToServerTemp(vtkClientServerStream* stream);
+  virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);
+//ETX
 
   // Description:
   // Send the stream represented by the given string to the client,

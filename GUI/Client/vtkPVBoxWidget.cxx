@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.29");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -268,11 +268,11 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 
   *file << endl;
   *file << "set pvTemp" << this->BoxMatrixID.ID
-        << " [$proxyManager NewProxy math Matrix4x4]"
+        << " [$proxyManager NewProxy matrices Matrix4x4]"
         << endl;
-  *file << "$proxyManager RegisterProxy math pvTemp" << this->BoxMatrixID.ID
+  *file << "  $proxyManager RegisterProxy math pvTemp" << this->BoxMatrixID.ID
         << " $pvTemp" << this->BoxMatrixID.ID << endl;
-  *file << " $pvTemp" << this->BoxMatrixID.ID << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << this->BoxMatrixID.ID << " UnRegister {}" << endl;
 
   for(int i=0; i<16; i++)
     {

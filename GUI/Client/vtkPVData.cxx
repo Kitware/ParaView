@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.281");
+vtkCxxRevisionMacro(vtkPVData, "1.282");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2841,9 +2841,9 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << partD->GetGeometryID() << " $pvTemp" << partD->GetGeometryID() 
           << endl;
     *file << "  $pvTemp" << partD->GetGeometryID() << " UnRegister {}" << endl;
-    *file << "  $pvTemp" <<  partD->GetGeometryID() << " SetInput 0 "
-          << "$pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
-          << " SetInput 0"
+
+    *file << "  [$pvTemp" <<  partD->GetGeometryID() << " GetProperty Input] "
+          << " AddInput $pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
           << endl;
 
     *file << "  $Ren1 AddDisplayer $pvTemp" << partD->GetGeometryID() << endl;

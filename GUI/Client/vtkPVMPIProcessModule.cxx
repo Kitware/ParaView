@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.27");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.28");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -229,6 +229,20 @@ void vtkPVMPIProcessModule::SendStreamToServer()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerRootTemp(
+  vtkClientServerStream* stream)
+{
+  this->Superclass::SendStreamToServerRootTemp(stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
+{
+  this->SendStreamToServerInternal(stream);
+  stream->Reset();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVMPIProcessModule::SendStreamToRenderServer()
 {
   this->SendStreamToServer();
@@ -307,6 +321,21 @@ void vtkPVMPIProcessModule::SendStreamToServerInternal()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerInternal(
+  vtkClientServerStream* stream)
+{
+  // First send the command to the other server nodes.
+  int numPartitions = this->GetNumberOfPartitions();
+  for(int i=1; i < numPartitions; ++i)
+    {
+    this->SendStreamToServerNodeInternal(i, stream);
+    }
+
+  // Now process the stream locally.
+  this->Interpreter->ProcessStream(*stream);
+}
+
+//----------------------------------------------------------------------------
 void
 vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
 {
@@ -324,6 +353,30 @@ vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
     const unsigned char* data;
     size_t length;
     this->ClientServerStream->GetData(&data, &length);
+    this->Controller->TriggerRMI(remoteId, (void*)data, length,
+                                 VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+    }
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVMPIProcessModule::SendStreamToServerNodeInternal(
+  int remoteId, vtkClientServerStream* stream)
+{
+  if (stream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
+  if(remoteId == this->Controller->GetLocalProcessId())
+    {
+    this->Interpreter->ProcessStream(*stream);
+    }
+  else
+    {
+    const unsigned char* data;
+    size_t length;
+    stream->GetData(&data, &length);
     this->Controller->TriggerRMI(remoteId, (void*)data, length,
                                  VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     }
