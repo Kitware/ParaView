@@ -167,7 +167,7 @@
           class="vtkPVEnSightReaderModule"
           root_name="Ensight"
           module_type="Reader"
-          extensions=".case"
+          extensions=".case .CASE .Case"
           file_description="EnSight Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectionList label="Byte order"
@@ -337,7 +337,7 @@
           class="vtkPVEnSightReaderModule"
           root_name="EnsightMS"
           module_type="Reader"
-          extensions=".sos"
+          extensions=".sos .SOS"
           file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectTimeSet label="Select time value"
