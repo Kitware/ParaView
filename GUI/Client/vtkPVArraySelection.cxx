@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.46");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.47");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -595,4 +595,5 @@ void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AttributeName: " 
      << (this->AttributeName?this->AttributeName:"none") << endl;
   os << indent << "VTKReaderID: " << this->VTKReaderID.ID << endl;
+  os << indent << "LabelText: " << (this->LabelText?this->LabelText:"none") << endl;
 }
