@@ -96,7 +96,7 @@ void vtkGetRemoteGhostCells::Execute()
   vtkPointLocator *outputLocator = vtkPointLocator::New();
   vtkPoints *polyDataPoints = vtkPoints::New();
   float *bounds = input->GetBounds(), *remoteBounds = bounds;
-  int ghostLevel = this->GetGhostLevel();
+  int ghostLevel = output->GetUpdateGhostLevel();
   int pointIncr, cellIdCount;
   int *cellIdMap;
   

@@ -91,6 +91,8 @@ public:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
   
+  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
+  
 protected:
   vtkPVActorComposite();
   ~vtkPVActorComposite();
