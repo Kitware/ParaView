@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.5");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -95,7 +95,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
                     << helperID << "SetWriter" << writerID
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetApplicationID() << "GetController"
+                    << pm->GetProcessModuleID() << "GetController"
                     << vtkClientServerStream::End
                     << vtkClientServerStream::Invoke
                     << helperID << "SetController"
