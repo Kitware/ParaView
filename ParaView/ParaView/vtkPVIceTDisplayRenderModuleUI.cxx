@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.4");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.5");
 
 int vtkPVIceTDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -218,7 +218,7 @@ void vtkPVIceTDisplayRenderModuleUI::SetReductionFactor(int factor)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTDisplayRenderModuleUI::SaveState(ostream *file)
+void vtkPVIceTDisplayRenderModuleUI::SaveState(ofstream *file)
 {
   this->Superclass::SaveState(file);
  

@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.10");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.11");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -481,7 +481,7 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::SaveState(ostream *file)
+void vtkPVLODRenderModuleUI::SaveState(ofstream *file)
 {
   this->Superclass::SaveState(file);
 

@@ -127,7 +127,7 @@ public:
 
   // Description:
   // Export the state of the interactor style to a file.
-  virtual void SaveState(ostream *file);
+  virtual void SaveState(ofstream *file);
   
 protected:
   vtkPVInteractorStyleControl();

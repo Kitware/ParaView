@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.10");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -777,7 +777,7 @@ void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::SaveState(ostream *file)
+void vtkPVCompositeRenderModuleUI::SaveState(ofstream *file)
 {
   this->Superclass::SaveState(file);
   

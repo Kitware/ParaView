@@ -53,7 +53,7 @@ public:
 
   // Description:
   // Export the render module state to a file.
-  virtual void SaveState(ostream *file);
+  virtual void SaveState(ofstream *file);
   
 protected:
   vtkPVIceTDisplayRenderModuleUI();

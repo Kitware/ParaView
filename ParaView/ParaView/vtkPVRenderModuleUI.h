@@ -48,7 +48,7 @@ public:
 
   // Description:
   // Export the render module to a file.
-  void SaveState(ostream *) {}
+  virtual void SaveState(ofstream *) {}
   
 protected:
   vtkPVRenderModuleUI();

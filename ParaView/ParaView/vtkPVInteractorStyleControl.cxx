@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.25");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -754,7 +754,7 @@ void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::SaveState(ostream *file)
+void vtkPVInteractorStyleControl::SaveState(ofstream *file)
 {
   if (!this->ManipulatorCollection)
     {
