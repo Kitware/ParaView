@@ -66,7 +66,6 @@ public:
   // Description:
   // Get the interpreter being used by this application
   Tcl_Interp *GetMainInterp() {return this->MainInterp;};
-  static Tcl_Interp *GetGlobalInterp() {return vtkKWApplication::GlobalInterp;};
 
   // Description:
   // The method to invoke when the user exits the app
@@ -360,7 +359,6 @@ protected:
 
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
-  static Tcl_Interp *GlobalInterp;
   vtkKWWindowCollection *Windows;
 
   char *ApplicationName;

@@ -57,11 +57,10 @@ EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 int vtkKWApplication::WidgetVisibility = 1;
-Tcl_Interp *vtkKWApplication::GlobalInterp = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.174");
+vtkCxxRevisionMacro(vtkKWApplication, "1.175");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -138,7 +137,6 @@ vtkKWApplication::vtkKWApplication()
       "initialized properly...");
     return;
     }
-  vtkKWApplication::GlobalInterp = this->MainInterp;
 
   //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
   //                           vtkKWApplicationCommand);
@@ -735,7 +733,6 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
     vtkKWBWidgets::Initialize(interp);
     }
-  vtkKWApplication::GlobalInterp = interp;
 
   return interp;
 }
