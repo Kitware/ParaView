@@ -31,12 +31,13 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.61");
+vtkCxxRevisionMacro(vtkPVScale, "1.62");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -174,11 +175,14 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(this->EntryLabel);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(this->EntryLabel);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   
   // Now a label
@@ -296,7 +300,7 @@ void vtkPVScale::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   if (this->EntryFlag)
@@ -324,16 +328,19 @@ void vtkPVScale::Accept()
 //---------------------------------------------------------------------------
 void vtkPVScale::Trace()
 {
-  if (this->GetApplication() && this->GetApplication()->GetTraceFile())
+  
+  vtkPVApplication *pvapp = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
+  if (pvapp && pvapp->GetTraceFile())
     {
-    this->Trace(this->GetApplication()->GetTraceFile());
+    this->Trace(pvapp->GetTraceFile());
     }
 }
 
 //---------------------------------------------------------------------------
 void vtkPVScale::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -580,16 +587,16 @@ void vtkPVScale::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 //----------------------------------------------------------------------------
 void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
   
   this->Superclass::AnimationMenuCallback(ai);
 
   ai->SetLabelAndScript(
-    this->LabelWidget->GetText(), NULL, this->GetTraceName());
+    this->LabelWidget->GetText(), NULL, this->GetTraceHelper()->GetObjectName());
   
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *dom = prop->GetDomain("range");

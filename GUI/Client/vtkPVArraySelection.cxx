@@ -31,6 +31,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 #include <vtkstd/set>
@@ -41,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.65");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.66");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -123,7 +124,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
     }
   else
     {
-    this->LabeledFrame->SetLabelText(this->TraceName);
+    this->LabeledFrame->SetLabelText(this->GetTraceHelper()->GetObjectName());
     }
   app->Script("pack %s -fill x -expand t -side top",
               this->LabeledFrame->GetWidgetName());
@@ -314,7 +315,7 @@ void vtkPVArraySelection::ResetInternal()
 //---------------------------------------------------------------------------
 void vtkPVArraySelection::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

@@ -25,6 +25,7 @@
 class vtkCornerAnnotation;
 class vtkKWView;
 class vtkPVRenderView;
+class vtkPVTraceHelper;
 
 class VTK_EXPORT vtkPVCornerAnnotation : public vtkKWCornerAnnotation
 {
@@ -49,6 +50,10 @@ public:
   vtkBooleanMacro(Visibility, int);
 
   // Description:
+  // Set the maximum line height (override).
+  virtual void SetMaximumLineHeight(float);
+
+  // Description:
   // Set corner text
   virtual void SetCornerText(const char *txt, int corner);
 
@@ -58,8 +63,15 @@ public:
   virtual void Update();
 
   void UpdateCornerText();
+
+  // Description:
+  // Callbacks
   virtual void CornerTextCallback(int i);
   
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
+
 protected:
   vtkPVCornerAnnotation();
   ~vtkPVCornerAnnotation();
@@ -71,6 +83,7 @@ protected:
   virtual void Render();
 
   vtkCornerAnnotation     *InternalCornerAnnotation;
+  vtkPVTraceHelper* TraceHelper;
 
 private:
   vtkPVCornerAnnotation(const vtkPVCornerAnnotation&); // Not implemented

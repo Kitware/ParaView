@@ -26,7 +26,7 @@
 #define __vtkPVColorMap_h
 
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 #include "vtkClientServerID.h" // Needed for LookupTableID
 
 class vtkKWChangeColorButton;
@@ -38,8 +38,7 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
-class vtkKWTextProperty;
-class vtkKWWidget;
+class vtkPVTextProperty;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVColorMapObserver;
@@ -49,11 +48,11 @@ class vtkTextProperty;
 class vtkSMScalarBarWidgetProxy;
 class vtkSMLookupTableProxy;
 class vtkSMProxy;
-class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
+class VTK_EXPORT vtkPVColorMap : public vtkPVTracedWidget
 {
 public:
   static vtkPVColorMap* New();
-  vtkTypeRevisionMacro(vtkPVColorMap, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVColorMap, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -204,8 +203,8 @@ public:
   // Description:
   // GUI components access
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
-  vtkGetObjectMacro(TitleTextPropertyWidget, vtkKWTextProperty);
-  vtkGetObjectMacro(LabelTextPropertyWidget, vtkKWTextProperty);
+  vtkGetObjectMacro(TitleTextPropertyWidget, vtkPVTextProperty);
+  vtkGetObjectMacro(LabelTextPropertyWidget, vtkPVTextProperty);
 
   // Call backs from the vector mode frame.
   void VectorModeMagnitudeCallback();
@@ -339,8 +338,8 @@ protected:
   vtkKWLabel*        ScalarBarLabelFormatLabel;
   vtkKWEntry*        ScalarBarLabelFormatEntry;
   
-  vtkKWTextProperty *TitleTextPropertyWidget;
-  vtkKWTextProperty *LabelTextPropertyWidget;
+  vtkPVTextProperty *TitleTextPropertyWidget;
+  vtkPVTextProperty *LabelTextPropertyWidget;
   
   // For the map image.
   unsigned char *MapData;

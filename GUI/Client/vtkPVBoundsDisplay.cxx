@@ -26,10 +26,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.24");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -199,10 +200,12 @@ void vtkPVBoundsDisplay::CopyProperties(
     const char* frameLabel = this->GetFrameLabel();
     pvbd->SetFrameLabel(frameLabel);
     if (frameLabel && frameLabel[0] &&
-        (pvbd->TraceNameState == vtkPVWidget::Uninitialized ||
-         pvbd->TraceNameState == vtkPVWidget::Default) )
+        (pvbd->GetTraceHelper()->GetObjectNameState() == 
+         vtkPVTraceHelper::ObjectNameStateUninitialized ||
+         pvbd->GetTraceHelper()->GetObjectNameState() == 
+         vtkPVTraceHelper::ObjectNameStateDefault) )
       {
-      pvbd->SetTraceName(frameLabel);
+      pvbd->GetTraceHelper()->SetObjectName(frameLabel);
       }
     }
   else 

@@ -45,6 +45,7 @@
 #include "vtkCallbackCommand.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
+#include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
@@ -52,6 +53,7 @@
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkPVTraceHelper.h"
 
 #if defined(PARAVIEW_USE_WIN32_RW)
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -86,7 +88,8 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.6");
+vtkStandardNewMacro( vtkKWView );
+vtkCxxRevisionMacro(vtkKWView, "1.7");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -140,8 +143,9 @@ vtkKWView::vtkKWView()
 
   this->AnnotationProperties = vtkKWFrame::New();
   this->CornerAnnotation = vtkPVCornerAnnotation::New();
-  this->CornerAnnotation->SetTraceReferenceObject(this);
-  this->CornerAnnotation->SetTraceReferenceCommand("GetCornerAnnotation");
+  this->CornerAnnotation->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->CornerAnnotation->GetTraceHelper()->SetReferenceCommand("GetCornerAnnotation");
   
   this->PropertiesCreated = 0;
   this->InteractiveUpdateRate = 5.0;

@@ -30,6 +30,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkSMProperty.h"
 #include "vtkSMStringListRangeDomain.h"
@@ -150,7 +151,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.33");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -353,7 +354,7 @@ void vtkPVXDMFParameters::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -373,7 +374,7 @@ void vtkPVXDMFParameters::SetParameterIndex(const char* label, int value)
 //---------------------------------------------------------------------------
 void vtkPVXDMFParameters::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -485,7 +486,7 @@ void vtkPVXDMFParameters::AddAnimationScriptsToMenu(
               ai->GetTclName(), 
               svp->GetElement(2*i),
               i);
-      sprintf(name, "%s_%s", this->GetTraceName(), svp->GetElement(2*i));
+      sprintf(name, "%s_%s", this->GetTraceHelper()->GetObjectName(), svp->GetElement(2*i));
       menu->AddCommand(name, this, methodAndArgs, 0,"");
       }
     }
@@ -506,17 +507,17 @@ void vtkPVXDMFParameters::ResetAnimationRange(
 void vtkPVXDMFParameters::AnimationMenuCallback(
   vtkPVAnimationInterfaceEntry *ai, const char *name, unsigned int idx)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
                         this->GetTclName(), ai->GetTclName(), name);
     }
   
   this->Superclass::AnimationMenuCallback(ai);
 
   char label[1024];
-  sprintf(label, "%s_%s", this->GetTraceName(), name);
-  ai->SetLabelAndScript(label, NULL, this->GetTraceName());
+  sprintf(label, "%s_%s", this->GetTraceHelper()->GetObjectName(), name);
+  ai->SetLabelAndScript(label, NULL, this->GetTraceHelper()->GetObjectName());
 
   char methodAndArgs[500];
   

@@ -34,6 +34,7 @@
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVWindow.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkKWEvent.h"
 #include "vtkSMSphereWidgetProxy.h"
@@ -43,8 +44,9 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
+
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -251,7 +253,7 @@ void vtkPVSphereWidget::Trace(ofstream *file)
   double val[3];
   int cc;
   
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -427,11 +429,14 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-      this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+      this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("Sphere");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("Sphere");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   this->SetFrameLabel("Sphere Widget");
@@ -702,7 +707,7 @@ double vtkPVSphereWidget::GetRadiusInternal()
 void vtkPVSphereWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x, y, z);
-  this->AddTraceEntry("$kw(%s) SetCenter %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCenter %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
@@ -763,7 +768,7 @@ void vtkPVSphereWidget::SetRadiusInternal(double r)
 void vtkPVSphereWidget::SetRadius(double r)
 {
   this->SetRadiusInternal(r);
-  this->AddTraceEntry("$kw(%s) SetRadius %f ", this->GetTclName(), r);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetRadius %f ", this->GetTclName(), r);
   this->ModifiedCallback();
 }
 

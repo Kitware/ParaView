@@ -25,6 +25,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 class vtkPVAnimationCue;
+class vtkPVTraceHelper;
 
 class VTK_EXPORT vtkPVTimeLine : public vtkKWParameterValueFunctionEditor
 {
@@ -90,6 +91,11 @@ public:
   virtual void ParameterCursorStartInteractionCallback(int x);
   virtual void ParameterCursorEndInteractionCallback();
   virtual void ParameterCursorMoveCallback(int x);
+
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
+
 protected:
   vtkPVTimeLine();
   ~vtkPVTimeLine();
@@ -117,6 +123,8 @@ protected:
   int OldSelection;
   int Focus;
   vtkPVAnimationCue* AnimationCue;
+  vtkPVTraceHelper* TraceHelper;
+
 private:
   vtkPVTimeLine(const vtkPVTimeLine&); // Not implemented.
   void operator=(const vtkPVTimeLine&); // Not implemented.

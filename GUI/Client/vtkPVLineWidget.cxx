@@ -30,6 +30,7 @@
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkCommand.h"
 #include "vtkSMLineWidgetProxy.h"
@@ -40,7 +41,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -167,7 +168,7 @@ void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
 void vtkPVLineWidget::SetPoint1(double x, double y, double z)
 {
   this->SetPoint1Internal(x, y, z);
-  this->AddTraceEntry("$kw(%s) SetPoint1 %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPoint1 %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
@@ -225,7 +226,7 @@ void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
 void vtkPVLineWidget::SetPoint2(double x, double y, double z)
 {
   this->SetPoint2Internal(x, y, z);
-  this->AddTraceEntry("$kw(%s) SetPoint2 %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPoint2 %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
@@ -306,7 +307,7 @@ void vtkPVLineWidget::SetResolutionInternal(int res)
 void vtkPVLineWidget::SetResolution(int res)
 {
   this->SetResolutionInternal(res);
-  this->AddTraceEntry("$kw(%s) SetResolution %d", this->GetTclName(), res);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetResolution %d", this->GetTclName(), res);
   this->ModifiedCallback();
 }
 
@@ -347,7 +348,7 @@ void vtkPVLineWidget::SetResolution()
 //---------------------------------------------------------------------------
 void vtkPVLineWidget::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -772,11 +773,14 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-      this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+      this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("Line");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("Line");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   // Widget needs the RenderModule for picking

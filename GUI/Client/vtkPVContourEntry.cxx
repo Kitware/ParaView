@@ -26,10 +26,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.55");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -109,7 +110,7 @@ void vtkPVContourEntry::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   // The superclass (vtkPVValueList) uses Accept for moving value from
@@ -201,15 +202,15 @@ void vtkPVContourEntry::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
 
   this->Superclass::AnimationMenuCallback(ai);
 
-  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
+  ai->SetLabelAndScript(this->GetTraceHelper()->GetObjectName(), NULL, this->GetTraceHelper()->GetObjectName());
   ai->SetAnimationElement(0);
 
   vtkSMProperty *prop = this->GetSMProperty();

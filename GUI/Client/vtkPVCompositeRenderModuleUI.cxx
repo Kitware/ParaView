@@ -26,10 +26,11 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.22");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.23");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -523,7 +524,7 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
   
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetCompositeThreshold %f}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetCompositeThreshold %f}",
                       this->GetTclName(), threshold);
 }
 
@@ -548,7 +549,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
 {
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) CompositeWithFloatCallback %d}", 
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) CompositeWithFloatCallback %d}", 
                       this->GetTclName(), val);
   this->CompositeWithFloatFlag = val;
   if ( this->CompositeWithFloatCheck->GetState() != val )
@@ -589,7 +590,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
 {
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) CompositeWithRGBACallback %d}", 
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) CompositeWithRGBACallback %d}", 
                       this->GetTclName(), val);
   this->CompositeWithRGBAFlag = val;
   if ( this->CompositeWithRGBACheck->GetState() != val )
@@ -629,7 +630,7 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 {
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) CompositeCompressionCallback %d}", 
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) CompositeCompressionCallback %d}", 
                       this->GetTclName(), val);
 
   this->CompositeCompressionFlag = val;
@@ -679,7 +680,7 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
 
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetSquirtLevel %d}", 
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetSquirtLevel %d}", 
                       this->GetTclName(), level);
   this->SquirtLevel = level;
 
@@ -760,7 +761,7 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
 
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetReductionFactor %d}", 
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetReductionFactor %d}", 
                       this->GetTclName(), factor);
   this->ReductionFactor = factor;
 

@@ -60,45 +60,12 @@ public:
   static int GetIntegerResult(vtkKWApplication *);
   static float GetFloatResult(vtkKWApplication *);
 
-  // Description:
-  // This method returns 1 if the trace for this object has been 
-  // initialized. If it has not, it tries to initialize the object
-  // by invoking an event.  If this does not work, it returns 0.
-  // The argument is for saving a trace into a state file.
-  // When NULL, then the application trace file is used (conveniance).
-  // When file does not match global trace file, init flag is ignored.
-  virtual int InitializeTrace(ofstream* file);
-
-  // Description:
-  // If the a callback initializes the widget, then it can indicate so
-  // by setting this flag.
-  vtkSetMacro(TraceInitialized, int);
-  vtkGetMacro(TraceInitialized, int);
-  vtkBooleanMacro(TraceInitialized, int);
-
-  // Description:
-  // Setting the reference object and its command will allow this
-  // object to be initialized in the trace when necessary.
-  // When command is called on the reference object, it should
-  // return this object. Note:  We do not reference count
-  // the reference object.  It could be done in the future.
-  void SetTraceReferenceObject(vtkKWObject* o) {this->TraceReferenceObject = o;}
-  vtkGetObjectMacro(TraceReferenceObject, vtkKWObject);
-  vtkSetStringMacro(TraceReferenceCommand);
-  vtkGetStringMacro(TraceReferenceCommand);
-
-//BTX
+  //BTX
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
   virtual const char* Script(const char *EventString, ...);
-  
-  // Description:
-  // Method to estimate the length of the string that will be produced
-  // from printing the given format string and arguments.  The
-  // returned length will always be at least as large as the string
-  // that will result from printing.
-  int EstimateFormatLength(const char* format, va_list ap);
+  //ETX
   
 private:
   char *TclName;
@@ -108,23 +75,9 @@ protected:
   ~vtkKWObject();
 
   // this instance variable holds the command functions for this class.
+  //BTX
   int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
-
-  // Support for tracing activity to a script.
-  // This flag indicates that a variable has been defined in the 
-  // trace file for this widget.
-  int TraceInitialized;
-  // This object can be obtained from the reference object on the script.
-  vtkKWObject *TraceReferenceObject;
-  // This string is the method and args that can be used to get this object
-  // from the reference object.
-  char *TraceReferenceCommand;
-  // Convenience method that initializes and handles formating the trace command.
-  // The formated string should contain a command that looks like:
-  // "$kw(%s) SetValue %d", this->GetTclName(), this->GetValue().  
-  void AddTraceEntry(const char *EventString, ...);
-
-//ETX
+  //ETX
 
   // This method can be used to create
   // A method to set a callback function on object.  The first argument is

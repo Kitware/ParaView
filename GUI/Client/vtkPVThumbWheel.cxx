@@ -30,10 +30,11 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.13");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -124,11 +125,14 @@ void vtkPVThumbWheel::SetLabel(const char *str)
 {
   this->Label->SetText(str);
   if (str && str[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(str);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(str);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 
@@ -248,15 +252,15 @@ void vtkPVThumbWheel::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
                         this->GetTclName(), ai->GetTclName());
     }
   
   this->Superclass::AnimationMenuCallback(ai);
 
-  ai->SetLabelAndScript(this->Label->GetText(), NULL, this->GetTraceName());
+  ai->SetLabelAndScript(this->Label->GetText(), NULL, this->GetTraceHelper()->GetObjectName());
 
   char methodAndArgs[500];
   
@@ -333,7 +337,7 @@ void vtkPVThumbWheel::ResetInternal()
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::Trace(ofstream *file)
 {
-  if (!this->InitializeTrace(file))
+  if (!this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

@@ -90,6 +90,7 @@ class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkSMAxesProxy;
 class vtkKWSplitFrame;
+class vtkPVTraceHelper;
 
 class vtkPVAnimationManager;
 class vtkKWToolbarSet;
@@ -304,7 +305,7 @@ public:
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList)
     { return this->CreatePVSource(className, sourceList, 1, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
-                              int addTraceEntry, int grabFocus);
+                              int add_trace_entry, int grabFocus);
   
   //BTX
   // Description:
@@ -595,6 +596,11 @@ public:
   // Calls an Update on the Animation Manager forcing it to get in sync with the 
   // current system state. Called when a source is created or deleted.
   void UpdateAnimationInterface();
+
+  // Description:
+  // Get the trace helper framework.
+  vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -771,6 +777,8 @@ protected:
   vtkSMAxesProxy *CenterAxesProxy; 
   char* CenterAxesProxyName;
   vtkSetStringMacro(CenterAxesProxyName);
+
+  vtkPVTraceHelper* TraceHelper;
 
 private:
 

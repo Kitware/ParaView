@@ -26,6 +26,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
+#include "vtkPVTraceHelper.h"
 
 #include <ctype.h>
 
@@ -67,7 +68,7 @@ protected:
 
 //*****************************************************************************
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVWidget, "1.61");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -84,8 +85,6 @@ vtkPVWidget::vtkPVWidget()
   this->Dependents = vtkLinkedList<void*>::New();
   this->PVSource = 0;
 
-  this->TraceNameState = vtkPVWidget::Uninitialized;
-  
   this->UseWidgetRange = 0;
   this->WidgetRange[0] = 0;
   this->WidgetRange[1] = 0;
@@ -363,8 +362,8 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 {
   // Copy the tracename and help (note that SetBalloonHelpString
   // is virtual and is redefined by subclasses when necessary).
-  clone->SetTraceName(this->GetTraceName());
-  clone->SetTraceNameState(this->TraceNameState);
+  clone->GetTraceHelper()->SetObjectName(this->GetTraceHelper()->GetObjectName());
+  clone->GetTraceHelper()->SetObjectNameState(this->GetTraceHelper()->GetObjectNameState());
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
   clone->SetSMPropertyName(this->GetSMPropertyName());
@@ -463,8 +462,9 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* trace_name = element->GetAttribute("trace_name");
   if (trace_name) 
     { 
-    this->SetTraceName(trace_name); 
-    this->SetTraceNameState(vtkPVWidget::XMLInitialized);
+    this->GetTraceHelper()->SetObjectName(trace_name); 
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateXMLInitialized);
     }
   else
     {
@@ -509,7 +509,6 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ModifiedCommandObjectTclName: " 
      << (this->ModifiedCommandObjectTclName?
          this->ModifiedCommandObjectTclName:"(none)") << endl;
-  os << indent << "TraceNameState: " << this->TraceNameState << endl;
   os << indent << "UseWidgetRange: " << this->UseWidgetRange << endl;
   os << indent << "HideGUI: " << this->HideGUI << endl;
   os << indent << "WidgetRange: " << this->WidgetRange[0] << " "

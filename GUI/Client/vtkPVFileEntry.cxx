@@ -37,6 +37,7 @@
 #include "vtkKWEvent.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <kwsys/SystemTools.hxx>
 
@@ -72,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.105");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.106");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -136,11 +137,14 @@ void vtkPVFileEntry::SetLabel(const char* label)
   this->LabelWidget->SetText(label);
 
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 
@@ -664,7 +668,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 //---------------------------------------------------------------------------
 void vtkPVFileEntry::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -970,7 +974,7 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     char methodAndArgs[500];
 
     sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-    menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
+    menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0,"");
     }
 }
 
@@ -997,9 +1001,9 @@ void vtkPVFileEntry::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
       this->GetTclName(), ai->GetTclName());
     }
 
@@ -1025,7 +1029,7 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   ai->SetResetRangeButtonState(1);
   ai->UpdateEnableState();
   
-  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
+  ai->SetLabelAndScript(this->GetTraceHelper()->GetObjectName(), NULL, this->GetTraceHelper()->GetObjectName());
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(dom);
   this->ResetAnimationRange(ai);

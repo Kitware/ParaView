@@ -206,6 +206,11 @@ public:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
+  // Description:
+  // This can be used to trace the application.
+  // Look at vtkKWWidgets to see how it is used.
+  ofstream *GetTraceFile() {return this->TraceFile;}
+
   // Descrition:
   // Show/Hide the sources long help.
   virtual void SetShowSourcesLongHelp(int);
@@ -332,6 +337,7 @@ protected:
 
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
+  ofstream *TraceFile;
   char* Argv0;
   vtkSetStringMacro(Argv0);
 

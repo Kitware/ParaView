@@ -28,12 +28,13 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.31");
 
 class vtkPVSourceVectorInternals
 {
@@ -285,7 +286,7 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
 {
   vtkPVSource *pvs;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -294,7 +295,7 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
   for (unsigned int i=0; i < this->Internal->InputsVector.size(); ++i)
     {
     pvs = this->Internal->InputsVector[i];
-    if ( ! pvs->InitializeTrace(file))
+    if ( ! pvs->GetTraceHelper()->Initialize(file))
       {
       vtkErrorMacro("Could not initialize trace for object.");
       }

@@ -217,30 +217,10 @@ public:
     this->SetBalloonHelpJustification(2);};
   
   // Description:
-  // These method are for supporting tracing the widgets activity.
-  // GetChildWidget is used only for initializing the widget relative
-  // to its parent.  The trace name has to be set by the parent
-  // for GetChildWidget to work.
-  vtkSetStringMacro(TraceName);
-  vtkGetStringMacro(TraceName);
-  vtkKWWidget *GetChildWidgetWithTraceName(const char* traceName);
-
-  // Description:
-  // Tracing support specific to widgets.  This method will initialize
-  // a widget useing its parent as reference.  This method returns 1
-  // if the widget was initialized successfully.  This widget needs
-  // a TraceName unique between the children of the parent in order for
-  // this method to work.  The parent also has to be able to be initialized.
-  // The "file" arguments extends the functinality to saving state
-  // Into a tcl script.  I need a way to store "TraceInitialized"
-  // for each file.
-  virtual int InitializeTrace(ofstream* file);
-
-  // Description:
   // Query if there are drag and drop targets between this widget and
   // other widgets. Get the targets.
   // IMPORTANT: the vtkKWDragAndDropHelper object is lazy-allocated, i.e.
-  // allocated only when it is needed, when GetDragAndDropHelper() is called.
+  // allocated only when it is needed, as GetDragAndDropHelper() is called.
   // Therefore, to check if the instance *has* drag and drop targets, use 
   // HasDragAndDropHelper(), not GetDragAndDropHelper().
   virtual int HasDragAndDropHelper();
@@ -333,11 +313,6 @@ protected:
   int   BalloonHelpInitialized;
   void  SetUpBalloonHelpBindings();
   
-  // We need a unique way to get the widget from the parent.  This
-  // is unfortunate, but necessary.  Without this name set, the
-  // trace cannot be initialized for this widget.
-
-  char *TraceName;
   int Enabled;
 
   // Encoding methods

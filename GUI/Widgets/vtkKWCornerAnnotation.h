@@ -93,7 +93,6 @@ public:
   // Description:
   // Set/Get the maximum line height.
   virtual void SetMaximumLineHeight(float);
-  virtual void SetMaximumLineHeightNoTrace(float);
 
   // Description:
   // Set the event invoked when the anything in the annotation is changed.

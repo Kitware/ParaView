@@ -33,6 +33,7 @@
 #include "vtkTclUtil.h"
 #include "vtkSmartPointer.h"
 #include "vtkStdString.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -41,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.44");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -393,7 +394,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
 void vtkPVInteractorStyleControl::SetCurrentManipulator(
   int pos, const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetCurrentManipulator %d {%s}",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentManipulator %d {%s}",
                       this->GetTclName(), pos, name);
   
   this->SetManipulator(pos, name);
@@ -674,9 +675,9 @@ void vtkPVInteractorStyleControl::AddArgument(
   this->Internals->Widgets[name] = widget;
 
   char str[512];
-  widget->SetTraceReferenceObject(this);
+  widget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   sprintf(str, "GetWidget {%s}", name);
-  widget->SetTraceReferenceCommand(str);
+  widget->GetTraceHelper()->SetReferenceCommand(str);
   
   // find vector of manipulators that respond to this argument
   vtkPVInteractorStyleControlInternal::MapStringToArrayString::iterator mit

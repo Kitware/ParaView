@@ -35,7 +35,8 @@
 #ifndef __vtkPVAnimationCue_h
 #define __vtkPVAnimationCue_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
+
 class vtkKWWidget;
 class vtkKWLabel;
 class vtkPVTimeLine;
@@ -51,11 +52,11 @@ class vtkPVSource;
 class vtkSMPropertyStatusManager;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkPVAnimationCue : public vtkKWWidget
+class VTK_EXPORT vtkPVAnimationCue : public vtkPVTracedWidget
 {
 public:
   static vtkPVAnimationCue* New();
-  vtkTypeRevisionMacro(vtkPVAnimationCue, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationCue, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication* app, const char* args);

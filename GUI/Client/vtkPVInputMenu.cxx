@@ -32,10 +32,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.70");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.71");
 
 
 //----------------------------------------------------------------------------
@@ -68,11 +69,14 @@ void vtkPVInputMenu::SetLabel(const char* label)
 {
   this->Label->SetText(label);
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 
@@ -364,12 +368,13 @@ void vtkPVInputMenu::Accept()
 //---------------------------------------------------------------------------
 void vtkPVInputMenu::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
 
-  if (this->CurrentValue && this->CurrentValue->InitializeTrace(file))
+  if (this->CurrentValue && 
+      this->CurrentValue->GetTraceHelper()->Initialize(file))
     {
     *file << "$kw(" << this->GetTclName() << ") SetCurrentValue "
           << "$kw(" << this->CurrentValue->GetTclName() << ")\n";

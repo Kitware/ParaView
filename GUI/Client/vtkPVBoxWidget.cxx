@@ -40,9 +40,10 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 #include "vtkPVWindow.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -241,7 +242,7 @@ void vtkPVBoxWidget::Accept()
 //---------------------------------------------------------------------------
 void vtkPVBoxWidget::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -274,7 +275,7 @@ void vtkPVBoxWidget::Trace(ofstream *file)
    << val[0] << " " << val[1] << " " << val[2] << endl;
 
    rad = atof(this->RadiusEntry->GetValue());
-   this->AddTraceEntry("$kw(%s) SetRadius %f", 
+   this->GetTraceHelper()->AddEntry("$kw(%s) SetRadius %f", 
    this->GetTclName(), rad);
    *file << "$kw(" << this->GetTclName() << ") SetRadius "
    << rad << endl;
@@ -460,11 +461,14 @@ void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 {
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-      this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+      this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("Box");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("Box");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   this->SetFrameLabel("Box Widget");
@@ -770,7 +774,7 @@ void vtkPVBoxWidget::SetOrientation(double px, double py, double pz)
   if ( py < 0 ) { py += 360; }
   if ( pz < 0 ) { pz += 360; }
   this->SetOrientationInternal(px, py, pz);
-  this->AddTraceEntry("$kw(%s) SetOrientation %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientation %f %f %f",
     this->GetTclName(), px, py, pz);  
   this->ModifiedCallback();
 }
@@ -779,7 +783,7 @@ void vtkPVBoxWidget::SetOrientation(double px, double py, double pz)
 void vtkPVBoxWidget::SetScale(double px, double py, double pz)
 {
   this->SetScaleInternal(px, py, pz);
-  this->AddTraceEntry("$kw(%s) SetScale %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScale %f %f %f",
     this->GetTclName(), px, py, pz);  
   this->ModifiedCallback();
 }
@@ -788,7 +792,7 @@ void vtkPVBoxWidget::SetScale(double px, double py, double pz)
 void vtkPVBoxWidget::SetTranslate(double px, double py, double pz)
 {
   this->SetTranslateInternal(px, py, pz);
-  this->AddTraceEntry("$kw(%s) SetTranslate %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTranslate %f %f %f",
     this->GetTclName(), px, py, pz);  
   this->ModifiedCallback();
 }

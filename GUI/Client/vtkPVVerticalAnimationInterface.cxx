@@ -38,9 +38,10 @@
 #include "vtkKWScale.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.12");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.13");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -350,7 +351,7 @@ void vtkPVVerticalAnimationInterface::SetKeyFrameType(int type)
     return;
     }
    
-  this->AddTraceEntry("$kw(%s) SetKeyFrameType %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyFrameType %d", this->GetTclName(),
     type);
 
   this->AnimationManager->ReplaceKeyFrame(this->AnimationCue,
@@ -425,7 +426,7 @@ void vtkPVVerticalAnimationInterface::SetCacheGeometry(int cache)
   this->CacheGeometry = cache;
   this->CacheGeometryCheck->SetState(cache);
   this->AnimationManager->InvalidateAllGeometries();
-  this->AddTraceEntry("$kw(%s) SetCacheGeometry %d", this->GetTclName(), cache);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCacheGeometry %d", this->GetTclName(), cache);
 }
 
 //-----------------------------------------------------------------------------
@@ -438,7 +439,7 @@ void vtkPVVerticalAnimationInterface::AdvancedAnimationViewCallback()
 void vtkPVVerticalAnimationInterface::SetAdvancedAnimationView(int advanced)
 {
   this->AnimationManager->SetAdvancedView(advanced);
-  this->AddTraceEntry("$kw(%s) SetAdvancedAnimationView %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetAdvancedAnimationView %d", this->GetTclName(),
     advanced);
 }
 //-----------------------------------------------------------------------------
@@ -570,7 +571,7 @@ void vtkPVVerticalAnimationInterface::SetKeyFrameIndex(int val)
     }
   this->AnimationCue->GetTimeLine()->SelectPoint(val);
   this->IndexScale->SetValue(val+1);
-  this->AddTraceEntry("$kw(%s) SetKeyFrameIndex %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyFrameIndex %d", this->GetTclName(), val);
 }
 
 //-----------------------------------------------------------------------------

@@ -31,10 +31,11 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSource.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.23");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.24");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -171,7 +172,7 @@ void vtkPVFieldMenu::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -180,7 +181,7 @@ void vtkPVFieldMenu::Accept()
 //---------------------------------------------------------------------------
 void vtkPVFieldMenu::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

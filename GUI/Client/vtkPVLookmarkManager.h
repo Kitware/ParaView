@@ -34,7 +34,7 @@
 #ifndef __vtkPVLookmarkManager_h
 #define __vtkPVLookmarkManager_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWLookmarkFolder;
 class vtkKWLookmark;
@@ -43,7 +43,6 @@ class vtkXMLDataElement;
 class vtkKWIcon;
 class vtkKWFrame;
 class vtkKWPushButton;
-class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVSource;
 class vtkPVRenderView;
@@ -56,11 +55,11 @@ class vtkKWText;
 template<class DataType> class vtkVector;
 //ETX
 
-class VTK_EXPORT vtkPVLookmarkManager : public vtkKWWidget
+class VTK_EXPORT vtkPVLookmarkManager : public vtkPVTracedWidget
 {
 public:
   static vtkPVLookmarkManager* New();
-  vtkTypeRevisionMacro(vtkPVLookmarkManager, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVLookmarkManager, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

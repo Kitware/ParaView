@@ -60,6 +60,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkPVTraceHelper.h"
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -178,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.180");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.181");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -833,7 +834,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
     {
     return;
     }
-  this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
 
 }
 
@@ -860,7 +861,7 @@ void vtkPVAnimationInterface::SetLoop(int v)
   this->Loop = v;
   this->Modified();
 
-  this->AddTraceEntry("$kw(%s) SetLoop %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLoop %d",
                       this->GetTclName(), this->GetLoop());
 }
 
@@ -875,14 +876,14 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
 {
   if (this->ScriptCheckButton->GetState())
     {
-    this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 1", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetScriptCheckButtonState 1", 
                         this->GetTclName());
     this->Script("pack %s -side top -expand yes -fill x -padx 2",
                  this->ScriptEditor->GetWidgetName());
     }
   else
     {
-    this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 0", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetScriptCheckButtonState 0", 
                         this->GetTclName());
     this->Script("pack forget %s", 
                  this->ScriptEditor->GetWidgetName());
@@ -1016,7 +1017,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
 
     if (trace)
       {
-      this->AddTraceEntry("$kw(%s) SetCurrentTime %d 1",
+      this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTime %d 1",
                           this->GetTclName(), this->GetCurrentTime());
       }
     
@@ -1442,7 +1443,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   
   this->View->SetRenderWindowSize(width, height);
   
-  this->AddTraceEntry("$kw(%s) SaveImages {%s} {%s}",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages {%s} {%s}",
                       this->GetTclName(), fileRoot, ext);
   winToImage = vtkWindowToImageFilter::New();
   winToImage->SetInput(this->View->GetRenderWindow());
@@ -1599,7 +1600,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
-  this->AddTraceEntry("$kw(%s) SaveGeometry {%s} {%d}",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveGeometry {%s} {%d}",
                       this->GetTclName(), fileName, numPartitions);
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
@@ -1893,7 +1894,7 @@ void vtkPVAnimationInterface::CacheGeometryCheckCallback()
       app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
       }
     }
-  this->AddTraceEntry("$kw(%s) SetCacheGeometry %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCacheGeometry %d",
                       this->GetTclName(), this->GetCacheGeometry());
 }
 
@@ -1943,12 +1944,12 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::AddEmptySourceItem()
   // signature, so they look the same, but both are needed.
   entry->SetParent(this);
   entry->SetParent(this->AnimationEntryInformation->GetFrame());
-  entry->SetTraceReferenceObject(this);
+  entry->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   entry->SetCurrentIndex(idx);
   entry->Create(this->GetPVApplication(), 0);
   this->UpdateEntries();
   this->ShowEntryInFrame(idx);
-  this->AddTraceEntry("$kw(%s) AddEmptySourceItem", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) AddEmptySourceItem", this->GetTclName());
   entry->Delete();
   this->Dirty = 1;
   return entry;
@@ -1967,7 +1968,7 @@ void vtkPVAnimationInterface::DeleteSourceItem(int item)
   
   this->Dirty = 1;
   this->AnimationEntries->RemoveItem(item);
-  this->AddTraceEntry("$kw(%s) DeleteSourceItem %d", this->GetTclName(), item);
+  this->GetTraceHelper()->AddEntry("$kw(%s) DeleteSourceItem %d", this->GetTclName(), item);
   this->UpdateEntries();
   this->ShowEntryInFrame(0);
 }
@@ -2401,7 +2402,7 @@ void vtkPVAnimationInterface::SetDelay(int value)
     this->AnimationDelayScale->SetValue(value);
     }
   
-  this->AddTraceEntry("$kw(%s) SetDelay %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDelay %d",
                       this->GetTclName(), value);
 }
 

@@ -22,7 +22,7 @@
 #ifndef __vtkPVSource_h
 #define __vtkPVSource_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
 
 class vtkCollection;
@@ -45,11 +45,11 @@ class vtkSMPointLabelDisplay;
 class vtkPVColorMap;
 class vtkPVDisplayGUI;
 
-class VTK_EXPORT vtkPVSource : public vtkKWWidget
+class VTK_EXPORT vtkPVSource : public vtkPVTracedWidget
 {
 public:
   static vtkPVSource* New();
-  vtkTypeRevisionMacro(vtkPVSource,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVSource,vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

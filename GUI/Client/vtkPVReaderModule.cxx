@@ -29,9 +29,11 @@
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 #include <vtkstd/string>
+#include "vtkPVTraceHelper.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.60");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.61");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -228,9 +230,9 @@ int vtkPVReaderModule::FinalizeInternal(const char*, int accept)
   window->AddPVSource("Sources", this);
   this->Delete();
 
-  if (this->GetTraceInitialized() == 0)
+  if (this->GetTraceHelper()->GetInitialized() == 0)
     { 
-    this->SetTraceInitialized(1);
+    this->GetTraceHelper()->SetInitialized(1);
     }
   this->GrabFocus();
   if (accept)
@@ -327,16 +329,18 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
   
   // Just doing what is in vtkPVSource::AddPVWidget(pvw);
   char str[512];
-  if (fileEntry->GetTraceName() == NULL)
+  if (fileEntry->GetTraceHelper()->GetObjectName() == NULL)
     {
     vtkWarningMacro("TraceName not set. Widget class: " 
                     << fileEntry->GetClassName());
     return;
     }
 
-  fileEntry->SetTraceReferenceObject(this);
-  sprintf(str, "GetPVWidget {%s}", fileEntry->GetTraceName());
-  fileEntry->SetTraceReferenceCommand(str);
+  fileEntry->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  sprintf(str, 
+          "GetPVWidget {%s}", fileEntry->GetTraceHelper()->GetObjectName());
+  fileEntry->GetTraceHelper()->SetReferenceCommand(str);
   fileEntry->Select();
 }
 

@@ -23,7 +23,7 @@
 #define __vtkPVDisplayGUI_h
 
 
-#include "vtkKWFrame.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkCollection;
 class vtkKWBoundsDisplay;
@@ -49,11 +49,11 @@ class vtkPVVolumeAppearanceEditor;
 class vtkData;
 class vtkPVColorMap;
 
-class VTK_EXPORT vtkPVDisplayGUI : public vtkKWFrame
+class VTK_EXPORT vtkPVDisplayGUI : public vtkPVTracedWidget
 {
 public:
   static vtkPVDisplayGUI* New();
-  vtkTypeRevisionMacro(vtkPVDisplayGUI, vtkKWFrame);
+  vtkTypeRevisionMacro(vtkPVDisplayGUI, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -295,6 +295,7 @@ public:
   // to the script file. 
   void SaveVolumeRenderStateDisplay(ofstream *os);
 
+  vtkGetObjectMacro(MainFrame, vtkKWFrame);
 
 protected:
   vtkPVDisplayGUI();
@@ -336,6 +337,8 @@ protected:
   // A flag to let the source know that Initialize should be called again.
   // This flag is set when the data set type is unknown.
   int ShouldReinitialize;
+
+  vtkKWFrame *MainFrame;
 
   vtkKWFrameLabeled *ColorFrame;
   vtkKWFrameLabeled *VolumeAppearanceFrame;

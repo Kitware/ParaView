@@ -25,7 +25,7 @@
 #ifndef __vtkPVWidget_h
 #define __vtkPVWidget_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkKWMenu;
 class vtkPVSource;
@@ -44,10 +44,10 @@ template <class value>
 class vtkLinkedList;
 //ETX
 
-class VTK_EXPORT vtkPVWidget : public vtkKWWidget
+class VTK_EXPORT vtkPVWidget : public vtkPVTracedWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkPVWidget, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVWidget, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -202,26 +202,6 @@ public:
   vtkGetStringMacro(ModifiedCommandMethod);
 
   // Description:
-  // This variable is used to determine who set the TraceName of
-  // this widget. Initially, the TraceName is Unitializad. Then,
-  // usually, vtkPVXMLPackageParser assigns a Default name. Then,
-  // either it is set from XML, the user sets it or one is assigned 
-  // during Create.
-  vtkSetMacro(TraceNameState,int);
-  vtkGetMacro(TraceNameState,int);
-
-//BTX
-  enum TraceNameState_t
-  {
-    Uninitialized,
-    Default,
-    XMLInitialized,
-    SelfInitialized,
-    UserInitialized
-  };
-//ETX
-
-  // Description:
   // Used by subclasses to save this widgets state into a PVScript.
   // This method does not initialize trace variable or check modified.
   virtual void Trace(ofstream *file) = 0;  
@@ -303,8 +283,6 @@ protected:
   // Used void* instead of vtkPVWidget* to avoid reference counting
   vtkLinkedList<void*>* Dependents;
 //ETX
-
-  int TraceNameState;
 
   int HideGUI;
 

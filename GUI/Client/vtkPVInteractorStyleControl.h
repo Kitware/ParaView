@@ -24,7 +24,7 @@
 #ifndef __vtkPVInteractorStyleControl_h
 #define __vtkPVInteractorStyleControl_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkCollection;
 class vtkKWApplication;
@@ -38,11 +38,11 @@ class vtkPVWidget;
 
 class vtkPVInteractorStyleControlInternal;
 
-class VTK_EXPORT vtkPVInteractorStyleControl : public vtkKWWidget
+class VTK_EXPORT vtkPVInteractorStyleControl : public vtkPVTracedWidget
 {  
 public:
   static vtkPVInteractorStyleControl* New();
-  vtkTypeRevisionMacro(vtkPVInteractorStyleControl,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVInteractorStyleControl,vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

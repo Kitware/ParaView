@@ -37,9 +37,10 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -277,7 +278,7 @@ void vtkPVOrientScaleWidget::UpdateActiveState()
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Trace(ofstream *file)
 {
-  if (!this->InitializeTrace(file))
+  if (!this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

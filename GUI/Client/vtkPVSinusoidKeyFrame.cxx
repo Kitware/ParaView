@@ -20,9 +20,10 @@
 #include "vtkKWEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkSMSinusoidKeyFrameProxy.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.5");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -147,7 +148,7 @@ void vtkPVSinusoidKeyFrame::SetPhase(double base)
 {
   vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetPhase(base);
-  this->AddTraceEntry("$kw(%s) SetPhase %f", this->GetTclName(), base);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPhase %f", this->GetTclName(), base);
 }
 
 //-----------------------------------------------------------------------------
@@ -162,7 +163,7 @@ void vtkPVSinusoidKeyFrame::SetFrequency(double p)
 { 
   vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetFrequency(p);
-  this->AddTraceEntry("$kw(%s) SetFrequency %f", this->GetTclName(), p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrequency %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +178,7 @@ void vtkPVSinusoidKeyFrame::SetOffset(double p)
 {
   vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetOffset(p);
-  this->AddTraceEntry("$kw(%s) SetOffset %f", this->GetTclName(), p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOffset %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------

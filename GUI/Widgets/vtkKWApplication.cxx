@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.188");
+vtkCxxRevisionMacro(vtkKWApplication, "1.189");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -96,7 +96,6 @@ vtkKWApplication::vtkKWApplication()
 
   this->InExit = 0;
   this->DialogUp = 0;
-  this->TraceFile = NULL;
   this->LimitedEditionMode = 0;
 
   this->ExitStatus = 0;
@@ -232,13 +231,6 @@ vtkKWApplication::~vtkKWApplication()
 
   this->SetDisplayHelpStartingPage(NULL);
 
-  if (this->TraceFile)
-    {
-    this->TraceFile->close();
-    delete this->TraceFile;
-    this->TraceFile = NULL;
-    }
-
   if (this->Registry )
     {
     this->Registry->Delete();
@@ -370,7 +362,7 @@ const char* vtkKWApplication::ScriptInternal(const char* format,
   char* buffer = event;
   
   // Estimate the length of the result string.  Never underestimates.
-  int length = this->EstimateFormatLength(format, var_args1);
+  int length = kwsys::SystemTools::EstimateFormatLength(format, var_args1);
   
   // If our stack-allocated buffer is too small, allocate on one on
   // the heap that will be large enough.
@@ -1176,46 +1168,6 @@ void vtkKWApplication::AddAboutCopyrights(ostream &os)
      << "  - Copyright (c) 1994 The Australian National University." << endl
      << "  - Copyright (c) 1994-1998 Sun Microsystems, Inc." << endl
      << "  - Copyright (c) 1998-2000 Ajuba Solutions." << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::AddSimpleTraceEntry(const char *trace)
-{
-  this->AddTraceEntry(trace);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::AddTraceEntry(const char *format, ...)
-{
-  if (this->TraceFile == NULL)
-    {
-    return;
-    }
-  
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-
-  *(this->TraceFile) << buffer << endl;
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -42,10 +42,11 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.41");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -575,13 +576,13 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   if (!strcmp(newMode, "point"))
     {
     this->AttributeModeMenu->SetValue("Point Data");
-    this->AddTraceEntry("$kw(%s) ChangeAttributeMode {%s}",
+    this->GetTraceHelper()->AddEntry("$kw(%s) ChangeAttributeMode {%s}",
                         this->GetTclName(), newMode);
     }
   if (!strcmp(newMode, "cell"))
     {
     this->AttributeModeMenu->SetValue("Cell Data");
-    this->AddTraceEntry("$kw(%s) ChangeAttributeMode {%s}",
+    this->GetTraceHelper()->AddEntry("$kw(%s) ChangeAttributeMode {%s}",
                         this->GetTclName(), newMode);
     }
   
@@ -762,7 +763,7 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
 {
   int idx;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

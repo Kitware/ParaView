@@ -33,11 +33,12 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
+#include "vtkPVTraceHelper.h"
 
 #include <ctype.h>
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.48");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.49");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -94,8 +95,9 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
     e = e->GetParent();
     }
   tname << ends;
-  pvWidget->SetTraceName(tname.str());
-  pvWidget->SetTraceNameState(vtkPVWidget::Default);
+  pvWidget->GetTraceHelper()->SetObjectName(tname.str());
+  pvWidget->GetTraceHelper()->SetObjectNameState(
+    vtkPVTraceHelper::ObjectNameStateDefault);
   tname.rdbuf()->freeze(0);
   return pvWidget;
 }

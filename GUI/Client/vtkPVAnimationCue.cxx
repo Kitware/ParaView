@@ -45,6 +45,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkKWRange.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 #define VTK_PV_ANIMATON_ENTRY_HEIGHT 20
@@ -75,7 +76,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.17");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.18");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -115,8 +116,8 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->TimeLineContainer = vtkKWFrame::New();
   this->Label = vtkKWLabel::New();
   this->TimeLine = vtkPVTimeLine::New();
-  this->TimeLine->SetTraceReferenceObject(this);
-  this->TimeLine->SetTraceReferenceCommand("GetTimeLine");
+  this->TimeLine->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  this->TimeLine->GetTraceHelper()->SetReferenceCommand("GetTimeLine");
 
   this->ImageType = vtkPVAnimationCue::NONE;
   this->Image = vtkKWLabel::New();
@@ -489,10 +490,10 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->SetName(str.str());
   str.rdbuf()->freeze(0);
   
-  keyframe->SetTraceReferenceObject(this);
+  keyframe->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream sCommand;
   sCommand << "GetKeyFrame \"" << keyframe->GetName() << "\"" << ends;
-  keyframe->SetTraceReferenceCommand(sCommand.str());
+  keyframe->GetTraceHelper()->SetReferenceCommand(sCommand.str());
   sCommand.rdbuf()->freeze(0);
 
   keyframe->SetAnimationCue(this); // provide a pointer to cue, so that the interace
@@ -618,10 +619,10 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
   int selection_id = this->TimeLine->GetSelectedPoint();
   
   newFrame->SetName(oldFrame->GetName());
-  newFrame->SetTraceReferenceObject(this);
+  newFrame->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   ostrstream sCommand;
   sCommand << "GetKeyFrame \"" << newFrame->GetName() << "\"" << ends;
-  newFrame->SetTraceReferenceCommand(sCommand.str());
+  newFrame->GetTraceHelper()->SetReferenceCommand(sCommand.str());
   sCommand.rdbuf()->freeze(0);
 
   this->InitializeKeyFrameUsingCurrentState(newFrame);
@@ -1010,7 +1011,7 @@ void vtkPVAnimationCue::GetFocus()
     {
     this->GetSelfFocus();
     }
-  this->AddTraceEntry("$kw(%s) GetFocus", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) GetFocus", this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------

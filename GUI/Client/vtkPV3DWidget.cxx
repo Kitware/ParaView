@@ -29,6 +29,7 @@
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkKWEvent.h"
 #include "vtkSMProxyManager.h"
@@ -37,7 +38,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.68");
 
 //===========================================================================
 //***************************************************************************
@@ -250,7 +251,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     this->PlaceWidget();
     }
   this->SetVisibilityNoTrace(visibility);
-  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), visibility);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetVisibility %d", this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
   this->Visible = visibility;
 }

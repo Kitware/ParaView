@@ -57,12 +57,11 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-
-
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.22");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.23");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -442,7 +441,7 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
                                   threshold);
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetLODThreshold %f}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetLODThreshold %f}",
                       this->GetTclName(), threshold);
 }
 
@@ -459,7 +458,7 @@ void vtkPVLODRenderModuleUI::LODResolutionScaleCallback()
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetLODResolution %d}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetLODResolution %d}",
                       this->GetTclName(), value);
 }
 
@@ -485,7 +484,7 @@ void vtkPVLODRenderModuleUI::SetLODResolution(int value)
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetLODResolution %d}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetLODResolution %d}",
                       this->GetTclName(), value);
 }
 
@@ -521,7 +520,7 @@ void vtkPVLODRenderModuleUI::OutlineThresholdScaleCallback()
   vtkTimerLog::FormatAndMarkEvent("--- Change Outline Threshold %f.", value);
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetOutlineThreshold %f}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetOutlineThreshold %f}",
                       this->GetTclName(), value);
 }
 
@@ -545,7 +544,7 @@ void vtkPVLODRenderModuleUI::SetOutlineThreshold(float value)
   vtkTimerLog::FormatAndMarkEvent("--- Change Outline threshold %f.", value);
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetOutlineThreshold %f}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetOutlineThreshold %f}",
                       this->GetTclName(), value);
 }
 
@@ -584,7 +583,7 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
 
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d}",
+  this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d}",
                       this->GetTclName(),
                       this->RenderInterruptsEnabledCheck->GetState());
 }

@@ -25,7 +25,7 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
-#include "vtkKWTextProperty.h"
+#include "vtkPVTextProperty.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidget.h"
 #include "vtkLookupTable.h"
@@ -48,6 +48,8 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
 #include "vtkKWRange.h"
+#include "vtkTextProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkTextProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -63,7 +65,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.116");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.117");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,8 +192,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->VisitedFlag = 0;
 
-  this->TitleTextPropertyWidget = vtkKWTextProperty::New();
-  this->LabelTextPropertyWidget = vtkKWTextProperty::New();
+  this->TitleTextPropertyWidget = vtkPVTextProperty::New();
+  this->LabelTextPropertyWidget = vtkPVTextProperty::New();
 
   this->LabelTextProperty = vtkTextProperty::New();
   this->TitleTextProperty = vtkTextProperty::New();
@@ -570,9 +572,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->TitleTextPropertyWidget->SetTextProperty(
     this->TitleTextProperty);
   this->TitleTextPropertyWidget->Create(app);
-  this->TitleTextPropertyWidget->SetChangedCommand(this, "TitleTextPropertyWidgetCallback");
-  this->TitleTextPropertyWidget->SetTraceReferenceObject(this);
-  this->TitleTextPropertyWidget->SetTraceReferenceCommand(
+  this->TitleTextPropertyWidget->SetChangedCommand(
+    this, "TitleTextPropertyWidgetCallback");
+  this->TitleTextPropertyWidget->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->TitleTextPropertyWidget->GetTraceHelper()->SetReferenceCommand(
     "GetTitleTextPropertyWidget");
 
   this->Script("grid %s -row 0 -column 0 -sticky nws %s",
@@ -630,8 +634,9 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->LabelTextPropertyWidget->Create(app);
   this->LabelTextPropertyWidget->SetChangedCommand(this, 
     "LabelTextPropertyWidgetCallback");
-  this->LabelTextPropertyWidget->SetTraceReferenceObject(this);
-  this->LabelTextPropertyWidget->SetTraceReferenceCommand(
+  this->LabelTextPropertyWidget->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->LabelTextPropertyWidget->GetTraceHelper()->SetReferenceCommand(
     "GetLabelTextPropertyWidget");
 
   this->Script("grid %s -row 0 -column 0 -sticky nws %s",
@@ -941,7 +946,7 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
     str2 = new char [strlen(arrayname) + 128];
     sprintf(str2, "GetPVColorMap {%s} %d", arrayname, 
       this->NumberOfVectorComponents);
-    this->SetTraceReferenceCommand(str2);
+    this->GetTraceHelper()->SetReferenceCommand(str2);
     delete [] str2;
     }
 }
@@ -1071,7 +1076,7 @@ void vtkPVColorMap::SetArrayName(const char* str)
     char *str2;
     str2 = new char [strlen(str) + 128];
     sprintf(str2, "GetPVColorMap {%s} %d", str, this->NumberOfVectorComponents);
-    this->SetTraceReferenceCommand(str2);
+    this->GetTraceHelper()->SetReferenceCommand(str2);
     delete [] str2;
     }
   this->Modified();
@@ -1139,7 +1144,7 @@ void vtkPVColorMap::SetScalarBarTitle(const char* name)
     } 
   this->ScalarBarTitleEntry->SetValue(this->ScalarBarTitle);
   this->UpdateScalarBarTitle();
-  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarTitle {%s}", 
     this->GetTclName(), name);
   this->RenderView();
   this->Modified();
@@ -1195,7 +1200,7 @@ void vtkPVColorMap::SetScalarBarVectorTitle(const char* name)
 
     this->ScalarBarVectorTitleEntry->SetValue(name);
 
-    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
       this->GetTclName(), name);
     }
   else
@@ -1233,7 +1238,7 @@ void vtkPVColorMap::SetScalarBarVectorTitle(const char* name)
 
     this->ScalarBarVectorTitleEntry->SetValue(name);
 
-    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
       this->GetTclName(), name);
 
     this->UpdateVectorComponentMenu();
@@ -1255,7 +1260,7 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
 {
   this->ScalarBarLabelFormatEntry->SetValue(name);
   this->SetLabelFormatInternal(name);
-  this->AddTraceEntry("$kw(%s) SetScalarBarLabelFormat {%s}", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarLabelFormat {%s}", 
                       this->GetTclName(), name);
   this->RenderView();
   this->Modified();
@@ -1289,7 +1294,7 @@ void vtkPVColorMap::SetNumberOfColors(int num)
   this->NumberOfColorsScale->SetValue(num);
 
   this->SetNumberOfColorsInternal(num);
-  this->AddTraceEntry("$kw(%s) SetNumberOfColors %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetNumberOfColors %d", this->GetTclName(),
     num);
   this->UpdateMap();
   this->Modified();
@@ -1342,7 +1347,7 @@ void vtkPVColorMap::SetColorSchemeToRedBlue()
   this->SetValueRangeInternal(vr);*/
   this->SetHSVRangesInternal(hr,sr,vr);
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
   this->UpdateMap();
   this->Modified();
   this->RenderView();
@@ -1367,7 +1372,7 @@ void vtkPVColorMap::SetColorSchemeToBlueRed()
   this->SetValueRangeInternal(vr);*/
   this->SetHSVRangesInternal(hr,sr,vr);
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
   this->UpdateMap();
   this->Modified();
   this->RenderView();
@@ -1392,7 +1397,7 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
   this->SetValueRangeInternal(vr);*/
   this->SetHSVRangesInternal(hr,sr,vr);
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
   this->UpdateMap();
   this->Modified();
   this->RenderView();
@@ -1439,7 +1444,7 @@ void vtkPVColorMap::SetColorSchemeToLabBlueRed()
   this->SetValueRangeInternal(vr);*/
   this->SetHSVRangesInternal(hr,sr,vr);
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToLabBlueRed", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetColorSchemeToLabBlueRed", this->GetTclName());
   this->UpdateMap();
   this->Modified();
   this->RenderView();
@@ -1508,7 +1513,7 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
   this->SetValueRangeInternal(vr);*/
   this->SetHSVRangesInternal(hr,sr,vr);
 
-  this->AddTraceEntry("$kw(%s) SetStartHSV %g %g %g", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetStartHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
 
   this->UpdateMap();
@@ -1636,7 +1641,7 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
   //this->SetHueRangeInternal(hr);
   //this->SetSaturationRangeInternal(sr);
   //this->SetValueRangeInternal(vr);
-  this->AddTraceEntry("$kw(%s) SetEndHSV %g %g %g", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetEndHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
   this->UpdateMap();
   this->Modified();
@@ -1674,7 +1679,7 @@ void vtkPVColorMap::SetScalarRangeLock(int val)
     }
 
   // Trace.
-  this->AddTraceEntry("$kw(%s) SetScalarRangeLock %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarRangeLock %d", 
                       this->GetTclName(), val);
 }
 
@@ -1684,7 +1689,7 @@ void vtkPVColorMap::SetVectorComponent(int component)
   this->SetVectorComponentInternal(component);
   this->UpdateVectorComponentMenu();
   this->UpdateScalarBarTitle();
-  this->AddTraceEntry("$kw(%s) SetVectorComponent %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetVectorComponent %d", 
                       this->GetTclName(), component);
 }
 
@@ -1707,7 +1712,7 @@ void vtkPVColorMap::SetVectorComponentInternal(int component)
 void vtkPVColorMap::ResetScalarRange()
 {
   this->ResetScalarRangeInternal();
-  this->AddTraceEntry("$kw(%s) ResetScalarRange", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ResetScalarRange", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -1763,7 +1768,7 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     this->ScalarBarCheck->SetState(0);
     }
 
-  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
                       val);
   
   this->UpdateInternalScalarBarVisibility();
@@ -1956,7 +1961,7 @@ void vtkPVColorMap::SetVectorModeInternal(int mode)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::VectorModeMagnitudeCallback()
 {
-  this->AddTraceEntry("$kw(%s) VectorModeMagnitudeCallback", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) VectorModeMagnitudeCallback", 
                       this->GetTclName());
   this->SetVectorModeInternal(vtkLookupTable::MAGNITUDE);
   this->Script("pack forget %s",
@@ -1975,7 +1980,7 @@ void vtkPVColorMap::VectorModeComponentCallback()
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) VectorModeComponentCallback", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) VectorModeComponentCallback", 
                       this->GetTclName());
 
   this->SetVectorModeInternal(vtkLookupTable::COMPONENT);
@@ -2093,7 +2098,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
 void vtkPVColorMap::SetScalarBarPosition1(float x, float y)
 {
   this->SetPosition1Internal(x,y);
-  this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
                       this->GetTclName(), x, y);
   this->RenderView();
 }
@@ -2133,7 +2138,7 @@ void vtkPVColorMap::GetPosition1Internal(double pos[2])
 void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
 {
   this->SetPosition2Internal(x,y);
-  this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
                       this->GetTclName(), x, y);
   this->RenderView();
 }
@@ -2172,7 +2177,7 @@ void vtkPVColorMap::GetPosition2Internal(double pos[2])
 void vtkPVColorMap::SetScalarBarOrientation(int o)
 {
   this->SetOrientationInternal(o);
-  this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarOrientation %d", 
                       this->GetTclName(), o);
   this->RenderView();
 }
@@ -2256,7 +2261,7 @@ const char* vtkPVColorMap::GetLabelFormatInternal()
 void vtkPVColorMap::SetTitleColor(double r, double g, double b)
 {
   this->SetTitleColorInternal(r,g,b);
-  this->AddTraceEntry("$kw(%s) SetTitleColor %g %g %g", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleColor %g %g %g", this->GetTclName(),
                       r, g, b);
   this->Modified();
   this->RenderView();
@@ -2266,7 +2271,7 @@ void vtkPVColorMap::SetTitleColor(double r, double g, double b)
 void vtkPVColorMap::SetTitleOpacity(double opacity)
 {
   this->SetTitleOpacityInternal(opacity);
-  this->AddTraceEntry("$kw(%s) SetTitleOpacity %g ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleOpacity %g ", this->GetTclName(),
                       opacity);
   this->Modified();
   this->RenderView();
@@ -2276,7 +2281,7 @@ void vtkPVColorMap::SetTitleOpacity(double opacity)
 void vtkPVColorMap::SetTitleFontFamily(int font)
 {
   this->SetTitleFontFamilyInternal(font);
-  this->AddTraceEntry("$kw(%s) SetTitleFontFamily %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleFontFamily %d ", this->GetTclName(),
                       font);
   this->Modified();
   this->RenderView();
@@ -2286,7 +2291,7 @@ void vtkPVColorMap::SetTitleFontFamily(int font)
 void vtkPVColorMap::SetTitleBold(int bold)
 {
   this->SetTitleBoldInternal(bold);
-  this->AddTraceEntry("$kw(%s) SetTitleBold %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleBold %d ", this->GetTclName(),
                       bold);
   this->Modified();
   this->RenderView();
@@ -2296,7 +2301,7 @@ void vtkPVColorMap::SetTitleBold(int bold)
 void vtkPVColorMap::SetTitleItalic(int italic)
 {
   this->SetTitleItalicInternal(italic);
-  this->AddTraceEntry("$kw(%s) SetTitleItalic %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleItalic %d ", this->GetTclName(),
                       italic);
   this->Modified();
   this->RenderView();
@@ -2306,7 +2311,7 @@ void vtkPVColorMap::SetTitleItalic(int italic)
 void vtkPVColorMap::SetTitleShadow(int shadow)
 {
   this->SetTitleShadowInternal(shadow);
-  this->AddTraceEntry("$kw(%s) SetTitleShadow %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTitleShadow %d ", this->GetTclName(),
                       shadow);
   this->Modified();
   this->RenderView();
@@ -2402,7 +2407,7 @@ void vtkPVColorMap::SetTitleShadowInternal(int shadow)
 void vtkPVColorMap::SetLabelColor(double r, double g, double b)
 {
   this->SetLabelColorInternal(r,g,b);
-  this->AddTraceEntry("$kw(%s) SetLabelColor %g %g %g", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelColor %g %g %g", this->GetTclName(),
                       r, g, b);
   this->Modified();
   this->RenderView();
@@ -2412,7 +2417,7 @@ void vtkPVColorMap::SetLabelColor(double r, double g, double b)
 void vtkPVColorMap::SetLabelOpacity(double opacity)
 {
   this->SetLabelOpacityInternal(opacity);
-  this->AddTraceEntry("$kw(%s) SetLabelOpacity %g ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelOpacity %g ", this->GetTclName(),
                       opacity);
   this->Modified();
   this->RenderView();
@@ -2422,7 +2427,7 @@ void vtkPVColorMap::SetLabelOpacity(double opacity)
 void vtkPVColorMap::SetLabelFontFamily(int font)
 {
   this->SetLabelFontFamilyInternal(font);
-  this->AddTraceEntry("$kw(%s) SetLabelFontFamily %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelFontFamily %d ", this->GetTclName(),
                       font);
   this->Modified();
   this->RenderView();
@@ -2432,7 +2437,7 @@ void vtkPVColorMap::SetLabelFontFamily(int font)
 void vtkPVColorMap::SetLabelBold(int bold)
 {
   this->SetLabelBoldInternal(bold);
-  this->AddTraceEntry("$kw(%s) SetLabelBold %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelBold %d ", this->GetTclName(),
                       bold);
   this->Modified();
   this->RenderView();
@@ -2442,7 +2447,7 @@ void vtkPVColorMap::SetLabelBold(int bold)
 void vtkPVColorMap::SetLabelItalic(int italic)
 {
   this->SetLabelItalicInternal(italic);
-  this->AddTraceEntry("$kw(%s) SetLabelItalic %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelItalic %d ", this->GetTclName(),
                       italic);
   this->Modified();
   this->RenderView();
@@ -2452,7 +2457,7 @@ void vtkPVColorMap::SetLabelItalic(int italic)
 void vtkPVColorMap::SetLabelShadow(int shadow)
 {
   this->SetLabelShadowInternal(shadow);
-  this->AddTraceEntry("$kw(%s) SetLabelShadow %d ", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelShadow %d ", this->GetTclName(),
                       shadow);
   this->Modified();
   this->RenderView();
@@ -2575,11 +2580,11 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
       this->GetPosition1Internal(pos1);
       this->GetPosition2Internal(pos2);
       
-      this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
+      this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
                           this->GetTclName(), pos1[0], pos1[1]);
-      this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
+      this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
                           this->GetTclName(), pos2[0], pos2[1]);
-      this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
+      this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarOrientation %d",
                           this->GetTclName(), this->GetOrientationInternal());
       break;
     }
@@ -2798,7 +2803,7 @@ void vtkPVColorMap::SetScalarRange(double min, double max)
     return;
     }
   this->SetScalarRangeInternal(min, max);
-  this->AddTraceEntry("$kw(%s) SetScalarRange %g %g", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarRange %g %g", this->GetTclName(),
                       min, max);
 }
 

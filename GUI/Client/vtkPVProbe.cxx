@@ -31,12 +31,13 @@
 #include "vtkSMPlotDisplay.h"
 #include "vtkPVRenderModule.h"
 #include "vtkCommand.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138");
+vtkCxxRevisionMacro(vtkPVProbe, "1.139");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -211,11 +212,11 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
       vtkXYPlotActor* xypa = this->XYPlotWidget->GetXYPlotActor();
       double *pos1 = xypa->GetPositionCoordinate()->GetValue();
       double *pos2 = xypa->GetPosition2Coordinate()->GetValue();
-      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
+      //this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
       //                    this->GetTclName(), pos1[0], pos1[1]);
-      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
+      //this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
       //                    this->GetTclName(), pos2[0], pos2[1]);
-      //this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
+      //this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarBarOrientation %d",
       //                    this->GetTclName(), sact->GetOrientation());
 
       // Synchronize the server scalar bar.
@@ -248,7 +249,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 //----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallbackInternal()
 {
-  this->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
+  this->GetTraceHelper()->AddEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
                       this->GetTclName(),
                       this->ShowXYPlotToggle->GetState());
   

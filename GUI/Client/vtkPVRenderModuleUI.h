@@ -20,16 +20,16 @@
 #ifndef __vtkPVRenderModuleUI_h
 #define __vtkPVRenderModuleUI_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkPVApplication;
 class vtkPVRenderModule;
 
-class VTK_EXPORT vtkPVRenderModuleUI : public vtkKWWidget
+class VTK_EXPORT vtkPVRenderModuleUI : public vtkPVTracedWidget
 {
 public:
   static vtkPVRenderModuleUI* New();
-  vtkTypeRevisionMacro(vtkPVRenderModuleUI,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVRenderModuleUI,vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
       
   // Description:

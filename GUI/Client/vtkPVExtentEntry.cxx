@@ -36,10 +36,11 @@
 #include "vtkSMExtentDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -170,11 +171,14 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
   // For getting the widget in a script.
 
   if (this->Label && this->Label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(this->Label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(this->Label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   this->LabeledFrame->Create(pvApp, 0);
@@ -270,7 +274,7 @@ void vtkPVExtentEntry::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -279,7 +283,7 @@ void vtkPVExtentEntry::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -397,7 +401,7 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   cascadeMenu = vtkKWMenu::New();
   cascadeMenu->SetParent(menu);
   cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
-  menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
+  menu->AddCascade(this->GetTraceHelper()->GetObjectName(), cascadeMenu, 0,
                              "Choose a plane of the extent to animate.");  
   // i min
   sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName());
@@ -444,22 +448,22 @@ void vtkPVExtentEntry::ResetAnimationRange(
   switch (mode)
     {
     case 0:
-      ai->SetLabelAndScript("I Min", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("I Min", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     case 1:
-      ai->SetLabelAndScript("I Max", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("I Max", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     case 2:
-      ai->SetLabelAndScript("J Min", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("J Min", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     case 3:
-      ai->SetLabelAndScript("J Max", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("J Max", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     case 4:
-      ai->SetLabelAndScript("K Min", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("K Min", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     case 5:
-      ai->SetLabelAndScript("K Max", NULL, this->GetTraceName());
+      ai->SetLabelAndScript("K Max", NULL, this->GetTraceHelper()->GetObjectName());
       break;
     default:
       vtkErrorMacro("Bad animation extent");
@@ -482,9 +486,9 @@ void vtkPVExtentEntry::ResetAnimationRange(
 void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int mode)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
       this->GetTclName(), ai->GetTclName(), mode);
     }
 

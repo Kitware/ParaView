@@ -93,6 +93,7 @@
 #include "vtkVectorIterator.txx"
 #include "vtkImageClip.h"
 #include "vtkStdString.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkCamera.h"
 #include "vtkPVProcessModule.h"
@@ -109,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.18");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1527,7 +1528,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
     return;
     }
 
- // this->AddTraceEntry("$kw(%s) CreateLookmark",
+ // this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark",
  //                     this->GetTclName());
 
   // what if the main window is not maximized in screen? 
@@ -3182,7 +3183,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
       for (i = 0; i < reader->GetWidgets()->GetNumberOfItems(); i++)
         {
         pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-        if(strstr(ptr,pvWidget->GetTraceName()))
+        if(strstr(ptr,pvWidget->GetTraceHelper()->GetObjectName()))
           {
           if((scale = vtkPVScale::SafeDownCast(pvWidget)) && useDatasetFlag==1)
             {

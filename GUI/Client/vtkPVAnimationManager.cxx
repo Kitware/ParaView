@@ -55,13 +55,14 @@
 #include "vtkPVWidget.h"
 #include <vtkstd/map>
 #include <vtkstd/string>
+#include "vtkPVTraceHelper.h"
 
 #include <kwsys/SystemTools.hxx>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.26");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.27");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -110,17 +111,23 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->HorizantalParent = NULL;
   this->VerticalParent = NULL;
   this->VAnimationInterface = vtkPVVerticalAnimationInterface::New();
-  this->VAnimationInterface->SetTraceReferenceObject(this);
-  this->VAnimationInterface->SetTraceReferenceCommand("GetVAnimationInterface");
+  this->VAnimationInterface->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->VAnimationInterface->GetTraceHelper()->SetReferenceCommand(
+    "GetVAnimationInterface");
   
   this->HAnimationInterface = vtkPVHorizontalAnimationInterface::New();
-  this->HAnimationInterface->SetTraceReferenceObject(this);
-  this->HAnimationInterface->SetTraceReferenceCommand("GetHAnimationInterface");
+  this->HAnimationInterface->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->HAnimationInterface->GetTraceHelper()->SetReferenceCommand(
+    "GetHAnimationInterface");
   
   
   this->AnimationScene = vtkPVAnimationScene::New();
-  this->AnimationScene->SetTraceReferenceObject(this);
-  this->AnimationScene->SetTraceReferenceCommand("GetAnimationScene");
+  this->AnimationScene->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->AnimationScene->GetTraceHelper()->SetReferenceCommand(
+    "GetAnimationScene");
 
   this->ProxyIterator = vtkSMProxyIterator::New();
   this->Internals = new vtkPVAnimationManagerInternals;
@@ -249,7 +256,7 @@ void vtkPVAnimationManager::Update()
   this->ValidateAndAddSpecialCues();
 
   //1) validate if any of the old sources have disappeared.
-  this->ValidateOldSources();
+  this->ValidateOldSources(); 
   //2) add any new sources.
   this->AddNewSources();
   this->HAnimationInterface->GetParentTree()->UpdateCueVisibility(
@@ -911,7 +918,7 @@ void vtkPVAnimationManager::SetCurrentTime(double ntime)
     {
     this->AnimationScene->SetNormalizedCurrentTime(ntime);
     }
-  this->AddTraceEntry("$kw(%s) SetCurrentTime %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTime %f",
     this->GetTclName(), ntime);
 }
 

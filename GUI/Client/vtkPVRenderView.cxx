@@ -75,6 +75,7 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
 #include "vtkPVOptions.h"
+#include "vtkPVTraceHelper.h"
 
 
 #ifdef _WIN32
@@ -131,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.358");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -282,7 +283,7 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registry)
     return;
     }
   
-  this->AddTraceEntry("$kw(%s) ShowNavigationWindowCallback %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ShowNavigationWindowCallback %d",
                       this->GetTclName(), registry);
   
   this->Script("catch {eval pack forget [pack slaves %s]}",
@@ -310,7 +311,7 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
     return;
     }
   
-  this->AddTraceEntry("$kw(%s) ShowSelectionWindowCallback %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ShowSelectionWindowCallback %d",
                       this->GetTclName(), registry);
   
   this->Script("catch {eval pack forget [pack slaves %s]}",
@@ -788,8 +789,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // For initializing the trace of the notebook.
   // Do we really need this?
-  this->GetSourceParent()->SetTraceReferenceObject(this);
-  this->GetSourceParent()->SetTraceReferenceCommand("GetParametersParent");
+  //this->GetSourceParent()->GetTraceHelper()->SetReferenceObject(this);
+  //this->GetSourceParent()->GetTraceHelper()->SetReferenceCommand("GetParametersParent");
 
   this->EventuallyRender();
   delete [] local;
@@ -1006,8 +1007,10 @@ void vtkPVRenderView::CreateViewProperties()
     this->RenderModuleUI->SetRenderModule(pm->GetRenderModule());
     this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
     this->RenderModuleUI->Create(this->GetApplication(),0);
-    this->RenderModuleUI->SetTraceReferenceObject(this);
-    this->RenderModuleUI->SetTraceReferenceCommand("GetRenderModuleUI");
+    this->RenderModuleUI->GetTraceHelper()->SetReferenceHelper(
+      this->GetTraceHelper());
+    this->RenderModuleUI->GetTraceHelper()->SetReferenceCommand(
+      "GetRenderModuleUI");
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
       this->RenderModuleUI->GetWidgetName());
     // Disable compositing if the server does not support remote rendering.
@@ -1301,14 +1304,18 @@ void vtkPVRenderView::CreateViewProperties()
   this->ManipulatorControl2D->SetParent(frame->GetFrame());
   this->ManipulatorControl2D->Create(pvapp, 0);
   this->ManipulatorControl2D->SetLabel("2D Movements");
-  this->ManipulatorControl2D->SetTraceReferenceObject(this);
-  this->ManipulatorControl2D->SetTraceReferenceCommand("GetManipulatorControl2D");
+  this->ManipulatorControl2D->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->ManipulatorControl2D->GetTraceHelper()->SetReferenceCommand(
+    "GetManipulatorControl2D");
   
   this->ManipulatorControl3D->SetParent(frame->GetFrame());
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
-  this->ManipulatorControl3D->SetTraceReferenceObject(this);
-  this->ManipulatorControl3D->SetTraceReferenceCommand("GetManipulatorControl3D");
+  this->ManipulatorControl3D->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->ManipulatorControl3D->GetTraceHelper()->SetReferenceCommand(
+    "GetManipulatorControl3D");
   
   // Camera: camera control frame
 
@@ -1323,8 +1330,10 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraControl->Create(this->GetApplication(), 0);
   this->CameraControl->SetInteractorStyle(this->GetPVWindow()->GetCenterOfRotationStyle());
   this->CameraControl->SetRenderView(this);
-  this->CameraControl->SetTraceReferenceObject(this);
-  this->CameraControl->SetTraceReferenceCommand("GetCameraControl");
+  this->CameraControl->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->CameraControl->GetTraceHelper()->SetReferenceCommand(
+    "GetCameraControl");
   
   this->Script("pack %s -side top -fill x -expand y", this->CameraControl->GetWidgetName());
   
@@ -1345,7 +1354,7 @@ void vtkPVRenderView::CreateViewProperties()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
 {
-  this->AddTraceEntry("$kw(%s) StandardViewCallback %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) StandardViewCallback %f %f %f",
                       this->GetTclName(), x, y, z);
   
   vtkCamera *cam = this->GetRenderer()->GetActiveCamera();
@@ -1404,7 +1413,7 @@ void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
   this->RendererBackgroundColor->SetColor(r, g, b);
   // Since setting the color of the button from a script does
   // not invoke the callback, We also trace the view.
-  this->AddTraceEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
   pvApp->GetProcessModule()->GetRenderModule()->SetBackgroundColor(r, g, b);
   this->EventuallyRender();
@@ -1468,7 +1477,7 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
   vtkCamera *cam; 
   
   // This is to trace effects of loaded scripts. 
-  this->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f", 
     this->GetTclName(), p0, p1, p2, fp0, fp1, fp2, up0, up1, up2); 
   
@@ -1483,7 +1492,7 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetCameraParallelScale(float scale)
 {
-  this->AddTraceEntry("$kw(%s) SetCameraParallelScale %.3f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCameraParallelScale %.3f",
                       this->GetTclName(), scale);
   
   this->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
@@ -1703,7 +1712,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
   vtkPVApplication *pvApp;
   int numParts, partIdx;
 
-  this->AddTraceEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
                       state);
 
   if (this->TriangleStripsCheck->GetState() != state)
@@ -1747,7 +1756,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ParallelProjectionOn()
 {
-  this->AddTraceEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
 
   if (!this->ParallelProjectionCheck->GetState())
     {
@@ -1760,7 +1769,7 @@ void vtkPVRenderView::ParallelProjectionOn()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ParallelProjectionOff()
 {
-  this->AddTraceEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
   if (this->ParallelProjectionCheck->GetState())
     {
     this->ParallelProjectionCheck->SetState(0);
@@ -1808,7 +1817,7 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   vtkPVSource *pvs;
   int partIdx, numParts;
 
-  this->AddTraceEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
                       state);
 
   if (this->ImmediateModeCheck->GetState() != state)
@@ -2253,7 +2262,7 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 {
   if (this->OrientationAxesCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetOrientationAxesVisibility %d",
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesVisibility %d",
                         this->GetTclName(), val);
     this->OrientationAxesCheck->SetState(val);
     }
@@ -2275,7 +2284,7 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 void vtkPVRenderView::OrientationAxesCheckCallback()
 {
   int val = this->OrientationAxesCheck->GetState();
-  this->AddTraceEntry("$kw(%s) SetOrientationAxesVisibility %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesVisibility %d",
                       this->GetTclName(), val);
   this->SetOrientationAxesVisibility(val);
   
@@ -2289,7 +2298,7 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 {
   if (this->OrientationAxesInteractiveCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetOrientationAxesInteractivity %d",
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesInteractivity %d",
                         this->GetTclName(), val);
     this->OrientationAxesInteractiveCheck->SetState(val);
     }
@@ -2301,7 +2310,7 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 void vtkPVRenderView::OrientationAxesInteractiveCallback()
 {
   int val = this->OrientationAxesInteractiveCheck->GetState();
-  this->AddTraceEntry("$kw(%s) SetOrientationAxesInteractivity %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesInteractivity %d",
                       this->GetTclName(), val);
   this->SetOrientationAxesInteractivity(val);
   this->GetApplication()->SetRegistryValue(2, "RunTime",
@@ -2317,7 +2326,7 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
     {
     this->OrientationAxesOutlineColor->SetColor(r, g, b);
     }
-  this->AddTraceEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
                       this->GetTclName(), r, g, b);
   this->OrientationAxes->SetOutlineColor(r, g, b);
   this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
@@ -2332,7 +2341,7 @@ void vtkPVRenderView::SetOrientationAxesTextColor(double r, double g, double b)
     {
     this->OrientationAxesTextColor->SetColor(r, g, b);
     }
-  this->AddTraceEntry("$kw(%s) SetOrientationAxesTextColor %lf %lf %lf",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesTextColor %lf %lf %lf",
                       this->GetTclName(), r, g, b);
   this->OrientationAxes->SetAxisLabelColor(r, g, b);
   this->GetPVWindow()->SaveColor(2, "OrientationAxesText",

@@ -199,13 +199,7 @@ public:
   vtkBooleanMacro(WidgetVisibility, int);
   
   // Description:
-  // This can be used to trace the application.
-  // Look at vtkKWWidgets to see how it is used.
-  ofstream *GetTraceFile() {return this->TraceFile;}
-  virtual void AddSimpleTraceEntry(const char* trace);
-  //BTX
-  virtual void AddTraceEntry(const char* format, ...);
-  //ETX
+  // Get application key
   virtual int GetApplicationKey() {return -1;};
 
   //BTX
@@ -395,8 +389,6 @@ protected:
   int ExitStatus;
   int LimitedEditionMode;
   char *LimitedEditionModeName;
-
-  ofstream *TraceFile;
 
   vtkKWRegistryUtilities *Registry;
   int RegistryLevel;

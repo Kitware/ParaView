@@ -29,10 +29,11 @@
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.46");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -146,11 +147,14 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 
   const char* label = this->MinLabel->GetText();
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   this->MinFrame->Create(pvApp, "frame", "");
@@ -282,7 +286,7 @@ void vtkPVMinMax::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -291,7 +295,7 @@ void vtkPVMinMax::Accept()
 //---------------------------------------------------------------------------
 void vtkPVMinMax::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -338,7 +342,7 @@ void vtkPVMinMax::ResetInternal()
         vtkErrorMacro(
           "Could not find property of name: "
           << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-          << " for widget: " << this->GetTraceName());
+          << " for widget: " << this->GetTraceHelper()->GetObjectName());
         }
       }
     }

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.86");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.87");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -347,8 +347,6 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->ShowLabelOn();
   this->TextPropertyWidget->Create(app);
   this->TextPropertyWidget->GetLabel()->SetText("Text properties:");
-  this->TextPropertyWidget->SetTraceReferenceObject(this);
-  this->TextPropertyWidget->SetTraceReferenceCommand("GetTextPropertyWidget");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
@@ -467,7 +465,6 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
     this->Update();
     this->Render();
     this->SendChangedEvent();
-    this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), state);
     }
 }
 
@@ -481,7 +478,7 @@ void vtkKWCornerAnnotation::CheckButtonCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetMaximumLineHeightNoTrace(float v)
+void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
 {
   if (!this->CornerAnnotation ||
       this->CornerAnnotation->GetMaximumLineHeight() == v)
@@ -502,19 +499,11 @@ void vtkKWCornerAnnotation::SetMaximumLineHeightNoTrace(float v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
-{
-  this->SetMaximumLineHeightNoTrace(v);
-  this->AddTraceEntry(
-    "$kw(%s) SetMaximumLineHeight %f", this->GetTclName(), v);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::MaximumLineHeightCallback()
 {
   if (this->IsCreated() && this->MaximumLineHeightScale)
     {
-    this->SetMaximumLineHeightNoTrace(
+    this->SetMaximumLineHeight(
       this->MaximumLineHeightScale->GetValue());
     }
 }
@@ -594,9 +583,6 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
       }
 
     this->SendChangedEvent();
-
-    this->AddTraceEntry("$kw(%s) SetCornerText {%s} %d", 
-                        this->GetTclName(), text, corner);
     }
 }
 

@@ -44,10 +44,11 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 #include "vtkPVWindow.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -361,7 +362,7 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
   double val[3];
   int cc;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -543,11 +544,14 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   // Now that the 3D widget is on each process,
   // we do not need to create our own plane (but it does not hurt).
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-      this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+      this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("Plane");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("Plane");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   this->SetFrameLabel("Plane Widget");
@@ -834,7 +838,7 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
 void vtkPVImplicitPlaneWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x,y,z);
-  this->AddTraceEntry("$kw(%s) SetCenter %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCenter %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
@@ -881,7 +885,7 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
 void vtkPVImplicitPlaneWidget::SetNormal(double x, double y, double z)
 {
   this->SetNormalInternal(x, y, z);
-  this->AddTraceEntry("$kw(%s) SetNormal %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetNormal %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
@@ -1188,9 +1192,9 @@ void vtkPVImplicitPlaneWidget::ResetAnimationRange(
 void vtkPVImplicitPlaneWidget::AnimationMenuCallback(
   vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
                         this->GetTclName(), ai->GetTclName());
     }
 
@@ -1201,7 +1205,8 @@ void vtkPVImplicitPlaneWidget::AnimationMenuCallback(
   ai->SetResetRangeButtonState(1);
   ai->UpdateEnableState();
 
-  ai->SetLabelAndScript("Offset", NULL, this->GetTraceName());
+  ai->SetLabelAndScript(
+    "Offset", NULL, this->GetTraceHelper()->GetObjectName());
   
   vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
   vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(

@@ -28,10 +28,11 @@
 #include "vtkPVSource.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.27");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -161,7 +162,7 @@ void vtkPVExtractPartsWidget::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     return;
     }
   
@@ -189,7 +190,7 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
 
-  if ( ! this->InitializeTrace(file) || !ivp)
+  if ( ! this->GetTraceHelper()->Initialize(file) || !ivp)
     {
     return;
     }

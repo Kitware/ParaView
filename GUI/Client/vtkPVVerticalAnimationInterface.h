@@ -19,7 +19,7 @@
 #ifndef __vtkPVVerticalAnimationInterface_h
 #define __vtkPVVerticalAnimationInterface_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWFrame;
 class vtkKWFrameLabeled;
@@ -32,11 +32,11 @@ class vtkKWCheckButton;
 class vtkPVKeyFrame;
 class vtkPVAnimationManager;
 class vtkKWScale;
-class VTK_EXPORT vtkPVVerticalAnimationInterface : public vtkKWWidget
+class VTK_EXPORT vtkPVVerticalAnimationInterface : public vtkPVTracedWidget
 {
 public:
   static vtkPVVerticalAnimationInterface* New();
-  vtkTypeRevisionMacro(vtkPVVerticalAnimationInterface, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVVerticalAnimationInterface, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

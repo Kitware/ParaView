@@ -30,9 +30,10 @@
 #include "vtkPVAnimationManager.h"
 #include "vtkPVTimeLine.h"
 #include "vtkKWParameterValueFunctionEditor.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.13");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -44,8 +45,9 @@ vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
   this->AnimationEntries = vtkCollection::New();
   this->AnimationEntriesIterator = this->AnimationEntries->NewIterator();
   this->ParentTree = vtkPVAnimationCueTree::New();
-  this->ParentTree->SetTraceReferenceObject(this);
-  this->ParentTree->SetTraceReferenceCommand("GetParentTree");
+  this->ParentTree->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->ParentTree->GetTraceHelper()->SetReferenceCommand("GetParentTree");
 }
 
 //-----------------------------------------------------------------------------

@@ -35,10 +35,11 @@
 #include "vtkStringList.h"
 #include "vtkCollectionIterator.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.4");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.5");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -278,7 +279,7 @@ void vtkPVSelectArrays::Trace(ofstream *file)
   int num, idx, state;
   const char* arrayName;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

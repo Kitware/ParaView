@@ -59,7 +59,7 @@
 #ifndef __vtkPVAnimationManager_h
 #define __vtkPVAnimationManager_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkPVVerticalAnimationInterface;
 class vtkPVHorizontalAnimationInterface;
@@ -74,11 +74,11 @@ class vtkPVSource;
 class vtkPVKeyFrame;
 class vtkSMStringVectorProperty;
 
-class VTK_EXPORT vtkPVAnimationManager : public vtkKWWidget
+class VTK_EXPORT vtkPVAnimationManager : public vtkPVTracedWidget
 {
 public:
   static vtkPVAnimationManager* New();
-  vtkTypeRevisionMacro(vtkPVAnimationManager, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationManager, vtkPVTracedWidget);
   void PrintSelf(ostream& os ,vtkIndent indent);
 
   virtual void Create(vtkKWApplication* app, const char* args);

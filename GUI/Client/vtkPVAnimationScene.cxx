@@ -56,6 +56,7 @@
 #include "vtkErrorCode.h"
 #include "vtkPVVCRControl.h"
 #include "vtkKWToolbarSet.h"
+#include "vtkPVTraceHelper.h"
 
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
@@ -68,7 +69,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.23");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -499,7 +500,7 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
     this->MovieWriter->Start();
     }
  
-  this->AddTraceEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %d", this->GetTclName(),
     fileRoot, ext, width, height, aspectRatio);
 
   // Play the animation.
@@ -556,7 +557,7 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) SaveGeometry %s", this->GetTclName(), filename);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveGeometry %s", this->GetTclName(), filename);
 
   this->GeometryWriter = animWriter;
 
@@ -761,7 +762,7 @@ void vtkPVAnimationScene::SetDuration(double duration)
   this->TimeScale->SetRange(0, duration);
   this->TimeScale->SetValue(duration*ntime);
   this->InvalidateAllGeometries();
-  this->AddTraceEntry("$kw(%s) SetDuration %f", this->GetTclName(), duration);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetDuration %f", this->GetTclName(), duration);
 }
 
 //-----------------------------------------------------------------------------
@@ -787,7 +788,7 @@ void vtkPVAnimationScene::Play()
   this->VCRControl->UpdateEnableState();
   this->VCRToolbar->SetInPlay(0);
   this->VCRToolbar->UpdateEnableState();
-  this->AddTraceEntry("$kw(%s) Play", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) Play", this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------
@@ -798,7 +799,7 @@ void vtkPVAnimationScene::Stop()
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
-  this->AddTraceEntry("$kw(%s) Stop", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) Stop", this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------
@@ -866,7 +867,7 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
     return;
     }
   this->AnimationSceneProxy->SetPlayMode(mode);
-  this->AddTraceEntry("$kw(%s) SetPlayMode %d", this->GetTclName(), mode);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", this->GetTclName(), mode);
 }
 
 //-----------------------------------------------------------------------------
@@ -917,7 +918,7 @@ void vtkPVAnimationScene::RecordCheckCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::StartRecording()
 {
-  this->AddTraceEntry("$kw(%s) StartRecording", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) StartRecording", this->GetTclName());
   this->AnimationManager->StartRecording();
   this->VCRToolbar->SetRecordCheckButtonState(1);
   this->VCRControl->SetRecordCheckButtonState(1);
@@ -933,13 +934,13 @@ void vtkPVAnimationScene::StopRecording()
   this->VCRControl->SetRecordCheckButtonState(0);
   this->VCRControl->UpdateEnableState();
   this->VCRToolbar->UpdateEnableState();
-  this->AddTraceEntry("$kw(%s) StopRecording", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) StopRecording", this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::RecordState()
 {
-  this->AddTraceEntry("$kw(%s) RecordState", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) RecordState", this->GetTclName());
   this->AnimationManager->RecordState();
 }
 
@@ -963,7 +964,7 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
   this->AnimationSceneProxy->SetFrameRate(fps);
   this->FrameRateThumbWheel->SetValue(fps);
   this->InvalidateAllGeometries();
-  this->AddTraceEntry("$kw(%s) SetFrameRate %f", this->GetTclName(), fps);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", this->GetTclName(), fps);
 }
 
 //-----------------------------------------------------------------------------
@@ -996,7 +997,7 @@ void vtkPVAnimationScene::SetLoop(int loop)
   this->VCRControl->SetLoopButtonState(loop);
   this->VCRToolbar->SetLoopButtonState(loop);
   this->AnimationSceneProxy->SetLoop(loop);
-  this->AddTraceEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
 }
 
 //-----------------------------------------------------------------------------
@@ -1019,7 +1020,7 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
-  this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------

@@ -25,9 +25,10 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 #include "vtkCommand.h"
 #include "vtkKWEvent.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.11");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -134,8 +135,8 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
     str << "GetChild \"" << child->GetName() << "\"" << ends;
     }
   
-  child->SetTraceReferenceObject(this);
-  child->SetTraceReferenceCommand(str.str());
+  child->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  child->GetTraceHelper()->SetReferenceCommand(str.str());
   child->SetParentAnimationCue(this);
   str.rdbuf()->freeze(0);
   child->Create(this->GetApplication(), "-relief flat");
@@ -360,9 +361,9 @@ void vtkPVAnimationCueTree::ExecuteEvent(vtkObject* wdg, unsigned long event, vo
     double parameter[2];
     this->TimeLine->GetVisibleParameterRange(parameter);
     this->Zoom(parameter);
-    this->AddTraceEntry("$kw(%s) Zoom %f %f",
+    this->GetTraceHelper()->AddEntry("$kw(%s) Zoom %f %f",
       this->GetTclName(), parameter[0], parameter[1]);
-    this->AddTraceEntry("update");
+    this->GetTraceHelper()->AddEntry("update");
     }
   this->Superclass::ExecuteEvent(wdg, event, calldata);
 }
@@ -403,7 +404,7 @@ void vtkPVAnimationCueTree::SetExpanded(int expand)
     }
   this->Script("update; event generate %s <<ResizeEvent>>",
     this->GetWidgetName());
-  this->AddTraceEntry("$kw(%s) SetExpanded %d", this->GetTclName(), expand);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetExpanded %d", this->GetTclName(), expand);
 }
 
 //-----------------------------------------------------------------------------

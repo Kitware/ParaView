@@ -19,7 +19,7 @@
 #ifndef __vtkPVKeyFrame_h
 #define __vtkPVKeyFrame_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 class vtkSMKeyFrameProxy;
 class vtkKWThumbWheel;
 class vtkPVWidget;
@@ -29,10 +29,10 @@ class vtkPVKeyFrameObserver;
 class vtkPVAnimationCue;
 class vtkSMProperty;
 
-class VTK_EXPORT vtkPVKeyFrame : public vtkKWWidget
+class VTK_EXPORT vtkPVKeyFrame : public vtkPVTracedWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkPVKeyFrame, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVKeyFrame, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication* app, const char* args);

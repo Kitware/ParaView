@@ -20,9 +20,10 @@
 #include "vtkKWEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkSMExponentialKeyFrameProxy.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.4");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
@@ -137,7 +138,7 @@ void vtkPVExponentialKeyFrame::SetBase(double base)
 {
   vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetBase(base);
-  this->AddTraceEntry("$kw(%s) SetBase %f", this->GetTclName(), base);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetBase %f", this->GetTclName(), base);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +153,7 @@ void vtkPVExponentialKeyFrame::SetStartPower(double p)
 { 
   vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetStartPower(p);
-  this->AddTraceEntry("$kw(%s) SetStartPower %f", this->GetTclName(), p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetStartPower %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +168,7 @@ void vtkPVExponentialKeyFrame::SetEndPower(double p)
 {
   vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
     SetEndPower(p);
-  this->AddTraceEntry("$kw(%s) SetEndPower %f", this->GetTclName(), p);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetEndPower %f", this->GetTclName(), p);
 }
 
 //-----------------------------------------------------------------------------

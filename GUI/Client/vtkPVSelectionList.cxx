@@ -23,10 +23,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkStringList.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.54");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.55");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -166,11 +167,14 @@ void vtkPVSelectionList::SetLabel(const char* label)
   this->Label->SetText(label);
 
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
   
@@ -235,7 +239,7 @@ void vtkPVSelectionList::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
   
   this->Superclass::Accept();
@@ -245,7 +249,7 @@ void vtkPVSelectionList::Accept()
 //---------------------------------------------------------------------------
 void vtkPVSelectionList::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

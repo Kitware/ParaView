@@ -22,10 +22,11 @@
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.35");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -136,7 +137,7 @@ void vtkPVLabeledToggle::Disable()
 //---------------------------------------------------------------------------
 void vtkPVLabeledToggle::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -176,7 +177,7 @@ void vtkPVLabeledToggle::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -221,11 +222,14 @@ void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone,
     pvlt->Label->SetText(label);
 
     if (label && label[0] &&
-        (pvlt->TraceNameState == vtkPVWidget::Uninitialized ||
-         pvlt->TraceNameState == vtkPVWidget::Default) )
+        (pvlt->GetTraceHelper()->GetObjectNameState() == 
+         vtkPVTraceHelper::ObjectNameStateUninitialized ||
+         pvlt->GetTraceHelper()->GetObjectNameState() == 
+         vtkPVTraceHelper::ObjectNameStateDefault) )
       {
-      pvlt->SetTraceName(label);
-      pvlt->SetTraceNameState(vtkPVWidget::SelfInitialized);
+      pvlt->GetTraceHelper()->SetObjectName(label);
+      pvlt->GetTraceHelper()->SetObjectNameState(
+        vtkPVTraceHelper::ObjectNameStateSelfInitialized);
       }
     }
   else 
@@ -248,7 +252,7 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->Label->SetText(this->TraceName);
+    this->Label->SetText(this->GetTraceHelper()->GetObjectName());
     }
 
   return 1;
@@ -259,11 +263,14 @@ void vtkPVLabeledToggle::SetLabel(const char *str)
 {
   this->Label->SetText(str); 
   if (str && str[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(str);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(str);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 

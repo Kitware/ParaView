@@ -34,10 +34,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.71");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.72");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -78,11 +79,14 @@ void vtkPVArrayMenu::SetLabel(const char* label)
 {
   this->Label->SetText(label);
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 
@@ -193,7 +197,7 @@ void vtkPVArrayMenu::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -202,7 +206,7 @@ void vtkPVArrayMenu::Accept()
 //---------------------------------------------------------------------------
 void vtkPVArrayMenu::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }

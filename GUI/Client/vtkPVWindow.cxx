@@ -24,6 +24,7 @@
 #include "vtkImageData.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -96,6 +97,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkPVAnimationManager.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
 #ifdef PARAVIEW_USE_LOOKMARKS
@@ -136,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678");
+vtkCxxRevisionMacro(vtkPVWindow, "1.679");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -164,6 +166,9 @@ vtkPVWindow::vtkPVWindow()
 
   this->CommandFunction = vtkPVWindowCommand;
   this->ModifiedEnableState = 0;
+
+  this->TraceHelper = vtkPVTraceHelper::New();
+  this->TraceHelper->SetObject(this);
 
   // ParaView specific menus:
   // SelectMenu   -> used to select existing data objects
@@ -220,16 +225,26 @@ vtkPVWindow::vtkPVWindow()
 
   this->CurrentPVSource = NULL;
 
+#if 0
+  this->AnimationManager = NULL;
+  this->AnimationInterface = NULL;
+#else
   this->AnimationManager = vtkPVAnimationManager::New();
-  this->AnimationManager->SetTraceReferenceObject(this);
-  this->AnimationManager->SetTraceReferenceCommand("GetAnimationManager");
+  this->AnimationManager->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->AnimationManager->GetTraceHelper()->SetReferenceCommand(
+    "GetAnimationManager");
   this->AnimationManager->SetApplication(this->GetApplication());
-  
+
   // Frame used for animations.
+
   this->AnimationInterface = vtkPVAnimationInterface::New();
-  this->AnimationInterface->SetTraceReferenceObject(this);
-  this->AnimationInterface->SetTraceReferenceCommand("GetAnimationInterface");
+  this->AnimationInterface->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->AnimationInterface->GetTraceHelper()->SetReferenceCommand(
+    "GetAnimationInterface");
   this->AnimationInterface->SetApplication(this->GetApplication());
+#endif
 
   this->LowerToolbars = vtkKWToolbarSet::New();
   
@@ -373,8 +388,11 @@ vtkPVWindow::~vtkPVWindow()
   this->TranslateCameraButton->Delete();
   this->TranslateCameraButton = NULL;
 
-  this->SourceLists->Delete();
-  this->SourceLists = 0;
+  if (this->SourceLists)
+    {
+    this->SourceLists->Delete();
+    this->SourceLists = 0;
+    }
   
   this->ToolbarButtons->Delete();
   this->ToolbarButtons = 0;
@@ -436,14 +454,19 @@ vtkPVWindow::~vtkPVWindow()
     this->CenterAxesProxy = 0;
     }
 
-  #ifdef PARAVIEW_USE_LOOKMARKS
+#ifdef PARAVIEW_USE_LOOKMARKS
   if(this->PVLookmarkManager)
     {
     this->PVLookmarkManager->Delete();
     this->PVLookmarkManager = NULL;
     }
-  #endif
+#endif
 
+  if (this->TraceHelper)
+    {
+    this->TraceHelper->Delete();
+    this->TraceHelper = NULL;
+    }
 }
 
 
@@ -725,6 +748,18 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->LowerToolbars->Delete();
     this->LowerToolbars = NULL;
+    }
+
+  if (this->SourceLists)
+    {
+    this->SourceLists->Delete();
+    this->SourceLists = 0;
+    }
+
+  if (this->TraceHelper)
+    {
+    this->TraceHelper->Delete();
+    this->TraceHelper = NULL;
     }
 }
 
@@ -1443,16 +1478,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                wname, tname);
 
   // Interface for the animation tool.
-  this->AnimationInterface->SetWindow(this);
-  this->AnimationInterface->SetView(this->GetMainView());
-  this->AnimationInterface->SetParent(this->GetPropertiesParent());
-  this->AnimationInterface->Create(app, "-relief flat");
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->SetWindow(this);
+    this->AnimationInterface->SetView(this->GetMainView());
+    this->AnimationInterface->SetParent(this->GetPropertiesParent());
+    this->AnimationInterface->Create(app, "-relief flat");
+    }
 
-  this->AnimationManager->SetParent(this);
-  this->AnimationManager->SetHorizantalParent(this->LowerFrame->GetFrame2());
-  this->AnimationManager->SetVerticalParent(this->GetPropertiesParent());
-  this->AnimationManager->Create(app, "-relief flat");
-  this->AnimationManager->ShowHAnimationInterface();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->SetParent(this);
+    this->AnimationManager->SetHorizantalParent(this->LowerFrame->GetFrame2());
+    this->AnimationManager->SetVerticalParent(this->GetPropertiesParent());
+    this->AnimationManager->Create(app, "-relief flat");
+    this->AnimationManager->ShowHAnimationInterface();
+    }
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
@@ -1480,10 +1521,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       pvs->IsPermanentOn();
       pvs->Accept(1);
-      pvs->SetTraceReferenceObject(this);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
       s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-      pvs->SetTraceReferenceCommand(s.str());
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
       }
     else
@@ -1497,10 +1538,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       pvs->IsPermanentOn();
       pvs->Accept(1);
-      pvs->SetTraceReferenceObject(this);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
       s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-      pvs->SetTraceReferenceCommand(s.str());
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
       }
     else
@@ -1514,10 +1555,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       pvs->IsPermanentOn();
       pvs->Accept(1);
-      pvs->SetTraceReferenceObject(this);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
       s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-      pvs->SetTraceReferenceCommand(s.str());
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
       }
     else
@@ -1532,10 +1573,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       pvs->IsPermanentOn();
       pvs->Accept(1);
-      pvs->SetTraceReferenceObject(this);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
       s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-      pvs->SetTraceReferenceCommand(s.str());
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
       }
     else
@@ -1549,10 +1590,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       pvs->IsPermanentOn();
       pvs->Accept(1);
-      pvs->SetTraceReferenceObject(this);
+      pvs->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
       ostrstream s;
       s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-      pvs->SetTraceReferenceCommand(s.str());
+      pvs->GetTraceHelper()->SetReferenceCommand(s.str());
       s.rdbuf()->freeze(0);
       }
     else
@@ -1699,7 +1740,7 @@ void vtkPVWindow::CenterEntryCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
-  this->AddTraceEntry("$kw(%s) SetCenterOfRotation %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCenterOfRotation %f %f %f",
                       this->GetTclName(), x, y, z);
   
   this->CenterXEntry->SetValue(x);
@@ -1777,7 +1818,7 @@ void vtkPVWindow::ToggleCenterActorCallback()
     this->ShowCenterActor();
     }
 
-  this->AddTraceEntry("$kw(%s) ToggleCenterActorCallback", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ToggleCenterActorCallback", this->GetTclName());
 
   this->MainView->EventuallyRender();
 }
@@ -1953,7 +1994,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     double* focalPoint    = cam->GetFocalPoint();
     double* viewUp        = cam->GetViewUp();
 
-    this->AddTraceEntry(
+    this->GetTraceHelper()->AddEntry(
       "$kw(%s) SetCameraState "
       "%.3lf %.3lf %.3lf  %.3lf %.3lf %.3lf  %.3lf %.3lf %.3lf", 
       this->MainView->GetTclName(), 
@@ -2321,7 +2362,7 @@ vtkPVReaderModule* vtkPVWindow::InitializeRead(vtkPVReaderModule* proto,
     {
     return 0;
     }
-  this->GetPVApplication()->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "set kw(%s) [$kw(%s) InitializeReadCustom \"%s\" \"%s\"]", 
     clone->GetTclName(), this->GetTclName(), proto->GetModuleName(), fileName);
 
@@ -2343,7 +2384,7 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
 
   if (retVal == VTK_OK)
     {
-    this->GetPVApplication()->AddTraceEntry(
+    this->GetTraceHelper()->AddEntry(
       "$kw(%s) ReadFileInformation $kw(%s) \"%s\"", 
       this->GetTclName(), clone->GetTclName(), fileName);
     }
@@ -2361,7 +2402,7 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
 // correctly.
 int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
 {
-  this->GetPVApplication()->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "$kw(%s) FinalizeRead $kw(%s) \"%s\"", 
     this->GetTclName(), clone->GetTclName(), fileName);
 
@@ -2478,7 +2519,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
     }
   
   // Now that we can safely write the file, add the trace entry.
-  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
                        filename, ghostLevel);
   
   // Actually write the file.
@@ -2825,7 +2866,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   ofstream* file;
 
   // We may want different questions if there is no animation.
-  const char *script = this->AnimationInterface->GetScript();
+  const char *script = this->AnimationInterface ? this->AnimationInterface->GetScript() : NULL;
   if (script && script[0] && this->AnimationInterface->GetScriptAvailable() && 
     this->AnimationInterface->IsAnimationValid())
     {
@@ -2957,7 +2998,10 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   cit->Delete();
   cit = 0;
   this->CenterAxesProxy->SaveInBatchScript(file);
-  this->AnimationManager->SaveInBatchScript(file);
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->SaveInBatchScript(file);
+    }
 // TODO replace this
 //   if (geometryFileName)
 //     {
@@ -2996,7 +3040,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   *file << "   $proxyManager SaveState $stateName" << endl;
   *file << "} else {" << endl;
 
-  if (animationFlag)
+  if (animationFlag && this->AnimationInterface)
     {
     this->AnimationInterface->SaveInBatchScript(file, 
                                                 imageFileName, 
@@ -3213,10 +3257,17 @@ void vtkPVWindow::SaveState(const char* filename)
   *file << "set kw(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
   *file << "set kw(" << this->GetMainView()->GetTclName() 
         << ") [$kw(" << this->GetTclName() << ") GetMainView]" << endl;
-  *file << "set kw(" << this->AnimationInterface->GetTclName() 
-        << ") [$kw(" << this->GetTclName() << ") GetAnimationInterface]" << endl;
-  *file << "set kw(" << this->AnimationManager->GetTclName()
-    << ") [$kw(" << this->GetTclName() << ") GetAnimationManager]" << endl;
+
+  if (this->AnimationInterface)
+    {
+    *file << "set kw(" << this->AnimationInterface->GetTclName() 
+          << ") [$kw(" << this->GetTclName() << ") GetAnimationInterface]" << endl;
+    }
+  if (this->AnimationManager)
+    {
+    *file << "set kw(" << this->AnimationManager->GetTclName()
+          << ") [$kw(" << this->GetTclName() << ") GetAnimationManager]" << endl;
+    }
 
   vtkInteractorObserver *style = this->Interactor->GetInteractorStyle();
   if (style == this->CameraStyle3D)
@@ -3324,11 +3375,16 @@ void vtkPVWindow::SaveState(const char* filename)
     {
 
     // Save state of the animation interface
-    this->AnimationInterface->SaveState(file);
+    if (this->AnimationInterface)
+      {
+      this->AnimationInterface->SaveState(file);
+      }
 
     // Save state of the new animation interface
-    this->AnimationManager->SaveState(file);
-
+    if (this->AnimationManager)
+      {
+      this->AnimationManager->SaveState(file);
+      }
     }
 
   //  Save state of the Volume Appearance editor
@@ -3592,16 +3648,16 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 
   if (pvs)
     {
-    if (pvs->InitializeTrace(NULL))
+    if (pvs->GetTraceHelper()->Initialize())
       {
-      this->GetPVApplication()->AddTraceEntry(
+      this->GetTraceHelper()->AddEntry(
         "$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
         this->GetTclName(), pvs->GetTclName());
       }
     }
   else
     {
-    this->GetPVApplication()->AddTraceEntry(
+    this->GetTraceHelper()->AddEntry(
       "$kw(%s) SetCurrentPVSourceCallback {}", this->GetTclName());
     }
 }
@@ -3672,14 +3728,20 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateAnimationInterface()
 {
-  this->AnimationManager->Update();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->Update();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::AddDefaultAnimation(vtkPVSource* pvSource)
 {
-  this->AnimationManager->Update();
-  this->AnimationManager->AddDefaultAnimation(pvSource);
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->Update();
+    this->AnimationManager->AddDefaultAnimation(pvSource);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -3730,7 +3792,7 @@ vtkPVSourceCollection* vtkPVWindow::GetSourceList(const char* listname)
 void vtkPVWindow::ResetCameraCallback()
 {
 
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) ResetCameraCallback", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) ResetCameraCallback", 
                                           this->GetTclName());
 
   if (this->ResetCameraButton->GetCheckButtonState("ViewAngle"))
@@ -3928,7 +3990,7 @@ void vtkPVWindow::EnableToolbarButtons()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 {
-  this->GetPVApplication()->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "$kw(%s) ShowCurrentSourcePropertiesCallback", this->GetTclName());
 
   this->ShowCurrentSourceProperties();
@@ -3969,10 +4031,13 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowAnimationProperties",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ShowAnimationProperties",
                                           this->GetTclName());
 
-  this->AnimationInterface->PrepareAnimationInterface(this);
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->PrepareAnimationInterface(this);
+    }
 
   // Bring up the properties panel
   this->ShowProperties();
@@ -3981,18 +4046,21 @@ void vtkPVWindow::ShowAnimationProperties()
   this->GetMenuView()->CheckRadioButton(
     this->GetMenuView(), "Radio", VTK_PV_ANIMATION_MENU_INDEX);
 
-  // Get rid of the page already packed.
-  this->AnimationInterface->UnpackSiblings();
-
-  // Put our page in.
-  this->Script("pack %s -anchor n -side top -expand t -fill x",
-               this->AnimationInterface->GetWidgetName());
+  if (this->AnimationInterface)
+    {
+    // Get rid of the page already packed.
+    this->AnimationInterface->UnpackSiblings();
+    
+    // Put our page in.
+    this->Script("pack %s -anchor n -side top -expand t -fill x",
+                 this->AnimationInterface->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationPanes()
 {
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowAnimationPanes",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ShowAnimationPanes",
     this->GetTclName());
   
   //Bring up the properties panel.
@@ -4002,7 +4070,10 @@ void vtkPVWindow::ShowAnimationPanes()
   // We need to update the properties-menu radio button too!
   this->GetMenuView()->CheckRadioButton(
     this->GetMenuView(), "Radio", VTK_PV_ANIMATION_MENU_INDEX+1);
-  this->AnimationManager->ShowAnimationInterfaces();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->ShowAnimationInterfaces();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -4014,7 +4085,7 @@ int vtkPVWindow::GetHorizontalPaneVisibility()
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
 {
-  this->GetPVApplication()->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "$kw(%s) SetHorizontalPaneVisibility %d",
     this->GetTclName(), arg);
   if (arg)
@@ -4180,7 +4251,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
 // Create a new data object/source by cloning a module prototype.
 vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
                                          const char* sourceList,
-                                         int addTraceEntry,
+                                         int add_trace_entry,
                                          int grabFocus)
 {
   vtkPVSource *pvs = 0;
@@ -4240,25 +4311,25 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       clone->GrabFocus();
       }
 
-    if (addTraceEntry)
+    if (add_trace_entry)
       {
-      if (clone->GetTraceInitialized() == 0)
+      if (clone->GetTraceHelper()->GetInitialized() == 0)
         { 
         if (sourceList)
           {
-          this->GetPVApplication()->AddTraceEntry(
+          this->GetTraceHelper()->AddEntry(
             "set kw(%s) [$kw(%s) CreatePVSource %s %s]", 
             clone->GetTclName(), this->GetTclName(),
             moduleName, sourceList);
           }
         else
           {
-          this->GetPVApplication()->AddTraceEntry(
+          this->GetTraceHelper()->AddEntry(
             "set kw(%s) [$kw(%s) CreatePVSource %s]", 
             clone->GetTclName(), this->GetTclName(),
             moduleName);
           }
-        clone->SetTraceInitialized(1);
+        clone->GetTraceHelper()->SetInitialized(1);
         }
       }
 
@@ -4288,6 +4359,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     vtkErrorMacro("Prototype for " << moduleName << " could not be found.");
     }
   this->UpdateEnableState();
+
   return clone;
 }
 
@@ -4354,7 +4426,7 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
     }
 
   // Save the package load command in the trace file.
-  this->GetApplication()->AddTraceEntry(
+  this->GetTraceHelper()->AddEntry(
     "$kw(%s) OpenPackage \"%s\"", this->GetTclName(), openFileName);
 
   // Add the package to the list that will be saved to state and batch
@@ -4480,37 +4552,55 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayCallback()
 {
-  this->AnimationInterface->Play();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->Play();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::StopCallback()
 {
-  this->AnimationInterface->Stop();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->Stop();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::GoToBeginningCallback()
 {
-  this->AnimationInterface->GoToBeginning();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->GoToBeginning();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::GoToEndCallback()
 {
-  this->AnimationInterface->GoToEnd();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->GoToEnd();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::GoToPreviousCallback()
 {
-  this->AnimationInterface->GoToPrevious();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->GoToPrevious();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::GoToNextCallback()
 {
-  this->AnimationInterface->GoToNext();
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->GoToNext();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -4657,13 +4747,19 @@ void vtkPVWindow::ProcessErrorClick()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SaveAnimation()
 {
-  this->AnimationManager->SaveAnimation();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->SaveAnimation();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SaveGeometry()
 {
-  this->AnimationManager->SaveGeometry();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->SaveGeometry();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -4703,7 +4799,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   cm->SetPVRenderView(this->GetMainView());
   cm->SetNumberOfVectorComponents(numberOfComponents);
   cm->Create(this->GetPVApplication());
-  cm->SetTraceReferenceObject(this);
+  cm->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   cm->SetArrayName(parameterName);
   cm->SetScalarBarTitle(parameterName);
   cm->ResetScalarRangeInternal();
@@ -4726,8 +4822,10 @@ vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
     this->VolumeAppearanceEditor->
       SetPVRenderView(this->GetMainView());
     this->VolumeAppearanceEditor->Create(this->GetPVApplication());
-    this->VolumeAppearanceEditor->SetTraceReferenceObject(this);
-    this->VolumeAppearanceEditor->SetTraceReferenceCommand("GetVolumeAppearanceEditor");
+    this->VolumeAppearanceEditor->GetTraceHelper()->SetReferenceHelper(
+      this->GetTraceHelper());
+    this->VolumeAppearanceEditor->GetTraceHelper()->SetReferenceCommand(
+      "GetVolumeAppearanceEditor");
     }
   
   return this->VolumeAppearanceEditor;
@@ -4857,8 +4955,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSources()
 {
-  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
-  pvApp->AddTraceEntry("# User selected delete all modules");
+  this->GetTraceHelper()->AddEntry("# User selected delete all modules");
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )
     {
@@ -4893,8 +4990,11 @@ void vtkPVWindow::DeleteAllKeyframesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllKeyframes()
 {
-  this->AnimationManager->RemoveAllKeyFrames(); 
-  this->AddTraceEntry("$kw(%s) DeleteAllKeyframes", this->GetTclName());
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->RemoveAllKeyFrames(); 
+    this->GetTraceHelper()->AddEntry("$kw(%s) DeleteAllKeyframes", this->GetTclName());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -5111,7 +5211,8 @@ void vtkPVWindow::UpdateEnableState()
     }
   it->Delete();
 
-  if ( source_grabbed  || this->AnimationManager->GetInRecording() )
+  if ( source_grabbed  || 
+       (this->AnimationManager && this->AnimationManager->GetInRecording()))
     {
     this->Enabled = 0;
     }
@@ -5173,7 +5274,8 @@ void vtkPVWindow::UpdateMenuState()
     return;
     }
   
-  if ( this->Enabled || this->AnimationManager->GetInRecording())
+  if ( this->Enabled || 
+       (this->AnimationManager && this->AnimationManager->GetInRecording()))
     {
     int oe = this->Enabled;
     this->Enabled = 1;
@@ -5315,7 +5417,10 @@ void vtkPVWindow::SaveWindowGeometry()
       2, "Geometry", "WindowHorizontalFrame1Size",
       "%d", this->LowerFrame->GetFrame1Size());
 
-    this->AnimationManager->SaveWindowGeometry();
+    if (this->AnimationManager)
+      {
+      this->AnimationManager->SaveWindowGeometry();
+      }
     }
   
 }
@@ -5333,7 +5438,10 @@ void vtkPVWindow::RestorePVWindowGeometry()
       this->LowerFrame->SetFrame1Size(reg_size);
       }
     }
-  this->AnimationManager->RestoreWindowGeometry();
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->RestoreWindowGeometry();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -5418,6 +5526,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InDemo: " << this->InDemo << endl;
   os << indent << "LowerToolbars: " << this->LowerToolbars << endl;
   os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
+  os << indent << "TraceHelper: " << this->TraceHelper << endl;
 
   // Lookmarks part:
 #ifdef PARAVIEW_USE_LOOKMARKS

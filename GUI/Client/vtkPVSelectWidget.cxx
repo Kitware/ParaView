@@ -33,12 +33,13 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.66");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -140,11 +141,14 @@ void vtkPVSelectWidget::SetLabel(const char* label)
   // For getting the widget in a script.
   this->SetEntryLabel(label);
   if (label && label[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(label);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(label);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   if (this->GetApplication())
@@ -324,7 +328,7 @@ void vtkPVSelectWidget::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file) )
+  if ( ! this->GetTraceHelper()->Initialize(file) )
     {
     return;
     }
@@ -523,11 +527,12 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
       }
     }
 
-  pvw->SetTraceReferenceObject(this);
-  pvw->SetTraceName(labelVal);
-  this->SetTraceNameState(vtkPVWidget::UserInitialized);
+  pvw->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  pvw->GetTraceHelper()->SetObjectName(labelVal);
+  this->GetTraceHelper()->SetObjectNameState(
+    vtkPVTraceHelper::ObjectNameStateUserInitialized);
   sprintf(str, "GetPVWidget {%s}", labelVal);
-  pvw->SetTraceReferenceCommand(str);
+  pvw->GetTraceHelper()->SetReferenceCommand(str);
 }
 
 //-----------------------------------------------------------------------------

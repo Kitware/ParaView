@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.48");
+vtkCxxRevisionMacro(vtkKWObject, "1.49");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -35,9 +35,6 @@ vtkKWObject::vtkKWObject()
   this->TclName = NULL;
   this->Application = NULL;  
   this->CommandFunction = vtkKWObjectCommand;
-  this->TraceInitialized = 0;
-  this->TraceReferenceObject = NULL;
-  this->TraceReferenceCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -48,10 +45,7 @@ vtkKWObject::~vtkKWObject()
     delete [] this->TclName;
     }
   this->SetApplication(NULL);
-  this->SetTraceReferenceObject(NULL);
-  this->SetTraceReferenceCommand(NULL);
 }
-
 
 //----------------------------------------------------------------------------
 const char *vtkKWObject::GetTclName()
@@ -139,175 +133,6 @@ void vtkKWObject::SetApplication (vtkKWApplication* arg)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWObject::InitializeTrace(ofstream* file)
-{
-  int stateFlag = 0;
-  int dummyInit = 0;
-  int* pInit;
-
-  if(this->GetApplication() == NULL)
-    {
-    return 0;
-    }
-
-  // Special logic for state files.
-  // The issue is that this KWObject can only keep track of initialization
-  // for one file, and I do not like any possible solutions to extend this.
-  if (file == NULL || file == this->GetApplication()->GetTraceFile())
-    { // Tracing:  Keep track of initialization.
-    file = this->GetApplication()->GetTraceFile();
-    pInit = &(this->TraceInitialized);
-    }
-  else
-    { // Saving state: Ignore trace initialization.
-    stateFlag = 1;
-    pInit = &(dummyInit);
-    }
-
-  // There is no need to do anything if there is no trace file.
-  if (file == NULL)
-    {
-    return 0;
-    }
-  if (*pInit)
-    {
-    return 1;
-    }
-  if (this->TraceReferenceObject && this->TraceReferenceCommand)
-    {
-    if (this->TraceReferenceObject->InitializeTrace(file))
-      {
-      *file << "set kw(" << this->GetTclName() << ") [$kw(" 
-            << this->TraceReferenceObject->GetTclName() << ") "
-            << this->TraceReferenceCommand << "]" << endl;
-      *pInit = 1;
-      }
-    }
-
-  // Hack to get state working.
-  if (stateFlag)
-    {  // Tracing relies on sources being initialized outside of this call.
-    return 1;
-    }
-
-  return *pInit;
-}  
-
-//----------------------------------------------------------------------------
-void vtkKWObject::AddTraceEntry(const char *format, ...)
-{
-  if ( !this->GetApplication() )
-    {
-    return;
-    }
-
-  ofstream *os;
-
-  os = this->GetApplication()->GetTraceFile();
-  if (os == NULL)
-    {
-    return;
-    }
-
-  if (this->InitializeTrace(os) == 0)
-    {
-    return;
-    }
-
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-  
-  *os << buffer << endl;
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
-{
-  if (!format)
-    {
-    return 0;
-    }
-
-  // Quick-hack attempt at estimating the length of the string.
-  // Should never under-estimate.
-  
-  // Start with the length of the format string itself.
-  int length = strlen(format);
-  
-  // Increase the length for every argument in the format.
-  const char* cur = format;
-  while(*cur)
-    {
-    if(*cur++ == '%')
-      {
-      // Skip "%%" since it doesn't correspond to a va_arg.
-      if(*cur != '%')
-        {
-        while(!int(isalpha(*cur)))
-          {
-          ++cur;
-          }
-        switch (*cur)
-          {
-          case 's':
-            {
-            // Check the length of the string.
-            char* s = va_arg(ap, char*);
-            if(s)
-              {
-              length += strlen(s);
-              }
-            } break;
-          case 'e':
-          case 'f':
-          case 'g':
-            {
-            // Assume the argument contributes no more than 64 characters.
-            length += 64;
-            
-            // Eat the argument.
-            static_cast<void>(va_arg(ap, double));
-            } break;
-          default:
-            {
-            // Assume the argument contributes no more than 64 characters.
-            length += 64;
-            
-            // Eat the argument.
-            static_cast<void>(va_arg(ap, int));
-            } break;
-          }
-        }
-      
-      // Move past the characters just tested.
-      ++cur;
-      }
-    }
-  
-  return length;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWObject::SetObjectMethodCommand(
   char **command, 
   vtkKWObject *object, 
@@ -346,10 +171,4 @@ void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Application: " << this->GetApplication() << endl;
-  os << indent << "TraceInitialized: " << this->GetTraceInitialized() << endl;
-  os << indent << "TraceReferenceCommand: " 
-     << (this->TraceReferenceCommand?this->TraceReferenceCommand:"none") 
-     << endl;
-  os << indent << "TraceReferenceObject: " 
-     << this->GetTraceReferenceObject() << endl;
 }

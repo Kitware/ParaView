@@ -23,7 +23,7 @@
 #ifndef __vtkPVHorizontalAnimationInterface_h
 #define __vtkPVHorizontalAnimationInterface_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 class vtkKWApplication;
 class vtkKWSplitFrame;
 class vtkCollection;
@@ -31,10 +31,10 @@ class vtkCollectionIterator;
 class vtkPVAnimationCueTree;
 class vtkPVAnimationCue;
 
-class VTK_EXPORT vtkPVHorizontalAnimationInterface : public vtkKWWidget
+class VTK_EXPORT vtkPVHorizontalAnimationInterface : public vtkPVTracedWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkPVHorizontalAnimationInterface, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVHorizontalAnimationInterface, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVHorizontalAnimationInterface* New();
 

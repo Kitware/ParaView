@@ -25,12 +25,13 @@
 #include "vtkPVSource.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.43");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -107,11 +108,14 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(this->EntryLabel);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(this->EntryLabel);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   
   // Now a label
@@ -172,7 +176,7 @@ void vtkPVStringEntry::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -181,7 +185,7 @@ void vtkPVStringEntry::Accept()
 //---------------------------------------------------------------------------
 void vtkPVStringEntry::Trace(ofstream *file)
 {
-  if (this->InitializeTrace(file))
+  if (this->GetTraceHelper()->Initialize(file))
     {
     *file << "$kw(" << this->GetTclName() << ") SetValue {"
           << this->GetValue() << "}" << endl;
@@ -262,7 +266,7 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->SetLabel(this->TraceName);
+    this->SetLabel(this->GetTraceHelper()->GetObjectName());
     }
 
   return 1;

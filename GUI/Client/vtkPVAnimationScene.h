@@ -15,10 +15,12 @@
 // .NAME vtkPVAnimationScene
 // .SECTION Description
 // GUI for vtkSMAnimationSceneProxy.
+
 #ifndef __vtkPVAnimationScene_h
 #define __vtkPVAnimationScene_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
+
 class vtkPVAnimationSceneObserver;
 class vtkKWFrame;
 class vtkKWPushButton;
@@ -38,11 +40,11 @@ class vtkWindowToImageFilter;
 class vtkSMXMLPVAnimationWriterProxy;
 class vtkPVVCRControl;
 
-class VTK_EXPORT vtkPVAnimationScene : public vtkKWWidget
+class VTK_EXPORT vtkPVAnimationScene : public vtkPVTracedWidget
 {
 public:
   static vtkPVAnimationScene* New();
-  vtkTypeRevisionMacro(vtkPVAnimationScene, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationScene, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication* app, const char* args);

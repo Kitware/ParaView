@@ -18,7 +18,7 @@
 #ifndef __vtkPVAnimationInterfaceEntry_h
 #define __vtkPVAnimationInterfaceEntry_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWFrame;
 class vtkKWLabel;
@@ -30,7 +30,6 @@ class vtkKWRange;
 class vtkKWScale;
 class vtkKWText;
 class vtkKWThumbWheel;
-class vtkKWWidget;
 class vtkPVAnimationInterface;
 class vtkPVAnimationInterfaceEntryObserver;
 class vtkPVApplication;
@@ -38,11 +37,11 @@ class vtkPVSource;
 class vtkSMDomain;
 class vtkSMProperty;
 
-class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWWidget
+class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkPVTracedWidget
 {
 public:
   static vtkPVAnimationInterfaceEntry* New();
-  vtkTypeRevisionMacro(vtkPVAnimationInterfaceEntry, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationInterfaceEntry, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetParent(vtkKWWidget* widget);
@@ -252,12 +251,8 @@ protected:
   char*              SaveStateScript;
   char*              Script;
   char*              CurrentMethod;
-  char*              TraceName;
   char*              TimeEquation;
   char*              Label;
-
-  vtkSetStringMacro(TraceName);
-  vtkGetStringMacro(TraceName);
 
   vtkSMProperty *CurrentSMProperty;
   vtkSMDomain *CurrentSMDomain;

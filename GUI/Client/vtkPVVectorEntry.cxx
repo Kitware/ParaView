@@ -30,12 +30,13 @@
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkStringList.h"
+#include "vtkPVTraceHelper.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.71");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.72");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -145,11 +146,14 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   // For getting the widget in a script.
 
   if (this->EntryLabel && this->EntryLabel[0] &&
-    (this->TraceNameState == vtkPVWidget::Uninitialized ||
-     this->TraceNameState == vtkPVWidget::Default) )
+    (this->GetTraceHelper()->GetObjectNameState() == 
+     vtkPVTraceHelper::ObjectNameStateUninitialized ||
+     this->GetTraceHelper()->GetObjectNameState() == 
+     vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(this->EntryLabel);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(this->EntryLabel);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
   // Now a label
@@ -281,7 +285,7 @@ void vtkPVVectorEntry::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -292,7 +296,7 @@ void vtkPVVectorEntry::Trace(ofstream *file)
 {
   vtkKWEntry *entry;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -576,7 +580,7 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     vtkKWMenu *cascadeMenu = vtkKWMenu::New();
     cascadeMenu->SetParent(menu);
     cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
-    menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
+    menu->AddCascade(this->GetTraceHelper()->GetObjectName(), cascadeMenu, 0,
                      "Choose a vector component to animate.");
     int i;
     for (i = 0; i < this->Entries->GetNumberOfItems(); i++)
@@ -642,9 +646,9 @@ void vtkPVVectorEntry::ResetAnimationRange(
 void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int idx)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
                         this->GetTclName(), ai->GetTclName());
     }
 
@@ -694,13 +698,13 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   if (this->Entries->GetNumberOfItems() == 1)
     {
     ai->SetLabelAndScript(this->LabelWidget->GetText(), NULL,
-                          this->GetTraceName());
+                          this->GetTraceHelper()->GetObjectName());
     }
   else
     {
     char label[200];
     sprintf(label, "%s (%d)", this->LabelWidget->GetText(), idx);
-    ai->SetLabelAndScript(label, NULL, this->GetTraceName());
+    ai->SetLabelAndScript(label, NULL, this->GetTraceHelper()->GetObjectName());
     }
   
 
@@ -791,7 +795,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   else
     {
-    this->SetLabel(this->TraceName);
+    this->SetLabel(this->GetTraceHelper()->GetObjectName());
     }
 
   return 1;

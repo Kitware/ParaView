@@ -174,9 +174,12 @@ SET( ParaViewClient_SRCS
   vtkPVSphereWidget.cxx
   vtkPVStringEntry.cxx
   vtkPVTempTessellatorEntry.cxx
+  vtkPVTextProperty.cxx
   vtkPVThumbWheel.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx
+  vtkPVTraceHelper.cxx
+  vtkPVTracedWidget.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballPan.cxx
   vtkPVTrackballRoll.cxx

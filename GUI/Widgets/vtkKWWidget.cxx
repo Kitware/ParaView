@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.113");
+vtkCxxRevisionMacro(vtkKWWidget, "1.114");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -50,8 +50,6 @@ vtkKWWidget::vtkKWWidget()
   this->BalloonHelpString        = NULL;  
   this->BalloonHelpJustification = 0;
   this->BalloonHelpInitialized   = 0;
-
-  this->TraceName                = NULL;
 
   this->Enabled                  = 1;
 
@@ -90,7 +88,6 @@ vtkKWWidget::~vtkKWWidget()
     }
 
   this->SetParent(NULL);
-  this->SetTraceName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -328,26 +325,6 @@ vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
 }
        
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWWidget::GetChildWidgetWithTraceName(const char *traceName)
-{
-  if (traceName && this->HasChildren())
-    {
-    vtkKWWidget *child;
-    vtkKWWidgetCollection *children = this->GetChildren();
-    children->InitTraversal();
-    while ((child = children->GetNextKWWidget()))
-      {
-      const char *tname = child->GetTraceName();
-      if (tname && strcmp(traceName, tname) == 0)
-        {
-        return child;
-        }
-      }
-    }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren && this->HasChildren())
@@ -477,69 +454,6 @@ vtkKWWindow* vtkKWWidget::GetWindow()
     }
   return win;
 }
-
-//----------------------------------------------------------------------------
-// Methods for tracing.
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::InitializeTrace(ofstream* file)
-{
-  int dummyInit = 0;
-  int *pInit;
-  int stateFlag = 0;
-  
-  if(!this->GetApplication())
-    {
-    vtkErrorMacro("Tracing before application is set on the widget.");
-    return 0;
-    }
-
-  if (file == NULL || file == this->GetApplication()->GetTraceFile())
-    { // Use the global trace file and respect initialized.
-    file = this->GetApplication()->GetTraceFile();
-    pInit = &(this->TraceInitialized);
-    }
-  else
-    { // Use stateFile and ignore "TraceInitialized"
-    stateFlag = 1;
-    pInit = &(dummyInit);
-    }
-
-  // There is no need to do anything if there is no trace file.
-  if(file == NULL)
-    {
-    return 0;
-    }
-  if (*pInit)
-    {
-    return 1;
-    }
-
-  // The new general way to initialize objects (from vtkKWObject).
-  if (this->TraceReferenceObject && this->TraceReferenceCommand)
-    {
-    if (this->TraceReferenceObject->InitializeTrace(file))
-      {
-      *file << "set kw(" << this->GetTclName() << ") "
-            << "[$kw(" << this->TraceReferenceObject->GetTclName()
-            << ") " << this->TraceReferenceCommand << "]" << endl;
-      *pInit = 1;
-      return 1;
-      }
-    }
-
-  // I used to have the option of getting the child from the parent,
-  // but it was not used, and we can simply set the 
-  // TraceReferenceObject to the parent, and the TraceReferenceCommand to
-  // GetChildWidgetName "this->TraceName".
-
-  if (stateFlag)
-    {
-    return 1;
-    }
-  
-  return 0;
-}  
 
 //----------------------------------------------------------------------------
 const char* vtkKWWidget::GetType()
@@ -1499,8 +1413,6 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
   os << indent << "Children: " << this->Children << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
-  os << indent << "TraceName: " 
-     << (this->TraceName ? this->TraceName : "None") << endl;
   os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
   os << indent << "DragAndDropHelper: ";
   if (this->DragAndDropHelper)

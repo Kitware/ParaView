@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.36");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.37");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -567,8 +567,6 @@ void vtkKWTextProperty::SetColor(double r, double g, double b)
 
   this->UpdateColorButton();
 
-  this->AddTraceEntry("$kw(%s) SetColor %lf %lf %lf", this->GetTclName(), r,g,b);
-
   if (this->ColorChangedCommand)
     {
     this->Script("eval %s", this->ColorChangedCommand);
@@ -660,8 +658,6 @@ void vtkKWTextProperty::SetFontFamily(int v)
     }
 
   this->UpdateFontFamilyOptionMenu();
-
-  this->AddTraceEntry("$kw(%s) SetFontFamily %d", this->GetTclName(), v);
 
   if (this->ChangedCommand)
     {
@@ -760,8 +756,6 @@ void vtkKWTextProperty::SetBold(int v)
 
   this->UpdateBoldCheckButton();
 
-  this->AddTraceEntry("$kw(%s) SetBold %d", this->GetTclName(), v);
-
   if (this->ChangedCommand)
     {
     this->Script("eval %s", this->ChangedCommand);
@@ -802,8 +796,6 @@ void vtkKWTextProperty::SetItalic(int v)
     }
 
   this->UpdateItalicCheckButton();
-
-  this->AddTraceEntry("$kw(%s) SetItalic %d", this->GetTclName(), v);
 
   if (this->ChangedCommand)
     {
@@ -846,8 +838,6 @@ void vtkKWTextProperty::SetShadow(int v)
 
   this->UpdateShadowCheckButton();
 
-  this->AddTraceEntry("$kw(%s) SetShadow %d", this->GetTclName(), v);
-
   if (this->ChangedCommand)
     {
     this->Script("eval %s", this->ChangedCommand);
@@ -889,7 +879,7 @@ void vtkKWTextProperty::SetShowOpacity(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetOpacityNoTrace(float v) 
+void vtkKWTextProperty::SetOpacity(float v) 
 {
   if (this->GetOpacity() == v)
     {
@@ -911,17 +901,6 @@ void vtkKWTextProperty::SetOpacityNoTrace(float v)
     {
     this->Script("eval %s", this->ChangedCommand);
     }
-}
-
-// ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetOpacity(float v) 
-{
-  this->SetOpacityNoTrace(v);
-  if ( !this->IsCreated() )
-    {
-    return;
-    }
-  this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(), v);
 }
 
 // ----------------------------------------------------------------------------
@@ -974,7 +953,7 @@ void vtkKWTextProperty::OpacityCallback()
 {
   if (this->OpacityScale->IsCreated())
     {
-    this->SetOpacityNoTrace(this->OpacityScale->GetValue());
+    this->SetOpacity(this->OpacityScale->GetValue());
     }
 }
 

@@ -42,8 +42,9 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkKWPushButton.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.7");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.8");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -619,7 +620,7 @@ void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 void vtkPVKeyFrame::SetKeyTime(double time)
 {
   this->KeyFrameProxy->SetKeyTime(time);
-  this->AddTraceEntry("$kw(%s) SetKeyTime %f", this->GetTclName(), time);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", this->GetTclName(), time);
 }
 
 //-----------------------------------------------------------------------------
@@ -632,7 +633,7 @@ double vtkPVKeyFrame::GetKeyTime()
 void vtkPVKeyFrame::SetKeyValue(double val)
 {
   this->KeyFrameProxy->SetKeyValue(val);
-  this->AddTraceEntry("$kw(%s) SetKeyValue %f", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %f", this->GetTclName(), val);
 }
 
 //-----------------------------------------------------------------------------

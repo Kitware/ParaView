@@ -20,7 +20,7 @@
 #ifndef __vtkPVCameraControl_h
 #define __vtkPVCameraControl_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWEntry;
 class vtkKWLabel;
@@ -28,11 +28,11 @@ class vtkKWPushButton;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVRenderView;
 
-class VTK_EXPORT vtkPVCameraControl : public vtkKWWidget
+class VTK_EXPORT vtkPVCameraControl : public vtkPVTracedWidget
 {
 public:
   static vtkPVCameraControl* New();
-  vtkTypeRevisionMacro(vtkPVCameraControl, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVCameraControl, vtkPVTracedWidget);
   void PrintSelf(ostream &os, vtkIndent indent);
   
   // Description:

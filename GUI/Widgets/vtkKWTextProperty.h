@@ -135,28 +135,27 @@ public:
   virtual void CopyValuesFrom(vtkKWTextProperty*);
 
   // GUI components callbacks
-  void ChangeColorButtonCallback(double, double, double);
-  void SetColor(double, double, double);
-  void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
-  double* GetColor();
-  void FontFamilyCallback();
-  void SetFontFamily(int);
-  void BoldCallback();
-  void SetBold(int);
-  void ItalicCallback();
-  void SetItalic(int);
-  void ShadowCallback();
-  void SetShadow(int);
-  void OpacityCallback();
-  void OpacityEndCallback();
-  void SetOpacity(float);
-  void SetOpacityNoTrace(float);
-  float GetOpacity();
+  virtual void ChangeColorButtonCallback(double, double, double);
+  virtual void SetColor(double, double, double);
+  virtual void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
+  virtual double* GetColor();
+  virtual void FontFamilyCallback();
+  virtual void SetFontFamily(int);
+  virtual void BoldCallback();
+  virtual void SetBold(int);
+  virtual void ItalicCallback();
+  virtual void SetItalic(int);
+  virtual void ShadowCallback();
+  virtual void SetShadow(int);
+  virtual void OpacityCallback();
+  virtual void OpacityEndCallback();
+  virtual void SetOpacity(float);
+  virtual float GetOpacity();
 
   // Description:
   // Save out the text properties to a file.
-  void SaveInTclScript(ofstream *file, const char *tcl_name = 0,
-                       int tabify = 1);
+  virtual void SaveInTclScript(ofstream *file, const char *tcl_name = 0,
+                               int tabify = 1);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

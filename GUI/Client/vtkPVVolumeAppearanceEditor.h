@@ -21,7 +21,7 @@
 #ifndef __vtkPVVolumeAppearanceEditor_h
 #define __vtkPVVolumeAppearanceEditor_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWPushButton;
 class vtkPVRenderView;
@@ -30,11 +30,11 @@ class vtkPVArrayInformation;
 class vtkPVVolumePropertyWidget;
 class vtkVolumeProperty; //FIXME: Need a proxy/property instead
 
-class VTK_EXPORT vtkPVVolumeAppearanceEditor : public vtkKWWidget
+class VTK_EXPORT vtkPVVolumeAppearanceEditor : public vtkPVTracedWidget
 {
 public:
   static vtkPVVolumeAppearanceEditor* New();
-  vtkTypeRevisionMacro(vtkPVVolumeAppearanceEditor, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVVolumeAppearanceEditor, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

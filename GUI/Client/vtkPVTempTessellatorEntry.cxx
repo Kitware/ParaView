@@ -26,6 +26,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVTraceHelper.h"
 
 #include "vtkSMDoubleVectorProperty.h"
 
@@ -34,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.20");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -380,11 +381,14 @@ void vtkPVTempTessellatorEntry::SetLabel( const char* label )
 {
   this->Data->CriteriaFrame->SetLabelText( label );
   if ( label && label[0] &&
-       (this->TraceNameState == vtkPVWidget::Uninitialized ||
-        this->TraceNameState == vtkPVWidget::Default) )
+       (this->GetTraceHelper()->GetObjectNameState() == 
+        vtkPVTraceHelper::ObjectNameStateUninitialized ||
+        this->GetTraceHelper()->GetObjectNameState() == 
+        vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName( label );
-    this->SetTraceNameState( vtkPVWidget::SelfInitialized );
+    this->GetTraceHelper()->SetObjectName( label );
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized );
     }
 }
 
@@ -478,7 +482,7 @@ void vtkPVTempTessellatorEntry::Accept()
 
 void vtkPVTempTessellatorEntry::Trace( ofstream *file )
 {
-  if ( ! this->InitializeTrace(file) )
+  if ( ! this->GetTraceHelper()->Initialize(file) )
     {
     return;
     }

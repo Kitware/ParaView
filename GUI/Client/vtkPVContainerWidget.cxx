@@ -19,10 +19,11 @@
 #include "vtkPVSource.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.32");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -178,7 +179,7 @@ void vtkPVContainerWidget::Trace(ofstream *file)
   
   vtkPVWidget* widget;
 
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -277,15 +278,15 @@ void vtkPVContainerWidget::AddPVWidget(vtkPVWidget *pvw)
   char str[512];
   this->Widgets->AddItem(pvw);
   
-  if (pvw->GetTraceName() == NULL)
+  if (pvw->GetTraceHelper()->GetObjectName() == NULL)
     {
     vtkWarningMacro("TraceName not set.");
     return;
     }
 
-  pvw->SetTraceReferenceObject(this);
-  sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
-  pvw->SetTraceReferenceCommand(str); 
+  pvw->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  sprintf(str, "GetPVWidget {%s}", pvw->GetTraceHelper()->GetObjectName());
+  pvw->GetTraceHelper()->SetReferenceCommand(str); 
 }
 
 //----------------------------------------------------------------------------
@@ -310,8 +311,8 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
   while( !it->IsDoneWithTraversal() )
     {
     widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-    if (widget->GetTraceName() && 
-        strcmp(traceName,widget->GetTraceName()) == 0) 
+    if (widget->GetTraceHelper()->GetObjectName() && 
+        strcmp(traceName,widget->GetTraceHelper()->GetObjectName()) == 0) 
       {
       it->Delete();
       return widget;

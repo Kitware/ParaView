@@ -19,12 +19,17 @@
 #include "vtkPVAnimationCue.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
+#include "vtkPVTraceHelper.h"
+
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.6");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
 {
+  this->TraceHelper = vtkPVTraceHelper::New();
+  this->TraceHelper->SetObject(this);
+
   this->OldSelection = 0;
   this->ActiveColor[0] = 0.83;
   this->ActiveColor[1] = 0.83;
@@ -53,6 +58,12 @@ vtkPVTimeLine::vtkPVTimeLine()
 vtkPVTimeLine::~vtkPVTimeLine()
 {
   this->SetAnimationCue(0);
+
+  if (this->TraceHelper)
+    {
+    this->TraceHelper->Delete();
+    this->TraceHelper = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -288,7 +299,7 @@ void vtkPVTimeLine::InvokeSelectionChangedCommand()
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::StartInteractionCallback(int x, int y)
 {
-  this->AddTraceEntry("$kw(%s) StartInteractionCallback %d %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) StartInteractionCallback %d %d", 
     this->GetTclName(), x, y);
   vtkPVApplication::SafeDownCast(this->GetApplication())->GetMainWindow()
     ->ShowAnimationPanes();
@@ -302,7 +313,7 @@ void vtkPVTimeLine::StartInteractionCallback(int x, int y)
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::MovePointCallback(int x, int y, int shift)
 {
-  this->AddTraceEntry("$kw(%s) MovePointCallback %d %d %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) MovePointCallback %d %d %d",
     this->GetTclName(), x, y, shift);
   this->Superclass::MovePointCallback(x, y, shift);
 }
@@ -310,7 +321,7 @@ void vtkPVTimeLine::MovePointCallback(int x, int y, int shift)
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::EndInteractionCallback(int x, int y)
 {
-  this->AddTraceEntry("$kw(%s) EndInteractionCallback %d %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) EndInteractionCallback %d %d",
     this->GetTclName(), x, y);
   this->Superclass::EndInteractionCallback(x, y);
 }
@@ -318,7 +329,7 @@ void vtkPVTimeLine::EndInteractionCallback(int x, int y)
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::ParameterCursorStartInteractionCallback(int x)
 {
-  this->AddTraceEntry("$kw(%s) ParameterCursorStartInteractionCallback %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ParameterCursorStartInteractionCallback %d",
     this->GetTclName(), x);
   this->Superclass::ParameterCursorStartInteractionCallback(x);
 }
@@ -326,7 +337,7 @@ void vtkPVTimeLine::ParameterCursorStartInteractionCallback(int x)
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::ParameterCursorMoveCallback(int x)
 {
-  this->AddTraceEntry("$kw(%s) ParameterCursorMoveCallback %d",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ParameterCursorMoveCallback %d",
     this->GetTclName(), x);
   this->Superclass::ParameterCursorMoveCallback(x);
 }
@@ -334,7 +345,7 @@ void vtkPVTimeLine::ParameterCursorMoveCallback(int x)
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::ParameterCursorEndInteractionCallback()
 {
-  this->AddTraceEntry("$kw(%s) ParameterCursorEndInteractionCallback",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ParameterCursorEndInteractionCallback",
     this->GetTclName());
   this->Superclass::ParameterCursorEndInteractionCallback();
 }
@@ -370,4 +381,5 @@ void vtkPVTimeLine::PrintSelf(ostream& os, vtkIndent indent)
     << this->ActiveColor[1] << ", " << this->ActiveColor[2] << endl;
   os << indent << "Focus: " << this->Focus << endl;
   os << indent << "OldSelection: " << this->OldSelection << endl;
+  os << indent << "TraceHelper: " << this->TraceHelper << endl;
 }

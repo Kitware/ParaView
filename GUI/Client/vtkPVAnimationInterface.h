@@ -30,7 +30,7 @@
 #ifndef __vtkPVAnimationInterface_h
 #define __vtkPVAnimationInterface_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 
 class vtkKWCheckButton;
 class vtkKWLabel;
@@ -52,11 +52,11 @@ class vtkPVAnimationInterfaceEntry;
 class vtkPVAnimationInterfaceObserver;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
+class VTK_EXPORT vtkPVAnimationInterface : public vtkPVTracedWidget
 {
 public:
   static vtkPVAnimationInterface* New();
-  vtkTypeRevisionMacro(vtkPVAnimationInterface, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkPVAnimationInterface, vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

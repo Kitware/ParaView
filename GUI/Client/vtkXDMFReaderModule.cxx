@@ -30,13 +30,14 @@
 #include "vtkKWPushButton.h"
 #include "vtkPVColorMap.h"
 #include "vtkSMPartDisplay.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.33");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.34");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -227,7 +228,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     stream << vtkClientServerStream::Invoke
            << this->GetVTKSourceID(0) << "SetDomainName" << this->Domain 
            << vtkClientServerStream::End;
-    pvApp->AddTraceEntry("$kw(%s) SetDomain {%s}", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetDomain {%s}", 
       this->GetTclName(), 
       this->Domain);
     }
@@ -246,7 +247,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     stream << vtkClientServerStream::Invoke
            << this->GetVTKSourceID(0) << "EnableGrid" << mit->first.c_str() 
            << vtkClientServerStream::End;
-    pvApp->AddTraceEntry(
+    this->GetTraceHelper()->AddEntry(
       "$kw(%s) EnableGrid {%s}", this->GetTclName(), mit->first.c_str());
     }
 

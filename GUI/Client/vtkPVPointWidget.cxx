@@ -34,9 +34,10 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPointWidgetProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.47");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -190,7 +191,7 @@ void vtkPVPointWidget::Accept()
 //---------------------------------------------------------------------------
 void vtkPVPointWidget::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -240,11 +241,14 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   int i;
   unsigned int ui;
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("Point");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("Point");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   // Widget needs the RenderModule for picking
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -377,7 +381,7 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
 void vtkPVPointWidget::SetPosition(double x, double y, double z)
 {
   this->SetPositionInternal(x, y, z);
-  this->AddTraceEntry("$kw(%s) SetPosition %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPosition %f %f %f",
     this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }

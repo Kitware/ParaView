@@ -75,6 +75,7 @@
 #include "vtkDataSet.h"
 #include "vtkPVOptions.h"
 #include "vtkStdString.h"
+#include "vtkPVTraceHelper.h"
 
 #define VTK_PV_OUTLINE_LABEL "Outline"
 #define VTK_PV_SURFACE_LABEL "Surface"
@@ -84,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.28");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -102,6 +103,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ScalarBarCheckVisible = 1;
   this->InterpolateColorsCheckVisible = 1;
 
+  this->MainFrame = vtkKWFrame::New();
   this->ColorFrame = vtkKWFrameLabeled::New();
   this->VolumeAppearanceFrame = vtkKWFrameLabeled::New();
   this->DisplayStyleFrame = vtkKWFrameLabeled::New();
@@ -262,6 +264,8 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
   
+  this->MainFrame->Delete();
+  this->MainFrame = NULL;
   this->ColorFrame->Delete();
   this->ColorFrame = NULL;
   this->VolumeAppearanceFrame->Delete();
@@ -362,8 +366,9 @@ void vtkPVDisplayGUI::SetPVSource(vtkPVSource *source)
 
   this->PVSource = source;
 
-  this->SetTraceReferenceObject(source);
-  this->SetTraceReferenceCommand("GetPVOutput");
+  this->GetTraceHelper()->SetReferenceHelper(
+    source ? source->GetTraceHelper() : NULL);
+  this->GetTraceHelper()->SetReferenceCommand("GetPVOutput");
 }
 
 
@@ -376,12 +381,13 @@ void vtkPVDisplayGUI::SetPVSource(vtkPVSource *source)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 {
-  if (this->GetApplication())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->Superclass::Create(app, "frame", options))
     {
-    vtkErrorMacro("Widget already created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->Superclass::Create(app, options);
 
   // We are going to 'grid' most of it, so let's define some const
 
@@ -392,9 +398,16 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   float col_0_factor = 1.5;
   float col_1_factor = 1.0;
 
+  // Main frame
+
+  this->MainFrame->SetParent(this);
+  this->MainFrame->Create(this->GetApplication(), 0);
+  this->Script("pack %s -fill both -expand t -pady 0 -padx 0", 
+               this->MainFrame->GetWidgetName());
+
   // View frame
 
-  this->ViewFrame->SetParent(this->GetFrame());
+  this->ViewFrame->SetParent(this->MainFrame->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->GetApplication(), 0);
   this->ViewFrame->SetLabelText("View");
@@ -459,7 +472,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
     }
 
   // Color
-  this->ColorFrame->SetParent(this->GetFrame());
+  this->ColorFrame->SetParent(this->MainFrame->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->GetApplication(), 0);
   this->ColorFrame->SetLabelText("Color");
@@ -551,7 +564,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->SetVolumeAppearanceEditor(this->GetPVApplication()->GetMainWindow()->
                                   GetVolumeAppearanceEditor());
 
-  this->VolumeAppearanceFrame->SetParent(this->GetFrame());
+  this->VolumeAppearanceFrame->SetParent(this->MainFrame->GetFrame());
   this->VolumeAppearanceFrame->ShowHideFrameOn();
   this->VolumeAppearanceFrame->Create(this->GetApplication(), 0);
   this->VolumeAppearanceFrame->SetLabelText("Volume Appearance");
@@ -592,7 +605,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
 
   // Display style
-  this->DisplayStyleFrame->SetParent(this->GetFrame());
+  this->DisplayStyleFrame->SetParent(this->MainFrame->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->GetApplication(), 0);
   this->DisplayStyleFrame->SetLabelText("Display Style");
@@ -733,7 +746,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   
   // Actor Control
 
-  this->ActorControlFrame->SetParent(this->GetFrame());
+  this->ActorControlFrame->SetParent(this->MainFrame->GetFrame());
   this->ActorControlFrame->ShowHideFrameOn();
   this->ActorControlFrame->Create(this->GetApplication(), 0);
   this->ActorControlFrame->SetLabelText("Actor Control");
@@ -950,7 +963,7 @@ void vtkPVDisplayGUI::EditColorMapCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DataColorRangeCallback()
 {
-  this->AddTraceEntry("$kw(%s) DataColorRangeCallback", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) DataColorRangeCallback", this->GetTclName());
   if (this->PVSource)
     {
     vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
@@ -970,7 +983,7 @@ void vtkPVDisplayGUI::EditVolumeAppearanceCallback()
     return;
     }
   
-  this->AddTraceEntry("$kw(%s) ShowVolumeAppearanceEditor",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ShowVolumeAppearanceEditor",
                       this->GetTclName());
 
   this->ShowVolumeAppearanceEditor();
@@ -1512,7 +1525,7 @@ void vtkPVDisplayGUI::SetActorColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
 {
-  this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) ChangeActorColor %f %f %f",
                       this->GetTclName(), r, g, b);
 
   this->SetActorColor(r, g, b);
@@ -1533,7 +1546,7 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
 void vtkPVDisplayGUI::ColorByProperty()
 {
   this->ColorSetByUser = 1;
-  this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByProperty", this->GetTclName());
   this->ColorMenu->SetValue("Property");
   this->ColorByPropertyInternal();
 }
@@ -1565,7 +1578,7 @@ void vtkPVDisplayGUI::VolumeRenderPointField(const char *name, int numComps)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) VolumeRenderPointField {%s} %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) VolumeRenderPointField {%s} %d", 
                       this->GetTclName(), name, numComps);
 
   this->ArraySetByUser = 1;
@@ -1614,7 +1627,7 @@ void vtkPVDisplayGUI::VolumeRenderCellField(const char *name, int numComps)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s} %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) VolumeRenderCellField {%s} %d", 
                       this->GetTclName(), name, numComps);
 
   this->ArraySetByUser = 1;
@@ -1660,7 +1673,7 @@ void vtkPVDisplayGUI::ColorByPointField(const char *name, int numComps)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) ColorByPointField {%s} %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByPointField {%s} %d", 
                       this->GetTclName(), name, numComps);
 
   this->ArraySetByUser = 1;
@@ -1714,7 +1727,7 @@ void vtkPVDisplayGUI::ColorByCellField(const char *name, int numComps)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) ColorByCellField {%s} %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) ColorByCellField {%s} %d", 
                       this->GetTclName(), name, numComps);
   
   this->ArraySetByUser = 1;
@@ -1843,7 +1856,7 @@ void vtkPVDisplayGUI::DrawWireframe()
 {
   if (this->GetPVSource()->GetInitialized())
     {
-    this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) DrawWireframe", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   this->VolumeRenderModeOff();
@@ -1861,7 +1874,7 @@ void vtkPVDisplayGUI::DrawPoints()
 {
   if (this->GetPVSource()->GetInitialized())
     {
-    this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) DrawPoints", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   this->VolumeRenderModeOff();
@@ -1886,7 +1899,7 @@ void vtkPVDisplayGUI::DrawVolume()
     }
   if (this->GetPVSource()->GetInitialized())
     {
-    this->AddTraceEntry("$kw(%s) DrawVolume", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) DrawVolume", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
   this->VolumeRenderModeOn();
@@ -1904,7 +1917,7 @@ void vtkPVDisplayGUI::DrawSurface()
 {
   if (this->GetPVSource()->GetInitialized())
     {
-    this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) DrawSurface", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
   this->VolumeRenderModeOff();
@@ -1924,7 +1937,7 @@ void vtkPVDisplayGUI::DrawOutline()
 {
   if (this->GetPVSource()->GetInitialized())
     {
-    this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) DrawOutline", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
   this->VolumeRenderModeOff();
@@ -2064,7 +2077,7 @@ void vtkPVDisplayGUI::SetInterpolation(const char* repr)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolationToFlat()
 {
-  this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
   this->PVSource->GetPartDisplay()->SetInterpolation(VTK_FLAT);
@@ -2079,7 +2092,7 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolationToGouraud()
 {
-  this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetInterpolationToGouraud", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
@@ -2176,7 +2189,7 @@ void vtkPVDisplayGUI::CenterCamera()
       }
     }
   
-  this->AddTraceEntry("$kw(%s) CenterCamera", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) CenterCamera", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -2235,7 +2248,7 @@ void vtkPVDisplayGUI::CubeAxesCheckCallback()
 {
   //law int fixme;  // Loading the trace will not trace the visibility.
   // Move the tracing into vtkPVSource.
-  this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCubeAxesVisibility %d", 
                       this->PVSource->GetTclName(),
                       this->CubeAxesCheck->GetState());
   this->PVSource->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
@@ -2250,7 +2263,7 @@ void vtkPVDisplayGUI::PointLabelCheckCallback()
 {
   //law int fixme;  // Loading the trace will not trace the visibility.
   // Move the tracing into vtkPVSource.
-  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", 
                       this->PVSource->GetTclName(),
                       this->PointLabelCheck->GetState());
   this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetState());
@@ -2273,7 +2286,7 @@ void vtkPVDisplayGUI::MapScalarsCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetMapScalarsFlag(int val)
 {
-  this->AddTraceEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
   if (this->MapScalarsCheck->GetState() != val)
     {
     this->MapScalarsCheck->SetState(val);
@@ -2298,7 +2311,7 @@ void vtkPVDisplayGUI::InterpolateColorsCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolateColorsFlag(int val)
 {
-  this->AddTraceEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
   if (this->InterpolateColorsCheck->GetState() != val)
     {
     this->InterpolateColorsCheck->SetState(val);
@@ -2319,7 +2332,7 @@ void vtkPVDisplayGUI::SetPointSize(int size)
   // added by the ChangePointSizeEndCallback but this callback is only
   // called when the interaction on the scale is stopped.
   this->PointSizeThumbWheel->SetValue(size);
-  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
                       (int)(this->PointSizeThumbWheel->GetValue()));
 }
 
@@ -2338,7 +2351,7 @@ void vtkPVDisplayGUI::ChangePointSize()
 void vtkPVDisplayGUI::ChangePointSizeEndCallback()
 {
   this->ChangePointSize();
-  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
                       (int)(this->PointSizeThumbWheel->GetValue()));
 } 
 
@@ -2354,7 +2367,7 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
   // added by the ChangeLineWidthEndCallback but this callback is only
   // called when the interaction on the scale is stopped.
   this->LineWidthThumbWheel->SetValue(width);
-  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
                       (int)(this->LineWidthThumbWheel->GetValue()));
 }
 
@@ -2373,7 +2386,7 @@ void vtkPVDisplayGUI::ChangeLineWidth()
 void vtkPVDisplayGUI::ChangeLineWidthEndCallback()
 {
   this->ChangeLineWidth();
-  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
                       (int)(this->LineWidthThumbWheel->GetValue()));
 }
 
@@ -2466,6 +2479,7 @@ void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double 
 void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "MainFrame: " << this->MainFrame << endl;
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
   os << indent << "VolumeScalarsMenu: " << this->VolumeScalarsMenu << endl;
   os << indent << "ResetCameraButton: " << this->ResetCameraButton << endl;
@@ -2505,7 +2519,7 @@ void vtkPVDisplayGUI::OpacityChangedCallback()
 void vtkPVDisplayGUI::OpacityChangedEndCallback()
 {
   this->OpacityChangedCallback();
-  this->AddTraceEntry("$kw(%s) SetOpacity %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetOpacity %f", 
                       this->GetTclName(), this->OpacityScale->GetValue());
 }
 
@@ -2545,7 +2559,7 @@ void vtkPVDisplayGUI::SetActorTranslate(double x, double y, double z)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-  this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetActorTranslate %f %f %f",
                       this->GetTclName(), x, y, z);  
 }
 
@@ -2617,7 +2631,7 @@ void vtkPVDisplayGUI::SetActorScale(double x, double y, double z)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-  this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetActorScale %f %f %f",
                       this->GetTclName(), x, y, z);  
 }
 
@@ -2688,7 +2702,7 @@ void vtkPVDisplayGUI::SetActorOrientation(double x, double y, double z)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-  this->AddTraceEntry("$kw(%s) SetActorOrientation %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetActorOrientation %f %f %f",
                       this->GetTclName(), x, y, z);  
 }
 
@@ -2758,7 +2772,7 @@ void vtkPVDisplayGUI::SetActorOrigin(double x, double y, double z)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-  this->AddTraceEntry("$kw(%s) SetActorOrigin %f %f %f",
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetActorOrigin %f %f %f",
                       this->GetTclName(), x, y, z);  
 }
 

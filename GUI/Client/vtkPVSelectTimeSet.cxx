@@ -28,12 +28,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.52");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.53");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -109,11 +110,14 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+  if ((this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName("SelectTimeSet");
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName("SelectTimeSet");
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
   
   this->LabeledFrame->Create(this->GetApplication(), 0);
@@ -245,7 +249,7 @@ void vtkPVSelectTimeSet::Accept()
   if (modFlag)
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
-    this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeValueCallback {%s}", 
                         this->GetTclName(), 
                         this->GetApplication()->GetMainInterp()->result);
     }
@@ -261,7 +265,7 @@ void vtkPVSelectTimeSet::Accept()
     vtkErrorMacro(
       "Could not find property of name: "
       << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceName());
+      << " for widget: " << this->GetTraceHelper()->GetObjectName());
     }
 
   this->Superclass::Accept();
@@ -270,7 +274,7 @@ void vtkPVSelectTimeSet::Accept()
 //---------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -398,7 +402,7 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
-  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0, "");
+  menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0, "");
 }
 
 
@@ -407,9 +411,9 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 // Maybe the animation should call PVwidget methods and not vtk object methods.
 void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  if (ai->InitializeTrace(NULL))
+  if (ai->GetTraceHelper()->Initialize())
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
   
@@ -417,7 +421,7 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
-  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
+  ai->SetLabelAndScript(this->GetTraceHelper()->GetObjectName(), NULL, this->GetTraceHelper()->GetObjectName());
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *rangeDomain = prop->GetDomain("range");

@@ -51,11 +51,12 @@
 #include "vtkSMCubeAxesDisplay.h"
 #include "vtkSMPointLabelDisplay.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkPVTraceHelper.h"
+
 #include <vtkstd/vector>
 
-
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427");
+vtkCxxRevisionMacro(vtkPVSource, "1.428");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -749,9 +750,9 @@ void vtkPVSource::SetLabel(const char* arg)
       current, current->SourceGrabbed);
     }
   // Trace here, not in SetLabel (design choice)
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetLabel {%s}",
-                                          this->GetTclName(),
-                                          this->Label);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLabel {%s}",
+                                   this->GetTclName(),
+                                   this->Label);
 }
 
 //----------------------------------------------------------------------------
@@ -798,7 +799,7 @@ void vtkPVSource::SetVisibility(int v)
     return;
     }
   
-  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->SetVisibilityNoTrace(v);
 }
 
@@ -854,7 +855,7 @@ void vtkPVSource::SetCubeAxesVisibility(int val)
     {
     return;
     }
-  this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(), val);
   this->SetCubeAxesVisibilityNoTrace(val);
 }
 
@@ -885,7 +886,7 @@ void vtkPVSource::SetPointLabelVisibility(int val)
     {
     return;
     }
-  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(), val);
   this->SetPointLabelVisibilityNoTrace(val);
 }
 
@@ -1006,7 +1007,7 @@ void vtkPVSource::AcceptCallbackInternal()
     dialogAlreadyUp=1;
     }
   this->Accept(0);
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) AcceptCallback",
+  this->GetTraceHelper()->AddEntry("$kw(%s) AcceptCallback",
                                           this->GetTclName());
   if (!dialogAlreadyUp)
     {
@@ -1446,7 +1447,7 @@ void vtkPVSource::DeleteCallback()
     }
     
   // Save this action in the trace file.
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) DeleteCallback",
+  this->GetTraceHelper()->AddEntry("$kw(%s) DeleteCallback",
                                           this->GetTclName());
 
   // Get the input so we can make it visible and make it current.
@@ -1943,11 +1944,11 @@ void vtkPVSource::SaveState(ofstream *file)
   vtkPVWidget *pvw;
 
   // Detect if this source is in Glyph sourcesm and already exists.
-  if (this->GetTraceReferenceCommand())
+  if (this->GetTraceHelper()->GetReferenceCommand())
     {
     *file << "set kw(" << this->GetTclName() << ") [$kw(" 
-          << this->GetTraceReferenceObject()->GetTclName() << ") " 
-          << this->GetTraceReferenceCommand() << "]\n";
+          << this->GetTraceHelper()->GetReferenceHelper()->GetObject()->GetTclName() << ") " 
+          << this->GetTraceHelper()->GetReferenceCommand() << "]\n";
     return;
     }
 
@@ -2050,16 +2051,16 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
   char str[512];
   this->Widgets->AddItem(pvw);
 
-  if (pvw->GetTraceName() == NULL)
+  if (pvw->GetTraceHelper()->GetObjectName() == NULL)
     {
     vtkWarningMacro("TraceName not set. Widget class: " 
                     << pvw->GetClassName());
     return;
     }
 
-  pvw->SetTraceReferenceObject(this);
-  sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
-  pvw->SetTraceReferenceCommand(str);
+  pvw->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+  sprintf(str, "GetPVWidget {%s}", pvw->GetTraceHelper()->GetObjectName());
+  pvw->GetTraceHelper()->SetReferenceCommand(str);
 }
 
 //----------------------------------------------------------------------------
@@ -2109,7 +2110,9 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
   while ( (o = this->Widgets->GetNextItemAsObject()) )
     {
     pvw = vtkPVWidget::SafeDownCast(o);
-    if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
+    if (pvw && 
+        pvw->GetTraceHelper()->GetObjectName() && 
+        strcmp(pvw->GetTraceHelper()->GetObjectName(), name) == 0)
       {
       return pvw;
       }

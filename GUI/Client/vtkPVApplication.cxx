@@ -59,6 +59,7 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTraceFileDialog.h"
+#include "vtkPVTraceHelper.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -111,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.344");
+vtkCxxRevisionMacro(vtkPVApplication, "1.345");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -174,7 +175,8 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
   vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );
   const char* message = static_cast<char*>( calldata );
   cerr << "# Error or warning: " << message << endl;
-  self->AddTraceEntry("# Error or warning:");
+  vtkPVTraceHelper::OutputSimpleEntry(
+    self->GetTraceFile(), "# Error or warning:");
   size_t cc;
   ostrstream str;
   for ( cc= 0; cc < strlen(message); cc ++ )
@@ -186,7 +188,8 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
       }
     }
   str << ends;
-  self->AddTraceEntry("# %s\n#", str.str());
+  vtkPVTraceHelper::OutputEntry(
+    self->GetTraceFile(), "# %s\n#", str.str());
   //cout << "# " << str.str() << endl;
   str.rdbuf()->freeze(0);
 }
@@ -441,6 +444,7 @@ vtkPVApplication::vtkPVApplication()
   this->HasSplashScreen = 1;
 
   this->TraceFileName = 0;
+  this->TraceFile = NULL;
   this->Argv0 = 0;
 
   this->StartGUI = 1;
@@ -462,10 +466,11 @@ vtkPVApplication::~vtkPVApplication()
   vtkOutputWindow::SetInstance(0);
 
   this->SetProcessModule(NULL);
-  if ( this->TraceFile )
+  if (this->TraceFile)
     {
+    this->TraceFile->close();
     delete this->TraceFile;
-    this->TraceFile = 0;
+    this->TraceFile = NULL;
     }
   this->SetTraceFileName(0);
   this->SetArgv0(0);
@@ -1159,14 +1164,17 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->TraceFile = new ofstream(this->TraceFileName, ios::out);
     
   // Initialize a couple of variables in the trace file.
-  this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
-                      ui->GetTclName());
-  ui->SetTraceInitialized(1);
+  vtkPVTraceHelper::OutputEntry(
+    this->GetTraceFile(), 
+    "set kw(%s) [$Application GetMainWindow]", ui->GetTclName());
+  ui->GetTraceHelper()->SetInitialized(1);
   // We have to set this variable after the window variable is set,
   // so it has to be done here.
-  this->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",
-                      ui->GetMainView()->GetTclName(), ui->GetTclName());
-  ui->GetMainView()->SetTraceInitialized(1);
+  vtkPVTraceHelper::OutputEntry(
+    this->GetTraceFile(), 
+    "set kw(%s) [$kw(%s) GetMainView]",
+    ui->GetMainView()->GetTclName(), ui->GetTclName());
+  ui->GetMainView()->GetTraceHelper()->SetInitialized(1);
 
   // Some scripts were hanging due to event loop issues.
   // This update prevents such problems.
@@ -1361,9 +1369,11 @@ void vtkPVApplication::StartRecordingScript(char *filename)
     }
 
   // Initialize a couple of variables in the trace file.
-  this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
-                      this->GetMainWindow()->GetTclName());
-  this->GetMainWindow()->SetTraceInitialized(1);
+  vtkPVTraceHelper::OutputEntry(
+    this->GetTraceFile(), 
+    "set kw(%s) [$Application GetMainWindow]",
+    this->GetMainWindow()->GetTclName());
+  this->GetMainWindow()->GetTraceHelper()->SetInitialized(1);
   this->SetTraceFileName(filename);
 }
 

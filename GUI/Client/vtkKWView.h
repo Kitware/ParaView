@@ -28,7 +28,7 @@
 
 #define VTK_KW_VIEW_MENU_INDEX     10
 
-#include "vtkKWWidget.h"
+#include "vtkPVTracedWidget.h"
 #include "vtkWindows.h" // needed for RECT HDC
 
 class vtkKWApplication;
@@ -54,10 +54,11 @@ class vtkViewport;
 class vtkViewport;
 class vtkWindow;
 
-class VTK_EXPORT vtkKWView : public vtkKWWidget
+class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
 {
   public:
-  vtkTypeRevisionMacro(vtkKWView,vtkKWWidget);
+  static vtkKWView* New();
+  vtkTypeRevisionMacro(vtkKWView,vtkPVTracedWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

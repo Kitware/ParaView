@@ -32,9 +32,10 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.22");
+vtkCxxRevisionMacro(vtkPVValueList, "1.23");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -131,11 +132,14 @@ void vtkPVValueList::SetLabel(const char* str)
 {
   this->ContourValuesFrame->SetLabelText(str);
   if (str && str[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+      (this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateUninitialized ||
+       this->GetTraceHelper()->GetObjectNameState() == 
+       vtkPVTraceHelper::ObjectNameStateDefault) )
     {
-    this->SetTraceName(str);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    this->GetTraceHelper()->SetObjectName(str);
+    this->GetTraceHelper()->SetObjectNameState(
+      vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 }
 
@@ -568,7 +572,7 @@ void vtkPVValueList::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
@@ -595,7 +599,7 @@ void vtkPVValueList::AddAnimationScriptsToMenu(
   char methodAndArgs[500];
   
   sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
+  menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0,"");
 }
 
 //-----------------------------------------------------------------------------

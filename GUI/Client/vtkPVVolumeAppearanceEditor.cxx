@@ -33,10 +33,11 @@
 #include "vtkPVVolumePropertyWidget.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWColorTransferFunctionEditor.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.28");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -350,7 +351,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
     // Save trace 
-    this->AddTraceEntry("$kw(%s) SetScalarOpacityUnitDistance %f", this->GetTclName(), d );
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetScalarOpacityUnitDistance %f", this->GetTclName(), d );
     int numParts = this->PVSource->GetNumberOfParts();
     vtkSMPart *part;
 
@@ -389,7 +390,7 @@ void vtkPVVolumeAppearanceEditor::AddColorPoint(double s, double r, double g, do
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
     // Save trace:
-    this->AddTraceEntry("$kw(%s) AddColorPoint %f %f %f %f", this->GetTclName(), s, r, g, b);
+    this->GetTraceHelper()->AddEntry("$kw(%s) AddColorPoint %f %f %f %f", this->GetTclName(), s, r, g, b);
     int numParts = this->PVSource->GetNumberOfParts();
     vtkSMPart *part;
 
@@ -429,7 +430,7 @@ void vtkPVVolumeAppearanceEditor::AddScalarOpacityPoint(double scalar, double op
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
     // Save trace:
-    this->AddTraceEntry("$kw(%s) AddScalarOpacityPoint %f %f", this->GetTclName(), scalar, opacity);
+    this->GetTraceHelper()->AddEntry("$kw(%s) AddScalarOpacityPoint %f %f", this->GetTclName(), scalar, opacity);
     int numParts = this->PVSource->GetNumberOfParts();
     vtkSMPart *part;
 

@@ -39,6 +39,7 @@
 #include "vtkKWScale.h"
 #include "vtkSMProperty.h"
 #include "vtkSMDomain.h"
+#include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 
@@ -77,7 +78,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.58");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -111,7 +112,6 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->Script = 0;
   this->CustomScript = 0;
   this->CurrentMethod = 0;
-  this->TraceName = 0;
   this->TimeStart = 0;
   this->TimeEnd = 100;
   this->AnimationElement = 0;
@@ -209,10 +209,10 @@ void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
     return;
     }
   this->CurrentIndex = idx;
-  this->TraceInitialized = 0;
+  this->GetTraceHelper()->SetInitialized(0);
   char buffer[1024];
   sprintf(buffer, "GetSourceEntry %d", idx);
-  this->SetTraceReferenceCommand(buffer);
+  this->GetTraceHelper()->SetReferenceCommand(buffer);
   this->Dirty = 1;
 }
 
@@ -394,7 +394,6 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
   this->SetCurrentMethod(0);
-  this->SetTraceName(0);
   this->SetLabel(0);
   this->SetPVSource(0);
   this->SetSaveStateObject(0);
@@ -501,9 +500,9 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
     button->SetButtonText(label);
     delete[] label;
     //cout << "-- PV source was set to: " << (src?src->GetName():"<none>") << endl;
-    if (this->PVSource->InitializeTrace(NULL))
+    if (this->PVSource->GetTraceHelper()->Initialize())
       {
-      this->AddTraceEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
+      this->GetTraceHelper()->AddEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
                           this->PVSource->GetTclName());
       }
     }
@@ -513,7 +512,7 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
       {
       button->SetButtonText("None");
       }
-    this->AddTraceEntry("$kw(%s) SetPVSource {}", this->GetTclName());
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetPVSource {}", this->GetTclName());
     }
   this->UpdateMethodMenu(0);
   this->Parent->ShowEntryInFrame(this, -1);
@@ -524,7 +523,7 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::NoMethodCallback()
 {
-  this->AddTraceEntry("$kw(%s) NoMethodCallback", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) NoMethodCallback", this->GetTclName());
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->SetScript(0);
@@ -541,7 +540,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
 {
-  this->AddTraceEntry("$kw(%s) ScriptMethodCallback", this->GetTclName());
+  this->GetTraceHelper()->AddEntry("$kw(%s) ScriptMethodCallback", this->GetTclName());
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->UpdateMethodMenu();
@@ -646,7 +645,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeStart(float f)
     {
     return;
     } 
-  this->AddTraceEntry("$kw(%s) SetTimeStart %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeStart %f", 
                       this->GetTclName(), f);
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -674,7 +673,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
     {
     return;
     } 
-  this->AddTraceEntry("$kw(%s) SetTimeEnd %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeEnd %f", 
                       this->GetTclName(), f);
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -749,7 +748,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationStyle(int s)
     {
     return;
     } 
-  this->AddTraceEntry("$kw(%s) SetTimeEquationStyle %d", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeEquationStyle %d", 
                       this->GetTclName(), s);
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -778,7 +777,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationPhase(float p)
     {
     return;
     } 
-  this->AddTraceEntry("$kw(%s) SetTimeEquationPhase %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeEquationPhase %f", 
                       this->GetTclName(), p);
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -807,7 +806,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationFrequency(float f)
     {
     return;
     } 
-  this->AddTraceEntry("$kw(%s) SetTimeEquationFrequency %f", 
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetTimeEquationFrequency %f", 
                       this->GetTclName(), f);
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -1084,7 +1083,7 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
     {
     return;
     }
-  this->AddTraceEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
                       script);
   this->GetMethodMenuButton()->SetButtonText("Script");
   this->Parent->UpdateNewScript();
@@ -1160,12 +1159,12 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
   if ( this->Dirty )
     {
     this->SetTypeToFloat();
-    //this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
+    //this->GetTraceHelper()->AddEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
     //  this->GetTclName(), label, script);
     }
   this->Parent->UpdateNewScript();
 
-  this->SetTraceName(traceName);
+  this->GetTraceHelper()->SetObjectName(traceName);
 }
 
 //-----------------------------------------------------------------------------
@@ -1192,7 +1191,7 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
         {
         *file << "$kw(" << this->GetTclName() << ") SetCurrentSMProperty [["
               << "$kw(" << this->GetPVSource()->GetTclName()
-              << ") GetPVWidget {" << this->GetTraceName()
+              << ") GetPVWidget {" << this->GetTraceHelper()->GetObjectName()
               << "}] GetSMProperty]" << endl;
         *file << "$kw(" << this->GetTclName() << ") SetCurrentSMDomain [["
               << "$kw(" <<this->GetTclName()
@@ -1201,7 +1200,7 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
 
       *file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {"
             << this->CurrentMethod << "} \"\" " 
-            << this->GetTraceName() << endl;
+            << this->GetTraceHelper()->GetObjectName() << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEquationStyle " << this->TimeEquationStyle << endl;

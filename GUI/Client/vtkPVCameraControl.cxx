@@ -24,9 +24,10 @@
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.7");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -109,7 +110,7 @@ void vtkPVCameraControl::Elevation(double angle)
   
   xform->Delete();
   
-  this->AddTraceEntry("$kw(%s) Elevation %f", this->GetTclName(), angle);
+  this->GetTraceHelper()->AddEntry("$kw(%s) Elevation %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Azimuth(double angle)
@@ -149,7 +150,7 @@ void vtkPVCameraControl::Azimuth(double angle)
   
   xform->Delete();
 
-  this->AddTraceEntry("$kw(%s) Azimuth %f", this->GetTclName(), angle);
+  this->GetTraceHelper()->AddEntry("$kw(%s) Azimuth %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Roll(double angle)
@@ -195,7 +196,7 @@ void vtkPVCameraControl::Roll(double angle)
   
   xform->Delete();
 
-  this->AddTraceEntry("$kw(%s) Roll %f", this->GetTclName(), angle);
+  this->GetTraceHelper()->AddEntry("$kw(%s) Roll %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)

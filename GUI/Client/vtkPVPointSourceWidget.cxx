@@ -31,10 +31,11 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkPVWindow.h"
+#include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.46");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -50,13 +51,15 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   
   this->RadiusWidget = vtkPVScaleFactorEntry::New();
   this->RadiusWidget->SetParent(this);
-  this->RadiusWidget->SetTraceReferenceObject(this);
-  this->RadiusWidget->SetTraceReferenceCommand("GetRadiusWidget");
+  this->RadiusWidget->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->RadiusWidget->GetTraceHelper()->SetReferenceCommand("GetRadiusWidget");
   
   this->NumberOfPointsWidget = vtkPVVectorEntry::New();
   this->NumberOfPointsWidget->SetParent(this);
-  this->NumberOfPointsWidget->SetTraceReferenceObject(this);
-  this->NumberOfPointsWidget->SetTraceReferenceCommand(
+  this->NumberOfPointsWidget->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->NumberOfPointsWidget->GetTraceHelper()->SetReferenceCommand(
     "GetNumberOfPointsWidget");
   
   // Start out modified so that accept will set the source
@@ -339,7 +342,7 @@ void vtkPVPointSourceWidget::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Trace(ofstream *file)
 {
-  if ( ! this->InitializeTrace(file))
+  if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
     }
