@@ -2,7 +2,7 @@ ParaView render server modifications:
 
 There are two types of situations that the new render server will address:
 
-1) Data on a super computer SGI, IBM, etc and Rendering on a Linux cluster
+1) Data on a super computer (SGI, IBM, etc) and Rendering on a Linux cluster
    with hardware graphics support.  This problem is known as the "M" to "N"
    geometry load redistribution problem.  It addresses the common case where
    there is a signinficante mismatch in the size of large parallel computing
@@ -13,11 +13,9 @@ There are two types of situations that the new render server will address:
 2) Both data and rendering processing occur on a super computer that has
    rendering support.  A certain number of processes will be dedicated to
    each task.  In this case, it is planned that the data server and the
-   rendering would all be in the same MPI group.  
-
-   In this case, we expect that we will be able to use the LANL prototype MxN
-   polygon load redistribution code.
-
+   rendering would all be in the same MPI group.  In this case, we expect
+   that we will be able to use the LANL prototype MxN polygon load
+   redistribution code.
 
 
 
@@ -86,38 +84,12 @@ modified paraview will have the following command line options:
       2. Extend the ProcessModule to send data to the RenderServer with a
       method SendStreamToRenderServer using the new clientserver streams.
 
-      3. Change vtkPartDisplay.cxx to create the right objects on the correct servers.
-      Basically, this will be an extension of what already exists in
-      ParaView.  For a simple case of a Cone display, the pipelines look like this:
-
-         Server:
-         Cone -> GeometryFilter -> CollectFilter -> Suppressor -> Mapper -> Actor
-
-         Client:
-                                   CollectFilter -> Suppressor -> Mapper -> Actor
-
-
-      In the new RenderServer version of ParaView it will look something like this:
-
-      DataServer:
-         Cone -> GeometryFilter -> CollectFilter -> Suppressor   (N of these)
-
-      RenderServer:
-         CollectFilter -> Suppressor -> Mapper -> Actor  (M of these)
-
-       Update will be broadcast to all servers (client, render, data) at the same
-       time.
-
-      4. Create a filter that will do the M to N data distribution.  This
-      will be based on vtkDuplicatePolydata and will use the MPI call like
-      AllGather.  The first implementation will be a brute force division of
-      the M to N.  All data will be collected to the server manager and then
-      distributed among the renderserver processes.
-
 
 
 Stage 2:
 
+      1. Connect processes on data server to the render server. 
+      
       Once the render server is working via the socket connect from P0 of the
       data server and P0 of the render server, the next step will be to
       create socket connections directly from the data server to the render
@@ -145,8 +117,35 @@ Stage 2:
       |  |      |
       P0 P1 ... PN
 
-      In this case, the filter that does the M to N distribution will be on
-      the data server.
  
+      2. Change vtkPartDisplay.cxx to create the right objects on the correct servers.
+      Basically, this will be an extension of what already exists in
+      ParaView.  For a simple case of a Cone display, the pipelines look like this:
+
+         Server:
+         Cone -> GeometryFilter -> CollectFilter -> Suppressor -> Mapper -> Actor
+
+         Client:
+                                   CollectFilter -> Suppressor -> Mapper -> Actor
+
+
+      In the new RenderServer version of ParaView it will look something like this:
+
+      DataServer:
+         Cone -> GeometryFilter -> CollectFilter -> Suppressor   (N of these)
+
+      RenderServer:
+         CollectFilter -> Suppressor -> Mapper -> Actor  (M of these)
+
+       Update will be broadcast to all servers (client, render, data) at the same
+       time.
+
+      3. Create a filter that will do the M to N data distribution.  This
+      will be based on vtkDuplicatePolydata and will use the MPI call like
+      AllGather.  The first implementation will be a brute force division of
+      the M to N.  All data will be collected to the server manager and then
+      distributed among the renderserver processes.
+
+
 Stage 3:
      Implement case 2.
