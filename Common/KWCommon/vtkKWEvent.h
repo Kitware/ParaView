@@ -102,6 +102,7 @@ class VTK_EXPORT vtkKWEvent
     Marker3DRemoveAllMarkerGroupsEvent,
     Marker3DRemoveSelectedMarkerEvent,
     Marker3DRemoveSelectedMarkerGroupEvent,
+    Marker3DSelectMarkerGroupEvent,
     Marker3DVisibilityChangedEvent,
     MaterialPropertyChangedEvent,
     MaterialPropertyChangingEvent,
