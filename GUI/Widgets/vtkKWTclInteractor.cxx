@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.23");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.24");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -164,8 +164,8 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app, "-setgrid true");
-  this->DisplayText->SetWidth(60);
-  this->DisplayText->SetHeight(8);
+  this->DisplayText->SetWidth(100);
+  this->DisplayText->SetHeight(20);
   this->DisplayText->SetWrapToWord();
   this->DisplayText->EditableTextOff();
   this->DisplayText->UseVerticalScrollbarOn();
@@ -189,6 +189,22 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::Display()
 {
+  if (this->MasterWindow)
+    {
+    int width, height;
+    
+    int x, y;
+
+    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+           &width, &height, &x, &y);
+    
+    x += width / 3;
+    y += height / 3;
+    
+    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), x, y);
+    }
+
   this->Script("wm deiconify %s", this->GetWidgetName());
 }
 
