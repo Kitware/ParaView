@@ -33,14 +33,11 @@
 
 #include <vtkObject.h>
 
-#include <vtkSystemIncludes.h>
-
 class vtkDataSetAttributes;
-class vtkStreamingTessellator;
 class vtkMatrix4x4;
+class vtkStreamingTessellator;
 
-class VTK_EXPORT vtkSubdivisionAlgorithm
-  : public vtkObject
+class VTK_EXPORT vtkSubdivisionAlgorithm : public vtkObject
 {
   public:
     vtkTypeRevisionMacro(vtkSubdivisionAlgorithm,vtkObject);

@@ -37,13 +37,10 @@
 
 #include <vtkSubdivisionAlgorithm.h>
 
-#include <vtkSystemIncludes.h>
-
-class vtkDataSet;
 class vtkCell;
+class vtkDataSet;
 
-class VTK_EXPORT vtkDataSetSubdivisionAlgorithm
-  : public vtkSubdivisionAlgorithm
+class VTK_EXPORT vtkDataSetSubdivisionAlgorithm : public vtkSubdivisionAlgorithm
 {
   public:
     vtkTypeRevisionMacro(vtkDataSetSubdivisionAlgorithm,vtkSubdivisionAlgorithm);

@@ -19,7 +19,7 @@
 #include <vtkCell.h>
 #include <vtkDataSet.h>
 
-vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.3");
+vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.4");
 vtkStandardNewMacro(vtkDataSetSubdivisionAlgorithm);
 
 vtkDataSetSubdivisionAlgorithm::vtkDataSetSubdivisionAlgorithm()
@@ -48,6 +48,8 @@ void vtkDataSetSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
   os << indent << "CurrentCellId: " << this->CurrentCellId << endl;
   os << indent << "CurrentMesh: " << this->CurrentMesh << endl;
+  os << indent << "ChordError2: " << this->ChordError2 << endl;
+  os << indent << "ActiveFieldCriteria: " << this->ActiveFieldCriteria << endl;
 }
 
 void vtkDataSetSubdivisionAlgorithm::SetMesh( vtkDataSet* mesh )

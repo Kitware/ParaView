@@ -51,18 +51,17 @@
 // .SECTION See Also
 // vtkDataSetToUnstructuredGridFilter vtkDataSet vtkStreamingTessellator vtkDataSetSubdivisionAlgorithm
 
-#include <vtkDataSet.h>
-#include <vtkUnstructuredGrid.h>
 #include <vtkDataSetToUnstructuredGridFilter.h>
 
 class vtkDataArray;
-
+class vtkDataSet;
+class vtkDataSetSubdivisionAlgorithm;
+class vtkPoints;
 class vtkStreamingTessellator;
 class vtkSubdivisionAlgorithm;
-class vtkDataSetSubdivisionAlgorithm;
+class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkTempTessellatorFilter
-  : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridFilter
 {
   public:
     vtkTypeRevisionMacro(vtkTempTessellatorFilter,vtkDataSetToUnstructuredGridFilter);
