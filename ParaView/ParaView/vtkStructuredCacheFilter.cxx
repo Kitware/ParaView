@@ -30,7 +30,7 @@
 #include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.3");
+vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.4");
 vtkStandardNewMacro(vtkStructuredCacheFilter);
 
 //----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ void vtkStructuredCacheFilter::UpdateData(vtkDataObject *outObject)
       if (extProc == 1)
         { // This extent is from the input.
         input->SetUpdateExtent(ext);
-        input->Update();
+        input->UpdateData();
         this->CopyExtent(input, output, ext);
         }
       if (extProc > 1)
@@ -111,6 +111,8 @@ void vtkStructuredCacheFilter::UpdateData(vtkDataObject *outObject)
       }
     }
   
+  output->DataHasBeenGenerated();
+
   // Save the output as cache.
   if (this->Cache == NULL)
     {
