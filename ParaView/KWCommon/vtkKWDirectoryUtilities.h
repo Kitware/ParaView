@@ -127,7 +127,13 @@ public:
   // Description:
   // Remove file.
   static int RemoveFile(const char* filename);
-  
+
+  // Description:
+  // Get modified and creation time of file. 
+  // Win32: CreationTime works only for NTFS filesystem, not FAT
+  static time_t ModifiedTime(const char* filename);
+  static time_t CreationTime(const char* filename);
+
 protected:
   vtkKWDirectoryUtilities();
   ~vtkKWDirectoryUtilities();

@@ -61,7 +61,7 @@ static inline int Chdir(const char* dir)
 #define _unlink unlink
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.16");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.17");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -726,5 +726,32 @@ int vtkKWDirectoryUtilities::RemoveFile(const char* filename)
   return unlink(filename) ? 0 : 1;
 }
 
+//----------------------------------------------------------------------------
+time_t vtkKWDirectoryUtilities::ModifiedTime(const char* filename)
+{
+  struct stat fs;
+  if (stat(filename, &fs) != 0) 
+    {
+    return 0;
+    }
+  else
+    {
+    return fs.st_mtime;
+    }
+}
+
+//----------------------------------------------------------------------------
+time_t vtkKWDirectoryUtilities::CreationTime(const char* filename)
+{
+  struct stat fs;
+  if (stat(filename, &fs) != 0) 
+    {
+    return 0;
+    }
+  else
+    {
+    return fs.st_ctime >= 0 ? fs.st_ctime : 0;
+    }
+}
 
 

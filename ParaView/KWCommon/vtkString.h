@@ -132,6 +132,17 @@ public:
   // string and replacing them with an ellipsis (...). This is done in-place.
   static char* CropString(char* str, size_t max_len);
 
+  // Description:
+  // Convert a string in __DATE__ or __TIMESTAMP__ format into a struct tm
+  // or a time_t.
+  // return 0 on error, 1 on success
+  //BTX
+  static int ConvertDateMacroString(char *str, struct tm* tmt);
+  static int ConvertDateMacroString(char *str, time_t *tmt);
+  static int ConvertTimeStampMacroString(char *str, struct tm* tmt);
+  static int ConvertTimeStampMacroString(char *str, time_t *tmt);
+  //ETX
+
 protected:
   vtkString() {};
   ~vtkString() {};
