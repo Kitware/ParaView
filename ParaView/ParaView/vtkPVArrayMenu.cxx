@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.42");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -242,7 +242,7 @@ void vtkPVArrayMenu::ArrayMenuEntryCallback(const char* name)
   this->SetArrayName(name);
   this->UpdateComponentMenu();
   this->ModifiedCallback();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
 
   this->SelectedComponent = comp;
   this->ModifiedCallback();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -494,7 +494,7 @@ void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
 void vtkPVArrayMenu::Update()
 {
   this->UpdateArrayMenu();
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------

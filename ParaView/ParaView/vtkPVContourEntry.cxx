@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -79,7 +79,6 @@ vtkPVContourEntry::vtkPVContourEntry()
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
-  this->SetPVSource(NULL);
   this->SetProperty(NULL);
   this->SetArrayMenu(NULL);
 }

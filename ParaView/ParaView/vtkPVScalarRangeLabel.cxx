@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.17");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -121,6 +121,7 @@ void vtkPVScalarRangeLabel::Update()
     this->Range[0] = VTK_LARGE_FLOAT;
     this->Range[1] = -VTK_LARGE_FLOAT;
     this->Label->SetLabel("Missing Array");
+    this->Superclass::Update();
     return;
     }
 
@@ -137,6 +138,7 @@ void vtkPVScalarRangeLabel::Update()
     }
 
   this->Label->SetLabel(str);
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
