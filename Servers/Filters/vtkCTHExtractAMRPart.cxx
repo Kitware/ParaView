@@ -42,7 +42,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.10");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.11");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -361,7 +361,7 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
 #ifdef VTK_USE_PATENTED
   this->Contour = vtkPVKitwareContourFilter::New();
   // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  contour->ComputeNormalsOff();
+  this->Contour->ComputeNormalsOff();
 #else
   this->Contour = vtkContourFilter::New();
 #endif
