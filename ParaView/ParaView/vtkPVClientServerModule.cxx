@@ -250,7 +250,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.2");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1084,7 +1084,7 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
 
 void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 {
-  this->ClientServerInterpreter->ProcessMessage(msg, len);
+  this->ClientServerInterpreter->ProcessStream(msg, len);
 }
 
 
