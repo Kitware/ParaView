@@ -27,6 +27,8 @@ vtkKWLabeledFrame.cxx
 vtkKWLabeledLabel.cxx 
 vtkKWLabeledLabelSet.cxx
 vtkKWLabeledOptionMenu.cxx 
+vtkKWLabeledPopupButton.cxx 
+vtkKWLabeledPushButton.cxx
 vtkKWLabeledPushButtonSet.cxx 
 vtkKWLabeledRadioButtonSet.cxx 
 vtkKWLabeledText.cxx 
@@ -40,6 +42,7 @@ vtkKWNotebook.cxx
 vtkKWOKCancelDialog.cxx 
 vtkKWObject.cxx 
 vtkKWOptionMenu.cxx 
+vtkKWPopupButton.cxx 
 vtkKWProgressGauge.cxx 
 vtkKWPushButton.cxx 
 vtkKWPushButtonSet.cxx 
