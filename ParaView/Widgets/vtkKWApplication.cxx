@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.2");
+vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.3");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1043,12 +1043,10 @@ int vtkKWApplication::LoadScript(const char* filename)
   // add this window as a variable
   if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
     {
-    vtkErrorMacro("\n    Script: \n" << filename << "\n    Returned Error on line "
+    vtkErrorMacro("\n    Script: \n" << filename 
+                  << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n      "  
                   << Tcl_GetStringResult(this->MainInterp) << endl);
-    cout << "\n    Script: \n" << filename << "\n    Returned Error on line "
-         << this->MainInterp->errorLine << ": \n      "  
-         << Tcl_GetStringResult(this->MainInterp) << endl;
     res = 0;
     this->SetExitStatus(1);
     }
