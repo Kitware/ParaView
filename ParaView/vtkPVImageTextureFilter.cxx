@@ -168,9 +168,17 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
 
   input->GetWholeExtent(this->Extent);
 
+  cerr << "WholeExtent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
+       << this->Extent[2] << ", " << this->Extent[3] << ", "
+       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  
   if (this->Assignment)
     {
     aExt = this->Assignment->GetExtent();
+    
+    cerr << this->Assignment << " AssignExtent: " << aExt[0] << ", " << aExt[1] << ", "
+	 << aExt[2] << ", " << aExt[3] << ", "
+	 << aExt[4] << ", " << aExt[5] << endl;    
     
     if (aExt[0] > this->Extent[0])
       {
@@ -200,9 +208,23 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
       }
     }
   
-  input->SetUpdateExtent(this->Extent);
+  // Check for condition of no overlap
+  if (this->Extent[0] > this->Extent[1] || 
+      this->Extent[2] > this->Extent[3] ||
+      this->Extent[4] > this->Extent[5])
+    {
+    this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
+    this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;    
+    }
   
+  cerr << "Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
+       << this->Extent[2] << ", " << this->Extent[3] << ", "
+       << this->Extent[4] << ", " << this->Extent[5] << endl;
+  
+  input->SetUpdateExtent(this->Extent);
 }
+
+#include "vtkStructuredPointsWriter.h"
 
 
 //----------------------------------------------------------------------------
@@ -215,12 +237,25 @@ void vtkPVImageTextureFilter::Execute()
   vtkPolyData *output = this->GetOutput();
   vtkImageData *outputTexture = this->GetTextureOutput();
   
+  if (this->Extent[0] > this->Extent[1])
+    {
+    return;
+    }
+  
   this->IntermediateImage->ShallowCopy(input);
   this->Clip->SetOutputWholeExtent(this->Extent);
   this->Clip->Update();
   
   outputTexture->ShallowCopy(this->Clip->GetOutput());
-
+  cerr << *outputTexture << endl;
+  vtkStructuredPointsWriter *w;
+  w = vtkStructuredPointsWriter::New();
+  w->SetInput(this->IntermediateImage);
+  w->SetFileTypeToBinary();
+  w->SetFileName("junkTexture.vtk");
+  w->Write();
+  w->Delete();
+  
   // Determine which axis we are displaying.
   if (this->Extent[0] == this->Extent[1])
     {
