@@ -12,5 +12,5 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#define PARAVIEW_BINARY_DIR "@PARAVIEW_BINARY_DIR@"
+#define PARAVIEW_BINARY_DIR "@EXECUTABLE_OUTPUT_PATH@"
 
