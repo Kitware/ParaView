@@ -21,6 +21,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
+#include "vtkPVRenderModule.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -33,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.19");
 
 struct vtkSMSourceProxyInternals
 {
@@ -262,6 +263,12 @@ void vtkSMSourceProxy::MarkConsumersAsModified()
 {
   this->Superclass::MarkConsumersAsModified();
   this->InvalidateDataInformation();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetRenderModule())
+    {
+    pm->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
+    }
 }
 
 //---------------------------------------------------------------------------

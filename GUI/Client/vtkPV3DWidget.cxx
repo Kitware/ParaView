@@ -25,7 +25,6 @@
 #include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPart.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -35,7 +34,7 @@
 #include "vtkKWEvent.h"
 #include "vtkRM3DWidget.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.56");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.57");
 
 //===========================================================================
 //***************************************************************************
@@ -281,14 +280,6 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ActualPlaceWidget()
 {
-  // I do not think we actually need an input.
-
-  //vtkDataSet* data = 0;
-  //if ( this->PVSource->GetPVInput() )
-  //  {
-  //  data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
-  //  }
-  //this->Widget3D->SetInput(data);
   double bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   this->RM3DWidget->PlaceWidget(bds);

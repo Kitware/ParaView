@@ -20,14 +20,14 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVSource.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkDataSet.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.7");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()

@@ -28,7 +28,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 

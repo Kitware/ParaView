@@ -58,7 +58,7 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.335");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.336");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

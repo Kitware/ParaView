@@ -68,6 +68,13 @@ public:
   // until we come up with a better API (maybe proxy/properties).
   // The method SetPartDisplay also adds the display to this collection.
   void AddDisplay(vtkPVDisplay* disp);
+
+  // Description:
+  // This is used to get the class name of the output.
+  // It should probably just be a part of data information.
+  vtkPVClassNameInformation* GetClassNameInformation() 
+    {return this->ClassNameInformation;}
+
 //ETX
   // Description:
   // Update the data and geometry.

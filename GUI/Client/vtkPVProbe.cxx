@@ -29,7 +29,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.125");
+vtkCxxRevisionMacro(vtkPVProbe, "1.126");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -291,8 +291,8 @@ void vtkPVProbe::AcceptCallbackInternal()
     {
     // Connect to the display.
     // These should be merged.
-    this->PlotDisplay->SetPart(this->GetPart(0)->GetSMPart());
-    this->PlotDisplay->SetInput(this->GetPart(0)->GetSMPart());
+    this->PlotDisplay->SetPart(this->GetPart(0));
+    this->PlotDisplay->SetInput(this->GetPart(0));
     this->GetPart(0)->AddDisplay(this->PlotDisplay);
     this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PlotDisplay);
     }

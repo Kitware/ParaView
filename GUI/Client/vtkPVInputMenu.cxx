@@ -25,7 +25,7 @@
 #include "vtkPVData.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.62");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.63");
 
 
 //----------------------------------------------------------------------------

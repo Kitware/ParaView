@@ -21,7 +21,7 @@
 #include "vtkPVWindow.h"
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkKWRange.h"
 #include "vtkKWLabeledFrame.h"
@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.12");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.13");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -426,7 +426,7 @@ void vtkPVVolumeAppearanceEditor::UpdateMap(int width, int height)
     return;
     }
   
-  vtkPVPart *part = this->PVSource->GetPart(0);
+  vtkSMPart *part = this->PVSource->GetPart(0);
 
   vtkColorTransferFunction *colorFunc = 
       vtkColorTransferFunction::SafeDownCast(
@@ -508,7 +508,7 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     this->ColorRampRange->SetWholeRange( this->ScalarRange[0], 
                                                  this->ScalarRange[1] );
       
-    vtkPVPart *part = this->PVSource->GetPart(0);
+    vtkSMPart *part = this->PVSource->GetPart(0);
 
     vtkPiecewiseFunction *opacityFunc = 
       vtkPiecewiseFunction::SafeDownCast(
@@ -642,7 +642,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityRampInternal( double scalarSta
     {
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
-    vtkPVPart *part;
+    vtkSMPart *part;
     
     for (i = 0; i < numParts; i++)
       {
@@ -698,7 +698,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistanceInternal(double d)
     {
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
-    vtkPVPart *part;
+    vtkSMPart *part;
     
     for (i = 0; i < numParts; i++)
       {
@@ -791,7 +791,7 @@ void vtkPVVolumeAppearanceEditor::SetColorRampInternal( double s1, double r1,
     {
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
-    vtkPVPart *part;
+    vtkSMPart *part;
     
     for (i = 0; i < numParts; i++)
       {

@@ -104,7 +104,6 @@ SET( ParaViewClient_SRCS
   vtkPVNavigationWindow.cxx
   vtkPVObjectWidget.cxx
   vtkPVOrientScaleWidget.cxx
-  vtkPVPart.cxx
   vtkPVPLOT3DReaderModule.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx

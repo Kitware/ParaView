@@ -17,7 +17,7 @@
 #include "vtkPVData.h"
 #include "vtkPVPickDisplay.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVRenderModule.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.5");
+vtkCxxRevisionMacro(vtkPVPick, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -105,8 +105,8 @@ void vtkPVPick::AcceptCallbackInternal()
     {
     // Connect to the display.
     // These should be merged.
-    this->PickDisplay->SetPart(this->GetPart(0)->GetSMPart());
-    this->PickDisplay->SetInput(this->GetPart(0)->GetSMPart());
+    this->PickDisplay->SetPart(this->GetPart(0));
+    this->PickDisplay->SetInput(this->GetPart(0));
     this->GetPart(0)->AddDisplay(this->PickDisplay);
     this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PickDisplay);
     }

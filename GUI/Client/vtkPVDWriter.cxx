@@ -19,7 +19,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.8");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -116,7 +116,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
       {
       pm->GetStream() << vtkClientServerStream::Invoke
                       << writerID << "AddInput"
-                      << pvs->GetPart(i)->GetVTKDataID()
+                      << pvs->GetPart(i)->GetID(0)
                       << pvs->GetName()
                       << vtkClientServerStream::End;
       }
@@ -154,7 +154,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
       {
       pm->GetStream() << vtkClientServerStream::Invoke
                       << writerID << "AddInput"
-                      << pvs->GetPart(i)->GetVTKDataID()
+                      << pvs->GetPart(i)->GetID(0)
                       << vtkClientServerStream::End;
       }
 

@@ -48,7 +48,7 @@ class vtkSMSourceProxy;
 class vtkSource;
 class vtkStringList;
 class vtkCollection;
-class vtkPVPart;
+class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
 
@@ -325,10 +325,10 @@ public:
 
   // Description:
   // Access to individual parts.
-  void AddPart(vtkPVPart *part);
-  void SetPart(vtkPVPart *part);
-  vtkPVPart *GetPart() {return this->GetPart(0);} 
-  vtkPVPart *GetPart(int idx); 
+  void AddPart(vtkSMPart *part);
+  void SetPart(vtkSMPart *part);
+  vtkSMPart *GetPart() {return this->GetPart(0);} 
+  vtkSMPart *GetPart(int idx); 
   int GetNumberOfParts();
 
   // Descriptions:

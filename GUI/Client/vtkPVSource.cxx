@@ -35,7 +35,7 @@
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.369");
+vtkCxxRevisionMacro(vtkPVSource, "1.370");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -402,7 +402,7 @@ int vtkPVSource::GetNumberOfParts()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPart(vtkPVPart* part)
+void vtkPVSource::SetPart(vtkSMPart* part)
 {
   if ( !part )
     {
@@ -412,7 +412,7 @@ void vtkPVSource::SetPart(vtkPVPart* part)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddPart(vtkPVPart* part)
+void vtkPVSource::AddPart(vtkSMPart* part)
 {
   if ( !part )
     {
@@ -422,11 +422,11 @@ void vtkPVSource::AddPart(vtkPVPart* part)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPart* vtkPVSource::GetPart(int idx)
+vtkSMPart* vtkPVSource::GetPart(int idx)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
-  part = static_cast<vtkPVPart*>(this->Parts->GetItemAsObject(idx));
+  part = static_cast<vtkSMPart*>(this->Parts->GetItemAsObject(idx));
   return part;
 }
 
@@ -449,10 +449,10 @@ void vtkPVSource::InvalidateDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVSource::GatherDataInformation()
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   this->Parts->InitTraversal();
-  while ( ( part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
+  while ( ( part = (vtkSMPart*)(this->Parts->GetNextItemAsObject())) )
     {
     part->GatherDataInformation();
     }
@@ -468,10 +468,10 @@ void vtkPVSource::GatherDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   this->Parts->InitTraversal();
-  while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
+  while ( (part = (vtkSMPart*)(this->Parts->GetNextItemAsObject())) )
     {
     part->Update();
     }
@@ -527,7 +527,7 @@ void vtkPVSource::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVisibilityInternal(int v)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   if (this->GetPVOutput())
@@ -541,7 +541,7 @@ void vtkPVSource::SetVisibilityInternal(int v)
     part = this->GetPart(idx);
     if (part)
       {
-      part->SetVisibility(v);
+      part->GetPartDisplay()->SetVisibility(v);
       }
     }
 }
@@ -1347,7 +1347,7 @@ void vtkPVSource::MarkSourcesForUpdate()
 
   // Get rid of caches.
   int numParts;
-  vtkPVPart *part;
+  vtkSMPart *part;
   numParts = this->GetNumberOfParts();
   for (idx = 0; idx < numParts; ++idx)
     {
@@ -1360,6 +1360,7 @@ void vtkPVSource::MarkSourcesForUpdate()
     consumer = this->GetPVConsumer(idx);
     consumer->MarkSourcesForUpdate();
     }  
+
 }
 
 //----------------------------------------------------------------------------
@@ -2403,7 +2404,6 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
 int vtkPVSource::InitializeData()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVPart* part;
   vtkPVData* pvd;
 
   // Create the output.
@@ -2416,11 +2416,7 @@ int vtkPVSource::InitializeData()
   for (unsigned int i=0; i<numParts; i++)
     {
     vtkSMPart* smpart = this->Proxy->GetPart(i); 
-    part = vtkPVPart::New();
-    part->SetProcessModule(pvApp->GetProcessModule());
-    part->SetSMPart(smpart);
-    this->AddPart(part);
-    part->Delete();
+    this->AddPart(smpart);
     }
 
   this->SetPVOutput(pvd);

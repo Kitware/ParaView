@@ -69,7 +69,7 @@
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.593");
+vtkCxxRevisionMacro(vtkPVWindow, "1.594");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2174,9 +2174,9 @@ void vtkPVWindow::WriteData()
     }
 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetVTKDataID());
+  pm->GatherInformation(info, part->GetID(0));
 
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
@@ -2344,9 +2344,9 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   vtkPVWriter* writer = 0;
   vtkDataSet* data = NULL;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetVTKDataID());
+  pm->GatherInformation(info, part->GetID(0));
   if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
     {
     data = vtkImageData::New();
@@ -2764,7 +2764,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
   vtkPVSource* source;
   const char* sourceName;
   int numParts, partIdx;
-  vtkPVPart* part;
+  vtkSMPart* part;
   vtkPVPartDisplay* partDisplay = NULL;
   char *fileName;
   vtkPVSourceCollection *sources;

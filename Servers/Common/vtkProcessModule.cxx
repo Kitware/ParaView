@@ -25,6 +25,7 @@
 #include "vtkToolkits.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkProcessObject.h"
+#include "vtkPVRenderModule.h"
 
 #include <vtkstd/map>
 
@@ -42,7 +43,8 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.4");
+vtkCxxRevisionMacro(vtkProcessModule, "1.5");
+vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -94,6 +96,7 @@ vtkProcessModule::vtkProcessModule()
 
   this->ProgressRequests = 0;
   this->ProgressHandler = vtkPVProgressHandler::New();
+  this->RenderModule = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +116,7 @@ vtkProcessModule::~vtkProcessModule()
     }
   this->Observer->Delete();
   this->Observer = 0;
+  this->SetRenderModule(0);
 
   delete this->Internals;
 }

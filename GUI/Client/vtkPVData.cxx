@@ -19,7 +19,7 @@
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkCollection.h"
 #include "vtkColorTransferFunction.h"
@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.298");
+vtkCxxRevisionMacro(vtkPVData, "1.299");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -452,7 +452,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   this->vtkKWObject::SetApplication(pvApp);
   
-  // Nothing to do here since we created vtkPVPart.  
+  // Nothing to do here since we created vtkSMPart.  
   // I did not remove method in case we need to create Cube Axes in parallel.
   // I am having issues rendering on client.  I do not want to send
   // the zbuffer.
@@ -1520,7 +1520,7 @@ void vtkPVData::UpdatePropertiesInternal()
                                                   "DrawVolume");
       
     // Update the transfer functions
-    vtkPVPart *part;
+    vtkSMPart *part;
     int idx, num;
     
     num = this->GetPVSource()->GetNumberOfParts();
@@ -1535,7 +1535,7 @@ void vtkPVData::UpdatePropertiesInternal()
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorColor(double r, double g, double b)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -1625,7 +1625,7 @@ void vtkPVData::ColorByProperty()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPropertyInternal()
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -1674,7 +1674,7 @@ void vtkPVData::VolumeRenderPointField(const char *name)
   sprintf(str, "Point %s", name);
   
   // Update the transfer functions
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
   
   vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
@@ -1698,7 +1698,7 @@ void vtkPVData::VolumeRenderPointField(const char *name)
 void vtkPVData::VolumeRenderPointFieldInternal(const char *name)
 {
   int num, idx;
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1748,7 +1748,7 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   int num, idx;
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name, numComps));
   if (this->PVColorMap == NULL)
@@ -1814,7 +1814,7 @@ void vtkPVData::ColorByCellField(const char *name, int numComps)
 void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name, numComps));
@@ -1954,7 +1954,7 @@ void vtkPVData::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
   
   if (this->GetPVSource()->GetInitialized())
@@ -2037,7 +2037,7 @@ void vtkPVData::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   if (this->GetPVSource()->GetInitialized())
@@ -2113,7 +2113,7 @@ void vtkPVData::DrawPoints()
 //----------------------------------------------------------------------------
 void vtkPVData::DrawVolume()
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   if (this->GetPVSource()->GetInitialized())
@@ -2142,7 +2142,7 @@ void vtkPVData::DrawSurface()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  vtkPVPart *part;
+  vtkSMPart *part;
   int num, idx;
   
   if (this->GetPVSource()->GetInitialized())
@@ -2222,7 +2222,7 @@ void vtkPVData::DrawOutline()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  vtkPVPart *part;
+  vtkSMPart *part;
   int num, idx;
   
   if (this->GetPVSource()->GetInitialized())
@@ -2347,7 +2347,7 @@ void vtkPVData::SetInterpolationToFlat()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
@@ -2379,7 +2379,7 @@ void vtkPVData::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int num, idx;
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
@@ -2430,7 +2430,7 @@ void vtkPVData::AmbientChanged()
 //----------------------------------------------------------------------------
 void vtkPVData::SetAmbient(double ambient)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int num, idx;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -2663,7 +2663,7 @@ void vtkPVData::SetPointLabelVisibility(int val, int changeButtonState)
   
   int numParts = this->GetPVSource()->GetNumberOfParts();
   int i;
-  vtkPVPart *part;
+  vtkSMPart *part;
   vtkPVLODPartDisplay *display;
   
   for (i = 0; i < numParts; i++)
@@ -2810,7 +2810,7 @@ void vtkPVData::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
   
   num = this->GetPVSource()->GetNumberOfParts();
@@ -2863,7 +2863,7 @@ void vtkPVData::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
   
   num = this->GetPVSource()->GetNumberOfParts();
@@ -2921,7 +2921,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-    vtkPVPart *part = this->GetPVSource()->GetPart(0);
+    vtkSMPart *part = this->GetPVSource()->GetPart(0);
     vtkPVPartDisplay *partD = part->GetPartDisplay();
     *file << endl;
     *file << "set pvTemp" <<  partD->GetGeometryID()
@@ -3230,7 +3230,7 @@ void vtkPVData::SaveState(ofstream *file)
     int count;
     double *fun;
     
-    vtkPVPart *part = this->GetPVSource()->GetPart(0);
+    vtkSMPart *part = this->GetPVSource()->GetPart(0);
     
     vtkPiecewiseFunction *volumeOpacity = part->GetPartDisplay()->GetVolumeOpacity();
     *file << "$kw(" << this->GetTclName() << ") ClearVolumeOpacity" << endl;
@@ -3264,7 +3264,7 @@ void vtkPVData::SetVolumeOpacityUnitDistance( double d )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3284,7 +3284,7 @@ void vtkPVData::ClearVolumeOpacity()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3304,7 +3304,7 @@ void vtkPVData::AddVolumeOpacity( double scalar, double opacity )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3324,7 +3324,7 @@ void vtkPVData::ClearVolumeColor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3344,7 +3344,7 @@ void vtkPVData::AddVolumeColor( double scalar, double r, double g, double b )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3425,7 +3425,7 @@ void vtkPVData::OpacityChangedCallback()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   num = this->GetPVSource()->GetNumberOfParts();
@@ -3461,7 +3461,7 @@ void vtkPVData::OpacityChangedEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::GetActorTranslate(double* point)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   part = this->GetPVSource()->GetPart(0);  
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
@@ -3480,7 +3480,7 @@ void vtkPVData::GetActorTranslate(double* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorTranslateNoTrace(double x, double y, double z)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   this->TranslateThumbWheel[0]->SetValue(x);
@@ -3555,7 +3555,7 @@ void vtkPVData::ActorTranslateEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::GetActorScale(double* point)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   part = this->GetPVSource()->GetPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
@@ -3574,7 +3574,7 @@ void vtkPVData::GetActorScale(double* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorScaleNoTrace(double x, double y, double z)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   this->ScaleThumbWheel[0]->SetValue(x);
@@ -3649,7 +3649,7 @@ void vtkPVData::ActorScaleEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::GetActorOrientation(double* point)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   part = this->GetPVSource()->GetPart(0);
 
@@ -3669,7 +3669,7 @@ void vtkPVData::GetActorOrientation(double* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOrientationNoTrace(double x, double y, double z)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   this->OrientationScale[0]->SetValue(x);
@@ -3744,7 +3744,7 @@ void vtkPVData::ActorOrientationEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::GetActorOrigin(double* point)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
 
   part = this->GetPVSource()->GetPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetPartDisplay()->GetProp());
@@ -3763,7 +3763,7 @@ void vtkPVData::GetActorOrigin(double* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOriginNoTrace(double x, double y, double z)
 {
-  vtkPVPart *part;
+  vtkSMPart *part;
   int idx, num;
 
   this->OriginThumbWheel[0]->SetValue(x);

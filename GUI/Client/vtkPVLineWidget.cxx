@@ -24,7 +24,7 @@
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -35,7 +35,7 @@
 #include "vtkRMLineWidget.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.52");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()

@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProp3D.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
@@ -35,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.27");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.28");
 
 
 //----------------------------------------------------------------------------

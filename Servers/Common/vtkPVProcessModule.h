@@ -41,7 +41,6 @@ class vtkSocketController;
 class vtkKWApplication;
 class vtkProcessModuleGUIHelper;
 class vtkPVServerInformation;
-class vtkPVRenderModule;
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
 public:
@@ -213,13 +212,6 @@ public:
   virtual void SetProcessEnvironmentVariable(int processId, const char* var);
 
   // Description:
-  // RenderingModule has the rendering abstraction.  
-  // It creates the render window and any composit manager.  
-  // It also creates part displays which handle level of details.
-  void SetRenderModule(vtkPVRenderModule *module);
-  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
-  
-  // Description:
   // This should be eliminated (server information instead) or should
   // be in render module.
   vtkSetMacro(UseTiledDisplay,int);
@@ -260,7 +252,6 @@ protected:
   int UseStereoRendering;
   vtkPVServerInformation* ServerInformation;
   vtkProcessModuleGUIHelper* GUIHelper;
-  vtkPVRenderModule *RenderModule;
   int UseTiledDisplay;
   char* CaveConfigurationFileName;
   int UseTriangleStrips;

@@ -19,7 +19,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.17");
+vtkCxxRevisionMacro(vtkPVWriter, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -125,7 +125,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerID dataID = pvs->GetPart()->GetVTKDataID();
+  vtkClientServerID dataID = pvs->GetPart()->GetID(0);
   int success = 1;
 
   // Create the writer and configure it.

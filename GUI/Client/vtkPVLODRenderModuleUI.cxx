@@ -41,7 +41,7 @@
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.16");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.17");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

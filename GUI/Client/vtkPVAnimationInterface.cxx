@@ -51,7 +51,7 @@
 #include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkCompleteArrays.h"
@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.145");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.146");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1618,7 +1618,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         int numParts = source->GetNumberOfParts();
         for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
-          vtkPVPart* part = source->GetPart(partIdx);
+          vtkSMPart* part = source->GetPart(partIdx);
           vtkClientServerID animCompleteArraysID = pm->NewStreamObject("vtkCompleteArrays");
           arrays.push_back(animCompleteArraysID);
           pm->GetStream() << vtkClientServerStream::Invoke 
@@ -1672,7 +1672,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         int numParts = source->GetNumberOfParts();
         for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
-          vtkPVPart* part = source->GetPart(partIdx);
+          vtkSMPart* part = source->GetPart(partIdx);
           pm->GetStream() << vtkClientServerStream::Invoke 
                           << part->GetPartDisplay()->GetGeometryID()
                           << "GetOutput"

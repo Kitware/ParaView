@@ -22,7 +22,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectionList.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.24");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.25");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

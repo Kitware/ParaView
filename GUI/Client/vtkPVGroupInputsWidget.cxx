@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.25");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -203,13 +203,6 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID )
       // for some reason it only works for the first input.
       // I am lazy and do not want to debug this ...
       pvs->SetVisibility(0);
-      //numParts = pvd->GetNumberOfPVParts();
-      //for (partIdx = 0; partIdx < numParts; ++partIdx)
-      //  {
-      //  part = pvd->GetPVPart(partIdx);
-      //  pvApp->GetProcessModule()->ServerScript("%s AddInput %s",  vtkSourceTclName,
-      //                         part->GetVTKDataTclName());
-      //  }
       }
     }
 

@@ -23,14 +23,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
+#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMIntVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.21");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -233,7 +234,7 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 void vtkPVExtractPartsWidget::ResetInternal()
 {
   vtkPVSource *input;
-  vtkPVPart *part;
+  vtkSMPart *part;
   int num, idx;
 
   this->PartSelectionList->DeleteAll();
@@ -243,7 +244,8 @@ void vtkPVExtractPartsWidget::ResetInternal()
   for (idx = 0; idx < num; ++idx)
     {
     part = input->GetPart(idx);
-    this->PartSelectionList->InsertEntry(idx, part->GetName());
+    this->PartSelectionList->InsertEntry(idx, 
+                                  part->GetDataInformation()->GetName());
     }
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(

@@ -80,6 +80,11 @@ public:
   vtkGetStringMacro(Name);
 
   // Description:
+  // We allow the name to be set so paraview can set a default value
+  // if the data has no name.
+  vtkSetStringMacro(Name);
+
+  // Description:
   // ClassName of the data represented by information object.
   vtkGetStringMacro(DataClassName);
 
@@ -101,7 +106,6 @@ protected:
   int            Extent[6];
 
   char*          Name;
-  vtkSetStringMacro(Name);
 
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);

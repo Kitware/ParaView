@@ -39,7 +39,6 @@
 #include "vtkTimerLog.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVServerInformation.h"
-#include "vtkPVRenderModule.h"
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -47,8 +46,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.14");
-vtkCxxSetObjectMacro(vtkPVProcessModule, RenderModule, vtkPVRenderModule);
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -74,7 +72,6 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
   this->UseStereoRendering = 0;
-  this->RenderModule = 0;
   this->UseTiledDisplay = 0;
   this->CaveConfigurationFileName = 0;
   this->UseTriangleStrips = 0;
@@ -95,7 +92,6 @@ vtkPVProcessModule::~vtkPVProcessModule()
   this->SetDemoPath(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
-  this->SetRenderModule(0);
   this->SetCaveConfigurationFileName(0);
 }
 

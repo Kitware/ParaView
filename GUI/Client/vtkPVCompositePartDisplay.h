@@ -30,7 +30,6 @@ class vtkPVLODPartDisplayInformation;
 class vtkPolyDataMapper;
 class vtkProp;
 class vtkProperty;
-class vtkPVPart;
 
 class VTK_EXPORT vtkPVCompositePartDisplay : public vtkPVLODPartDisplay
 {

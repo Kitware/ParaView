@@ -27,6 +27,7 @@
 
 class vtkMultiProcessController;
 class vtkPVInformation;
+class vtkPVRenderModule;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
@@ -215,6 +216,14 @@ public:
   vtkGetMacro(ProgressRequests, int);
   vtkSetMacro(ProgressRequests, int);
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
+
+  // Description:
+  // RenderingModule has the rendering abstraction.  
+  // It creates the render window and any composit manager.  
+  // It also creates part displays which handle level of details.
+  void SetRenderModule(vtkPVRenderModule *module);
+  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -267,6 +276,7 @@ protected:
   int ProgressRequests;
 
   vtkProcessModuleObserver* Observer;
+  vtkPVRenderModule *RenderModule;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented
