@@ -79,7 +79,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.5");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -93,6 +93,9 @@ vtkKWRemoteExecute::vtkKWRemoteExecute()
   this->SSHArguments = 0;
 
   this->SetSSHCommand("ssh");
+
+  this->MultiThreader = vtkMultiThreader::New();
+  this->ProcessThreadId = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +106,7 @@ vtkKWRemoteExecute::~vtkKWRemoteExecute()
 
   this->SetSSHCommand(0);
   this->SetSSHArguments(0);
+  this->MultiThreader->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -141,30 +145,35 @@ int vtkKWRemoteExecute::RunRemoteCommand(const char*,
     vtkErrorMacro("SSH Command not set");
     return 0;
     }
-  int res = 0;
   int cc;
   for ( cc = 0; args[cc]; cc ++ )
     {
     this->Internals->Args.push_back(args[cc]);
     }
   cout << "This is: " << this << endl;
-  vtkMultiThreader* th = vtkMultiThreader::New();
-  int tid = th->SpawnThread(
-    static_cast<vtkThreadFunctionType>(vtkKWRemoteExecute::RunCommandThread), this);
+  vtkMultiThreader* th = this->MultiThreader;
+  this->ProcessThreadId = th->SpawnThread(
+    (vtkThreadFunctionType)(vtkKWRemoteExecute::RunCommandThread), this);
   this->ProcessRunning = 1;
   this->Result = vtkKWRemoteExecute::RUNNING;
+  return 1;
+}
 
-  while( this->Result == vtkKWRemoteExecute::RUNNING )
+//----------------------------------------------------------------------------
+int vtkKWRemoteExecute::WaitToFinish()
+{
+  if ( this->ProcessThreadId < 0 )
     {
-    sleep(2);
-    cout << "Waiting" << endl;
+    cout << "No process running" << endl;
+    return 0;
     }
+  int res = 0;
+  vtkMultiThreader* th = this->MultiThreader;
+  th->TerminateThread(this->ProcessThreadId);
   if ( this->Result == vtkKWRemoteExecute::SUCCESS )
     {
     res = 1;
     }
-  th->TerminateThread(tid);
-  th->Delete();
   return res;
 }
 

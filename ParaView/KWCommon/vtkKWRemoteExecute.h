@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObject.h"
 
+class vtkMultiThreader;
+
 class vtkKWRemoteExecuteInternal;
 
 class VTK_EXPORT vtkKWRemoteExecute : public vtkObject
@@ -75,6 +77,10 @@ public:
     FAIL
   };
 //ETX
+  
+  // Description:
+  // Wait for remote command to finish.
+  int WaitToFinish();
 
   // Description:
   // Detach process from the current console. Useful for when invoking new
@@ -106,12 +112,15 @@ protected:
   ~vtkKWRemoteExecute();
 
   vtkKWRemoteExecuteInternal* Internals;
+  vtkMultiThreader* MultiThreader;
 
   char* SSHCommand;
   char* SSHArguments;
   char* RemoteHost;
   int ProcessRunning;
   int Result;
+
+  int ProcessThreadId;
 
 private:
   vtkKWRemoteExecute(const vtkKWRemoteExecute&); // Not implemented
