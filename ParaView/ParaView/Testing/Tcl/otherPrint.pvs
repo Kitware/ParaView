@@ -27,6 +27,9 @@ proc rtOtherTest { fileid } {
         if {$a == "vtkTkImageViewerWidget"} {
            continue
         }
+        if {$a == "vtkImageDataToTkPhoto"} {
+           continue
+        }
         if {$a == "vtkCommand"} {
             continue
         }

@@ -62,7 +62,6 @@ $pvWindow EnableNavigationWindow
 $pvWindow EnableToolbarButton "PVProbeButton"
 $pvWindow DisableToolbarButton "PVProbeButton"
 $pvWindow EnableToolbarButton "PVProbeButton"
-$pvWindow FlySpeedScaleCallback
 
 $pvWindow ChangeInteractorStyle 0
 $pvWindow ChangeInteractorStyle 1
