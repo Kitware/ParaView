@@ -110,7 +110,6 @@ void pvTestDriver::CollectConfiguredOptions()
 {
   // Find the location of paraview
   this->ParaView = PARAVIEW_BINARY_DIR;
-  std::cout << this->ParaView.c_str() << "\n";
 #ifdef  CMAKE_INTDIR
   this->ParaView  += "/" CMAKE_INTDIR;
 #endif
