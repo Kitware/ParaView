@@ -278,6 +278,8 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
     }
 
   this->AboutDialog->Invoke();  
+  this->AboutDialog->Delete();
+  this->AboutDialog = 0;
 
   //this->SplashScreen->ShowWithBind();
 }
