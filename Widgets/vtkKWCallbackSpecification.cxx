@@ -39,6 +39,9 @@ vtkKWCallbackSpecification::vtkKWCallbackSpecification()
   this->CommandString   = NULL;
   this->CalledObject    = NULL;
   this->Window          = NULL;
+  this->CommandMethod   = NULL;
+  this->ArgDeleteMethod = NULL;
+  this->Arg             = NULL;
   this->NextCallback    = NULL;
   this->CommandFunction = vtkKWCallbackSpecificationCommand;
 }
@@ -48,6 +51,11 @@ vtkKWCallbackSpecification::~vtkKWCallbackSpecification()
   this->SetNextCallback(NULL);
   delete [] this->CommandString;
   delete [] this->EventString;
+  if ( this->ArgDeleteMethod )
+    {
+    this->ArgDeleteMethod(this->Arg);
+    this->Arg = NULL;
+    }
 }
 
 vtkKWCallbackSpecification* vtkKWCallbackSpecification::New()

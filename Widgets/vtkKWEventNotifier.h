@@ -53,14 +53,18 @@ public:
   // window. The command is a C++ method to be called (no tcl interpreter used)
   // It must take a string as an argument, and know how to parse it.
   void AddCallback( const char *event,   vtkKWWindow *window,
-		    void (*f)(const char *) );
+		    void (*callMethod)(const char *, void *), 
+		    void *arg,
+		    void (*delMethod)(void *) );
 
   // Description:
   // Add a callback for a specified event occurring in a specified
   // window. The command is a C++ method to be called (no tcl interpreter used)
   // It must take a string as an argument, and know how to parse it.
-  void AddCallback( const char *event, void (*f)(const char *) )
-    {this->AddCallback( event, (vtkKWWindow *)NULL, f );};
+  void AddCallback( const char *event, void (*callMethod)(const char *, void *), 
+		    void *arg, void (*delMethod)(void *) )
+    {this->AddCallback( event, (vtkKWWindow *)NULL, 
+			callMethod, arg, delMethod );};
 
 //ETX
   
@@ -73,7 +77,7 @@ public:
   // Description:
   // Remove a specific callback - C++ method version
   void RemoveCallback( const char *event,   vtkKWWindow *window,
-		       vtkKWObject *object, void (*f)(const char *) );
+		       vtkKWObject *object, void (*f)(const char *, void *) );
 //ETX
   
   // Description:
