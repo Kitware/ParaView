@@ -35,7 +35,9 @@ CVSROOT=":pserver:anonymous@www.paraview.org:/cvsroot/ParaView"
 CVSROOT_GREP=":pserver:anonymous@www.paraview.org:[0-9]*/cvsroot/ParaView"
 CVS_PASS="paraview"
 
+# Default program names.
 CMAKE="cmake"
+MAKE="make"
 
 TEST_SUBTREE=ParaView
 INSTALL_SUBTREE=ParaView
@@ -412,7 +414,7 @@ build()
     echo "Running make ..." &&
     (
         cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
-        make
+        ${MAKE}
     ) >Logs/build.log 2>&1 || error_log Logs/build.log
 }
 
@@ -425,7 +427,7 @@ tests()
     echo "Running tests ..." &&
     (
         cd "${PROJECT}-${VERSION}-${PLATFORM}/${TEST_SUBTREE}" &&
-        make test &&
+        ${MAKE} test &&
         touch "${PROJECT}-${VERSION}-${PLATFORM}/release.tests"
     ) >Logs/tests.log 2>&1 || error_log Logs/tests.log
 }
@@ -440,7 +442,7 @@ install()
     (
         rm -rf Install &&
         cd "${PROJECT}-${VERSION}-${PLATFORM}/${INSTALL_SUBTREE}" &&
-        make install DESTDIR="${RELEASE_ROOT}/Install"
+        ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
     ) >Logs/install.log 2>&1 || error_log Logs/install.log
 }
 
