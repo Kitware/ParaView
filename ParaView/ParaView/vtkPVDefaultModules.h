@@ -737,7 +737,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "    <Filter type=\"vtkPProbeFilter\"/>\n"
 "    <SelectWidget use_widget_command=\"1\" label=\"Probe object\"\n"
 "                  variable=\"Input\">\n"
-"      <Item label=\"Point Cloud\" value=\"GetOutputTclName\">\n"
+"      <Item label=\"Point\" value=\"GetOutputTclName\">\n"
 "          <PointSourceWidget/>\n"
 "      </Item>\n"
 "      <Item label=\"Line\" value=\"GetOutputTclName\">\n"
