@@ -695,7 +695,7 @@ void vtkPVActorComposite::UpdateProperties()
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
 	                               this, "ColorByProperty");
-  fieldData = this->GetPVData()->GetVTKData()->GetPointData()->GetFieldData();
+  fieldData = this->Mapper->GetInput()->GetPointData();
   if (fieldData)
     {
     numArrays = fieldData->GetNumberOfArrays();
@@ -727,7 +727,7 @@ void vtkPVActorComposite::UpdateProperties()
       }
     }
   
-  fieldData = this->GetPVData()->GetVTKData()->GetCellData()->GetFieldData();
+  fieldData = this->Mapper->GetInput()->GetCellData();
   if (fieldData)
     {
     numArrays = fieldData->GetNumberOfArrays();
@@ -1088,6 +1088,14 @@ void vtkPVActorComposite::Initialize()
   
   if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
     {
+    pvApp->BroadcastScript("%s SetInput %s",
+			       this->GeometryTclName,
+			       this->PVData->GetVTKDataTclName());
+    }
+  else
+    {
+    // Keep the conditional becuase I want to try eliminating the geometry
+    // filter with poly data.
     pvApp->BroadcastScript("%s SetInput %s",
 			       this->GeometryTclName,
 			       this->PVData->GetVTKDataTclName());

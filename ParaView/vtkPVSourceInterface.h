@@ -111,7 +111,7 @@ public:
   
   // Decription:
   // This method is called to create another source.
-  vtkPVSource *CreateCallback();
+  virtual vtkPVSource *CreateCallback();
 
   // Description:
   // Save this interface to a file.

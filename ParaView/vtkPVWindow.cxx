@@ -783,8 +783,6 @@ void vtkPVWindow::Open()
 {
   char *openFileName = NULL;
   char *extension = NULL;
-  int i, numSourceInterfaces;
-  char* className;
   vtkPVSourceInterface *sInt;
   char rootName[100];
   int position;
@@ -833,87 +831,41 @@ void vtkPVWindow::Open()
     delete [] newRootName;
     }
   
-  numSourceInterfaces = this->SourceInterfaces->GetNumberOfItems();
-  
   if (strcmp(extension, ".vtk") == 0)
     {
-    for (i = 0; i < numSourceInterfaces; i++)
-      {
-      sInt =
-        ((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
-      className = sInt->GetSourceClassName();
-      if (strcmp(className, "vtkPDataSetReader") == 0)
-	{
-	sInt->SetDataFileName(openFileName);
-        sInt->SetRootName(rootName);
-	((vtkPVDataSetReaderInterface*)sInt)->CreateCallback();
-	}
-      }
+    sInt = this->GetSourceInterface("vtkPDataSetReader");
     }
-  if (strcmp(extension, ".pvtk") == 0)
+  else if (strcmp(extension, ".pvtk") == 0)
     {
-    for (i = 0; i < numSourceInterfaces; i++)
-      {
-      sInt =
-        ((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
-      className = sInt->GetSourceClassName();
-      if (strcmp(className, "vtkPDataSetReader") == 0)
-	{
-	sInt->SetDataFileName(openFileName);
-        sInt->SetRootName(rootName);
-	((vtkPVDataSetReaderInterface*)sInt)->CreateCallback();
-	}
-      }
+    sInt = this->GetSourceInterface("vtkPDataSetReader");
     }
   else if (strcmp(extension, ".case") == 0)
     {
-    for (i = 0; i < numSourceInterfaces; i++)
-      {
-      sInt =
-	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
-      className = sInt->GetSourceClassName();
-      if (strcmp(className, "vtkGenericEnSightReader") == 0)
-	{
-	sInt->SetDataFileName(openFileName);
-        sInt->SetRootName(rootName);
-	((vtkPVEnSightReaderInterface*)sInt)->CreateCallback();
-	}
-      }
+    sInt = this->GetSourceInterface("vtkGenericEnSightReader");
     }
   else if (strcmp(extension, ".pop") == 0)
     {
-    for (i = 0; i < numSourceInterfaces; i++)
-      {
-      sInt =
-	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
-      className = sInt->GetSourceClassName();
-      if (strcmp(className, "vtkPOPReader") == 0)
-	{
-	sInt->SetDataFileName(openFileName);
-        sInt->SetRootName(rootName);
-	sInt->CreateCallback();
-	}
-      }
+    sInt = this->GetSourceInterface("vtkPOPReader");
     }
   else if (strcmp(extension, ".stl") == 0)
     {
-    for (i = 0; i < numSourceInterfaces; i++)
-      {
-      sInt =
-	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
-      className = sInt->GetSourceClassName();
-      if (strcmp(className, "vtkSTLReader") == 0)
-	{
-	sInt->SetDataFileName(openFileName);
-        sInt->SetRootName(rootName);
-	sInt->CreateCallback();
-	}
-      }
+    sInt = this->GetSourceInterface("vtkSTLReader");
     }
   else
     {
     vtkErrorMacro("Unknown file extension");
+    sInt = NULL;
     }
+  if (sInt == NULL)
+    {
+    vtkErrorMacro("Could not find interface.");
+  	}
+  else  
+    {
+    sInt->SetDataFileName(openFileName);
+    sInt->SetRootName(rootName);
+	  sInt->CreateCallback();
+	  }
 }
 
 void vtkPVWindow::WriteData()

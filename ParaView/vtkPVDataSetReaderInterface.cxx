@@ -72,19 +72,20 @@ vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 {
-  char tclName[100], outputTclName[100];
+  char tclName[20], extentTclName[100], tmp[100];
+  char outputTclName[100];
+  vtkPDataSetReader *s; 
   vtkDataSet *d;
   vtkPVData *pvd;
-  vtkPDataSetReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   char* result;
   char *extension;
-  int position;
+  int extensionPosition;
   char *endingSlash = NULL;
-  char *newTclName;  
-  
-  // Create the vtkReader on all processes (through tcl).
+  int slashPosition;
+
+  // Create a name for the reader.
   if (!this->GetDataFileName())
     {
     pvApp->Script("set newFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]");
@@ -95,96 +96,135 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
       }
     this->SetDataFileName(result);
     }
-  
-  extension = strrchr(this->DataFileName, '.');
-  position = extension - this->DataFileName;
-  strncpy(tclName, this->DataFileName, position);
-  tclName[position] = '\0';
-  
-  if ((endingSlash = strrchr(tclName, '/')))
+  // Get the root name between the last slash and last period.
+  slashPosition = 0;
+  extensionPosition = strlen(this->DataFileName);
+  if ((extension = strrchr(this->DataFileName, '.')))
     {
-    position = endingSlash - tclName + 1;
-    newTclName = new char[strlen(tclName) - position + 1];
-    strcpy(newTclName, tclName + position);
-    strcpy(tclName, "");
-    strcat(tclName, newTclName);
-    delete [] newTclName;
+    extensionPosition = extension - this->DataFileName;
     }
+  if ((endingSlash = strrchr(this->DataFileName, '/')))
+    {
+    slashPosition = endingSlash - this->DataFileName + 1;
+    }
+  strncpy(tclName, this->DataFileName+slashPosition, extensionPosition-slashPosition);
+  tclName[extensionPosition-slashPosition] = '\0';
+
   if (isdigit(tclName[0]))
     {
     // A VTK object name beginning with a digit is invalid.
-    newTclName = new char[strlen(tclName) + 3];
-    sprintf(newTclName, "PV%s", tclName);
-    strcpy(tclName, "");
-    strcat(tclName, newTclName);
-    delete [] newTclName;
+    strcpy(tmp, tclName);
+    sprintf(tclName, "PV%s", tmp);
     }
+  // Append the unique number for the name.
+  strcpy(tmp, tclName);
+  sprintf(tclName, "%s%d", tmp, this->InstanceCount);
 
-  sprintf(tclName, "%s%d", tclName, this->InstanceCount);
-  
-  reader = (vtkPDataSetReader *)
-              (pvApp->MakeTclObject(this->SourceClassName, tclName));
-  if (reader == NULL)
+  // Create the vtkSource.
+  // Create the object through tcl on all processes.
+  s = (vtkPDataSetReader *)(pvApp->MakeTclObject(this->SourceClassName, tclName));
+  if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
-
-  pvApp->Script("%s SetFileName %s", tclName, this->GetDataFileName());
   
-  // No file name?  Just abort.
-  if (strcmp(reader->GetFileName(), "") == 0)
-    {
-    pvApp->BroadcastScript("%s Delete", tclName);
-    return NULL;
-    }
-    
-  // Broadcast file name to readers on all processes.
-  pvApp->BroadcastScript("%s SetFileName %s", tclName,
-			 reader->GetFileName());
-  this->SetFileName(reader->GetFileName());
-  // Let the reader create its outputs.
-  pvApp->BroadcastScript("%s Update", tclName);
-  
-  // Create dummy source for each output.
-  sprintf(outputTclName, "%sOutput", tclName);
-  d = (vtkDataSet*)(pvApp->MakeTclObject(reader->GetOutput()->GetClassName(),
-                                         outputTclName));
-  pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput]",
-			   outputTclName, tclName);
-  pvd = vtkPVData::New();
-  pvd->SetApplication(pvApp);
-  pvd->SetVTKData(d, outputTclName);
-    
   pvs = vtkPVSource::New();
   pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);
-
+  pvs->SetVTKSource(s, tclName);
+  pvs->SetName(tclName);  
+  
+  // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
   this->PVWindow->SetCurrentPVSource(pvs);
-    
-  pvs->SetName(tclName);
-  pvs->SetNthPVOutput(0, pvd);
 
-  pvd->InsertExtractPiecesIfNecessary();
-    
-  pvs->AcceptCallback();
-   
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+
+
+  sprintf(outputTclName, "%sOutput", tclName);
+  s->SetFileName(this->GetDataFileName());
+  s->UpdateInformation();
+  switch (s->GetDataType())
+    {
+    case VTK_POLY_DATA:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", outputTclName));
+      break;
+    case VTK_UNSTRUCTURED_GRID:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkUnstructuredGrid", outputTclName));
+      break;
+    case VTK_STRUCTURED_GRID:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkStructuredGrid", outputTclName));
+      break;
+    case VTK_RECTILINEAR_GRID:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
+      break;
+    case VTK_STRUCTURED_POINTS:
+      d = (vtkDataSet *)(pvApp->MakeTclObject("vtkStructuredPoints", outputTclName));
+      break;
+    default:
+      vtkErrorMacro("Could not determine output type.");
+      pvs->Delete();
+      pvd->Delete();
+      return NULL;
+    }
+  pvd->SetVTKData(d, outputTclName);
+
+  // Connect the source and data.
+  pvs->SetNthPVOutput(0, pvd);
+  // It would be nice to have the vtkPVSource set this up, but for multiple outputs,
+  // How do we know the method.
+  // Relay the connection to the VTK objects.  
+  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());   
+
+  sprintf(extentTclName, "%s%dTranslator", tclName);
+  pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
+  pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
+			                   extentTclName, pvs->GetVTKSourceTclName());
+  pvApp->BroadcastScript("%s SetExtentTranslator %s",
+			                   pvd->GetVTKDataTclName(), extentTclName);
+  // Hold onto name so it can be deleted.
+  pvs->SetExtentTranslatorTclName(extentTclName);
+
+
+  
   pvs->Delete();
   pvd->Delete();
-  
-  // Get rid of the original reader.
-  pvApp->BroadcastScript("%s Delete", tclName);
-  
+
   ++this->InstanceCount;
-  
-  // so we get prompted for a file name if another data set reader is created
-  this->SetDataFileName(NULL);
-  
+
+  pvd->InsertExtractPiecesIfNecessary();
+
+  pvs->AcceptCallback();  
+
   return pvs;
 } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void vtkPVDataSetReaderInterface::SaveInTclScript(ofstream *file, const char* sourceName)
 {

@@ -77,6 +77,7 @@ vtkPVCutPlane::vtkPVCutPlane()
   this->OffsetLabel = vtkKWLabel::New();
   this->OffsetEntry = vtkKWEntry::New();
 
+  this->ReplaceInputOff();
 }
 
 //----------------------------------------------------------------------------

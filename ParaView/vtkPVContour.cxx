@@ -65,6 +65,9 @@ vtkPVContour::vtkPVContour()
   this->ComputeScalarsCheck = vtkKWCheckButton::New();
   
   this->ScalarRangeLabel = vtkKWLabel::New();
+
+  this->ReplaceInputOff();
+
 }
 
 //----------------------------------------------------------------------------
@@ -304,32 +307,47 @@ void vtkPVContour::GetDataArrayRange(float range[2])
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
   int id, num;
+  vtkDataArray *array;
   float temp[2];
   
+  range[0] = 1.0;
+  range[1] = 0.0;
   if (! this->DefaultScalarsName)
     {
-    range[0] = 1.0;
-    range[1] = 0.0;
     return;
     }
   
   pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
                          this->GetNthPVInput(0)->GetVTKDataTclName(),
                          this->DefaultScalarsName);
-  this->GetNthPVInput(0)->GetVTKData()->GetPointData()->
-    GetArray(this->DefaultScalarsName)->GetRange(range, 0);
+  array = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->
+                  GetArray(this->DefaultScalarsName);
+
+  if (array != NULL)
+    {
+    array->GetRange(range, 0);
+    }
   
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; id++)
     {
     controller->Receive(temp, 2, id, 1976);
-    if (temp[0] < range[0])
+    // try to protect against invalid ranges.
+    if (range[0] > range[1])
       {
       range[0] = temp[0];
-      }
-    if (temp[1] > range[1])
-      {
       range[1] = temp[1];
+      }
+    else if (temp[0] < temp[1])
+      {
+      if (temp[0] < range[0])
+        {
+        range[0] = temp[0];
+        }
+      if (temp[1] > range[1])
+        {
+        range[1] = temp[1];
+        }
       }
     }
 }
