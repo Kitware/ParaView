@@ -109,7 +109,7 @@ public:
   // Description: 
   // Set the height of the list box.  If the height is less than or equal to 0,
   // then the height is set to the size of the number of items in the listbox.
-    void SetHeight(int);
+  void SetHeight(int);
 
   // Description:
   // Setting this string enables balloon help for this widget.
