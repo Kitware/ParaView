@@ -22,11 +22,6 @@
 
 #include "vtkKWWidget.h"
 
-//BTX
-template <class key, class data> 
-class vtkArrayMap;
-//ETX
-
 class VTK_EXPORT vtkKWMenu : public vtkKWWidget
 {
 public:
@@ -217,17 +212,6 @@ public:
 
   //BTX
   enum { Normal = 0, Active, Disabled, Unknown };
-  //ETX
-
-  //BTX
-  // Description:
-  // The following two methods allows one to store and restore
-  // the state of a menu. This can be used to, for example, to
-  // store the state, disable all the entries and then restore
-  // the menu to the previous. Note that only the state of menu
-  // entries with labels are stored.
-  void StoreMenuState(vtkArrayMap<const char*, int>* state);
-  void RestoreMenuState(vtkArrayMap<const char*, int>* state);
   //ETX
 
   // Description:

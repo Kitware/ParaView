@@ -16,11 +16,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
-#include "vtkArrayMap.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.57");
+vtkCxxRevisionMacro(vtkKWMenu, "1.58");
 
 
 
@@ -943,48 +942,6 @@ void vtkKWMenu::SetEntryCommand(const char* item, vtkKWObject* object,
   this->SetEntryCommand(index, object, MethodAndArgString);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::StoreMenuState(vtkArrayMap<const char*, int>* state)
-{
-  state->RemoveAllItems();
-  int numEntries = this->GetNumberOfItems();
-  for(int i = 0; i < numEntries; i++)
-    {
-    char label[128];
-    if (this->GetItemLabel(i, label, 128) == VTK_OK)
-      {
-      state->SetItem(label, this->GetState(i));
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* states)
-{
-  vtkArrayMapIterator<const char*, int>* it = states->NewIterator();
-
-  // Mark all sources as not visited.
-  while( !it->IsDoneWithTraversal() )
-    {    
-    int state = 0;
-    const char* item = 0;
-    if (it->GetKey(item) == VTK_OK && item && it->GetData(state) == VTK_OK)
-      {
-      if ( state == vtkKWMenu::Active )
-        {
-        this->SetState(item, vtkKWMenu::Normal);
-        }
-      else
-        {
-        this->SetState(item, state);
-        }
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-
-}
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::HasItemOption(int idx, const char *option)
