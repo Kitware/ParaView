@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.36");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.37");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -160,6 +160,9 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   // If the extension matches, see if the reader can read the file.
   if(matches)
     {
+    // Assume that it can read the file (based on extension match)
+    // if CanReadFile does not exist.
+    canRead = 1;
     vtkClientServerID tmpID = pm->NewStreamObject(this->SourceClassName);
     pm->GetStream() << vtkClientServerStream::Invoke
                     << pm->GetProcessModuleID()
