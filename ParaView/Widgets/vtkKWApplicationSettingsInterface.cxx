@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWToolbar.h"
@@ -53,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.10");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.11");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -164,7 +165,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   ostrstream tk_cmd;
   vtkKWWidget *page;
-  vtkKWWidget *frame;
+  vtkKWFrame *frame;
 
   // --------------------------------------------------------------
   // Add a "Preferences" page

@@ -50,9 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
-class vtkKWImageLabel;
 class vtkKWApplication;
+class vtkKWFrame;
 class vtkKWIcon;
+class vtkKWImageLabel;
+class vtkKWLabel;
 
 #define VTK_KW_LABEL_CASE_USER_SPECIFIED 0
 #define VTK_KW_LABEL_CASE_UPPERCASE_FIRST 1
@@ -78,18 +80,18 @@ public:
   // the LabelFrame. This method if bound to a <Configure> event, so
   // the widget should adjust itself automatically most of the time.
   void AdjustMargin();
-
+ 
   // Description:
   // Get the internal frame.
-  vtkGetObjectMacro(Frame, vtkKWWidget);
+  vtkGetObjectMacro(Frame, vtkKWFrame);
 
   // Description:
   // Get the internal frame containing the label.
-  vtkGetObjectMacro(LabelFrame, vtkKWWidget);
+  vtkGetObjectMacro(LabelFrame, vtkKWFrame);
 
   // Description:
   // Get the label.
-  vtkGetObjectMacro(Label, vtkKWWidget);
+  vtkGetObjectMacro(Label, vtkKWLabel);
 
   // Description:
   // Show or hide the frame.
@@ -129,12 +131,13 @@ protected:
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
 
+  vtkKWFrame *Frame;
+  vtkKWFrame *LabelFrame;
+  vtkKWLabel *Label;
+
   vtkKWWidget *Border;
   vtkKWWidget *Border2;
-  vtkKWWidget *Frame;
-  vtkKWWidget *LabelFrame;
   vtkKWWidget *Groove;
-  vtkKWWidget *Label;
   vtkKWImageLabel *Icon;
   vtkKWIcon       *IconData;
   int Displayed;
