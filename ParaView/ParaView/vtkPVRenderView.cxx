@@ -123,7 +123,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.279");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.280");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -409,6 +409,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->PropertiesButton->Delete();
   this->PropertiesButton = NULL;
   this->SetMenuLabelSwitchBackAndForthToViewProperties(NULL);
+  vtkTimerLog::CleanupLog();
 }
 
 //----------------------------------------------------------------------------
