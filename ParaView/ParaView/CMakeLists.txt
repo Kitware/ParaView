@@ -27,6 +27,7 @@ vtkPVContourEntry.cxx
 vtkPVData.cxx 
 vtkPVDataSetFileEntry.cxx
 vtkPVDataSetReaderModule.cxx
+vtkPVDummyWidget.cxx
 vtkPVEnSightArraySelection.cxx
 vtkPVEnSightReaderModule.cxx
 vtkPVErrorLogDisplay.cxx
@@ -49,12 +50,14 @@ vtkPVLODActor.cxx
 vtkPVLabel.cxx
 vtkPVLabeledToggle.cxx
 vtkPVLineWidget.cxx
+vtkPVLineSourceWidget.cxx
 vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
 vtkPVPick.cxx
 vtkPVPivotManipulator.cxx
 vtkPVPlaneWidget.cxx
+vtkPVPointSourceWidget.cxx
 vtkPVPointWidget.cxx
 vtkPVProbe.cxx
 vtkPVPushButton.cxx
@@ -69,6 +72,7 @@ vtkPVSource.cxx
 vtkPVSourceCollection.cxx
 vtkPVSourceList.cxx
 vtkPVSourcesNavigationWindow.cxx
+vtkPVSourceWidget.cxx
 vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
 vtkPVThreshold.cxx 
@@ -102,6 +106,7 @@ vtkPVObjectWidget
 vtkPVWidget
 vtkPV3DWidget
 vtkPVJoystickFly
+vtkPVSourceWidget
 )
 
 # Setup vtkInstantiator registration for this library's classes.
