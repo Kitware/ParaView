@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221");
+vtkCxxRevisionMacro(vtkPVApplication, "1.222");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -515,40 +515,6 @@ int vtkPVApplication::PromptRegistration(char* vtkNotUsed(name),
 int vtkPVApplication::CheckRegistration()
 {
   return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVApplication::CheckForArgument(int argc, char* argv[], 
-                                       const char* arg, int& index)
-{
-  if (!arg)
-    {
-    return VTK_ERROR;
-    }
-
-  int i;
-  int retVal = VTK_ERROR;
-  for (i=0; i < argc; i++)
-    {
-    char* newarg = vtkString::Duplicate(argv[i]);
-    int len = (int)(strlen(newarg));
-    for (int j=0; j<len; j++)
-      {
-      if (newarg[j] == '=')
-        {
-        newarg[j] = '\0';
-        }
-      }
-    if (newarg && strcmp(arg, newarg) == 0)
-      {
-      index = i;
-      retVal = VTK_OK;
-      delete[] newarg;
-      break;
-      }
-    delete[] newarg;
-    }
-  return retVal;
 }
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 

@@ -429,8 +429,6 @@ protected:
   
   vtkPVOutputWindow *OutputWindow;
 
-  static int CheckForArgument(int argc, char* argv[], const char* arg,
-                              int& index);
   static int CheckForExtension(const char* arg, const char* ext);
   char* CreateHelpString();
   int CheckForTraceFile(char* name, unsigned int len);
