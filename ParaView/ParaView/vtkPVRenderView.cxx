@@ -1373,8 +1373,9 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
   vtkCamera *cam; 
   
   // This is to trace effects of loaded scripts. 
-  this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f", 
-                      this->GetTclName(), p0, p1, p2, fp0, fp1, fp2, up0, up1, up2); 
+  this->AddTraceEntry(
+    "$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f", 
+    this->GetTclName(), p0, p1, p2, fp0, fp1, fp2, up0, up1, up2); 
   
   cam = this->GetRenderer()->GetActiveCamera(); 
   cam->SetPosition(p0, p1, p2); 
@@ -2256,7 +2257,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.187 $");
+  this->ExtractRevision(os,"$Revision: 1.188 $");
 }
 
 //------------------------------------------------------------------------------

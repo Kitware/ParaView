@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
 #include "vtkAxes.h"
+#include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkDirectory.h"
@@ -1297,6 +1298,20 @@ void vtkPVWindow::MouseAction(int action,int button,
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->RightButtonReleaseEvent();
       }    
+
+    vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
+    //float* parallelScale = cam->GetParallelScale();
+    double* position      = cam->GetPosition();
+    double* focalPoint    = cam->GetFocalPoint();
+    double* viewUp        = cam->GetViewUp();
+
+    this->AddTraceEntry(
+      "$kw(%s) SetCameraState "
+      "%.3lf %.3lf %.3lf  %.3lf %.3lf %.3lf  %.3lf %.3lf %.3lf", 
+      this->MainView->GetTclName(), 
+      position[0], position[1], position[2], 
+      focalPoint[0], focalPoint[1], focalPoint[2], 
+      viewUp[0], viewUp[1], viewUp[2]);
     }
   else
     {
@@ -3287,7 +3302,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.337 $");
+  this->ExtractRevision(os,"$Revision: 1.338 $");
 }
 
 //----------------------------------------------------------------------------
