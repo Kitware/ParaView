@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.30");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.31");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -542,7 +542,15 @@ int vtkKWParameterValueFunctionEditor::FunctionPointCanBeMovedToParameter(
     {
     return 0;
     }
-  
+ 
+  // Neighborhood checks do not apply if the point being moved if one of the
+  // end points and the RescaleBetweenEndPoints has been enabled.
+  if (this->RescaleBetweenEndPoints &&
+    (id == 0 || id == this->GetFunctionSize() - 1))
+    {
+    return 1;
+    }
+
   double neighbor_parameter;
 
   // Check if we are trying to move the point before its previous neighbor
