@@ -25,7 +25,9 @@ vtkKWLabeledEntry.cxx
 vtkKWLabeledFrame.cxx 
 vtkKWLabeledLabel.cxx 
 vtkKWLabeledOptionMenu.cxx 
+vtkKWLabeledPushButtonSet.cxx 
 vtkKWLabeledRadioButtonSet.cxx 
+vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
 vtkKWLoadSaveDialog.cxx
 vtkKWMenu.cxx 
@@ -37,6 +39,7 @@ vtkKWObject.cxx
 vtkKWOptionMenu.cxx 
 vtkKWProgressGauge.cxx 
 vtkKWPushButton.cxx 
+vtkKWPushButtonSet.cxx 
 vtkKWRadioButton.cxx 
 vtkKWRadioButtonSet.cxx 
 vtkKWSaveImageDialog.cxx 
