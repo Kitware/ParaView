@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.10");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.11");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -81,6 +81,16 @@ void vtkRedistributePolyData::Execute()
   vtkPolyData* input = vtkPolyData::New();
   input->ShallowCopy(tmp);
   this->CompleteInputArrays(input);
+
+  // Check for bad input that would make us hang.
+  if ( ! this->DoubleCheckArrays(input))
+    {
+    vtkErrorMacro("Skiping redistribute to avoid hanging.");
+    output->CopyStructure(tmp);
+    output->GetPointData()->ShallowCopy(tmp->GetPointData());
+    output->GetCellData()->ShallowCopy(tmp->GetCellData());
+    return;
+    }
 
   int myId;
   if (!this->Controller)
@@ -202,65 +212,6 @@ void vtkRedistributePolyData::Execute()
   output->GetPointData()->CopyAllocate(input->GetPointData());
   output->GetCellData()->CopyAllocate(input->GetCellData());
   
-  // ... make sure output array info is initialized  ...
-
-  int getArrayInfo = 0;
-  int sendArrayInfo = 0;
-
-  if (input->GetPointData()->GetNumberOfArrays() == 0 ) 
-    {
-    // set request flag to true ...
-    getArrayInfo = 1;
-    }
-  else
-    {
-    // ... set request flag to false because the array info isn't 
-    //   needed ...
-    getArrayInfo = 0;
-    }
-
-  // ... can get info from any processor that will be sending
-  //  to this one because the remote processor must have the array
-  //  info ...
-
-  int type;
-  int i;
-
-  if (cntRec>0)
-    {
-    this->Controller->Send(&getArrayInfo, 1, recFrom[0], 997243);
-    }
-
-  // ... send false request flags to the rest of the processors 
-  //   data is being received from ...
-
-  int getArrayInfo2 = 0;
-  for (i=1; i<cntRec; i++)
-    this->Controller->Send(&getArrayInfo2, 1, 
-                              recFrom[i], 997243);
-
-  // ... loop over all processors data is being sent to and send 
-  //   array information if it is needed ...
-
-  for (i=0; i<cntSend; i++)
-  {
-    // ... get flag ...
-    this->Controller->Receive(&sendArrayInfo, 1, sendTo[i], 997243);
-
-    if (sendArrayInfo) 
-      {
-      //this->SendCompleteArrays(sendTo[i]);
-      }
-  }
-
-
-  // ... receive array info from first array in recFrom list ...
-
-  if (cntRec>0 && getArrayInfo) 
-    {
-    //this->CompleteArrays(recFrom[0]);
-    }
-
   // ... copy remaining input cell data to output cell data ...
 
   vtkCellArray* inputCellArrays[NUM_CELL_TYPES];
@@ -269,6 +220,7 @@ void vtkRedistributePolyData::Execute()
   inputCellArrays[2] = input->GetPolys();
   inputCellArrays[3] = input->GetStrips();
 
+  int i, type;
   vtkIdType inputNumCells[NUM_CELL_TYPES];
   vtkIdType origNumCells[NUM_CELL_TYPES]; 
   for (type=0; type<NUM_CELL_TYPES; type++) 
@@ -2646,6 +2598,113 @@ void vtkRedistributePolyData::ReceiveArrays
     }
 }
 
+//--------------------------------------------------------------------
+int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
+{
+  int mismatch = 0;
+  int myId = this->Controller->GetLocalProcessId();
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  // Sanity check: Avoid haning on bad input.
+  // Format a message that has all of the array information.
+  // All arrays must be the same type and numcomps on all procs.
+  // This keeps us from locking up.
+  int length = input->GetPointData()->GetNumberOfArrays();
+  length += input->GetCellData()->GetNumberOfArrays();
+  // num PD arrays, num CD arrays, type and num comps per array. 
+  length = 2 + length * 2;
+  int* sanity = new int[length];
+  int idx, numArrays, count;
+  vtkDataArray* array;
+  sanity[0] = input->GetPointData()->GetNumberOfArrays();
+  sanity[1] = input->GetCellData()->GetNumberOfArrays();
+  count = 2;
+  numArrays = sanity[0];
+  for (idx = 0; idx < numArrays; ++idx)
+    {
+    array = input->GetPointData()->GetArray(idx);
+    sanity[count++] = array->GetDataType();
+    sanity[count++] = array->GetNumberOfComponents();
+    }
+  numArrays = sanity[1];
+  for (idx = 0; idx < numArrays; ++idx)
+    {
+    array = input->GetCellData()->GetArray(idx);
+    sanity[count++] = array->GetDataType();
+    sanity[count++] = array->GetNumberOfComponents();
+    }
+  if (myId == 0)
+    {
+    // Broadcast my info as the correct arrays.
+    for ( idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Send(&length, 1, idx, 77431);
+      this->Controller->Send(sanity, length, idx, 77432);
+      }
+    // Receive matches
+    int otherMismatch;
+    for ( idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(&otherMismatch, 1, idx, 77433);
+      if (otherMismatch)
+        {
+        mismatch = 1;
+        }
+      }
+    // Send out the final mismatch result to all procs. 
+    for ( idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Send(&mismatch, 1, idx, 77434);
+      }
+    }
+  else
+    {
+    int zeroLength;
+    int* zeroSanity;
+    this->Controller->Receive(&zeroLength, 1, 0, 77431);
+    zeroSanity = new int[zeroLength];
+    this->Controller->Receive(zeroSanity, length, 0, 77432);
+    // Compare
+    if (length != zeroLength)
+      {
+      mismatch = 1;
+      }
+    else
+      {
+      for (idx = 0; idx < length; ++idx)
+        {
+        if (sanity[idx] != zeroSanity[idx])
+          {
+          mismatch = 1;
+          }
+        }
+      }
+    delete [] zeroSanity;
+    zeroSanity = NULL;
+
+    this->Controller->Send(&mismatch, 1, 0, 77433);
+    this->Controller->Receive(&mismatch, 1, 0, 77434);
+    }
+
+  delete [] sanity;
+  sanity = NULL;
+  if (mismatch)
+    {
+    return 0;
+    }
+
+  return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 //--------------------------------------------------------------------
@@ -2658,11 +2717,12 @@ void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
     vtkErrorMacro("Missing controller.");
     return;
     }
+
+  int idx;
   int myId = this->Controller->GetLocalProcessId();
   int numProcs = this->Controller->GetNumberOfProcesses();
   int* msg = new int[numProcs];
   int numPts = input->GetNumberOfPoints();
-  int idx;
   if (myId > 0)
     {
     // First send the number of points to process zero.
