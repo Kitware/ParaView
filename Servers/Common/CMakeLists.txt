@@ -69,7 +69,10 @@ VTK_MAKE_INSTANTIATOR3(vtkPVCommonInstantiator CommonInst_SRCS
 
 # Create filters library.
 ADD_LIBRARY(vtkPVCommon ${Common_SRCS} ${CommonInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVCommon vtkKWCommon vtkHybridCS vtkParallelCS vtkKWCommon)
+TARGET_LINK_LIBRARIES(vtkPVCommon vtkHybridCS vtkParallelCS KWCommon)
+IF(KWSYS_NAMESPACE)
+  TARGET_LINK_LIBRARIES (vtkPVCommon ${KWSYS_NAMESPACE})
+ENDIF(KWSYS_NAMESPACE)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVCommon vtkPatented)
 ENDIF (VTK_USE_PATENTED)

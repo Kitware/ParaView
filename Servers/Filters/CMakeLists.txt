@@ -204,7 +204,10 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS vtkKWCommon ${PARAVIEW_ADDITIONAL_LIBRARIES})
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS KWCommon ${PARAVIEW_ADDITIONAL_LIBRARIES})
+IF(KWSYS_NAMESPACE)
+  TARGET_LINK_LIBRARIES (vtkPVFilters ${KWSYS_NAMESPACE})
+ENDIF(KWSYS_NAMESPACE)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
