@@ -122,7 +122,12 @@ public:
   // Replace a character or some characters in the string (inplace).
   // Return a pointer to the string (i.e. 'str').
   static char* ReplaceChar(char* str, char toreplace, char replacement);
-  static char* ReplaceChars(char* str, const char *toreplace, char replacement);
+  static char* ReplaceChars(char* str, const char *toreplace,char replacement);
+
+  // Description:
+  // Remove some characters from a string.
+  // Return a pointer to a new allocated string.
+  static char* RemoveChars(const char* str, const char *toremove);
 
   // Description:
   // Return the number of occurence of a char.
