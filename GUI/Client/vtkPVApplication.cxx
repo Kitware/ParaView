@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.292");
+vtkCxxRevisionMacro(vtkPVApplication, "1.293");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2324,6 +2324,7 @@ void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
 {
   (void)event;
   (void)calldata;
+  (void)o;
   // Placeholder for future events
   /*
   switch ( event ) 
