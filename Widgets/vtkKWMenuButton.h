@@ -66,12 +66,6 @@ public:
   
   vtkKWMenu* GetMenu();
   
-  // Description:
-  // Option to make this menu a tearoff menu.  By dafault this value is on.
-  vtkSetMacro(TearOff, int);
-  vtkGetMacro(TearOff, int);
-  vtkBooleanMacro(TearOff, int);
-
 protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
@@ -79,7 +73,6 @@ protected:
   void operator=(const vtkKWMenuButton&) {};
   
   vtkKWMenu *Menu;
-  int TearOff;
 };
 
 #endif

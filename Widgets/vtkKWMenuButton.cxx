@@ -51,7 +51,6 @@ vtkKWMenuButton::vtkKWMenuButton()
   this->CommandFunction = vtkKWMenuButtonCommand;
   
   this->Menu = vtkKWMenu::New();
-  this->TearOff = 1;
 }
 
 vtkKWMenuButton::~vtkKWMenuButton()

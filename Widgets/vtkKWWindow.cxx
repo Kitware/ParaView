@@ -281,7 +281,8 @@ vtkKWMenu *vtkKWWindow::GetMenuEdit()
   
   this->MenuEdit = vtkKWMenu::New();
   this->MenuEdit->SetParent(this->GetMenu());
-  this->MenuEdit->Create(this->Application,"-tearoff 0");
+  this->MenuEdit->SetTearOff(0);
+  this->MenuEdit->Create(this->Application,"");
   // Make sure Edit menu is next to file menu
   this->Menu->InsertCascade(1, "Edit", this->MenuEdit, 0);
   return this->MenuEdit;
@@ -296,7 +297,8 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
 
   this->MenuView = vtkKWMenu::New();
   this->MenuView->SetParent(this->GetMenu());
-  this->MenuView->Create(this->Application, "-tearoff 0");
+  this->MenuView->SetTearOff(0);
+  this->MenuView->Create(this->Application, "");
   // make sure Help menu is on the right
   if (this->MenuEdit)
     { 
@@ -319,7 +321,8 @@ vtkKWMenu *vtkKWWindow::GetMenuProperties()
   
   this->MenuProperties = vtkKWMenu::New();
   this->MenuProperties->SetParent(this->GetMenu());
-  this->MenuProperties->Create(this->Application,"-tearoff 0");
+  this->MenuProperties->SetTearOff(0);
+  this->MenuProperties->Create(this->Application,"");
   // make sure Help menu is on the right
   if (this->MenuView && this->MenuEdit)
     {
@@ -398,13 +401,16 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     this->ToolbarFrame->GetWidgetName());
   
   // Set up standard menus
-  this->Menu->Create(app,"-tearoff 0");
-  this->MenuFile->Create(app,"-tearoff 0");
+  this->Menu->SetTearOff(0);
+  this->Menu->Create(app,"");
+  this->MenuFile->SetTearOff(0);
+  this->MenuFile->Create(app,"");
   this->Menu->AddCascade("File", this->MenuFile, 0);
   this->MenuFile->AddCommand("Load Script", this, "LoadScript");
 
   // add render quality setting
-  this->PageMenu->Create(this->Application,"-tearoff 0");
+  this->PageMenu->SetTearOff(0);
+  this->PageMenu->Create(this->Application,"");
 
   char* rbv = 
     this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
@@ -425,7 +431,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->AddCommand("Exit", this, "Exit");
   // install the menu bar into this window
   this->InstallMenu(this->Menu);
-  this->MenuHelp->Create(app,"-tearoff 0");
+  this->MenuHelp->SetTearOff(0);
+  this->MenuHelp->Create(app,"");
   if ( this->SupportHelp )
     {
     this->Menu->AddCascade("Help", this->MenuHelp, 0);
@@ -809,5 +816,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.26 $");
 }

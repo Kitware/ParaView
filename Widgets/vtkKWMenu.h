@@ -131,6 +131,12 @@ public:
   // Call back for active menu item doc line help
   void DisplayHelp(const char*);
   
+  // Description:
+  // Option to make this menu a tearoff menu.  By dafault this value is off.
+  void SetTearOff(int val);
+  vtkGetMacro(TearOff, int);
+  vtkBooleanMacro(TearOff, int);
+
 protected:
   
   vtkKWMenu();
@@ -143,6 +149,8 @@ protected:
   void InsertGeneric(int position, const char* addtype, const char* label, 
 		     vtkKWObject* Object,
 		     const char* MethodAndArgString, const char* extra, const char* help);
+
+  int TearOff;
   
 };
 

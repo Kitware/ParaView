@@ -66,6 +66,7 @@ int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWMenu::vtkKWMenu()
 {
   this->CommandFunction = vtkKWMenuCommand;
+  this->TearOff = 0;
 }
 
 vtkKWMenu::~vtkKWMenu()
@@ -81,11 +82,27 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
     return;
     }
   this->SetApplication(app);
-  this->Script("menu %s %s", this->GetWidgetName(), args); 
+  this->Script("menu %s %s -tearoff %d", this->GetWidgetName(), args, this->TearOff); 
   this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", this->GetWidgetName(),
 	       this->GetTclName());
   
 }
+
+void vtkKWMenu::SetTearOff(int val)
+{
+  if (val == this->TearOff)
+    {
+    return;
+    }
+  this->Modified();
+  this->TearOff = val;
+
+  if (this->Application)
+    {
+    this->Script("%s configure -tearoff %d", this->GetWidgetName(), val);
+    }
+}
+
 
 void vtkKWMenu::DisplayHelp(const char* widget)
 {

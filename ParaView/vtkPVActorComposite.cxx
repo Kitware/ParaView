@@ -1368,6 +1368,12 @@ void vtkPVActorComposite::SetVisibility(int v)
     {
     pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->MapperTclName);
     }
+
+  if (this->VisibilityCheck->GetState() != v)
+    {
+    this->VisibilityCheck->SetState(v);
+    }
+
 }
   
 //----------------------------------------------------------------------------
@@ -1463,7 +1469,7 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
   
   if (this->ScalarBarCheck->GetState() != val)
     {
-    this->ScalarBarCheck->SetState(0);
+    this->ScalarBarCheck->SetState(val);
     }
 
   // I am going to add and remove it from the renderer instead of using visibility.
@@ -1555,6 +1561,16 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
+}
+
+void vtkPVActorComposite::SetScalarBarOrientationToVertical()
+{
+  this->ScalarBarOrientationCheck->SetState(1);
+}
+
+void vtkPVActorComposite::SetScalarBarOrientationToHorizontal()
+{
+  this->ScalarBarOrientationCheck->SetState(0);
 }
 
 void vtkPVActorComposite::ChangePointSize()

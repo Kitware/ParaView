@@ -198,6 +198,8 @@ public:
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
   void ScalarBarOrientationCallback();
+  void SetScalarBarOrientationToVertical();
+  void SetScalarBarOrientationToHorizontal();
   
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
@@ -228,7 +230,7 @@ public:
   // Callbacks for point size and line width sliders
   void ChangePointSize();
   void ChangeLineWidth();
-  
+
 protected:
 
   vtkPVActorComposite();
