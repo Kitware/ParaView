@@ -40,6 +40,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
@@ -110,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.332");
+vtkCxxRevisionMacro(vtkPVApplication, "1.333");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -476,6 +477,12 @@ vtkPVApplication::~vtkPVApplication()
 
   this->SMApplication->Finalize();
   this->SMApplication->Delete();
+
+  if (this->SaveRuntimeInfoButton)
+    {
+    this->SaveRuntimeInfoButton->Delete();
+    this->SaveRuntimeInfoButton = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
