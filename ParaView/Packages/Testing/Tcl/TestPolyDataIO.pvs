@@ -1,0 +1,59 @@
+# Application should exit when this script is finished.
+Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+# Open the AltIO package.
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp1) OpenPackage "$DataDir/Data/vtkAltIOPackage.xml"
+
+# Create a non-trivial vtkPolyData.
+set kw(vtkTemp231) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp247) [$kw(vtkTemp231) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp247) SetValue 36
+set kw(vtkTemp256) [$kw(vtkTemp231) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp256) SetValue 36
+$kw(vtkTemp231) AcceptCallback
+set kw(vtkTemp281) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+$kw(vtkTemp281) AcceptCallback
+update
+
+# Write the vtkPolyData.
+vtkXMLPolyDataWriter writer
+writer SetFileName "sPolyData.xml"
+writer SetInput [[$kw(vtkTemp281) GetVTKSource] GetOutput]
+writer Write
+writer Delete
+
+# Delete the old pipeline.
+$kw(vtkTemp281) DeleteCallback
+$kw(vtkTemp231) DeleteCallback
+
+# Read the vtkPolyData from the temporary file.
+$kw(vtkTemp1) Open "sPolyData.xml"
+set kw(vtkTemp231) [vtkTemp1 GetCurrentPVSource]
+
+update
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+
+# Delete the temporary file.
+catch { file delete -force "sPolyData.xml" }
