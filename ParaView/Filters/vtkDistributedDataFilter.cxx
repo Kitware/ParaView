@@ -91,7 +91,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.3");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.4");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -133,7 +133,16 @@ vtkDistributedDataFilter::~vtkDistributedDataFilter()
     this->TimerLog = 0;
     }
 }
+vtkPKdTree *vtkDistributedDataFilter::GetKdtree()
+{
+  if (this->Kdtree == NULL)
+    {
+    this->Kdtree = vtkPKdTree::New();
+    this->Kdtree->SetController(this->Controller);
+    }
 
+  return this->Kdtree;
+}
 unsigned long vtkDistributedDataFilter::GetMTime()
 {
   unsigned long t1, t2;

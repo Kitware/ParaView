@@ -121,7 +121,7 @@ public:
   //   or other tree building default parameters.  See vtkPKdTree and 
   //   vtkKdTree for more information about these options.
 
-  vtkPKdTree *GetKdtree(){return this->Kdtree;}
+  vtkPKdTree *GetKdtree();
 
   // Description:
   //   Each cell in the data set is associated with one of the
