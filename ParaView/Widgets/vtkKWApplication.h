@@ -72,10 +72,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   virtual vtkKWApplication *GetApplication()  { return this;  }
-  virtual void SetApplication (vtkKWApplication*) 
-    { 
-    vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
-    }
+  virtual void SetApplication (vtkKWApplication*);
   
   // Description:
   // Start running the main application.

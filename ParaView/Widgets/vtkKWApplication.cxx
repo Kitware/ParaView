@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.105");
+vtkCxxRevisionMacro(vtkKWApplication, "1.106");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -208,6 +208,10 @@ vtkKWApplication::~vtkKWApplication()
     }
 }
 
+void vtkKWApplication::SetApplication(vtkKWApplication*) 
+{ 
+  vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
+}
 
 const char* vtkKWApplication::EvaluateString(const char *String, ...)
 {
