@@ -40,6 +40,7 @@ INPUT                = \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/KWCommon" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/ParaView" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Widgets" \
+ "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Filters" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/doc_ParaView_index.dox" 
 
 TAGFILES             = "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
