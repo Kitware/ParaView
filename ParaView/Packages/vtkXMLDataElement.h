@@ -39,8 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkXMLDataElement represents an XML element and those nested inside.
+// .NAME vtkXMLDataElement - Represents an XML element and those nested inside.
 // .SECTION Description
+// vtkXMLDataElement is used by vtkXMLDataParser to represent an XML
+// element.  It provides methods to access the element's attributes
+// and nested elements in a convenient manner.  This allows easy
+// traversal of an input XML file by vtkXMLReader and its subclasses.
+
+// .SECTION See Also
+// vtkXMLDataParser
+
 #ifndef __vtkXMLDataElement_h
 #define __vtkXMLDataElement_h
 

@@ -39,8 +39,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkXMLDataParser parses 
+// .NAME vtkXMLDataParser - Used by vtkXMLReader to parse VTK XML files.
 // .SECTION Description
+// vtkXMLDataParser provides a subclass of vtkXMLParser that
+// constructs a representation of an XML data format's file using
+// vtkXMLDataElement to represent each XML element.  This
+// representation is then used by vtkXMLReader and its subclasses to
+// traverse the structure of the file and extract data.
+
+// .SECTION See Also
+// vtkXMLDataElement
+
 #ifndef __vtkXMLDataParser_h
 #define __vtkXMLDataParser_h
 

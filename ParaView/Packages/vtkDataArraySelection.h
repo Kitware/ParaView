@@ -15,9 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkDataArraySelection -
+// .NAME vtkDataArraySelection - Store on/off settings for data arrays for a vtkSource.
 // .SECTION Description
-// vtkDataArraySelection 
+// vtkDataArraySelection can be used by vtkSource subclasses to store
+// on/off settings for whether each vtkDataArray in its input should
+// be passed in the source's output.  This is primarily intended to
+// allow file readers to configure what data arrays are read from the
+// file.
 
 #ifndef __vtkDataArraySelection_h
 #define __vtkDataArraySelection_h
