@@ -103,7 +103,6 @@ vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
 vtkStringList.cxx 
 vtkTiledDisplayManager.cxx
-vtkARLReaderModule.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -158,8 +157,7 @@ SET(ParaViewBinary_SRCS
     ParaView.cxx)
 
 IF(WIN32)
-  SOURCE_FILES(ParaViewBinary_SRCS
-               ParaView.rc)
+  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} ParaView.rc)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(ParaView WIN32 ${ParaViewBinary_SRCS}) 
