@@ -37,6 +37,7 @@ vtkKWLabeledText.cxx
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
 vtkKWLoadSaveDialog.cxx
+vtkKWMarker2D.cxx
 vtkKWMenu.cxx 
 vtkKWMenuButton.cxx 
 vtkKWMessageDialog.cxx 

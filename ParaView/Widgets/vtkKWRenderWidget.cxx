@@ -45,8 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
-#include "vtkKWEventMap.h"
+#include "vtkKWMarker2D.h"
 #include "vtkKWEvent.h"
+#include "vtkKWEventMap.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
@@ -61,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.29");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -144,13 +145,18 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent,
                                   this->Observer);
 
-  this->Cursor2DVisibility = 0;
-  this->Cursor2DColor[0] = this->Cursor2DColor[1] = this->Cursor2DColor[2] = 1.0;
+  this->Marker2DVisibility = 0;
+  this->Marker2DColor[0] = this->Marker2DColor[1] = this->Marker2DColor[2] = 1.0;
+
+  this->Marker2D = vtkKWMarker2D::New();
+  this->Renderer->AddProp(this->Marker2D);
+  this->Marker2D->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
 }
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
+  this->Marker2D->Delete();
   this->Renderer->Delete();
   this->RenderWindow->Delete();
   this->SetParentWindow(NULL);
@@ -358,17 +364,20 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
 {
-  if (this->Cursor2DVisibility)
+  if (this->Marker2DVisibility)
     {
     float fargs[3];
     fargs[0] = x;
     fargs[1] = y;
+    this->Renderer->DisplayToNormalizedDisplay(fargs[0], fargs[1]);
     fargs[2] = this->EventIdentifier;
-    this->InvokeEvent(vtkKWEvent::Cursor2DPositionChangedEvent, fargs);
+    this->InvokeEvent(vtkKWEvent::Marker2DPositionChangedEvent, fargs);
     }
-
-  this->Interactor->SetMoveEventInformationFlipY(x, y);
-  this->Interactor->MouseMoveEvent();
+  else
+    {
+    this->Interactor->SetMoveEventInformationFlipY(x, y);
+    this->Interactor->MouseMoveEvent();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -886,46 +895,38 @@ void vtkKWRenderWidget::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCursor2DVisibility(int v)
+void vtkKWRenderWidget::SetMarker2DVisibility(int v)
 {
-  if ( v == this->Cursor2DVisibility )
+  if ( v == this->Marker2DVisibility )
     {
     return;
     }
-  this->Cursor2DVisibility = v;
-  // Set the visibility
-  this->Modified();
+  this->Marker2D->SetVisibility(v);
+  this->Marker2DVisibility = v;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCursor2DColor(float r, float g, float b)
+void vtkKWRenderWidget::SetMarker2DColor(float r, float g, float b)
 {
-  if ( r == this->Cursor2DColor[0] &&
-       g == this->Cursor2DColor[1] &&
-       b == this->Cursor2DColor[2] )
+  if ( r == this->Marker2DColor[0] &&
+       g == this->Marker2DColor[1] &&
+       b == this->Marker2DColor[2] )
     {
     return;
     }
 
-  this->Cursor2DColor[0] = r;
-  this->Cursor2DColor[1] = g;
-  this->Cursor2DColor[2] = b;
+  this->Marker2DColor[0] = r;
+  this->Marker2DColor[1] = g;
+  this->Marker2DColor[2] = b;
   // Change color of widget
+  this->Marker2D->SetColor(r, g, b);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCursor2DPosition(int x, int y)
+void vtkKWRenderWidget::SetMarker2DPosition(float x, float y)
 {
-  if ( x == this->Cursor2DPosition[0] &&
-       y == this->Cursor2DPosition[1] )
-    {
-    return;
-    }
-  this->Cursor2DPosition[0] = x;
-  this->Cursor2DPosition[1] = y;
-  // Move the widget
-  this->Modified();
+  this->Marker2D->SetPosition(x, y);
 }
 
 //----------------------------------------------------------------------------

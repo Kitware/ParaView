@@ -53,14 +53,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkCamera;
+class vtkCornerAnnotation;
+class vtkKWMarker2D;
 class vtkKWEventMap;
 class vtkKWGenericRenderWindowInteractor;
 class vtkKWRenderWidgetObserver;
 class vtkKWWindow;
-class vtkCornerAnnotation;
 class vtkProp;
-class vtkRenderer;
 class vtkRenderWindow;
+class vtkRenderer;
 class vtkTextActor;
 class vtkTextMapper;
 
@@ -158,14 +159,14 @@ public:
 
   // Description:
   // Get and control the 2D cursor annotation.
-  virtual void SetCursor2DVisibility(int v);
-  vtkBooleanMacro(Cursor2DVisibility, int);
-  vtkGetMacro(Cursor2DVisibility, int);
-  virtual void SetCursor2DColor(float r, float g, float b);
-  virtual void SetCursor2DColor(float *rgb)
-    { this->SetCursor2DColor(rgb[0], rgb[1], rgb[2]); };
-  vtkGetVector3Macro(Cursor2DColor, float);
-  virtual void SetCursor2DPosition(int x, int y);
+  virtual void SetMarker2DVisibility(int v);
+  vtkBooleanMacro(Marker2DVisibility, int);
+  vtkGetMacro(Marker2DVisibility, int);
+  virtual void SetMarker2DColor(float r, float g, float b);
+  virtual void SetMarker2DColor(float *rgb)
+    { this->SetMarker2DColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(Marker2DColor, float);
+  virtual void SetMarker2DPosition(float x, float y);
 
   // Description:
   // Get and control the header annotation.
@@ -277,9 +278,10 @@ protected:
   int CollapsingRenders;
   int CollapsingRendersCount;
 
-  int   Cursor2DVisibility;
-  float Cursor2DColor[3];
-  int   Cursor2DPosition[2];
+  int   Marker2DVisibility;
+  float Marker2DColor[3];
+  float Marker2DPosition[2];
+  vtkKWMarker2D* Marker2D;
   
   vtkKWRenderWidgetObserver *Observer;
   
