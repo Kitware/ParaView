@@ -38,10 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWView.h"
 #include "vtkTesting.h"
+#include "vtkPNGReader.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.1");
+vtkCxxRevisionMacro(vtkKWTesting, "1.2");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
@@ -49,6 +50,7 @@ vtkKWTesting::vtkKWTesting()
 {
   this->Testing = vtkTesting::New();
   this->RenderView = 0;
+  this->ComparisonImage = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -57,6 +59,7 @@ vtkKWTesting::~vtkKWTesting()
   this->SetRenderView(0);
   this->Testing->Delete();
   this->Testing = 0;
+  this->SetComparisonImage(0);
 }
 
 //----------------------------------------------------------------------------
@@ -68,8 +71,21 @@ void vtkKWTesting::AddArgument(const char* arg)
 //----------------------------------------------------------------------------
 int vtkKWTesting::RegressionTest(float thresh)
 {
-  this->Testing->SetRenderWindow(this->RenderView->GetRenderWindow());
-  return this->Testing->RegressionTest(thresh) != vtkTesting::PASSED;
+  int res = vtkTesting::FAILED;
+  if ( this->RenderView )
+    {
+    this->Testing->SetRenderWindow(this->RenderView->GetRenderWindow());
+    res = this->Testing->RegressionTest(thresh) != vtkTesting::PASSED;
+    }
+  if ( this->ComparisonImage )
+    {
+    vtkPNGReader* reader = vtkPNGReader::New();
+    reader->SetFileName(this->ComparisonImage);
+    reader->Update();
+    res = this->Testing->RegressionTest(reader->GetOutput(), thresh);
+    reader->Delete();
+    }
+  return res;
 }
 
 //----------------------------------------------------------------------------
