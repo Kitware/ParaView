@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.3");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -42,6 +42,7 @@ public:
 
 vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
 {
+  this->Socket = 0;
   this->HostName = 0;
   this->PortNumber = -1;
   this->Internals = new vtkMPIMToNSocketConnectionInternals;
@@ -70,6 +71,7 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "NumberOfConnections: (" << this->NumberOfConnections << ")\n";
   os << indent << "Controller: (" << this->Controller << ")\n";
+  os << indent << "Socket: (" << this->Socket << ")\n";
   os << indent << "SocketCommunicator: (" << this->SocketCommunicator << ")\n";
   vtkIndent i2 = indent.GetNextIndent();
   for(unsigned int i = 0; i < this->Internals->ServerInformation.size(); ++i)
@@ -85,19 +87,29 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
 
 void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
 {
-  int myId = this->Controller->GetLocalProcessId();
-  // This should determine the host, and select a random port
-  // for now, just hard code localhost and port 33333 for testing
+  if(this->SocketCommunicator)
+    {
+    vtkErrorMacro("SetupWaitForConnection called more than once");
+    return;
+    }
+  this->SocketCommunicator = vtkSocketCommunicator::New();
+  // open a socket on a random port
+  int sock = this->SocketCommunicator->OpenSocket(0);
+  // find out the random port picked
+  int port = this->SocketCommunicator->GetPort(sock);
+  cout << "found port " << port << "\n";
   this->SetHostName("localhost");
-  this->PortNumber = 33333 + myId;
+  this->PortNumber = port;
+  this->Socket = sock;
   this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
+  cout.flush();
 }
 
 void vtkMPIMToNSocketConnection::WaitForConnection()
 { 
-  if(this->SocketCommunicator)
+  if(!this->SocketCommunicator)
     {
-    vtkErrorMacro("WaitForConnection called more than once");
+    vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
     }
   int myId = this->Controller->GetLocalProcessId();
@@ -105,12 +117,13 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     {
     return;
     }
-  this->SocketCommunicator = vtkSocketCommunicator::New();
-  cout << "WaitForConnection: id :" << myId << "  host: " << this->HostName << "  Port:" << this->PortNumber << "\n";
-  this->SocketCommunicator->WaitForConnection(this->PortNumber);
+  cout << "WaitForConnection: id :" 
+       << myId << "  host: " << this->HostName << "  Port:" << this->PortNumber << "\n";
+  this->SocketCommunicator->WaitForConnectionOnSocket(this->Socket);
   int data;
   this->SocketCommunicator->Receive(&data, 1, 1, 1238);
   cout << "Received Hello from process " << data << "\n";
+  cout.flush();
 } 
 
 void vtkMPIMToNSocketConnection::Connect()
@@ -131,6 +144,7 @@ void vtkMPIMToNSocketConnection::Connect()
        << "  Port:" 
        << this->Internals->ServerInformation[myId].PortNumber 
        << "\n";
+  cout.flush();
   this->SocketCommunicator->ConnectTo((char*)this->Internals->ServerInformation[myId].HostName.c_str(),
                                       this->Internals->ServerInformation[myId].PortNumber );
   int id = static_cast<int>(myId);

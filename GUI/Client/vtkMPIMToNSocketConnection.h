@@ -70,6 +70,7 @@ protected:
   ~vtkMPIMToNSocketConnection();
 private:
   int PortNumber;
+  int Socket;
   char* HostName;
   vtkSetStringMacro(HostName);
   int NumberOfConnections;
