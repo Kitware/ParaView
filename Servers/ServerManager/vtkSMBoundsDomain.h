@@ -65,7 +65,6 @@ protected:
   
   int Mode;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

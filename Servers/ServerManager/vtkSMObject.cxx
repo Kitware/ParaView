@@ -18,7 +18,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMObject);
-vtkCxxRevisionMacro(vtkSMObject, "1.4");
+vtkCxxRevisionMacro(vtkSMObject, "1.5");
 
 vtkSMProxyManager* vtkSMObject::ProxyManager = 0;
 
@@ -56,6 +56,12 @@ void vtkSMObject::SetProxyManager(vtkSMProxyManager* pm)
   vtkSMObject::ProxyManager = pm;
 }
 
+//---------------------------------------------------------------------------
+void vtkSMObject::SaveState(const char*, ostream* os, vtkIndent indent)
+{
+  *os << indent << "<!-- SaveState not specified in " << this->GetClassName()
+    << " (" << reinterpret_cast<void*>(this) << ") -->" << endl;
+}
 //---------------------------------------------------------------------------
 void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {

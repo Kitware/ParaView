@@ -96,8 +96,6 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   vtkSMVectorProperty(const vtkSMVectorProperty&); // Not implemented
   void operator=(const vtkSMVectorProperty&); // Not implemented

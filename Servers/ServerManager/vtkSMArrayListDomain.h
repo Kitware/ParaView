@@ -91,8 +91,6 @@ protected:
   int AttributeType;
   unsigned int DefaultElement;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {};
-
   vtkSetStringMacro(InputDomainName);
   vtkGetStringMacro(InputDomainName);
 

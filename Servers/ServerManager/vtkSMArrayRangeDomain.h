@@ -49,8 +49,6 @@ protected:
   vtkSMArrayRangeDomain();
   ~vtkSMArrayRangeDomain();
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   void Update(const char* arrayName,
               vtkSMProxyProperty* ip,

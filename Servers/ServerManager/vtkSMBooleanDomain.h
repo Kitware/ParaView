@@ -43,8 +43,6 @@ protected:
   vtkSMBooleanDomain();
   ~vtkSMBooleanDomain();
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   vtkSMBooleanDomain(const vtkSMBooleanDomain&); // Not implemented
   void operator=(const vtkSMBooleanDomain&); // Not implemented

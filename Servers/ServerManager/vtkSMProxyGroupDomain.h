@@ -91,8 +91,6 @@ protected:
 
   vtkSMProxyGroupDomainInternals* PGInternals;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   vtkSMProxyGroupDomain(const vtkSMProxyGroupDomain&); // Not implemented
   void operator=(const vtkSMProxyGroupDomain&); // Not implemented
