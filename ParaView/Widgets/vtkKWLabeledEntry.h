@@ -71,6 +71,10 @@ public:
   void SetLabel(const char *);
   
   // Description:
+  // get the internal label
+  vtkKWLabel *GetLabel() { return this->Label; }
+  
+  // Description:
   // get the internal entry
   vtkKWEntry *GetEntry() { return this->Entry; }
   
