@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45.4.2");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45.4.3");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -89,7 +89,7 @@ int vtkPVEnSightReaderModule::InitializeData()
                     << "Update" 
                     << vtkClientServerStream::End;
     }
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToServer();
   return this->Superclass::InitializeData();
 }
 
