@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.168");
+vtkCxxRevisionMacro(vtkPVData, "1.169");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2996,7 +2996,10 @@ void vtkPVData::SetCollectThreshold(float threshold)
   
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  if (!pvApp->GetUseRenderingGroup() && this->CollectTclName)
+  // Threshold is only used whit vtkCollectPolyData.
+  // We need rendering modules ...
+  if (!pvApp->GetUseRenderingGroup() && !pvApp->GetUseTiledDisplay() && 
+      this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
                            static_cast<unsigned long>(threshold*1000.0));
@@ -3011,7 +3014,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.168 $");
+  this->ExtractRevision(os,"$Revision: 1.169 $");
 }
 
 //----------------------------------------------------------------------------

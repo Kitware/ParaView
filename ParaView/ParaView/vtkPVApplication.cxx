@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.160");
+vtkCxxRevisionMacro(vtkPVApplication, "1.161");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -524,6 +524,12 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Use a subset of processes to render.",
   "--group-file", "-gf",
   "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
+  "--use-tiled-display", "-td",
+  "Duplicate the final data to all nodes and tile node displays 1-N into one large display.",
+  "--tile-dimensions-x", "-tdx",
+  "-tdx=X where X is number of displays in each row of the display.",
+  "--tile-dimensions-y", "-tdy",
+  "-tdy=Y where Y is number of displays in each column of the display.",
 #ifdef VTK_MANGLE_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -736,7 +742,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
         }
       }
     }
-
   int index=-1;
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
@@ -773,7 +778,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
                                           index) == VTK_OK )
     {
     const char* newarg=0;
-
     int len = (int)(strlen(argv[index]));
     for (int i=0; i<len; i++)
       {
@@ -792,19 +796,39 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     this->UseTiledDisplay = 1;
 
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tiled-x",
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
                                             index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-tx",
+         vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
                                           index) == VTK_OK )
       {
-      this->TileDimensions[0] = atoi(argv[index]);
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->TileDimensions[0] = atoi(newarg);
       }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tiled-y",
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
                                             index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-ty",
+         vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
                                           index) == VTK_OK )
       {
-      this->TileDimensions[1] = atoi(argv[index]);
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->TileDimensions[1] = atoi(newarg);
       }
     }
 

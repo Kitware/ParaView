@@ -22,7 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.1");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.2");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -96,11 +96,11 @@ void vtkDuplicatePolyData::Execute()
   numProcs = this->Controller->GetNumberOfProcesses();
 
   // Collect.
-  vtkAppendPolyData *append = vtkAppendPolyData::New();
   vtkPolyData *pd = NULL;;
 
   if (myId == 0)
     {
+    vtkAppendPolyData *append = vtkAppendPolyData::New();
     pd = vtkPolyData::New();
     pd->CopyStructure(input);
     pd->GetPointData()->PassData(input->GetPointData());
@@ -134,9 +134,13 @@ void vtkDuplicatePolyData::Execute()
   else
     {
     this->Controller->Send(input, 0, 131767);
-    this->Controller->Receive(output, 0, 131768);
-    append->Delete();
-    append = NULL;
+    vtkPolyData *pd = vtkPolyData::New();
+    this->Controller->Receive(pd, 0, 131768);
+    output->CopyStructure(pd);
+    output->GetPointData()->PassData(pd->GetPointData());
+    output->GetCellData()->PassData(pd->GetCellData());
+    pd->Delete();
+    pd = NULL;
     }
 }
 

@@ -102,6 +102,7 @@ vtkPVXMLElement.cxx
 vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
 vtkStringList.cxx 
+vtkTiledDisplayManager.cxx
 )
 
 WRAP_EXCLUDE_FILES(
