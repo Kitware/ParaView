@@ -655,10 +655,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->TrayFrame->Create(app, 0);
   this->Script("%s configure -borderwidth 0", this->TrayFrame->GetWidgetName());
   this->TrayImage->Create(app, "");
-  this->Script("%s configure -relief sunken -bd 2 -bg red",
+  this->Script("%s configure -relief sunken -bd 2",
 	       this->TrayImage->GetWidgetName());
   vtkKWIcon *ico = vtkKWIcon::New();
-  ico->SetImageData(vtkKWIcon::ICON_GENERAL);
+  ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
   this->TrayImage->SetImageData(ico);
   ico->Delete();
   this->TrayImage->SetBind(this, "<Button-1>", "ProcessErrorClick");
@@ -1014,7 +1014,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.98 $");
+  this->ExtractRevision(os,"$Revision: 1.99 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1285,16 +1285,17 @@ void vtkKWWindow::SetErrorIcon(int s)
     if ( s > 1 )
       {
       //cout << "Configure with color red" << endl;
-      this->Script("%s configure -bg red", this->TrayImage->GetWidgetName());
+      vtkKWIcon *ico = vtkKWIcon::New();
+      ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
+      this->TrayImage->SetImageData(ico);
+      ico->Delete();
       }
     else
       {
-      int r, g, b;
-      this->TrayFrame->GetBackgroundColor(&r, &g, &b);
-      //cout << "Configure with color: " << r << g <<  b << endl;
-      this->Script("%s configure -bg #%03d%03d%03d", 
-		   this->TrayImage->GetWidgetName(),
-		   r, g, b);
+      vtkKWIcon *ico = vtkKWIcon::New();
+      ico->SetImageData(vtkKWIcon::ICON_SMALLERROR);
+      this->TrayImage->SetImageData(ico);
+      ico->Delete();
       }
     }
   else

@@ -39,16 +39,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVErrorLogDisplay.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWText.h"
-#include "vtkTimerLog.h"
-#include "vtkKWWindow.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
-#include "vtkKWCheckButton.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWText.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
+#include "vtkTimerLog.h"
 #include "vtkVector.txx"
 
 //----------------------------------------------------------------------------
@@ -88,6 +90,16 @@ void vtkPVErrorLogDisplay::Clear()
   if ( this->ErrorMessages )
     {
     this->ErrorMessages->RemoveAllItems();
+    }
+
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+  if ( app )
+    {
+    vtkKWWindow *window = app->GetMainWindow();
+    if ( window )
+      {
+      window->SetErrorIcon(0);
+      }
     }
   this->Update();
 }
