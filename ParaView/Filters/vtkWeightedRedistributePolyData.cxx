@@ -29,7 +29,7 @@
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.3");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.4");
 
 //-------------------------------------------------------------------
 
@@ -333,7 +333,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           rsSendTo[type][ostart]  = new int[cnt];
           rsSendNum[type][ostart] = new vtkIdType[cnt];
           }
-        for (int i=0; i<cnt;i++)
+        for (i=0; i<cnt;i++)
           {
           rsSendTo[type][ostart][i]  = sendToTemp[i];
           rsSendNum[type][ostart][i] = sendNumTemp[i];
@@ -615,8 +615,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   else
     {
     // myId != 0
-    int schedLen1 = 0;
-    int schedLen2 = 0;
+    schedLen1 = 0;
+    schedLen2 = 0;
     this->Controller->Receive((int*)(&schedLen1), 1, 0, 
       SCHED_LEN_1_TAG); 
     this->Controller->Receive((int*)(&schedLen2), 1, 0, 
