@@ -27,7 +27,7 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.24");
+vtkCxxRevisionMacro(vtkString, "1.24.4.1");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -384,7 +384,7 @@ char* vtkString::RemoveAllButUpperHex(const char* str)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkString::CountChar(const char* str, const char c)
+unsigned int vtkString::CountChar(const char* str, char c)
 {
   int count = 0;
 

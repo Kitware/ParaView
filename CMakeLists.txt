@@ -2,6 +2,12 @@ CMAKE_MINIMUM_REQUIRED (VERSION 1.8)
 PROJECT(ParaView)
 
 #########################################################################
+# Disallow in-source build
+IF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+  MESSAGE(FATAL_ERROR "ParaView requiers out of source Build. Please create a separate binary directory and run CMake there.")
+ENDIF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+
+#########################################################################
 # Common settings
 #
 # ParaView version number.  An even minor number corresponds to releases.
