@@ -92,6 +92,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataMapper.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
+#include "vtkRenderer.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -111,7 +112,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.362");
+vtkCxxRevisionMacro(vtkPVWindow, "1.363");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1646,7 +1647,7 @@ void vtkPVWindow::OpenCallback()
 
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "OpenPath");
-  loadDialog->Create(this->Application,"");
+  loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExt(".vtk");
   loadDialog->SetFileTypes(str.str());
@@ -1995,7 +1996,6 @@ void vtkPVWindow::WriteData()
   const char* defaultExtension = 0;
   
   ostrstream typesStr;
-  typesStr << "{";
   
   // Build list of file types supporting this data type.
   vtkLinkedListIterator<vtkPVWriter*>* it =
@@ -2044,47 +2044,50 @@ void vtkPVWindow::WriteData()
     return;
     }
   
-  typesStr << " }" << ends;
+  typesStr << ends;
   char* types = vtkString::Duplicate(typesStr.str());
   typesStr.rdbuf()->freeze(0);
   
+  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(saveDialog, "SaveDataFile");
+  saveDialog->Create(this->Application, 0);
+  saveDialog->SaveDialogOn();
+  saveDialog->SetTitle("Save Data");
+  saveDialog->SetDefaultExt(defaultExtension);
+  saveDialog->SetFileTypes(types);
+  char *filename = 0;
+  
   // Ask the user for the filename.  Default the extension to the
   // first writer supported.
-  this->Script("tk_getSaveFile -filetypes %s"
-               " -defaultextension %s -initialfile data%s",
-               types, defaultExtension, defaultExtension);
-  
-  // Get the filename selected.
-  char* filename =
-    vtkString::Duplicate(this->Application->GetMainInterp()->result);
-  
+
   delete [] types;
-  
-  // Make sure we were given a filename.
-  if (strcmp(filename, "") == 0)
+
+  if ( saveDialog->Invoke() &&
+       vtkString::Length(saveDialog->GetFileName())>0 )
     {
-    delete [] filename;
-    return;
-    }
-  
-  // Write the file.
-  if(parallel)
-    {
-    // See if the user wants to save any ghost levels.
-    this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} "
-                 "{How many ghost levels would you like to save?} "
-                 "{} 0 0 1 2");
-    int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
-    if (ghostLevel >= 0)
+    const char* filename = saveDialog->GetFileName();  
+    
+    // Write the file.
+    if(parallel)
       {
-      this->WriteVTKFile(filename, ghostLevel);
+      // See if the user wants to save any ghost levels.
+      this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} "
+                   "{How many ghost levels would you like to save?} "
+                   "{} 0 0 1 2");
+      int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
+      if (ghostLevel >= 0)
+        {
+        this->WriteVTKFile(filename, ghostLevel);
+        this->SaveLastPath(saveDialog, "SaveDataFile");
+        }
+      }
+    else
+      {
+      this->WriteVTKFile(filename);  
+      this->SaveLastPath(saveDialog, "SaveDataFile");
       }
     }
-  else
-    {
-    this->WriteVTKFile(filename);  
-    }
-  delete [] filename;
+  saveDialog->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -2118,7 +2121,7 @@ void vtkPVWindow::ExportVTKScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "ExportVTKLastPath");
-  exportDialog->Create(this->Application,"");
+  exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save VTK Script");
   exportDialog->SetDefaultExt(".tcl");
@@ -3050,7 +3053,7 @@ void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveTracePath");
-  exportDialog->Create(this->Application,"");
+  exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExt(".pvs");
@@ -3220,7 +3223,7 @@ int vtkPVWindow::OpenPackage()
   int res = 0;
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "PackagePath");
-  loadDialog->Create(this->Application,"");
+  loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExt(".xml");
   loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}");
@@ -3589,7 +3592,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.362 $");
+  this->ExtractRevision(os,"$Revision: 1.363 $");
 }
 
 //----------------------------------------------------------------------------
