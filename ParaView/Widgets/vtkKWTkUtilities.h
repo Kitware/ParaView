@@ -49,8 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObject.h"
 
 class vtkImageData;
+class vtkKWMenu;
 struct Tcl_Interp;
-
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+//ETX
 class VTK_EXPORT vtkKWTkUtilities : public vtkObject
 {
 public:
@@ -149,6 +153,18 @@ public:
                                                const char **widgets,
                                                const float *factors = 0,
                                                const int *weights = 0);
+
+  
+  // Description:
+  // The following two methods allows one to store and restore
+  // the state of a menu. This can be used to, for example, to
+  // store the state, disable all the entries and then restore
+  // the menu to the previous. Note that only the state of menu
+  // entries with labels are stored.
+  static void StoreMenuState(
+    vtkKWMenu* menu, vtkArrayMap<const char*, int>* state);
+  static void RestoreMenuState(
+    vtkKWMenu* menu, vtkArrayMap<const char*, int>* state);
 
   //ETX
 

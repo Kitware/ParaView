@@ -41,9 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWTkUtilities.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkImageFlip.h"
+#include "vtkArrayMap.txx"
 #include "vtkBase64Utility.h"
+#include "vtkImageFlip.h"
+#include "vtkKWMenu.h"
+#include "vtkObjectFactory.h"
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -57,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.1");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.2");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -719,6 +721,56 @@ int vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
   delete [] col_widths;
 
   return ok;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::StoreMenuState(vtkKWMenu* menu, 
+                                      vtkArrayMap<const char*, int>* state)
+{
+  state->RemoveAllItems();
+
+  if (!menu)
+    {
+    return;
+    }
+  int numEntries = menu->GetNumberOfItems();
+  for(int i=0; i<numEntries; i++)
+    {
+    char label[128];
+    if (menu->GetItemLabel(i, label, 128) == VTK_OK)
+      {
+      state->SetItem(label, menu->GetState(i));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::RestoreMenuState(vtkKWMenu* menu, 
+                                        vtkArrayMap<const char*, int>* state)
+{
+
+  vtkArrayMapIterator<const char*, int>* it = state->NewIterator();
+
+  // Mark all sources as not visited.
+  while( !it->IsDoneWithTraversal() )
+    {    
+    int state;
+    const char* item;
+    if (it->GetKey(item) == VTK_OK && item && it->GetData(state) == VTK_OK)
+      {
+      if ( state == vtkKWMenu::Active )
+        {
+        menu->SetState(item, vtkKWMenu::Normal);
+        }
+      else
+        {
+        menu->SetState(item, state);
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
 }
 
 //----------------------------------------------------------------------------
