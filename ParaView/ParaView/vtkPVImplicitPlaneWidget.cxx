@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -273,7 +273,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
       {
       val[cc] = atof( this->CenterEntry[cc]->GetValue() );
       }
-    this->SetCenter(val);
+    this->SetCenterInternal(val[0], val[1], val[2]);
     pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
@@ -281,7 +281,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
       }
-    this->SetNormal(val);
+    this->SetNormalInternal(val[0], val[1], val[2]);
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
@@ -669,12 +669,11 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetCenterInternal(float x, float y, float z)
 {
   this->CenterEntry[0]->SetValue(x, 3);
   this->CenterEntry[1]->SetValue(y, 3);
   this->CenterEntry[2]->SetValue(z, 3); 
-  this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
@@ -684,18 +683,31 @@ void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
+{
+  this->SetCenterInternal(x,y,z);
+  this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::SetNormalInternal(float x, float y, float z)
 {
   this->NormalEntry[0]->SetValue(x, 3);
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
-  this->ModifiedCallback();
   if ( this->Widget3DTclName )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->Widget3DTclName, x, y, z);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
+{
+  this->SetNormalInternal(x, y, z);
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

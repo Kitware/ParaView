@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.38");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -577,12 +577,12 @@ void vtkPVArrayMenu::UpdateArrayMenu()
         }
       }
 
-    // In this case, the widget does not match the object.
-    this->ModifiedCallback();
-
     if (ai)
       {
       this->SetArrayName(ai->GetName());
+
+      // In this case, the widget does not match the object.
+      this->ModifiedCallback();
       }
 
     // Now set the menu's value.

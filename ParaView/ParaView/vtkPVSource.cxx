@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.292");
+vtkCxxRevisionMacro(vtkPVSource, "1.293");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -815,7 +815,7 @@ void vtkPVSource::CreateProperties()
   
   this->AcceptButton->SetParent(frame);
   this->AcceptButton->Create(this->Application, 
-                             "-text Accept -background red1");
+                             "-text Accept");
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect");
@@ -2071,21 +2071,38 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 //----------------------------------------------------------------------------
 void vtkPVSource::SetAcceptButtonColorToRed()
 {
+  if (this->AcceptButtonRed)
+    {
+    return;
+    }
   this->AcceptButtonRed = 1;
   this->Script("%s configure -background red1",
+               this->AcceptButton->GetWidgetName());
+  this->Script("%s configure -activebackground red1",
                this->AcceptButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetAcceptButtonColorToWhite()
 {
+  if (!this->AcceptButtonRed)
+    {
+    return;
+    }
   this->AcceptButtonRed = 0;
 
 #ifdef _WIN32
-  this->Script("%s configure -background SystemButtonFace",
+  this->Script("%s configure -background [lindex [%s configure -background] 3]",
+               this->AcceptButton->GetWidgetName(),
+               this->AcceptButton->GetWidgetName());
+  this->Script("%s configure -activebackground "
+               "[lindex [%s configure -activebackground] 3]",
+               this->AcceptButton->GetWidgetName(),
                this->AcceptButton->GetWidgetName());
 #else
-  this->Script("%s configure -background #d9d9d9",
+  this->Script("%s configure -background #ccc",
+               this->AcceptButton->GetWidgetName());
+  this->Script("%s configure -activebackground #eee",
                this->AcceptButton->GetWidgetName());
 #endif
 }
@@ -2613,7 +2630,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.292 $");
+  this->ExtractRevision(os,"$Revision: 1.293 $");
 }
 
 //----------------------------------------------------------------------------

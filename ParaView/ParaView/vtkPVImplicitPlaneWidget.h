@@ -95,12 +95,14 @@ public:
   // Center of the plane.
   void SetCenter();
   virtual void SetCenter(float,float,float);
+  virtual void SetCenterInternal(float,float,float);
   virtual void SetCenter(float f[3]) { this->SetCenter(f[0], f[1], f[2]); }
 
   // Description:
   // The normal to the plane.
   void SetNormal();
   virtual void SetNormal(float,float,float);
+  virtual void SetNormalInternal(float,float,float);
   virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }
 
   // Description:
