@@ -117,7 +117,6 @@ protected:
   virtual int FillInputPortInformation(int, vtkInformation*);
 
   virtual void ReportReferences(vtkGarbageCollector*);
-  virtual void RemoveReferences();
   private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented

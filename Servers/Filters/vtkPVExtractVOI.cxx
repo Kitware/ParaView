@@ -27,7 +27,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.4");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.5");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -295,30 +295,9 @@ void vtkPVExtractVOI::SetSampleRateK(int ratek)
 void vtkPVExtractVOI::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  collector->ReportReference(this->ExtractVOI, "ExtractVOI");
-  collector->ReportReference(this->ExtractGrid, "ExtractGrid");
-  collector->ReportReference(this->ExtractRG, "ExtractRG");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVExtractVOI::RemoveReferences()
-{
-  if(this->ExtractVOI)
-    {
-    this->ExtractVOI->Delete();
-    this->ExtractVOI = 0;
-    }
-  if(this->ExtractGrid)
-    {
-    this->ExtractGrid->Delete();
-    this->ExtractGrid = 0;
-    }
-  if(this->ExtractRG)
-    {
-    this->ExtractRG->Delete();
-    this->ExtractRG = 0;
-    }
-  this->Superclass::RemoveReferences();
+  vtkGarbageCollectorReport(collector, this->ExtractVOI, "ExtractVOI");
+  vtkGarbageCollectorReport(collector, this->ExtractGrid, "ExtractGrid");
+  vtkGarbageCollectorReport(collector, this->ExtractRG, "ExtractRG");
 }
 
 //----------------------------------------------------------------------------

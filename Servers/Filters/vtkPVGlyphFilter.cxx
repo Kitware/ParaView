@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.12");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.13");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -129,18 +129,7 @@ void vtkPVGlyphFilter::Execute()
 void vtkPVGlyphFilter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  collector->ReportReference(this->MaskPoints, "MaskPoints");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::RemoveReferences()
-{
-  if(this->MaskPoints)
-    {
-    this->MaskPoints->Delete();
-    this->MaskPoints = 0;
-    }
-  this->Superclass::RemoveReferences();
+  vtkGarbageCollectorReport(collector, this->MaskPoints, "MaskPoints");
 }
 
 //-----------------------------------------------------------------------------

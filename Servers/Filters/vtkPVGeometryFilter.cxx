@@ -40,7 +40,7 @@
 #include "vtkCallbackCommand.h"
 #include "vtkGarbageCollector.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.43");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.44");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -619,24 +619,10 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
 void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  collector->ReportReference(this->DataSetSurfaceFilter, "DataSetSurfaceFilter");
-  collector->ReportReference(this->HierarchicalBoxOutline, "HierarchicalBoxOutline");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVGeometryFilter::RemoveReferences()
-{
-  if(this->DataSetSurfaceFilter)
-    {
-    this->DataSetSurfaceFilter->Delete();
-    this->DataSetSurfaceFilter = 0;
-    }
-  if(this->HierarchicalBoxOutline)
-    {
-    this->HierarchicalBoxOutline->Delete();
-    this->HierarchicalBoxOutline = 0;
-    }
-  this->Superclass::RemoveReferences();
+  vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter,
+                            "DataSetSurfaceFilter");
+  vtkGarbageCollectorReport(collector, this->HierarchicalBoxOutline,
+                            "HierarchicalBoxOutline");
 }
 
 //----------------------------------------------------------------------------
