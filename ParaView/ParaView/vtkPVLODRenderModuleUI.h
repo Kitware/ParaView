@@ -68,6 +68,7 @@ public:
   // Description:
   // Threshold for individual actors as number of points.
   void LODThresholdScaleCallback();
+  void LODThresholdLabelCallback();
   void LODCheckCallback();
 
   // Description:

@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.287");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.288");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -924,6 +924,8 @@ void vtkPVRenderView::CreateViewProperties()
     this->RenderModuleUI->SetRenderModule(pvapp->GetRenderModule());
     this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
     this->RenderModuleUI->Create(this->Application,0);
+    this->RenderModuleUI->SetTraceReferenceObject(this);
+    this->RenderModuleUI->SetTraceReferenceCommand("GetRenderModuleUI");
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
       this->RenderModuleUI->GetWidgetName());
     }

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.7");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.8");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -205,8 +205,10 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->CompositeThresholdScale->SetRange(0.0, 100.0);
     this->CompositeThresholdScale->SetResolution(0.1);
     this->CompositeThresholdScale->SetValue(this->CompositeThreshold);
+    this->CompositeThresholdScale->SetEndCommand(this, 
+                                                 "CompositeThresholdScaleCallback");
     this->CompositeThresholdScale->SetCommand(this, 
-                                            "CompositeThresholdScaleCallback");
+                                              "CompositeThresholdLabelCallback");
     this->CompositeThresholdScale->SetBalloonHelpString(
       "This slider determines when distributed rendering is used."
       "When compositing is off geometry is collected to process 0 for "
@@ -264,8 +266,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->ReductionFactorScale->SetRange(2, 5);
     this->ReductionFactorScale->SetResolution(1);
     this->ReductionFactorScale->SetValue(this->ReductionFactor);
-    this->ReductionFactorScale->SetCommand(this, 
-                                            "ReductionFactorScaleCallback");
+    this->ReductionFactorScale->SetCommand(this, "ReductionFactorScaleCallback");
     this->ReductionFactorScale->SetBalloonHelpString(
              "Subsampling is a compositing LOD technique. "
              "Subsampling will use larger pixels during interaction.");
@@ -310,8 +311,8 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->SquirtLevelScale->SetRange(1, 6);
     this->SquirtLevelScale->SetResolution(1);
     this->SquirtLevelScale->SetValue(this->SquirtLevel);
-    this->SquirtLevelScale->SetCommand(this, 
-                                            "SquirtLevelScaleCallback");
+    this->SquirtLevelScale->SetEndCommand(this, 
+                                          "SquirtLevelScaleCallback");
 
     this->SquirtLevelLabel->SetParent(this->LODScalesFrame);
     this->SquirtLevelLabel->Create(this->Application, "-anchor w");
@@ -439,6 +440,24 @@ void vtkPVCompositeRenderModuleUI::CompositeThresholdScaleCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback()
+{
+  float threshold = this->CompositeThresholdScale->GetValue();
+
+  if (threshold == VTK_LARGE_FLOAT)
+    {
+    this->CompositeThresholdLabel->SetLabel("Compositing Disabled");
+    }
+  else
+    {
+    char str[256];
+    sprintf(str, "Composite above %.1f MBytes", threshold);
+    this->CompositeThresholdLabel->SetLabel(str);
+    }
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeCheckCallback()
 {
   int val = this->CompositeCheck->GetState();
@@ -468,22 +487,20 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
     threshold = VTK_LARGE_FLOAT;
     }
 
+  this->CompositeThresholdLabelCallback();
+
   if (threshold == VTK_LARGE_FLOAT)
     {
     this->CompositeCheck->SetState(0);
     this->CompositeThresholdScale->EnabledOff();
     this->CompositeThresholdLabel->EnabledOff();
-    this->CompositeThresholdLabel->SetLabel("Compositing Disabled");
     }
   else
     {
-    char str[256];
     this->CompositeCheck->SetState(1);
     this->CompositeThresholdScale->EnabledOn();
     this->CompositeThresholdLabel->EnabledOn();
     this->CompositeThresholdScale->SetValue(threshold);
-    sprintf(str, "Composite above %.1f MBytes", threshold);
-    this->CompositeThresholdLabel->SetLabel(str);
     }
 
   this->CompositeThreshold = threshold;
@@ -491,7 +508,10 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
 
   this->SetCompositeThresholdInternal(threshold);
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
-  this->AddTraceEntry("$kw(%s) SetCompositeThreshold %f",
+  
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetCompositeThreshold %f}",
                       this->GetTclName(), threshold);
 }
 
@@ -514,7 +534,9 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback()
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
 {
-  this->AddTraceEntry("$kw(%s) CompositeWithFloatCallback %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) CompositeWithFloatCallback %d}", 
                       this->GetTclName(), val);
   this->CompositeWithFloatFlag = val;
   if ( this->CompositeWithFloatCheck->GetState() != val )
@@ -554,7 +576,9 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback()
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
 {
-  this->AddTraceEntry("$kw(%s) CompositeWithRGBACallback %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) CompositeWithRGBACallback %d}", 
                       this->GetTclName(), val);
   this->CompositeWithRGBAFlag = val;
   if ( this->CompositeWithRGBACheck->GetState() != val )
@@ -593,7 +617,9 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback()
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 {
-  this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) CompositeCompressionCallback %d}", 
                       this->GetTclName(), val);
 
   this->CompositeCompressionFlag = val;
@@ -643,7 +669,9 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) SetSquirtLevel %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetSquirtLevel %d}", 
                       this->GetTclName(), level);
   this->SquirtLevel = level;
 
@@ -724,7 +752,9 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) SetReductionFactor %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetReductionFactor %d}", 
                       this->GetTclName(), factor);
   this->ReductionFactor = factor;
 

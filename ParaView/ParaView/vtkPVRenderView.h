@@ -261,6 +261,10 @@ public:
   void SetOrientationAxesInteractivity(int val);
   void OrientationAxesInteractiveCallback();
   void SetOrientationAxesOutlineColor(double r, double g, double b);
+
+  // Description:
+  // Returns the UI created by the render module
+  vtkGetObjectMacro(RenderModuleUI, vtkPVRenderModuleUI);
   
 protected:
   vtkPVRenderView();

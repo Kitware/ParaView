@@ -72,6 +72,7 @@ public:
   // Threshold for collecting data to a single process (MBytes).
   void CompositeCheckCallback();
   void CompositeThresholdScaleCallback();
+  void CompositeThresholdLabelCallback();
   void SetCompositeThreshold(float val);
   vtkGetMacro(CompositeThreshold, float);
   // I should really put this in the composite module.

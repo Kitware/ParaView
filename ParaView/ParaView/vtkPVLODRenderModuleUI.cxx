@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.8");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.9");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -218,7 +218,9 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->SetLODThreshold(this->LODThreshold);
   this->LODThresholdScale->SetValue(this->LODThreshold);
   this->LODThresholdScale->SetCommand(this, 
-                                      "LODThresholdScaleCallback");
+                                      "LODThresholdLabelCallback");
+  this->LODThresholdScale->SetEndCommand(this, 
+                                         "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
     "This slider determines whether to use decimated models "
     "during interaction.  Threshold critera is based on size "
@@ -335,13 +337,28 @@ void vtkPVLODRenderModuleUI::LODCheckCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::LODThresholdLabelCallback()
+{
+  float threshold = this->LODThresholdScale->GetValue();
+  if (threshold == VTK_LARGE_FLOAT)
+    {
+    this->LODThresholdValue->SetLabel("Disabled");
+    }
+  else
+    {
+    char str[256];
+    sprintf(str, "%.1f MBytes", threshold);
+    this->LODThresholdValue->SetLabel(str);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
 {
   if ( this->LODThresholdValue && this->LODThresholdValue->IsCreated() )
     {
     if (threshold == VTK_LARGE_FLOAT)
       {
-      this->LODThresholdValue->SetLabel("Disabled");
       this->LODThresholdScale->EnabledOff();
       this->LODThresholdValue->EnabledOff();
       this->LODResolutionLabel->EnabledOff();
@@ -351,9 +368,6 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
       }
     else
       {
-      char str[256];
-      sprintf(str, "%.1f MBytes", threshold);
-      this->LODThresholdValue->SetLabel(str);
       this->LODThresholdScale->EnabledOn();
       this->LODThresholdValue->EnabledOn();
       this->LODResolutionLabel->EnabledOn();
@@ -362,6 +376,7 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
       this->LODCheck->SetState(1);
       this->LODThresholdScale->SetValue(threshold);
       }
+    this->LODThresholdLabelCallback();
     }
     
   if ( this->LODRenderModule )
@@ -372,7 +387,9 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
 
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
                                   threshold);
-  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetLODThreshold %f}",
                       this->GetTclName(), threshold);
 }
 
@@ -387,7 +404,9 @@ void vtkPVLODRenderModuleUI::LODResolutionScaleCallback()
   this->SetLODResolutionInternal(value);
 
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
-  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetLODResolution %d}",
                       this->GetTclName(), value);
 }
 
@@ -411,7 +430,9 @@ void vtkPVLODRenderModuleUI::SetLODResolution(int value)
   this->SetLODResolutionInternal(value);
 
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
-  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetLODResolution %d}",
                       this->GetTclName(), value);
 }
 
