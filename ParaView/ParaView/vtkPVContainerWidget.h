@@ -81,6 +81,16 @@ public:
   virtual void Reset();
 
   // Description:
+  // This method is called when the source that contains this widget
+  // is selected.
+  void Select();
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is deselected.
+  void Deselect();
+
+  // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
 
@@ -91,6 +101,12 @@ public:
   // Description:
   // Return the widget with the corresponding trace name.
   vtkPVWidget* GetPVWidget(const char* traceName);
+
+  // Description:
+  // The direction in which the sub-widgets are packed
+  // ( top, left etc. )
+  vtkSetStringMacro(PackDirection);
+  vtkGetStringMacro(PackDirection);
     
 //BTX
   // Description:
@@ -99,8 +115,8 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVContainerWidget* ClonePrototype(vtkPVSource* pvSource,
-				    vtkArrayMap<vtkPVWidget*, 
-				    vtkPVWidget*>* map);
+                                    vtkArrayMap<vtkPVWidget*, 
+                                    vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -111,12 +127,14 @@ protected:
   vtkLinkedList<vtkPVWidget*>* Widgets;
 
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  char* PackDirection;
 
 private:
   vtkPVContainerWidget(const vtkPVContainerWidget&); // Not implemented

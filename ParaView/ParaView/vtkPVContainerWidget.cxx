@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkPVContainerWidget);
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
-		     int argc, char *argv[]);
+                     int argc, char *argv[]);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
@@ -64,6 +64,9 @@ vtkPVContainerWidget::vtkPVContainerWidget()
   this->CommandFunction = vtkPVContainerWidgetCommand;
 
   this->Widgets = vtkLinkedList<vtkPVWidget*>::New();
+
+  this->PackDirection = 0;
+  this->SetPackDirection("top");
 }
 
 //----------------------------------------------------------------------------
@@ -71,6 +74,7 @@ vtkPVContainerWidget::~vtkPVContainerWidget()
 {
   this->Widgets->Delete();
   this->Widgets = NULL;
+  this->SetPackDirection(0);
 }
 
 //----------------------------------------------------------------------------
@@ -94,8 +98,8 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
     if (widget && !widget->GetApplication())
       {
       widget->Create(this->Application);
-      this->Script("pack %s -side top -fill both -expand true",
-		   widget->GetWidgetName());
+      this->Script("pack %s -side %s -fill both -expand true",
+                   widget->GetWidgetName(), this->PackDirection);
       }
     it->GoToNextItem();
     }
@@ -146,6 +150,45 @@ void vtkPVContainerWidget::Reset()
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::Select()
+{
+  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkPVWidget* widget;
+  while ( !it->IsDoneWithTraversal() )
+    {
+    widget = 0;
+    it->GetData(widget);
+    if (widget)
+      {
+      widget->Select();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::Deselect()
+{
+  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkPVWidget* widget;
+  while ( !it->IsDoneWithTraversal() )
+    {
+    widget = 0;
+    it->GetData(widget);
+    if (widget)
+      {
+      widget->Deselect();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  this->ModifiedFlag = 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::AddPVWidget(vtkPVWidget *pvw)
@@ -189,7 +232,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
     widget = 0;
     it->GetData(widget);
     if (widget && widget->GetTraceName() && 
-	strcmp(traceName,widget->GetTraceName()) == 0) 
+        strcmp(traceName,widget->GetTraceName()) == 0) 
       {
       it->Delete();
       return widget;
@@ -242,12 +285,12 @@ vtkPVWidget* vtkPVContainerWidget::ClonePrototypeInternal(
       widget = 0;
       it->GetData(widget);
       if (widget)
-	{
-	clone = widget->ClonePrototype(pvSource, map);
-	clone->SetParent(pvCont);
-	pvCont->AddPVWidget(clone);
-	clone->Delete();
-	}
+        {
+        clone = widget->ClonePrototype(pvSource, map);
+        clone->SetParent(pvCont);
+        pvCont->AddPVWidget(clone);
+        clone->Delete();
+        }
       it->GoToNextItem();
       }
     it->Delete();
@@ -270,6 +313,18 @@ void vtkPVContainerWidget::CopyProperties(
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVContainerWidget* pvcw = vtkPVContainerWidget::SafeDownCast(clone);
+  if (pvcw)
+    {
+    pvcw->SetPackDirection(this->PackDirection);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to "
+                  "PVContainerWidget.");
+    }
+  
+
 }
 
 //----------------------------------------------------------------------------
@@ -301,6 +356,12 @@ int vtkPVContainerWidget::ReadXMLAttributes(vtkPVXMLElement* element,
       widget->Delete();
       }
     }  
+
+  const char* pack_direction  = element->GetAttribute("pack_direction");
+  if (pack_direction)
+    {
+    this->SetPackDirection(pack_direction);
+    }
   
   return 1;
 }
