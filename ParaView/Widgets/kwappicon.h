@@ -7,7 +7,7 @@
 #define KWAPPICON_EXTERN extern
 #endif
 
-#include "tcl.h"
+#include "vtkTcl.h"
 
 KWAPPICON_EXTERN int ApplicationIcon_DoInit(Tcl_Interp *interp);
 
