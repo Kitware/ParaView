@@ -219,12 +219,8 @@ public:
   void ColorByCellField(const char *name, int numComps);
   
   // Description:
-  // Select a point field to use for volume rendering
+  // Select which point field to use for volume rendering
   void VolumeRenderPointField(const char *name);
-
-  // Description:
-  // Select a cell field to use for volume rendering
-  void VolumeRenderCellField(const char *name);
   
   // Description:
   // Called by vtkPVSource::DeleteCallback().
@@ -317,7 +313,6 @@ protected:
   void ColorByCellFieldInternal(const char *name, int numComps);
   void SetActorColor(double r, double g, double b);
   void VolumeRenderPointFieldInternal(const char *name);
-  void VolumeRenderCellFieldInternal(const char *name);
   
   // A flag that helps Update determine 
   // whether to set the default color.

@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.7");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.8");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1151,42 +1151,6 @@ void vtkPVDisplayGUI::UpdateInternal()
         }
       }
     }
-  
-  attrInfo = dataInfo->GetCellDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(volCmd, "VolumeRenderCellField {%s}", arrayInfo->GetName());
-    if (numComps > 1)
-      {
-      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(), numComps);
-      }
-    else
-      {
-      sprintf(tmp, "Cell %s", arrayInfo->GetName());
-      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-      if ( (firstField && !strlen(currentVolumeField)) ||
-           !strcmp( tmp, currentVolumeField ) )
-        {
-        this->VolumeScalarsMenu->SetValue( tmp );
-        volRenArray = arrayInfo;
-        firstField = 0;
-        }
-      }
-    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
-      {
-      strcpy(defCmd, tmp);
-      defPoint = 1;
-      defArray = arrayInfo;
-      if ( !strlen(currentVolumeField) )
-        {
-        volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
-        }
-      }
-    }
 
   // Determine if this is unstructured grid data and add the 
   // volume rendering option
@@ -1552,46 +1516,6 @@ void vtkPVDisplayGUI::VolumeRenderPointFieldInternal(const char *name)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-}
-
-//----------------------------------------------------------------------------
-// Select which cell field to use for volume rendering
-//
-void vtkPVDisplayGUI::VolumeRenderCellField(const char *name)
-{
-  if (name == NULL)
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s}", 
-                      this->GetTclName(), name);
-
-  char *str;
-  str = new char [strlen(name) + 16];
-  sprintf(str, "Cell %s", name);
-  
-  // Update the transfer functions  
-  vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
-  vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetCellDataInformation();
-  vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
-  
-  this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
-  
-  this->VolumeScalarsMenu->SetValue(str);
-  this->VolumeRenderCellFieldInternal(name);
-  
-  delete [] str;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::VolumeRenderCellFieldInternal(const char *name)
-{
-  this->PVSource->GetPartDisplay()->VolumeRenderCellField( name );
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
