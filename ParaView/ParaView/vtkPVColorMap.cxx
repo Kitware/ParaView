@@ -49,7 +49,7 @@
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.72");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.73");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1163,7 +1163,7 @@ void vtkPVColorMap::UpdateLookupTable()
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetSaturationRange"
-                  << this->StartHSV[2] << this->EndHSV[2]
+                  << this->StartHSV[1] << this->EndHSV[1]
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetValueRange"
@@ -1172,7 +1172,8 @@ void vtkPVColorMap::UpdateLookupTable()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "ForceBuild"
                   << vtkClientServerStream::End;
-
+  pm->SendStreamToClientAndServer();
+  
   if (this->MapWidth > 0 && this->MapHeight > 0)
     {
     this->UpdateMap(this->MapWidth, this->MapHeight);
