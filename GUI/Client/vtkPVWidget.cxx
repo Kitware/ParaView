@@ -45,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVWidget, "1.51");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -419,39 +419,6 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetSMPropertyName(property);
     }
 
-  const char* deps = element->GetAttribute("dependents");
-  if(deps)
-    {
-    const char* start = deps;
-    const char* end = 0;
-    
-    // Parse the space-separated list.
-    while(*start)
-      {
-      while(*start && vtkPVWidgetIsSpace(*start)) { ++start; }
-      end = start;
-      while(*end && !vtkPVWidgetIsSpace(*end)) { ++end; }
-      int length = end-start;
-      if(length)
-        {
-        char* entry = new char[length+1];
-        strncpy(entry, start, length);
-        entry[length] = '\0';
-        vtkPVXMLElement* depElement = element->LookupElement(entry);
-        vtkPVWidget* dep = this->GetPVWidgetFromParser(depElement, parser);
-        if(!dep)
-          {
-          vtkErrorMacro("Couldn't add dependent " << entry);
-          delete [] entry;
-          return 0;
-          }
-        delete [] entry;
-        this->Dependents->AppendItem(dep);
-        dep->Delete();
-        }
-      start = end;
-      }
-    }
   return 1;
 }
 
