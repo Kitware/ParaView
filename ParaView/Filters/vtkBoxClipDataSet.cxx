@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.10");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.11");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -1769,7 +1769,6 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
         
       unsigned totalnewcells = cellarray->GetNumberOfCells();
       vtkCellArray *newcellArray = vtkCellArray::New();
-      unsigned idcellnew;
       int edgeNum;
         
       for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
@@ -2135,7 +2134,6 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
       unsigned test[6] = {1,1,1,1,1,1};
       for (i=0; i<4; i++)
         {
-        int k;
         cellPts->GetPoint(v_id[i],v);
 
         // Use plane equation 
@@ -3116,7 +3114,6 @@ void vtkBoxClipDataSet::ClipBoxInOut(vtkPoints *newPoints,
       } //for all planes
 
     unsigned totalnewcells = cellarray->GetNumberOfCells();   // Inside
-    unsigned idcellnew;
     for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
       {
       cellarray->GetNextCell(npts,v_id);
@@ -3204,7 +3201,6 @@ void vtkBoxClipDataSet::ClipHexahedronInOut(vtkPoints *newPoints,
       cellPts->GetPoint(v_id[i],v_tetra[i]);
 
       // Use plane equation
-      unsigned k;
       for(k=0;k<6;k++)
         p[k] = n_pl[k][0]*(v_tetra[i][0] - o_pl[k][0]) +  
                n_pl[k][1]*(v_tetra[i][1] - o_pl[k][1]) +  
@@ -3687,7 +3683,6 @@ void vtkBoxClipDataSet::ClipHexahedronInOut(vtkPoints *newPoints,
 
     unsigned totalnewcells = cellarray->GetNumberOfCells();    // Inside 
 
-    unsigned idcellnew;
     for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
       {
       cellarray->GetNextCell(npts,v_id);
