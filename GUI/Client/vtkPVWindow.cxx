@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.567");
+vtkCxxRevisionMacro(vtkPVWindow, "1.568");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -158,7 +158,8 @@ vtkPVWindow::vtkPVWindow()
   this->FilterMenu = vtkKWMenu::New();
   this->SelectMenu = vtkKWMenu::New();
   this->GlyphMenu = vtkKWMenu::New();
-
+  this->PreferencesMenu = 0;
+  
   this->PluginsDialog = vtkPVPluginsDialog::New();
 
   // This toolbar contains buttons for modifying user interaction
