@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.105");
+vtkCxxRevisionMacro(vtkKWWidget, "1.106");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -467,7 +467,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.105 $");
+  this->ExtractRevision(os,"$Revision: 1.106 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1977,5 +1977,6 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EnableDragAndDrop: " 
      << (this->EnableDragAndDrop ? "On" : "Off") << endl;
   os << indent << "DragAndDropAnchor: " << this->DragAndDropAnchor << endl;
+  os << indent << "IsCreated: " << (this->IsCreated() ? "Yes" : "No") << endl;
 }
 
