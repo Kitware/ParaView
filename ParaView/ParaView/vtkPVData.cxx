@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.220");
+vtkCxxRevisionMacro(vtkPVData, "1.221");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1954,7 +1954,8 @@ void vtkPVData::Initialize()
     }
   else if (dataSetType == VTK_UNSTRUCTURED_GRID)
     {
-    if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() < 1000000)
+    if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() 
+          < 5000000)
       {
       this->SetRepresentation("Surface");
       }
