@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 
 #ifdef _WIN32
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWWin32RegisteryUtilities.h"
 #endif
 
 #ifndef VTK_USE_ANSI_STDLIB
@@ -815,16 +815,14 @@ void vtkPVWindow::PlayDemo()
 #ifdef _WIN32  
 
   // First look in the registery
-  char fkey[1024];
   char loc[1024];
-
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplication()->GetApplicationKey());  
-  HKEY hKey;
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
-		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
+  char temp[1024];
+  
+  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  sprintf(temp, "%i", this->GetApplication()->GetApplicationKey());
+  reg->SetTopLevel(temp);
+  if (reg->ReadValue("Inst", loc, "Loc"))
     {
-    vtkKWRegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
-    RegCloseKey(hKey);
     sprintf(temp1,"%s/Demos/Demo1.tcl",loc);
     sprintf(temp2,"%s/Data/blow.vtk",loc);
     }
@@ -846,7 +844,8 @@ void vtkPVWindow::PlayDemo()
     found=1;
     }
 
-
+  reg->Delete();
+  
 #endif // _WIN32  
 
   // Look in binary and installation directories

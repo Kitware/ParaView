@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
 #include "htmlhelp.h"
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWWin32RegisteryUtilities.h"
 #endif
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -928,15 +928,12 @@ void vtkPVApplication::DisplayHelp()
 {
 #ifdef _WIN32
   char temp[1024];
-  char fkey[1024];
   char loc[1024];
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
-  HKEY hKey;
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
-		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
+  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  sprintf(temp, "%i", this->GetApplicationKey());
+  reg->SetTopLevel(temp);
+  if (reg->ReadValue("Inst", loc, "Loc"))
     {
-    vtkKWRegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
-    RegCloseKey(hKey);
     sprintf(temp,"%s/%s.chm::/UsersGuide/index.html",
             loc,this->ApplicationName);
     }
@@ -945,6 +942,7 @@ void vtkPVApplication::DisplayHelp()
     sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
     }
   HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
+  reg->Delete();
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
