@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.10");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.11");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -795,7 +795,16 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
     {
     for(const char*const* p = optionalPaths; *p; ++p)
       {
-      paths.push_back(*p);
+      std::string path = *p;
+      if(path.length() > 0)
+        {
+        char end = *(path.end()-1);
+        if(end != '/' && end != '\\')
+          {
+          path += "/";
+          }
+        paths.push_back(path);
+        }
       }
     }
 
@@ -820,6 +829,23 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
     {
     struct stat data;
     vtkstd::string fullPath = *p;
+
+#if defined(CMAKE_INTDIR)
+    // Look in the subdirectory for the configuration in which this
+    // interpreter was built.
+    vtkstd::string fullPathWithIntDir = fullPath;
+    fullPathWithIntDir += CMAKE_INTDIR "/";
+    fullPathWithIntDir += libName;
+    if(stat(fullPathWithIntDir.c_str(), &data) == 0)
+      {
+      return this->LoadInternal(moduleName, fullPathWithIntDir.c_str());
+      }
+    searched += p->substr(0, p->length()-1);
+    searched += "/" CMAKE_INTDIR;
+    searched += "\n";
+#endif
+
+    // Look in the directory specified.
     fullPath += libName;
     if(stat(fullPath.c_str(), &data) == 0)
       {
