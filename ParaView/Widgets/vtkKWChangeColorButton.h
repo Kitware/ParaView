@@ -130,6 +130,8 @@ protected:
   // internal widgets.
   virtual void UpdateEnableState();
 
+  int ButtonDown;
+  
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
   void operator=(const vtkKWChangeColorButton&); // Not implemented

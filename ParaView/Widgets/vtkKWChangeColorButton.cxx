@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.35");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.36");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -65,6 +65,8 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
 
   this->ColorButton = vtkKWWidget::New();
   this->MainFrame = vtkKWWidget::New();
+  
+  this->ButtonDown = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -309,6 +311,7 @@ void vtkKWChangeColorButton::UnBind()
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::ButtonPressCallback(int /*x*/, int /*y*/)
 {  
+  this->ButtonDown = 1;
   this->Script("%s configure -relief sunken", 
                this->MainFrame->GetWidgetName());  
 }
@@ -316,6 +319,13 @@ void vtkKWChangeColorButton::ButtonPressCallback(int /*x*/, int /*y*/)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::ButtonReleaseCallback(int x, int y)
 {  
+  if (!this->ButtonDown)
+    {
+    return;
+    }
+  
+  this->ButtonDown = 0;
+  
   this->Script("%s configure -relief raised", 
                this->MainFrame->GetWidgetName());  
 
@@ -485,7 +495,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
 //----------------------------------------------------------------------------
