@@ -40,15 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWSaveImageDialog_h
 #define __vtkKWSaveImageDialog_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWLoadSaveDialog.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWSaveImageDialog : public vtkKWWidget
+class VTK_EXPORT vtkKWSaveImageDialog : public vtkKWLoadSaveDialog
 {
 public:
   static vtkKWSaveImageDialog* New();
-  vtkTypeRevisionMacro(vtkKWSaveImageDialog,vtkKWWidget);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeRevisionMacro(vtkKWSaveImageDialog,vtkKWLoadSaveDialog);
 
   // Description:
   // Create a Tk widget
@@ -56,18 +55,12 @@ public:
 
   // Description::
   // Invoke the dialog 
-  virtual void Invoke();
-
-  // Description:
-  // Set/Get the file name selected
-  vtkGetStringMacro(FileName);
-  vtkSetStringMacro(FileName);
+  virtual int Invoke();
 
 protected:
   vtkKWSaveImageDialog();
   ~vtkKWSaveImageDialog() {};
 
-  char *FileName;
 private:
   vtkKWSaveImageDialog(const vtkKWSaveImageDialog&); // Not implemented
   void operator=(const vtkKWSaveImageDialog&); // Not implemented
@@ -75,6 +68,3 @@ private:
 
 
 #endif
-
-
-

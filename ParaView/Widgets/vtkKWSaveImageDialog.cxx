@@ -33,112 +33,87 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWSaveImageDialog.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
-#include "vtkKWMessageDialog.h"
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.19");
-
-
-
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.20");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+                                int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWSaveImageDialog::vtkKWSaveImageDialog()
 {
-  this->FileName = NULL;
   this->CommandFunction = vtkKWSaveImageDialogCommand;
 }
 
-// invoke the dialog
-void vtkKWSaveImageDialog::Invoke()
+//----------------------------------------------------------------------------
+int vtkKWSaveImageDialog::Invoke()
 {
+  int res = 0;
+
+  this->SaveDialogOn();
+  this->SetTitle("Save As Image");
+  this->SetFileTypes("{{Windows Bitmap} {.bmp}} "
+                     "{{JPEG Images} {.jpg}} "
+                     "{{PNG Images} {.png}} "
+                     "{{Binary PPM} {.ppm}} "
+                     "{{TIFF Images} {.tif}}");
+  this->SetDefaultExtension(".bmp");
+
   int done = 0;
-  char *path = NULL;
-  
-  this->Application->SetDialogUp(1);
   while (!done)
     {
-    ostrstream command;
-    command << "tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}";
-    
-    vtkKWWindow* window = this->GetWindow();
-    if (window)
-      {
-      command << " -parent " << window->GetWidgetName();
-      }
-    command << ends;
-    this->Script(command.str());
-    command.rdbuf()->freeze(0);
-    
-    path =  
-      strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-             this->Application->GetMainInterp()->result);
-    if (strlen(path) == 0)
-      {
-      done = 1;
-      }  
-    else if (!strcmp(path + strlen(path) - 4,".bmp") ||
-             !strcmp(path + strlen(path) - 4,".tif") ||
-             !strcmp(path + strlen(path) - 4,".png") ||
-             !strcmp(path + strlen(path) - 4,".jpg") ||
-             !strcmp(path + strlen(path) - 4,".ppm"))
+    if (!this->vtkKWLoadSaveDialog::Invoke())
       {
       done = 1;
       }
-    else
+    else 
       {
-      // unknown file extension
-      vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
-      dlg2->Create(this->Application,"");
-      dlg2->SetText(
-        "A valid file extension was not found.\\n"
-        "Please use a .bmp, .ppm, or .tif file extension\\n"
-        "when naming your file.");
-      dlg2->SetOptions(dlg2->GetOptions() | vtkKWMessageDialog::ErrorIcon);
-      dlg2->SetTitle("Save Image Error");
-      dlg2->Invoke();
-      dlg2->Delete();
+      const char *fname = this->GetFileName();
+      const char *ext = fname + strlen(fname) - 4;
+      if (fname && strlen(fname) &&
+          (!strcmp(ext,".bmp") ||
+           !strcmp(ext,".jpg") ||
+           !strcmp(ext,".png") ||
+           !strcmp(ext,".ppm") ||
+           !strcmp(ext,".tif")))
+        {
+        this->GenerateLastPath(fname);
+        res = 1;
+        done = 1;
+        }
+      else
+        {
+        vtkKWMessageDialog::PopupMessage( 
+          this->Application, 0, "Save Image Error", 
+          "A valid file extension was not found.\n"
+          "Please use a .bmp, .jpg, .png, .ppm, or .tif file extension\n"
+          "when naming your file.", vtkKWMessageDialog::ErrorIcon);
+        }
       }
     }
-  
-  if (strlen(path))
-    {
-    this->SetFileName(path);
-    }
-  else
-    {
-    this->SetFileName(NULL);
-    }
-  delete[] path;
-  this->Application->SetDialogUp(0);
+
+  return res;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
-  // Set the application
+  // Already created ?
 
-  if (this->IsCreated())
+  if (this->Application)
     {
-    vtkErrorMacro("SaveImageDialog already created");
+    vtkErrorMacro("SaveDialog already created");
     return;
     }
 
   this->SetApplication(app);
 }
-
-
-//----------------------------------------------------------------------------
-void vtkKWSaveImageDialog::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "FileName: " << (this->FileName?this->FileName:"none") 
-     << endl;
-}
-
