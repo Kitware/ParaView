@@ -1,0 +1,285 @@
+Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+}
+    
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp20) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp1) Open "/home/andy/vtk/VTKData/Data/ironProt.vtk"
+set kw(vtkTemp276) [vtkTemp1 GetCurrentPVSource]
+set kw(vtkTemp287) [$kw(vtkTemp276) GetPVWidget {File Name}]
+$kw(vtkTemp287) SetValue /home/andy/vtk/VTKData/Data/ironProt.vtk
+set kw(vtkTemp309) [$kw(vtkTemp1) CreatePVSource Contour]
+set kw(vtkTemp315) [$kw(vtkTemp309) GetPVWidget {Scalars}]
+$kw(vtkTemp315) SetValue {scalars}
+set kw(vtkTemp318) [$kw(vtkTemp309) GetPVWidget {Contour Values}]
+$kw(vtkTemp318) RemoveAllValues
+$kw(vtkTemp318) AddValue 5.000000
+$kw(vtkTemp318) AddValue 30.000000
+$kw(vtkTemp309) AcceptCallback
+$kw(vtkTemp20) SetCameraState 133.664 91.019 236.475  33.500 33.500 33.500  -0.117 -0.939 0.324
+set kw(vtkTemp357) [$kw(vtkTemp1) CreatePVSource Clip]
+set kw(vtkTemp377) [$kw(vtkTemp357) GetPVWidget {Clip Function}]
+set kw(vtkTemp373) [$kw(vtkTemp377) GetPVWidget {Plane}]
+$kw(vtkTemp373) SetVisibility 1
+$kw(vtkTemp20) SetCameraState 133.664 91.019 236.475  33.500 33.500 33.500  -0.117 -0.939 0.324
+$kw(vtkTemp373) SetCenter 33.502998 33.474998 33.500000
+$kw(vtkTemp373) SetNormal -0.344490 0.440040 0.829270
+$kw(vtkTemp357) AcceptCallback
+$kw(vtkTemp373) SetVisibility 0
+$kw(vtkTemp20) SetCameraState 99.893 -106.492 -141.240  33.500 33.500 33.500  -0.955 -0.249 -0.163
+$kw(vtkTemp20) SetCameraState 123.173 -125.639 -112.011  33.500 33.500 33.500  -0.922 -0.323 -0.215
+set kw(vtkTemp302) [$kw(vtkTemp276) GetPVOutput]
+$kw(vtkTemp302) SetVisibility 0
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp276)
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp357)
+set kw(vtkTemp401) [$kw(vtkTemp1) CreatePVSource Cut]
+set kw(vtkTemp420) [$kw(vtkTemp401) GetPVWidget {Cut Function}]
+set kw(vtkTemp417) [$kw(vtkTemp420) GetPVWidget {Plane}]
+$kw(vtkTemp417) SetVisibility 1
+$kw(vtkTemp20) SetCameraState 123.173 -125.639 -112.011  33.500 33.500 33.500  -0.922 -0.323 -0.215
+$kw(vtkTemp20) SetCameraState 105.641 -157.458 -79.949  33.500 33.500 33.500  -0.951 -0.259 -0.168
+$kw(vtkTemp20) SetCameraState 105.641 -157.458 -79.949  33.500 33.500 33.500  -0.951 -0.259 -0.168
+$kw(vtkTemp20) SetCameraState 105.641 -157.458 -79.949  33.500 33.500 33.500  -0.951 -0.259 -0.168
+$kw(vtkTemp20) SetCameraState 105.641 -157.458 -79.949  33.500 33.500 33.500  -0.951 -0.259 -0.168
+$kw(vtkTemp20) SetCameraState 105.641 -157.458 -79.949  33.500 33.500 33.500  -0.951 -0.259 -0.168
+$kw(vtkTemp417) SetCenter 32.014999 33.488998 36.480000
+$kw(vtkTemp417) SetNormal -0.336420 0.476200 0.812440
+set kw(vtkTemp423) [$kw(vtkTemp401) GetPVWidget {Cut Values}]
+$kw(vtkTemp423) RemoveAllValues
+$kw(vtkTemp423) AddValue 0.000000
+$kw(vtkTemp423) AddValue 5.000000
+$kw(vtkTemp423) AddValue 30.000000
+$kw(vtkTemp401) AcceptCallback
+$kw(vtkTemp417) SetVisibility 0
+set kw(vtkTemp428) [$kw(vtkTemp401) GetPVWidget {Input}]
+$kw(vtkTemp428) SetCurrentValue $kw(vtkTemp276)
+$kw(vtkTemp417) SetCenter 32.014999 33.488998 36.480000
+$kw(vtkTemp417) SetNormal -0.336000 0.476000 0.812000
+$kw(vtkTemp423) RemoveAllValues
+$kw(vtkTemp423) AddValue 0.000000
+$kw(vtkTemp423) AddValue 5.000000
+$kw(vtkTemp423) AddValue 30.000000
+$kw(vtkTemp401) AcceptCallback
+$kw(vtkTemp20) SetCameraState 132.833 -38.881 -165.080  33.500 33.500 33.500  -0.582 0.625 -0.519
+$kw(vtkTemp428) SetCurrentValue $kw(vtkTemp276)
+$kw(vtkTemp423) RemoveAllValues
+$kw(vtkTemp423) AddValue 0.000000
+$kw(vtkTemp401) AcceptCallback
+$kw(vtkTemp20) SetCameraState 36.533 115.620 -185.103  33.500 33.500 33.500  -0.580 0.765 0.279
+$kw(vtkTemp20) SetCameraState 64.537 170.701 -152.921  33.500 33.500 33.500  -0.900 0.408 0.151
+$kw(vtkTemp20) SetCameraState -43.660 125.364 233.868  33.500 33.500 33.500  -0.761 0.427 -0.489
+$kw(vtkTemp20) SetCameraState -130.674 88.963 190.059  33.500 33.500 33.500  -0.583 0.348 -0.734
+set kw(vtkTemp448) [$kw(vtkTemp1) CreatePVSource Contour]
+set kw(vtkTemp454) [$kw(vtkTemp448) GetPVWidget {Scalars}]
+$kw(vtkTemp454) SetValue {scalars}
+set kw(vtkTemp457) [$kw(vtkTemp448) GetPVWidget {Contour Values}]
+$kw(vtkTemp457) RemoveAllValues
+$kw(vtkTemp457) AddValue 5.000000
+$kw(vtkTemp457) AddValue 30.000000
+$kw(vtkTemp448) AcceptCallback
+$kw(vtkTemp20) SetCameraState 139.497 -93.367 -131.452  33.500 33.500 33.500  0.270 0.839 -0.472
+set kw(vtkTemp441) [$kw(vtkTemp401) GetPVOutput]
+$kw(vtkTemp441) SetVisibility 0
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp401)
+$kw(vtkTemp20) SetCameraState 133.652 29.522 -177.435  33.500 33.500 33.500  0.423 0.887 0.184
+$kw(vtkTemp20) SetCameraState 170.755 -39.456 -140.794  33.500 33.500 33.500  0.520 0.853 0.052
+$kw(vtkTemp441) SetVisibility 1
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp401)
+$kw(vtkTemp441) SetVisibility 0
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp401)
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp448)
+$kw(vtkTemp457) RemoveAllValues
+$kw(vtkTemp457) AddValue 5.000000
+$kw(vtkTemp457) AddValue 30.000000
+$kw(vtkTemp457) AddValue 6.000000
+$kw(vtkTemp457) AddValue 7.000000
+$kw(vtkTemp457) AddValue 8.000000
+$kw(vtkTemp457) AddValue 9.000000
+$kw(vtkTemp457) AddValue 10.000000
+$kw(vtkTemp457) AddValue 11.000000
+$kw(vtkTemp457) AddValue 12.000000
+$kw(vtkTemp457) AddValue 13.000000
+$kw(vtkTemp457) AddValue 14.000000
+$kw(vtkTemp457) AddValue 15.000000
+$kw(vtkTemp457) AddValue 16.000000
+$kw(vtkTemp457) AddValue 17.000000
+$kw(vtkTemp457) AddValue 18.000000
+$kw(vtkTemp457) AddValue 19.000000
+$kw(vtkTemp457) AddValue 20.000000
+$kw(vtkTemp457) AddValue 21.000000
+$kw(vtkTemp457) AddValue 22.000000
+$kw(vtkTemp457) AddValue 23.000000
+$kw(vtkTemp457) AddValue 24.000000
+$kw(vtkTemp457) AddValue 25.000000
+$kw(vtkTemp457) AddValue 26.000000
+$kw(vtkTemp457) AddValue 27.000000
+$kw(vtkTemp457) AddValue 28.000000
+$kw(vtkTemp457) AddValue 29.000000
+$kw(vtkTemp448) AcceptCallback
+$kw(vtkTemp20) SetCameraState 97.919 89.123 -183.977  33.500 33.500 33.500  0.616 0.700 0.361
+$kw(vtkTemp20) SetCameraState 131.544 52.822 -177.578  33.500 33.500 33.500  0.619 0.702 0.352
+$kw(vtkTemp20) SetCameraState 129.878 -60.853 -157.153  33.500 33.500 33.500  0.772 0.631 0.078
+$kw(vtkTemp20) SetCameraState 17.999 -164.033 -90.115  33.500 33.500 33.500  0.900 0.178 -0.398
+$kw(vtkTemp20) SetCameraState -61.098 -150.096 -75.512  33.500 33.500 33.500  0.825 -0.095 -0.556
+$kw(vtkTemp20) SetCameraState -53.296 76.561 -178.991  33.500 33.500 33.500  0.873 -0.265 -0.410
+$kw(vtkTemp20) SetCameraState 146.795 -100.869 -120.282  33.500 33.500 33.500  0.800 -0.011 0.599
+$kw(vtkTemp20) SetCameraState 82.087 -155.004 -95.517  33.500 33.500 33.500  0.852 -0.128 0.508
+$kw(vtkTemp20) SetCameraState 56.267 -54.829 -26.954  7.680 133.676 102.063  0.852 -0.128 0.508
+
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+$kw(vtkTemp20) CompositeWithFloatCallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithRGBACallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithRGBACallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithRGBACallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithFloatCallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithFloatCallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 1
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeWithRGBACallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+$kw(vtkTemp20) CompositeCompressionCallback 0
+update
+RenWin1 Render
+update
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+   
+Application Exit
+
+
