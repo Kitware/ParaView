@@ -142,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.9");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.10");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2102,7 +2102,7 @@ void vtkPVWindow::WriteData()
     this->GetCurrentPVSource()->GetPart()->GetVTKDataID() << "GetClassName" <<
     vtkClientServerStream::End;
   pm->SendStreamToServer();
-  const vtkClientServerStream* amsg = pm->GetLastResultStream();
+  const vtkClientServerStream* amsg = pm->GetLastServerResult();
   const char* dataClassName;
   if(!amsg->GetArgument(0, 0, &dataClassName))
     {
@@ -2286,7 +2286,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
     this->GetCurrentPVSource()->GetPart()->GetVTKDataID() << "GetClassName" <<
     vtkClientServerStream::End;
   pm->SendStreamToServer();
-  const vtkClientServerStream* amsg = pm->GetLastResultStream();
+  const vtkClientServerStream* amsg = pm->GetLastServerResult();
   const char* dataClassName;
   if(!amsg->GetArgument(0, 0, &dataClassName))
     {
