@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.10");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.11");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -65,7 +65,7 @@ vtkPVScale::vtkPVScale()
   this->Scale = vtkKWScale::New();
   this->Round = 0;
   this->RangeSourceVariable = 0;
-
+  this->Property = 0;
   this->DefaultValue = 0.0;
 }
 

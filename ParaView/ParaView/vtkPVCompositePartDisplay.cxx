@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.6.2.2");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.6.2.3");
 
 
 //----------------------------------------------------------------------------
@@ -406,7 +406,6 @@ void vtkPVCompositePartDisplay::SetCollectionDecision(int v)
 void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if (v == this->CollectionDecision)
     {
@@ -419,7 +418,11 @@ void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
     vtkErrorMacro("Missing Suppressor.");
     return;
     }
-
+  if(!pvApp)
+    {
+    return;
+    }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (this->LODCollectID.ID)
     {
     pm->GetStream()

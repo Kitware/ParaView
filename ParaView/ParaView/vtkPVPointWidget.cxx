@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.6");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.7");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -225,7 +225,8 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3DID = pm->NewStreamObject("vtkPointWidget");
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
                   << vtkClientServerStream::End;
-
+  pm->SendStreamToClientAndServer();
+  
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");

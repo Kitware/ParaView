@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.5");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.6");
 
 //===========================================================================
 //***************************************************************************
@@ -179,8 +179,11 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->ChildCreate(pvApp);
 
-  this->Widget3D = 
-    vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
+  if(this->Widget3DID.ID != 0)
+    {
+    this->Widget3D = 
+      vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
+    }
 
   // Only initialize observers on the UI process.
   if (this->Widget3DID.ID  != 0)
