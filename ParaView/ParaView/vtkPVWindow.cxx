@@ -114,9 +114,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY "ToolbarFlatFrame"
 #define VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY "ToolbarFlatButtons"
 
+#define VTK_PV_VTK_FILTERS_MENU_LABEL "Insert Filters"
+#define VTK_PV_VTK_SOURCES_MENU_LABEL "Insert Sources"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.374");
+vtkCxxRevisionMacro(vtkPVWindow, "1.375");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -666,6 +669,21 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Save current data in VTK format.
   this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData",0);
 
+  // Add advanced file options
+  int clidx = this->GetFileMenuIndex();
+  this->MenuFile->InsertCommand(clidx++, "Load ParaView Script", this, 
+                                "LoadScript", 0,
+                                "Load ParaView Script (.pvs)");
+  this->MenuFile->InsertCommand(clidx++,
+                                "Save ParaView Script", this, 
+                                "SaveTrace", 17,
+                                "Saves a script/trace of every action "
+                                "since start up.");
+  this->MenuFile->InsertCommand(clidx++, "Export VTK Script", this,
+                                "ExportVTKScript", 7,
+                                "Write a script which can be "
+                                "parsed by the vtk executable");
+
   // Select menu: ParaView specific menus.
 
   // Create the select menu (for selecting user created and default
@@ -686,33 +704,30 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->AdvancedMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
 
-  this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
-                                 "Load ParaView Script (.pvs)");
-  this->AdvancedMenu->AddCommand("Save ParaView Script", this, "SaveTrace", 0,
-                                 "Saves a script/trace of every action since start up.");
-  this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
-                                    "ExportVTKScript", 7,
-                                    "Write a script which can be "
-                                    "parsed by the vtk executable");
-  
-  this->AdvancedMenu->InsertCommand(7, "Open Package", this, "OpenPackage", 2,
-                                    "Open a ParaView package and load the "
-                                    "contents");
-  
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
-  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 5,
+  this->AdvancedMenu->AddCascade(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+                                 this->SourceMenu, 8,
                                  "Choose a source from a list of "
                                  "VTK sources");  
   
   // Create the menu for creating data sources (filters).  
   this->FilterMenu->SetParent(this->AdvancedMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
-  this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4,
+  this->AdvancedMenu->AddCascade(VTK_PV_VTK_FILTERS_MENU_LABEL, 
+                                 this->FilterMenu, 7,
                                  "Choose a filter from a list of "
                                  "VTK filters");  
-  this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
+  this->AdvancedMenu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
+                               vtkKWMenu::Disabled);
+
+  // Open XML package
+  this->AdvancedMenu->AddSeparator();
+  this->AdvancedMenu->AddCommand("Open Package", this, 
+                                "OpenPackage", 2,
+                                "Open a ParaView package and load the "
+                                "contents");
 
   // Window menu:
 
@@ -2655,11 +2670,13 @@ void vtkPVWindow::UpdateSourceMenu()
   // If there are no filters, disable the menu.
   if (numFilters > 0)
     {
-    this->AdvancedMenu->SetState("VTK Sources", vtkKWMenu::Normal);
+    this->AdvancedMenu->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+                                 vtkKWMenu::Normal);
     }
   else
     {
-    this->AdvancedMenu->SetState("VTK Sources", vtkKWMenu::Disabled);
+    this->AdvancedMenu->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+                                 vtkKWMenu::Disabled);
     }
 }
 
@@ -2727,18 +2744,21 @@ void vtkPVWindow::UpdateFilterMenu()
     // If there are no sources, disable the menu.
     if (numSources > 0)
       {
-      this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Normal);
+      this->AdvancedMenu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
+                                   vtkKWMenu::Normal);
       }
     else
       {
-      this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
+      this->AdvancedMenu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
+                                   vtkKWMenu::Disabled);
       }
     }
   else
     {
     // If there is no current data, disable the menu.
     this->DisableToolbarButtons();
-    this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
+    this->AdvancedMenu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
+                                 vtkKWMenu::Disabled);
     }
   
 }
@@ -3827,7 +3847,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.374 $");
+  this->ExtractRevision(os,"$Revision: 1.375 $");
 }
 
 //----------------------------------------------------------------------------
