@@ -901,12 +901,26 @@ void vtkPVActorComposite::ChangeColorMapToGrayscale()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetColorRange(float min, float max)
 {
+  this->AddTraceEntry("$kw(%s) SetColorRange %f %f", 
+                      this->GetTclName(), min, max);
+
+  this->SetColorRangeInternal(min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetColorRangeInternal(float min, float max)
+{
   this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
 					    this->MapperTclName,
 					    min, max);
   this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
 					    this->LODMapperTclName,
 					    min, max);
+
+  // This is here in case process 0 has not geometry.  
+  // We have to explicitly build the color map.
+  this->Script("[%s GetLookupTable] Build", this->ScalarBarTclName);
+  this->Script("[%s GetLookupTable] Modified", this->ScalarBarTclName);
 
   this->ColorRangeMinEntry->SetValue(min, 5);
   this->ColorRangeMaxEntry->SetValue(max, 5);
@@ -924,7 +938,7 @@ void vtkPVActorComposite::ResetColorRange()
     range[1] = range[0];
     }
 
-  this->SetColorRange(range[0], range[1]);
+  this->SetColorRangeInternal(range[0], range[1]);
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -1591,6 +1605,10 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     if (val)
       {
       this->Script("%s AddActor %s", tclName, this->GetScalarBarTclName());
+      // This is here in case process 0 has not geometry.  
+      // We have to explicitly build the color map.
+      this->Script("[%s GetLookupTable] Build", this->ScalarBarTclName);
+      this->Script("[%s GetLookupTable] Modified", this->ScalarBarTclName);
       }
     else
       {
