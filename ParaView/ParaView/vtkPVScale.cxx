@@ -193,10 +193,10 @@ void vtkPVScale::Accept()
 
   if (this->ObjectTclName && this->VariableName)
     {
-    pvApp->Script("%s Set%s %d", 
-                  this->ObjectTclName,
-                  this->VariableName, 
-                  this->GetValue());
+    pvApp->BroadcastScript("%s Set%s %d", 
+                           this->ObjectTclName,
+                           this->VariableName, 
+                           this->GetValue());
     }
 
   this->ModifiedFlag = 0;
