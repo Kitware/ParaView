@@ -25,15 +25,15 @@ vtkKWRenderView \
 vtkPVApplication \
 vtkPVComposite \
 vtkPVConeSource \
-vtkPVImage \
-vtkPVImagePlaneComponent \
-vtkPVImageReader \
+vtkPVContourFilter \
+vtkPVElevationFilter \
 vtkPVMenuButton \
 vtkPVPolyData \
-vtkPVPolyDataComposite \
 vtkPVRenderSlave \
 vtkPVRenderView \
+vtkPVShrinkPolyData \
 vtkPVSlave \
+vtkPVSource \
 vtkPVWindow \
 vtkPVMesaRenderWindow
 
