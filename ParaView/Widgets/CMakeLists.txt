@@ -1,28 +1,27 @@
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw).*$")
 SOURCE_FILES( KWWidgets_SRCS
 kwinit
-vtkKWLoadSaveDialog
-vtkKWHashTable
-vtkKWHashTableIterator
-vtkKWPointerArray
-vtkKWComposite 
-vtkKWView 
+vtkContainer
 vtkCornerAnnotation 
 vtkKWActorComposite 
 vtkKWApplication 
 vtkKWChangeColorButton 
 vtkKWCheckButton 
+vtkKWComposite 
 vtkKWCompositeCollection 
-vtkContainer
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
 vtkKWExtent 
+vtkKWFileDialog
 vtkKWGenericComposite 
+vtkKWHashTable
+vtkKWHashTableIterator
 vtkKWLabel 
 vtkKWLabeledEntry 
 vtkKWLabeledFrame 
 vtkKWListBox 
+vtkKWLoadSaveDialog
 vtkKWMenu 
 vtkKWMenuButton 
 vtkKWMessageDialog 
@@ -30,6 +29,7 @@ vtkKWNotebook
 vtkKWObject 
 vtkKWOKCancelDialog 
 vtkKWOptionMenu 
+vtkKWPointerArray
 vtkKWProgressGauge 
 vtkKWPushButton 
 vtkKWRadioButton 
@@ -38,15 +38,16 @@ vtkKWSaveImageDialog
 vtkKWScale 
 vtkKWSerializer 
 vtkKWSplitFrame
+vtkKWTclCommand
 vtkKWTclInteractor
 vtkKWText 
 vtkKWToolbar 
-vtkKWWidget 
-vtkKWWidgetCollection 
+vtkKWView 
 vtkKWViewCollection 
 vtkKWVolumeComposite 
+vtkKWWidget 
+vtkKWWidgetCollection 
 vtkKWWindow 
-vtkKWTclCommand
 vtkKWWindowCollection 
 vtkKWXtEmbeddedWidget 
 ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl 
@@ -56,6 +57,7 @@ ABSTRACT_FILES(
 vtkKWComposite 
 vtkContainer
 vtkKWView 
+vtkKWFileDialog
 )
 
 
@@ -135,4 +137,5 @@ ENDIF(BUILD_TESTING)
 
 CONFIGURE_FILE(${KWWIDGETS_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in ${KWWIDGETS_BINARY_DIR}/vtkKWWidgetsConfigure.h)
 INCLUDE_DIRECTORIES(${KWWIDGETS_BINARY_DIR})
+
 
