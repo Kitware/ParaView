@@ -3,35 +3,37 @@ SUBDIRS(VTK ParaView)
 SUBDIR_DEPENDS(ParaView VTK)
 
 SET (LIBRARY_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin/ CACHE PATH 
-"Single output directory for building all libraries.")
+      "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin/ CACHE PATH 
-"Single output directory for building all executables.")
+      "Single output directory for building all executables.")
 
 # force these to be ON by default as they are required by ParaView
 OPTION (VTK_USE_HYBRID "Build the hybrid directory classes" ON)
 OPTION (VTK_USE_PARALLEL "Build the parallel directory classes" ON)
 OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
-OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.2.3" ON)
+OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.3.2" ON)
 
 IF(USE_INCLUDED_TCLTK)
   IF(UNIX)
     IF(RUN_CONFIGURE)
-      EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tcl8.2.3/unix/configure --disable-shared"
-                 ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix)
-      EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tk8.2.3/unix/configure --disable-shared"
-                 ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix)
+      EXEC_PROGRAM(
+       "${ParaViewComplete_SOURCE_DIR}/tcl8.3.2/unix/configure --disable-shared"
+       ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix)
+      EXEC_PROGRAM(
+       "${ParaViewComplete_SOURCE_DIR}/tk8.3.2/unix/configure --disable-shared"
+       ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix)
     ENDIF(RUN_CONFIGURE)
   
-    SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix/libtcl8.2.a 
+    SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtcl8.3.a 
        CACHE FILEPATH
      "Path to tcl library")
-    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.2.3/generic 
+    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.3.2/generic 
         CACHE PATH "Path to tcl include")
-    SET(TK_LIBRARY ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix/libtk8.2.a 
+    SET(TK_LIBRARY ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix/libtk8.3.a 
        CACHE FILEPATH
      "Path to tk library")
-    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.2.3/generic 
+    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.3.2/generic 
         CACHE PATH "Path to tk include")
     IF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
       IF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
@@ -41,52 +43,54 @@ IF(USE_INCLUDED_TCLTK)
  
     IF (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix\; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix\; make )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix\; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix\; make )
     ELSE (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix; make )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix; make )
     ENDIF (CMAKE_ESCAPES_SC)
   
   ELSE(UNIX)
-    SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tcl82.lib
+    SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tcl83.lib
         CACHE FILEPATH
      "Path to tcl library")
-    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/include 
+    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
         CACHE PATH "Path to tcl include")
-    SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tk82.lib 
+    SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tk83.lib 
        CACHE FILEPATH
      "Path to tcl library")
-    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/include 
+    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
         CACHE PATH "Path to tcl include")
-    SET(TK_INTERNAL_PATH ${ParaViewComplete_SOURCE_DIR}/VTK/Rendering/tkInternals CACHE PATH "Path to tcl include")
-  # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin directory
-  # so no paths are needed to run this.
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tcl82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl82.dll 
+    SET(TK_INTERNAL_PATH 
+        ${ParaViewComplete_SOURCE_DIR}/VTK/Rendering/tkInternals 
+        CACHE PATH "Path to tcl include")
+  # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
+  # directory so no paths are needed to run this.
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl83.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tcl82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tcl82.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tcl83.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tcl82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tcl82.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tcl83.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tcl82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl82.dll
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl83.dll
                     COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tk82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk82.dll COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tk82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tk82.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk83.dll COPYONLY)
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tk83.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tk82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tk82.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tk83.dll 
                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/bin/tk82.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk82.dll 
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk83.dll 
                    COPYONLY)
   ENDIF(UNIX)
 ENDIF(USE_INCLUDED_TCLTK)
@@ -97,18 +101,19 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
 #
 # try to find the data files for VTKData
 #
-FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData ${VTK_SOURCE_DIR}/../../VTKData $ENV{VTK_DATA_ROOT} DOC "If you have VTK data files (used in tests and examples), where is it located?")
+FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData 
+                                       ${VTK_SOURCE_DIR}/../../VTKData 
+                                       $ENV{VTK_DATA_ROOT} DOC 
+ "If you have VTK data files (used in tests and examples), where is it located?")
 
-MARK_AS_ADVANCED(CLEAR VTK_USE_MPI MPI_EXTRA_LIBRARY MPI_INCLUDE_PATH MPI_LIBRARY)
-MARK_AS_ADVANCED(BUILD_EXAMPLES VTK_WRAP_TCL VTK_WRAP_JAVA VTK_WRAP_PYTHON VTK_USE_HYBRID VTK_USE_PARALLEL VTK_USE_RENDERING VTK_USE_VOLUMEPRO VTK_USE_ANSI_STDLIB TK_WISH TCL_TCLSH PARAVIEW_DATA_ROOT)
+MARK_AS_ADVANCED(CLEAR VTK_USE_MPI MPI_EXTRA_LIBRARY MPI_INCLUDE_PATH 
+                       MPI_LIBRARY)
+MARK_AS_ADVANCED(BUILD_EXAMPLES VTK_WRAP_TCL VTK_WRAP_JAVA VTK_WRAP_PYTHON 
+                 VTK_USE_HYBRID VTK_USE_PARALLEL VTK_USE_RENDERING 
+                 VTK_USE_VOLUMEPRO VTK_USE_ANSI_STDLIB VTK_USE_X TK_WISH 
+                 TCL_TCLSH PARAVIEW_DATA_ROOT TCL_LIBRARY_DEBUG
+                 TCL_STUB_LIBRARY_DEBUG TK_LIBRARY_DEBUG TK_STUB_LIBRARY_DEBUG
+                 VTK_USE_VIDEO_FOR_WINDOWS VTK_USE_MATROX_IMAGING)
+MARK_AS_ADVANCED(USE_INCLUDED_TCLTK TCL_INCLUDE_PATH TCL_LIBRARY 
+                 TCL_STUB_LIBRARY TK_INCLUDE_PATH TK_LIBRARY TK_STUB_LIBRARY )
 
-OPTION (VTK_USE_MPI 
-        "use MPI (Message Passing Interface) library for parallel support"
-        OFF)
-
-IF(VTK_USE_MPI)
-  FIND_LIBRARY(MPI_EXTRA_LIBRARY 
-               NAMES mpi++
-               PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
-               DOC "If a second mpi library is necessary, specify it here.")
-ENDIF(VTK_USE_MPI)
