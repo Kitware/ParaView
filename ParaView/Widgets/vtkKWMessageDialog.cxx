@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWEvent.h"
 #include "vtkKWIcon.h"
 #include "vtkKWImageLabel.h"
 #include "vtkKWLabel.h"
@@ -83,6 +84,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->IconImage = 0;
   this->DialogName = 0;
   this->Options    = 0;
+  this->DialogText = 0;
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
@@ -101,6 +103,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
     this->IconImage->Delete();
     }
   this->SetDialogName(0);
+  this->SetDialogText(0);
 }
 
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
@@ -112,6 +115,10 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
   this->Label->Create(app,"");
+  if ( this->DialogText )
+    {
+    this->Label->SetLabel(this->DialogText);
+    }
   this->CheckButton->Create(app, "");
   this->ButtonFrame->Create(app,"frame","");
   
@@ -200,11 +207,17 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
 void vtkKWMessageDialog::SetText(const char *txt)
 {
-  this->Label->SetLabel(txt);
+  this->SetDialogText(txt);
+  if ( this->Label )
+    {
+    this->Label->SetLabel(this->DialogText);
+    }
 }
 
 int vtkKWMessageDialog::Invoke()
 {
+  this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, 
+		    this->DialogText);
   if ( !this->GetApplication()->GetUseMessageDialogs() )
     {
     return 0;

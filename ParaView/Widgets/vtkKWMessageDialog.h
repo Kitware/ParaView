@@ -135,6 +135,10 @@ protected:
   int             Default;
   int             Options;
   char            *DialogName;
+  char            *DialogText;
+
+  vtkSetStringMacro(DialogText);
+  vtkGetStringMacro(DialogText);
 
   vtkKWWidget     *MessageDialogFrame;
   vtkKWLabel      *Label;

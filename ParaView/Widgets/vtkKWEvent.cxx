@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const char *vtkKWEventStrings[] = {
   "KWWidgetEvents",
+  "MessageDialogInvokeEvent",
   "WindowLevelChangedEvent",
   "WindowLevelChangingEvent",
   "WindowLevelChangedImageCompositeEvent",
@@ -90,7 +91,10 @@ static const char *vtkKWEventStrings[] = {
   "ChangeMouseOperationsEvent",
   "ChangeStandardInteractivityEvent",
   "SwitchToVolumeProEvent",
-  "InitializeTraceEvent"
+  "InitializeTraceEvent",
+  "ErrorMessageEvent",
+  "WarningMessageEvent",
+  "FinalBogusNotUsedEvent"
 };
 
 const char *vtkKWEvent::GetStringFromEventId(unsigned long event)

@@ -53,8 +53,9 @@ class VTK_EXPORT vtkKWEvent
   static const char* GetStringFromEventId(unsigned long event);
   enum {
     KWWidgetEvents = 2000,
+    MessageDialogInvokeEvent,
     // VV    
-    WindowLevelChangedEvent = 2000,    
+    WindowLevelChangedEvent,
     WindowLevelChangingEvent,
     WindowLevelChangedImageCompositeEvent,
     WindowLevelChangingImageCompositeEvent,
@@ -101,7 +102,11 @@ class VTK_EXPORT vtkKWEvent
     SwitchToVolumeProEvent,
     ViewAnnotationChangedEvent,
     // PV
-    InitializeTraceEvent
+    InitializeTraceEvent,
+    ErrorMessageEvent,
+    WarningMessageEvent,    
+    // 
+    FinalBogusNotUsedEvent
   };
 };
 
