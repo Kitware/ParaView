@@ -43,7 +43,7 @@
 #ifndef VTKSNL_PVTESSELLATOR_ENTRY_H
 #define VTKSNL_PVTESSELLATOR_ENTRY_H
 
-#include <vtkPVWidget.h>
+#include "vtkPVWidget.h"
 
 class vtkPVInputMenu;
 class vtkPVWidgetProperty;
@@ -51,8 +51,7 @@ class vtkPVDataSetAttributesInformation;
 
 class vtkTessellatorEntryData;
 
-class VTK_EXPORT vtkPVTempTessellatorEntry
-  : public vtkPVWidget
+class VTK_EXPORT vtkPVTempTessellatorEntry : public vtkPVWidget
 {
 public:
   static vtkPVTempTessellatorEntry* New();

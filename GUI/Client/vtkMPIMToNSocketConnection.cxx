@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.8");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.9");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -84,6 +84,8 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
     os << i3 << "PortNumber: " << this->Internals->ServerInformation[i].PortNumber << "\n";
     os << i3 << "HostName: " << this->Internals->ServerInformation[i].HostName.c_str() << "\n";
     }
+  os << indent << "MachinesFileName: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
+  os << indent << "PortNumber: " << this->PortNumber << endl;
 }
 
 void vtkMPIMToNSocketConnection::LoadMachinesFile()

@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.573");
+vtkCxxRevisionMacro(vtkPVWindow, "1.574");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4617,4 +4617,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
      << (this->InteractiveRenderEnabled?"on":"off") << endl;
   os << indent << "AnimationInterface: " << this->AnimationInterface << endl;
   os << indent << "InteractorID: " << this->InteractorID << endl;
+  os << indent << "InDemo: " << this->InDemo << endl;
 }

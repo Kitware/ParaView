@@ -36,14 +36,12 @@ class vtkKWLabeledFrame;
 class vtkKWPushButton;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkPVPluginsDialog
-  : public vtkKWDialog
+class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
 {
  public:
   static vtkPVPluginsDialog* New();
   vtkTypeRevisionMacro(vtkPVPluginsDialog,vtkKWDialog);
-  void PrintSelf(ostream& os,
-                 vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create the widget

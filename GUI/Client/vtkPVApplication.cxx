@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.281");
+vtkCxxRevisionMacro(vtkPVApplication, "1.282");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2164,6 +2164,11 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
   os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
   os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
+  os << indent << "MachinesFileName: " 
+    << (this->MachinesFileName?this->MachinesFileName:"(null)") << endl;
+  os << indent << "CaveConfigurationFileName: " 
+    << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(null)") << endl;
+  os << indent << "DisableComposite: " << this->DisableComposite << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.125");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.126");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -2179,4 +2179,5 @@ void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Window: " << this->GetWindow() << endl;
   os << indent << "ScriptAvailable: " << this->ScriptAvailable << endl;
   os << indent << "InPlay: " << this->InPlay << endl;
+  os << indent << "SavingData: " << this->SavingData << endl;
 }

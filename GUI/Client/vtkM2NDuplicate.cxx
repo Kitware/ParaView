@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NDuplicate, "1.3");
+vtkCxxRevisionMacro(vtkM2NDuplicate, "1.4");
 vtkStandardNewMacro(vtkM2NDuplicate);
 
 vtkCxxSetObjectMacro(vtkM2NDuplicate,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -337,5 +337,9 @@ void vtkM2NDuplicate::Execute()
 void vtkM2NDuplicate::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "ClientMode: " << this->ClientMode << endl;
+  os << indent << "ServerMode: " << this->ServerMode << endl;
+  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
 }
 

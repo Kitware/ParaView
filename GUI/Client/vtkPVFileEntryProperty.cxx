@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.6");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.7");
 
 class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
 {
@@ -160,4 +160,6 @@ void vtkPVFileEntryProperty::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeStep: " << this->TimeStep << endl;
+  os << indent << "DirectoryName: "
+    << (this->DirectoryName?this->DirectoryName:"(none)") << endl;
 }
