@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.6");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -343,6 +343,67 @@ int vtkKWTkUtilities::GetPhotoWidth(Tcl_Interp *interp,
   int width, height;
   Tk_PhotoGetSize(photo, &width, &height);
   return width;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontToBold(Tcl_Interp *interp,
+                                       const char *widget)
+{
+  int res;
+
+  // First try to modify the old -foundry-family-weigth-*-*-... form
+
+  ostrstream regsub;
+  regsub << "regsub -- {(-[^-]*-[^-]*-)([^-]*)(-.*)} [" << widget 
+          << " cget -font] {\\1bold\\3} __temp__" << ends;
+  res = Tcl_GlobalEval(interp, regsub.str());
+  regsub.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to regsub!");
+    return 0;
+    }
+  if (atoi(Tcl_GetStringResult(interp)) == 1)
+    {
+    ostrstream replace;
+    replace << widget << " config -font $__temp__" << ends;
+    res = Tcl_GlobalEval(interp, replace.str());
+    replace.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub!");
+      return 0;
+      }
+    return 1;
+    }
+
+  // Otherwise replace the -weight parameter
+
+  ostrstream regsub2;
+  regsub2 << "regsub -- {(.* -weight )(\\w*\\M)(.*)} [font actual [" << widget 
+          << " cget -font]] {\\1bold\\3} __temp__" << ends;
+  res = Tcl_GlobalEval(interp, regsub2.str());
+  regsub2.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to regsub (2)!");
+    return 0;
+    }
+  if (atoi(Tcl_GetStringResult(interp)) == 1)
+    {
+    ostrstream replace2;
+    replace2 << widget << " config -font $__temp__" << ends;
+    res = Tcl_GlobalEval(interp, replace2.str());
+    replace2.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2)!");
+      return 0;
+      }
+    return 1;
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

@@ -96,6 +96,9 @@ public:
   static int GetPhotoWidth(Tcl_Interp *interp,
                            const char *photo_name);
 
+
+  static int ChangeFontToBold(Tcl_Interp *interp,
+                              const char *widget);
   //ETX
 
 protected:
