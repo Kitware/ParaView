@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.210");
+vtkCxxRevisionMacro(vtkPVApplication, "1.211");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -289,6 +289,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
   this->SetApplicationName("ParaView");
@@ -552,6 +553,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
   "--user", "",
   "Tell the client what username to send to server when establishing SSH connection.",
+  "--always-ssh", "",
+  "",
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
   "--stereo", "",
@@ -604,12 +607,15 @@ char* vtkPVApplication::CreateHelpString()
   const char* help = vtkPVApplication::ArgumentList[j+2];
   while (argument1 && argument1[0])
     {
-    error << argument1;
-    if (argument2[0])
+    if ( strlen(help) > 0 )
       {
-      error << ", " << argument2;
+      error << argument1;
+      if (argument2[0])
+        {
+        error << ", " << argument2;
+        }
+      error << " : " << help << endl;
       }
-    error << " : " << help << endl;
     j += 3;
     argument1 = vtkPVApplication::ArgumentList[j];
     if (argument1 && argument1[0]) 
@@ -977,6 +983,15 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->Port = atoi(newarg);
+      }
+    }
+
+  if (this->ClientMode)
+    {
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--always-ssh",
+                                            index) == VTK_OK)
+      {
+      this->AlwaysSSH = 1;
       }
     }
 
@@ -1729,6 +1744,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Port: " << this->Port << endl;
     os << indent << "Host: " << this->HostName << endl;
     os << indent << "Username: " << this->Username << endl;
+    os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
     }
   if (this->ServerMode)
     {
@@ -1747,7 +1763,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "ParaView was started with no default modules.\n";
     }
-
   os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
      << endl;
   os << indent << "TraceFileName: " 

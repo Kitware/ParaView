@@ -335,6 +335,10 @@ public:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
+  vtkSetClampMacro(AlwaysSSH, int, 0, 1);
+  vtkBooleanMacro(AlwaysSSH, int);
+  vtkGetMacro(AlwaysSSH, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -376,6 +380,7 @@ protected:
   char* Username;
   vtkSetStringMacro(Username);
   int Port;
+  int AlwaysSSH;
   int UseSoftwareRendering;
   int UseSatelliteSoftware;
   int UseStereoRendering;
