@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.19.2.1");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.19.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -82,8 +82,15 @@ vtkPVFileEntry::~vtkPVFileEntry()
 void vtkPVFileEntry::SetLabel(const char* label)
 {
   // For getting the widget in a script.
-  this->SetTraceName(label);
   this->LabelWidget->SetLabel(label);
+
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------

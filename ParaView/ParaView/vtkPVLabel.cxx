@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabel);
-vtkCxxRevisionMacro(vtkPVLabel, "1.5");
+vtkCxxRevisionMacro(vtkPVLabel, "1.5.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()
@@ -187,7 +187,15 @@ int vtkPVLabel::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVLabel::SetLabel(const char *str)
 {
-  this->Label->SetLabel(str); this->SetTraceName(str);
+  this->Label->SetLabel(str); 
+
+  if (str && str[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(str);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------

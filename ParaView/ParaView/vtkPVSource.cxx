@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.7");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.8");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2083,7 +2083,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.7 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.8 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2092,7 +2092,12 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Initialized: " << (this->Initialized?"yes":"no") << endl;
   os << indent << "Name: " << (this->Name ? this->Name : "none") << endl;
-  os << indent << "Description: " << (this->Description ? this->Description : "none") << endl;
+  os << indent << "LongHelp: " << (this->LongHelp ? this->LongHelp : "none") 
+     << endl;
+  os << indent << "ShortHelp: " << (this->ShortHelp ? this->ShortHelp : "none") 
+     << endl;
+  os << indent << "Description: " 
+     << (this->Description ? this->Description : "none") << endl;
   os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
      << endl;
   os << indent << "MenuName: " << (this->MenuName?this->MenuName:"none")

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25.2.2");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25.2.3");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -204,6 +204,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     firstSelect->SetLabel("Select initial time step:");
     firstSelect->SetObjectTclName(tclName);
     firstSelect->SetTraceName("selectTimeSet");
+    firstSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     firstSelect->SetReader(reader);
     firstSelect->Reset();
     this->Application->Script("pack %s -side top -fill x -expand t", 
@@ -893,6 +894,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     select->GetLabeledFrame()->ShowHideFrameOn();
     select->SetObjectTclName(tclName);
     select->SetTraceName("selectTimeSet");
+    select->SetTraceNameState(vtkPVWidget::SelfInitialized);
     select->SetModifiedCommand(pvs->GetTclName(), 
                                "SetAcceptButtonColorToRed");
     select->SetReader(reader);
@@ -912,6 +914,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     pointSelect->SetAttributeName("Point");
     pointSelect->Create(pvApp);
     pointSelect->SetTraceName("selectPointVariables");
+    pointSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     pointSelect->SetModifiedCommand(pvs->GetTclName(),
                                     "SetAcceptButtonColorToRed");
 
@@ -922,6 +925,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     cellSelect->SetAttributeName("Cell");
     cellSelect->Create(pvApp);
     cellSelect->SetTraceName("selectCellVariables");
+    cellSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
     cellSelect->SetModifiedCommand(pvs->GetTclName(),
                                    "SetAcceptButtonColorToRed");
 

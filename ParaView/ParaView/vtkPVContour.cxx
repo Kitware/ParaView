@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.53");
+vtkCxxRevisionMacro(vtkPVContour, "1.53.2.1");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -128,6 +128,7 @@ void vtkPVContour::CreateProperties()
   vtkPVScalarRangeLabel* scalarRange = vtkPVScalarRangeLabel::New();
   scalarRange->SetArrayMenu(this->ArrayMenu);
   scalarRange->SetTraceName("ScalarRangeLabel");
+  scalarRange->SetTraceNameState(vtkPVWidget::UserInitialized);
   scalarRange->SetParent(this->ParameterFrame->GetFrame());
   scalarRange->Create(this->Application);
   this->ArrayMenu->AddDependent(scalarRange);  

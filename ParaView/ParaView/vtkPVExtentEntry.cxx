@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9.2.1");
 
 //---------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
@@ -109,7 +109,13 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     }
   
   // For getting the widget in a script.
-  this->SetTraceName(this->EntryLabel);
+  if (this->EntryLabel && this->EntryLabel[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(this->EntryLabel);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 
   this->SetApplication(pvApp);
 

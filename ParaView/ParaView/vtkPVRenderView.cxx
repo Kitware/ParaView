@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.17");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.18");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -902,9 +902,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->GetPVWindow()->GetInterfaceSettingsFrame()->GetFrame());
   this->SourcesBrowserAlwaysShowName->Create(this->Application, "");
   this->SourcesBrowserAlwaysShowName->SetText(
-    "Sources browsers show source name");
+    "Source browsers display source names");
   this->SourcesBrowserAlwaysShowName->SetCommand(
     this, "SourcesBrowserAlwaysShowNameCallback");
+  this->SourcesBrowserAlwaysShowName->SetBalloonHelpString(
+    "This advanced option adjusts whether the unique source names "
+    "are shown in the source browsers. This name is normally useful "
+    "only to script developers.");
 
   if (this->Application->HasRegisteryValue(
     2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY) &&
@@ -2590,7 +2594,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.17 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.18 $");
 }
 
 //------------------------------------------------------------------------------

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.16");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.16.2.1");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -99,7 +99,13 @@ vtkPVContourEntry::~vtkPVContourEntry()
 void vtkPVContourEntry::SetLabel(const char* str)
 {
   this->ContourValuesLabel->SetLabel(str);
-  this->SetTraceName(str);
+  if (str && str[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(str);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------

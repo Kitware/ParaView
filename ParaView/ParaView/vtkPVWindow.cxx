@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.13");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.14");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2646,7 +2646,7 @@ void vtkPVWindow::UpdateFilterMenu()
               menuName = key;
               }
 
-            if (numSources % 30 == 0 )
+            if (numSources % 25 == 0 )
               {
               this->FilterMenu->AddGeneric("command", menuName, this, 
                                            methodAndArgs, "-columnbreak 1", 
@@ -3773,7 +3773,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.13 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.14 $");
 }
 
 //----------------------------------------------------------------------------

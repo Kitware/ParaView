@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.14");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.14.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -210,8 +210,17 @@ void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone,
   vtkPVLabeledToggle* pvlt = vtkPVLabeledToggle::SafeDownCast(clone);
   if (pvlt)
     {
-    pvlt->Label->SetLabel(this->Label->GetLabel());
-    pvlt->SetTraceName(this->Label->GetLabel());
+    const char* label = this->Label->GetLabel();
+    pvlt->Label->SetLabel(label);
+
+    if (label && label[0] &&
+        (pvlt->TraceNameState == vtkPVWidget::Uninitialized ||
+         pvlt->TraceNameState == vtkPVWidget::Default) )
+      {
+      pvlt->SetTraceName(label);
+      pvlt->SetTraceNameState(vtkPVWidget::SelfInitialized);
+      }
+      
     }
   else 
     {
@@ -242,7 +251,14 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::SetLabel(const char *str) 
 {
-  this->Label->SetLabel(str); this->SetTraceName(str);
+  this->Label->SetLabel(str); 
+  if (str && str[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(str);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
 
 //----------------------------------------------------------------------------

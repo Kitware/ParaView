@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.30");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.30.2.1");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -186,8 +186,15 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 void vtkPVSelectionList::SetLabel(const char* label) 
 {
   // For getting the widget in a script.
-  this->SetTraceName(label);
   this->Label->SetLabel(label);
+
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
 }
   
 const char *vtkPVSelectionList::GetLabel()

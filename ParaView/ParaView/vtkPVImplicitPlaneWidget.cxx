@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.5.2.1");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -319,7 +319,13 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3D->PlaceWidget(0, 1, 0, 1, 0, 1);
   ++instanceCount;
   sprintf(planeTclName, "pvPlane%d", instanceCount);
-  this->SetTraceName("Plane");
+
+  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName("Plane");
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
   pvApp->BroadcastScript("vtkPlane %s", planeTclName);
   this->SetPlaneTclName(planeTclName);
 

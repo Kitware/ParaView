@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.13.2.1");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.13.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -140,8 +140,15 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(this->MinLabel->GetLabel());
-  
+  const char* label = this->MinLabel->GetLabel();
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
+
   this->SetApplication(pvApp);
 
   // create the top level

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.15.2.1");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -237,7 +237,13 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3D->PlaceWidget(0, 1, 0, 1, 0, 1);
   ++instanceCount;
   sprintf(sphereTclName, "pvSphere%d", instanceCount);
-  this->SetTraceName("Sphere");
+
+  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName("Sphere");
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
   pvApp->BroadcastScript("vtkSphere %s", sphereTclName);
   this->SetSphereTclName(sphereTclName);
   

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.9");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.9.2.1");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -216,12 +216,19 @@ void vtkPVBoundsDisplay::CopyProperties(vtkPVWidget* clone,
   if (pvbd)
     {
     pvbd->SetShowHideFrame(this->GetShowHideFrame());
-    pvbd->SetFrameLabel(this->GetFrameLabel());
-    pvbd->SetTraceName(this->GetFrameLabel());
+    const char* frameLabel = this->GetFrameLabel();
+    pvbd->SetFrameLabel(frameLabel);
+    if (frameLabel && frameLabel[0] &&
+        (pvbd->TraceNameState == vtkPVWidget::Uninitialized ||
+         pvbd->TraceNameState == vtkPVWidget::Default) )
+      {
+      pvbd->SetTraceName(frameLabel);
+      }
     }
   else 
     {
-    vtkErrorMacro("Internal error. Could not downcast clone to PVBoundsDisplay.");
+    vtkErrorMacro(
+      "Internal error. Could not downcast clone to PVBoundsDisplay.");
     }
 }
 

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.9");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.9.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -127,7 +127,12 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  this->SetTraceName("SelectTimeSet");
+  if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName("SelectTimeSet");
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
   
   this->SetApplication(pvApp);
   

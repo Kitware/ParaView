@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.16.2.1");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -156,8 +156,15 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 void vtkPVSelectWidget::SetLabel(const char* label) 
 {
   // For getting the widget in a script.
-  this->SetTraceName(label);
   this->SetEntryLabel(label);
+  if (label && label[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(label);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
+
   if (this->Application)
     {
     this->LabeledFrame->SetLabel(label);
@@ -332,6 +339,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
 
   pvw->SetTraceReferenceObject(this);
   pvw->SetTraceName(labelVal);
+  this->SetTraceNameState(vtkPVWidget::UserInitialized);
   sprintf(str, "GetPVWidget {%s}", labelVal);
   pvw->SetTraceReferenceCommand(str);
 }

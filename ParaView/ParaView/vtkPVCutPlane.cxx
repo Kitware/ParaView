@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutPlane);
-vtkCxxRevisionMacro(vtkPVCutPlane, "1.26");
+vtkCxxRevisionMacro(vtkPVCutPlane, "1.26.2.1");
 
 int vtkPVCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -103,6 +103,7 @@ void vtkPVCutPlane::CreateProperties()
   boundsDisplay->ShowHideFrameOn();
   boundsDisplay->Create(this->Application);
   boundsDisplay->SetTraceName("BoundsDisplay");
+  boundsDisplay->SetTraceNameState(vtkPVWidget::UserInitialized);
   boundsDisplay->SetLabel("Input Bounds");
   boundsDisplay->SetInputMenu(inputMenu);
   inputMenu->AddDependent(boundsDisplay);

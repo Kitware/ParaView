@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.6.2.2");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
@@ -92,6 +92,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   select->SetNumberOfComponents((int)range[1]);
   select->Create(pvApp);
   select->SetTraceName("ComponentSelect");
+  select->SetTraceNameState(vtkPVWidget::UserInitialized);
   this->AddPVWidget(select);
   
   this->Script("pack %s", select->GetWidgetName());
@@ -100,9 +101,9 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVExtractGeometryByScalar::SaveInTclScript(ofstream* vtkNotUsed(file),
-                                                   int vtkNotUsed(interactiveFlag), 
-                                                   int vtkNotUsed(vtkFlag))
+void vtkPVExtractGeometryByScalar::SaveInTclScript(
+  ofstream* vtkNotUsed(file), int vtkNotUsed(interactiveFlag), 
+  int vtkNotUsed(vtkFlag))
 {
 }
 

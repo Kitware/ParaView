@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPushButton);
-vtkCxxRevisionMacro(vtkPVPushButton, "1.5");
+vtkCxxRevisionMacro(vtkPVPushButton, "1.5.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVPushButton::vtkPVPushButton()
@@ -121,7 +121,13 @@ void vtkPVPushButton::Create(vtkKWApplication *pvApp)
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(this->EntryLabel);
+  if (this->EntryLabel && this->EntryLabel[0] &&
+      (this->TraceNameState == vtkPVWidget::Uninitialized ||
+       this->TraceNameState == vtkPVWidget::Default) )
+    {
+    this->SetTraceName(this->EntryLabel);
+    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
   
   this->SetApplication(pvApp);
 

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.15.2.1");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.15.2.2");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -115,6 +115,7 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
     }
   tname << ends;
   pvWidget->SetTraceName(tname.str());
+  pvWidget->SetTraceNameState(vtkPVWidget::Default);
   tname.rdbuf()->freeze(0);
   return pvWidget;
 }
