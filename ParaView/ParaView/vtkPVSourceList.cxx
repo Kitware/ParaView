@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWEntry.h"
+#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
 #include "vtkPVRenderView.h"
@@ -50,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
-#include "vtkKWMenu.h"
+#include "vtkString.h"
 
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -332,35 +333,37 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in, int current)
 
   // Draw the icon indicating visibility.
   result = NULL;
-  if (comp->GetPVOutput(0) == NULL)
+  if ( !comp->GetHideDisplayPage() )
     {
-    this->Script("%s create image %d %d -image visonbm",
-                 this->Canvas->GetWidgetName(), x, y);
-    result = this->Application->GetMainInterp()->result;
-    x += 9;
-    }
-  else
-    {
-    switch (comp->GetPVOutput(0)->GetVisibility())
+    if (comp->GetPVOutput(0) == NULL)
       {
-      case 0:
-        this->Script("%s create image %d %d -image visoffbm",
-                     this->Canvas->GetWidgetName(), x, y);
-        result = this->Application->GetMainInterp()->result;
-        x += 9;
-        break;
-      case 1:
-        this->Script("%s create image %d %d -image visonbm",
-                     this->Canvas->GetWidgetName(), x, y);
-        result = this->Application->GetMainInterp()->result;
-        x += 9;
-        break;
+      this->Script("%s create image %d %d -image visonbm",
+                   this->Canvas->GetWidgetName(), x, y);
+      result = this->Application->GetMainInterp()->result;
+      x += 9;
+      }
+    else
+      {
+      switch (comp->GetPVOutput(0)->GetVisibility())
+        {
+        case 0:
+          this->Script("%s create image %d %d -image visoffbm",
+                       this->Canvas->GetWidgetName(), x, y);
+          result = this->Application->GetMainInterp()->result;
+          x += 9;
+          break;
+        case 1:
+          this->Script("%s create image %d %d -image visonbm",
+                       this->Canvas->GetWidgetName(), x, y);
+          result = this->Application->GetMainInterp()->result;
+          x += 9;
+          break;
+        }
       }
     }
   if (result)
     {
-    tmp = new char[strlen(result)+1];
-    strcpy(tmp,result);
+    tmp = vtkString::Duplicate(result);
     this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d 1}",
                  this->Canvas->GetWidgetName(), tmp,
                  this->GetTclName(), compIdx);
