@@ -25,7 +25,7 @@ CFG=Widgets - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=xicl6.exe
+CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -51,7 +51,7 @@ RSC=rc.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=xilink6.exe
+LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # ADD LINK32 ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib ..\..\vtkbin\vtktcl\vtktcl.lib ..\..\vtkbin\vtkdll\vtkdll.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"Release/vtkKWWidgetsTcl.dll" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
@@ -78,7 +78,7 @@ LINK32=xilink6.exe
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
-LINK32=xilink6.exe
+LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"Debug/vtkKWWidgetsTcl.dll" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
@@ -267,6 +267,14 @@ SOURCE=.\vtkKWObject.cxx
 # Begin Source File
 
 SOURCE=.\vtkKWObjectTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWOKCancelDialog.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWOKCancelDialogTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -1012,6 +1020,35 @@ InputName=vtkKWObject
 # Begin Custom Build
 InputPath=.\vtkKWObject.h
 InputName=vtkKWObject
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWOKCancelDialog.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWOKCancelDialog.h
+InputName=vtkKWOKCancelDialog
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWOKCancelDialog.h
+InputName=vtkKWOKCancelDialog
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

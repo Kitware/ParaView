@@ -81,7 +81,7 @@ void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
   this->ButtonFrame->Create(app,"frame","");
   this->OKButton->Create(app,"button","-text OK -width 16");
   this->OKButton->SetCommand(this, "OK");
-  this->CancelButton->Create(app,"button","-text OK -width 16");
+  this->CancelButton->Create(app,"button","-text Cancel -width 16");
   this->CancelButton->SetCommand(this, "Cancel");
   this->Script("pack %s %s -side left -padx 4 -expand yes",
                this->OKButton->GetWidgetName(),
