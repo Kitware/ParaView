@@ -90,6 +90,7 @@ static const char *vtkKWEventStrings[] = {
   "LightIntensityChangedEvent",
   "LightPositionChangedEvent",
   "LightVisibilityChangedEvent",
+  "LightboxOrientationChangedEvent",
   "LightboxResolutionChangedEvent",
   "MiddleMouseOptionChangedEvent",
   "MultiPassStillRenderEndEvent",
@@ -121,6 +122,7 @@ static const char *vtkKWEventStrings[] = {
   "WindowLevelChangedImageCompositeEvent",
   "WindowLevelChangingEvent",
   "WindowLevelChangingImageCompositeEvent",
+  "WindowLevelResetEvent",
   // PV
   "ErrorMessageEvent",
   "InitializeTraceEvent",

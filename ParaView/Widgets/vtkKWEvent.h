@@ -99,6 +99,7 @@ class VTK_EXPORT vtkKWEvent
     LightIntensityChangedEvent,
     LightPositionChangedEvent,
     LightVisibilityChangedEvent,
+    LightboxOrientationChangedEvent,
     LightboxResolutionChangedEvent,
     MiddleMouseOptionChangedEvent,
     MultiPassStillRenderEndEvent,
@@ -130,6 +131,7 @@ class VTK_EXPORT vtkKWEvent
     WindowLevelChangedImageCompositeEvent,
     WindowLevelChangingEvent,
     WindowLevelChangingImageCompositeEvent,
+    WindowLevelResetEvent,
     // PV
     ErrorMessageEvent,
     InitializeTraceEvent,
