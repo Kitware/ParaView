@@ -1018,6 +1018,8 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag)
           << this->RendererTclName << "\n"
           << "vtkRenderWindowInteractor iren\n\t"
           << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+    *file << "vtkTreeComposite treeComp\n\t"
+          << "treeComp SetRenderWindow " << this->RenderWindowTclName << "\n\n";
     }
 
   camera = this->GetRenderer()->GetActiveCamera();

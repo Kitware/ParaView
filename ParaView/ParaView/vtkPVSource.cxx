@@ -1179,8 +1179,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   if (this->NumberOfPVInputs > 0)
     {
     *file << "\t" << tclName << " SetInput [";
-    if (strcmp(this->GetPVInput()->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                               "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
@@ -1222,12 +1222,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   for (i = 0; i < numWidgets; i++)
     {
     widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget && (widget->IsA("vtkPVLabeledToggle") ||
-                   widget->IsA("vtkPVFileEntry") ||
-                   widget->IsA("vtkPVScale") ||
-                   widget->IsA("vtkPVSelectionList") ||
-                   widget->IsA("vtkPVStringEntry") ||
-                   widget->IsA("vtkPVVectorEntry")) )
+    if (widget)
       {
       *file << "\t";
       widget->SaveInTclScript(file, tclName);
