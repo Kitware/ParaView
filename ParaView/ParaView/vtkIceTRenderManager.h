@@ -51,6 +51,7 @@
 #include "vtkParallelRenderManager.h"
 
 class vtkPKdTree;
+class vtkIntArray;
 
 #include <GL/ice-t.h> // Needed for IceTContext
 
@@ -142,6 +143,25 @@ public:
   vtkGetObjectMacro(SortingKdTree, vtkPKdTree);
   virtual void SetSortingKdTree(vtkPKdTree *tree);
 
+  // Description:
+  // Get/Set the data replication group.  The group comprises a list of
+  // process IDs that contian the exact same data (geometry).  Replicating
+  // data can reduce image composition time.  The local process ID should
+  // be in the group and all processes within the group should have set the
+  // exact same list in the same order.  This consistency is not checked,
+  // but bad things can happen if it is not maintained.  By default, the
+  // data replication group is set to a group containing only the local
+  // process and is reset every time the controller is set.
+  vtkGetObjectMacro(DataReplicationGroup, vtkIntArray);
+  virtual void SetDataReplicationGroup(vtkIntArray *group);
+
+  // Description:
+  // An alternate way of setting the data replication group.  All processes
+  // with the same color are assumed to be part of a data replication group
+  // (that is, they all have the same geometry).  This method will not
+  // return until it is called in all methods of the communicator.
+  virtual void SetDataReplicationGroupColor(int color);
+
 //BTX
   enum {
     ICET_INFO_TAG=234551,
@@ -186,6 +206,8 @@ protected:
   int ComposeOperationDirty;
 
   vtkPKdTree *SortingKdTree;
+
+  vtkIntArray *DataReplicationGroup;
 
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which

@@ -46,10 +46,11 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7.2.4");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7.2.5");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
+vtkCxxSetObjectMacro(vtkIceTRenderManager, DataReplicationGroup, vtkIntArray);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
 {
@@ -72,6 +73,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 
   this->FullImageSharesData = 0;
   this->ReducedImageSharesData = 0;
+
+  this->DataReplicationGroup = NULL;
 }
 
 vtkIceTRenderManager::~vtkIceTRenderManager()
@@ -83,6 +86,7 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
     }
   delete[] this->TileRanks;
   this->SetSortingKdTree(NULL);
+  this->SetDataReplicationGroup(NULL);
 }
 
 vtkRenderer *vtkIceTRenderManager::MakeRenderer()
@@ -126,6 +130,17 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
     this->Context = icetCreateContext(icet_comm);
     icetDestroyMPICommunicator(icet_comm);
     vtkDebugMacro("Created new ICE-T context.");
+
+    vtkIntArray *drg = vtkIntArray::New();
+    drg->SetNumberOfComponents(1);
+    drg->SetNumberOfTuples(1);
+    drg->SetValue(0, this->Controller->GetLocalProcessId());
+    this->SetDataReplicationGroup(drg);
+    drg->Delete();
+    }
+  else
+    {
+    this->SetDataReplicationGroup(NULL);
     }
 
   this->ContextDirty = 1;
@@ -226,6 +241,25 @@ void vtkIceTRenderManager::UpdateIceTContext()
       icetDisable(ICET_DISPLAY_INFLATE);
       }
     icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
+
+    if (this->UseCompositing)
+      {
+      icetDataReplicationGroup(this->DataReplicationGroup->GetNumberOfTuples(),
+                               this->DataReplicationGroup->GetPointer(0));
+      }
+    else
+      {
+      // If we're not compositing, tell ICE-T that all processes have
+      // duplicated data.  ICE-T will just have each process render to its
+      // local tile instead.
+      int *drg = new int[this->Controller->GetNumberOfProcesses()];
+      for (int i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
+        {
+        drg[i] = i;
+        }
+      icetDataReplicationGroup(this->Controller->GetNumberOfProcesses(), drg);
+      delete[] drg;
+      }
     }
 
   this->ContextUpdateTime.Modified();
@@ -365,6 +399,24 @@ void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
 
   this->ComposeOperation = operation;
   this->ComposeOperationDirty = 1;
+}
+
+void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
+{
+  // Just use ICE-T to figure out groups, since it can do that already.
+  icetSetContext(this->Context);
+
+  icetDataReplicationGroupColor(color);
+
+  vtkIntArray *drg = vtkIntArray::New();
+  drg->SetNumberOfComponents(1);
+  int size;
+  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP_SIZE, &size);
+  drg->SetNumberOfTuples(size);
+  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, drg->GetPointer(0));
+
+  this->SetDataReplicationGroup(drg);
+  drg->Delete();
 }
 
 double vtkIceTRenderManager::GetRenderTime()
@@ -547,27 +599,13 @@ void vtkIceTRenderManager::PreRenderProcessing()
     return;
       }
 
-  // Code taken from my tile display module.
-  if (!this->UseCompositing)
-    {
-    int x, y;
-    int tileIdx = this->Controller->GetLocalProcessId();
-    y = tileIdx/this->NumTilesX;
-    x = tileIdx - y*this->NumTilesX;
-    y = this->NumTilesY-y-1;
-    // Setup the camera for this tile.
-    cam->SetWindowCenter(1.0-(double)(this->NumTilesX) + 2.0*(double)x,
-                         1.0-(double)(this->NumTilesY) + 2.0*(double)y);
-    // Try to match IceT's view angle calculation.
-    double angle = cam->GetViewAngle() * vtkMath::DoublePi()/180.0;
-    angle = 2.0*atan(tan(angle/2.0)/(double)(this->NumTilesY));
-    cam->SetViewAngle(angle * 180.0/vtkMath::DoublePi());
-    return;
-    }
-  else
-    {
-    cam->SetWindowCenter(0.0, 0.0);
-    }
+  // Normally if this->UseCompositing was false, we would return here.  But
+  // if we did that, the tile display would become invalid.  Instead, in
+  // UpdateIceTContext we tell ICE-T that the data is replicated on all
+  // nodes.  This will make ICE-T turn off compositing and make each
+  // process render its local tile (if any).  The only real overhead is an
+  // unnecessary frame buffer read back by ICE-T.  If that's a problem, we
+  // could always add a special case to ICE-T...
 
   this->UpdateIceTContext();
   for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
@@ -618,12 +656,6 @@ void vtkIceTRenderManager::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
 
-  // Try to put the camera back the way it was.
-  if (!this->UseCompositing)
-    {
-      return;
-    }
-  
   this->Controller->Barrier();
 
   if (this->WriteBackImages)
