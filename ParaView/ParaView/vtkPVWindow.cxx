@@ -95,6 +95,10 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkClientServerStream.h"
 
+#include "vtkStdString.h"
+#include <vtkstd/map>
+#include "vtkSmartPointer.h"
+
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
 #endif
@@ -120,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.502");
+vtkCxxRevisionMacro(vtkPVWindow, "1.503");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3125,7 +3129,23 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
   vtkPVSourceCollection* col = this->GetSourceList(listname);
   if (col && col->IsItemPresent(pvs) == 0)
     {
-    col->AddItem(pvs);
+    // Ugly implementation to sort the sources in the menu.  We should
+    // use a map to store the sources in the first place.
+    typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVSource> > SourcesType;
+    SourcesType sources;
+    sources[pvs->GetName()] = pvs;
+    vtkCollectionIterator* it = col->NewIterator();
+    for(it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+      {
+      vtkPVSource* source = static_cast<vtkPVSource*>(it->GetObject());
+      sources[source->GetName()] = source;
+      }
+    it->Delete();
+    col->RemoveAllItems();
+    for(SourcesType::iterator i = sources.begin(); i != sources.end(); ++i)
+      {
+      col->AddItem(i->second.GetPointer());
+      }
     }
 }
 
