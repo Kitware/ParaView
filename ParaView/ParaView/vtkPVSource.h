@@ -349,9 +349,25 @@ public:
   void RaiseSourcePage();
 
   // Description:
-  // Set or get the module name.
-  vtkSetStringMacro(ModuleName);
+  // Set or get the module name. This name is used to store the
+  // prototype in the sources/filters/readers maps. It is passed
+  // to CreatePVSource when creating a new instance.
   vtkGetStringMacro(ModuleName);
+
+  // Description:
+  // Set or get the label to be used in the Source/Filter menus.
+  vtkSetStringMacro(MenuName);
+  vtkGetStringMacro(MenuName);
+
+  // Description:
+  // A short help string describing the module.
+  vtkSetStringMacro(ShortHelp);
+  vtkGetStringMacro(ShortHelp);
+
+  // Description:
+  // A longer help string describing the module.
+  vtkSetStringMacro(LongHelp);
+  vtkGetStringMacro(LongHelp);
 
   // Description:
   // This method returns the input source as a Tcl string.
@@ -371,6 +387,14 @@ public:
   vtkGetMacro(ToolbarModule, int);
   vtkBooleanMacro(ToolbarModule, int);
 
+  // Description:
+  // When a module is first created, the user should not be able
+  // to use certain menus, buttons etc. before accepting the first
+  // time or deleting the module. GrabFocus() is used to tell the
+  // module to disable certain things in the window.
+  void GrabFocus();
+  void UnGrabFocus();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -387,10 +411,7 @@ protected:
 
   vtkPVRenderView* GetPVRenderView();
 
-  // Description:
-  // Grab and ungrab focus focus.
-  void GrabFocus();
-  void UnGrabFocus();
+  vtkSetStringMacro(ModuleName);
   
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
@@ -435,7 +456,10 @@ protected:
 
   // The name is just for display.
   char      *Name;
+  char      *MenuName;
   char      *Description;
+  char      *ShortHelp;
+  char      *LongHelp;
 
   // This is the module name.
   char      *ModuleName;

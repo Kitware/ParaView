@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.6");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.7");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -86,9 +86,12 @@ vtkPVSource::vtkPVSource()
   // Number of instances cloned from this prototype
   this->PrototypeInstanceCount = 0;
 
-  this->Name = NULL;
-  this->Description = NULL;
+  this->Name = 0;
+  this->Description = 0;
   this->ModuleName = 0;
+  this->MenuName = 0;
+  this->ShortHelp = 0;
+  this->LongHelp  = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
@@ -183,6 +186,10 @@ vtkPVSource::~vtkPVSource()
   // the navigation window update when it should not.
   delete[] this->Name;
   delete[] this->Description;
+
+  this->SetMenuName(0);
+  this->SetShortHelp(0);
+  this->SetLongHelp(0);
 
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
@@ -545,13 +552,7 @@ void vtkPVSource::CreateProperties()
 
   frame->Delete();  
  
-  
   this->UpdateProperties();
-  
-  // Isolate events to this window until accept or reset is pressed.
-  this->GrabFocus();
-
-  //this->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------
@@ -611,9 +612,12 @@ void vtkPVSource::GrabFocus()
 void vtkPVSource::UnGrabFocus()
 {
 
-  this->GetPVWindow()->EnableToolbarButtons();
-  this->GetPVWindow()->EnableMenus();
-  this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
+  if ( this->SourceGrabbed )
+    {
+    this->GetPVWindow()->EnableToolbarButtons();
+    this->GetPVWindow()->EnableMenus();
+    this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
+    }
   this->SourceGrabbed = 0;
 }
 
@@ -942,7 +946,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-    // Remove the local grab
     this->UnGrabFocus();
 
     // Set the current data of the window.
@@ -1741,6 +1744,8 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   pvs->SetOutputClassName(this->OutputClassName);
   pvs->SetSourceClassName(this->SourceClassName);
 
+  pvs->SetModuleName(this->ModuleName);
+
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->Application);
   if (!pvApp)
     {
@@ -2078,7 +2083,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.6 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.7 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2089,6 +2094,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Name: " << (this->Name ? this->Name : "none") << endl;
   os << indent << "Description: " << (this->Description ? this->Description : "none") << endl;
   os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
+     << endl;
+  os << indent << "MenuName: " << (this->MenuName?this->MenuName:"none")
      << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
   os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
