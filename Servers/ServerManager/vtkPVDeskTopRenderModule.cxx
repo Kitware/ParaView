@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.4");
 
 
 
@@ -168,7 +168,7 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
   stream << vtkClientServerStream::Invoke << pvm->GetProcessModuleID()
-                  << "GetSocketController"
+                  << "GetRenderServerSocketController"
                   << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetController" << vtkClientServerStream::LastResult
