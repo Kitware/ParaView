@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
 
 
 
@@ -230,11 +230,11 @@ void vtkPVCompositeRenderModule::InteractiveRender()
 
   // MakeCollection Decision.
   localRender = 0;
-  if ((float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+  if (!this->PVApplication->GetUseRenderingGroup() &&
+      (float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
     {
     localRender = 1;
     }
-
   // Change the collection flags and update.
   this->PartDisplays->InitTraversal();
   while ( (object = this->PartDisplays->GetNextItemAsObject()) )
