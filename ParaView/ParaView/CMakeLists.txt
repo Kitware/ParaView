@@ -2,6 +2,7 @@ SOURCE_FILES( ParaView_SRCS
 vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
 vtkCompositeProp.cxx
+vtkDuplicatePolyData.cxx
 vtkRedistributePolyData.cxx
 vtkWeightedRedistributePolyData.cxx
 vtkKWBoundsDisplay.cxx

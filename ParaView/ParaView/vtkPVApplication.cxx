@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.159");
+vtkCxxRevisionMacro(vtkPVApplication, "1.160");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -264,6 +264,9 @@ vtkPVApplication::vtkPVApplication()
 
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
+
+  this->UseTiledDisplay = 0;
+  this->TileDimensions[0] = this->TileDimensions[1] = 1;
 
   // GUI style & consistency
 
@@ -780,6 +783,29 @@ void vtkPVApplication::Start(int argc, char*argv[])
         }
       }
     this->SetGroupFileName(newarg);
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-td",
+                                          index) == VTK_OK )
+    {
+    this->UseTiledDisplay = 1;
+
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tiled-x",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-tx",
+                                          index) == VTK_OK )
+      {
+      this->TileDimensions[0] = atoi(argv[index]);
+      }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tiled-y",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-ty",
+                                          index) == VTK_OK )
+      {
+      this->TileDimensions[1] = atoi(argv[index]);
+      }
     }
 
 #ifdef VTK_MANGLE_MESA
@@ -1719,8 +1745,15 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
-  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") 
-     << endl;
+  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off")
+     << endl; 
+  if (this->UseTiledDisplay)
+    { 
+    os << indent << "UseTiledDisplay: On\n";
+    os << indent << "TileDimensions: " << this->TileDimensions[0]
+       << ", " << this->TileDimensions[1] << endl;
+    }
+
   os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
      << endl;
   os << indent << "TraceFileName: " 

@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.215");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.216");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -528,29 +528,42 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
     }
 
-  // Create the compositer.
-  this->Composite = static_cast<vtkPVTreeComposite*>
-    (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
-
-  // Try using a more efficient compositer (if it exists).
-  // This should be a part of a module.
-  pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
-                         "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
-
-  this->CompositeTclName = NULL;
-  this->SetCompositeTclName("TreeComp1");
-
-  // If we are using SGI pipes, create a new Controller/Communicator/Group
-  // to use for compositing.
-  if (pvApp->GetUseRenderingGroup())
+  if (pvApp->GetUseTiledDisplay())
     {
-    int numPipes = pvApp->GetNumberOfPipes();
-    // I would like to create another controller with a subset of world, but...
-    // For now, I added it as a hack to the composite manager.
-    pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
-                           this->CompositeTclName, numPipes);
-    }
+    this->Composite = NULL;
+    pvApp->MakeTclObject("vtkTiledDisplayManager", "TDispManager1");
+    int *tileDim = pvApp->GetTileDimensions();
+    pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
+                           tileDim[0], tileDim[1]);
 
+    this->CompositeTclName = NULL;
+    this->SetCompositeTclName("TDispManager1");
+    }
+  else
+    {
+    // Create the compositer.
+    this->Composite = static_cast<vtkPVTreeComposite*>
+      (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
+
+    // Try using a more efficient compositer (if it exists).
+    // This should be a part of a module.
+    pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
+                           "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
+
+    this->CompositeTclName = NULL;
+    this->SetCompositeTclName("TreeComp1");
+
+    // If we are using SGI pipes, create a new Controller/Communicator/Group
+    // to use for compositing.
+    if (pvApp->GetUseRenderingGroup())
+      {
+      int numPipes = pvApp->GetNumberOfPipes();
+      // I would like to create another controller with a subset of world, but...
+      // For now, I added it as a hack to the composite manager.
+      pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
+                             this->CompositeTclName, numPipes);
+      }
+    }
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
                          this->RendererTclName);
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
@@ -694,7 +707,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // Otherwise I would have done this in "CreateRenderObjects".
   // Create the compositer.
 
-  if (this->Composite)
+  if (this->CompositeTclName)
     {
     // Since the render view is only on process 0, do not broadcast.
     this->GetPVApplication()->Script("%s SetRenderView %s", 
@@ -1687,14 +1700,18 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 void vtkPVRenderView::ResetCameraClippingRange()
 {
   // Avoid serialization.
-#ifdef VTK_USE_MPI
-  this->Composite->ResetCameraClippingRange(this->GetRenderer());
-#else
-  // If not parallel, forward to the renderer.
-  this->GetRenderer()->ResetCameraClippingRange();
-#endif
+  if (this->Composite)
+    {
+    this->Composite->ResetCameraClippingRange(this->GetRenderer());
+    }
+  else
+    {
+    // If not parallel, forward to the renderer.
+    this->GetRenderer()->ResetCameraClippingRange();
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AddBindings()
 {
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
@@ -1769,6 +1786,14 @@ void vtkPVRenderView::StartRender()
   float newReductionFactor;
   float maxReductionFactor;
   
+  // Tiled displays do not use pixel reduction LOD.
+  // This is not necessary because to caller already checks,
+  // but it clarifies the situation.
+  if (this->Composite == NULL)
+    {
+    return;
+    }
+
   if (!this->UseReductionFactor)
     {
     this->Composite->SetReductionFactor(1);
@@ -2594,7 +2619,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.215 $");
+  this->ExtractRevision(os,"$Revision: 1.216 $");
 }
 
 //------------------------------------------------------------------------------

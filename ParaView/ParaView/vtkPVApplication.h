@@ -252,6 +252,11 @@ public:
   vtkGetMacro(UseRenderingGroup, int);
 
   // Description:
+  // Varibles (command line argurments) set to render to a tiled display.
+  vtkGetMacro(UseTiledDisplay, int);
+  vtkGetVector2Macro(TileDimensions, int);
+
+  // Description:
   // This is used internally for specifying how many pipes
   // to use for rendering when UseRenderingGroup is defined.
   // All processes have this set to the same value.
@@ -289,6 +294,9 @@ protected:
   int UseRenderingGroup;
   char* GroupFileName;
   vtkSetStringMacro(GroupFileName);
+
+  int UseTiledDisplay;
+  int TileDimensions[2];
 
   // Need to put a global flag that indicates interactive rendering.
   // All process must be consistent in choosing LODs because
