@@ -2,6 +2,7 @@ ADD_EXECUTABLE( TestHashTable TestHashTable )
 ADD_EXECUTABLE( TestPointerArray TestPointerArray )
 ADD_EXECUTABLE( TestRegistery TestRegistery )
 ADD_EXECUTABLE( TestMemory TestMemory )
+ADD_EXECUTABLE( ConvertImage ConvertImage )
 
 ADD_TEST(TestHashTable ${CXX_TEST_PATH}/TestHashTable)
 ADD_TEST(TestPointerArray ${CXX_TEST_PATH}/TestPointerArray)
