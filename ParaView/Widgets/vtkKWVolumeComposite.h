@@ -76,7 +76,7 @@ public:
 
   // Description:
   // Get the prop for this composite
-  virtual vtkProp *GetProp() {return (vtkProp *)this->LODVolume;};
+  virtual vtkProp *GetProp();
 
   vtkGetObjectMacro( LODVolume, vtkLODProp3D );
   vtkGetMacro( RayCastID, int );

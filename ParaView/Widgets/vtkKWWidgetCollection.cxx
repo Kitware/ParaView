@@ -63,3 +63,17 @@ vtkKWWidget *vtkKWWidgetCollection::GetLastKWWidget()
     }
 }
 
+void vtkKWWidgetCollection::AddItem(vtkKWWidget *a) 
+{
+  this->vtkCollection::AddItem(static_cast<vtkObject *>(a));
+}
+
+void vtkKWWidgetCollection::RemoveItem(vtkKWWidget *a) 
+{
+  this->vtkCollection::RemoveItem(static_cast<vtkObject *>(a));
+}
+
+int vtkKWWidgetCollection::IsItemPresent(vtkKWWidget *a) 
+{
+  return this->vtkCollection::IsItemPresent(static_cast<vtkObject *>(a));
+}

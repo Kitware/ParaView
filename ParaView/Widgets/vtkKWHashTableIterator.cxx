@@ -87,23 +87,19 @@ void *vtkKWHashTableIterator::GetData()
 
 int vtkKWHashTableIterator::Next()
 {
-  //cout << "Find next" << endl;
   if ( !this->HashTable )
     {
-    //cout << "Iterator::Next() No hash table" << endl;
     return 0;
     }
   if ( this->HashTableElement && this->HashTableElement->Next )
     {
     this->HashTableElement = this->HashTableElement->Next;
-    //cout << "Iterator::Next() Found one in the linked list" << endl;
     this->Modified();
     return 1;
     }
   this->HashTableElement = 0;
   while ( !this->HashTableElement )
     {
-    //cout << "Bucket: " << this->Bucket << endl;
     this->Bucket++;
     if ( this->HashTableElement )
       {
@@ -111,19 +107,16 @@ int vtkKWHashTableIterator::Next()
       }
     if ( this->Bucket >= this->HashTable->NumberOfBuckets )
       {
-      //cout << "Iterator::Next() No more buckets" << endl;
       return 0;
       }
     this->HashTableElement = this->HashTable->Table[this->Bucket];
     }
   this->Modified();
-  //cout << "Iterator::Next() Found next one" << endl;
   return 1;
 }
 
 void vtkKWHashTableIterator::Reset()
 {
-  //cout << "Reset the iterator" << endl;
   this->HashTableElement = 0;
   this->Bucket = 0;
   this->HashTableElement = this->HashTable->Table[this->Bucket];
@@ -136,7 +129,6 @@ void vtkKWHashTableIterator::Reset()
 
 void vtkKWHashTableIterator::SetHashTable(vtkKWHashTable *table)
 {
-  //cout << "Set hash table" << endl;
   if ( !table )
     {
     if ( this->HashTable )

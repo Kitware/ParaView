@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.4");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.5");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -172,7 +172,7 @@ int vtkKWProcessStatistics::QueryMemory()
   fd = fopen("/proc/meminfo", "r" );
   if ( !fd ) 
     {
-    cout << "Problem opening /proc/meminfo" << endl;
+    vtkErrorMacro("Problem opening /proc/meminfo");
     return 0;
     }
   long temp;

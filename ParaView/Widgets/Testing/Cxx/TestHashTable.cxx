@@ -20,8 +20,6 @@ int main()
     "Will"
   };
 
-  //cout << "Testing KW Hash Table" << endl;
-
   vtkKWHashTable *ht = vtkKWHashTable::New();
 
   for ( cc =0 ; cc< 10; cc++ )
@@ -42,7 +40,6 @@ int main()
     char *name = ( char * )ht->Lookup( names[cc] );
     if ( name ) 
       {
-      // cout << key << ": " << name << endl;
       }
     else
       {      
@@ -69,7 +66,6 @@ int main()
     }
 
   vtkKWHashTableIterator *it = ht->Iterator();
-  //cout << "Traverse hash table:" << endl;
   if ( !it )
     {
     cout << "Cannot get the pointer. This is strange, since I just"

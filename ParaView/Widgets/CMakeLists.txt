@@ -40,7 +40,6 @@ vtkKWSaveImageDialog
 vtkKWScale 
 vtkKWSerializer 
 vtkKWSplitFrame
-vtkKWTclCommand
 vtkKWTclInteractor
 vtkKWText 
 vtkKWToolbar 
@@ -85,7 +84,6 @@ WRAP_EXCLUDE_FILES(
   vtktcl 
   vtkKWEvent
   vtkKWHashTable 
-  vtkKWTclCommand 
   vtkContainer
   vtkKWRegisteryUtilities
 )

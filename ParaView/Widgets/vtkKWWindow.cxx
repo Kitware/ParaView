@@ -859,11 +859,6 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     return;
     }
 
-  //cout << "Store recent menu to registry; MRU: " 
-  //     << this->RealNumberOfMRUFiles << endl;
-  //cout << "Storing recent files: " << endl;
-  //this->PrintRecentFiles();
-
   for (i = 0; i < this->NumberOfRecentFiles; i++)
     {
     sprintf(KeyNameP, "File%d", i);
@@ -887,7 +882,6 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
   char KeyNameP[10];
   char CmdNameP[10];
-  //cout << "vtkKWWindow::AddRecentFilesToMenu()" << endl;
   int i;
   char File[1024];
   char Cmd[1024];
@@ -949,7 +943,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.66 $");
+  this->ExtractRevision(os,"$Revision: 1.67 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1041,9 +1035,6 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
     this->RecentFiles = vtkKWPointerArray::New();
     }
 
-  //cout << "We have recent files: "
-  //     << this->RecentFiles << ", now let us put something in" << endl;
-  
   // Find current one
   vtkKWWindowMenuEntry *recent = 0;
   vtkKWWindowMenuEntry *kc = 0;
@@ -1057,7 +1048,6 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
       {
       recent = kc;
       // delete it from array
-      //cout << "Delete from array: " << kc->GetFile() << endl;
       this->RecentFiles->Remove(cc);
       break;
       }
@@ -1086,38 +1076,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
     }
 
   delete [] file;
-  //cout << "---------------------------------------" << endl;
 }
-
-void vtkKWWindow::PrintRecentFiles()
-{
-  if ( !this->RecentFiles )
-    {
-    cout << "No recent files" << endl;
-    return;
-    }
-  
-  cout << "Recent files: " << endl;
-  int cc;
-  for( cc=0; 
-       static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
-    {
-    vtkKWWindowMenuEntry *kc;
-    kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc);
-    if ( kc )
-      {
-      cout << " - " << kc->GetFile() << " (" 
-	   << kc->GetTarget()->GetTclName() << " " 
-	   << kc->GetCommand() << ")"
-	   << endl;
-      }
-    else
-      {
-      cout << " -- null " << endl;
-      }
-    }
-}
-
 
 int vtkKWWindow::SetRegisteryValue(int level, const char* subkey, 
 				   const char* key, 
@@ -1143,8 +1102,6 @@ int vtkKWWindow::SetRegisteryValue(int level, const char* subkey,
     = this->GetApplication()->GetRegistery(
       this->GetApplication()->GetApplicationName());
   res = reg->SetValue(buffer, key, value);
-  //cout << "SetRegisteryValue(" << buffer << ", " << key << ", "
-  //     << value << ")" << endl;
   return res;
 }
 
@@ -1166,7 +1123,6 @@ int vtkKWWindow::DeleteRegisteryValue(int level, const char* subkey,
     = this->GetApplication()->GetRegistery(
       this->GetApplication()->GetApplicationName());
   res = reg->DeleteValue(buffer, key);
-  //cout << "DeleteRegisteryValue(" << buffer << ", " << key << ")" << endl;
   return res;
 }
 
@@ -1191,7 +1147,6 @@ int vtkKWWindow::GetRegisteryValue(int level, const char* subkey,
     = this->GetApplication()->GetRegistery(
       this->GetApplication()->GetApplicationName());
   res = reg->ReadValue(buffer, key, buff);
-  //cout << "GetRegisteryValue(" << buffer << ", " << key << ")" << endl;
   if ( *buff )
     {
     strcpy(value, buff);

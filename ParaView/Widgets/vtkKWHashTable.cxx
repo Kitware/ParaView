@@ -93,7 +93,6 @@ vtkKWHashTable::~vtkKWHashTable()
 {
   this->Clean();
   delete [] this->Table;
-  //cout << "Items left: " << vtkKWHashTableItem::Count << endl;
 }
 
 
@@ -138,13 +137,11 @@ vtkKWHashTable::Lookup( unsigned long item )
   vtkKWHashTableItem *tmp;
 
   tmp = this->Table[slot];
-  //cout << "Looking " << slot << " in " << tmp << endl;
 
   while (tmp) 
     {
     if (tmp->Key == item) 
       {
-      //cout << "We found it" << endl;
       return tmp->Data;
       }
     tmp = tmp->Next;

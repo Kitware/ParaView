@@ -21,11 +21,9 @@ int main()
 
   char separate[] = "separate";
 
-  //cout << "Testing KW Pointer Array" << endl;
 
   vtkKWPointerArray *pa = vtkKWPointerArray::New();
 
-  //cout << "Insert ten names" << endl;
   for ( cc =0 ; cc< 10; cc++ )
     {
     int res = pa->Append( (void *)names[cc] );
@@ -37,15 +35,11 @@ int main()
       }
     }
 
-  //cout << "Retrieve eleven names" << endl;
-
   for ( cc=0; cc < 11; cc++ )
     {
     char *name = (char *)pa->Lookup(cc);
     if ( name )
       {
-      //cout << "At position: " << cc << " there is: " << name
-      //<< endl;
       }
     else
       {
@@ -58,21 +52,16 @@ int main()
       }
     }
 
-  //cout << "Remove every other name" << endl;
   for ( cc=1; cc<10; cc+= 2 )
     {
     pa->Remove(cc);
     }
-
-  //cout << "Retrieve names" << endl;
 
   for ( cc=0; cc < 11; cc++ )
     {
     char *name = (char *)pa->Lookup(cc);
     if ( name )
       {
-      //cout << "At position: " << cc << " there is: " << name
-      //<< endl;
       }
     else
       {
@@ -90,7 +79,6 @@ int main()
     cout << "Number of elements left: " << pa->GetSize() << endl;
     error = 1;
     }
-  //cout << "Insert hundred names" << endl;
   for ( cc =0 ; cc< 100; cc++ )
     {
     int res = pa->Prepend( (void *)separate );
@@ -107,8 +95,6 @@ int main()
     char *name = (char *)pa->Lookup(cc);
     if ( name )
       {
-      //cout << "At position: " << cc << " there is: " << name
-      //<< endl;
       }
     else
       {      
@@ -117,7 +103,6 @@ int main()
       error = 1;
       }
     }
-  // cout << "Remove all " << pa->GetSize() << " elements..." << endl;
   for ( ; pa->GetSize(); )
     {
     int res = pa->Remove(0);

@@ -86,21 +86,6 @@ private:
   void operator=(const vtkKWWidgetCollection&); // Not implemented
 };
 
-inline void vtkKWWidgetCollection::AddItem(vtkKWWidget *a) 
-{
-  this->vtkCollection::AddItem((vtkObject *)a);
-}
-
-inline void vtkKWWidgetCollection::RemoveItem(vtkKWWidget *a) 
-{
-  this->vtkCollection::RemoveItem((vtkObject *)a);
-}
-
-inline int vtkKWWidgetCollection::IsItemPresent(vtkKWWidget *a) 
-{
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
-}
-
 #endif
 
 

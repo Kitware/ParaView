@@ -79,6 +79,7 @@ int vtkKWDialog::Invoke()
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
+  this->Script("update idletasks");
   this->Script("grab %s",this->GetWidgetName());
   if ( this->Beep )
     {
@@ -104,6 +105,7 @@ void vtkKWDialog::Display()
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
+  this->Script("update idletasks");
   this->Script("grab %s",this->GetWidgetName());
 }
 

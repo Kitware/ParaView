@@ -290,8 +290,6 @@ protected:
   int InExit;
 
   vtkKWPointerArray *RecentFiles;
-  
-  void PrintRecentFiles();
 private:
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented
