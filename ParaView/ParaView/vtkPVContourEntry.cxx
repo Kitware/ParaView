@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.21");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.22");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -72,6 +72,8 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->NewValueEntry = vtkKWEntry::New();
   this->AddValueButton = vtkKWPushButton::New();
   this->DeleteValueButton = vtkKWPushButton::New();
+
+  this->SuppressReset = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -130,6 +132,7 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->Script("bind %s <Delete> {%s DeleteValueCallback}",
                this->ContourValuesList->GetWidgetName(),
                this->GetTclName());
+
   // We need focus for delete binding.
   this->Script("bind %s <Enter> {focus %s}",
                this->ContourValuesList->GetWidgetName(),
