@@ -27,7 +27,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkClientServerStream.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
@@ -37,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.55");
+vtkCxxRevisionMacro(vtkPVScale, "1.56");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
