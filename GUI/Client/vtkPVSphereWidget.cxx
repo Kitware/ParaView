@@ -44,7 +44,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -588,7 +588,7 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   if (vtkSM3DWidgetProxy::SafeDownCast(wdg))
     {
-    if(l == vtkKWEvent::WidgetModifiedEvent)
+    if(l == vtkCommand::WidgetModifiedEvent)
       {
       double center[3];
       double radius;

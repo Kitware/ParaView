@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.56");
+vtkCxxRevisionMacro(vtkPVScale, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -146,7 +146,7 @@ void vtkPVScale::CheckModifiedCallback()
 {
   this->ModifiedCallback();
   this->AcceptedCallback();
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
+  this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------

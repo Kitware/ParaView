@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -723,7 +723,7 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     this->GetCenterInternal(center);
     this->GetNormalInternal(normal);
 
-    if(l == vtkKWEvent::WidgetModifiedEvent)
+    if(l == vtkCommand::WidgetModifiedEvent)
       {
       this->CenterEntry[0]->SetValue(center[0]);
       this->CenterEntry[1]->SetValue(center[1]);

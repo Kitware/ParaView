@@ -222,7 +222,6 @@ class VTK_EXPORT vtkKWEvent
     InitializeTraceEvent,
     ManipulatorModifiedEvent,
     WarningMessageEvent,
-    WidgetModifiedEvent,
     //
     FinalBogusNotUsedEvent
   };

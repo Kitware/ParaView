@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.99");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.100");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -259,7 +259,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->Script("pack %s -fill x", this->FileListPopup->GetWidgetName());
 
   this->ListObserverTag = this->FileListSelect->AddObserver(
-    vtkKWEvent::WidgetModifiedEvent, 
+    vtkCommand::WidgetModifiedEvent, 
     this->Observer);
   frame->Delete();
 
@@ -1046,7 +1046,7 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
-  if ( event == vtkKWEvent::WidgetModifiedEvent && !this->IgnoreFileListEvents )
+  if ( event == vtkCommand::WidgetModifiedEvent && !this->IgnoreFileListEvents )
     {
     this->UpdateTimeStep();
     this->ModifiedCallback();

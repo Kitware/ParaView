@@ -64,7 +64,7 @@
 #include "vtkKWMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.112");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.113");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1026,7 +1026,7 @@ void vtkPVColorMap::InitializeObservers()
     this->ScalarBarObserver);
   this->ScalarBarProxy->AddObserver(vtkCommand::EndInteractionEvent, 
     this->ScalarBarObserver);
-  this->ScalarBarProxy->AddObserver(vtkKWEvent::WidgetModifiedEvent,
+  this->ScalarBarProxy->AddObserver(vtkCommand::WidgetModifiedEvent,
     this->ScalarBarObserver);
 }
 
@@ -2552,7 +2552,7 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 {
   switch ( event )
     {
-    case vtkKWEvent::WidgetModifiedEvent:
+    case vtkCommand::WidgetModifiedEvent:
       // the only things that have changed are the positions.
       // since we have no GUI for positions, we don't have any work to do here.
       //this->RenderView();

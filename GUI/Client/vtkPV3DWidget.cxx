@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.64");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.65");
 
 //===========================================================================
 //***************************************************************************
@@ -183,7 +183,7 @@ void vtkPV3DWidget::InitializeObservers(vtkSM3DWidgetProxy* widgetproxy)
 {
   if(widgetproxy)
     {
-    widgetproxy->AddObserver(vtkKWEvent::WidgetModifiedEvent,this->Observer);
+    widgetproxy->AddObserver(vtkCommand::WidgetModifiedEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::StartInteractionEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::EndInteractionEvent,this->Observer);
     }

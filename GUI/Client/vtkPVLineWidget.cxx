@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -692,7 +692,7 @@ void vtkPVLineWidget::DisplayLength(double len)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  if(l == vtkKWEvent::WidgetModifiedEvent)
+  if(l == vtkCommand::WidgetModifiedEvent)
     {
     double pos1[3];
     double pos2[3];

@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.29");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -190,7 +190,7 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
 {
   this->ModifiedCallback();
   this->AcceptedCallback();
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
+  this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------

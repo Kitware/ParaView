@@ -42,7 +42,7 @@
 #include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -892,7 +892,7 @@ double* vtkPVBoxWidget::GetScaleFromGUI()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long event, void* p)
 {
-  if(vtkSM3DWidgetProxy::SafeDownCast(wdg) && event == vtkKWEvent::WidgetModifiedEvent)
+  if(vtkSM3DWidgetProxy::SafeDownCast(wdg) && event == vtkCommand::WidgetModifiedEvent)
     {//case to update the display values from iVars
     this->UpdateFromBox();
     }

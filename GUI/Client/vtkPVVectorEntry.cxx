@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.67");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.68");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -200,7 +200,7 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
           }
         this->EntryValues[cc] = vtkString::Duplicate(this->GetEntry(cc)->GetValue());
         this->AcceptedCallback();
-        this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
+        this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
         }
       }
     }
