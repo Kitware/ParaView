@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.9");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -78,6 +78,7 @@ public:
 //----------------------------------------------------------------------------
 vtkXDMFReaderModule::vtkXDMFReaderModule()
 {
+  this->DomainGridFrame = 0;
   this->DomainMenu = 0;
 
   this->Domain = 0;
@@ -90,7 +91,23 @@ vtkXDMFReaderModule::vtkXDMFReaderModule()
 //----------------------------------------------------------------------------
 vtkXDMFReaderModule::~vtkXDMFReaderModule()
 {
+  this->SetDomain(0);
   delete this->Internals;
+  if ( this->DomainMenu )
+    {
+    this->DomainMenu->Delete();
+    this->DomainMenu = 0;
+    }
+  if ( this->GridSelection )
+    {
+    this->GridSelection->Delete();
+    this->GridSelection = 0;
+    }
+  if ( this->DomainGridFrame )
+    {
+    this->DomainGridFrame->Delete();
+    this->DomainGridFrame = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -140,19 +157,20 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->SetMasterWindow(this->GetPVWindow());
     dlg->Create(pvApp,0);
     dlg->SetText("Select Domain and Grids");
-    vtkKWLabeledFrame* frame = vtkKWLabeledFrame::New();
-    frame->SetParent(dlg->GetMessageDialogFrame());
-    frame->Create(pvApp, 0);
-    frame->SetLabel("Domain and Grids Selection");
+
+    this->DomainGridFrame = vtkKWLabeledFrame::New();
+    this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
+    this->DomainGridFrame->Create(pvApp, 0);
+    this->DomainGridFrame->SetLabel("Domain and Grids Selection");
 
     this->DomainMenu = vtkKWOptionMenu::New();
-    this->DomainMenu->SetParent(frame->GetFrame());
+    this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
     this->DomainMenu->Create(pvApp, 0);
     this->UpdateDomains(res);
 
 
     this->GridSelection = vtkKWListBox::New();
-    this->GridSelection->SetParent(frame->GetFrame());
+    this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
     this->GridSelection->ScrollbarOn();
     this->GridSelection->Create(pvApp, "-selectmode extended");
     this->GridSelection->SetHeight(0);
@@ -164,7 +182,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
       this->GridSelection->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
-      frame->GetWidgetName());
+      this->DomainGridFrame->GetWidgetName());
 
     if ( dlg->Invoke() )
       {
@@ -185,7 +203,10 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
     this->GridSelection->Delete();
     this->GridSelection = 0;
-    frame->Delete();
+
+    this->DomainGridFrame->Delete();
+    this->DomainGridFrame = 0;
+
     dlg->Delete();
 
     }

@@ -97,12 +97,11 @@ protected:
   vtkXDMFReaderModule();
   ~vtkXDMFReaderModule();
 
+  vtkKWLabeledFrame *DomainGridFrame;
   vtkKWOptionMenu *DomainMenu;
-
   vtkKWListBox* GridSelection;
 
   char *Domain;
-
   vtkXDMFReaderModuleInternal* Internals;
 
 private:
