@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.13");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -391,7 +391,7 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
     this->ColorTransferFunction->GetDataPointer()[id * 4]);
   if (old_size != this->GetFunctionSize())
     {
-    this->RedrawCanvasPoint(id);
+    this->RedrawCanvasElements();
     if (this->HasSelection() && id < this->SelectedPoint)
       {
       this->SelectPoint(this->SelectedPoint - 1);

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -440,7 +440,7 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
     this->PiecewiseFunction->GetDataPointer()[id * 2]);
   if (old_size != this->GetFunctionSize())
     {
-    this->RedrawCanvasPoint(id);
+    this->RedrawCanvasElements();
     if (this->HasSelection() && id < this->SelectedPoint)
       {
       this->SelectPoint(this->SelectedPoint - 1);
