@@ -60,7 +60,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.36");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.37");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -111,7 +111,6 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
 
-  this->Interpreter->SetLogFile("pvClient.out");
   app->Start(argc,argv);
 
   return app->GetExitStatus();

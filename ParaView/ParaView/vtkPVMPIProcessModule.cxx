@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.21");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.22");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -173,8 +173,6 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
     }
   this->ArgumentCount = argc;
   this->Arguments = argv;
-
-  this->Interpreter->SetLogFile("pvClient.out");
 
   // Go through the motions.
   // This indirection is not really necessary and is just to mimick the

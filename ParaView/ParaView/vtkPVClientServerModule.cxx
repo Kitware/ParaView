@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.56");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.57");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -234,8 +234,6 @@ void vtkPVClientServerModule::Initialize()
 
   if (this->ClientMode)
     {
-    this->Interpreter->SetLogFile("pvClient.out");
-
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -264,8 +262,6 @@ void vtkPVClientServerModule::Initialize()
     }
   else if (myId == 0)
     { // process 0 of Server
-    this->Interpreter->SetLogFile("pvServer.out");
-
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
