@@ -21,8 +21,11 @@
 #include "vtkCommand.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkGeometryFilter.h"
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+#include "vtkCompositeDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHierarchicalBoxOutlineFilter.h"
+#endif
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -35,7 +38,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.15");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.16");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -46,14 +49,18 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->UseStrips = 0;
   this->NumberOfRequiredInputs = 0;
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
   this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
+#endif
 }
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 {
   this->DataSetSurfaceFilter->Delete();
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
   this->HierarchicalBoxOutline->Delete();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +83,36 @@ vtkDataObject *vtkPVGeometryFilter::GetInput()
 }
 
 
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
+{
+  if (input->IsA("vtkDataSet"))
+    {
+    if (!static_cast<vtkDataSet*>(input)->CheckAttributes())
+      {
+      return 0;
+      }
+    }
+//   else if (input->IsA("vtkCompositeDataSet"))
+//     {
+//     vtkCompositeDataSet* compInput = 
+//       static_cast<vtkCompositeDataSet*>(input);
+//     vtkCompositeDataIterator* iter = compInput->NewIterator();
+//     while (!iter->IsDoneWithTraversal())
+//       {
+//       vtkDataObject* curDataSet = iter->GetCurrentDataObject();
+//       if (curDataSet && !this->CheckAttributes(curDataSet))
+//         {
+//         return 0;
+//         }
+//       iter->GoToNextItem();
+//       }
+//     iter->Delete();
+//     }
+  return 1;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::Execute()
 {
@@ -85,10 +122,11 @@ void vtkPVGeometryFilter::Execute()
     {
     return;
     }
-//   if (input->CheckAttributes())
-//     {
-//     return;
-//     }
+
+  if (!this->CheckAttributes(input))
+    {
+    return;
+    }
 
   if (input->IsA("vtkImageData"))
     {
@@ -123,14 +161,17 @@ void vtkPVGeometryFilter::Execute()
     this->DataSetExecute(static_cast<vtkDataSet*>(input));
     return;
     }
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
   if (input->IsA("vtkHierarchicalBoxDataSet"))
     {
     this->HierarchicalBoxExecute(static_cast<vtkHierarchicalBoxDataSet*>(input));
     return;
     }
+#endif
   return;
 }
 
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input)
 {
@@ -141,6 +182,7 @@ void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *inpu
   this->HierarchicalBoxOutline->Update();
   this->GetOutput()->ShallowCopy(this->HierarchicalBoxOutline->GetOutput());
 }
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)

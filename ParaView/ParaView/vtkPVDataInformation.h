@@ -60,7 +60,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInformation.h"
 
 class vtkCollection;
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 class vtkCompositeDataSet;
+#endif
 class vtkDataSet;
 class vtkPVDataSetAttributesInformation;
 
@@ -122,7 +124,9 @@ protected:
 
   void DeepCopy(vtkPVDataInformation *dataInfo);
 
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
+#endif
   void CopyFromDataSet(vtkDataSet* data);
 
   // Data information collected from remote processes.
