@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.286");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.287");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1963,6 +1963,8 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetNavigationFrame() << endl;
   os << indent << "TriangleStripsCheck: " 
      << this->GetTriangleStripsCheck() << endl;
+  os << indent << "ParallelProjectionCheck: "
+     << this->GetParallelProjectionCheck();
   os << indent << "ManipulatorControl2D: " 
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
