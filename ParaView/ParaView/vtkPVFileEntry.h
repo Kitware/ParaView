@@ -142,7 +142,11 @@ public:
   // Description:
   // For event handling.
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
-  
+
+  // Description:
+  // Callback for Timesteps button
+  void UpdateAvailableFiles();
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
@@ -181,7 +185,6 @@ protected:
   vtkPVFileEntryObserver* Observer;
 
   void UpdateTimeStep();
-  void UpdateAvailableFiles();
 
   int Initialized;
 
