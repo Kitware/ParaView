@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.177");
+vtkCxxRevisionMacro(vtkPVData, "1.178");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -3043,13 +3043,6 @@ void vtkPVData::GetActorTranslate(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorTranslate(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->TranslateThumbWheel[0]->SetValue(x);
   this->TranslateThumbWheel[1]->SetValue(y);
   this->TranslateThumbWheel[2]->SetValue(z);
@@ -3057,23 +3050,18 @@ void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
                                             this->PropTclName, x, y, z);
 
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
+  // Do not render here (do it in the callback, since it could be either
+  // Render or EventuallyRender depending on the interaction)
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorTranslate(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorTranslate(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->SetActorTranslateNoTrace(x, y, z);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 
   this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
                       this->GetTclName(), x, y, z);  
@@ -3093,6 +3081,10 @@ void vtkPVData::ActorTranslateCallback()
   point[1] = this->TranslateThumbWheel[1]->GetValue();
   point[2] = this->TranslateThumbWheel[2]->GetValue();
   this->SetActorTranslateNoTrace(point[0], point[1], point[2]);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->Render();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3124,13 +3116,6 @@ void vtkPVData::GetActorScale(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorScale(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->ScaleThumbWheel[0]->SetValue(x);
   this->ScaleThumbWheel[1]->SetValue(y);
   this->ScaleThumbWheel[2]->SetValue(z);
@@ -3138,23 +3123,18 @@ void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
                                             this->PropTclName, x, y, z);
 
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
+  // Do not render here (do it in the callback, since it could be either
+  // Render or EventuallyRender depending on the interaction)
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorScale(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorScale(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->SetActorScaleNoTrace(x, y, z);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 
   this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
                       this->GetTclName(), x, y, z);  
@@ -3174,6 +3154,10 @@ void vtkPVData::ActorScaleCallback()
   point[1] = this->ScaleThumbWheel[1]->GetValue();
   point[2] = this->ScaleThumbWheel[2]->GetValue();
   this->SetActorScaleNoTrace(point[0], point[1], point[2]);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->Render();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3205,13 +3189,6 @@ void vtkPVData::GetActorOrientation(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorOrientation(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->OrientationScale[0]->SetValue(x);
   this->OrientationScale[1]->SetValue(y);
   this->OrientationScale[2]->SetValue(z);
@@ -3219,23 +3196,18 @@ void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
                                             this->PropTclName, x, y, z);
 
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
+  // Do not render here (do it in the callback, since it could be either
+  // Render or EventuallyRender depending on the interaction)
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOrientation(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorOrientation(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->SetActorOrientationNoTrace(x, y, z);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 
   this->AddTraceEntry("$kw(%s) SetActorOrientation %f %f %f",
                       this->GetTclName(), x, y, z);  
@@ -3255,6 +3227,10 @@ void vtkPVData::ActorOrientationCallback()
   point[1] = this->OrientationScale[1]->GetValue();
   point[2] = this->OrientationScale[2]->GetValue();
   this->SetActorOrientationNoTrace(point[0], point[1], point[2]);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->Render();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3286,13 +3262,6 @@ void vtkPVData::GetActorOrigin(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorOrigin(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->OriginThumbWheel[0]->SetValue(x);
   this->OriginThumbWheel[1]->SetValue(y);
   this->OriginThumbWheel[2]->SetValue(z);
@@ -3300,23 +3269,18 @@ void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
                                             this->PropTclName, x, y, z);
 
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
+  // Do not render here (do it in the callback, since it could be either
+  // Render or EventuallyRender depending on the interaction)
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetActorOrigin(float x, float y, float z)
 {
-  float point[3];
-  this->GetActorOrigin(point);
-  if (x == point[0] && y == point[1] && z == point[2])
-    {
-    return;
-    }
-
   this->SetActorOriginNoTrace(x, y, z);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 
   this->AddTraceEntry("$kw(%s) SetActorOrigin %f %f %f",
                       this->GetTclName(), x, y, z);  
@@ -3336,6 +3300,10 @@ void vtkPVData::ActorOriginCallback()
   point[1] = this->OriginThumbWheel[1]->GetValue();
   point[2] = this->OriginThumbWheel[2]->GetValue();
   this->SetActorOriginNoTrace(point[0], point[1], point[2]);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3419,7 +3387,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.177 $");
+  this->ExtractRevision(os,"$Revision: 1.178 $");
 }
 
 //----------------------------------------------------------------------------
