@@ -228,6 +228,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 
   // Put the outputs in the canvas.
   outputs = currentSource->GetPVOutputs();
+  int numOutputs = currentSource->GetNumberOfPVOutputs();
   if (outputs)
     {
     y = 10;
@@ -235,9 +236,37 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
       {
       // only want to set xMid  once
       xMid = bboxSource[2] + 25;
-      for (i = 0; i < outputs[0]->GetNumberOfPVConsumers(); i++)
+      // We have two display modes:
+      // 1. If the number of outputs is > 1, we display the first
+      // consumer of each output (with the current implementation,
+      // there is no way of assigning more than one consumer to
+      // an output from the user interface if there are more than
+      // 1 outputs)
+      // 2. If there is only one output, we display all the consumers
+      // of that output
+      int num;
+      if (numOutputs > 1)
 	{
-        source = outputs[0]->GetPVConsumer(i);
+	num = numOutputs;
+	}
+      else
+	{
+	num = outputs[0]->GetNumberOfPVConsumers();
+	}
+      for (i = 0; i < num; i++)
+	{
+	if (numOutputs > 1)
+	  {
+	  if ( outputs[i]->GetNumberOfPVConsumers() == 0 )
+	    {
+	    continue;
+	    }
+	  source = outputs[i]->GetPVConsumer(0);
+	  }
+	else
+	  {
+	  source = outputs[0]->GetPVConsumer(i);
+	  }
         
         // Draw the name of the assembly .
         tmp = this->CreateCanvasItem(
@@ -440,12 +469,13 @@ void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, int x, int y)
+void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, 
+						   int x, int y)
 {
   //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
   vtkKWApplication *app = this->Application;
   ostrstream str;
-  if ( app->EvaluateBooleanExpression("%s DeleteCheck", module) )
+  if ( app->EvaluateBooleanExpression("%s IsDeletable", module) )
     {
     str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
     this->PopupMenu->SetEntryCommand("Delete", this, str.str());
