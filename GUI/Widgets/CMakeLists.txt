@@ -120,6 +120,14 @@ SET( KWWidgets_SRCS
   vtkKWXtEmbeddedWidget.cxx 
   )
 
+IF (PARAVIEW_USE_LOOKMARKS)
+  SET( KWWidgets_SRCS
+    ${KWWidgets_SRCS}
+    vtkKWLookmark.cxx 
+    vtkKWLookmarkFolder.cxx 
+    )
+ENDIF (PARAVIEW_USE_LOOKMARKS)
+
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
