@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.15");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -85,7 +85,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 
   this->UpdateVTKSourceParameters();
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("%s CanReadFile [%s GetFileName]",
+  pm->RootScript("%s CanReadBinaryFile [%s GetFileName]",
                  this->GetVTKSourceTclName(0),
                  this->GetVTKSourceTclName(0));
   if (atoi(pm->GetRootResult()) == 0)
