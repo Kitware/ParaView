@@ -43,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.6");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.7");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -126,9 +126,16 @@ void vtkDesktopDeliveryServer
     // Remove observers to RenderWindow.  We use the prm instead.
     if (this->ObservingRenderWindow)
       {
-      this->RenderWindow->RemoveObserver(this->StartRenderTag);
-      this->RenderWindow->RemoveObserver(this->EndRenderTag);
-      this->ObservingRenderWindow = false;
+      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+      vtkRenderer *ren;
+      rens->InitTraversal();
+      ren = rens->GetNextItem();
+      if (ren)
+        {
+        rens->RemoveObserver(this->StartRenderTag);
+        rens->RemoveObserver(this->EndRenderTag);
+        this->ObservingRenderWindow = false;
+        }
       }
     }
   else
@@ -139,23 +146,28 @@ void vtkDesktopDeliveryServer
       {
       vtkCallbackCommand *cbc;
         
-      this->ObservingRenderWindow = true;
+      vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+      vtkRenderer *ren;
+      rens->InitTraversal();
+      ren = rens->GetNextItem();
+      if (ren)
+        {
+        this->ObservingRenderWindow = true;
         
-      cbc= vtkCallbackCommand::New();
-      cbc->SetCallback(::SatelliteStartRender);
-      cbc->SetClientData((void*)this);
-      this->StartRenderTag
-    = this->RenderWindow->AddObserver(vtkCommand::StartEvent,cbc);
-      // renWin will delete the cbc when the observer is removed.
-      cbc->Delete();
+        cbc= vtkCallbackCommand::New();
+        cbc->SetCallback(::SatelliteStartRender);
+        cbc->SetClientData((void*)this);
+        this->StartRenderTag
+          = ren->AddObserver(vtkCommand::StartEvent,cbc);
+        cbc->Delete();
         
-      cbc = vtkCallbackCommand::New();
-      cbc->SetCallback(::SatelliteEndRender);
-      cbc->SetClientData((void*)this);
-      this->EndRenderTag
-    = this->RenderWindow->AddObserver(vtkCommand::EndEvent,cbc);
-      // renWin will delete the cbc when the observer is removed.
-      cbc->Delete();
+        cbc = vtkCallbackCommand::New();
+        cbc->SetCallback(::SatelliteEndRender);
+        cbc->SetClientData((void*)this);
+        this->EndRenderTag
+          = ren->AddObserver(vtkCommand::EndEvent,cbc);
+        cbc->Delete();
+        }
       }
     }
 }
@@ -166,10 +178,17 @@ void vtkDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 
   if (this->ObservingRenderWindow && this->ParallelRenderManager)
     {
-    // Don't need the observers we just attached.
-    this->RenderWindow->RemoveObserver(this->StartRenderTag);
-    this->RenderWindow->RemoveObserver(this->EndRenderTag);
-    this->ObservingRenderWindow = false;
+    vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
+    vtkRenderer *ren;
+    rens->InitTraversal();
+    ren = rens->GetNextItem();
+    if (ren)
+      {
+      // Don't need the observers we just attached.
+      ren->RemoveObserver(this->StartRenderTag);
+      ren->RemoveObserver(this->EndRenderTag);
+      this->ObservingRenderWindow = false;
+      }
     }
 }
 

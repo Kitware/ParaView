@@ -33,7 +33,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.13");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.14");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -105,13 +105,7 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
   this->Controller->Receive(&this->RemoteDisplay, 1, this->ServerProcessId,
                 vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
 
-  if (this->RemoteDisplay)
-    {
-    // Turn swap buffers off so we can put the final image into the render
-    // window before it is shown to the viewer.
-    this->RenderWindow->SwapBuffersOff();
-    }
-  else
+  if ( ! this->RemoteDisplay)
     {
     if (this->ImageReductionFactor > 1)
       {
@@ -228,10 +222,6 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
         }
       this->RenderWindowImageUpToDate = true;
       }
-
-    // Force swap buffers here.
-    this->RenderWindow->SwapBuffersOn();
-    this->RenderWindow->Frame();
     }
   else
     {
