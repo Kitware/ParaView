@@ -1,11 +1,8 @@
 #include "vtkKWPointerArray.h"
 #include <iostream.h>
-#include "vtkOutputWindow.h"
 
 int main()
 {
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-  vtkGenericWarningMacro("hello");
   int cc;
   char names[][10] = {
     "Andy",
@@ -110,8 +107,6 @@ int main()
 
   pa->Delete();
 
-
-  vtkGenericWarningMacro("hello");
   return 0;
 }
 
