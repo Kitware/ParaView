@@ -39,12 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkKWUNIXRegisteryUtilities.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkKWHashTable.h"
 #include "vtkKWHashTableIterator.h"
-#include <ctype.h>
+#include "vtkString.h"
+#include "vtkArrayMap.txx"
+#include "vtkArrayMapIterator.txx"
 
 #ifdef VTK_USE_ANSI_STDLIB
 #define VTK_IOS_NOCREATE 
@@ -52,65 +54,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_IOS_NOCREATE | ios::nocreate
 #endif
 
-vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-
-vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
-{
-  this->Entries = 0;
-  this->SubKey  = 0;
-}
-
-vtkKWUNIXRegisteryUtilities::~vtkKWUNIXRegisteryUtilities()
-{
-  if ( this->Entries )
-    {
-    this->Entries->Delete();
-    }
-}
-
 #define MStrDup(x) \
    x ? strcpy( new char[ strlen(x) + 1 ], x ) : 0
 
-class vtkKWUNIXRegisteryEntry
-{  
-public:
-  vtkKWUNIXRegisteryEntry( const char *key, const char *value )
-    {
-      this->Key = MStrDup(key);
-      this->Value = MStrDup(value);
-      this->Count ++;
-    }
-
-  ~vtkKWUNIXRegisteryEntry()
-    {
-      if ( this->Key )
-	{
-	delete [] this->Key;
-	}
-      if ( this->Value )
-	{
-	delete [] this->Value;
-	}
-      this->Count--;
-    }
-  void SetValue(const char* value)
-    {
-      if ( this->Value )
-	{
-	delete [] this->Value;
-	}
-      this->Value = MStrDup(value);
-    }  
-
-  char *Key;
-  char *Value;
-  static int Count;
-};
-int vtkKWUNIXRegisteryEntry::Count = 0;
-
 #define BUFFER_SIZE 1024
+
+vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
+
+//----------------------------------------------------------------------------
+vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
+{
+  this->EntriesMap = 0;
+  this->SubKey  = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkKWUNIXRegisteryUtilities::~vtkKWUNIXRegisteryUtilities()
+{
+  if ( this->EntriesMap )
+    {
+    this->EntriesMap->Delete();
+    }
+}
+
+
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
-					       const char *subkey, int readonly)
+					      const char *subkey, 
+					      int readonly)
 {  
   int res = 0;
   int cc;
@@ -140,9 +111,9 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
     delete ifs;
     return 0;
     }
-  if ( !this->Entries )
+  if ( !this->EntriesMap )
     {
-    this->Entries = vtkKWHashTable::New();
+    this->EntriesMap = vtkKWUNIXRegisteryUtilities::StringStringMap::New();
     }
 
   res = 1;
@@ -171,8 +142,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
 	char *value = line + cc + 1;
 	char *nkey = this->Strip(key);
 	char *nvalue = this->Strip(value);
-	this->Entries->Insert( nkey, 
-			       new vtkKWUNIXRegisteryEntry(nkey, nvalue) );
+	this->EntriesMap->SetItem( nkey, nvalue );
 	this->Empty = 0;
 	delete [] key;
 	found = 1;	
@@ -190,36 +160,14 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::CloseInternal()
 {
   int res = 0;
   if ( !this->Changed )
     {
-    vtkKWHashTableIterator *it = this->Entries->Iterator();
-    if ( it )
-      {
-      while ( it )
-	{
-	if ( it->Valid() )
-	  {      
-	  //unsigned long key = it->GetKey();
-	  void *value = it->GetData();
-	  if ( value )
-	    {
-	    vtkKWUNIXRegisteryEntry *ku 
-	      = static_cast<vtkKWUNIXRegisteryEntry *>(value);
-	    delete ku;	    
-	    }	
-	  }
-	if ( !it->Next() )
-	  {
-	  break;
-	  }
-	}
-      it->Delete();
-      }
-    this->Entries->Delete();
-    this->Entries = 0;
+    this->EntriesMap->Delete();
+    this->EntriesMap = 0;
     this->Empty = 1;
     this->SetSubKey(0);
     return 1;
@@ -248,39 +196,23 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
        << "# key = value" << endl
        << "#" << endl;
 
-  if ( this->Entries )
+  if ( this->EntriesMap )
     {
-    vtkKWHashTableIterator *it = this->Entries->Iterator();
-    if ( !it )
+    vtkKWUNIXRegisteryUtilities::StringStringMap::IteratorType *it
+      = this->EntriesMap->NewIterator();
+    while ( !it->IsDoneWithTraversal() )
       {
-      res = 1;
+      const char *key = 0;
+      const char *value = 0;
+      it->GetKey(key);
+      it->GetData(value);
+      *ofs << key << " = " << value << endl;
+      it->GoToNextItem();
       }
-    else 
-      {
-      while ( it )
-	{
-	if ( it->Valid() )
-	  {      
-	  // unsigned long key = it->GetKey();
-	  void *value = it->GetData();
-	  if ( value )
-	    {
-	    vtkKWUNIXRegisteryEntry *ku 
-	      = static_cast<vtkKWUNIXRegisteryEntry *>(value);
-	    *ofs << ku->Key << " = " << ku->Value << endl;
-	    delete ku;
-	    }	
-	  }
-	if ( !it->Next() )
-	  {
-	  break;
-	  }
-	}
-      it->Delete();
-      }
+    it->Delete();
     }
-  this->Entries->Delete();
-  this->Entries=0;
+  this->EntriesMap->Delete();
+  this->EntriesMap = 0;
   ofs->close();
   res = 1;
   this->SetSubKey(0);
@@ -288,6 +220,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
 						   char *value)
 
@@ -298,83 +231,51 @@ int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
     {
     return 0;
     }
-  if ( this->Entries->Lookup( key ) )
+  const char* val = 0;
+  if ( this->EntriesMap->GetItem(key, val) == VTK_OK )
     {
-    vtkKWUNIXRegisteryEntry *en = static_cast<vtkKWUNIXRegisteryEntry*>(
-      this->Entries->Lookup( key ) );
-    strcpy(value, en->Value);
+    strcpy(value, val);
     res = 1;
     }
   delete [] key;
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::DeleteKeyInternal(const char* vtkNotUsed(key))
 {
   int res = 0;
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::DeleteValueInternal(const char *skey)
 {
-  int res = 0;
   char *key = this->CreateKey( skey );
   if ( !key )
     {
     return 0;
     }
-  if ( this->Entries->Lookup( key ) )
-    {
-    vtkKWUNIXRegisteryEntry *en = static_cast<vtkKWUNIXRegisteryEntry*>(
-      this->Entries->Lookup( key ) );
-    if ( strcmp(en->Key, key) == 0 )
-      {
-      if ( this->Entries->Remove( key ) )
-	{
-	delete en;
-	res = 1;
-	}
-      }
-    }
+  this->EntriesMap->RemoveItem(key);
   delete [] key;
-  return res;
+  return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::SetValueInternal(const char *skey, 
-						   const char *value)
+						  const char *value)
 {
-  int res = 0;
-  vtkKWUNIXRegisteryEntry *en = 0;
   char *key = this->CreateKey( skey );
   if ( !key )
     {
     return 0;
     }
-  if ( this->Entries->Lookup( key ) )
-    {
-    en = static_cast<vtkKWUNIXRegisteryEntry*>( 
-      this->Entries->Lookup( key ) );
-    en->SetValue(value);
-    res = 1;
-    this->Empty = 0;
-    }
-  if ( !en )
-    {
-    en = new vtkKWUNIXRegisteryEntry(key, value);
-    if ( this->Entries->Insert( key, en ) )
-      {
-      res = 1;
-      this->Empty = 0;
-      }
-    else
-      {
-      delete en;
-      }
-    }
+  this->EntriesMap->SetItem(key, value);
   delete [] key;
-  return res;
+  return 1;
 }
 
+//----------------------------------------------------------------------------
 char *vtkKWUNIXRegisteryUtilities::CreateKey( const char *key )
 {
   char *newkey;

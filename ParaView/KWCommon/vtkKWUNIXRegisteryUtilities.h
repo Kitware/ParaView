@@ -45,13 +45,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWRegisteryUtilities.h"
 
-class vtkKWHashTable;
+//BTX
+template<class KeyType,class DataType> class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkKWUNIXRegisteryUtilities : public vtkKWRegisteryUtilities
 {
 public:
   static vtkKWUNIXRegisteryUtilities* New();
   vtkTypeMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
+
+//BTX  
+  typedef vtkArrayMap<const char*, const char*> StringStringMap;
+//ETX
 
   // Description:
   // Read a value from the registry.
@@ -71,7 +77,8 @@ public:
 
   // Description:
   // Open the registry at toplevel/subkey.
-  virtual int OpenInternal(const char *toplevel, const char *subkey, int readonly);
+  virtual int OpenInternal(const char *toplevel, const char *subkey, 
+			   int readonly);
   
   // Description:
   // Close the registry.
@@ -85,7 +92,7 @@ protected:
   char *CreateKey(const char *key);
 
 private:
-  vtkKWHashTable *Entries;
+  StringStringMap *EntriesMap;
   char *SubKey;
 };
 
