@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.504");
+vtkCxxRevisionMacro(vtkPVWindow, "1.505");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1543,7 +1543,11 @@ void vtkPVWindow::MouseAction(int action,int button,
 void vtkPVWindow::Configure(int width, int height)
 {
   this->MainView->Configured();
-  this->Interactor->UpdateSize(width, height);
+  // The above Configured call could have changed the size of the render
+  // window, so get the size from there instead of using the input width and
+  // height.
+  int *size = this->MainView->GetRenderWindowSize();
+  this->Interactor->UpdateSize(size[0], size[1]);
   this->Interactor->ConfigureEvent();
 }
 
