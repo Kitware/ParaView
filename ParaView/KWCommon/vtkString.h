@@ -22,7 +22,7 @@
 #define __vtkString_h
 
 #include "vtkObject.h"
-#include <time.h> /* for time_t, until VTK provides a int64 */
+#include <time.h> // for time_t, until VTK provides a int64 
 
 class VTK_EXPORT vtkString : public vtkObject
 {
