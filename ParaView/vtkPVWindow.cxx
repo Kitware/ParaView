@@ -1192,6 +1192,69 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
   
+
+  // ---- Arrow Source ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkArrowSource");
+  sInt->SetRootName("Arrow");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("TipResolution");
+  mInt->SetSetCommand("SetTipResolution");
+  mInt->SetGetCommand("GetTipResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of faces on the tip.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("TipRadius");
+  mInt->SetSetCommand("SetTipRadius");
+  mInt->SetGetCommand("GetTipRadius");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the widest part of the tip.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("TipLength");
+  mInt->SetSetCommand("SetTipLength");
+  mInt->SetGetCommand("GetTipLength");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the length of the tip (the whole arrow is length 1)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ShaftResolution");
+  mInt->SetSetCommand("SetShaftResolution");
+  mInt->SetGetCommand("GetShaftResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of faces on shaft");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ShaftRadius");
+  mInt->SetSetCommand("SetShaftRadius");
+  mInt->SetGetCommand("GetShaftRadius");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the shaft");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- Axes ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -2699,6 +2762,50 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
   
+  // ---- InhibitPoints ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkInhibitPoints");
+  sInt->SetRootName("InhibPts");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  sInt->DefaultVectorsOn();
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Scale");
+  mInt->SetSetCommand("SetScale");
+  mInt->SetGetCommand("GetScale");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the size of the inihibition neighborhood.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("MagnitudeThreshold");
+  mInt->SetSetCommand("SetMagnitudeThreshold");
+  mInt->SetGetCommand("GetMagnitudeThreshold");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Vectors smaller that this are not considered.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GenerateVertices");
+  mInt->SetSetCommand("SetGenerateVertices");
+  mInt->SetGetCommand("GetGenerateVertices");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Flag to create vertex cells/");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- LinearExtrusion ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
