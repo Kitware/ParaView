@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkOutlineSource.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkCommand.h"
 
 
 //------------------------------------------------------------------------------
@@ -122,9 +122,15 @@ void vtkImageOutlineFilter::UpdateData(vtkDataObject *vtkNotUsed(output))
     }
  
   // If there is a start method, call it
-  if ( this->StartMethod )
+//  if ( this->StartMethod )
+//    {
+//    (*this->StartMethod)(this->StartMethodArg);
+//    }
+  
+  if ( this->StartTag )
     {
-    (*this->StartMethod)(this->StartMethodArg);
+    // All the examples of using this I see have NULL as the 2nd parameter.
+    this->InvokeEvent(vtkCommand::StartEvent, NULL);
     }
 
   // Execute this object - we have not aborted yet, and our progress
@@ -148,9 +154,14 @@ void vtkImageOutlineFilter::UpdateData(vtkDataObject *vtkNotUsed(output))
     }
 
   // Call the end method, if there is one
-  if ( this->EndMethod )
+//  if ( this->EndMethod )
+//    {
+//    (*this->EndMethod)(this->EndMethodArg);
+//    }
+  
+  if ( this->EndTag )
     {
-    (*this->EndMethod)(this->EndMethodArg);
+    this->InvokeEvent(vtkCommand::EndEvent, NULL);
     }
     
   // Now we have to mark the data as up to data.

@@ -1322,14 +1322,15 @@ void vtkPVSource::CancelCallback()
     this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
     this->GetWindow()->GetSourceList()->Update();    
 
+    // Delete the source on the other processes.  Removing it from the
+    // view's list of composites amounts to deleting the source on the
+    // local processor because it's the last thing that has a reference to it.
+    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+      {
+      pvApp->BroadcastScript("%s Delete", this->GetTclName());
+      }
+
     this->GetWindow()->GetMainView()->RemoveComposite(this);
-    
-    // How do we delete the sources in all processes ???
-//    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-//      {
-//      pvApp->BroadcastScript("%s Delete", this->GetTclName());
-//      }
-//    this->Delete();
     }
   else
     {

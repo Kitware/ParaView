@@ -644,7 +644,7 @@ void vtkPVWindow::CreateImageReader()
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
   
-  reader->SetName("image reader");
+  reader->SetName("imageReader");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);
   
