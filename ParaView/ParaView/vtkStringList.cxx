@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.7");
+vtkCxxRevisionMacro(vtkStringList, "1.8");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -97,7 +97,23 @@ char *vtkStringList::GetString(int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkStringList::AddString(const char *format, ...)
+void vtkStringList::AddString(const char* str)
+{
+  // Check to see if we need to extent to array of commands.
+  if (this->StringArrayLength <= this->NumberOfStrings)
+    {
+    // Yes.
+    this->Reallocate(this->StringArrayLength + 20);
+    }
+  
+  // Allocate the string for and set the new command.
+  this->Strings[this->NumberOfStrings] = new char[strlen(str) + 2];
+  strcpy(this->Strings[this->NumberOfStrings], str);
+  this->NumberOfStrings += 1;  
+}
+
+//----------------------------------------------------------------------------
+void vtkStringList::AddFormattedString(const char* format, ...)
 {
   static char event[16000];
 
@@ -105,18 +121,8 @@ void vtkStringList::AddString(const char *format, ...)
   va_start(var_args, format);
   vsprintf(event, format, var_args);
   va_end(var_args);
-
-  // Check to see if we need to extent to array of commands.
-  if (this->StringArrayLength <= this->NumberOfStrings)
-    { // Yes.
-    this->Reallocate(this->StringArrayLength + 20);
-    }
-
-  // Allocate the string for and set the new command.
-  this->Strings[this->NumberOfStrings] 
-              = new char[strlen(event) + 2];
-  strcpy(this->Strings[this->NumberOfStrings], event);
-  this->NumberOfStrings += 1;
+  
+  this->AddString(event);
 }
 
 //----------------------------------------------------------------------------

@@ -57,11 +57,15 @@ public:
   vtkTypeRevisionMacro(vtkStringList,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-//BTX
   // Description:
-  // Add a command and format it any way you like/
-  void AddString(const char *EventString, ...);
-//ETX
+  // Add a simple string.
+  void AddString(const char* str);
+  
+  //BTX
+  // Description:
+  // Add a command and format it any way you like.
+  void AddFormattedString(const char* EventString, ...);
+  //ETX
   
   // Description:
   // Initialize to empty.
