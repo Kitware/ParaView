@@ -86,6 +86,11 @@ public:
   virtual int GetElementIndexFromFinalList(const char* element);
 
   // Description:
+  // Remove items from the list.
+  virtual void RemoveItemsFromSourceList();
+  virtual void RemoveItemsFromFinalList();
+
+  // Description:
   // Callbacks.
   virtual void AddCallback();
   virtual void AddAllCallback();

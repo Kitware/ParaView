@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.2");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -350,6 +350,19 @@ int vtkKWListSelectOrder::GetElementIndexFromSourceList(const char* element)
 int vtkKWListSelectOrder::GetElementIndexFromFinalList(const char* element)
 {
   return this->FinalList->GetItemIndex(element);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::RemoveItemsFromSourceList()
+{
+  this->SourceList->DeleteAll();
+  this->Modified();
+}
+
+void vtkKWListSelectOrder::RemoveItemsFromFinalList()
+{
+  this->FinalList->DeleteAll();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
