@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.95");
+vtkCxxRevisionMacro(vtkKWWidget, "1.96");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -331,7 +331,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.95 $");
+  this->ExtractRevision(os,"$Revision: 1.96 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1610,6 +1610,84 @@ void vtkKWWidget::Configure(const char* opts)
     this->GetWidgetName(), opts);
 }
 
+/*
+ *--------------------------------------------------------------
+ *
+ * TkImageGetColor --
+ *
+ *  This procedure converts a pixel value to three floating
+ *      point numbers, representing the amount of red, green, and 
+ *      blue in that pixel on the screen.  It makes use of colormap
+ *      data passed as an argument, and should work for all Visual
+ *      types.
+ *
+ *  This implementation is bogus on Windows because the colormap
+ *  data is never filled in.  Instead all postscript generated
+ *  data coming through here is expected to be RGB color data.
+ *  To handle lower bit-depth images properly, XQueryColors
+ *  must be implemented for Windows.
+ *
+ * Results:
+ *  Returns red, green, and blue color values in the range 
+ *      0 to 1.  There are no error returns.
+ *
+ * Side effects:
+ *  None.
+ *
+ *--------------------------------------------------------------
+ */
+
+/*
+ * The following definition is used in generating postscript for images
+ * and windows.
+ */
+
+struct vtkKWWidgetTkColormapData {  /* Hold color information for a window */
+  int separated;    /* Whether to use separate color bands */
+  int color;      /* Whether window is color or black/white */
+  int ncolors;    /* Number of color values stored */
+  XColor *colors;    /* Pixel value -> RGB mappings */
+  int red_mask, green_mask, blue_mask;  /* Masks and shifts for each */
+  int red_shift, green_shift, blue_shift;  /* color band */
+};
+
+static void
+vtkKWWidgetTkImageGetColor(vtkKWWidgetTkColormapData* cdata,
+  unsigned long pixel, double *red, double *green, double *blue)
+//TkColormapData *cdata;              /* Colormap data */
+//unsigned long pixel;                /* Pixel value to look up */
+//double *red, *green, *blue;         /* Color data to return */
+#ifdef WIN32
+
+/*
+ * We could just define these instead of pulling in windows.h.
+#define GetRValue(rgb)  ((BYTE)(rgb))
+#define GetGValue(rgb)  ((BYTE)(((WORD)(rgb)) >> 8))
+#define GetBValue(rgb)  ((BYTE)((rgb)>>16))
+*/
+
+{
+  *red   = (double) GetRValue(pixel) / 255.0;
+  *green = (double) GetGValue(pixel) / 255.0;
+  *blue  = (double) GetBValue(pixel) / 255.0;
+}
+#else
+{
+  if (cdata->separated) {
+    int r = (pixel & cdata->red_mask) >> cdata->red_shift;
+    int g = (pixel & cdata->green_mask) >> cdata->green_shift;
+    int b = (pixel & cdata->blue_mask) >> cdata->blue_shift;
+    *red   = cdata->colors[r].red / 65535.0;
+    *green = cdata->colors[g].green / 65535.0;
+    *blue  = cdata->colors[b].blue / 65535.0;
+  } else {
+    *red   = cdata->colors[pixel].red / 65535.0;
+    *green = cdata->colors[pixel].green / 65535.0;
+    *blue  = cdata->colors[pixel].blue / 65535.0;
+  }
+}
+#endif
+
 //----------------------------------------------------------------------------
 int vtkKWWidget::TakeScreenDump(const char* fname)
 {
@@ -1644,7 +1722,6 @@ int vtkKWWidget::TakeScreenDump(const char* fname)
     return 0;
     }
 
-#if defined(VTK_USE_X)
   Tk_Window image_window;
 
   image_window = Tk_MainWindow (this->Application->GetMainInterp());
@@ -1664,35 +1741,78 @@ int vtkKWWidget::TakeScreenDump(const char* fname)
     buffer_size = ximage->bytes_per_line * ximage->height * ximage->depth;
     }
 
-  unsigned long pixel;
-  unsigned long mask[3];
-  unsigned int shift0[3], shift8[3];
+  vtkKWWidgetTkColormapData cdata;
+  Colormap cmap;
+  Visual *visual;
+  int i, ncolors;
+  cmap = Tk_Colormap(image_window);
+  visual = Tk_Visual(image_window);
 
-  mask[0] = ximage->red_mask;
-  mask[1] = ximage->green_mask;
-  mask[2] = ximage->blue_mask;
-  if (!mask[0] || !mask[1] || !mask[2]) 
+  /*
+   * Obtain information about the colormap, ie the mapping between
+   * pixel values and RGB values.  The code below should work
+   * for all Visual types.
+   */
+
+  ncolors = visual->map_entries;
+  cdata.colors = (XColor *) ckalloc(sizeof(XColor) * ncolors);
+  cdata.ncolors = ncolors;
+
+  if (visual->c_class == DirectColor || visual->c_class == TrueColor) 
     {
-    vtkErrorMacro("unsupported screen depth; bailing out");
-    XDestroyImage(ximage);
-    return 0;
+    cdata.separated = 1;
+    cdata.red_mask = visual->red_mask;
+    cdata.green_mask = visual->green_mask;
+    cdata.blue_mask = visual->blue_mask;
+    cdata.red_shift = 0;
+    cdata.green_shift = 0;
+    cdata.blue_shift = 0;
+    while ((0x0001 & (cdata.red_mask >> cdata.red_shift)) == 0)
+      cdata.red_shift ++;
+    while ((0x0001 & (cdata.green_mask >> cdata.green_shift)) == 0)
+      cdata.green_shift ++;
+    while ((0x0001 & (cdata.blue_mask >> cdata.blue_shift)) == 0)
+      cdata.blue_shift ++;
+    for (i = 0; i < ncolors; i ++)
+      cdata.colors[i].pixel =
+        ((i << cdata.red_shift) & cdata.red_mask) |
+        ((i << cdata.green_shift) & cdata.green_mask) |
+        ((i << cdata.blue_shift) & cdata.blue_mask);
+    } 
+  else 
+    {
+    cdata.separated=0;
+    for (i = 0; i < ncolors; i ++)
+      cdata.colors[i].pixel = i;
+    }
+  if (visual->c_class == StaticGray || visual->c_class == GrayScale)
+    {
+    cdata.color = 0;
+    }
+  else
+    {
+    cdata.color = 1;
     }
 
-  int i;
-  for (i = 0; i < 3; i++) 
+  XQueryColors(Tk_Display(image_window), cmap, cdata.colors, ncolors);
+
+  /*
+   * Figure out which color level to use (possibly lower than the 
+   * one specified by the user).  For example, if the user specifies
+   * color with monochrome screen, use gray or monochrome mode instead. 
+   */
+
+  int level = 2;
+  if (!cdata.color && level == 2) 
     {
-    shift0[i] = 0;
-    while (!(mask[i] & (1 << shift0[i])))
-      {
-      shift0[i]++;
-      }
-    shift8[i] = shift0[i];
-    while (mask[i] & (1 << shift8[i]))
-      {
-      shift8[i]++;
-      }
-    shift8[i] = 8 - (shift8[i] - shift0[i]);
+    level = 1;
     }
+
+  if (!cdata.color && cdata.ncolors == 2) 
+    {
+    level = 0;
+    }
+
 
   vtkImageData* id = vtkImageData::New();
   id->SetDimensions(ww, hh, 1);
@@ -1706,10 +1826,13 @@ int vtkKWWidget::TakeScreenDump(const char* fname)
     {
     for (x = 0; x < ww; x++) 
       {
-      pixel = (*ximage->f.get_pixel)(ximage, x, hh-y);
-      ptr[0] = (pixel & mask[0]) >> shift0[0] << shift8[0];
-      ptr[1] = (pixel & mask[1]) >> shift0[1] << shift8[1];
-      ptr[2] = (pixel & mask[2]) >> shift0[2] << shift8[2];
+      double red, green, blue;
+      vtkKWWidgetTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y),
+        &red, &green, &blue);
+      ptr[0] = (unsigned char)(255 * red);
+      ptr[1] = (unsigned char)(255 * green);
+      ptr[2] = (unsigned char)(255 * blue);
+      //std::cout << "RGB: " << ptr[0] << " " << ptr[1] << " " << ptr[2] << endl;
       ptr += 3;
       }
     }
@@ -1722,7 +1845,6 @@ int vtkKWWidget::TakeScreenDump(const char* fname)
 
   XDestroyImage(ximage);
   res = 1; 
-#endif
 
   return res;
 }
