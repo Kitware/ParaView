@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.8");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.9");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -277,7 +277,8 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
   while ( this->ReceiveProgressFromSatellite(&id, &progress) );
   vtkClientServerID nid;
   nid.ID = id;
-  vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
+  vtkObjectBase* base = 
+    app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid, 1);
   if ( base )
     {
     char buffer[1024];
