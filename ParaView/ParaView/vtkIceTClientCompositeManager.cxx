@@ -48,7 +48,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.8");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.9");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -195,9 +195,10 @@ void vtkIceTClientCompositeManager::GatherZBufferValueRMI(int , int ){}
 
 //-------------------------------------------------------------------------
 // We may want to pass the render window as an argument for a sanity check.
-void vtkIceTClientCompositeManagerStartRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event), 
-                                 void *clientData, void *)
+void vtkIceTClientCompositeManagerStartRender(vtkObject *,
+                                              unsigned long, 
+                                              void *clientData, 
+                                              void *)
 {
   vtkIceTClientCompositeManager *self = (vtkIceTClientCompositeManager *)clientData;
   
