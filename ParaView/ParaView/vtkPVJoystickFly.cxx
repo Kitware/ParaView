@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.5");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.6");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -308,6 +308,7 @@ void vtkPVJoystickFly::ComputeCameraAxes(vtkRenderer* ren)
 void vtkPVJoystickFly::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FlySpeed: " << this->FlySpeed << endl;
 }
 
 

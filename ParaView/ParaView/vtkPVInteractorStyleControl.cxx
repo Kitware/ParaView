@@ -616,4 +616,5 @@ void vtkPVInteractorStyleControl::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DefaultManipulator: " << (this->DefaultManipulator?this->DefaultManipulator:"None") << endl;
   os << indent << "ManipulatorCollection: " << this->ManipulatorCollection << endl;
   os << indent << "RegisteryName: " << (this->RegisteryName?this->RegisteryName:"none") << endl;
+  os << indent << "CurrentManipulator: " << this->CurrentManipulator << endl;
 }
