@@ -43,7 +43,7 @@ public:
 protected: 
   // Description:
   // Add machine information from the xml tag <Machine ....>
-  int vtkPVServerOptions::AddMachineInformation(const char** atts);
+  int AddMachineInformation(const char** atts);
   // Description:
   // Default constructor.
   vtkPVServerOptions();
