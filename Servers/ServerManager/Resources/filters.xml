@@ -2112,7 +2112,7 @@
        name="Input"
        command="SetInput">
           <ProxyGroupDomain name="groups">
-            <Group name="glyph_sources"/>
+            <Group name="sources"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkImageData"/>
@@ -2170,7 +2170,7 @@
        name="Input"
        command="SetInput">
           <ProxyGroupDomain name="groups">
-            <Group name="glyph_sources"/>
+            <Group name="sources"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
@@ -2183,7 +2183,7 @@
         name="Source"
         command="SetSource">
            <ProxyGroupDomain name="groups">
-             <Group name="probe_sources"/>
+             <Group name="sources"/>
            </ProxyGroupDomain>
       </InputProperty>
    <!-- End Probe -->
@@ -2196,7 +2196,7 @@
        clean_command="RemoveAllInputs"
        multiple_input="1">
           <ProxyGroupDomain name="groups">
-            <Group name="glyph_sources"/>
+            <Group name="sources"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
@@ -2209,7 +2209,7 @@
         name="Source"
         command="SetSource">
            <ProxyGroupDomain name="groups">
-             <Group name="streamline_sources"/>
+             <Group name="sources"/>
            </ProxyGroupDomain>
       </InputProperty>
 
