@@ -503,6 +503,9 @@ void vtkPVArrayCalculator::CreateProperties()
                this->CalculatorFrame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 6 -minsize 40",
                this->CalculatorFrame->GetFrame()->GetWidgetName());
+
+  this->UpdateParameterWidgets();
+
 }
 
 void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
