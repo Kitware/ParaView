@@ -159,6 +159,10 @@ public:
   void ProcessMessage(unsigned char* arg, size_t len);
   
   // Description:
+  // Send current ClientServerStream data to the client
+  virtual void SendStreamToClient();
+  
+  // Description:
   // Send current ClientServerStream data to the server
   virtual void SendStreamToServer();
   
@@ -170,7 +174,12 @@ public:
   // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream* GetLastResultStream();
+  virtual const vtkClientServerStream* GetLastServerResult();
+
+  // Description:
+  // Return a message containing the result of the last call made on
+  // the client.
+  virtual const vtkClientServerStream* GetLastClientResult();
   friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
   //ETX
 protected:
@@ -198,6 +207,7 @@ protected:
   int MultiProcessMode;
   int NumberOfProcesses;
   
+  vtkClientServerStream* LastServerResultStream;
   vtkClientServerInterpreter* ServerInterpreter;
   
   vtkKWRemoteExecute* RemoteExecution;

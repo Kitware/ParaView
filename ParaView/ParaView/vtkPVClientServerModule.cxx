@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.3");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.4");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -271,7 +271,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 {
   this->ServerInterpreter = 0;
   this->ClientServerStream = new vtkClientServerStream;
-  this->LastResultStream = new vtkClientServerStream;
+  this->LastServerResultStream = new vtkClientServerStream;
   this->Controller = NULL;
   this->SocketController = NULL;
   this->ClientMode = 1;
@@ -293,7 +293,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::~vtkPVClientServerModule()
 {
-  delete this->LastResultStream;
+  delete this->LastServerResultStream;
   if (this->Controller)
     {
     this->Controller->Delete();
@@ -359,12 +359,24 @@ void vtkPVClientServerModule::Initialize()
     this->ClientInterpreter = vtkClientServerInterpreter::New();
     this->ClientInterpreter->SetLogFile("c:/pvClient.out");
     Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+    this->GetStream()
+      << vtkClientServerStream::Assign
+      << this->GetApplicationID() << this->GetPVApplication()
+      << vtkClientServerStream::End;
+    this->ClientInterpreter->ProcessStream(this->GetStream());
+    this->GetStream().Reset();
     }
   else
     {
     this->ServerInterpreter = vtkClientServerInterpreter::New();
     this->ServerInterpreter->SetLogFile("c:/pvServer.out");
     Vtkparaviewcswrapped_Initialize(this->ServerInterpreter);
+    this->GetStream()
+      << vtkClientServerStream::Assign
+      << this->GetApplicationID() << this->GetPVApplication()
+      << vtkClientServerStream::End;
+    this->ServerInterpreter->ProcessStream(this->GetStream());
+    this->GetStream().Reset();
     }
   
   if (this->ClientMode)
@@ -1101,9 +1113,12 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
   this->ServerInterpreter->ProcessStream(msg, len);
 }
 
+const vtkClientServerStream* vtkPVClientServerModule::GetLastClientResult()
+{
+  return this->ClientInterpreter->GetLastResult();
+}
 
-
-const vtkClientServerStream* vtkPVClientServerModule::GetLastResultStream()
+const vtkClientServerStream* vtkPVClientServerModule::GetLastServerResult()
 {  
   if(!this->Application)
     {
@@ -1125,8 +1140,15 @@ const vtkClientServerStream* vtkPVClientServerModule::GetLastResultStream()
     }
   unsigned char* result = new unsigned char[length];
   this->SocketController->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
-  this->LastResultStream->SetData(result, length);
-  return this->LastResultStream;
+  this->LastServerResultStream->SetData(result, length);
+  return this->LastServerResultStream;
+}
+
+void vtkPVClientServerModule::SendStreamToClient()
+{
+  // Just process the stream locally.
+  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
 }
 
 //----------------------------------------------------------------------------

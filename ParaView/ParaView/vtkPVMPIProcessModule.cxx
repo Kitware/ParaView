@@ -68,11 +68,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInformation.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.1");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.2");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -175,6 +177,10 @@ void vtkPVMPIProcessModule::Initialize()
     }
 }
 
+// Declare the initialization function as external
+// this is defined in the PackageInit file
+extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
+
 
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
@@ -192,6 +198,17 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->ArgumentCount = argc;
   this->Arguments = argv;
  
+  this->ClientServerStream = new vtkClientServerStream;
+  this->ClientInterpreter = vtkClientServerInterpreter::New();
+  this->ClientInterpreter->SetLogFile("pvClient.out");
+  Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+  this->GetStream()
+    << vtkClientServerStream::Assign
+    << this->GetApplicationID() << this->GetPVApplication()
+    << vtkClientServerStream::End;
+  this->ClientInterpreter->ProcessStream(this->GetStream());
+  this->GetStream().Reset();
+
   // Go through the motions.
   // This indirection is not really necessary and is just to mimick the
   // threaded controller.

@@ -185,19 +185,30 @@ public:
   // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream* GetLastResultStream();
+  virtual const vtkClientServerStream* GetLastServerResult();
+
+  // Description:
+  // Return a message containing the result of the last call made on
+  // the client.
+  virtual const vtkClientServerStream* GetLastClientResult();
 //ETX
   // Description:
+
+  // Send the current vtkClientServerStream contents to the client only.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClient();
 
   // Send the current vtkClientServerStream contents to the server.
   // Also reset the vtkClientServerStream object.
   virtual void SendStreamToServer();
-  
+
   // Description:
   // Send current ClientServerStream data to the server and the client.
+  // Also reset the vtkClientServerStream object.
   virtual void SendStreamToClientAndServer();
 
   vtkClientServerID GetUniqueID();
+  vtkClientServerID GetApplicationID();
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -211,7 +222,6 @@ protected:
 
   vtkClientServerInterpreter* ClientInterpreter;
   vtkClientServerStream* ClientServerStream;
-  vtkClientServerStream* LastResultStream;
   vtkClientServerID UniqueID;
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.5");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.6");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -98,7 +98,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->UniqueID.ID = 3;
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
-  this->RootResult = NULL; 
+  this->RootResult = NULL;
   this->ClientServerStream = 0;
   this->ClientInterpreter = 0;
 }
@@ -136,20 +136,25 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   vtkPVApplication *app = this->GetPVApplication();
   // For SGI pipes option.
   app->SetNumberOfPipes(1);
-    
+
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-  app->SetupTrapsForSignals(myId);   
+  app->SetupTrapsForSignals(myId);
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
 
   this->InitializeTclMethodImplementations();
-  
+
 
   this->ClientServerStream = new vtkClientServerStream;
   this->ClientInterpreter = vtkClientServerInterpreter::New();
   this->ClientInterpreter->SetLogFile("c:/pvClient.out");
   Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+  this->GetStream()
+    << vtkClientServerStream::Assign
+    << this->GetApplicationID() << app
+    << vtkClientServerStream::End;
+  this->ClientInterpreter->ProcessStream(this->GetStream());
 
   app->Start(argc,argv);
 
@@ -179,7 +184,7 @@ void vtkPVProcessModule::BroadcastScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -190,19 +195,19 @@ void vtkPVProcessModule::BroadcastScript(const char* format, ...)
   va_start(ap, format);
   int length = this->Application->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->BroadcastSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -214,7 +219,7 @@ void vtkPVProcessModule::ServerScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -225,19 +230,19 @@ void vtkPVProcessModule::ServerScript(const char* format, ...)
   va_start(ap, format);
   int length = this->Application->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->ServerSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -254,7 +259,7 @@ void vtkPVProcessModule::BroadcastSimpleScript(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::ServerSimpleScript(const char *str)
 {
-  // Do this so that only the client server process module 
+  // Do this so that only the client server process module
   // needs to implement this method.
   this->BroadcastSimpleScript(str);
 }
@@ -264,7 +269,7 @@ void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-    
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -275,19 +280,19 @@ void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
   va_start(ap, format);
   int length = this->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
-  va_end(var_args);  
-  
+  va_end(var_args);
+
   this->RemoteSimpleScript(id, buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -313,7 +318,7 @@ void vtkPVProcessModule::RemoteSimpleScript(int remoteId, const char *str)
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetNumberOfPartitions()
-{ 
+{
   return 1;
 }
 
@@ -321,7 +326,7 @@ int vtkPVProcessModule::GetNumberOfPartitions()
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherInformation(vtkPVInformation* info, 
+void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
                                            char* objectTclName)
 {
   // Just a simple way of passing the information object to the next
@@ -332,15 +337,15 @@ void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
     {
     this->ServerScript(
       "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName); 
+      info->GetClassName(), objectTclName);
     }
   else
     {
     this->RootScript(
       "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName); 
+      info->GetClassName(), objectTclName);
     }
-  this->TemporaryInformation = NULL; 
+  this->TemporaryInformation = NULL;
 }
 
 
@@ -368,24 +373,24 @@ void vtkPVProcessModule::RootScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   va_list ap;
   va_start(ap, format);
   int length = this->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->RootSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -520,10 +525,10 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
     {
     return 0;
     }
-  
+
   // We are the server.  Just return the object from the local
   // interpreter.
-  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);  
+  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);
   vtkObject* obj = this->GetPVApplication()->TclToVTKObject(name.c_str());
   vtkPolyData* dobj = vtkPolyData::SafeDownCast(obj);
   if(dobj)
@@ -539,21 +544,27 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClient()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVProcessModule::SendStreamToServer()
-{ 
+{
   this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
   this->ClientServerStream->Reset();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SendStreamToClientAndServer()
-{ 
+{
   this->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
 vtkClientServerID vtkPVProcessModule::NewStreamObject(const char* type)
-{ 
+{
   vtkClientServerStream& stream = this->GetStream();
   vtkClientServerID id = this->GetUniqueID();
   stream << vtkClientServerStream::New << type
@@ -576,15 +587,29 @@ void vtkPVProcessModule::DeleteStreamObject(vtkClientServerID id)
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream* vtkPVProcessModule::GetLastResultStream()
+const vtkClientServerStream* vtkPVProcessModule::GetLastServerResult()
 {
   return this->ClientInterpreter->GetLastResult();
 }
 
+//----------------------------------------------------------------------------
+const vtkClientServerStream* vtkPVProcessModule::GetLastClientResult()
+{
+  return this->GetLastServerResult();
+}
+
+//----------------------------------------------------------------------------
 vtkClientServerID vtkPVProcessModule::GetUniqueID()
 {
-  UniqueID.ID++;
-  return UniqueID;
+  this->UniqueID.ID++;
+  return this->UniqueID;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::GetApplicationID()
+{
+  vtkClientServerID id = {1};
+  return id;
 }
 
 //----------------------------------------------------------------------------
@@ -597,4 +622,3 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "RootResult: " << this->RootResult << endl;
     }
 }
-
