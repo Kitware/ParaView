@@ -899,7 +899,7 @@ dnl AC_CHECK_TOOL(AR, ar)
 
 	    # AIX v<=4.1 has some different flags than 4.2+
 	    if test "$system" = "AIX-4.1" -o "`uname -v`" -lt "4" ; then
-		LIBOBJS="$LIBOBJS tclLoadAix.o"
+		AC_LIBOBJ([tclLoadAix])
 		DL_LIBS="-lld"
 	    fi
 
@@ -2261,7 +2261,7 @@ AC_DEFUN(SC_BUGGY_STRTOD, [
 	    AC_MSG_RESULT(ok)
 	else
 	    AC_MSG_RESULT(buggy)
-	    LIBOBJS="$LIBOBJS fixstrtod.o"
+	    AC_LIBOBJ([fixstrtod])
 	    AC_DEFINE(strtod, fixstrtod)
 	fi
     fi
