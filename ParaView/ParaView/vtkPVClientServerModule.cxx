@@ -270,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.19");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.20");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -360,9 +360,6 @@ void vtkPVClientServerModule::Initialize()
     return;
     } 
 
-  // Setup the interpreter for this process.
-  this->InitializeInterpreter();
-
   if (this->ClientMode)
     {
     this->Interpreter->SetLogFile("pvClient.out");
@@ -445,9 +442,6 @@ void vtkPVClientServerModule::Initialize()
     this->Controller->ProcessRMIs();    
     // Now we are exiting.
     }
-
-  // Delete the interpreter for this process.
-  this->FinalizeInterpreter();
 }
 
 

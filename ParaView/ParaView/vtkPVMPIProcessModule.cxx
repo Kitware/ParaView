@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.13");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.14");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -216,7 +216,6 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->ArgumentCount = argc;
   this->Arguments = argv;
 
-  this->InitializeInterpreter();
   this->Interpreter->SetLogFile("pvClient.out");
 
   // Go through the motions.
@@ -227,7 +226,6 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
 
   this->Controller->Finalize();
 
-  this->FinalizeInterpreter();
   return this->ReturnValue;
 }
 

@@ -226,6 +226,12 @@ public:
   // Description:
   // Get the interpreter used on the local process.
   virtual vtkClientServerInterpreter* GetInterpreter();
+
+  // Description:
+  // Initialize/Finalize the process module's
+  // vtkClientServerInterpreter.
+  virtual void InitializeInterpreter();
+  virtual void FinalizeInterpreter();
   //ETX
 
   // Description:
@@ -251,8 +257,6 @@ protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
-  virtual void InitializeInterpreter();
-  virtual void FinalizeInterpreter();
   static void InterpreterCallbackFunction(vtkObject* caller,
                                           unsigned long eid,
                                           void* cd, void* d);

@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.26");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.27");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -140,10 +140,8 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
 
-  this->InitializeInterpreter();
   this->Interpreter->SetLogFile("pvClient.out");
   app->Start(argc,argv);
-  this->FinalizeInterpreter();
 
   return app->GetExitStatus();
 }
@@ -609,25 +607,6 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-// ClientServer wrapper initialization functions.
-extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
-#ifdef VTK_USE_PATENTED
-extern void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
-#endif
-extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
-extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
-#ifdef PARAVIEW_LINK_XDMF
-extern void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
-#endif
-
-//----------------------------------------------------------------------------
 void vtkPVProcessModule::InitializeInterpreter()
 {
   if(this->Interpreter)
@@ -645,24 +624,6 @@ void vtkPVProcessModule::InitializeInterpreter()
   this->InterpreterObserver->SetClientData(this);
   this->Interpreter->AddObserver(vtkCommand::ErrorEvent,
                                  this->InterpreterObserver);
-
-  // Initialize built-in wrapper modules.
-  vtkCommonCS_Initialize(this->Interpreter);
-  vtkFilteringCS_Initialize(this->Interpreter);
-  vtkImagingCS_Initialize(this->Interpreter);
-  vtkGraphicsCS_Initialize(this->Interpreter);
-  vtkIOCS_Initialize(this->Interpreter);
-  vtkRenderingCS_Initialize(this->Interpreter);
-  vtkHybridCS_Initialize(this->Interpreter);
-  vtkParallelCS_Initialize(this->Interpreter);
-#ifdef VTK_USE_PATENTED
-  vtkPatentedCS_Initialize(this->Interpreter);
-#endif
-  vtkPVFiltersCS_Initialize(this->Interpreter);
-  vtkParaViewServerCS_Initialize(this->Interpreter);
-#ifdef PARAVIEW_LINK_XDMF
-  vtkXdmfCS_Initialize(this->Interpreter);
-#endif
 
   // Assign standard IDs.
   vtkPVApplication *app = this->GetPVApplication();
