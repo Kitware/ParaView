@@ -118,6 +118,12 @@ public:
   static void SetLabelCaseToLowercaseFirst() 
     {vtkKWLabeledFrame::SetLabelCase(VTK_KW_LABEL_CASE_LOWERCASE_FIRST);};
 
+  // Description:
+  // Globally enable or disable bold label.
+  // By default it is globally disabled.
+  static void BoldLabelOn();
+  static void BoldLabelOff();
+
 protected:
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
@@ -132,6 +138,7 @@ protected:
   vtkKWIcon       *IconData;
   int Displayed;
   static int AllowShowHide;
+  static int BoldLabel;
   static int LabelCase;
   int ShowHideFrame;
 private:
