@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkDataSet.h"
 #include "vtkKWPushButton.h"
+#include "vtkPVSourceCollection.h"
 
 class vtkPVActorComposite;
 class vtkPVSource;
@@ -129,6 +130,15 @@ public:
   
   void ShowActorComposite();
   
+  // Description:
+  // We are keeping the forward links.  I have not 
+  // considered deleting objects properly.
+  // These methods are used internally. They are not meant to be called
+  // by the user.
+  void AddPVSourceToUsers(vtkPVSource *s);
+  void RemovePVSourceFromUsers(vtkPVSource *s);
+  vtkPVSourceCollection *GetPVSourceUsers() {return this->PVSourceCollection;}
+
 protected:
   vtkPVData();
   ~vtkPVData();
@@ -145,6 +155,11 @@ protected:
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
   vtkPVAssignment *Assignment;
+
+    // Keep a list of sources that are using this data.
+  // We may want to have a list that does not reference
+  // count the sources.
+  vtkPVSourceCollection *PVSourceCollection;
 };
 
 #endif

@@ -62,6 +62,8 @@ vtkPVData::vtkPVData()
   
   // This is initialized in "Clone();"
   this->ActorComposite = NULL;
+
+  this->PVSourceCollection = vtkPVSourceCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +84,9 @@ vtkPVData::~vtkPVData()
   
   this->ActorCompositeButton->Delete();
   this->ActorCompositeButton = NULL;
+
+  this->PVSourceCollection->Delete();
+  this->PVSourceCollection = NULL;  
 }
 
 //----------------------------------------------------------------------------
@@ -640,6 +645,17 @@ void vtkPVData::Update()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVData::AddPVSourceToUsers(vtkPVSource *s)
+{
+  this->PVSourceCollection->AddItem(s);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::RemovePVSourceFromUsers(vtkPVSource *s)
+{
+  this->PVSourceCollection->RemoveItem(s);
+}
 
 
 

@@ -62,8 +62,20 @@ void vtkPVDataSetToPolyDataFilter::SetInput(vtkPVData *pvData)
     }  
   
   f->SetInput(pvData->GetData());
-  // What about reference counting???
-  this->Input = pvData;
+
+  // Handle reference counting and the reverse link.
+  if (this->Input)
+    {
+    this->Input->RemovePVSourceFromUsers(this);
+    this->Input->UnRegister(this);
+    this->Input = NULL;
+    }
+  if (pvData)
+    {
+    pvData->Register(this);
+    this->Input = pvData;
+    this->Input->AddPVSourceToUsers(this);
+    }
 }
 
 

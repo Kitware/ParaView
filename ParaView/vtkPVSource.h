@@ -153,6 +153,11 @@ public:
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
 
+  // Description:
+  // A call back method from the Navigation window.
+  // This sets the input source as the selected composite.
+  void SelectSource(vtkPVSource *source);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -168,9 +173,13 @@ protected:
 
   // Just one input for now.
   vtkPVData *Input;
-  char *Name;
-  vtkKWWidget *Properties;
+  // The name is just for display.
+  char      *Name;
+
+  vtkKWWidget       *Properties;
   vtkKWLabeledFrame *NavigationFrame;
+  vtkKWWidget       *NavigationCanvas;
+  void              UpdateNavigationCanvas();
   vtkKWLabeledFrame *ParameterFrame;
   
   int DataCreated;

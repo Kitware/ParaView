@@ -461,6 +461,14 @@ SOURCE=.\vtkPVSource.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVSourceCollection.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSourceCollectionTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVSourceList.cxx
 # End Source File
 # Begin Source File
@@ -1455,6 +1463,26 @@ SOURCE=.\vtkPVSource.h
 # Begin Custom Build
 InputPath=.\vtkPVSource.h
 InputName=vtkPVSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSourceCollection.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVSourceCollection.h
+InputName=vtkPVSourceCollection
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
