@@ -37,6 +37,7 @@ class vtkProbeFilter;
 class vtkProcessObject;
 class vtkPVApplicationObserver;
 class vtkPVProgressHandler;
+class vtkKWLoadSaveDialog;
 class vtkSMApplication;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
@@ -71,6 +72,11 @@ public:
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
   //ETX
+
+  // Description:
+  // Get a file selection dialog instance.
+  virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
+
 
   // Description:
   // Start running the main application.

@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.84");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.85");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -318,7 +318,7 @@ void vtkPVFileEntry::BrowseCallback()
 {
   ostrstream str;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   const char* fname = this->Entry->GetValue();
 
   vtkPVApplication* pvApp = pm->GetPVApplication();

@@ -109,10 +109,6 @@ public:
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
                                   vtkStringList* files, int save);
   
-  // Description:
-  // Get a file selection dialog instance.
-  virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
-  
 //BTX
   enum 
     {

@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.581");
+vtkCxxRevisionMacro(vtkPVWindow, "1.582");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1785,7 +1785,7 @@ void vtkPVWindow::OpenCallback()
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetParent(this);
@@ -2261,7 +2261,7 @@ void vtkPVWindow::WriteData()
   char* types = vtkString::Duplicate(typesStr.str());
   typesStr.rdbuf()->freeze(0);
   
-  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
   saveDialog->SaveDialogOn();

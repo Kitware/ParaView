@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.132");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.133");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1405,7 +1405,7 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   int numPartitions = pm->GetNumberOfPartitions();
   
-  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();

@@ -20,7 +20,6 @@
 #include "vtkDoubleArray.h"
 #include "vtkDummyController.h"
 #include "vtkFloatArray.h"
-#include "vtkKWLoadSaveDialog.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
@@ -47,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.49");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
@@ -184,13 +183,6 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
     {
     return 0;
     }
-}
-
-//----------------------------------------------------------------------------
-vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
-{
-  vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
-  return dialog;
 }
 
 //----------------------------------------------------------------------------

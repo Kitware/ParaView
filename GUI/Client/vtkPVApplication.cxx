@@ -84,7 +84,8 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkProcessModule.h"
 // #include "vtkPVRenderGroupDialog.h"
-
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkPVServerFileDialog.h"
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <signal.h>
@@ -107,7 +108,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.285");
+vtkCxxRevisionMacro(vtkPVApplication, "1.286");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2513,3 +2514,14 @@ char* vtkPVApplication::GetTextRepresentation(vtkPVSource* comp)
   return buffer;
 }
 
+vtkKWLoadSaveDialog* vtkPVApplication::NewLoadSaveDialog()
+{
+  if(!this->ClientMode)
+    {
+      return vtkKWLoadSaveDialog::New();
+    }
+  vtkPVServerFileDialog* dialog = vtkPVServerFileDialog::New();
+  dialog->SetMasterWindow(this->GetMainWindow());
+  return dialog;
+  
+}

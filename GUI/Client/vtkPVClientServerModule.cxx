@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.86");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.87");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1040,14 +1040,6 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     files->RemoveAllItems();
     return 0;
     }
-}
-
-//----------------------------------------------------------------------------
-vtkKWLoadSaveDialog* vtkPVClientServerModule::NewLoadSaveDialog()
-{
-  vtkPVServerFileDialog* dialog = vtkPVServerFileDialog::New();
-  dialog->SetMasterWindow(this->GetPVApplication()->GetMainWindow());
-  return dialog;
 }
 
 //----------------------------------------------------------------------------
