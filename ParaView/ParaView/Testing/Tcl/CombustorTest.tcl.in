@@ -33,20 +33,20 @@ set pvExtract [$eInt CreateCallback]
 $pvExtract UpdateParameterWidgets
 $pvExtract AcceptCallback
 
-[$pvExtract GetNthPVOutput 0] SetVisibility 0
+[$pvExtract GetPVOutput] SetVisibility 0
 
 set pvGlyph [$pvWindow GlyphCallback]
 $pvGlyph AcceptCallback
 
-[$pvGlyph GetNthPVOutput 0] ColorByProperty
+[$pvGlyph GetPVOutput] ColorByProperty
 [$pvGlyph GetVTKSource] SetScaleFactor 3.0
 $pvGlyph UpdateParameterWidgets
 $pvGlyph AcceptCallback
 
-[$pvGlyph GetNthPVOutput 0] SetVisibility 0
+[$pvGlyph GetPVOutput] SetVisibility 0
 
 
-set cntOutput [$cInt GetNthPVOutput 0]
+set cntOutput [$cInt GetPVOutput]
 
 set camera [Ren1 GetActiveCamera]
 $camera SetPosition -29.1076 -40.3242 38.8874
@@ -57,7 +57,7 @@ $camera SetClippingRange 34.7159 82.3051
 
 # Vary isosuface
 $cntOutput SetVisibility 1
-[$pvPlot3D GetNthPVOutput 0] SetVisibility 1
+[$pvPlot3D GetPVOutput] SetVisibility 1
 
 RenWin1 SetSize 300 300
 
@@ -103,7 +103,7 @@ $camera SetClippingRange 18.5955 61.8423
 $pvExtract UpdateParameterWidgets
 $pvExtract AcceptCallback
 
-[$pvExtract GetNthPVOutput 0] SetVisibility 1
+[$pvExtract GetPVOutput] SetVisibility 1
 
 
 RenWin1 Render
@@ -126,7 +126,7 @@ for {set i 23} {$i >= 0} {incr i -1} {
 
 }
 
-[$pvGlyph GetNthPVOutput 0] SetVisibility 1
+[$pvGlyph GetPVOutput] SetVisibility 1
 
 $camera SetPosition 36.8437 -0.196199 53.7392
 $camera SetFocalPoint -5.92921 -0.324064 18.022

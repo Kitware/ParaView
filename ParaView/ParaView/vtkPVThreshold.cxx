@@ -103,7 +103,7 @@ void vtkPVThreshold::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources());
   
@@ -128,9 +128,9 @@ void vtkPVThreshold::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  if (this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetScalars())
+  if (this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars())
     {
-    this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetScalars()->GetRange(range);
+    this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars()->GetRange(range);
     }
   else
     {
@@ -170,8 +170,7 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 {
   float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
-  char *arrayName = this->ScalarOperationMenu->GetValue();
+  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
 
   if ( ! this->TraceInitialized)
     {
@@ -191,35 +190,35 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   
   if (strcmp(newMode, "point") == 0)
     {
-    if (thresholdInput->GetPointData()->GetArray(arrayName))
-      {
-      thresholdInput->GetPointData()->GetArray(arrayName)->GetRange(range);
-      }
-    else
-      {
+    //if (thresholdInput->GetPointData()->GetArray(arrayName))
+    //  {
+    //  thresholdInput->GetPointData()->GetArray(arrayName)->GetRange(range);
+    //  }
+    //else
+    //  {
       range[0] = 0;
       range[1] = 1;
-      }
+    //  }
     ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUsePointData();
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
-    this->ScalarOperationMenu->UsePointDataOn();
+    //this->ScalarOperationMenu->UsePointDataOn();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    if (thresholdInput->GetCellData()->GetArray(arrayName))
-      {
-      thresholdInput->GetCellData()->GetArray(arrayName)->GetRange(range);
-      }
-    else
-      {
+    //if (thresholdInput->GetCellData()->GetArray(arrayName))
+    //  {
+    //  thresholdInput->GetCellData()->GetArray(arrayName)->GetRange(range);
+    //  }
+    //else
+    //  {
       range[0] = 0;
       range[1] = 1;
-      }
+    //  }
     ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUseCellData();
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
-    this->ScalarOperationMenu->UsePointDataOff();
+    //this->ScalarOperationMenu->UsePointDataOff();
     }
 
   this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
@@ -227,37 +226,38 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   this->MinMaxScale->SetMaxValue(range[1]);
   this->MinMaxScale->SetMinValue(range[0]);
   
-  this->ScalarOperationMenu->FillMenu();
+  //this->ScalarOperationMenu->FillMenu();
 }
 
 void vtkPVThreshold::UpdateScalars()
 {
   float range[2];
-  char *arrayName;
   int attributeMode;
-  vtkDataArray *dataArray;
   
   this->vtkPVSource::UpdateScalars();
-  arrayName = this->ScalarOperationMenu->GetValue();
+  //arrayName = this->ScalarOperationMenu->GetValue();
   attributeMode = ((vtkThreshold*)this->GetVTKSource())->GetAttributeMode();
   
   if (attributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA)
     {
-    dataArray = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetArray(arrayName);
-    if (dataArray)
-      {
-      dataArray->GetRange(range);
-      }
+    //dataArray = this->GetPVInput()->GetVTKData()->GetPointData()->GetArray(arrayName);
+    //if (dataArray)
+    //  {
+    //  dataArray->GetRange(range);
+    //  }
     }
   else if (attributeMode == VTK_ATTRIBUTE_MODE_USE_CELL_DATA)
     {
-    dataArray = this->GetNthPVInput(0)->GetVTKData()->GetCellData()->GetArray(arrayName);
-    if (dataArray)
-      {
-      dataArray->GetRange(range);
-      }
+    //dataArray = this->GetPVInput()->GetVTKData()->GetCellData()->GetArray(arrayName);
+    //if (dataArray)
+    //  {
+    //  dataArray->GetRange(range);
+    //  }
     }
   
+  range[0] = 0;
+  range[1] = 1;
+
   this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
   this->MinMaxScale->SetRange(range[0], range[1]);
   this->MinMaxScale->SetMaxValue(range[1]);
@@ -270,20 +270,17 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
   char *charFound;
   int pos;
   vtkPVSourceInterface *pvsInterface =
-    this->GetNthPVInput(0)->GetPVSource()->GetInterface();
+        this->GetPVInput()->GetPVSource()->GetInterface();
   
   if (this->DefaultScalarsName)
     {
-    *file << "vtkFieldDataToAttributeDataFilter "
-          << this->ChangeScalarsFilterTclName << "\n\t"
-          << this->ChangeScalarsFilterTclName << " SetInput [";
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
@@ -295,23 +292,17 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
       delete [] dataName;
       }
     else
       {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n\t";
       }
-    *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n\t";
-    *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n\t";
-    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-          << this->DefaultScalarsName << " 0\n\n";
     }
 
   *file << this->VTKSource->GetClassName() << " "
@@ -324,7 +315,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                "vtkGenericEnSightReader") == 0)
       {
-      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      char *dataName = this->GetPVInput()->GetVTKDataTclName();
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
@@ -336,8 +327,8 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
@@ -345,13 +336,9 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
       }
     else
       {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n\t";
       }
-    }
-  else
-    {
-    *file << this->ChangeScalarsFilterTclName << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetAttributeModeToUse";

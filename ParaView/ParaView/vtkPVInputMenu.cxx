@@ -155,13 +155,13 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     return 0;
     }
 
-  if (pvs == NULL || pvs->GetNthPVOutput(0) == NULL)
+  if (pvs == NULL || pvs->GetPVOutput() == NULL)
     {
     return 0;
     }
 
   if (this->InputType == NULL || 
-      ! pvs->GetNthPVOutput(0)->GetVTKData()->IsA(this->InputType))
+      ! pvs->GetPVOutput()->GetVTKData()->IsA(this->InputType))
     {
     return 0;
     }
@@ -229,7 +229,7 @@ void vtkPVInputMenu::Accept()
   if (this->CurrentValue)
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
-                 this->CurrentValue->GetNthPVOutput(0)->GetTclName());
+                 this->CurrentValue->GetPVOutput()->GetTclName());
     pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
                          this->GetTclName(), 
                          this->CurrentValue->GetTclName());

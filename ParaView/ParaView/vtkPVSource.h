@@ -55,6 +55,7 @@ class vtkKWPushButton;
 class vtkPVArraySelection;
 class vtkPVApplication;
 class vtkPVInputMenu;
+class vtkPVArrayMenu;
 class vtkSource;
 class vtkPVData;
 class vtkPVWindow;
@@ -106,39 +107,21 @@ public:
   vtkBooleanMacro(Visibility, int);
 
   // Description:
+  // Although not all sources will need or use this input, I want to 
+  // avoid duplicating VTK's source class structure.
+  void SetPVInput(vtkPVData *input);
+  vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
+
+  // Description:
+  // Sources are currently setup to have exactly one output.
+  void SetPVOutput(vtkPVData *pvd);
+  vtkPVData* GetPVOutput() { return this->GetNthPVOutput(0);}
+
+  // Description:
   // This name is used in the data list to identify the composite.
   virtual void SetName(const char *name);
   char* GetName();
-  
-  void SetNthPVInput(int idx, vtkPVData *input);
-  vtkPVData **GetPVInputs() { return this->PVInputs; };
-  vtkPVData *GetNthPVInput(int idx);
-  vtkGetMacro(NumberOfPVInputs, int);
-  void RemoveAllPVInputs();
-  
-  vtkPVData **GetPVOutputs() { return this->PVOutputs; };
-  vtkPVData *GetNthPVOutput(int idx);
-  vtkGetMacro(NumberOfPVOutputs, int);
-  void SetNthPVOutput(int idx, vtkPVData *output);
-  
-  // Description:
-  // If this VTK source operates on scalars, pack the menu to choose which
-  // array to use as scalars.
-  void PackScalarsMenu();
-
-  // Description:
-  // If this VTK source operates on vectors, pack the menu to choose which
-  // array to use as vectors.
-  void PackVectorsMenu();
-
-  // Description:
-  // Tcl callback to change which array to use as scalars
-  void ChangeScalars();
-
-  // Description:
-  // Tcl callback to change which array to use as vectors
-  void ChangeVectors();
-  
+    
   // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();  
@@ -179,28 +162,34 @@ public:
   virtual void UpdateVTKSourceParameters();
 
   //---------------------------------------------------------------------
-  // This is a poor way to create widgets.  Another method that integrates
-  // with vtkPVMethodInterfaces should be created.
+  // This is a poor way to create widgets.  Another method should be created.
   
-  vtkPVInputMenu *AddInputMenu(char *label, char *inputName, char *inputType,
-                               char *help, vtkCollection *sources);
+  // Description:
+  // Create a menu to select the input.
+  vtkPVInputMenu *AddInputMenu(char* label, char* inputName, char* inputType,
+                               char* help, vtkCollection* sources);
+
+  // Description:
+  // Create a menu to select the active scalars of the input..
+  vtkPVArrayMenu *AddArrayMenu(const char* label, const char* attributeName, 
+                               int numComponents, const char* help);
 
   // Description:
   // Create an entry for a filename.
-  vtkPVFileEntry *AddFileEntry(char *label, char *varName,
-                               char *ext, char* help);
+  vtkPVFileEntry *AddFileEntry(char* label, char* varName,
+                               char* ext, char* help);
 
   // Description:
   // Formats the command with brackets so that sopaces are preserved.  
   // Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVStringEntry *AddStringEntry(char *label, char *varName,
+  vtkPVStringEntry *AddStringEntry(char* label, char* varName,
                                    char* help);
  
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVVectorEntry *AddLabeledEntry(char *label, char *varName,
+  vtkPVVectorEntry *AddLabeledEntry(char* label, char* varName,
                                     char* help);
   
   // Description:
@@ -272,22 +261,26 @@ public:
   vtkBooleanMacro(ReplaceInput, int);
 
   // Description:
-  // Access for scripting
-  vtkGetObjectMacro(ScalarOperationMenu, vtkPVArraySelection);
-  vtkGetObjectMacro(VectorOperationMenu, vtkPVArraySelection);
-
-  virtual void      UpdateScalars();
-  void              UpdateVectors();
-
-  // Description:
   // Access to PVWidgets indexed by their name.
   vtkPVWidget *GetPVWidget(const char *name);
+
+  // Description:
+  // These are used for drawing the navigation window.
+  vtkGetMacro(NumberOfPVInputs, int);
+  vtkPVData **GetPVInputs() { return this->PVInputs; };
+  vtkGetMacro(NumberOfPVOutputs, int);
+  vtkPVData **GetPVOutputs() { return this->PVOutputs; };
 
 protected:
   vtkPVSource();
   ~vtkPVSource();
   vtkPVSource(const vtkPVSource&) {};
   void operator=(const vtkPVSource&) {};
+
+  // What did this do ??? ... 
+  char *DefaultScalarsName;
+  vtkSetStringMacro(DefaultScalarsName);
+  virtual void UpdateScalars();
 
   vtkPVRenderView* GetPVRenderView();
   
@@ -308,7 +301,19 @@ protected:
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
   vtkPVData **PVInputs;
-  int NumberOfPVInputs;
+  int NumberOfPVInputs; 
+ 
+  void SetNthPVInput(int idx, vtkPVData *input);
+  vtkPVData *GetNthPVInput(int idx);
+  void RemoveAllPVInputs();
+  
+  // Description:
+  // Although it looks like there is support for multiple outputs,
+  // there are several implementation details that assume only one output.
+  vtkPVData *GetNthPVOutput(int idx);
+  void SetNthPVOutput(int idx, vtkPVData *output);
+ 
+ 
   
   // The name is just for display.
   char      *Name;
@@ -323,28 +328,9 @@ protected:
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;
-  vtkPVInputMenu *InputMenu;
-  vtkKWWidget *ScalarOperationFrame;
-  vtkPVArraySelection *ScalarOperationMenu;
-  vtkKWWidget *VectorOperationFrame;
-  vtkPVArraySelection *VectorOperationMenu;
   vtkKWLabel *DisplayNameLabel;
-  
-  char *ChangeScalarsFilterTclName;
-  char *DefaultScalarsName;
-  vtkSetStringMacro(ChangeScalarsFilterTclName);
-  vtkSetStringMacro(DefaultScalarsName);
-  
-  char *DefaultVectorsName;
-  vtkSetStringMacro(DefaultVectorsName);
-  
+    
   vtkPVSelectionList *LastSelectionList;
-
-  // These are obsolete, and should be replaced by a reference to the vtkPVSourceInterface.
-  // Until we find a way to match up widget names and commands to the method interfaces,
-  // we will have to keep the generic strings.
-  vtkStringList *AcceptCommands;
-  vtkStringList *ResetCommands;
 
   vtkPVSourceInterface *Interface;
   

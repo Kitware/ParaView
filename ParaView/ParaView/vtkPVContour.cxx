@@ -95,10 +95,13 @@ void vtkPVContour::CreateProperties()
 
   this->vtkPVSource::CreateProperties();
 
-  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources());
   
+  this->AddArrayMenu("Scalars", "Scalars", 1,
+                     "Choose which scalar array you want to contour.");
+
   this->ScalarRangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScalarRangeLabel->Create(pvApp, "");
   
@@ -169,6 +172,7 @@ void vtkPVContour::UpdateScalars()
 {
   float range[2];
   char label[100];
+
   // call the superclass method
   this->vtkPVSource::UpdateScalars();
   
@@ -201,9 +205,9 @@ void vtkPVContour::GetDataArrayRange(float range[2])
     }
   
   pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
-                         this->GetNthPVInput(0)->GetVTKDataTclName(),
+                         this->GetPVInput()->GetVTKDataTclName(),
                          this->DefaultScalarsName);
-  array = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->
+  array = this->GetPVInput()->GetVTKData()->GetPointData()->
                   GetArray(this->DefaultScalarsName);
 
   if (array != NULL)
@@ -243,50 +247,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
   vtkContourFilter *source =
     (vtkContourFilter*)this->GetVTKSource();
   vtkPVSourceInterface *pvsInterface =
-    this->GetNthPVInput(0)->GetPVSource()->GetInterface();
+    this->GetPVInput()->GetPVSource()->GetInterface();
   
-  if (this->DefaultScalarsName)
-    {
-    *file << "vtkFieldDataToAttributeDataFilter "
-          << this->ChangeScalarsFilterTclName << "\n\t"
-          << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *charFound;
-      int pos;
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
-    *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n\t";
-    *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n\t";
-    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-          << this->DefaultScalarsName << " 0\n\n";
-    }
 
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
@@ -300,8 +262,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       {
       char *charFound;
       int pos;
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
@@ -313,8 +275,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
@@ -322,13 +284,9 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       }
     else
       {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n\t";
       }
-    }
-  else
-    {
-    *file << this->ChangeScalarsFilterTclName << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetNumberOfContours "

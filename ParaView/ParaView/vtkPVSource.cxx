@@ -61,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVArrayMenu.h"
 #include "vtkUnstructuredGridSource.h"
 #include "vtkPVArraySelection.h"
 #include "vtkPVLabeledToggle.h"
@@ -99,22 +100,11 @@ vtkPVSource::vtkPVSource()
   this->AcceptButton = vtkKWPushButton::New();
   this->ResetButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
-  this->ScalarOperationFrame = vtkKWWidget::New();
-  this->ScalarOperationMenu = vtkPVArraySelection::New();
-  this->VectorOperationFrame = vtkKWWidget::New();
-  this->VectorOperationMenu = vtkPVArraySelection::New();
   this->DisplayNameLabel = vtkKWLabel::New();
-  
-  this->ChangeScalarsFilterTclName = NULL;
-  this->DefaultScalarsName = NULL;
-  this->DefaultVectorsName = NULL;
-    
+      
   this->Widgets = vtkKWWidgetCollection::New();
   this->LastSelectionList = NULL;
-  
-  this->AcceptCommands = vtkStringList::New();
-  this->ResetCommands = vtkStringList::New();
-  
+    
   this->Interface = NULL;
 
   this->ExtentTranslatorTclName = NULL;
@@ -161,19 +151,7 @@ vtkPVSource::~vtkPVSource()
   
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
-      
-  this->ScalarOperationMenu->Delete();
-  this->ScalarOperationMenu = NULL;
-  
-  this->ScalarOperationFrame->Delete();
-  this->ScalarOperationFrame = NULL;
-  
-  this->VectorOperationMenu->Delete();
-  this->VectorOperationMenu = NULL;
-  
-  this->VectorOperationFrame->Delete();
-  this->VectorOperationFrame = NULL;
-  
+        
   this->DisplayNameLabel->Delete();
   this->DisplayNameLabel = NULL;
   
@@ -182,37 +160,12 @@ vtkPVSource::~vtkPVSource()
 
   this->Properties->Delete();
   this->Properties = NULL;
-
-  if (this->ChangeScalarsFilterTclName)
-    {
-    // I do not know why the change scalars is disapearing, 
-    // but this feature is going away soon anyway.  Just use a catch.
-    this->GetPVApplication()->BroadcastScript("catch {%s Delete}", 
-                                this->ChangeScalarsFilterTclName);
-    delete [] this->ChangeScalarsFilterTclName;
-    this->ChangeScalarsFilterTclName = NULL;
-    }
-  if (this->DefaultScalarsName)
-    {
-    delete [] this->DefaultScalarsName;
-    this->DefaultScalarsName = NULL;
-    }
-  if (this->DefaultVectorsName)
-    {
-    delete [] this->DefaultVectorsName;
-    this->DefaultVectorsName = NULL;
-    }
     
   if (this->LastSelectionList)
     {
     this->LastSelectionList->UnRegister(this);
     this->LastSelectionList = NULL;
     }
-
-  this->AcceptCommands->Delete();
-  this->AcceptCommands = NULL;  
-  this->ResetCommands->Delete();
-  this->ResetCommands = NULL;
 
   this->SetInterface(NULL);
 
@@ -235,6 +188,38 @@ vtkPVSource* vtkPVSource::New()
     }
   // If the factory was unable to create the object, then create it here.
   return new vtkPVSource;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVInput(vtkPVData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("No Application. Create the source before setting the input.");
+    return;
+    }
+
+  this->SetNthPVInput(0, pvd);
+
+  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
+                         pvd->GetVTKDataTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVOutput(vtkPVData *pvd)
+{
+  this->SetNthPVOutput(0, pvd);
+}
+
+
+//----------------------------------------------------------------------------
+// Functions to update the progress bar
+void vtkPVSource::UpdateScalars()
+{
+  // What did this do ??? ... 
 }
 
 //----------------------------------------------------------------------------
@@ -426,29 +411,6 @@ void vtkPVSource::CreateProperties()
                this->DeleteButton->GetWidgetName());
 
   frame->Delete();  
-
-  this->ScalarOperationFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->ScalarOperationFrame->Create(this->Application, "frame", "");    
-  this->Script("pack %s -side top -fill x -expand t",
-               this->ScalarOperationFrame->GetWidgetName());
-
-  this->ScalarOperationMenu->SetParent(this->ScalarOperationFrame);
-  this->ScalarOperationMenu->Create(this->Application);
-  this->ScalarOperationMenu->SetPVSource(this);
-  this->ScalarOperationMenu->SetMenuEntryCommand("UpdateScalars");
-  this->ScalarOperationMenu->SetBalloonHelpString("Select which array to use as point scalars for this filter");
-
-  this->VectorOperationFrame->SetParent(this->ParameterFrame->GetFrame());
-  this->VectorOperationFrame->Create(this->Application, "frame", "");    
-  this->Script("pack %s -side top -fill x -expand t",
-               this->VectorOperationFrame->GetWidgetName());
-
-  this->VectorOperationMenu->SetParent(this->VectorOperationFrame);
-  this->VectorOperationMenu->Create(this->Application);
-  this->VectorOperationMenu->SetPVSource(this);
-  this->VectorOperationMenu->SetMenuEntryCommand("UpdateVectors");
-  this->VectorOperationMenu->SetNumberOfComponents(3);
-  this->VectorOperationMenu->SetBalloonHelpString("Select which array to use as point vectors for this filter");
   
   // Isolate events to this window until accept or reset is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
@@ -458,139 +420,6 @@ void vtkPVSource::CreateProperties()
   //this->UpdateParameterWidgets();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSource::PackScalarsMenu()
-{
-  this->ScalarOperationMenu->FillMenu();
-  this->Script("pack %s -side left -fill x",
-               this->ScalarOperationMenu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::PackVectorsMenu()
-{
-  this->VectorOperationMenu->FillMenu();
-  this->Script("pack %s -side left -fill x",
-               this->VectorOperationMenu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::ChangeScalars()
-{
-  this->ChangeAcceptButtonColor();
-  this->UpdateScalars();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::ChangeVectors()
-{
-  this->ChangeAcceptButtonColor();
-  this->UpdateVectors();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateScalars()
-{
-  char *newScalars = this->ScalarOperationMenu->GetValue();
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (strcmp(newScalars, "") == 0)
-    {
-    return;
-    }
-  
-  if (this->DefaultScalarsName)
-    {
-    if (strcmp(newScalars, this->DefaultScalarsName) == 0)
-      {
-      return;
-      }
-    }
-
-  if (this->DefaultScalarsName)
-    {
-    delete [] this->DefaultScalarsName;
-    this->DefaultScalarsName = NULL;
-    }
-  this->SetDefaultScalarsName(newScalars);
-
-  if (!this->ChangeScalarsFilterTclName)
-    {
-    char tclName[256];
-    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
-    this->SetChangeScalarsFilterTclName(tclName);
-    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
-                         this->ChangeScalarsFilterTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-                           this->ChangeScalarsFilterTclName,
-                           this->VTKSourceTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->VTKSourceTclName,
-                           this->ChangeScalarsFilterTclName);
-    }
-  pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
-                         this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
-                         this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
-                         this->ChangeScalarsFilterTclName,
-                         this->DefaultScalarsName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateVectors()
-{
-  char *newVectors = this->VectorOperationMenu->GetValue();
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (strcmp(newVectors, "") == 0)
-    {
-    return;
-    }
-  
-  if (this->DefaultVectorsName)
-    {
-    if (strcmp(newVectors, this->DefaultVectorsName) == 0)
-      {
-      return;
-      }
-    }
-
-  if (this->DefaultVectorsName)
-    {
-    delete [] this->DefaultVectorsName;
-    this->DefaultVectorsName = NULL;
-    }
-  this->SetDefaultVectorsName(newVectors);
-
-  if (!this->ChangeScalarsFilterTclName)
-    {
-    char tclName[256];
-    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
-    this->SetChangeScalarsFilterTclName(tclName);
-    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
-                          this->ChangeScalarsFilterTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-                           this->ChangeScalarsFilterTclName,
-                           this->VTKSourceTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->VTKSourceTclName,
-                           this->ChangeScalarsFilterTclName);
-    }
-  pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
-                         this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
-                         this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetVectorComponent 0 %s 0",
-                         this->ChangeScalarsFilterTclName,
-                         this->DefaultVectorsName);
-  pvApp->BroadcastScript("%s SetVectorComponent 1 %s 1",
-                         this->ChangeScalarsFilterTclName,
-                         this->DefaultVectorsName);
-  pvApp->BroadcastScript("%s SetVectorComponent 2 %s 2",
-                         this->ChangeScalarsFilterTclName,
-                         this->DefaultVectorsName);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Select(vtkKWView *v)
@@ -779,7 +608,7 @@ void vtkPVSource::Accept()
     ac->CreateProperties();
     ac->Initialize();
     // Make the last data invisible.
-    input = this->GetNthPVInput(0);
+    input = this->GetPVInput();
     if (input)
       {
       if (this->ReplaceInput)
@@ -971,21 +800,9 @@ void vtkPVSource::DeleteCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateParameterWidgets()
 {
-  int num, i;
-  char *cmd;
+  int i;
   vtkKWWidget *widget;
   vtkPVWidget *pvw;
-
-  // Copy the ivars from the vtk object to the UI.
-  num = this->ResetCommands->GetLength();
-  for (i = 0; i < num; ++i)
-    {
-    cmd = this->ResetCommands->GetString(i);
-    if (cmd)
-      {
-      this->Script(cmd);
-      }
-    }
   
   this->Widgets->InitTraversal();
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
@@ -1007,14 +824,6 @@ void vtkPVSource::UpdateVTKSourceParameters()
   int i;
   vtkKWWidget *widget;
   vtkPVWidget *pvw;
-
-  // Call the commands to set ivars from widget values.
-  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
-    {
-    // This is not broadcast because the helper method takes 
-    // care of the broadcast.
-    this->Script(this->AcceptCommands->GetString(i));
-    }
   
   this->Widgets->InitTraversal();
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
@@ -1086,11 +895,11 @@ void vtkPVSource::UpdateProperties()
     {
     if (this->Interface->GetDefaultScalars())
       {
-      this->ScalarOperationMenu->FillMenu();
+      // ....
       }
     if (this->Interface->GetDefaultScalars())
       {
-      this->VectorOperationMenu->FillMenu();
+      // ....
       }
     }
 }
@@ -1192,33 +1001,6 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
     pvd->Register(this);
     pvd->AddPVConsumer(this);
     this->PVInputs[idx] = pvd;
-    }
-
-
-  // Relay the change to the VTK objects.  
-  // This is where we will need a SetCommand from the interface ...
-  if (this->ChangeScalarsFilterTclName && idx == 0)
-    {
-    pvApp->BroadcastScript("%s Delete",
-                           this->ChangeScalarsFilterTclName);
-    }
-  else
-    {
-    char tclName[256];
-    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
-    this->SetChangeScalarsFilterTclName(tclName);
-    }
-
-  if (pvd)
-    {
-    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
-                          this->ChangeScalarsFilterTclName);
-    pvApp->BroadcastScript("%s SetInput %s",
-                           this->ChangeScalarsFilterTclName,
-                           pvd->GetVTKDataTclName());
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->VTKSourceTclName,
-                           this->ChangeScalarsFilterTclName);
     }
 
   this->Modified();
@@ -1356,68 +1138,12 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   char* tempName;
   char* extension;
   int pos, i, numWidgets;
-  char *charFound;
-  char *dataName;
   vtkPVSourceInterface *pvsInterface = NULL;
   vtkPVWidget *widget;
   
-  if (this->GetNthPVInput(0))
+  if (this->GetPVInput())
     {
-    pvsInterface = this->GetNthPVInput(0)->GetPVSource()->GetInterface();
-    }
-  
-  if (this->ChangeScalarsFilterTclName)
-    {
-    *file << "vtkFieldDataToAttributeDataFilter "
-          << this->ChangeScalarsFilterTclName << "\n\t"
-          << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
-    *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n\t";
-    *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n\t";
-    if (this->DefaultScalarsName)
-      {
-      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-            << this->DefaultScalarsName << " 0\n\t";
-      }
-    if (this->DefaultVectorsName)
-      {
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 0 "
-            << this->DefaultVectorsName << " 0\n\t";
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 1 "
-            << this->DefaultVectorsName << " 1\n\t";
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 2 "
-            << this->DefaultVectorsName << " 2\n\t";
-      }
-    *file << "\n";
+    pvsInterface = this->GetPVInput()->GetPVSource()->GetInterface();
     }
   
   if (this->VTKSource)
@@ -1444,16 +1170,16 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     sprintf(tclName, this->Name);
     }
   
-  if (this->NumberOfPVInputs > 0 && !this->ChangeScalarsFilterTclName)
+  if (this->NumberOfPVInputs > 0)
     {
     *file << "\t" << tclName << " SetInput [";
-    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+    if (strcmp(this->GetPVInput()->GetPVSource()->GetInterface()->
                GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
@@ -1465,8 +1191,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
       
       sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(dataName, "O");
@@ -1476,16 +1202,11 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
       }
     else
       {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n";
       }
     }
-  else if (this->ChangeScalarsFilterTclName)
-    {
-    *file << "\t" << this->VTKSourceTclName << " SetInput ["
-          << this->ChangeScalarsFilterTclName << " GetOutput]\n";
-    }
-  
+
   if (this->Interface)
     {
     this->Interface->SaveInTclScript(file, tclName);
@@ -1534,6 +1255,33 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   this->Widgets->AddItem(inputMenu);
   inputMenu->Delete();
   return inputMenu;
+}
+
+//----------------------------------------------------------------------------
+vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label, 
+                                          const char *attributeName,
+                                          int numComponenets,
+                                          const char *help)
+{
+  vtkPVArrayMenu *arrayMenu;
+
+  arrayMenu = vtkPVArrayMenu::New();
+  arrayMenu->SetPVSource(this);
+  arrayMenu->SetNumberOfComponents(numComponenets);
+  arrayMenu->SetInputName("Input");
+  arrayMenu->SetAttributeName(attributeName);
+  arrayMenu->SetObjectTclName(this->GetVTKSourceTclName());
+
+  arrayMenu->SetParent(this->ParameterFrame->GetFrame());
+  arrayMenu->SetLabel(label);
+  arrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  arrayMenu->Create(this->Application);
+  arrayMenu->SetBalloonHelpString(help);
+  this->Script("pack %s -side top -fill x -expand t",
+               arrayMenu->GetWidgetName());
+  this->Widgets->AddItem(arrayMenu);
+  arrayMenu->Delete();
+  return arrayMenu;
 }
 
 

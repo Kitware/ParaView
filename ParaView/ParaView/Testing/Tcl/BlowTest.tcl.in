@@ -22,13 +22,13 @@
     $pvNormals UpdateParameterWidgets
     $pvNormals AcceptCallback
     
-    set warpOutput [$pvWarp GetNthPVOutput 0]
+    set warpOutput [$pvWarp GetPVOutput]
     $warpOutput SetVisibility 0
 
-    set subOutput [$pvSub GetNthPVOutput 0]
+    set subOutput [$pvSub GetPVOutput]
     $subOutput SetVisibility 0
 
-    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    set normalsOutput [$pvNormals GetPVOutput]
     $normalsOutput SetVisibility 0
 
 
@@ -42,18 +42,18 @@
     $camera SetViewAngle 30
     $camera SetClippingRange 127.006 167.567
 
-    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    set normalsOutput [$pvNormals GetPVOutput]
     $normalsOutput SetVisibility 1
 
-    [$pvWarp GetVectorOperationMenu] SetValue displacement1
-    $pvWarp ChangeVectors
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
     $normalsOutput ColorByPointFieldComponent thickness1 0
 
     RenWin1 SetSize 300 300
 
     for {set i 1} {$i <= 10} {incr i 1} {
-	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
-	$pvWarp ChangeVectors
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+        $pvWarp AcceptCallback
 	$normalsOutput ColorByPointFieldComponent thickness$i 0
 	RenWin1 Render
 	update
@@ -62,16 +62,17 @@
 
     $normalsOutput SetVisibility 0
 
-    set warpOutput [$pvWarp GetNthPVOutput 0]
-    [$pvWarp GetVectorOperationMenu] SetValue displacement1
-    $pvWarp ChangeVectors
+    set warpOutput [$pvWarp GetPVOutput]
+
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
     $warpOutput ColorByPointFieldComponent thickness1 0
 
     $warpOutput SetVisibility 1
 
     for {set i 1} {$i <= 10} {incr i 1} {
-	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
-	$pvWarp ChangeVectors
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+        $pvWarp AcceptCallback
 	$warpOutput ColorByPointFieldComponent thickness$i 0
 	RenWin1 Render
 	update

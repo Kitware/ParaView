@@ -56,18 +56,6 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->CommandFunction = vtkPVGlyph3DCommand;
   
   this->GlyphSource = NULL;
-  this->GlyphScaleMode = NULL;
-  this->GlyphVectorMode = NULL;
-  
-  this->ScaleModeFrame = vtkKWWidget::New();
-  this->ScaleModeLabel = vtkKWLabel::New();
-  this->ScaleModeMenu = vtkKWOptionMenu::New();
-  this->VectorModeFrame = vtkKWWidget::New();
-  this->VectorModeLabel = vtkKWLabel::New();
-  this->VectorModeMenu = vtkKWOptionMenu::New();
-  this->OrientCheck = vtkPVLabeledToggle::New();
-  this->ScaleCheck = vtkPVLabeledToggle::New();
-  this->ScaleEntry = vtkPVVectorEntry::New();
 
   // Glyph adds too its input, so sould not replace it.
   this->ReplaceInput = 0;
@@ -81,35 +69,6 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
     this->GlyphSource->UnRegister(this);
     this->GlyphSource = NULL;
     }
-  if (this->GlyphScaleMode)
-    {
-    delete [] this->GlyphScaleMode;
-    this->GlyphScaleMode = NULL;
-    }
-  if (this->GlyphVectorMode)
-    {
-    delete [] this->GlyphVectorMode;
-    this->GlyphVectorMode = NULL;
-    }
-  
-  this->ScaleModeLabel->Delete();
-  this->ScaleModeLabel = NULL;
-  this->ScaleModeMenu->Delete();
-  this->ScaleModeMenu = NULL;
-  this->ScaleModeFrame->Delete();
-  this->ScaleModeFrame = NULL;
-  this->VectorModeLabel->Delete();
-  this->VectorModeLabel = NULL;
-  this->VectorModeMenu->Delete();
-  this->VectorModeMenu = NULL;
-  this->VectorModeFrame->Delete();
-  this->VectorModeFrame = NULL;
-  this->OrientCheck->Delete();
-  this->OrientCheck = NULL;
-  this->ScaleCheck->Delete();
-  this->ScaleCheck = NULL;
-  this->ScaleEntry->Delete();
-  this->ScaleEntry = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -161,120 +120,29 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
     
-  this->AddInputMenu("Input", "NthPVInput 0", "vtkPolyData",
+  this->AddInputMenu("Input", "PVInput", "vtkPolyData",
                      "Select the input for the filter.", 
                      this->GetPVWindow()->GetSources());                            
 
   this->AddInputMenu("Glyph", "GlyphSource", "vtkPolyData",
                      "Select the data set to use as the glyph geometry.", 
                      this->GetPVWindow()->GetGlyphSources());
+  
+  this->AddModeList("Scale Mode", "ScaleMode", "Select whether/how to scale the glyphs");
+  this->AddModeListItem("Scalar", 0);
+  this->AddModeListItem("Vector", 1);
+  this->AddModeListItem("Vector Components", 2);
+  this->AddModeListItem("Data Scalaing Off", 3);
+    
+  this->AddModeList("Vector Mode", "VectorMode", "Select what to use as vectors for scaling/rotation");
+  this->AddModeListItem("Vector", 0);
+  this->AddModeListItem("Normal", 1);
+  this->AddModeListItem("Vector RotationOff", 2);
+    
+  this->AddLabeledToggle("Orient", "Orient", "Select whether to orient the glyphs");
+  this->AddLabeledToggle("Scaling", "Scaling", "Select whether to scale the glyphs");
 
-  // Set the default so Reset behaves properly.  There are other options.
-//  this->GetPVWindow()->GetGlyphSources()->InitTraversal();
-//  this->SetGlyphSource(((vtkPVSource*)(this->GetPVWindow()->GetGlyphSources()->GetNextItemAsObject()))->GetNthPVOutput(0));
-  // Now the input menu handles setting the default here.
-                                      
-  this->ScaleModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleModeFrame->Create(pvApp, "frame", "");
-  this->Script("pack %s -side top -fill x",
-               this->ScaleModeFrame->GetWidgetName());
-  
-  this->ScaleModeLabel->SetParent(this->ScaleModeFrame);
-  this->ScaleModeLabel->Create(pvApp, "");
-  this->ScaleModeLabel->SetLabel("Scale Mode:");
-  this->ScaleModeLabel->SetBalloonHelpString("Select whether/how to scale the glyphs");
-  
-  this->ScaleModeMenu->SetParent(this->ScaleModeFrame);
-  this->ScaleModeMenu->Create(pvApp, "");
-  this->ScaleModeMenu->AddEntryWithCommand("Scalar", this,
-                                           "ChangeAcceptButtonColor");
-  this->ScaleModeMenu->AddEntryWithCommand("Vector", this,
-                                           "ChangeAcceptButtonColor");
-  this->ScaleModeMenu->AddEntryWithCommand("Vector Components", this,
-                                           "ChangeAcceptButtonColor");
-  this->ScaleModeMenu->AddEntryWithCommand("Data Scaling Off", this,
-                                           "ChangeAcceptButtonColor");
-  this->ScaleModeMenu->SetValue("Scalar");
-  this->ScaleModeMenu->SetBalloonHelpString("Select whether/how to scale the glyphs");  
-  this->SetGlyphScaleMode("Scalar");
-  
-  this->AcceptCommands->AddString("%s ChangeScaleMode",
-                                  this->GetTclName());
-  this->ResetCommands->AddString("%s SetValue %s",
-                                 this->ScaleModeMenu->GetTclName(),
-                                 this->GetGlyphScaleMode());
-  
-  this->Script("pack %s %s -side left",
-               this->ScaleModeLabel->GetWidgetName(),
-               this->ScaleModeMenu->GetWidgetName());
-  
-  this->VectorModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->VectorModeFrame->Create(pvApp, "frame", "");
-  this->Script("pack %s -side top -fill x",
-               this->VectorModeFrame->GetWidgetName());
-  
-  this->VectorModeLabel->SetParent(this->VectorModeFrame);
-  this->VectorModeLabel->Create(pvApp, "");
-  this->VectorModeLabel->SetLabel("Vector Mode:");
-  this->VectorModeLabel->SetBalloonHelpString("Select what to use as vectors for scaling/rotation");
-  
-  this->VectorModeMenu->SetParent(this->VectorModeFrame);
-  this->VectorModeMenu->Create(pvApp, "");
-  this->VectorModeMenu->AddEntryWithCommand("Normal", this,
-                                            "ChangeAcceptButtonColor");
-  this->VectorModeMenu->AddEntryWithCommand("Vector", this,
-                                            "ChangeAcceptButtonColor");
-  this->VectorModeMenu->AddEntryWithCommand("Vector Rotation Off", this,
-                                            "ChangeAcceptButtonColor");
-  this->VectorModeMenu->SetValue("Vector");
-  this->VectorModeMenu->SetBalloonHelpString("Select what to use as vectors for scaling/rotation");
-  this->SetGlyphVectorMode("Vector");
-  
-  this->AcceptCommands->AddString("%s ChangeVectorMode",
-                                  this->GetTclName());
-  this->ResetCommands->AddString("%s SetValue %s",
-                                 this->VectorModeMenu->GetTclName(),
-                                 this->GetGlyphVectorMode());
-  
-  this->Script("pack %s %s -side left",
-               this->VectorModeLabel->GetWidgetName(),
-               this->VectorModeMenu->GetWidgetName());
-  
-  this->OrientCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->OrientCheck->SetLabel("Orient");
-  this->OrientCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                       "Orient");
-  this->OrientCheck->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->OrientCheck->Create(pvApp, "Select whether to orient the glyphs");
-  this->OrientCheck->SetState(1);
-  this->Widgets->AddItem(this->OrientCheck);
-  
-  this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleCheck->SetLabel("Scale");
-  this->ScaleCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                      "Scaling");
-  this->ScaleCheck->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->ScaleCheck->Create(pvApp, "Select whether to scale the glyphs");
-  this->ScaleCheck->SetState(1);
-  this->Widgets->AddItem(this->ScaleCheck);
-  
-  this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                      "ScaleFactor");
-  this->ScaleEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->ScaleEntry->Create(pvApp, "Scale Factor:", 1, NULL,
-                           "Select the amount to scale the glyphs by");
-  this->Widgets->AddItem(this->ScaleEntry);
-  this->ScaleEntry->GetEntry(0)->SetValue("1.0");
-
-  this->Script("pack %s %s",
-               this->OrientCheck->GetWidgetName(),
-               this->ScaleCheck->GetWidgetName());
-  this->Script("pack %s -side left -fill x -expand t",
-               this->ScaleEntry->GetWidgetName());
+  this->AddLabeledEntry("Scale Factor", "ScaleFactor", "Select the amount to scale the glyphs by");
 
   // Make sure the Input menus reflect the actual values.
   // This call is called too many times.  
@@ -282,236 +150,4 @@ void vtkPVGlyph3D::CreateProperties()
   this->UpdateParameterWidgets();  
 }
 
-void vtkPVGlyph3D::ChangeScaleMode()
-{
-  char *newMode = NULL;
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
-  newMode = this->ScaleModeMenu->GetValue();
-  
-  if (strcmp(newMode, "Scalar") == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleModeToScaleByScalar",
-                           this->GetVTKSourceTclName());
-    }
-  else if (strcmp(newMode, "Vector") == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleModeToScaleByVector",
-                           this->GetVTKSourceTclName());
-    }
-  else if (strcmp(newMode, "Vector Components") == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleModeToScaleByVectorComponents",
-                           this->GetVTKSourceTclName());
-    }
-  else if (strcmp(newMode, "Data Scaling Off") == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleModeToDataScalingOff",
-                           this->GetVTKSourceTclName());
-    }
-  if (newMode)
-    {
-    this->SetGlyphScaleMode(newMode);
-    }
-}
-
-void vtkPVGlyph3D::ChangeVectorMode()
-{
-  char *newMode = NULL;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  newMode = this->VectorModeMenu->GetValue();
-  
-  if (strcmp(newMode, "Normal") == 0)
-    {
-    pvApp->BroadcastScript("%s SetVectorModeToUseNormal",
-                           this->GetVTKSourceTclName());
-    }
-  else if (strcmp(newMode, "Vector") == 0)
-    {
-    pvApp->BroadcastScript("%s SetVectorModeToUseVector",
-                           this->GetVTKSourceTclName());
-    }
-  else if (strcmp(newMode, "Vector Rotation Off") == 0)
-    {
-    pvApp->BroadcastScript("%s SetVectorModeToVectorRotationOff",
-                           this->GetVTKSourceTclName());
-    }
-  if (newMode)
-    {
-    this->SetGlyphVectorMode(newMode);
-    }
-}
-
-void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
-{
-  char sourceName[30];
-  char *tempName;
-  char *charFound;
-  int pos;
-  vtkPVSourceInterface *pvsInterface = this->GetInterface();
-  
-  if (this->ChangeScalarsFilterTclName)
-    {
-    *file << "vtkFieldDataToAttributeDataFilter "
-          << this->ChangeScalarsFilterTclName << "\n\t"
-          << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *charFound;
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
-    *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n\t";
-    *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n\t";
-    if (this->DefaultScalarsName)
-      {
-      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-            << this->DefaultScalarsName << " 0\n";
-      }
-    else if (this->DefaultVectorsName)
-      {
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 0 "
-            << this->DefaultVectorsName << " 0\n\t";
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 1 "
-            << this->DefaultVectorsName << " 1\n\t";
-      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 2 "
-            << this->DefaultVectorsName << " 2\n";
-      }
-    *file << "\n";
-    }
-
-  if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphArrowOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
-    *file << "vtkArrowSource " << sourceName << "\n\n";
-    }
-  else if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphConeOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
-    *file << "vtkConeSource " << sourceName << "\n\n";
-    }
-  else if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphSphereOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
-    *file << "vtkSphereSource " << sourceName << "\n\n";
-    }
-  
-  *file << this->VTKSource->GetClassName() << " "
-        << this->VTKSourceTclName << "\n";
-  
-  *file << "\t" << this->VTKSourceTclName << " SetInput [";
-
-  if (!this->ChangeScalarsFilterTclName)
-    {
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
-    }
-  else
-    {
-    *file << this->ChangeScalarsFilterTclName << " GetOutput]\n\t";
-    }
-  
-  *file << this->VTKSourceTclName << " SetSource [";
-
-  *file << sourceName <<" GetOutput]\n\t";
-
-  *file << this->VTKSourceTclName << " SetScaleModeTo";
-  if (strcmp(this->ScaleModeMenu->GetValue(), "Scalar") == 0)
-    {
-    *file << "ScaleByScalar\n\t";
-    }
-  else if (strcmp(this->ScaleModeMenu->GetValue(), "Vector") == 0)
-    {
-    *file << "ScaleByVector\n\t";
-    }
-  else if (strcmp(this->ScaleModeMenu->GetValue(), "Vector Components") == 0)
-    {
-    *file << "ScaleByVectorComponents\n\t";
-    }
-  else
-    {
-    *file << "DataScalingOff\n\t";
-    }
-  
-  *file << this->VTKSourceTclName << " SetVectorModeTo";
-  if (strcmp(this->VectorModeMenu->GetValue(), "Normal") == 0)
-    {
-    *file << "UseNormal\n\t";
-    }
-  else if (strcmp(this->VectorModeMenu->GetValue(), "Vector") == 0)
-    {
-    *file << "UseVector\n\t";
-    }
-  else
-    {
-    *file << "VectorRotationOff\n\t";
-    }
-  
-//  *file << this->VTKSourceTclName << " SetOrient "
-//        << this->OrientCheck->GetState() << "\n\t";
-//  *file << this->VTKSourceTclName << " SetScaling "
-//        << this->ScaleCheck->GetState() << "\n\t";
-  this->OrientCheck->SaveInTclScript(file, this->VTKSourceTclName);
-  *file << "\t";
-  this->ScaleCheck->SaveInTclScript(file, this->VTKSourceTclName);
-  *file << "\t";
-  
-//  *file << this->VTKSourceTclName << " SetScaleFactor "
-//        << this->ScaleEntry->GetEntry(0)->GetValueAsFloat() << "\n\n";
-  this->ScaleEntry->SaveInTclScript(file, this->VTKSourceTclName);
-  *file << "\n";
-  
-  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
-}

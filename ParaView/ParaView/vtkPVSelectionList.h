@@ -78,9 +78,14 @@ public:
   const char *GetLabel() {return this->Label->GetLabel();}
 
   // Description:
-  // Called when accept button is pushed.  Just adds to trace
-  // file and calls supperclass accept.
+  // Called when accept button is pushed.
+  // Adds to the trace file and sets the objects variable from UI.
   virtual void Accept();
+
+  // Description:
+  // Called when reset button is pushed.
+  // Sets UI current value from objects variable.
+  virtual void Reset();
 
   // Description:
   // This is how the user can query the state of the selection.

@@ -199,7 +199,7 @@ void vtkPVPlaneWidget::Create(vtkKWApplication *app)
   // Initialize the center of the plane based on the input bounds.
   if (this->PVSource)
     {
-    vtkPVData *input = this->PVSource->GetNthPVInput(0);
+    vtkPVData *input = this->PVSource->GetPVInput();
     if (input)
       {
       float bds[6];
@@ -224,7 +224,7 @@ void vtkPVPlaneWidget::CenterResetCallback()
     return;
     }
 
-  input = this->PVSource->GetNthPVInput(0);
+  input = this->PVSource->GetPVInput();
   if (input == NULL)
     {
     return;

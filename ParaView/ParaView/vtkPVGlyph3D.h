@@ -47,11 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVGlyph3D_h
 
 #include "vtkPVSource.h"
-#include "vtkKWLabel.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkPVVectorEntry.h"
-#include "vtkGlyph3D.h"
 
 class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
 {
@@ -68,29 +63,6 @@ public:
   void SetGlyphSource(vtkPVData *source);
   vtkPVData* GetGlyphSource();
 
-  // Description:
-  // Tcl callback for the scale and vector mode option menus
-  void ChangeScaleMode();
-  void ChangeVectorMode();
-    
-  // Description:
-  // Set/Get the current glyph scale mode
-  vtkSetStringMacro(GlyphScaleMode);
-  vtkGetStringMacro(GlyphScaleMode);
-
-  // Description:
-  // Set/Get the current glyph scale mode
-  vtkSetStringMacro(GlyphVectorMode);
-  vtkGetStringMacro(GlyphVectorMode);
-
-  // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
-  
-  // Description:
-  // For scripting. Reset does not work for scale mode.
-  vtkGetObjectMacro(ScaleModeMenu, vtkKWOptionMenu);
-
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();
@@ -98,18 +70,6 @@ protected:
   void operator=(const vtkPVGlyph3D&) {};
 
   vtkPVData *GlyphSource;
-  char *GlyphScaleMode;
-  char *GlyphVectorMode;
-  
-  vtkKWWidget *ScaleModeFrame;
-  vtkKWLabel *ScaleModeLabel;
-  vtkKWOptionMenu *ScaleModeMenu;
-  vtkKWWidget *VectorModeFrame;
-  vtkKWLabel *VectorModeLabel;
-  vtkKWOptionMenu *VectorModeMenu;
-  vtkPVLabeledToggle *OrientCheck;
-  vtkPVLabeledToggle *ScaleCheck;
-  vtkPVVectorEntry *ScaleEntry;
 };
 
 #endif

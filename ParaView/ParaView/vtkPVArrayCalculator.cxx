@@ -225,7 +225,7 @@ void vtkPVArrayCalculator::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources());
 
@@ -542,13 +542,13 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
-    fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData();
+    fd = this->GetPVInput()->GetVTKData()->GetPointData();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
-    fd = this->GetNthPVInput(0)->GetVTKData()->GetCellData();
+    fd = this->GetPVInput()->GetVTKData()->GetCellData();
     }
   
   if (fd)
@@ -667,7 +667,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
   char* tempName;
   int i;
   vtkPVSourceInterface *pvsInterface =
-    this->GetNthPVInput(0)->GetPVSource()->GetInterface();
+    this->GetPVInput()->GetPVSource()->GetInterface();
   
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n\t"
@@ -677,8 +677,8 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
     {
     char *charFound;
     int pos;
-    char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
 
     charFound = strrchr(dataName, 't');
     tempName = strtok(dataName, "O");
@@ -690,8 +690,8 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
   else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                   "vtkPDataSetReader") == 0)
     {
-    char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
     
     tempName = strtok(dataName, "O");
     *file << tempName << " GetOutput]\n";
@@ -699,7 +699,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
     }
   else
     {
-    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
           << " GetOutput]\n";
     }
   

@@ -671,7 +671,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphArrowOutput"));
   pvd->SetVTKData(d, "pvGlyphArrowOutput");
   // Connect the source and data.
-  pvs->SetNthPVOutput(0, pvd);
+  pvs->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
@@ -695,7 +695,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphConeOutput"));
   pvd->SetVTKData(d, "pvGlyphConeOutput");
   // Connect the source and data.
-  pvs->SetNthPVOutput(0, pvd);
+  pvs->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
@@ -719,7 +719,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphSphereOutput"));
   pvd->SetVTKData(d, "pvGlyphSphereOutput");
   // Connect the source and data.
-  pvs->SetNthPVOutput(0, pvd);
+  pvs->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
@@ -1375,7 +1375,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
     {
     this->GetPVApplication()->AddTraceEntry("$pv(%s) SetCurrentPVSource $pv(%s)", 
                         this->GetTclName(), comp->GetTclName());
-    this->SetCurrentPVData(comp->GetNthPVOutput(0));
+    this->SetCurrentPVData(comp->GetPVOutput());
     }
   else
     {
@@ -1411,7 +1411,7 @@ void vtkPVWindow::AddPVSource(vtkPVSource *pvs)
     }
 
   this->MainView->SetSelectedComposite(pvs);  
-  this->SetCurrentPVData(pvs->GetNthPVOutput(0));  
+  this->SetCurrentPVData(pvs->GetPVOutput());  
 }
 
 
@@ -1608,7 +1608,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   calc->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   calc->SetApplication(pvApp);
   calc->SetVTKSource(s, tclName);
-  calc->SetNthPVInput(0, this->GetCurrentPVData());
+  calc->SetPVInput(this->GetCurrentPVData());
   calc->SetName(tclName);  
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CalculatorCallback]", 
@@ -1628,7 +1628,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  calc->SetNthPVOutput(0, pvd);
+  calc->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", calc->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
@@ -1693,7 +1693,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   cutPlane->SetApplication(pvApp);
   cutPlane->SetVTKSource(s, tclName);
-  cutPlane->SetNthPVInput(0, current);
+  cutPlane->SetPVInput(current);
   cutPlane->SetName(tclName);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CutPlaneCallback]", 
@@ -1714,7 +1714,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  cutPlane->SetNthPVOutput(0, pvd);
+  cutPlane->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", cutPlane->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
@@ -1775,7 +1775,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   threshold->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   threshold->SetApplication(pvApp);
   threshold->SetVTKSource(s, tclName);
-  threshold->SetNthPVInput(0, current);
+  threshold->SetPVInput(current);
   threshold->SetName(tclName);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ThresholdCallback]", 
@@ -1783,7 +1783,6 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
 
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
-  threshold->PackScalarsMenu();
   this->AddPVSource(threshold);
 
   // Create the output.
@@ -1796,7 +1795,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  threshold->SetNthPVOutput(0, pvd);
+  threshold->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", threshold->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
@@ -1862,7 +1861,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   clipPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   clipPlane->SetApplication(pvApp);
   clipPlane->SetVTKSource(s, tclName);
-  clipPlane->SetNthPVInput(0, current);
+  clipPlane->SetPVInput(current);
   clipPlane->SetName(tclName);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ClipPlaneCallback]", 
@@ -1882,7 +1881,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  clipPlane->SetNthPVOutput(0, pvd);
+  clipPlane->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", clipPlane->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
@@ -1950,7 +1949,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
-  contour->SetNthPVInput(0, current);
+  contour->SetPVInput(current);
   contour->SetName(tclName);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ContourCallback]", 
@@ -1958,7 +1957,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
-  contour->PackScalarsMenu();
   this->AddPVSource(contour);
 
   // Create the output.
@@ -1971,7 +1969,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  contour->SetNthPVOutput(0, pvd);
+  contour->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", contour->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());  
   
@@ -2001,7 +1999,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
-  vtkGlyph3D *glyph;
+  vtkSource *glyph;
   vtkDataSet *d;
   vtkPVGlyph3D *pvGlyph;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -2021,7 +2019,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   // Create the vtkSource.
   sprintf(tclName, "%s%d", "Glyph", instanceCount);
   // Create the object through tcl on all processes.
-  glyph = (vtkGlyph3D *)(pvApp->MakeTclObject("vtkGlyph3D", tclName));
+  glyph = (vtkSource *)(pvApp->MakeTclObject("vtkGlyph3D", tclName));
   if (glyph == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -2032,7 +2030,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvGlyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   pvGlyph->SetApplication(pvApp);
   pvGlyph->SetVTKSource(glyph, tclName);
-  pvGlyph->SetNthPVInput(0, current);
+  pvGlyph->SetPVInput(current);
   pvGlyph->SetName(tclName);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GlyphCallback]", 
@@ -2040,10 +2038,6 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
 
   this->GetMainView()->AddComposite(pvGlyph);
   pvGlyph->CreateProperties();
-  pvGlyph->GetScalarOperationMenu()->SetLabel("Scalar Arrays:");
-  pvGlyph->PackScalarsMenu();
-  pvGlyph->GetVectorOperationMenu()->SetLabel("Vector Arrays:");
-  pvGlyph->PackVectorsMenu();
   this->AddPVSource(pvGlyph);
 
   // Create the output.
@@ -2056,7 +2050,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  pvGlyph->SetNthPVOutput(0, pvd);
+  pvGlyph->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", pvGlyph->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
@@ -2138,7 +2132,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  probe->SetNthPVOutput(0, pvd);
+  probe->SetPVOutput(pvd);
   pvApp->BroadcastScript("%s SetOutput %s", probe->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
 

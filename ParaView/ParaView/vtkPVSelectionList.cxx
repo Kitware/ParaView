@@ -133,20 +133,26 @@ void vtkPVSelectionList::Accept()
     }
 
   // Command to update the UI.
-  //his->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
-  //                               this->GetTclName(), 
-  //                               this->PVSource->GetVTKSourceTclName(), 
-  //                               getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  //this->AcceptCommands->AddString("%s %s [%s GetCurrentValue]",
-  //                                this->PVSource->GetVTKSourceTclName(),
-  //                                setCmd,
-  //                                this->GetTclName());
+  pvApp->BroadcastScript("%s Set%s %d",
+                         this->ObjectTclName,
+                         this->VariableName,
+                         this->CurrentValue); 
 
-  this->vtkPVWidget::Accept();
+  this->ModifiedFlag = 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::Reset()
+{
+
+  this->Script("%s SetCurrentValue [%s Get%s]",
+               this->GetTclName(),
+               this->ObjectTclName,
+               this->VariableName);
+
+  this->ModifiedFlag = 0;
+}
 
 
 //----------------------------------------------------------------------------

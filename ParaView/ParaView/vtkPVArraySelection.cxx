@@ -145,7 +145,7 @@ void vtkPVArraySelection::FillMenu()
     return;
     }
   
-  vtkPVData *pvInput = this->PVSource->GetNthPVInput(0);
+  vtkPVData *pvInput = this->PVSource->GetPVInput();
 
   if ( ! pvInput && ! this->VTKData)
     {

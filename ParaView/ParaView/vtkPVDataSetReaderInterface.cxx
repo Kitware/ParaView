@@ -198,7 +198,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvd->SetVTKData(d, outputTclName);
 
   // Connect the source and data.
-  pvs->SetNthPVOutput(0, pvd);
+  pvs->SetPVOutput(pvd);
   // It would be nice to have the vtkPVSource set this up, but for multiple
   // outputs, how do we know the method?
   // Relay the connection to the VTK objects.  

@@ -71,6 +71,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
 
@@ -143,6 +147,9 @@ ADD_TEST(ProbePoint ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(RotateTranslate ${PARAVIEW_EXECUTABLE}
                ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl)
+
+ADD_TEST(ScalarSelection ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl)
 
 ADD_TEST(SphereTest ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)

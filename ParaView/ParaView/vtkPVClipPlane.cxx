@@ -90,7 +90,7 @@ void vtkPVClipPlane::CreateProperties()
 
   this->vtkPVSource::CreateProperties();
  
-  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources());
 
@@ -150,7 +150,7 @@ void vtkPVClipPlane::UpdateParameterWidgets()
   float bds[6];
 
   this->vtkPVSource::UpdateParameterWidgets();
-  input = this->GetNthPVInput(0);
+  input = this->GetPVInput();
   if (input == NULL)
     {
     bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;

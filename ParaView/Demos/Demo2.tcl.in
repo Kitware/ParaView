@@ -85,7 +85,7 @@ proc POPInit {} {
     .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading continents.\n Continents were created by extracting the models surface at depth 0 and cliping with salinity value of 0.\nThe resulting model was decimated."
     set pvCont [$pvWindow Open "$DataDir/contDeciFull.vtk"]
     # set the color of the continent model.
-    set pvContOutput [$pvCont GetNthPVOutput 0]
+    set pvContOutput [$pvCont GetPVOutput]
     [$pvContOutput GetColorMenu] SetValue {Property}
     $pvContOutput ColorByProperty
     $pvContOutput ChangeActorColor 0 [expr 197.0/255.0] 1.0
@@ -95,7 +95,7 @@ proc POPInit {} {
     .control.main.info configure -text "ParaView demo initializing.\n Please wait.\n\n Loading ocean floor.\nThe ocean floor was created by taking an salinity iso surface at value 0."
     set pvFloor [$pvWindow Open "$DataDir/oceanFloorSmall.vtk"]
     # set the color of the ocean floor model.
-    set pvFloorOutput [$pvFloor GetNthPVOutput 0]
+    set pvFloorOutput [$pvFloor GetPVOutput]
     [$pvFloorOutput GetColorMenu] SetValue {Property}
     $pvFloorOutput ColorByProperty
     $pvFloorOutput ChangeActorColor 0.5 0.4 0.4
@@ -115,7 +115,7 @@ proc POPInit {} {
     $pvExtractGrid AcceptCallback
 
     # Setup color map to show temperature.
-    set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
     [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
     $pvExtractGridOutput ColorByPointFieldComponent Temperature 0
     [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
@@ -138,7 +138,7 @@ proc POPInit {} {
     $pvContour AcceptCallback
 
     # Setup color map to show temperature.
-    set pvContourOutput [$pvContour GetNthPVOutput 0]
+    set pvContourOutput [$pvContour GetPVOutput]
     [$pvContourOutput GetColorMenu] SetValue {Point Temperature}
     $pvContourOutput ColorByPointFieldComponent Temperature 0
     [$pvContourOutput GetColorMapMenu] SetValue {Blue to Red}
@@ -160,10 +160,10 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
 
     set pvWindow [lindex [vtkPVWindow ListInstances] 0]
     set pvView [$pvWindow GetMainView]
-    set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
-    set pvContourOutput [$pvContour GetNthPVOutput 0]
-    set pvContOutput [$pvCont GetNthPVOutput 0]
-    set pvFloorOutput [$pvFloor GetNthPVOutput 0]
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
+    set pvContourOutput [$pvContour GetPVOutput]
+    set pvContOutput [$pvCont GetPVOutput]
+    set pvFloorOutput [$pvFloor GetPVOutput]
 
 
     # initial camera
@@ -221,7 +221,7 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
     update
 
     # Setup color map to show temperature.
-    set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
+    set pvExtractGridOutput [$pvExtractGrid GetPVOutput]
     [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
     $pvExtractGridOutput ColorByPointFieldComponent Temperature 0
     $pvExtractGrid UpdateParameterWidgets
@@ -333,7 +333,7 @@ proc ParticleDemoInit {} {
     $pvClip UpdateParameterWidgets
     $pvClip AcceptCallback
 
-    set pvClipOutput [$pvClip GetNthPVOutput 0]
+    set pvClipOutput [$pvClip GetPVOutput]
     $pvClipOutput SetPointSize 2
     $pvClipOutput SetScalarRange 7 12
 

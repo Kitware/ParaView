@@ -460,7 +460,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
         
         if (source->GetPVInputs())
           {
-          if (source->GetNthPVInput(0)->GetPVSource())
+          if (source->GetPVInput()->GetPVSource())
             {
             // Draw ellipsis indicating that this source has a source.
             this->Script("%s create line %d %d %d %d",

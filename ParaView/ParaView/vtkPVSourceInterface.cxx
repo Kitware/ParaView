@@ -167,25 +167,28 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   // Set the input if necessary.
   if (this->InputClassName)
     {
-    pvs->SetNthPVInput(0, current);
+    pvs->SetPVInput(current);
     }
   
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
-  if (this->DefaultScalars)
-    {
-    pvs->PackScalarsMenu();
-    }
-  if (this->DefaultVectors)
-    {
-    pvs->PackVectorsMenu();
-    }
 
   if (this->InputClassName)
     {
-    pvs->AddInputMenu("Input", "NthPVInput 0", this->InputClassName,
+    pvs->AddInputMenu("Input", "PVInput", this->InputClassName,
                       "Set the input to this filter.", this->PVWindow->GetSources());
+    }
+
+  if (this->DefaultScalars)
+    {
+    pvs->AddArrayMenu("Scalars", "Scalars", 1,
+                      "Select the input scalars to process.");
+    }
+  if (this->DefaultVectors)
+    {
+    pvs->AddArrayMenu("Vectors", "Vectors", 3,
+                      "Select the input vectors to process.");
     }
 
   this->PVWindow->AddPVSource(pvs);
@@ -199,7 +202,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  pvs->SetNthPVOutput(0, pvd);
+  pvs->SetPVOutput(pvd);
   // It would be nice to have the vtkPVSource set this up, but for multiple outputs,
   // How do we know the method.
   // Relay the connection to the VTK objects.  
@@ -226,12 +229,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   else
     {
     pvApp->BroadcastScript(
-      "%s SetExtentTranslator [%s GetExtentTranslator]",
-      pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
-    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
-    pvApp->BroadcastScript(
-      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
-      pvs->GetVTKSourceTclName(), current->GetVTKDataTclName());
+        "%s SetExtentTranslator [%s GetExtentTranslator]",
+        pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
     }
   
   // Hack here specifically for the POP reader.  Initialize the clip extent variable.
@@ -290,10 +289,10 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       {
       this->Script("eval %s Set%s [%s GetWholeExtent]",
 		   pvs->GetVTKSourceTclName(), mInt->GetVariableName(),
-		   pvs->GetNthPVInput(0)->GetVTKDataTclName());
-      pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
-			   mInt->GetVariableName(),
-                           mInt->GetBalloonHelp());      
+		   pvs->GetPVInput()->GetVTKDataTclName());
+       pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
+                            mInt->GetVariableName(),
+                            mInt->GetBalloonHelp());      
       }
     else if (mInt->GetNumberOfArguments() == 1)
       {

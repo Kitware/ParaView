@@ -75,7 +75,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp536)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp536) AcceptCallback
 
-[$pv(vtkTemp486) GetNthPVOutput 0] SetVisibility 1
+[$pv(vtkTemp486) GetPVOutput] SetVisibility 1
 $pv(vtkTemp1) ResetCameraCallback
 
 # Fix the size of the image.

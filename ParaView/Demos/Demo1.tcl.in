@@ -86,11 +86,11 @@ proc SphereDemoInit {} {
     set pvExtract [$eInt2 CreateCallback]
     $pvExtract AcceptCallback
 
-    set extractOutput [$pvExtract GetNthPVOutput 0]
+    set extractOutput [$pvExtract GetPVOutput]
     $extractOutput ColorByProperty
     $extractOutput SetVisibility 0
 
-    set elevOutput [$pvElevation GetNthPVOutput 0]
+    set elevOutput [$pvElevation GetPVOutput]
     $elevOutput SetVisibility 0
 
     return "$pvSphere $elevOutput $extractOutput"
@@ -162,17 +162,17 @@ proc CombustorDemoInit {} {
     $pvExtract UpdateParameterWidgets
     $pvExtract AcceptCallback
     
-    [$pvExtract GetNthPVOutput 0] SetVisibility 0
+    [$pvExtract GetPVOutput] SetVisibility 0
 
     set pvGlyph [$pvWindow GlyphCallback]
     $pvGlyph AcceptCallback
     
-    [$pvGlyph GetNthPVOutput 0] ColorByProperty
+    [$pvGlyph GetPVOutput] ColorByProperty
     [$pvGlyph GetVTKSource] SetScaleFactor 3.0
     $pvGlyph UpdateParameterWidgets
     $pvGlyph AcceptCallback
 
-    [$pvGlyph GetNthPVOutput 0] SetVisibility 0
+    [$pvGlyph GetPVOutput] SetVisibility 0
 
     return "$cInt $pvPlot3D $pvExtract $pvGlyph"
 }
@@ -181,7 +181,6 @@ proc AdjustContourValue { cnt val } {
     set entry [$cnt GetPVWidget {Contour Values}]
     $entry RemoveAllValues
     $entry AddValue $val
-    $entry AddValueCallback
     $cnt AcceptCallback
 }
 
@@ -195,7 +194,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
 
     global pvDemoShouldStop
 
-    set cntOutput [$cInt GetNthPVOutput 0]
+    set cntOutput [$cInt GetPVOutput]
 
     set camera [Ren1 GetActiveCamera]
     $camera SetPosition -29.1076 -40.3242 38.8874
@@ -206,7 +205,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
 
     # Vary isosuface
     $cntOutput SetVisibility 1
-    [$pvPlot3D GetNthPVOutput 0] SetVisibility 1
+    [$pvPlot3D GetPVOutput] SetVisibility 1
     
     .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n Generating density isosurfaces for values 0.2 through 0.7." -justify left
     set start 0.2
@@ -261,7 +260,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     $pvExtract UpdateParameterWidgets
     $pvExtract AcceptCallback
 
-    [$pvExtract GetNthPVOutput 0] SetVisibility 1
+    [$pvExtract GetPVOutput] SetVisibility 1
     
 
     RenWin1 Render
@@ -298,7 +297,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
 	}
     }
 
-    [$pvGlyph GetNthPVOutput 0] SetVisibility 1
+    [$pvGlyph GetPVOutput] SetVisibility 1
 
     $camera SetPosition 36.8437 -0.196199 53.7392
     $camera SetFocalPoint -5.92921 -0.324064 18.022
@@ -326,10 +325,10 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
 	}
     }
 
-    [$pvGlyph GetNthPVOutput 0] SetVisibility 0
-    [$pvExtract GetNthPVOutput 0] SetVisibility 0
+    [$pvGlyph GetPVOutput] SetVisibility 0
+    [$pvExtract GetPVOutput] SetVisibility 0
 
-    [$pvPlot3D GetNthPVOutput 0] SetVisibility 0
+    [$pvPlot3D GetPVOutput] SetVisibility 0
     RenWin1 Render
 
 }
@@ -362,13 +361,13 @@ proc BlowMoldingDemoInit {} {
     $pvNormals UpdateParameterWidgets
     $pvNormals AcceptCallback
     
-    set warpOutput [$pvWarp GetNthPVOutput 0]
+    set warpOutput [$pvWarp GetPVOutput]
     $warpOutput SetVisibility 0
 
-    set subOutput [$pvSub GetNthPVOutput 0]
+    set subOutput [$pvSub GetPVOutput]
     $subOutput SetVisibility 0
 
-    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    set normalsOutput [$pvNormals GetPVOutput]
     $normalsOutput SetVisibility 0
 
     return "$pvWarp $pvSub $pvNormals"
@@ -392,9 +391,9 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
     $camera SetViewAngle 30
     $camera SetClippingRange 127.006 167.567
 
-    set warpOutput [$pvWarp GetNthPVOutput 0]
-    [$pvWarp GetVectorOperationMenu] SetValue displacement1
-    $pvWarp ChangeVectors
+    set warpOutput [$pvWarp GetPVOutput]
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
     $warpOutput ColorByPointFieldComponent thickness1 0
 
     $warpOutput SetVisibility 1
@@ -402,8 +401,8 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
     .control.main.info configure -text "Running Blow Molding Demo :\n This demo demonstrates advanced capabilities\n of ParaView. It shows the deformation of a blow molded\n model as a function of time. This is accomplished\n by displacing the geometry using a displacement\n vector field.\n Actual grid." -justify left
 
     for {set i 1} {$i <= 10} {incr i 1} {
-	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
-	$pvWarp ChangeVectors
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+	$pvWarp AcceptCallback
 	$warpOutput ColorByPointFieldComponent thickness$i 0
 	RenWin1 Render
 	after 100
@@ -422,17 +421,17 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
 
     .control.main.info configure -text "Running Blow Molding Demo :\n This demo demonstrates advanced capabilities\n of ParaView. It shows the deformation of a blow molded\n model as a function of time. This is accomplished\n by displacing the geometry using a displacement\n vector field.\n Grid smoothed by subdiving." -justify left
     
-    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    set normalsOutput [$pvNormals GetPVOutput]
     $normalsOutput SetVisibility 1
 
-    [$pvWarp GetVectorOperationMenu] SetValue displacement1
-    $pvWarp ChangeVectors
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+    $pvWarp AcceptCallback
     $normalsOutput ColorByPointFieldComponent thickness1 0
     $pvWindow DisableMenus
 
     for {set i 1} {$i <= 10} {incr i 1} {
-	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
-	$pvWarp ChangeVectors
+	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+	$pvWarp AcceptCallback
 	$normalsOutput ColorByPointFieldComponent thickness$i 0
 	RenWin1 Render
 	after 100
