@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.228");
+vtkCxxRevisionMacro(vtkPVApplication, "1.229");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -187,9 +187,24 @@ public:
   static vtkPVOutputWindow* New();
 
   void DisplayText(const char* t)
-  {
+    {
+    int cc;
+    ostrstream str;
+    for ( cc= 0; cc < vtkString::Length(t); cc ++ )
+      {
+      str << t[cc];
+      if ( t[cc] == '\n' )
+        {
+        str << "# ";
+        }
+      }
+    str << ends;
+    this->Application->AddTraceEntry("# %s\n#", str.str());
+    //cout << "# " << str.str() << endl;
+    str.rdbuf()->freeze(0);
+
     if ( this->Windows && this->Windows->GetNumberOfItems() &&
-         this->Windows->GetLastKWWindow() )
+      this->Windows->GetLastKWWindow() )
       {
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
       char buffer[4096];      
@@ -208,16 +223,16 @@ public:
         char *rmessage = vtkString::Duplicate(message);
         int last = vtkString::Length(rmessage)-1;
         while ( last > 0 && 
-                (rmessage[last] == ' ' || rmessage[last] == '\n' || 
-                 rmessage[last] == '\r' || rmessage[last] == '\t') )
+          (rmessage[last] == ' ' || rmessage[last] == '\n' || 
+           rmessage[last] == '\r' || rmessage[last] == '\t') )
           {
           rmessage[last] = 0;
           last--;
           }
         sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
-                (error ? "Error" : "Warning"),
-                file, line,
-                rmessage);
+          (error ? "Error" : "Warning"),
+          file, line,
+          rmessage);
         if ( error )
           {
           win->ErrorMessage(buffer);
@@ -233,29 +248,35 @@ public:
         delete [] rmessage;
         }
       }
-  }
+    }
   
   vtkPVOutputWindow()
   {
     this->Windows = 0;
     this->ErrorOccurred = 0;
     this->TestErrors = 1;
+    this->Application = 0;
   }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
   {
     this->Windows = windows;
   }
+  void SetApplication(vtkPVApplication* app)
+  {
+    this->Application = app;
+  }
 
   int GetErrorOccurred()
-    {
+  {
     return this->ErrorOccurred;
-    }
+  }
 
   void EnableTestErrors() { this->TestErrors = 1; }
   void DisableTestErrors() { this->TestErrors = 0; }
 protected:
   vtkKWWindowCollection *Windows;
+  vtkKWApplication *Application;
   int ErrorOccurred;
   int TestErrors;
 private:
@@ -1328,6 +1349,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("proc bgerror { m } "
                "{ global Application; $Application DisplayTCLError $m }");
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
+  window->SetApplication(this);
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);

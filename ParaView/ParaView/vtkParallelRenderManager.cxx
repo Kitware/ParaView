@@ -30,12 +30,14 @@ static void SatelliteStartRender(vtkObject *caller,
 static void SatelliteEndRender(vtkObject *caller,
                   unsigned long vtkNotUsed(event),
                   void *clientData, void *);
+/*
 static void ResetCamera(vtkObject *caller,
                   unsigned long vtkNotUsed(event),
                   void *clientData, void *);
 static void ResetCameraClippingRange(vtkObject *caller,
                      unsigned long vtkNotUsed(event),
                      void *clientData, void *);
+*/
 static void RenderRMI(void *arg, void *, int, int);
 static void ComputeVisiblePropBoundsRMI(void *arg, void *, int, int);
 
@@ -73,7 +75,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.3");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.4");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -211,20 +213,20 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
       {
       this->RenderWindow->RemoveObserver(this->StartRenderTag);
       this->RenderWindow->RemoveObserver(this->EndRenderTag);
-      
+
       // Will make do with first renderer. (Assumes renderer does not change.)
       if (this->ObservingRenderer)
-    {
-    rens = this->RenderWindow->GetRenderers();
-    rens->InitTraversal();
-    ren = rens->GetNextItem();
-    if (ren)
-      {
-      //ren->RemoveObserver(this->ResetCameraTag);
-      //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
-      }
-    this->ObservingRenderer = false;
-    }
+        {
+        rens = this->RenderWindow->GetRenderers();
+        rens->InitTraversal();
+        ren = rens->GetNextItem();
+        if (ren)
+          {
+          //ren->RemoveObserver(this->ResetCameraTag);
+          //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+          }
+        this->ObservingRenderer = false;
+        }
 
       this->ObservingRenderWindow = false;
       }
@@ -248,29 +250,29 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
     cbc->SetClientData((void*)this);
     // renWin will delete the cbc when the observer is removed.
     this->AbortRenderCheckTag = renWin->AddObserver(vtkCommand::AbortCheckEvent,
-                            cbc);
+      cbc);
     cbc->Delete();
 
     if (this->Controller)
       {
       if (this->Controller->GetLocalProcessId() == this->RootProcessId)
         {
-    this->ObservingRenderWindow = true;
-        
+        this->ObservingRenderWindow = true;
+
         cbc = vtkCallbackCommand::New();
         cbc->SetCallback(::StartRender);
         cbc->SetClientData((void*)this);
         // renWin will delete the cbc when the observer is removed.
         this->StartRenderTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
         cbc->Delete();
-        
+
         cbc = vtkCallbackCommand::New();
         cbc->SetCallback(::EndRender);
         cbc->SetClientData((void*)this);
         // renWin will delete the cbc when the observer is removed.
         this->EndRenderTag = renWin->AddObserver(vtkCommand::EndEvent,cbc);
         cbc->Delete();
-        
+
         // Will make do with first renderer. (Assumes renderer does
         // not change.)
         rens = this->RenderWindow->GetRenderers();
@@ -278,14 +280,14 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
         ren = rens->GetNextItem();
         if (ren)
           {
-      this->ObservingRenderer = true;
+          this->ObservingRenderer = true;
 
           //cbc = vtkCallbackCommand::New();
           //cbc->SetCallback(::ResetCameraClippingRange);
           //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
           //this->ResetCameraClippingRangeTag = 
-            //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+          //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
           //cbc->Delete();
 
           //cbc = vtkCallbackCommand::New();
@@ -293,23 +295,23 @@ void vtkParallelRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
           //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
           //this->ResetCameraTag =
-            //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
+          //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
           //cbc->Delete();
           }
         }
       else // LocalProcessId != RootProcessId
         {
         vtkCallbackCommand *cbc;
-        
-    this->ObservingRenderWindow = true;
-        
+
+        this->ObservingRenderWindow = true;
+
         cbc= vtkCallbackCommand::New();
         cbc->SetCallback(::SatelliteStartRender);
         cbc->SetClientData((void*)this);
         // renWin will delete the cbc when the observer is removed.
         this->StartRenderTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
         cbc->Delete();
-        
+
         cbc = vtkCallbackCommand::New();
         cbc->SetCallback(::SatelliteEndRender);
         cbc->SetClientData((void*)this);
@@ -573,7 +575,7 @@ void vtkParallelRenderManager::StartRender()
     this->Viewports->SetNumberOfTuples(rens->GetNumberOfItems());
     }
   vtkRenderer *ren;
-  for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
+  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
     {
     ren->GetViewport(renInfoFloat.Viewport);
 
@@ -608,7 +610,7 @@ void vtkParallelRenderManager::StartRender()
       }
 
     vtkLight *light;
-    for (lc->InitTraversal(); light = lc->GetNextItem(); )
+    for (lc->InitTraversal(); (light = lc->GetNextItem()); )
       {
       light->GetPosition(lightInfoFloat.Position);
       light->GetFocalPoint(lightInfoFloat.FocalPoint);
@@ -653,7 +655,7 @@ void vtkParallelRenderManager::EndRender()
     vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
     vtkRenderer *ren;
     int i;
-    for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
+    for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
       {
       ren->SetViewport(this->Viewports->GetPointer(i*4));
       }
@@ -768,7 +770,7 @@ void vtkParallelRenderManager::SatelliteStartRender()
     if (ren != NULL)
       {
       vtkLight *light;
-      while (light = lc->GetNextItem())
+      while ((light = lc->GetNextItem()))
     {
     // To many lights?  Just remove the extras.
     ren->RemoveLight(light);
@@ -1021,7 +1023,7 @@ void vtkParallelRenderManager::ResetAllCameras()
   vtkRenderer *ren;
 
   rens = this->RenderWindow->GetRenderers();
-  for (rens->InitTraversal(); ren = rens->GetNextItem(); )
+  for (rens->InitTraversal(); (ren = rens->GetNextItem()); )
     {
     this->ResetCamera(ren);
     }
@@ -1588,6 +1590,7 @@ static void SatelliteEndRender(vtkObject *caller,
   self->SatelliteEndRender();
 }
 
+/*
 static void ResetCamera(vtkObject *caller,
             unsigned long vtkNotUsed(event),
             void *clientData, void *)
@@ -1605,6 +1608,7 @@ static void ResetCameraClippingRange(vtkObject *caller,
   vtkRenderer *ren = (vtkRenderer *)caller;
   self->ResetCameraClippingRange(ren);
 }
+*/
 
 static void RenderRMI(void *arg, void *, int, int)
 {

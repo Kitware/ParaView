@@ -341,8 +341,8 @@ protected:
   // Used to synchronize rendering information per frame.
   virtual void SendWindowInformation() {}
   virtual void ReceiveWindowInformation() {}
-  virtual void SendRendererInformation(vtkRenderer *ren) {};
-  virtual void ReceiveRendererInformation(vtkRenderer *ren) {};
+  virtual void SendRendererInformation(vtkRenderer *) {};
+  virtual void ReceiveRendererInformation(vtkRenderer *) {};
 
   // Description:
   // Here is a good place to handle processing of data before and after

@@ -43,7 +43,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.2");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.3");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
@@ -559,7 +559,7 @@ void vtkIceTRenderManager::PreRenderProcessing()
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
   vtkRenderer *ren;
   int i;
-  for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
+  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
     {
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
     if (icetRen == NULL)

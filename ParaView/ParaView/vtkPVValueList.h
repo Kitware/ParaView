@@ -85,7 +85,7 @@ public:
   // Description:
   // This virtual method returns the range in which new values
   // can be added. This method should be overwritten by sub-classes.
-  virtual int GetValueRange(float range[2]) {return 0;}
+  virtual int GetValueRange(float range[2]) {(void)range;return 0;}
 
   // Description:
   // Button callbacks.

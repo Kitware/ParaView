@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.3");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.4");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -226,7 +226,7 @@ void vtkIceTClientCompositeManager::StartRender()
   vtkLightCollection *lc;
   vtkLight *light;
   static int firstRender = 1;
-  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
+  //float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   if (firstRender)
     {
