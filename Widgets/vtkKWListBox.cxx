@@ -154,10 +154,9 @@ void vtkKWListBox::Create(vtkKWApplication *app, char *args)
   wname = this->GetWidgetName();
   
   this->Script("frame %s ", wname);
-  this->Script("pack %s", wname);
   this->Script("scrollbar %s.scroll -command \"%s.list yview\"", 
 	       wname, wname);
-  this->Script("listbox %s.list  -yscroll \"%s.scroll set\" -setgrid 1 %s", 
+  this->Script("listbox %s.list  -yscroll \"%s.scroll set\" %s", 
 	       wname, wname, args);
   this->Script("pack %s.scroll -side right -fill y", wname);
   this->Script("pack %s.list -side left -expand 1 -fill both", wname);
