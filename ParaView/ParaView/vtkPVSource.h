@@ -114,6 +114,8 @@ public:
   // avoid duplicating VTK's source class structure.
   virtual void SetPVInput(vtkPVData *input);
   virtual vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
+  vtkGetMacro(NumberOfPVInputs, int);
+  vtkPVData *GetNthPVInput(int idx);
 
   // Description:
   // Set/get the first output of this source. Most source are setup
@@ -126,7 +128,9 @@ public:
   // used since most of the source have only one output.
   void SetPVOutput(int idx, vtkPVData *pvd) {this->SetNthPVOutput(idx,pvd);}
   vtkPVData *GetPVOutput(int idx) { return this->GetNthPVOutput(idx); }
-
+  vtkGetMacro(NumberOfPVOutputs, int);
+  vtkPVData *GetNthPVOutput(int idx);
+ 
   // Description:
   // This name is used in the data list to identify the composite.
   virtual void SetName(const char *name);
@@ -153,7 +157,8 @@ public:
   // Hide flag is used for hidding creation of 
   // the glyph sources from the user.
   virtual void Accept() { this->Accept(0); }
-  virtual void Accept(int hideFlag);
+  virtual void Accept(int hideFlag) { this->Accept(hideFlag, 1); }
+  virtual void Accept(int hideFlag, int hideSource);
   
   // Description:
   // Called when the reset button is pressed.
@@ -223,9 +228,7 @@ public:
 
   // Description:
   // These are used for drawing the navigation window.
-  vtkGetMacro(NumberOfPVInputs, int);
   vtkPVData **GetPVInputs() { return this->PVInputs; };
-  vtkGetMacro(NumberOfPVOutputs, int);
   vtkPVData **GetPVOutputs() { return this->PVOutputs; };
 
   // Description:
@@ -332,6 +335,7 @@ protected:
 
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
+  virtual void SerializeToken(istream& is, const char token[1024]);
 
   // Description:
   // Create a menu to select the input.
@@ -368,10 +372,8 @@ protected:
   vtkPVData **PVInputs;
   int NumberOfPVInputs; 
  
-  vtkPVData *GetNthPVInput(int idx);
   void RemoveAllPVInputs();
   
-  vtkPVData *GetNthPVOutput(int idx);
   void SetNthPVOutput(int idx, vtkPVData *output);
   void SetNthPVInput(int idx, vtkPVData *input);
   

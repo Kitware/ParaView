@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWSerializer.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -62,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
+#include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
@@ -655,7 +657,7 @@ void vtkPVSource::AcceptCallbackInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Accept(int hideFlag)
+void vtkPVSource::Accept(int hideFlag, int hideSource)
 {
   vtkPVWindow *window;
 
@@ -708,7 +710,7 @@ void vtkPVSource::Accept(int hideFlag)
     input = this->GetPVInput();
     if (input)
       {
-      if (this->ReplaceInput && input->GetPropertiesCreated())
+      if (this->ReplaceInput && input->GetPropertiesCreated() && hideSource)
         {
         input->SetVisibilityInternal(0);
         }
@@ -1153,10 +1155,6 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (pvd)
     {
-    if (this->ReplaceInput && pvd->GetPropertiesCreated())
-      {
-      pvd->SetVisibilityInternal(0);
-      }
     pvd->Register(this);
     pvd->AddPVConsumer(this);
     this->PVInputs[idx] = pvd;
@@ -1621,28 +1619,20 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 //----------------------------------------------------------------------------
 void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
 {
+  int cc;
   this->Superclass::SerializeSelf(os, indent);
   os << indent << "ModuleName " << this->ModuleName << endl;
   os << indent << "HideDisplayPage " << this->HideDisplayPage << endl;
   os << indent << "HideParametersPage " << this->HideParametersPage << endl;
-  os << indent << "NumberOfPVOutputs " << this->NumberOfPVOutputs << endl;
-  os << indent << "NumberOfPVInputs " << this->NumberOfPVInputs << endl;
-  if ( this->InputClassName )
+  os << indent << "NumberOfPVInputs " << this->GetNumberOfPVInputs() << endl;
+  for ( cc = 0; cc < this->GetNumberOfPVInputs(); cc ++ )
     {
-    os << indent << "InputClassName " << this->InputClassName << endl;
-    }
-  if ( this->OutputClassName )
-    {
-    os << indent << "OutputClassName " << this->OutputClassName << endl;
-    }
-  if ( this->SourceClassName )
-    {
-    os << indent << "SourceClassName " << this->SourceClassName << endl;
-    }
-  if ( this->GetPVInput() && this->GetPVInput()->GetPVSource() )
-    {
-    os << indent << "Input " << this->GetPVInput()->GetPVSource()->GetName() 
-       << endl;
+    if ( this->GetNthPVInput(cc) && this->GetNthPVInput(cc)->GetPVSource() )
+      {
+      os << indent << "Input " << cc << " " 
+         << this->GetNthPVInput(cc)->GetPVSource()->GetName() 
+         << endl;
+      }
     }
   os << indent << "Output ";
   this->GetPVOutput()->Serialize(os, indent);
@@ -1657,7 +1647,7 @@ void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
     while( !it->IsDoneWithTraversal() )
       {
       vtkPVWidget* widget = static_cast<vtkPVWidget*>( it->GetObject() );
-      os << indentp << "Widget" << cc << " ";
+      os << indentp << "Widget \"" << widget->GetTraceName() << "\" ";
       widget->Serialize(os, indentp);
 
       it->GoToNextItem();
@@ -1669,17 +1659,151 @@ void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
 }
 
 //------------------------------------------------------------------------------
+void vtkPVSource::SerializeToken(istream& is, const char token[1024])
+{
+  int cc;
+  if ( vtkString::Equals(token, "HideDisplayPage") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->HideDisplayPage = cor;
+    }
+  else if ( vtkString::Equals(token, "HideParametersPage") )
+    {
+    int cor;
+    cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->HideParametersPage = cor;
+    }
+  else if ( vtkString::Equals(token, "ModuleName") )
+    {
+    char name[1024];
+    name[0] = 0;
+    if ( ! (is >> name ) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      return;
+      }
+    this->SetModuleName(name);
+    }
+  else if ( vtkString::Equals(token, "Output") )
+    {
+    vtkPVData* output = this->GetPVOutput();
+    if (!output )
+      {
+      cout << "Output does not exist yet..." << endl;
+      output = vtkPVData::New();
+      output->SetPVApplication(
+        vtkPVApplication::SafeDownCast(this->Application));
+      this->SetPVOutput(output);
+      output->Delete();
+      }
+    //this->AcceptCallback();
+    this->Accept(0, 0);
+    output->Serialize(is);
+    }
+  else if ( vtkString::Equals(token, "NumberOfPVInputs") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->SetNumberOfPVInputs(cor);
+    }
+  else if ( vtkString::Equals(token, "Input") )
+    {
+    int cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    //cout << "Reading input: " << cor << endl;
+    char name[1024];
+    name[0] = 0;
+    if ( ! (is >> name ) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      return;
+      }
+    //cout << "Input " << cor << " is: " << name << endl;
+    vtkPVApplication *application 
+      = vtkPVApplication::SafeDownCast(this->Application);
+    vtkPVSource* isource 
+      = application->GetMainWindow()->GetSourceFromName(name);
+    if ( !isource )
+      {
+      vtkErrorMacro("Cannot find input to this source");
+      return;
+      }
+    this->SetNthPVInput(cor, isource->GetPVOutput());
+    this->UpdateParameterWidgets();
+    }
+  else if ( vtkString::Equals(token, "Widgets") )
+    {
+    char ntoken[1024];
+    int done = 0;;
+    while(!done)
+      {
+      ntoken[0] = 0;
+      if ( !( is >> ntoken ) )
+        {
+        vtkErrorMacro("Error when parsing widgets");
+        return;
+        }
+      if ( vtkString::Equals(ntoken, "}") )
+        {
+        done = 1;
+        }
+      else if ( vtkString::Equals(ntoken, "Widget") )
+        {
+        char tracename[1024];
+        vtkKWSerializer::GetNextToken(&is,tracename);
+        vtkPVWidget* widget = this->GetPVWidget(tracename);
+        if ( !widget )
+          {
+          vtkErrorMacro("Widget " << tracename << " does not exists in "
+                        << this->GetModuleName());
+          return;
+          }
+        //cout << "Widget: " << tracename << " (" << widget << ") " 
+        //     << widget->GetClassName() << endl;
+        widget->Serialize(is);
+        }
+      else 
+        {
+        //cout << "Unknown token: " << ntoken << endl;
+        }
+      }
+    }
+  else
+    {
+    //cout << "Unknown Token for " << this->GetClassName() << ": " 
+    //     << token << endl;
+    this->Superclass::SerializeToken(is,token);  
+    }
+}
+
+//------------------------------------------------------------------------------
 void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.219 $");
+  this->ExtractRevision(os,"$Revision: 1.220 $");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
+     << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
   os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
   os << indent << "ExtentTranslatorTclName: " 
