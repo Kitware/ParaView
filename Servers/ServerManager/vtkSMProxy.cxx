@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.32");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -898,9 +898,34 @@ int vtkSMProxy::ReadXMLAttributes(
       if (subElement)
         {
         const char* name = subElement->GetAttribute("name");
+        const char* pname = subElement->GetAttribute("proxyname");
+        const char* gname = subElement->GetAttribute("proxygroup");
+        if (pname && !gname)
+          {
+          vtkErrorMacro("proxygroup not specified. Subproxy cannot be created.");
+          return 0;
+          }
+        if (gname && !pname)
+          {
+          vtkErrorMacro("proxyname not specified. Subproxy cannot be created.");
+          return 0;
+          }
         if (name)
           {
-          vtkSMProxy* subproxy = pm->NewProxy(subElement, 0);
+          vtkSMProxy* subproxy = 0;
+          if (pname && gname)
+            {
+            subproxy = pm->NewProxy(gname, pname);
+            }
+          else
+            {
+            subproxy = pm->NewProxy(subElement, 0);
+            }
+          if (!subproxy)
+            {
+            vtkErrorMacro("Failed to create subproxy.");
+            return 0;
+            }
           this->AddSubProxy(name, subproxy);
           subproxy->Delete();
           }
