@@ -23,9 +23,9 @@
 #
 
 # Release version number.
-TAG="ParaView-1-0-3"
+TAG="ParaView-1-0-4"
 PARAVIEW_VERSION="1.0"
-VERSION="${PARAVIEW_VERSION}.3"
+VERSION="${PARAVIEW_VERSION}.4"
 RELEASE="1"
 
 # Project configuration.
@@ -346,6 +346,8 @@ checkout()
         mkdir CheckoutTemp &&
         cd CheckoutTemp &&
         cvs -q -z3 -d $CVSROOT export -r ${TAG} ${CVS_MODULE} &&
+        rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
+        rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
         mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
         cd .. &&
         rm -rf CheckoutTemp
