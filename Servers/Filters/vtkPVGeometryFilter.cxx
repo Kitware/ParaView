@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.37");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.38");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -461,6 +461,12 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
     outline->Delete();
+    }
+  else
+    {
+    vtkPoints* pts = vtkPoints::New();
+    output->SetPoints(pts);
+    pts->Delete();
     }
 }
 
