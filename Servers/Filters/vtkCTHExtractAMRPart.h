@@ -86,15 +86,6 @@ protected:
   void ExecuteBlock(vtkImageData* block, vtkAppendPolyData** appends, double startProgress, double stopProgress);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
                    vtkAppendPolyData* append);
-  void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
-                                  vtkFloatArray *pointVolumeFraction, int *dims);
-
-  void ExecuteCellDataToPointData2(vtkDataArray *cellVolumeFraction, 
-                            vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
-  void FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList);
-  float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
-                           double* pCell, float* pPoint, vtkCTHData* output);
-  //void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
 
   int IgnoreGhostLevels;
 
