@@ -721,7 +721,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   // Create the main reader source.
   pvs = vtkPVSource::New();
-  pvs->SetParametersParent(window->GetMainView()->GetPropertiesParent());
+  pvs->SetParametersParent(window->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
   pvs->SetVTKSource(reader, tclName);
   pvs->SetView(window->GetMainView());
@@ -788,7 +788,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       // simply shallow copy their input to their output.
       connection = vtkPVSource::New();
       connection->SetParametersParent(
-        window->GetMainView()->GetPropertiesParent());
+        window->GetMainView()->GetSourceParent());
       connection->SetApplication(pvApp);
       connectionTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
       sprintf(connectionTclName, "%s_%d", tclName, i+1);

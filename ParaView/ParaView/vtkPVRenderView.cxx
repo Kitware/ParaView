@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWFrame.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
@@ -108,6 +109,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseReductionFactor = 1;
   
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
+
+  this->SplitFrame = vtkKWSplitFrame::New();
 
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->NavigationFrame = vtkKWLabeledFrame::New();
@@ -230,6 +233,9 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     this->SelectionWindow->Delete();
     }
+  this->SplitFrame->Delete();
+  this->SplitFrame = NULL;
+ 
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
  
@@ -592,21 +598,30 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // Expose.
   this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
                this->GetTclName());
-  
-  this->NavigationFrame->SetParent(this->GetPropertiesParent());
-  this->NavigationFrame->ShowHideFrameOn();
+
+  this->SplitFrame->SetParent(this->GetPropertiesParent());
+  this->SplitFrame->SetOrientationToVertical();
+  this->SplitFrame->Create(this->Application);
+  this->SplitFrame->SetFrame1MinimumSize(80);
+  this->SplitFrame->SetFrame1Size(80);
+  this->SplitFrame->SetSeparatorSize(5);
+  this->Script("pack %s -fill both -expand t -side top", 
+               this->SplitFrame->GetWidgetName());
+
+  this->NavigationFrame->SetParent(this->SplitFrame->GetFrame1());
+  this->NavigationFrame->ShowHideFrameOff();
   this->NavigationFrame->Create(this->Application);  
   this->NavigationFrame->SetLabel("Navigation");
-  this->Script("pack %s -fill x -expand t -side top", 
+  this->Script("pack %s -fill both -expand t -side top", 
                this->NavigationFrame->GetWidgetName());
 
   this->NavigationWindow->SetParent(this->NavigationFrame->GetFrame());
   this->NavigationWindow->SetWidth(341);
-  this->NavigationWindow->SetHeight(45);
+  this->NavigationWindow->SetHeight(545);
   this->NavigationWindow->Create(this->Application, 0); 
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
-  this->SelectionWindow->SetHeight(45);
+  this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
 
   if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
@@ -644,6 +659,14 @@ void vtkPVRenderView::PackProperties()
       }
     }
 }
+
+
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkPVRenderView::GetSourceParent()
+{
+  return this->SplitFrame->GetFrame2();
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -1754,7 +1777,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.174 $");
+  this->ExtractRevision(os,"$Revision: 1.175 $");
 }
 
 //------------------------------------------------------------------------------
@@ -1851,6 +1874,8 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetInteractiveCompositeTime() << endl;
   os << indent << "InteractiveRenderTime: " 
      << this->GetInteractiveRenderTime() << endl;
+  os << indent << "SplitFrame: " 
+     << this->GetSplitFrame() << endl;
   os << indent << "NavigationFrame: " 
      << this->GetNavigationFrame() << endl;
   os << indent << "RendererTclName: " 

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.9");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.10");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -440,7 +440,7 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
 int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 {
   pvm->SetApplication(this->Window->GetPVApplication());
-  pvm->SetParametersParent(this->Window->GetMainView()->GetPropertiesParent());
+  pvm->SetParametersParent(this->Window->GetMainView()->GetSourceParent());
   
   const char* root_name = me->GetAttribute("root_name");
   if(root_name) { pvm->SetName(root_name); }

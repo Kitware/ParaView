@@ -61,6 +61,7 @@ class vtkMultiProcessController;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
+class vtkKWSplitFrame;
 class vtkKWScale;
 class vtkLabeledFrame;
 class vtkPVApplication;
@@ -285,6 +286,11 @@ public:
   // Update manipulators after they were added to control.
   void UpdateCameraManipulators();
 
+  // Description:
+  // Here so that sources get packed in the second frame.
+  virtual vtkKWWidget *GetSourceParent();
+  vtkKWSplitFrame *GetSplitFrame() {return this->SplitFrame;}
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -340,6 +346,8 @@ protected:
   vtkKWWidget *FrameRateFrame;
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
+
+  vtkKWSplitFrame *SplitFrame;
 
   vtkPVNavigationWindow *NavigationWindow;
 

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDirectory.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -58,7 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
-#include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
@@ -184,10 +184,10 @@ vtkPVWindow::vtkPVWindow()
   this->CurrentPVSource = NULL;
 
   // Allow the user to interactively resize the properties parent.
-  this->MiddleFrame->SetSeparatorWidth(6);
-  this->MiddleFrame->SetFrame1MinimumWidth(5);
-  this->MiddleFrame->SetFrame1Width(360);
-  this->MiddleFrame->SetFrame2MinimumWidth(200);
+  this->MiddleFrame->SetSeparatorSize(5);
+  this->MiddleFrame->SetFrame1MinimumSize(5);
+  this->MiddleFrame->SetFrame1Size(360);
+  this->MiddleFrame->SetFrame2MinimumSize(200);
 
   // Frame used for animations.
   this->AnimationInterface = vtkPVAnimationInterface::New();
@@ -2598,8 +2598,8 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->MainView->GetPropertiesParent()->GetWidgetName());
-  this->Script("pack %s -side top -fill x -expand t",
-               this->MainView->GetNavigationFrame()->GetWidgetName());
+  this->Script("pack %s -side top -fill both -expand t",
+               this->MainView->GetSplitFrame()->GetWidgetName());
   
   if (!this->GetCurrentPVSource())
     {
@@ -3217,7 +3217,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.331 $");
+  this->ExtractRevision(os,"$Revision: 1.332 $");
 }
 
 //----------------------------------------------------------------------------

@@ -81,7 +81,7 @@ void vtkPVDataSetReaderModule::InitializePrototype()
 }
 
 int vtkPVDataSetReaderModule::ReadFile(const char* fname, 
-				       vtkPVReaderModule*& clone)
+                                       vtkPVReaderModule*& clone)
 {
   clone = 0;
 
@@ -142,7 +142,7 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   
   pvs = vtkPVReaderModule::New();
   pvs->SetParametersParent(
-    this->GetPVWindow()->GetMainView()->GetPropertiesParent());
+    this->GetPVWindow()->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
@@ -162,8 +162,8 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
       { 
       vtkPVApplication* pvApp=this->GetPVApplication();
       pvApp->AddTraceEntry("set kw(%s) [%s GetCurrentPVSource]", 
-			   pvs->GetTclName(), 
-			   pvApp->GetMainWindow()->GetTclName());
+                           pvs->GetTclName(), 
+                           pvApp->GetMainWindow()->GetTclName());
       pvs->SetTraceInitialized(1);
       }
     }
@@ -207,12 +207,12 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   // outputs, how do we know the method?
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());   
+                         pvd->GetVTKDataTclName());   
 
   extentTclName = new char[strlen(tclName)+11 + 
-			  (this->PrototypeInstanceCount%10)+1 + 10];
+                          (this->PrototypeInstanceCount%10)+1 + 10];
   sprintf(extentTclName, "%s%dTranslator", tclName, 
-	  this->PrototypeInstanceCount);
+          this->PrototypeInstanceCount);
   pvApp->BroadcastScript("vtkPVExtentTranslator %s", extentTclName);
   pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
                          extentTclName, pvs->GetVTKSourceTclName());

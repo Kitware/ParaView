@@ -489,7 +489,7 @@ void vtkPVSource::Select()
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ParametersParent->GetWidgetName());
-  this->Script("pack %s -side top -fill x",
+  this->Script("pack %s -side top -fill both -expand t",
                this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
@@ -1794,7 +1794,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.221 $");
+  this->ExtractRevision(os,"$Revision: 1.222 $");
 }
 
 //----------------------------------------------------------------------------
