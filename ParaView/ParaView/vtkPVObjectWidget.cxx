@@ -39,13 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVObjectWidget.h"
+
+#include "vtkArrayMap.txx"
+#include "vtkKWSerializer.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
-#include "vtkPVObjectWidget.h"
-#include "vtkObjectFactory.h"
-#include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
-
+#include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -124,7 +126,7 @@ void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }
 
 //----------------------------------------------------------------------------
@@ -133,9 +135,34 @@ void vtkPVObjectWidget::SerializeSelf(ostream& os, vtkIndent indent)
   this->Superclass::SerializeSelf(os, indent);
   if ( this->ObjectTclName && this->VariableName )
     {
-    os << indent << "VariableName " << this->VariableName << endl;
-    os << indent << "VariableValue " 
-       << this->Script("%s Get%s", this->ObjectTclName, this->VariableName) << endl;
+    os << indent << "Variable " << this->VariableName << " \""
+       << this->Script("%s Get%s", this->ObjectTclName, this->VariableName)
+       << " \"" << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVObjectWidget::SerializeToken(istream& is, const char token[1024])
+{
+  if ( vtkString::Equals(token, "Variable") )
+    {
+    char varname[1024];
+    char ntoken[1024];
+    varname[0] = 0;
+    if ( !( is >> varname ) )
+      {
+      vtkErrorMacro("Problem parsing variable name");
+      return;
+      }
+    vtkKWSerializer::GetNextToken(&is,ntoken);
+    //cout << "Variable: " << varname << " Value: " << ntoken << endl;
+    this->Script("%s Set%s %s", this->ObjectTclName, varname, ntoken);
+    }
+  else
+    {
+    //cout << "Unknown Token for " << this->GetClassName() << ": " 
+    //     << token << endl;
+    this->Superclass::SerializeToken(is,token);  
     }
 }
 
