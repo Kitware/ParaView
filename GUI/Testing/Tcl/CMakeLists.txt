@@ -111,11 +111,28 @@ ENDIF(VTK_USE_MPI)
 
 FOREACH (tfile ${PROJECT_TESTS})
   # repeat test in composite mode if test composite is on
-  IF (PARAVIEW_TEST_COMPOSITING)
-    ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI 
-      ${PARAVIEW_EXECUTABLE}     
+  IF (PARAVIEW_TEST_REMOTE)
+    SEPARATE_ARGUMENTS(VTK_MPI_CLIENT_POSTFLAGS)
+    ADD_TEST(${tfile}-ParaView-REMOTE
+      ${PARAVIEW_EXECUTABLE}
+      --client
+      --always-ssh
+      ${VTK_MPI_CLIENT_POSTFLAGS}
       ${TIMEOUT}
-      --disable-registry 
+      --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png
+      )
+  ENDIF (PARAVIEW_TEST_REMOTE)
+  IF (PARAVIEW_TEST_COMPOSITING)
+    ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI
+      ${PARAVIEW_EXECUTABLE}
+      ${TIMEOUT}
+      --disable-registry
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -UC
       -D ${PVClientTestData}
