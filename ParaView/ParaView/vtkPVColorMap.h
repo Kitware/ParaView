@@ -92,8 +92,9 @@ public:
   vtkPVRenderView* GetPVRenderView() { return this->PVRenderView;}
 
   // Description:
-  // The name of the color map serves as the label of the ScalarBar (e.g. Temperature).
-  // Currently it also indicates the arrays mapped by this color map object.
+  // The name of the color map serves as the label of the ScalarBar 
+  // (e.g. Temperature). Currently it also indicates the arrays mapped
+  // by this color map object.
   void SetScalarBarTitle(const char* Name);
   void SetScalarBarTitleNoTrace(const char* Name);
   const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
@@ -108,7 +109,8 @@ public:
   // Just like in vtk data objects, this method makes a data object
   // that is of the same type as the original.  It is used for creating
   // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVColorMap *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
+  virtual vtkPVColorMap *MakeObject()
+    { vtkErrorMacro("No MakeObject"); return NULL;}
       
   // Description:
   // This method should be called immediately after the object is constructed.
@@ -206,6 +208,10 @@ public:
                             void* calldata);
 //ETX
 
+  // Description:
+  // GUI components access
+  vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -253,7 +259,6 @@ protected:
   vtkKWLabeledEntry* ScalarBarTitleEntry;
   vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
-
 
   
   // For the map image.
