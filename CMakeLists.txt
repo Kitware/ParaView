@@ -252,3 +252,8 @@ INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION} FILES
   ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake
   ${ParaView_BINARY_DIR}/Utilities/ParaViewConfig.cmake
   )
+
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/CMake/CTestCustom.ctest.in
+  ${ParaView_BINARY_DIR}/CTestCustom.ctest @ONLY)
+
+
