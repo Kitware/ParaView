@@ -88,10 +88,22 @@ public:
   vtkSetStringMacro(FileName);
 
   // Description:
-  // Set default extention.
-  vtkSetStringMacro(DefaultExt);
-  vtkGetStringMacro(DefaultExt);
-
+  // Set default extension.
+  virtual void SetDefaultExt(const char *)
+    {
+      vtkErrorMacro("This method is deprecated use SetDefaultExtension");
+    }
+  const char *GetDefaultExt()
+    {
+      vtkErrorMacro("This method is deprecated use GetDefaultExtension");
+      return NULL;
+    }
+  
+  // Description:
+  // Set default extension.
+  vtkSetStringMacro(DefaultExtension);
+  vtkGetStringMacro(DefaultExtension);
+  
   // Description:
   // Set or reset the SaveDialog. If set, the dialog will be
   // save file dialog. If reset, the dialog will be load 
@@ -122,7 +134,7 @@ protected:
   char *FileTypes;
   char *Title;
   char *FileName;
-  char *DefaultExt;
+  char *DefaultExtension;
   char *LastPath;
   int SaveDialog;
   int Done;

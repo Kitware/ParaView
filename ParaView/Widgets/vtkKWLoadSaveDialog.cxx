@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.15");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.16");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -59,7 +59,7 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
   this->LastPath = 0;
 
   this->SaveDialog = 0;
-  this->DefaultExt = 0;
+  this->DefaultExtension = 0;
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
@@ -70,7 +70,7 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
   this->SetFileTypes(0);
   this->SetTitle(0);
   this->SetFileName(0);
-  this->SetDefaultExt(0);
+  this->SetDefaultExtension(0);
   this->SetLastPath(0);
 }
 
@@ -97,7 +97,7 @@ int vtkKWLoadSaveDialog::Invoke()
           << " -title {" << this->Title
           << "}"
           << " -defaultextension {" 
-          << (this->DefaultExt ? this->DefaultExt : "")
+          << (this->DefaultExtension ? this->DefaultExtension : "")
           << "}"
           << " -filetypes {" << this->FileTypes << "}"
           << " -initialdir { " 
@@ -152,7 +152,8 @@ const char* vtkKWLoadSaveDialog::GenerateLastPath(const char* path)
 void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "DefaultExt: " << (this->DefaultExt?this->DefaultExt:"none")
+  os << indent << "DefaultExtension: " << 
+    (this->DefaultExtension?this->DefaultExtension:"none")
      << endl;
   os << indent << "FileName: " << (this->FileName?this->FileName:"none") 
      << endl;
