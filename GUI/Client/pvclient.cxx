@@ -61,25 +61,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
-#ifdef PARAVIEW_ENABLE_FPE
-void u_fpu_setup()
-{
-#ifdef _MSC_VER
-  // enable floating point exceptions on MSVC
-  short m = 0x372;
-  __asm
-    {
-    fldcw m;
-    }
-#endif  //_MSC_VER
-#ifdef __linux__
-  // This only works on linux x86
-  unsigned int fpucw= 0x1372;
-  __asm__ ("fldcw %0" : : "m" (fpucw));
-#endif  //__linux__
-}
-#endif //PARAVIEW_ENABLE_FPE
-
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
 {
