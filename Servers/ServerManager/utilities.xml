@@ -1,0 +1,77 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="lookup_tables">
+    <LookupTableProxy name="LookupTable" class="vtkLookupTable">
+      <IntVectorProperty
+         name="NumberOfTableValues"
+         command="SetNumberOfTableValues"
+         number_of_elements="1"
+         default_values="32" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="HueRange"
+         command="SetHueRange"
+         number_of_elements="2" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="SaturationRange"
+         command="SetSaturationRange"
+         number_of_elements="2" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ValueRange"
+         command="SetValueRange"
+         number_of_elements="2" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ScalarRange"
+         command="SetTableRange"
+         number_of_elements="2" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="VectorComponent"
+         command="SetVectorComponent"
+         number_of_elements="1" >
+      </IntVectorProperty>
+    </LookupTableProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="implicit_functions">
+    <Proxy name="Plane" class="vtkPlane">
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Normal"
+         command="SetNormal"
+         number_of_elements="3"
+         default_values="0.0 0.0 1.0" >
+      </DoubleVectorProperty>
+    </Proxy>
+
+    <Proxy name="Sphere" class="vtkSphere">
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

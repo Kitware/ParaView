@@ -1,1 +1,108 @@
-# Nothing here yet
+PROJECT(ServerManager)
+
+SET( ServerManagerCommon_SRCS
+  vtkSMApplication.cxx
+  vtkSMCommunicationModule.cxx
+  vtkSMDoubleVectorProperty.cxx
+  vtkSMSimpleCommunicationModule.cxx
+  vtkSMIntVectorProperty.cxx
+  vtkSMLookupTableProxy.cxx
+  vtkSMObject.cxx
+  vtkSMPart.cxx
+  vtkSMProcessModule.cxx
+  vtkSMProperty.cxx
+  vtkSMProxy.cxx
+  vtkSMSourceProxy.cxx
+  vtkSMDisplayerProxy.cxx
+  vtkSMDisplayWindowProxy.cxx
+  vtkSMProxyManager.cxx
+  vtkSMProxyProperty.cxx
+  vtkSMStringVectorProperty.cxx
+  vtkSMVectorProperty.cxx
+  )
+
+SET( ServerManagerNonWrapped_SRCS
+  vtkSMXMLParser.cxx
+  )
+
+SET( ServerManager_SRCS
+  ${ServerManagerCommon_SRCS}
+  ${ServerManagerNonWrapped_SRCS}
+  )
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMCommunicationModule.cxx
+  vtkSMProperty.cxx
+  vtkSMVectorProperty.cxx
+  ABSTRACT
+  )
+
+INCLUDE_DIRECTORIES(
+  ${VTK_BINARY_DIR}
+  ${ParaView_SOURCE_DIR}/Common/KWCommon
+  ${ParaView_BINARY_DIR}/Common/KWCommon
+  ${ParaView_SOURCE_DIR}/Servers/Filters
+  ${ParaView_BINARY_DIR}/Servers/ServerManager
+)
+
+SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
+IF(VTK_USE_PATENTED)
+  SET(kits ${kits} Patented)
+ENDIF(VTK_USE_PATENTED)
+FOREACH(kit ${kits})
+  INCLUDE_DIRECTORIES(
+    ${VTK_SOURCE_DIR}/${kit}
+    ${VTK_BINARY_DIR}/${kit}
+    )
+ENDFOREACH(kit)
+
+# Setup vtkInstantiator registration for this library's classes.
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+VTK_MAKE_INSTANTIATOR3(
+  vtkSMInstantiator 
+  SMInstantiator_SRCS
+  "${ServerManager_SRCS}"
+  VTK_EXPORT
+  ${ParaView_BINARY_DIR}/Servers/ServerManager "")
+
+# load the ClientServer command
+INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
+CS_INITIALIZE_WRAP()
+INCLUDE_DIRECTORIES(
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
+  )
+
+# Wrap PVServer
+# Create ClientServer wrappers for ParaView classes.
+INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
+SET(VTK_BINARY_DIR "${ServerManager_BINARY_DIR}")
+VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS}")
+
+SET(KIT_WRAP_DEPS "")
+SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/ServerManager/Utilities")
+PV_PRE_WRAP_VTK_CS(vtkPVServerManager PVServerManager PVSERVERMANAGER "${KIT_WRAP_DEPS}")
+
+ADD_LIBRARY(vtkPVServerManager 
+  ${ServerManager_SRCS} 
+  ${CMInstantiator_SRCS} 
+  ${vtkPVServerManagerCS_SRCS} 
+  ${SMInstantiator_SRCS}
+  ) 
+TARGET_LINK_LIBRARIES (vtkPVServerManager vtkPVFiltersCS vtkClientServer)
+
+# Create Tcl wrappers for SM classes.
+SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
+SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
+SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
+INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
+VTK_WRAP_TCL3(
+  vtkPVServerManagerTCL 
+  ServerManagerTCL_SRCS 
+  "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
+  ""
+  )
+ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS})
+TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager)
+
+
