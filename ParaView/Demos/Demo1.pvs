@@ -1508,7 +1508,7 @@ proc stream_run { } {
 
     $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
 
-    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators (currently, streamlines are not available in parallel, this feature is under development). The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
+    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators. The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
 
     # outline
     $streams(vtkTemp384) SetVisibility 1
