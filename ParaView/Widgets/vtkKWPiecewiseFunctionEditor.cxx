@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabel.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.3");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -202,7 +202,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtCanvasCoordinates(
 
   if (old_size != this->GetFunctionSize())
     {
-    this->RedrawCanvasElements();
+    this->RedrawCanvasPoint(id);
     }
 
   return 1;
@@ -229,7 +229,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtParameter(
 
   if (old_size != this->GetFunctionSize())
     {
-    this->RedrawCanvasElements();
+    this->RedrawCanvasPoint(id);
     }
 
   return 1;
@@ -319,7 +319,7 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 
   if (old_size != this->GetFunctionSize())
     {
-    this->RedrawCanvasElements();
+    this->RedrawCanvasPoint(id);
     }
 
   return 1;
