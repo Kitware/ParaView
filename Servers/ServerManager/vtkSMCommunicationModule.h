@@ -37,7 +37,7 @@ public:
 
   // Description:
   virtual void SendStreamToServers(
-    vtkClientServerStream* stream, int numServers, int* serverIDs) = 0;
+    vtkClientServerStream* stream, int numServers, const int* serverIDs) = 0;
 
   // Description:
   vtkClientServerID GetUniqueID();
