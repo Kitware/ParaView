@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.11");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -509,6 +509,8 @@ void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InteractiveRenderTime: " 
      << this->InteractiveRenderTime << endl;
+  os << indent << "RenderWindowTclName: " 
+     << (this->GetRenderWindowTclName()?this->GetRenderWindowTclName():"<none>") << endl;
   os << indent << "RendererTclName: " 
      << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
   os << indent << "StillRenderTime: " << this->StillRenderTime << endl;
