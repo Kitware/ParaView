@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.175");
+vtkCxxRevisionMacro(vtkPVApplication, "1.176");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -641,7 +641,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   exportDialog->Create(this, 0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
-  exportDialog->SetDefaultExt(".pvs");
+  exportDialog->SetDefaultExtension(".pvs");
   exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 )

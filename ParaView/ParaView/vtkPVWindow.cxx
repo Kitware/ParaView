@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.409");
+vtkCxxRevisionMacro(vtkPVWindow, "1.410");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1742,7 +1742,7 @@ void vtkPVWindow::OpenCallback()
   loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
-  loadDialog->SetDefaultExt(".vtk");
+  loadDialog->SetDefaultExtension(".vtk");
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   if ( loadDialog->Invoke() )
@@ -2229,7 +2229,7 @@ void vtkPVWindow::WriteData()
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
-  saveDialog->SetDefaultExt(defaultExtension);
+  saveDialog->SetDefaultExtension(defaultExtension);
   saveDialog->SetFileTypes(types);
   // Ask the user for the filename.  Default the extension to the
   // first writer supported.
@@ -2307,7 +2307,7 @@ void vtkPVWindow::ExportVTKScript()
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save VTK Script");
-  exportDialog->SetDefaultExt(".tcl");
+  exportDialog->SetDefaultExtension(".tcl");
   exportDialog->SetFileTypes("{{Tcl Scripts} {.tcl}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
@@ -3311,7 +3311,7 @@ void vtkPVWindow::SaveTrace()
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
-  exportDialog->SetDefaultExt(".pvs");
+  exportDialog->SetDefaultExtension(".pvs");
   exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 &&
@@ -3483,7 +3483,7 @@ int vtkPVWindow::OpenPackage()
   loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
-  loadDialog->SetDefaultExt(".xml");
+  loadDialog->SetDefaultExtension(".xml");
   loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}");
   if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
@@ -3869,7 +3869,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.409 $");
+  this->ExtractRevision(os,"$Revision: 1.410 $");
 }
 
 //----------------------------------------------------------------------------
