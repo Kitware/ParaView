@@ -1608,7 +1608,10 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     clonedWidget->Delete();
     }
   widgetMap->Delete();
-
+  
+  // Accept button is always red when a source is first created.
+  pvs->SetAcceptButtonColorToRed();
+  
   clone = pvs;
   return VTK_OK;
 }
