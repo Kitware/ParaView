@@ -38,7 +38,6 @@ vtkPVSource
 vtkPVSourceInterface 
 vtkPVSourceInterfaceParser
 vtkPVStringEntry
-vtkTest
 vtkPVThreshold 
 vtkPVTreeComposite 
 vtkPVVectorEntry
