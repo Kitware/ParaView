@@ -44,14 +44,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.16.2.2");
+vtkCxxRevisionMacro(vtkPVScale, "1.16.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -59,6 +61,7 @@ vtkPVScale::vtkPVScale()
   this->EntryLabel = 0;
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
+  this->Round = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -185,15 +188,25 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVScale::SetValue(float val)
 {
+  float newVal;
   float oldVal;
   
+  if(this->Round)
+    {
+    newVal = this->RoundValue(val);
+    }
+  else
+    {
+    newVal = val;
+    }
+  
   oldVal = this->Scale->GetValue();
-  if (val == oldVal)
+  if (newVal == oldVal)
     {
     return;
     }
 
-  this->Scale->SetValue(val); 
+  this->Scale->SetValue(newVal); 
   this->ModifiedCallback();
 }
 
@@ -206,10 +219,20 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
 
   if (sourceTclName && this->VariableName)
     {
-    pvApp->BroadcastScript("%s Set%s %g", 
-                           sourceTclName,
-                           this->VariableName, 
-                           this->GetValue());
+    if(this->Round)
+      {
+      pvApp->BroadcastScript("%s Set%s %d", 
+                             sourceTclName,
+                             this->VariableName, 
+                             this->RoundValue(this->GetValue()));
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s Set%s %g", 
+                             sourceTclName,
+                             this->VariableName, 
+                             this->GetValue());
+      }
     }
 
   this->ModifiedFlag = 0;
@@ -317,4 +340,48 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+                                           vtkPVAnimationInterfaceEntry *ai)
+{
+  char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+{
+  char script[500];
+  
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+                        this->GetTclName(), ai->GetTclName());
+    }
+  
+  // I do not like setting the label like this but ...
+  sprintf(script, "%s Set%s $pvTime", 
+          this->ObjectTclName, this->VariableName);
+  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
+  ai->SetTimeStart(this->Scale->GetRangeMin());
+  ai->SetTimeEnd(this->Scale->GetRangeMax());
+  ai->SetTypeToInt();
+  ai->Update();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVScale::RoundValue(float val)
+{
+  if(val >= 0)
+    {
+    return static_cast<int>(val+0.5);
+    }
+  else
+    {
+    return -static_cast<int>((-val)+0.5);
+    }
 }

@@ -121,11 +121,27 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+
+  // Description:
+  // Called when menu item (above) is selected.  Neede for tracing.
+  // Would not be necessary if menus traced invocations.
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
+  
+  // Description:
+  // Get/Set whether to round floating point values to integers.
+  vtkSetMacro(Round, int);
+  vtkGetMacro(Round, int);
+  vtkBooleanMacro(Round, int);
+  
 protected:
   vtkPVScale();
   ~vtkPVScale();
   
-
+  int RoundValue(float val);
+  
   vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;
 
@@ -135,7 +151,9 @@ protected:
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
-
+  
+  int Round;
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
