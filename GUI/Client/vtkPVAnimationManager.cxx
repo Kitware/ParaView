@@ -57,7 +57,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.3");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -212,11 +212,23 @@ void vtkPVAnimationManager::ValidateOldSources()
     {
     return;
     }
+  int verified_until = 0;
+  int current_index = 0;
   vtkPVAnimationManagerInternals::StringToPVCueMap::iterator iter;
   for (iter = this->Internals->PVAnimationCues.begin();
-    iter != this->Internals->PVAnimationCues.end();
-    iter++)
+    iter != this->Internals->PVAnimationCues.end();current_index++)
     {
+    if (current_index < verified_until)
+      { 
+      iter++; 
+      continue;
+      }
+    /*
+     * For removal from the map to work propely on Sun, we have to 
+     * retart the iteration from the begining. To avoid repeated checks,
+     * we used the verified_until index.
+     */
+    int deleted = 0;
     const char* sourcekey = iter->first.c_str();
     const char* listname = this->GetSourceListName(sourcekey);
     const char* sourcename = this->GetSourceName(sourcekey);
@@ -239,7 +251,16 @@ void vtkPVAnimationManager::ValidateOldSources()
         //deletes all the subsources as well.
         }
       // if it is a subsource, then it will get deleted when the parent will be deleted.
+      // This should never occur as subsources are never directly added to the base node.
       this->Internals->PVAnimationCues.erase(iter);
+      current_index = -1;
+      iter = this->Internals->PVAnimationCues.begin(); 
+      deleted = 1;
+      }
+    if (!deleted)
+      {
+      iter++;
+      verified_until++;
       }
     delete [] listname;
     delete [] sourcename;
@@ -360,7 +381,9 @@ void vtkPVAnimationManager::AddNewSources()
       {
       // the node is added is it is the node for the source or 
       // it has children.
-      this->Internals->PVAnimationCues[proxyname] = pvCue;
+      //this->Internals->PVAnimationCues[proxyname] = pvCue;
+      this->Internals->PVAnimationCues.insert(
+        vtkPVAnimationManagerInternals::StringToPVCueMap::value_type(proxyname, pvCue));
       }
     else
       {// Cue has no animatable properties, remove it all together.
