@@ -159,6 +159,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
     }
   else
     {
+    this->VolumeProID = -1;
     this->RenderMethod = VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD;
     this->SoftwareMapperAvailable = 1;
     this->VolumeProMapperAvailable = 0;
@@ -487,5 +488,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.26 $");
 }
