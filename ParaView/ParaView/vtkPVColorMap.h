@@ -62,7 +62,8 @@ class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
-class vtkKWMenu;
+class vtkKWMenuButton;
+class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWTextProperty;
@@ -197,10 +198,6 @@ public:
   void MapConfigureCallback(int width, int height);
 
   // Description:
-  // Called when user select the map.
-  void DisplayPopupMenu(int x, int y);
-
-  // Description:
   // Called when the slider that select the resolution changes.
   void NumberOfColorsScaleCallback();
 
@@ -288,7 +285,7 @@ protected:
   int MapHeight;
   void UpdateMap(int width, int height);
 
-  vtkKWMenu* PopupMenu;
+  vtkKWMenuButton* PresetsMenuButton;
 
   // Stuff for setting the range of the color map.
   vtkKWWidget*       ColorRangeFrame;
