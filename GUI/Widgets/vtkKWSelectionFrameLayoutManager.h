@@ -69,11 +69,14 @@ public:
   // Description:
   // Get widget with given name (the unique one that was used to add it to the 
   // pool), with given title (each widget/selection-frame can customize 
-  // its own title), or n-th widget.
+  // its own title), or with given rank (n-th widget), or with given
+  // rank (n-th widget) but not matching another widget 'avoid'.
   // Return the widget, or NULL if not found
   virtual vtkKWSelectionFrame* GetWidget(const char *name);
-  virtual vtkKWSelectionFrame* GetNthWidget(int index);
   virtual vtkKWSelectionFrame* GetWidgetWithTitle(const char *title);
+  virtual vtkKWSelectionFrame* GetNthWidget(int index);
+  virtual vtkKWSelectionFrame* GetNthWidgetNotMatching(
+    int index, vtkKWSelectionFrame *avoid);
   virtual const char* GetNthWidgetName(int index);
   virtual int GetNumberOfWidgets();
 

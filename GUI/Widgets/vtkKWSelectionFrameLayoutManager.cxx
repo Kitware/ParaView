@@ -60,7 +60,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <vtkstd/vector>
 #include <vtkstd/string>
 
-
 #include "Resources/KWWindowLayout.h"
 
 #define VTK_KW_SFLMGR_LABEL_PATTERN "%d x %d"
@@ -72,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.7");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -793,6 +792,32 @@ vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetNthWidget(
 }
 
 //----------------------------------------------------------------------------
+vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetNthWidgetNotMatching(
+  int index, vtkKWSelectionFrame *avoid)
+{
+  if (index >= 0)
+    {
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
+      this->Internals->Pool.begin();
+    vtkKWSelectionFrameLayoutManagerInternals::PoolIterator end = 
+      this->Internals->Pool.end();
+    for (; it != end; ++it)
+      {
+      if (it->Widget && it->Widget != avoid)
+        {
+        index--;
+        if (index < 0)
+          {
+          return it->Widget;
+          }
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 vtkKWSelectionFrame* vtkKWSelectionFrameLayoutManager::GetWidgetWithTitle(
   const char *title)
 {
@@ -988,6 +1013,7 @@ int vtkKWSelectionFrameLayoutManager::DeleteWidget(
           {
           this->SelectWidget(this->GetNthWidget(0));
           }
+
         widget->Delete();
         this->NumberOfWidgetsHasChanged();
         return 1;
