@@ -39,7 +39,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.2.1");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.2.2");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -53,8 +53,14 @@ vtkIceTRenderer::~vtkIceTRenderer()
 
 void vtkIceTRenderer::ComputeAspect()
 {
-  float aspect[2];
   this->Superclass::ComputeAspect();
+
+  if (! this->ComposeNextFrame)
+    {
+    return;
+    }
+
+  float aspect[2];
   this->GetAspect(aspect);
 
   int global_viewport[4];

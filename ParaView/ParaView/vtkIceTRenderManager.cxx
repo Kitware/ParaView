@@ -20,6 +20,7 @@
 #include "vtkIceTRenderer.h"
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
+#include <vtkCamera.h>
 #include <vtkRendererCollection.h>
 #include <vtkMPIController.h>
 #include <vtkMPI.h>
@@ -32,7 +33,7 @@
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.1.2.1");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.1.2.2");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
@@ -398,6 +399,37 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
+
+  // Code taken from my tile display module.
+  if (!this->UseCompositing)
+    {
+    vtkCamera* cam;
+    vtkRenderWindow* renWin = this->RenderWindow;
+    vtkRendererCollection *rens;
+    vtkRenderer* ren;
+
+    rens = renWin->GetRenderers();
+    rens->InitTraversal();
+    ren = rens->GetNextItem();
+    if (ren)
+      {
+      cam = ren->GetActiveCamera();
+      }
+
+    int x, y;
+    int tileIdx = this->Controller->GetLocalProcessId();
+    y = tileIdx/this->NumTilesX;
+    x = tileIdx - y*this->NumTilesX;
+    // Flip the y axis to match IceT
+    y = this->NumTilesY-1-y;
+    // Setup the camera for this tile.
+    cam->SetWindowCenter(1.0-(double)(this->NumTilesX) + 2.0*(double)x,
+                         1.0-(double)(this->NumTilesY) + 2.0*(double)y);
+
+
+    return;
+    }
+
 
   this->UpdateIceTContext();
 
