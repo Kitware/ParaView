@@ -150,12 +150,12 @@ SET (TABLELIST_SUPPORT_LIBRARY_PATH "${TclTk_SOURCE_DIR}/tablelist/lib")
 FILE (GLOB_RECURSE 
       TABLELIST_SUPPORT_FILES "${TABLELIST_SUPPORT_LIBRARY_PATH}/*")
 FOREACH (file ${TABLELIST_SUPPORT_FILES})
-  IF (${file} MATCHES "/cvs/")
-  ELSE (${file} MATCHES "/cvs/")
+  IF (${file} MATCHES "/CVS/")
+  ELSE (${file} MATCHES "/CVS/")
     STRING(REGEX REPLACE ${TABLELIST_SUPPORT_LIBRARY_PATH} "" basename ${file})
     CONFIGURE_FILE (${file} 
                     "${APPLICATION_BINARY_DIR}/lib/${basename}" COPYONLY)
-  ENDIF (${file} MATCHES "/cvs/")
+  ENDIF (${file} MATCHES "/CVS/")
 ENDFOREACH (file)
 
 # Set TK_INTERNAL_PATH
