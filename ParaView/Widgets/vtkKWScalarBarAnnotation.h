@@ -45,10 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWFrame;
 class vtkKWLabeledEntry;
 class vtkKWLabeledPopupButton;
+class vtkKWScalarComponentSelectionWidget;
 class vtkKWScale;
 class vtkKWTextProperty;
 class vtkKWThumbWheel;
 class vtkScalarBarWidget;
+class vtkVolumeProperty;
 
 class VTK_EXPORT vtkKWScalarBarAnnotation : public vtkKWPopupFrameCheckButton
 {
@@ -87,8 +89,21 @@ public:
   vtkGetMacro(AnnotationChangedEvent, int);
 
   // Description:
+  // Set/get the volume property that can be used to set the LUT of the
+  // scalar bar actor
+  virtual void SetVolumeProperty(vtkVolumeProperty *prop);
+  vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
+
+  // Description:
+  // Set/get the number of components corresponding to the data represented
+  // by the volume property
+  virtual void SetNumberOfComponents(int);
+  vtkGetMacro(NumberOfComponents, int);
+
+  // Description:
   // Callbacks
   virtual void CheckButtonCallback();
+  virtual void SelectedComponentCallback(int);
   virtual void ScalarBarTitleCallback();
   virtual void ScalarBarLabelFormatCallback();
   virtual void TitleTextPropertyCallback();
@@ -109,24 +124,26 @@ protected:
   vtkKWScalarBarAnnotation();
   ~vtkKWScalarBarAnnotation();
 
+  int PopupTextProperty;
   int AnnotationChangedEvent;
+  int NumberOfComponents;
 
   vtkScalarBarWidget      *ScalarBarWidget;
+  vtkVolumeProperty       *VolumeProperty;
 
   // GUI
 
-  int                     PopupTextProperty;
-
-  vtkKWFrame              *TitleFrame;
-  vtkKWLabeledEntry       *TitleEntry;
-  vtkKWTextProperty       *TitleTextPropertyWidget;
-  vtkKWLabeledPopupButton *TitleTextPropertyPopupButton;
-  vtkKWFrame              *LabelFrame;
-  vtkKWLabeledEntry       *LabelFormatEntry;
-  vtkKWTextProperty       *LabelTextPropertyWidget;
-  vtkKWLabeledPopupButton *LabelTextPropertyPopupButton;
-  vtkKWThumbWheel         *MaximumNumberOfColorsThumbWheel;
-  vtkKWScale              *NumberOfLabelsScale;
+  vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
+  vtkKWFrame                          *TitleFrame;
+  vtkKWLabeledEntry                   *TitleEntry;
+  vtkKWTextProperty                   *TitleTextPropertyWidget;
+  vtkKWLabeledPopupButton             *TitleTextPropertyPopupButton;
+  vtkKWFrame                          *LabelFrame;
+  vtkKWLabeledEntry                   *LabelFormatEntry;
+  vtkKWTextProperty                   *LabelTextPropertyWidget;
+  vtkKWLabeledPopupButton             *LabelTextPropertyPopupButton;
+  vtkKWThumbWheel                     *MaximumNumberOfColorsThumbWheel;
+  vtkKWScale                          *NumberOfLabelsScale;
 
   virtual void Render();
   virtual void SetScalarBarTitle(const char *txt);

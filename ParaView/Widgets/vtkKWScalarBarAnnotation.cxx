@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWScalarBarAnnotation.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
@@ -44,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLabeledPopupButton.h"
 #include "vtkKWPopupButton.h"
+#include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWTextProperty.h"
 #include "vtkKWThumbWheel.h"
@@ -52,13 +54,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkTextProperty.h"
+#include "vtkVolumeProperty.h"
 #ifndef DO_NOT_BUILD_XML_RW
 #include "vtkXMLScalarBarWidgetWriter.h"
 #endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.1");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.2");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -71,8 +74,13 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
   this->AnnotationChangedEvent  = vtkKWEvent::ViewAnnotationChangedEvent;
   this->PopupTextProperty       = 0;
   this->ScalarBarWidget         = NULL;
+  this->VolumeProperty          = NULL;
+  this->NumberOfComponents      = VTK_MAX_VRCOMP;
 
   // GUI
+
+  this->ComponentSelectionWidget = 
+    vtkKWScalarComponentSelectionWidget::New();
 
   this->TitleFrame                      = vtkKWFrame::New();
   this->TitleEntry                      = vtkKWLabeledEntry::New();
@@ -91,7 +99,15 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::~vtkKWScalarBarAnnotation()
 {
+  this->SetVolumeProperty(NULL);
+
   // GUI
+
+  if (this->ComponentSelectionWidget)
+    {
+    this->ComponentSelectionWidget->Delete();
+    this->ComponentSelectionWidget = NULL;
+    }
 
   if (this->TitleFrame)
     {
@@ -188,6 +204,21 @@ void vtkKWScalarBarAnnotation::SetScalarBarWidget(vtkScalarBarWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
+void vtkKWScalarBarAnnotation::SetVolumeProperty(
+  vtkVolumeProperty *prop)
+{
+  if (this->VolumeProperty == prop)
+    {
+    return;
+    }
+
+  this->VolumeProperty = prop;
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app, 
                                    const char *args)
 {
@@ -227,6 +258,17 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->CheckButton->SetBalloonHelpString(
     "Toggle the visibility of the scalar bar representing the mapping "
     "of scalar value to RGB color");
+
+  // --------------------------------------------------------------
+  // Component selection
+
+  this->ComponentSelectionWidget->SetParent(frame);
+  this->ComponentSelectionWidget->Create(app, 0);
+  this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
+    this, "SelectedComponentCallback");
+
+  this->Script("pack %s -side top -padx 2 -pady 1 -anchor w", 
+               this->ComponentSelectionWidget->GetWidgetName());
 
   // --------------------------------------------------------------
   // Title frame
@@ -449,7 +491,30 @@ void vtkKWScalarBarAnnotation::Update()
     anno = this->ScalarBarWidget->GetScalarBarActor();
     }
 
-  if (!anno || !this->IsCreated())
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Component selection menu
+
+  if (this->ComponentSelectionWidget)
+    {
+    if (this->VolumeProperty)
+      {
+      this->ComponentSelectionWidget->SetIndependentComponents(
+        this->VolumeProperty->GetIndependentComponents());
+      this->ComponentSelectionWidget->SetNumberOfComponents(
+        this->NumberOfComponents);
+      this->ComponentSelectionWidget->AllowComponentSelectionOn();
+      }
+    else
+      {
+      this->ComponentSelectionWidget->AllowComponentSelectionOff();
+      }
+    }
+  
+  if (!anno)
     {
     return;
     }
@@ -546,11 +611,49 @@ void vtkKWScalarBarAnnotation::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWScalarBarAnnotation::SetNumberOfComponents(int arg)
+{
+  if (this->NumberOfComponents == arg ||
+      arg < 1 || arg > VTK_MAX_VRCOMP)
+    {
+    return;
+    }
+
+  this->NumberOfComponents = arg;
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWScalarBarAnnotation::CheckButtonCallback() 
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
     this->SetVisibility(this->CheckButton->GetState() ? 1 : 0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScalarBarAnnotation::SelectedComponentCallback(int n)
+{
+  if (!this->VolumeProperty || 
+      !this->ScalarBarWidget)
+    {
+    return;
+    }
+
+  vtkScalarBarActor *anno = this->ScalarBarWidget->GetScalarBarActor();
+  if (!anno)
+    {
+    return;
+    }
+
+  anno->SetLookupTable(this->VolumeProperty->GetRGBTransferFunction(n));
+
+  if (this->GetVisibility())
+    {
+    this->Render();
     }
 }
 
@@ -687,6 +790,11 @@ void vtkKWScalarBarAnnotation::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
+  if (this->ComponentSelectionWidget)
+    {
+    this->ComponentSelectionWidget->SetEnabled(this->Enabled);
+    }
+
   if (this->TitleFrame)
     {
     this->TitleFrame->SetEnabled(this->Enabled);
@@ -771,6 +879,8 @@ void vtkKWScalarBarAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnnotationChangedEvent: " 
      << this->AnnotationChangedEvent << endl;
   os << indent << "ScalarBarWidget: " << this->GetScalarBarWidget() << endl;
+  os << indent << "VolumeProperty: " << this->VolumeProperty << endl;
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
 }
