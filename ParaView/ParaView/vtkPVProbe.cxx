@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.91");
+vtkCxxRevisionMacro(vtkPVProbe, "1.92");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -317,7 +317,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       arrayName = array->GetName();
       if (array->GetNumberOfComponents() == 1)
         {
-        xyp->AddInput(this->GetPVPart()->GetVTKData(), arrayName, 0);
+        xyp->AddInput(probeOutput, arrayName, 0);
         xyp->SetPlotLabel(i, arrayName);
         float r, g, b;
         this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
