@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.98");
+vtkCxxRevisionMacro(vtkKWWidget, "1.99");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -331,7 +331,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.98 $");
+  this->ExtractRevision(os,"$Revision: 1.99 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1845,7 +1845,7 @@ int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname,
     for (x = 0; x < ww; x++) 
       {
       double red, green, blue;
-      vtkKWWidgetTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y),
+      vtkKWWidgetTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y-1),
         &red, &green, &blue);
       ptr[0] = (unsigned char)(255 * red);
       ptr[1] = (unsigned char)(255 * green);
