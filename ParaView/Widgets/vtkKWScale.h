@@ -130,8 +130,8 @@ public:
 
   // Description:
   // Method that gets invoked when the sliders value has changed.
-  virtual void ScaleValueChanged(double num);
-  virtual void EntryValueChanged();
+  virtual void ScaleValueCallback(double num);
+  virtual void EntryValueCallback();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();
   virtual void InvokeEntryCommand();
@@ -209,6 +209,7 @@ protected:
   int         DisplayRange;
   int         SmartResize;
   int         DisableCommands;
+  int         DisableScaleValueCallback;
 
   char        *Command;
   char        *StartCommand;

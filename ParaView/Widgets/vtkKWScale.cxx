@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.63");
+vtkCxxRevisionMacro(vtkKWScale, "1.64");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -72,6 +72,7 @@ vtkKWScale::vtkKWScale()
   this->EntryCommand = NULL;
 
   this->DisableCommands = 0;
+  this->DisableScaleValueCallback = 0;
 
   this->SmartResize = 0;
 
@@ -466,14 +467,14 @@ void vtkKWScale::Bind()
                    this->GetTclName());
       }
     
-    this->Scale->SetCommand(this, "ScaleValueChanged");
+    this->Scale->SetCommand(this, "ScaleValueCallback");
     }
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Script("bind %s <Return> {%s EntryValueChanged}",
+    this->Script("bind %s <Return> {%s EntryValueCallback}",
                  this->Entry->GetWidgetName(), this->GetTclName());
-    this->Script("bind %s <FocusOut> {%s EntryValueChanged}",
+    this->Script("bind %s <FocusOut> {%s EntryValueCallback}",
                  this->Entry->GetWidgetName(), this->GetTclName());
     }
 
@@ -641,8 +642,12 @@ void vtkKWScale::RefreshValue()
       {
       this->Scale->SetEnabled(1);
       }
+    // Disable the callback, since set will trigget the -command although
+    // we are doing something non-interactively
+    this->DisableScaleValueCallback = 1;
     this->Script("%s set %g", 
                  this->Scale->GetWidgetName(), this->Value);
+    this->DisableScaleValueCallback = 0;
     if (was_disabled)
       {
       this->Scale->SetEnabled(0);
@@ -685,13 +690,18 @@ void vtkKWScale::SetRange(double min, double max)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWScale::ScaleValueChanged(double num)
+void vtkKWScale::ScaleValueCallback(double num)
 {
+  if (this->DisableScaleValueCallback)
+    {
+    return;
+    }
+
   this->SetValue(num);
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWScale::EntryValueChanged()
+void vtkKWScale::EntryValueCallback()
 {
   double value = this->Entry->GetValueAsFloat();
   double old_value = this->GetValue();
