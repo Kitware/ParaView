@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.16");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -134,7 +134,6 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 
   this->TimeScriptEntryFrame = vtkKWFrame::New();
 
-  //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
 
   this->ScriptEditorDirty = 0;
@@ -153,7 +152,6 @@ void vtkPVAnimationInterfaceEntry::ExecuteEvent(vtkObject *o,
   (void)o;
   (void)event;
   (void)calldata;
-  //cout << "Source deleted" << endl;
   this->SetPVSource(0);
 }
 
@@ -193,7 +191,6 @@ int vtkPVAnimationInterfaceEntry::GetDirty()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
 {
-  //cout << "Current index: " << this->CurrentIndex << " (" << idx << ")" << endl;
   if ( this->CurrentIndex == idx )
     {
     return;
@@ -203,7 +200,6 @@ void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
   char buffer[1024];
   sprintf(buffer, "GetSourceEntry %d", idx);
   this->SetTraceReferenceCommand(buffer);
-  //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
 }
 
@@ -359,7 +355,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
 {
-  //cout << "SwitchScriptTime: " << i << endl;
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
   pvApp->Script("pack forget %s %s %s %s",
     this->DummyFrame->GetWidgetName(),
@@ -434,7 +429,6 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
     }
   this->UpdateMethodMenu(0);
   this->Parent->ShowEntryInFrame(this, -1);
-  //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
   this->Parent->UpdateNewScript();
 }
@@ -696,6 +690,10 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::ScriptEditorCallback()
 {
+  if ( !this->ScriptEditorDirty )
+    {
+    return;
+    }
   this->SetCustomScript(this->ScriptEditor->GetValue());
   this->ScriptEditorDirty = 0;
 }

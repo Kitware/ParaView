@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.82");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.83");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1576,6 +1576,13 @@ void vtkPVAnimationInterface::ShowEntryInFrame(int idx)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::ShowEntryInFrameCallback(int idx)
+{
+  vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(idx);
+  this->ShowEntryInFrame(entry, idx);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::ShowEntryInFrame(
   vtkPVAnimationInterfaceEntry* entry, int in_idx)
 {
@@ -1624,7 +1631,7 @@ void vtkPVAnimationInterface::ShowEntryInFrame(
 void vtkPVAnimationInterface::UpdateEntries()
 {
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
-  char* command = vtkString::Duplicate("ShowEntryInFrame XXXXXXXXXXXXXXXXX");
+  char* command = vtkString::Duplicate("ShowEntryInFrameCallback XXXXXXXXXXXXXXXXX");
   int idx = 0;
   this->AnimationEntriesMenu->GetMenu()->DeleteAllMenuItems();
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
@@ -1633,7 +1640,7 @@ void vtkPVAnimationInterface::UpdateEntries()
       = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
     entry->CreateLabel(idx);
     const char* label = entry->GetLabel();
-    sprintf(command, "ShowEntryInFrame %d", idx);
+    sprintf(command, "ShowEntryInFrameCallback %d", idx);
     this->AnimationEntriesMenu->AddCommand(label, this, command); 
     idx ++;
     }

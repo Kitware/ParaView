@@ -192,6 +192,7 @@ public:
 
   void ShowEntryInFrame(vtkPVAnimationInterfaceEntry *entry, int idx);
   void ShowEntryInFrame(int idx);
+  void ShowEntryInFrameCallback(int idx);
   void UpdateNewScript();
   void PrepareAnimationInterface(vtkPVWindow* win);
 
