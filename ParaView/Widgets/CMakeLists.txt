@@ -39,6 +39,7 @@ vtkKWRadioButton
 vtkKWRegisteryUtilities
 vtkKWSaveImageDialog 
 vtkKWScale 
+vtkKWScrollableFrame
 vtkKWSerializer 
 vtkKWSplitFrame
 vtkKWTclInteractor
