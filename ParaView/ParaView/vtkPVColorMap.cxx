@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.17");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.18");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -626,7 +626,7 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
   this->EndColorButton->SetColor(1.0, 1.0, 1.0);
 
   this->UpdateLookupTable();
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayScale", this->GetTclName());
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
