@@ -129,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.608");
+vtkCxxRevisionMacro(vtkPVWindow, "1.609");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -272,9 +272,9 @@ vtkPVWindow::vtkPVWindow()
   this->SourceLists->SetItem("Sources", sources);
   sources->Delete();
 
-  // Keep a list of all loaded packages (Tcl libraries) so that
-  // they can be written out when writing Tcl scripts.
-  this->PackageNames = vtkLinkedList<const char*>::New();
+  // Keep a list of all loaded packages so they can be saved
+  // for state or batch.
+  this->PackageFiles = vtkLinkedList<const char*>::New();
 
   // This can be used to disable the pop-up dialogs if necessary
   // (usually used from inside regression scripts)
@@ -355,8 +355,8 @@ vtkPVWindow::~vtkPVWindow()
   this->ToolbarButtons->Delete();
   this->ToolbarButtons = 0;
 
-  this->PackageNames->Delete();
-  this->PackageNames = 0;
+  this->PackageFiles->Delete();
+  this->PackageFiles = 0;
 
   
   if (this->TimerLogDisplay)
@@ -1399,13 +1399,6 @@ void vtkPVWindow::AddPrototype(const char* name, vtkPVSource* proto)
 }
 
 //-----------------------------------------------------------------------------
-// Keep a list of all loaded packages (Tcl libraries) so that
-// they can be written out when writing Tcl scripts.
-void vtkPVWindow::AddPackageName(const char* name)
-{
-  this->PackageNames->AppendItem(name);
-}
-
 void vtkPVWindow::CenterEntryOpenCallback()
 {
   this->Script("%s configure -image PVEditCenterButtonClose", 
@@ -2972,25 +2965,6 @@ void vtkPVWindow::SaveState(const char* filename)
         << this->GetPVApplication()->GetMajorVersion()
         << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
-  /*
-  if (this->PackageNames->GetNumberOfItems() > 0)
-    {
-    *file << vtkPVApplication::LoadComponentProc << endl;
-    vtkLinkedListIterator<const char*>* it = this->PackageNames->NewIterator();
-    while (!it->IsDoneWithTraversal())
-      {
-      const char* name = 0;
-      if (it->GetData(name) == VTK_OK && name)
-        {
-        *file << "::paraview::load_component " << name << endl;
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
-    }
-  *file << endl << endl;
-  */
-
   *file << "set kw(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
   *file << "set kw(" << this->GetMainView()->GetTclName() 
         << ") [$kw(" << this->GetTclName() << ") GetMainView]" << endl;
@@ -3017,8 +2991,24 @@ void vtkPVWindow::SaveState(const char* filename)
     *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 4"
           << endl;
     }
-  
-  
+
+  if (this->PackageFiles->GetNumberOfItems() > 0)
+    {
+    vtkLinkedListIterator<const char*>* it = this->PackageFiles->NewIterator();
+    while (!it->IsDoneWithTraversal())
+      {
+      const char* name = 0;
+      if (it->GetData(name) == VTK_OK && name)
+        {
+        *file << "$kw(" << this->GetTclName() << ") OpenPackage \""
+              << name << "\"" << endl;
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    *file << endl;
+    }
+
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
 
@@ -3993,9 +3983,13 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
     delete [] pth;
     }
 
-  // Initialize a couple of variables in the trace file.
+  // Save the package load command in the trace file.
   this->GetApplication()->AddTraceEntry(
     "$kw(%s) OpenPackage \"%s\"", this->GetTclName(), openFileName);
+
+  // Add the package to the list that will be saved to state and batch
+  // files.
+  this->PackageFiles->AppendItem(openFileName);
 
   return VTK_OK;
 }

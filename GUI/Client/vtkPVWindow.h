@@ -352,11 +352,6 @@ public:
   vtkSetMacro(InDemo, int);
 
   // Description:
-  // Adds package name. These names are later used when writing
-  // VTK scripts.
-  void AddPackageName(const char* name);
-
-  // Description:
   // Adds manipulator to the list of available manipulators.
   void AddManipulator(const char* type, const char* name, 
                       vtkPVCameraManipulator*);
@@ -642,7 +637,7 @@ protected:
   vtkArrayMap<const char*, const char*>* Writers;
   vtkArrayMap<const char*, int>* MenuState;
   vtkLinkedList<vtkPVReaderModule*>* ReaderList;
-  vtkLinkedList<const char*>* PackageNames;
+  vtkLinkedList<const char*>* PackageFiles;
   vtkLinkedList<vtkPVWriter*>* FileWriterList;
 
   friend class vtkPVXMLPackageParser;

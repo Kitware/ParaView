@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.43");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.44");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -663,7 +663,6 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
     vtkErrorMacro("Error loading Library component " << name);
     return 0;
     }
-  this->Window->AddPackageName(name);
 
   return 1;
 }
