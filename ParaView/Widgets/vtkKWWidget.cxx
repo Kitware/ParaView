@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.84");
+vtkCxxRevisionMacro(vtkKWWidget, "1.85");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.84 $");
+  this->ExtractRevision(os,"$Revision: 1.85 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1461,13 +1461,42 @@ void vtkKWWidget::SetImageOption(const unsigned char* data,
                                      blend_color_option))
     {
     vtkWarningMacro("Error updating Tk photo " << image_name.str());
+    image_name.rdbuf()->freeze(0);
     return;
     }
 
-  this->Script("%s configure %s {%s}", 
-               this->GetWidgetName(), image_option, image_name.str());
+  this->SetImageOption(image_name.str(), image_option);
 
   image_name.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetImageOption(const char *image_name,
+                                 const char *image_option)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return;
+    }
+
+  if (!image_option || !*image_option)
+    {
+    image_option = "-image";
+    }
+
+  if (!this->HasConfigurationOption(image_option))
+    {
+    return;
+    }
+
+  if (!image_name)
+    {
+    image_name = "";
+    }
+
+  this->Script("%s configure %s {%s}", 
+               this->GetWidgetName(), image_option, image_name);
 }
 
 //----------------------------------------------------------------------------

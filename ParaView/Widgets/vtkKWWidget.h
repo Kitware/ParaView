@@ -289,15 +289,15 @@ public:
   //BTX
   enum
   {
-    ANCHOR_N,
-    ANCHOR_NE,
-    ANCHOR_E,
-    ANCHOR_SE,
-    ANCHOR_S,
-    ANCHOR_SW,
-    ANCHOR_W,
-    ANCHOR_NW,
-    ANCHOR_CENTER
+    ANCHOR_N      = 0,
+    ANCHOR_NE     = 1,
+    ANCHOR_E      = 2,
+    ANCHOR_SE     = 3,
+    ANCHOR_S      = 4,
+    ANCHOR_SW     = 5,
+    ANCHOR_W      = 6,
+    ANCHOR_NW     = 7,
+    ANCHOR_CENTER = 8
   };
   //ETX
   static const char* GetAnchorAsString(int);
@@ -320,10 +320,12 @@ public:
   virtual void SetImageOption(vtkKWIcon *icon,
                               const char *blend_color_option = 0,
                               const char *image_option = 0);
-  virtual void SetImageOption(const unsigned char* data, 
+  virtual void SetImageOption(const unsigned char *data, 
                               int width, int height, int pixel_size = 4,
                               unsigned long buffer_length = 0,
                               const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(const char *image_name,
                               const char *image_option = 0);
   
   // Description:
