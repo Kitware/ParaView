@@ -193,7 +193,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
 
   for (int i = 0; i < 4; i++)
     {
-    this->CornerText[i]->Create(app,"-height 4 -width 28");
+    this->CornerText[i]->Create(app,"-height 4 -width 10 -wrap none");
     this->Script("bind %s <Return> {%s CornerChanged %i}",
                  this->CornerText[i]->GetWidgetName(), 
                  this->GetTclName(), i);
@@ -344,6 +344,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.2 $");
+  this->ExtractRevision(os,"$Revision: 1.3 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
