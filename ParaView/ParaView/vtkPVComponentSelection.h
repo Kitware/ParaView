@@ -53,6 +53,7 @@ class VTK_EXPORT vtkPVComponentSelection : public vtkPVObjectWidget
 public:
   static vtkPVComponentSelection* New();
   vtkTypeMacro(vtkPVComponentSelection, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   void Create(vtkKWApplication *pvApp);
   

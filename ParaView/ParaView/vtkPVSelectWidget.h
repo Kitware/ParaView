@@ -69,6 +69,7 @@ class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 public:
   static vtkPVSelectWidget* New();
   vtkTypeMacro(vtkPVSelectWidget, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Creates common widgets.

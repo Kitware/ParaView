@@ -55,6 +55,7 @@ class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 public:
   static vtkPVMinMax* New();
   vtkTypeMacro(vtkPVMinMax, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   void Create(vtkKWApplication *pvApp);
 
@@ -86,6 +87,9 @@ public:
   vtkSetStringMacro(GetMinCommand);
   vtkSetStringMacro(GetMaxCommand);
   vtkSetStringMacro(SetCommand);
+  vtkGetStringMacro(GetMinCommand);
+  vtkGetStringMacro(GetMaxCommand);
+  vtkGetStringMacro(SetCommand);
   
   // Description:
   // Save this widget to a file

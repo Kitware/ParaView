@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.3");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.4");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 //----------------------------------------------------------------------------
@@ -86,6 +86,8 @@ vtkPVXMLElement::~vtkPVXMLElement()
 void vtkPVXMLElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << "Id: " << (this->Id?this->Id:"<none>") << endl;
+  os << "Name: " << (this->Name?this->Name:"<none>") << endl;
 }
 
 //----------------------------------------------------------------------------

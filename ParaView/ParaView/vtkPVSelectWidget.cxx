@@ -566,3 +566,11 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << "UseWidgetCommand: " << this->UseWidgetCommand << endl;
+}
+

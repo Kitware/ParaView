@@ -2995,5 +2995,9 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenu: " << this->GetSourceMenu() << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
   os << indent << "TranslateCameraStyle: " << this->GetTranslateCameraStyle() << endl;
+  os << indent << "GenericInteractor: " << this->GenericInteractor << endl;
+  os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
+  os << indent << "InitializeDefaultInterfaces: " << this->InitializeDefaultInterfaces << endl;
+  os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
 }
 

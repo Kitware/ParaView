@@ -56,6 +56,7 @@ class VTK_EXPORT vtkPVFileEntry : public vtkPVObjectWidget
 public:
   static vtkPVFileEntry* New();
   vtkTypeMacro(vtkPVFileEntry, vtkPVObjectWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The label can be set before or after create is called.

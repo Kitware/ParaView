@@ -235,3 +235,11 @@ int vtkPVComponentSelection::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVComponentSelection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << "NumberOfComponents: " << this->NumberOfComponents << endl;
+}

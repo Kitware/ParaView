@@ -1455,4 +1455,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
   os << indent << "Widgets: " << this->GetWidgets() << endl;
+  os << indent << "InputClassName: " << this->InputClassName << endl;
+  os << indent << "IsDeletable: " << this->IsDeletable << endl;
+  os << indent << "OutputClassName: " << this->OutputClassName << endl;
+  os << indent << "SourceClassName: " << this->SourceClassName << endl;
 }

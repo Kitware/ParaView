@@ -55,6 +55,7 @@ class VTK_EXPORT vtkPVObjectWidget : public vtkPVWidget
 {
 public:
   vtkTypeMacro(vtkPVObjectWidget, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The point of a PV widget is that it is an interface for

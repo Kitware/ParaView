@@ -394,3 +394,13 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << "GetMaxCommand: " << this->GetGetMaxCommand() << endl;
+  os << "GetMinCommand: " << this->GetGetMinCommand() << endl;
+  os << "SetCommand: " << this->SetCommand << endl;
+}

@@ -725,15 +725,16 @@ void vtkPVArrayMenu::UpdateComponentMenu()
 void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ArrayName: " << this->GetArrayName();
-  os << indent << "ArrayNumberOfComponents: " << this->GetArrayNumberOfComponents();
-  os << indent << "AttributeType: " << this->GetAttributeType();
-  os << indent << "InputName: " << this->GetInputName();
-  os << indent << "NumberOfComponents: " << this->GetNumberOfComponents();
-  os << indent << "ObjectTclName: " << this->GetObjectTclName();
-  os << indent << "SelectedComponent: " << this->GetSelectedComponent();
-  os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu();
-  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu();
+  os << indent << "ArrayName: " << this->GetArrayName() << endl;
+  os << indent << "ArrayNumberOfComponents: " << this->GetArrayNumberOfComponents() << endl;
+  os << indent << "AttributeType: " << this->GetAttributeType() << endl;
+  os << indent << "InputName: " << this->GetInputName() << endl;
+  os << indent << "NumberOfComponents: " << this->GetNumberOfComponents() << endl;
+  os << indent << "ObjectTclName: " << this->GetObjectTclName() << endl;
+  os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
+  os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
+  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu() << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
 }
 
 vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,

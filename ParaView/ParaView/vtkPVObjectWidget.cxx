@@ -117,3 +117,12 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   return 1;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVObjectWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << "ObjectTclName: " << this->ObjectTclName << endl;
+  os << "VariableName: " << this->VariableName << endl;
+}

@@ -195,3 +195,11 @@ const char* vtkPVReaderModule::GetExtension(vtkIdType i)
   if(this->Extensions->GetItem(i, result) != VTK_OK) { result = 0; }
   return result;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVReaderModule::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << "AcceptAfterRead: " << this->AcceptAfterRead << endl;
+}
