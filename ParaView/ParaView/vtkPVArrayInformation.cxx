@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkDataArray.h"
+#include "vtkByteSwap.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -365,7 +366,7 @@ int vtkPVArrayInformation::WriteMessage(unsigned char *msg)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg)
+int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg, int swap)
 {
   int length = 0;
   short nameLength;
@@ -378,7 +379,8 @@ int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg)
     }
 
   // Short for name length.
-  memcpy(&nameLength, msg, sizeof(nameLength));
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 1, sizeof(short));}
+  memcpy(&nameLength, msg, sizeof(short));
   msg += sizeof(short); 
   length += sizeof(short);
 
@@ -407,6 +409,7 @@ int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg)
     }
   for (idx = 0; idx < num; ++idx)
     {
+    if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 2, sizeof(double));}
     memcpy((unsigned char*)&this->Ranges[2*idx], msg, sizeof(double));
     msg += sizeof(double);
     length += sizeof(double);

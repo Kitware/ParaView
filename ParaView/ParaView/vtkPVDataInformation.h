@@ -99,7 +99,7 @@ public:
   int DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkIdType);
   vtkGetMacro(NumberOfCells, vtkIdType);
-  vtkGetMacro(MemorySize, unsigned long);
+  vtkGetMacro(MemorySize, int);
   vtkGetVector6Macro(Bounds, double);
   void GetBounds(float* bds);
 
@@ -127,7 +127,7 @@ protected:
   int            DataSetType;
   vtkIdType      NumberOfPoints;
   vtkIdType      NumberOfCells;
-  unsigned long  MemorySize;
+  int            MemorySize;
   double         Bounds[6];
   int            Extent[6];
   char*          Name;

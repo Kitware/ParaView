@@ -103,7 +103,7 @@ public:
   // message (same as message length after call).
   int GetMessageLength();
   int WriteMessage(unsigned char *msg);
-  int CopyFromMessage(unsigned char *msg);
+  int CopyFromMessage(unsigned char *msg, int swap);
 
 protected:
   vtkPVDataSetAttributesInformation();

@@ -51,10 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
+#include "vtkByteSwap.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.9");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -387,8 +388,8 @@ int vtkPVDataInformation::GetMessageLength()
   // - vtkIdType for numberOfCells
   length += 2*sizeof(vtkIdType);
 
-  // 1 unsigned longs for memory size.
-  length += 1*sizeof(unsigned long);
+  // 1 int for memory size.
+  length += 1*sizeof(int);
 
   // - 6 doubles for bounds.
   // - 6 integers for extent.
@@ -449,8 +450,8 @@ void vtkPVDataInformation::WriteMessage(unsigned char* msg)
   memcpy(tmp, (unsigned char*)&this->NumberOfCells, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
   // Memory Size
-  memcpy(tmp, (unsigned char*)&this->MemorySize, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
+  memcpy(tmp, (unsigned char*)&this->MemorySize, sizeof(int));
+  tmp += sizeof(int);
 
   // Bounds
   for (idx = 0; idx < 6; ++idx)
@@ -486,6 +487,7 @@ void vtkPVDataInformation::WriteMessage(unsigned char* msg)
 void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
 {
   unsigned char bigEndianFlag;
+  int swap = 0;
   unsigned char* tmp;
   int attrMsgLength;
   int idx;
@@ -499,24 +501,27 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
   tmp = msg;
   if (bigEndianFlag != *tmp)
     {
-    vtkErrorMacro("We do not support heterogenious communication yet.");
-    return;
+    swap = 1;
     }
   tmp += 1;
 
   this->DataSetType = *tmp;
   tmp += 1;
 
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 1, sizeof(vtkIdType));}
   memcpy((unsigned char*)&this->NumberOfPoints, tmp, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
 
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 1, sizeof(vtkIdType));}
   memcpy((unsigned char*)&this->NumberOfCells, tmp, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
 
-  memcpy((unsigned char*)&this->MemorySize, tmp, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 1, sizeof(int));}
+  memcpy((unsigned char*)&this->MemorySize, tmp, sizeof(int));
+  tmp += sizeof(int);
 
   // Bounds
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 6, sizeof(double));}
   for (idx = 0; idx < 6; ++idx)
     {
     memcpy((unsigned char*)&this->Bounds[idx], tmp, sizeof(double));
@@ -524,6 +529,7 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
     }
 
   // Extent
+  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 6, sizeof(int));}
   for (idx = 0; idx < 6; ++idx)
     {
     memcpy((unsigned char*)&this->Extent[idx], tmp, sizeof(int));
@@ -531,11 +537,11 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
     }
 
   // Point data
-  attrMsgLength = this->PointDataInformation->CopyFromMessage(tmp);
+  attrMsgLength = this->PointDataInformation->CopyFromMessage(tmp, swap);
   tmp += attrMsgLength;
 
   // Cell data
-  attrMsgLength = this->CellDataInformation->CopyFromMessage(tmp);
+  attrMsgLength = this->CellDataInformation->CopyFromMessage(tmp, swap);
   tmp += attrMsgLength;
 
   int nameLength = *tmp;
