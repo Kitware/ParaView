@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for MedVIP
-# modified by S. Barre (Time-stamp: <2002-07-29 11:07:14 barre>
+# modified by S. Barre (Time-stamp: <2002-12-11 09:36:14 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = ParaView
@@ -37,6 +37,7 @@ IMAGE_PATH           = "@PARAVIEW_SOURCE_DIR@/Utilities/Doxygen"
 OUTPUT_DIRECTORY     = "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/doc"
 
 INPUT                = \
+ "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/KWCommon" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/ParaView" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Widgets" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/doc_ParaView_index.dox" 

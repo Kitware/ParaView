@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Doxygen documentation batch
-# modified by S. Barre (Time-stamp: <2002-07-29 11:07:10 barre>
+# modified by S. Barre (Time-stamp: <2002-12-11 09:35:58 barre>
 # -------------------------------------------------------------------------
 
 # Path to several tools (_PROG to avoid the typical GZIP env var pb)
@@ -160,6 +160,7 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
     $PERL_PROG $PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl \
         --to "$INTERMEDIATE_DOX_DIR" \
         --relativeto "$SOURCE_DIR/$REL_PATH_TO_TOP" \
+        "$SOURCE_DIR/$REL_PATH_TO_TOP/KWCommon" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/ParaView" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Widgets"
 fi
@@ -173,6 +174,7 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         --stop  "$PATH_TO_VTK_DOX_SCRIPTS/doc_index.stop" \
         --store "doc_""$PROJECT_NAME""_index.dox" \
         --to "$INTERMEDIATE_DOX_DIR" \
+        "$SOURCE_DIR/$REL_PATH_TO_TOP/KWCommon" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/ParaView" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Widgets"
 fi
