@@ -32,7 +32,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.12.2.1");
+vtkCxxRevisionMacro(vtkPickFilter, "1.12.2.2");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -362,7 +362,7 @@ int vtkPickFilter::CompareProcesses(double bestDist2)
 // I made this general so we could grow the region from the seed.
 void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
 {
-  if (this->BestInputIndex < 0 || this->RegionPtIds == 0)
+  if (this->BestInputIndex < 0 || this->RegionPointIds == 0)
     {
     return;
     }
