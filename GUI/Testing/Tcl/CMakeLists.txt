@@ -195,23 +195,24 @@ ADD_TEST (AnimationImages-ParaView
 
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
-  ADD_TEST(PVLocal ${CMAKE_CTEST_COMMAND}
-    --build-and-test
-    ${ParaView_SOURCE_DIR}/Examples/PVLocal
-    ${PVClientTests_BINARY_DIR}/Examples/PVLocal
-    --build-two-config
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${MAKEPROGRAM}
-    --build-project PVLocal
-    --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
-    --test-command
-    ${PARAVIEW_EXECUTABLE} --disable-registry
-    ${PVClientTests_SOURCE_DIR}/Tcl/PVLocal.pvs
-    --pvlocal-dir ${PVClientTests_BINARY_DIR}/Examples/PVLocal
-    -D ${PVClientTestData}
-    -C ${PVCompareImages}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/PVLocal.png
-
-)
+  IF(BUILD_SHARED_LIBS)
+    ADD_TEST(PVLocal ${CMAKE_CTEST_COMMAND}
+      --build-and-test
+      ${ParaView_SOURCE_DIR}/Examples/PVLocal
+      ${PVClientTests_BINARY_DIR}/Examples/PVLocal
+      --build-two-config
+      --build-generator ${CMAKE_GENERATOR}
+      --build-makeprogram ${MAKEPROGRAM}
+      --build-project PVLocal
+      --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
+      --test-command
+      ${PARAVIEW_EXECUTABLE} --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/PVLocal.pvs
+      --pvlocal-dir ${PVClientTests_BINARY_DIR}/Examples/PVLocal
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/PVLocal.png
+      )
+  ENDIF(BUILD_SHARED_LIBS)    
 ENDIF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
