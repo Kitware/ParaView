@@ -76,12 +76,22 @@ void vtkPVPolyDataSource::InitializePVOutput(int idx)
   vtkPVData *input;
   vtkPVPolyData *output;
   vtkPVAssignment *assignment;
+  char *outputTclName;
   
-  input = this->vtkPVSource::GetNthPVInput(0);
-  output = vtkPVPolyData::New();
+  // Convoluted way of creating an object. (just to get the tcl name I want).
+  outputTclName = new char[strlen(this->GetTclName()) + strlen("Output") + 1];
+  sprintf(outputTclName, "%sOutput", this->GetTclName());
+  output = vtkPVPolyData::SafeDownCast( 
+    this->GetPVApplication()->MakeTclObject("vtkPVPolyData",outputTclName));
+  delete [] outputTclName;
+  outputTclName = NULL;
+  output->Clone(this->GetPVApplication());
+  this->SetNthPVOutput(idx, output);
+
   output->Clone(this->GetPVApplication());
   this->SetNthPVOutput(idx, output);
   
+  input = this->vtkPVSource::GetNthPVInput(0);
   if (input != NULL)
     {
     assignment = input->GetAssignment();

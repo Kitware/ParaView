@@ -1889,8 +1889,8 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *input)
   // Handle parallelism.
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
-			   input->GetTclName());
+    pvApp->BroadcastScript("%s SetNthPVInput %d %s", this->GetTclName(),
+			   idx, input->GetTclName());
     }
   
   if (idx < 0)
@@ -2106,8 +2106,8 @@ void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *output)
   // Handle parallelism.
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
-			   output->GetTclName());
+    pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(),
+			   idx, output->GetTclName());
     }
   
   if (idx < 0)

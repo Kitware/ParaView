@@ -843,7 +843,7 @@ void vtkPVRenderView::RenderHack()
   if (1)
     {
     float *pdata, *zdata;
-    pdata = new float[numPixels];
+    pdata = new float[4 * numPixels];
     zdata = new float[numPixels];
     vtkTreeComposite(renWin, controller, 1, zdata, pdata);
     delete [] zdata;
