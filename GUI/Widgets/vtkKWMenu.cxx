@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.55");
+vtkCxxRevisionMacro(vtkKWMenu, "1.56");
 
 
 
@@ -702,7 +702,7 @@ int vtkKWMenu::GetIndex(const char* menuname)
 int vtkKWMenu::GetIndexOfCommand(
   vtkKWObject* Object, const char* MethodAndArgString)
 {
-  if (Object && MethodAndArgString)
+  if (Object && Object->GetApplication() && MethodAndArgString)
     {
     ostrstream str;
     str << Object->GetTclName() << " " << MethodAndArgString << ends;
