@@ -307,7 +307,7 @@
 #ifdef PARAVIEW_USE_EXODUS
  <Module name="ExodusReader" root_name="ExodusReader" 
    output="vtkUnstructuredGrid" 
-   class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".e .ex2 .00" 
+   class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".e .ex2 .exo .gen .0 .00 .000" 
    file_description="Exodus Reader">
   <Source class="vtkPExodusReader"/>
   <ArraySelection attribute_name="Cell" />
