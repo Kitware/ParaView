@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    test.cxx
+  Module:    ServersFiltersPrintSelf.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

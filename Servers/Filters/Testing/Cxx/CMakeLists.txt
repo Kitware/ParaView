@@ -1,4 +1,11 @@
-ADD_EXECUTABLE(TestContinuousClose3D TestContinuousClose3D.cxx)
-ADD_TEST(TestContinuousClose3D ${CXX_TEST_PATH}/TestContinuousClose3D)
+SET(ServersFilters_SRCS
+  TestContinuousClose3D
+  ServersFiltersPrintSelf
+  )
+
+FOREACH(name ${ServersFilters_SRCS})
+  ADD_EXECUTABLE(${name} ${name}.cxx)
+  ADD_TEST(${name} ${CXX_TEST_PATH}/${name})
  
-TARGET_LINK_LIBRARIES(TestContinuousClose3D vtkPVFilters)
+  TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
+ENDFOREACH(name)
