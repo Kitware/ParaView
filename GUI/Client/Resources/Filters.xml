@@ -843,6 +843,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
   </Module>
   <Module name="Calculator"
           class="vtkPVSource"
+          overide_autoaccept="1"
           root_name="Calc"
           button_image="PVCalculatorButton"
           button_help="Create new arrays using mathematical operations and existing arrays."

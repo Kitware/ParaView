@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVCalculatorWidget.h"
 
-#include "vtkArrayCalculator.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkKWEntry.h"
@@ -46,10 +45,10 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.40");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
+                                 int argc, char *argv[]);
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -59,7 +58,7 @@ vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMVectorVariableProperty,
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMAttributeModeProperty,
                      vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMRemoveAllVariablesProperty,
-  vtkSMProperty);
+                     vtkSMProperty);
 
 //----------------------------------------------------------------------------
 vtkPVCalculatorWidget::vtkPVCalculatorWidget()
@@ -547,6 +546,7 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->CalculatorFrame->GetFrame()->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::UpdateFunction(const char* newSymbol)
 {
   char* newFunction;
@@ -558,6 +558,7 @@ void vtkPVCalculatorWidget::UpdateFunction(const char* newSymbol)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::ClearFunction()
 {
   this->FunctionLabel->SetValue("");
@@ -663,6 +664,7 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   this->NumberOfScalarVariables++;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
                                                 const char *arrayName,
                                                 int component)
@@ -739,6 +741,7 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
   this->NumberOfVectorVariables++;  
 }
 
+//----------------------------------------------------------------------------
 int vtkPVCalculatorWidget::VectorVariableExists(const char *variableName,
                                                 const char *arrayName)
 {

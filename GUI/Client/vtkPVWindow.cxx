@@ -142,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.674");
+vtkCxxRevisionMacro(vtkPVWindow, "1.675");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3576,7 +3576,7 @@ void vtkPVWindow::UpdateFilterMenu()
     // If there is no current data, disable the menu.
     this->FilterMenu->SetEnabled(0);
     }
-  
+
 }
 
 //-----------------------------------------------------------------------------
@@ -3664,7 +3664,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
     }
     
   // I was having problems with the parts being created too early 
-  // (before accept was called).  Group was getting onloy one part when 
+  // (before accept was called).  Group was getting only one part when 
   // it should have two (two inputs selected form GUI).
   // This call seemed to trigger creation of the parts.
   //  This conditional will keep the parts from being created when
@@ -4196,6 +4196,18 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
   if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
     pvs->SetSourceList(sourceList);
+
+    // During CloneAndInitialize the CurrentPVSource is changed. Unfortunately
+    // we need the OverideAutoAccept from pvs. That's why we do the following trick 
+    // first we check if pvs has OverideAutoAccept set it to the CurrentPVSource
+    // and then set it back (we need the temp CurrentPVSource since it is changed !)
+    int overideautoaccept = 0;
+    vtkPVSource *current = NULL;
+    if( pvs->GetOverideAutoAccept() )
+      {
+      overideautoaccept = current->GetOverideAutoAccept();
+      current->SetOverideAutoAccept(1);
+      }
     // Make the cloned source current only if it is going into
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
@@ -4205,6 +4217,11 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     else
       {
       success = pvs->CloneAndInitialize(1, clone);
+      }
+    // Put back the old value
+    if( pvs->GetOverideAutoAccept() )
+      {
+      current->SetOverideAutoAccept(overideautoaccept);
       }
 
     if (success != VTK_OK)

@@ -65,7 +65,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.422");
+vtkCxxRevisionMacro(vtkPVSource, "1.423");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -93,6 +93,7 @@ vtkPVSource::vtkPVSource()
   this->ShortHelp = 0;
   this->LongHelp  = 0;
   this->SourceList = 0;
+  this->OverideAutoAccept = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
@@ -972,7 +973,7 @@ void vtkPVSource::AcceptCallback()
 {
   // This method is purposely not virtual.  The AcceptCallbackFlag
   // must be 1 for the duration of the accept callback no matter what
-  // subclasses might do.  All of the real AcceptCallback funcionality
+  // subclasses might do.  All of the real AcceptCallback functionality
   // should be implemented in AcceptCallbackInternal.
   this->AcceptCallbackFlag = 1;
   this->AcceptCallbackInternal();
@@ -982,7 +983,7 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
-  if ( ! this->Notebook->GetAcceptButtonRed())
+  if ( ! this->Notebook->GetAcceptButtonRed() )
     {
     return;
     }
@@ -1030,9 +1031,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   vtkPVWindow *window;
   vtkPVSource *input;
 
-  // vtkPVSource is taking over some of the update descisions because
+  // vtkPVSource is taking over some of the update decisions because
   // client does not have a real pipeline.
-  if ( ! this->Notebook->GetAcceptButtonRed())
+  if ( ! this->Notebook->GetAcceptButtonRed() )
     {
     return;
     } 
@@ -1055,7 +1056,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->MarkSourcesForUpdate();
     
   // Initialize the output if necessary.
-  if ( ! this->Initialized)
+  if ( ! this->Initialized )
     { // This is the first time, initialize data. 
     // I used to see if the display gui was properly set, but that was a legacy
     // check.  I removed the check.
@@ -2249,6 +2250,8 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   pvs->SetApplication(this->GetApplication());
   pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetNotebook(this->Notebook);
+  // Copy OverideAutoAccept
+  pvs->SetOverideAutoAccept( this->GetOverideAutoAccept());
 
   pvs->SetShortHelp(this->GetShortHelp());
   pvs->SetLongHelp(this->GetLongHelp());

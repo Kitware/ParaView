@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.47");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.48");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -496,14 +496,23 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     pvm->SetModuleName(name);
     }
 
+  const char* overide_autoaccept = me->GetAttribute("overide_autoaccept");
+  int overide = 0;
+  if (overide_autoaccept && atoi(overide_autoaccept))
+    {
+    overide = 1;
+    }
+  pvm->SetOverideAutoAccept(overide);
+
+
   const char* button_image = me->GetAttribute("button_image");
   if(name && button_image)
     {
     const char* button_image_file = me->GetAttribute("button_image_file");
     const char* button_help = me->GetAttribute("button_help");
-    const char* button_visiblity = me->GetAttribute("button_visibility");
+    const char* button_visibility = me->GetAttribute("button_visibility");
     int vis = 1;
-    if (button_visiblity && ! atoi(button_visiblity))
+    if (button_visibility && ! atoi(button_visibility))
       {
       vis = 0;
       }

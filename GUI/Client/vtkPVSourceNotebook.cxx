@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.8");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.9");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -459,17 +459,23 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     return;
     }
   this->AcceptButtonRed = 1;
-  if (this->AutoAccept == 1)
+  if ( this->PVSource 
+   && !this->PVSource->GetOverideAutoAccept())
     {
-    this->EventuallyAccept();
-    return;
+    if (this->AutoAccept == 1)
+      {
+      this->EventuallyAccept();
+      return;
+      }
+    if (this->AutoAccept == 2)
+      {
+      this->AcceptButtonCallback();
+      return;
+      }
     }
-  if (this->AutoAccept == 2)
+  else
     {
-    this->AcceptButtonCallback();
-    return;
     }
-    
   if ( this->GetPVApplication()->GetMainWindow()->GetInDemo() )
     {
     return;
@@ -614,9 +620,6 @@ void vtkPVSourceNotebook::EventuallyAcceptCallBack()
   this->TimerToken = NULL;
   this->AcceptButtonCallback();
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::PrintSelf(ostream& os, vtkIndent indent)
