@@ -75,6 +75,11 @@
           writer="vtkMetaImageWriter"
           extension=".mhd"
           file_description="Meta Image Files"/>
+ <Writer input="vtkImageData" 
+         class="vtkPVWriter"
+         writer="vtkPNGWriter"
+         extension=".png"
+         file_description="PNG Image Files"/>
 #ifdef PARAVIEW_LINK_XDMF
   <Writer input="vtkDataSet"
           class="vtkPVWriter"
@@ -97,4 +102,5 @@
           file_description="EnSight File"/>
 #endif
 </ModuleInterfaces>
+
 
