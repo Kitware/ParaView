@@ -135,7 +135,14 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
-  pvApp->BroadcastScript("%s SetFileName %s", tclName, this->GetDataFileName());
+  pvApp->BroadcastScript("%s SetFileName %s",
+                         tclName, this->GetDataFileName());
+  
+  // This is necessary because we need to locally keep a copy of the file name,
+  // but we need to set DataFileName to NULL (done late in this method)
+  // because otherwise we hang onto that file name and don't get prompted for
+  // a filename the next time we create a data set reader.
+  this->SetFileName(this->GetDataFileName());
   
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
@@ -202,31 +209,13 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
   pvs->AcceptCallback();  
 
+  // so we get prompted for a filename if another data set reader is created
+  this->SetDataFileName(NULL);
+  
   return pvs;
-} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 void vtkPVDataSetReaderInterface::SaveInTclScript(ofstream *file, const char* sourceName)
 {
-  *file << "\t" << sourceName << " SetFileName " << this->DataFileName << "\n";
+  *file << "\t" << sourceName << " SetFileName " << this->FileName << "\n";
 }
