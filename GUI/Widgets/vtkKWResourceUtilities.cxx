@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.1");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.2");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -73,8 +73,7 @@ int vtkKWResourceUtilities::ReadPNGImage(
   if (!info_ptr)
     {
     vtkGenericWarningMacro("Out of memory.");
-    png_destroy_read_struct(&png_ptr,
-                            (png_infopp)NULL, (png_infopp)NULL);
+    png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
     fclose(fp);
     return 0;
     }
@@ -83,8 +82,7 @@ int vtkKWResourceUtilities::ReadPNGImage(
   if (!end_info)
     {
     vtkGenericWarningMacro("Unable to read PNG file!");
-    png_destroy_read_struct(&png_ptr, &info_ptr,
-                            (png_infopp)NULL);
+    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
     fclose(fp);
     return 0;
     }
@@ -184,6 +182,129 @@ int vtkKWResourceUtilities::ReadPNGImage(
   png_read_end(png_ptr, NULL);
   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
   fclose(fp);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWResourceUtilities::WritePNGImage(
+  const char *filename,
+  int width, int height, 
+  int pixel_size,
+  unsigned char *pixels)
+{
+  // Check parameters
+
+  if (!filename || 
+      width <= 0 || height <= 0 || 
+      pixel_size < 1 || pixel_size > 4 || 
+      !pixels)
+    {
+    vtkGenericWarningMacro("Unable to write PNG file, invalid parameters!");
+    return 0;
+    }
+
+  // Open file for writing
+
+  FILE *fp = fopen(filename, "wb");
+  if (!fp)
+    {
+    vtkGenericWarningMacro("Unable to write PNG file " << filename);
+    return 0;
+    }
+
+  // Create some PNG structs
+
+  png_structp png_ptr = png_create_write_struct
+    (PNG_LIBPNG_VER_STRING, (png_voidp)NULL, NULL, NULL);
+  if (!png_ptr)
+    {
+    vtkGenericWarningMacro("Unable to write PNG file " << filename);
+    fclose(fp);
+    return 0;
+    }
+  
+  png_infop info_ptr = png_create_info_struct(png_ptr);
+  if (!info_ptr)
+    {
+    vtkGenericWarningMacro("Unable to write PNG file " << filename);
+    png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+    fclose(fp);
+    return 0;
+    }
+  
+  png_init_io(png_ptr, fp);
+
+  // Set error handler
+
+  if (setjmp(png_jmpbuf(png_ptr)))
+    {
+    vtkGenericWarningMacro("Unable to set error handler!");
+    png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+    fclose(fp);
+    return 0;
+    }
+
+  // Write the header, describe the image parameters
+
+  int color_type;
+  switch (pixel_size)
+    {
+    case 1: 
+      color_type = PNG_COLOR_TYPE_GRAY;
+      break;
+    case 2: 
+      color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
+      break;
+    case 3: 
+      color_type = PNG_COLOR_TYPE_RGB;
+      break;
+    default: 
+      color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+      break;
+    }
+  
+  png_set_IHDR(png_ptr, info_ptr, 
+               (png_uint_32)width, (png_uint_32)height,
+               8, 
+               color_type, 
+               PNG_INTERLACE_NONE,
+               PNG_COMPRESSION_TYPE_DEFAULT, 
+               PNG_FILTER_TYPE_DEFAULT);
+
+  png_write_info(png_ptr, info_ptr);
+
+  // Write the pixels
+
+  png_bytep *row_pointers = new png_bytep [height];
+  unsigned long stride = width * pixel_size;
+
+  int ui;
+  for (ui = 0; ui < height; ui++)
+    {
+    row_pointers[ui] = (png_bytep)pixels;
+    pixels += stride;
+    }
+
+  png_write_image(png_ptr, row_pointers);
+
+  delete [] row_pointers;
+
+  // Close the file
+
+  png_write_end(png_ptr, info_ptr);
+  png_destroy_write_struct(&png_ptr, &info_ptr);
+
+  if (fp)
+    {
+    fflush(fp);
+    fclose(fp);
+    if (ferror(fp))
+      {
+      vtkGenericWarningMacro("Error while writing PNG file " << filename);
+      return 0;
+      }
+    }
 
   return 1;
 }

@@ -39,12 +39,24 @@ public:
   // the 'delete' operator).
   // Note that grayscale images are promoted to RGB. Transparent images are
   // promoted to RGBA. The bit depth is promoted (or shrunk) to 8 bits
-  // per component. 'pixel_size' is therefore always 3 (RGB) or 4 (RGBA).
+  // per component. The resulting 'pixel_size' is therefore always
+  // 3 (RGB) or 4 (RGBA).
   // Return 1 on success, 0 otherwise.
   static int ReadPNGImage(const char *filename,
                           int *width, int *height, 
                           int *pixel_size,
                           unsigned char **pixels);
+
+  // Description:
+  // Write a PNG file given its 'filename'.
+  // The bit depth has to be 8 bit (i.e. unsigned char).
+  // The 'pixel_size' can be 1 (grayscale), 2 (grayscale + alpha), 3 (RGB),
+  // or 4 (RGB + alpha).
+  // Return 1 on success, 0 otherwise.
+  static int WritePNGImage(const char *filename,
+                           int width, int height, 
+                           int pixel_size,
+                           unsigned char *pixels);
 
 protected:
   vtkKWResourceUtilities() {};
