@@ -133,8 +133,12 @@ set kw(vtkTemp1427) [$kw(vtkTemp1404) GetPVWidget {Input}]
 $kw(vtkTemp1427) SetCurrentValue $kw(vtkTemp1292)
 set kw(vtkTemp1415) [$kw(vtkTemp1404) GetPVWidget {VOI}]
 $kw(vtkTemp1415) SetValue 2 10 -7 -7 -10 10 
-set kw(vtkTemp1422) [$kw(vtkTemp1404) GetPVWidget {SampleRate}]
-$kw(vtkTemp1422) SetValue 1 1 1
+set kw(vtkTemp1422) [[$kw(vtkTemp1404) GetPVWidget {SampleRate}] GetPVWidget {SampleRateI}]
+$kw(vtkTemp1422) SetValue 1
+set kw(vtkTemp1423) [[$kw(vtkTemp1404) GetPVWidget {SampleRate}] GetPVWidget {SampleRateJ}]
+$kw(vtkTemp1423) SetValue 1
+set kw(vtkTemp1424) [[$kw(vtkTemp1404) GetPVWidget {SampleRate}] GetPVWidget {SampleRateK}]
+$kw(vtkTemp1424) SetValue 1
 $kw(vtkTemp1404) AcceptCallback
 set kw(vtkTemp1438) [$kw(vtkTemp1404) GetPVOutput]
 $kw(vtkTemp1438) DrawSurface

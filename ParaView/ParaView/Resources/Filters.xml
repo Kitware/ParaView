@@ -12,6 +12,7 @@
                help="Balance the number of cells on all processes."
                input_name="Input"/>
     <Documentation>
+The Balance filter is available when ParaView is run in parallel. It does load-balancing so that all processes have the same number of cells. It operates on polygonal data sets and produces polygonal output.
     </Documentation>
   </Module>
   <Module name="AllToN"
@@ -27,11 +28,12 @@
                help="Redistribute polydata to a subset of processes."
                input_name="Input"/>
   <!-- dependent on number of processes being used -->
-    <VectorEntry trace_name="NumberOfProcesses"
+    <VectorEntry label="Number of Processes" trace_name="NumberOfProcesses"
                  variable="NumberOfProcesses"
                  type="int"
                  default_value="1"/>
     <Documentation>
+The All to N filter is available when ParaView is run in parallel. It redistributes the data so that it is located on the number of processes specified in the Number of Processes entry box. It also does load-balancing of the data among these processes. This filter operates on polygonal data and produces polygonal output.
     </Documentation>
   </Module>
   <Module name="AppendAttributes"
@@ -186,7 +188,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
                    help="Turn this On to control wheter points merging is performed."
                    default_value="1"/>
     <Documentation>
-The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specifed Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the units of the input data set.)
+The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specifed Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the distance units of the input data set.)
 The transforming of degenereate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
 If the Piece invariant option is checked, the whole data set will be processed at once so that cleaning this data set always produces the same results. If the box is unchecked, the data set can be processed one piece at a time, so it is not necessary for the entire data set to fit into memory, but the results are not guaranteed to be the same as they would be if the Piece invariant option was on.
     </Documentation>
@@ -343,10 +345,11 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
       <Item name="Duplicate cells" value="1"/>
       <Item name="Divide cells" value="2"/>
     </SelectionList>
-    <StringEntry variable="GlobalIdArrayName"
+    <StringEntry label="Global Id Array Name" variable="GlobalIdArrayName"
                  trace_name="GlobalIdArrayName"
                  help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
     <Documentation>
+The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly on process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copies to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. The output of this filter is of type unstructured grid.
     </Documentation>
   </Module>
   <Module name="ElevationFilter"
@@ -451,7 +454,7 @@ The line can be specifed interactively using the 3D line widget. See section 6.4
     <Documentation>
 Extract CTH Parts is a specialized filter for visualizing the data from a CTH simulation. It first converts the selected cell-centered arrays to point-centered ones. It then contours each array at a value of 0.5. The user has the option of clipping the resulting surface(s) with a plane.
 If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contigous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
-If you wish to clip the contour surfaces with a plane, select "On" from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See the 3D Widgets section for the details of using this widget or manually setting the plane's parameters.)
+If you wish to clip the contour surfaces with a plane, select "On" from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See section 6.4 for the details of using this widget or manually setting the plane's parameters.)
 This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
   </Module>
@@ -815,7 +818,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
                    default_value="0"/>
     <Documentation>
 The Mask Points filter reduces the number of points in the data set. It operates on any type of data set, but produces only points / vertices. This filter is often used before the Glyph filter, but now the basic point-masking functionality is available on the Parameters page for the Glyph filter.
-The Input menu allows the user to select the data set to which this filter will be applied. The value in the On ratio entry box specifies the ratio of points to retain in the output. (For example, if the on ratio is 3, then the output will contain 1/3 as many points -- up to the Max. points value -- as the input.) The Max. points entry box determines the maximum number of points that will appear in the output. The Offset entry box specifies the point in the data set from which to start masking. If the Random check box is marked, then the output points will be selected randomly from the input; otherwise every nth point (specified by the on ratio) will be selected. Selecting points at random is helpful to avoid striping when masking the points of a structured data set. If the Generate vertices option is checked, then a vertex cell will be created for each point in the output.
+The Input menu allows the user to select the data set to which this filter will be applied. The value in the On ratio thumb wheel specifies the ratio of points to retain in the output. (For example, if the on ratio is 3, then the output will contain 1/3 as many points -- up to the Max. points value -- as the input.) The Max. points thumb wheel determines the maximum number of points that will appear in the output. The Offset thumb wheel specifies the point in the data set from which to start masking. If the Random check box is marked, then the output points will be selected randomly from the input; otherwise every nth point (specified by the on ratio) will be selected. Selecting points at random is helpful to avoid striping when masking the points of a structured data set. If the Generate vertices option is checked, then a vertex cell will be created for each point in the output.
     </Documentation>
   </Module>
   <Module name="Median"
@@ -1304,7 +1307,7 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                  help="The change in radius during sweep process."
                  default_value="0.0"/>
     <Documentation>
-The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to seelct the data set to which this filter will be applied. The value of the Resolution entry box specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
+The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to seelct the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
 The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or the no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360 and Translation and Delta radius are 0).
     </Documentation>
   </Module>
@@ -1389,7 +1392,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point postions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations entry box specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
+The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point postions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
     </Documentation>
   </Module>
   <Module name="Stripper"
@@ -1441,6 +1444,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
              class="vtkPolyData"/>
     </Filter>
     <Documentation>
+The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
     </Documentation>
   </Module>
   <Module name="DataSetTriangleFilter"
@@ -1458,13 +1462,14 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
+The Tetrahedralize filter converts the 3D cells of any type of data set to tetrahedrons and the 2D ones to triangles. This filter always produces unstructured grid output.
     </Documentation>
   </Module>
   <Module name="TriangleFilter"
           menu_name="Triangulate"
           root_name="Tri"
           module_type="Filter"
-          long_help="This filter converts polygons and traingle strips to basic triangles."
+          long_help="This filter converts polygons and triangle strips to basic triangles."
           short_help="Convert polygonal data to triangles.">
     <Filter class="vtkTriangleFilter">
       <Input name="Input"
@@ -1475,6 +1480,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
+The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such sitations.
     </Documentation>
   </Module>
   <Module name="TransformFilter"
@@ -1503,6 +1509,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
       </Item>
     </SelectWidget>
     <Documentation>
+The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 6.4 for the detauils of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
     </Documentation>
   </Module>
   <Module name="TubeFilter"
@@ -1544,9 +1551,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    default_value="0">
       <Item name="Off"
             value="0"/>
-      <Item name="ByScalar"
+      <Item name="By Scalar"
             value="1"/>
-      <Item name="ByVector"
+      <Item name="By Vector"
             value="2"/>
     </SelectionList>
     <!-- RadiusFactor value chosen does not change processing speed of this filter or cause it to crash. -->
@@ -1557,6 +1564,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                  help="Set the maximum tube radius in terms of a multiple of the minimum radius"
                  default_value="10"/>
     <Documentation>
+The Tube filter creates tubes around the lines in the input polygonal data set. The output is also polygonal. The Num. sides value determines the number of faces around the circumference of the tube. The Capping toggle specifies whether to close the end of the tube with a polygon. The Radius entry determines the radius of the tube (or the minimum radius if you are varying the radius). From the Vary radius menu, you can select whether the radius of the tube should vary, and if so, whether it should be by scalar or by vector. If the radius is varied by scalar, the tube radius is based on the point-based scalar values. If it is varied by vector, the vector magnitude is used. If you are varying the radius, the value in the Radius factor entry sets the maximum radius by specifying a multiplier of the Radius value.
     </Documentation>
   </Module>
   <Module name="WarpScalar"
@@ -1608,6 +1616,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    help="Z value is used to warp the surface, scalars to color surface."
                    default_value="0"/>
     <Documentation>
+The Warp (scalar) filter translates the points of the input data set along a vector by a distance determined by the specified scalars (selected from the Scalars menu). The Scale factor entry allows you to rescale the scalar values used in warping the data.
+The Normal entries specify the direction in which to warp the geometry if the Use normal option is checked. If Use normal and X-Y plane are off, the data set will be warped along its normals array. (If no normals array exists, the Normal value will be used.) If X-Y plane is on, the Z-values in the data set are considered to be scalars, and warping is done along the Z axis. This is useful for creating carpet plots. Any scalars in the data set are copied to the output, so the data can be colored by them.
+This filter operates on polygonal, curvilinear, and unstructured grid data sets containing single-component scalar arrays. Because it only changes the positions of the points, the output data set type is the same as that of the input.
     </Documentation>
   </Module>
   <Module name="WarpVector"
@@ -1645,6 +1656,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                  help="Displacement is vector times scale."
                  default_value="1.0"/>
     <Documentation>
+The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Cut"
@@ -1701,6 +1713,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
               set_number_command="SetNumberOfContours"
               set_contour_command="SetValue"/>
     <Documentation>
+The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The paramters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 6.4.
+By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the same units as the data set coordinates. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add a several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. To delete a value from the Cutt Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
+The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to Cut. The output of this filter is polygonal data.
     </Documentation>
   </Module>
   <Module name="Clip"
@@ -1777,6 +1792,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    help="Switches which part to keep."
                    default_value="0"/>
     <Documentation>
+The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 6.4.
+If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. If the Inside Out option is checked, the opposite portions of the data set will be returned.
+This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Threshold"
@@ -1784,7 +1802,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
           button_image="PVThresholdButton"
           module_type="Filter"
           button_help="Extract cells that satisfy a threshold criterion."
-          long_help="This filter extracts cells that have point scalars in the specified range."
+          long_help="This filter extracts cells that have point or cell scalars in the specified range."
           short_help="Extract cells that satisfy a threshold criterion.">
     <Filter class="vtkPVThresholdFilter">
       <Input name="Input"
@@ -1823,6 +1841,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    default_value="1"
                    help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
     <Documentation>
+The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered and cell-centered data. To select between thses two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Contour"
@@ -1888,6 +1907,10 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    trace_name="Compute Scalars"
                    help="Select whether to compute scalars" />
     <Documentation>
+The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
+The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
+In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
+The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Glyph"
@@ -1896,7 +1919,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
           button_image="PVGlyphButton"
           replace_input="0"
           button_help="Generate a glyph (symbol) at each point of the dataset. These can be colored, scaled and oriented"
-          long_help="This filters generates an arrow, sphere, or cone at each point of the input data set.  The glyphs can be oriented and scale by the input point attributes."
+          long_help="This filter generates an arrow, cone, line, sphere, or 2D glyph at each point of the input data set.  The glyphs can be oriented and scaled by the input point attributes."
           short_help="Generate a glyph symbol at each point of the input data set.">
     <Filter class="vtkPVGlyphFilter">
       <Input name="Input"
@@ -1922,7 +1945,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                        scale_mode_command="SetScaleMode"
                        scale_factor_command="SetScaleFactor"
                        default_orient_mode="1"
-    default_scale_mode ="1"/>
+                       default_scale_mode ="1"/>
     <ThumbWheel label="Max. Number of Glyphs"
                 trace_name="Max Glyphs"
                 variable="MaximumNumberOfPoints"
@@ -1941,6 +1964,13 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                    default_value="1"
                    help="Choose points at random to mask" />
     <Documentation>
+The Glyph filter generates a glyph (i.e., an arrow, cone, line, sphere, or 2D glyph) at each point in the input data set. The glyphs can be oriented and scaled by the input point-centered scalars and vectors.
+From the Glyph menu, select which symbol should be drawn at each input point. The available choices are Arrow, Cone, Line, Sphere, and Glyph2D. To change the parameters of any of the glyphs (including which 2D glyph is drawn), choose the appropriate glyph from the Glyphs submenu of the Select menu. Change the desired parameter(s) and click Accept. To return to the Glyph interface, select this filter from the Selection/Navigation Window or from the Select menu.
+The Orient/Scale section of the interface determines how the point-centered scalars and vectors contribute to the orientation and scale of the widgets. The Orient Mode menu determines whether the glyphs are drawn in their original orientation (Off) or in an orientation determined by a vector array (Vector). If the input does not contain point-centered vectors, the Vector option in the Orient Mode menu will not be available.
+The Scale Mode menu determines how the scale of the glyphs will be determined. The options are to scale by the selected scalar array (Scalar), to scale by the magnitudes of the selected vector array (Vector Magnitude), to scale by each component of the selected vector array (Vector Components), or to draw the all the glyphs at the same scale (Data Scaling Off). If the input contains no point-centered scalar arrays, the Scalar option will be disabled. If it has no point-centered vector arrays, the Vector Magnitude and Vector Components entries will be unavailable. The value of the Scale Factor entry box is a multiplier that contributes to the final size of the glyphs.
+The Scalars and Vectors menus list the point-centered scalar (single-component) and vector (three-component) arrays in the input data set. These menus are enabled and disabled depending on the current Orient and Scale Mode selections.
+The Glyph Parameters tab also contains controls for masking the input points before glyphing. (This is a simplified version of the Mask Points filter interface.) To enable point masking, turn on the Mask Points option. When this is selected, the Max. Number of Glyphs thumbwheel sets an upper limit on the number of glyphs to display. If the Random Masking option is on, the input points to glyph will be randomly selected; otherwise every second point will be glyphed, starting from the first point id.
+The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Probe"
@@ -2072,7 +2102,8 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
       </Item>
     </ContainerWidget>
     <SelectionList trace_name="IntegrationDirection"
-                   variable="IntegrationDirection" 
+                   variable="IntegrationDirection"
+                   label="Integration Direction"
                    option_width="15"
                    default_value="2">
       <Item name="FORWARD"
@@ -2171,6 +2202,13 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                  help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"
                  default_value="0.000000000001"/>
     <Documentation>
+The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 6.4.
+The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's coordinates).
+The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as number of cells.
+The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
+The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
+If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="ExtractGrid"
@@ -2195,19 +2233,42 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
                  trace_name="VOI"
                  input_menu="im"
                  help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-    <!-- keeping vector entries with length > 1 -->
-    <VectorEntry label="Sample rate"
-                 trace_name="SampleRate"
-                 variable="SampleRate"
-                 type="int" length="3"
-                 default_value="1 1 1"
-                 help="Set the sampling rate for each dimension" />
+    <ContainerWidget pack_direction="left" trace_name="SampleRate">
+      <Item>
+        <ThumbWheel label="Sample Rate"
+                    variable="SampleRateI"
+                    trace_name="SampleRateI"
+                    resolution="1"
+                    minimum_value="1"
+                    default_value="1"
+                    help="Set the sampling rate for each dimension."/>
+      </Item>
+      <Item>
+        <ThumbWheel label=""
+                    variable="SampleRateJ"
+                    trace_name="SampleRateJ"
+                    resolution="1"
+                    minimum_value="1"
+                    default_value="1"
+                    help="Set the sampling rate for each dimension."/>
+      </Item>
+      <Item>
+        <ThumbWheel label=""
+                    variable="SampleRateK"
+                    trace_name="SampleRateK"
+                    resolution="1"
+                    minimum_value="1"
+                    default_value="1"
+                    help="Set the sampling rate for each dimension."/>
+      </Item>
+    </ContainerWidget>
     <LabeledToggle label="Include boundary"
                    variable="IncludeBoundary"
                    trace_name="IncludeBoundary"
                    default_value="0"
                    help="Select whether to always include the boundary of the grid in the output"/>
     <Documentation>
+The Extract Grid filter returns a subgrid of a structured input (image, volume, curvilinear, or nonuniform rectilinear) data set. The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For eample, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the toolbar.
     </Documentation>
   </Module>
 </ModuleInterfaces>
