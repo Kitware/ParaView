@@ -66,7 +66,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 LINK_LIBRARIES( 
-    vtkKWCoreTCL
+    vtkKWCommonTCL
     vtkCommon
     vtkjpeg
     vtkpng

@@ -87,7 +87,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 LINK_LIBRARIES (
-vtkKWCoreTCL
+vtkKWCommonTCL
 vtkRenderingTCL 
 vtkImagingTCL 
 vtkGraphicsTCL 

@@ -1,5 +1,5 @@
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
-SOURCE_FILES( KWCore_SRCS
+SOURCE_FILES( KWCommon_SRCS
 vtkKWHashTable
 vtkKWHashTableIterator
 vtkKWIcon
@@ -13,7 +13,7 @@ vtkKWSerializer
 
 
 IF (WIN32)
-  SOURCE_FILES( KWCore_SRCS 
+  SOURCE_FILES( KWCommon_SRCS 
     vtkKWWin32RegisteryUtilities
   )
   WRAP_EXCLUDE_FILES(
@@ -21,7 +21,7 @@ IF (WIN32)
   )
 ELSE (WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
-  SOURCE_FILES( KWCore_SRCS 
+  SOURCE_FILES( KWCommon_SRCS 
     vtkKWUNIXRegisteryUtilities
   )
   WRAP_EXCLUDE_FILES(
@@ -34,8 +34,8 @@ WRAP_EXCLUDE_FILES(
   vtkKWRegisteryUtilities
 )
 
-VTK_WRAP_TCL(vtkKWCoreTCL KWCoreTCL_SRCS KWCore_SRCS)
-ADD_LIBRARY(vtkKWCoreTCL KWCoreTCL_SRCS KWCore_SRCS)
+VTK_WRAP_TCL(vtkKWCommonTCL KWCommonTCL_SRCS KWCommon_SRCS)
+ADD_LIBRARY(vtkKWCommonTCL KWCommonTCL_SRCS KWCommon_SRCS)
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
 
@@ -83,7 +83,7 @@ IF(CMAKE_HAS_X)
    ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
 ENDIF(CMAKE_HAS_X)
 
-INSTALL_TARGETS(/lib vtkKWCoreTCL)
+INSTALL_TARGETS(/lib vtkKWCommonTCL)
 
 IF(BUILD_TESTING)
   SUBDIRS(Testing)

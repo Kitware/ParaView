@@ -90,7 +90,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (KWWIDGETS_SOURCE_DIR ${PARAVIEW_SOURCE_DIR}/Widgets)
  SET (KWWIDGETS_BINARY_DIR ${PARAVIEW_BINARY_DIR}/Widgets)
- SUBDIRS(KWCore Widgets Utilities  ParaView Demos)
+ SUBDIRS(KWCommon Widgets Utilities  ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets)
  SUBDIRS(Config)
  IF (BUILD_DOCUMENTATION)
@@ -125,11 +125,11 @@ IF (PARAVIEW_CAN_BUILD)
  ENDIF (TK_INCLUDE_PATH)
 
  INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR} 
-                     ${PARAVIEW_SOURCE_DIR}/KWCore
+                     ${PARAVIEW_SOURCE_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
- LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCore
+ LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCommon
                   ${PARAVIEW_BINARY_DIR}/Widgets
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
