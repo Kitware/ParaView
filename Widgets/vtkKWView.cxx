@@ -46,6 +46,9 @@ int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWView::vtkKWView()
 {
+  this->SupportPrint       = 1;
+  this->SupportSaveAsImage = 1;
+  
   this->Frame = vtkKWWidget::New();
   this->Frame->SetParent(this);
   this->Frame2 = vtkKWWidget::New();
@@ -722,10 +725,20 @@ void vtkKWView::Select(vtkKWWindow *pw)
       pw->GetMenuProperties(),"Radio");
   pw->GetMenuProperties()->AddRadioButton(10, this->MenuPropertiesName, rbv, this, "ShowViewProperties");
   delete [] rbv;
+
+  if ( this->SupportSaveAsImage )
+    {
+    // add the save as image option
+    pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+                                     "Save As Image",this, "SaveAsImage");
+    }
   
-  // add the Print option
-  pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                   "Print", this, "Print");
+  if ( this->SupportPrint )
+    {
+    // add the Print option
+    pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+                                     "Print", this, "Print");
+    }
   
 #ifdef _WIN32
   // add the edit copy option
@@ -760,9 +773,17 @@ void vtkKWView::Select(vtkKWWindow *pw)
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
   pw->GetMenuProperties()->DeleteMenuItem( this->MenuPropertiesName );
-  pw->GetMenuFile()->DeleteMenuItem("Print");
-  pw->GetMenuFile()->DeleteMenuItem("Save As Image");
-
+  
+  if ( this->SupportPrint )
+    {
+    pw->GetMenuFile()->DeleteMenuItem("Print");
+    }
+  
+  if ( this->SupportSaveAsImage )
+    {
+    pw->GetMenuFile()->DeleteMenuItem("Save As Image");
+    }
+  
 #ifdef _WIN32
   // add the edit copy option
   pw->GetMenuEdit()->DeleteMenuItem("Copy");
@@ -1011,5 +1032,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }

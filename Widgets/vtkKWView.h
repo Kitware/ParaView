@@ -266,7 +266,18 @@ public:
   // sheet entry
   vtkSetStringMacro( MenuPropertiesName );
   vtkGetStringMacro( MenuPropertiesName );
+
+  // Description:
+  // Options to enable / disable UI elements. Should be set before the
+  // UI is created.
+  vtkSetMacro( SupportSaveAsImage, int );
+  vtkGetMacro( SupportSaveAsImage, int );
+  vtkBooleanMacro( SupportSaveAsImage, int );
   
+  vtkSetMacro( SupportPrint, int );
+  vtkGetMacro( SupportPrint, int );
+  vtkBooleanMacro( SupportPrint, int );
+
 protected:
   vtkKWView();
   ~vtkKWView();
@@ -315,7 +326,11 @@ protected:
 
   char             *MenuPropertiesName;
   
-  int Printing;
+  int              Printing;
+  
+  int              SupportSaveAsImage;
+  int              SupportPrint;
+  
 };
 
 
