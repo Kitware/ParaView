@@ -188,7 +188,7 @@ remote_copy_source()
 remote_copy_docs()
 {
     check_host "$1" || return 1
-    remote_copy "$HOST" "${PROJECT}-docs-${VERSION}.tar*"
+    remote_copy "$HOST" "${PROJECT}-docs-${VERSION}.*"
 }
 
 #-----------------------------------------------------------------------------
@@ -250,10 +250,12 @@ remote_binary()
 upload()
 {
     echo "------- Copying tarballs to www.paraview.org. -------"
-    scp ${PROJECT}-${VERSION}*tar.* \
-        ${PROJECT}-docs-${VERSION}*tar.* \
-        ${PROJECT}-${VERSION}.zip \
-        kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
+    files=`ls ${PROJECT}-${VERSION}*tar.* \
+           ${PROJECT}-docs-${VERSION}*tar.* \
+           ${PROJECT}-${VERSION}.zip \
+           ${PROJECT}-docs-${VERSION}.zip`
+
+    scp ${files} kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
     echo "---- Done copying tarballs to www.paraview.org. -----"
 }
 
@@ -426,6 +428,24 @@ docs_tarball()
         compress -cf Tarballs/${PROJECT}-docs-${VERSION}.tar >Tarballs/${PROJECT}-docs-${VERSION}.tar.Z &&
         rm -rf Tarballs/${PROJECT}-docs-${VERSION}.tar
     ) >Logs/docs_tarball.log 2>&1 || error_log Logs/docs_tarball.log
+}
+
+#-----------------------------------------------------------------------------
+# Create a documentation zipfile.
+#
+#  docs_zipfile
+#
+docs_zipfile()
+{
+    [ -z "${DONE_docs_zipfile}" ] || return 0 ; DONE_docs_zipfile="yes"
+    config || return 1
+    [ -d "${PROJECT}-docs-${VERSION}" ] || checkout_docs || return 1
+    echo "Creating documentation zipfile ..." &&
+    (
+        mkdir -p Tarballs &&
+        rm -rf Tarballs/${PROJECT}-docs-${VERSION}.zip &&
+        zip -r Tarballs/${PROJECT}-docs-${VERSION}.zip ${PROJECT}-${VERSION}
+    ) >Logs/docs_zipfile.log 2>&1 || error_log Logs/docs_zipfile.log
 }
 
 #-----------------------------------------------------------------------------
