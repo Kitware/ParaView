@@ -25,8 +25,6 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "vtkActor.h"
-#include "vtkDataSetMapper.h"
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h" 
 #include "vtkPVSource.h"
@@ -36,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVContourFilter.h"
 #include "vtkPVElevationFilter.h"
 #include "vtkPVColorByProcess.h"
+#include "vtkPVCutter.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
@@ -55,9 +54,6 @@ vtkPVData::vtkPVData()
   
   this->FiltersMenuButton = vtkPVMenuButton::New();
   
-  this->Mapper = vtkDataSetMapper::New();
-  this->Mapper->ImmediateModeRenderingOn();
-  this->Actor = vtkActor::New();
   this->Assignment = NULL;
 
   this->ActorCompositeButton = vtkKWPushButton::New();
@@ -75,12 +71,6 @@ vtkPVData::~vtkPVData()
 
   this->FiltersMenuButton->Delete();
   this->FiltersMenuButton = NULL;
-  
-  this->Mapper->Delete();
-  this->Mapper = NULL;
-  
-  this->Actor->Delete();
-  this->Actor = NULL;
   
   if (this->ActorComposite)
     {
@@ -159,6 +149,8 @@ int vtkPVData::Create(char *args)
 				      "Elevation");
   this->FiltersMenuButton->AddCommand("vtkColorByProcess", this,
 				      "ColorByProcess");
+  this->FiltersMenuButton->AddCommand("vtkCutter", this, "Cutter");
+  
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
   
   this->ActorCompositeButton->SetParent(this);
@@ -210,6 +202,28 @@ void vtkPVData::Contour()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::Cutter()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVCutter *cutter = vtkPVCutter::New();
+  
+  cutter->Clone(pvApp);
+  cutter->SetInput(this);
+  
+  cutter->SetCutPlane(0, 0, 0, 0, 0, 1);
+
+  this->GetPVSource()->GetView()->AddComposite(cutter);
+  cutter->SetName("cutter");
+  
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  
+  window->SetCurrentSource(cutter);
+  window->GetSourceList()->Update();
+  
+  cutter->Delete();
+}
+  
+//----------------------------------------------------------------------------
 void vtkPVData::Elevation()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -260,12 +274,6 @@ void vtkPVData::ColorByProcess()
   pvFilter->Delete();
 }
 
-
-//----------------------------------------------------------------------------
-vtkProp* vtkPVData::GetProp()
-{
-  return this->Actor;
-}
 
 //----------------------------------------------------------------------------
 // This is a bit more complicated than you would expect, because I have to 

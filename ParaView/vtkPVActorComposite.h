@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVActorComposite_h
 
 #include "vtkKWActorComposite.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVApplication.h"
@@ -117,6 +118,7 @@ protected:
   vtkKWLabel *ZRangeLabel;
   
   vtkKWPushButton *DataNotebookButton;
+  vtkKWCheckButton *DecimateButton;
   
   // the data object that owns this composite
   vtkPVData *PVData;

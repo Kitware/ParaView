@@ -191,7 +191,6 @@ void vtkPVImage::SetData(vtkDataSet *data)
     image->UpdateInformation();
     outline = vtkImageOutlineFilter::New();
     outline->SetInput(image);
-    this->Mapper->SetInput(outline->GetOutput());
     this->ActorComposite->SetInput(outline->GetOutput());
     outline->Delete();
     }
@@ -203,12 +202,8 @@ void vtkPVImage::SetData(vtkDataSet *data)
       this->GeometryFilter = vtkGeometryFilter::New();
       }
     this->GeometryFilter->SetInput(image);
-    this->Mapper->SetInput(this->GeometryFilter->GetOutput());
-    this->Mapper->SetScalarRange(this->Data->GetScalarRange());
     this->ActorComposite->SetInput(this->GeometryFilter->GetOutput());
     }
-  
-  this->Actor->SetMapper(this->Mapper);
 }
 
 

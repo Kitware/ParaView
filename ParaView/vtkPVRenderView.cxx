@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkKWEventNotifier.h"
+
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
@@ -226,6 +228,10 @@ void vtkPVRenderViewStartRender(void *arg)
   int id, num;
   int *windowSize;
   
+  if (rv->IsInteractive())
+    {
+    return;
+    }
   
   if (TIMER == NULL)
     {  
@@ -280,6 +286,11 @@ void vtkPVRenderViewEndRender(void *arg)
   int numProcs;
   float *pdata, *zdata;    
   
+  if (rv->IsInteractive())
+    {
+    return;
+    }
+  
   windowSize = renWin->GetSize();
   controller = pvApp->GetController();
   numProcs = controller->GetNumberOfProcesses();
@@ -326,6 +337,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->CommandFunction = vtkPVRenderViewCommand;
   this->InteractorStyle = NULL;
   this->Interactor = vtkDummyRenderWindowInteractor::New();
+  
+  this->Interactive = 0;
   
 #ifdef WIN32
   vtkWin32OpenGLRenderWindow *renderWindow;
@@ -417,6 +430,11 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
 {
+  char *local;
+  const char *wname;
+
+  local = new char [strlen(args)+100];
+
   if (this->Application)
     {
     vtkErrorMacro("RenderView already created");
@@ -444,27 +462,101 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
     }
 #endif
   
-  this->vtkKWRenderView::Create(app, args);
+  // must set the application
+  if (this->Application)
+    {
+    vtkErrorMacro("RenderView already created");
+    return;
+    }
+  this->SetApplication(app);
+  Tcl_Interp *interp = this->Application->GetMainInterp();
+
+  // create the frame
+  wname = this->GetWidgetName();
+  this->Script("frame %s -bd 0 %s",wname,args);
+  //this->Script("pack %s -expand yes -fill both",wname);
+  
+  // create the label
+  this->Frame->Create(app,"frame","-bd 3 -relief ridge");
+  this->Script("pack %s -expand yes -fill both -side top -anchor nw",
+               this->Frame->GetWidgetName());
+  this->Frame2->Create(app,"frame","-bd 0 -bg #888");
+  this->Script("pack %s -fill x -side top -anchor nw",
+               this->Frame2->GetWidgetName());
+  this->Label->Create(app,"label","-fg #fff -text {3D View} -bd 0");
+  this->Script("pack %s  -side left -anchor w",this->Label->GetWidgetName());
+  this->Script("bind %s <Any-ButtonPress> {%s MakeSelected}",
+               this->Label->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Any-ButtonPress> {%s MakeSelected}",
+               this->Frame2->GetWidgetName(), this->GetTclName());
+
+  // Create the control frame - only pack it if support option enabled
+  this->ControlFrame->Create(app,"frame","-bd 0");
+  if (this->SupportControlFrame)
+    {
+    this->Script("pack %s -expand no -fill x -side top -anchor nw",
+                 this->ControlFrame->GetWidgetName());
+    }
+  
+  // add the -rw argument
+  sprintf(local,"%s -rw Addr=%p",args,this->RenderWindow);
+  this->Script("vtkTkRenderWidget %s %s",
+               this->VTKWidget->GetWidgetName(),local);
+  this->Script("pack %s -expand yes -fill both -side top -anchor nw",
+               this->VTKWidget->GetWidgetName());
+
 
   // Styles need motion events.
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
                this->VTKWidget->GetWidgetName(), this->GetTclName());
+  
+  // Expose.
+  this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName());
   
   // The start and end methods merge the processes renderers.
   // Start and End methods are used to swap buffers correctly.
   // It does not work when they're in a separate method.
   this->GetRenderer()->SetStartRenderMethod(vtkPVRenderViewStartRender, this);
   this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);
+
+  this->RenderWindow->Render();
+  delete [] local;
+}
+
+// a litle more complex than just "bind $widget <Expose> {%W Render}"
+// we have to handle all pending expose events otherwise they que up.
+void vtkPVRenderView::Exposed()
+{
+  if (this->InExpose) return;
+  this->InExpose = 1;
+  this->Script("update");
+  this->Render();
+  this->InExpose = 0;
 }
 
 void vtkPVRenderView::Update()
 {
-  vtkActorCollection *ac = this->GetRenderer()->GetActors();
+  vtkActorCollection *ac = this->RendererHack->GetActors();
   ac->InitTraversal();
   vtkActor *a;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int myId = pvApp->GetController()->GetLocalProcessId();
+  
+  cerr << "Update proc. id: " << pvApp->GetController()->GetLocalProcessId() << endl;
+  
+  if (myId == 0)
+    {
+    pvApp->BroadcastScript("%s Update", this->GetTclName());
+    }
+  
   
   while ((a = ac->GetNextItem()) != NULL)
     {
+    if (myId == 1)
+      {
+      cerr << "Updating actor " << a << " with mapper " << a->GetMapper() 
+	   << " with input " << a->GetMapper()->GetInput() << endl;
+      }
     a->Update();
     }
 }
@@ -536,6 +628,11 @@ void vtkPVRenderView::AButtonPress(int num, int x, int y)
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
 
+  this->Interactive = 1;
+  this->Application->GetEventNotifier()->
+    InvokeCallbacks( "InteractiveRenderStart",  
+  		     this->GetWindow(), "" );
+  
   if (this->InteractorStyle)
     {
     if (num == 1)
@@ -559,6 +656,11 @@ void vtkPVRenderView::AButtonRelease(int num, int x, int y)
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
 
+  this->Interactive = 0;
+  this->Application->GetEventNotifier()->
+    InvokeCallbacks( "InteractiveRenderEnd",  
+  		     this->GetWindow(), "" );
+  
   if (this->InteractorStyle)
     {
     if (num == 1)
@@ -574,16 +676,21 @@ void vtkPVRenderView::AButtonRelease(int num, int x, int y)
       this->InteractorStyle->OnRightButtonUp(0, 0, x, y);
       }
     }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Button1Motion(int x, int y)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
 
   if (this->InteractorStyle)
     {
+    // Make sure all pipelines update.
+    // Reset camera causes an update on process 0.
+    this->Update();
     this->InteractorStyle->OnMouseMove(0, 0, x, y);
     }
 }
@@ -672,7 +779,7 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
 			   this->GetTclName(), c->GetTclName());
     }
 
-  this->vtkKWRenderView::AddComposite(c);
+  this->vtkKWView::AddComposite(c);
 }
 
 //----------------------------------------------------------------------------
@@ -684,11 +791,16 @@ void vtkPVRenderView::AddCompositeHack(vtkKWComposite *c)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s Update", this->GetTclName());
-  this->vtkKWRenderView::Render();
+
+  this->Update();
+
+  //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
+    
+  this->RenderWindow->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -756,7 +868,4 @@ void vtkPVRenderView::RenderHack()
     controller->Send((char*)pdata, length, 0, 99);
     }
 }
-
-
-
 

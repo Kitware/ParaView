@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPolyData.h"
 #include "vtkDataSet.h"
 #include "vtkPVData.h"
+#include "vtkKWCheckButton.h"
 
 class VTK_EXPORT vtkPVPolyData : public vtkPVData
 {
@@ -58,16 +59,37 @@ public:
   void SetData(vtkDataSet *data);
   vtkPolyData *GetPolyData();
   
+  // Description:
+  // If local representation is set, then it used for interactive rendering.
+  void SetLocalRepresentation(vtkPVPolyData *data);
+  vtkGetObjectMacro(LocalRepresentation, vtkPVPolyData);
+  
+  // Description:
+  // These callbacks get called when the interactive rendering state changes.
+  // They switch the data displayed to LocalReprentation (if set).
+  void InteractiveOnCallback();
+  void InteractiveOffCallback();
+  
+  // Description:
+  // These are filtering operations called from UI.
   void Shrink();
   void Glyph();
   void GetGhostCells();
   void PolyDataNormals();
+  void TubeFilter();
+  void ParallelDecimate();
 
+  void Decimate();
+  
+  
 protected:
   vtkPVPolyData();
   ~vtkPVPolyData();
   vtkPVPolyData(const vtkPVPolyData&) {};
   void operator=(const vtkPVPolyData&) {};
+  
+  vtkKWCheckButton *DecimateButton;
+  vtkPVPolyData *LocalRepresentation;
 };
 
 #endif

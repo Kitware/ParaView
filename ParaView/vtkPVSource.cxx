@@ -150,18 +150,6 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-vtkProp* vtkPVSource::GetProp()
-{
-  vtkPVData *data = this->GetPVData();
-
-  if (data == NULL)
-    {
-    return NULL;
-    }
-  return data->GetProp();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 { 
   const char *sourcePage;

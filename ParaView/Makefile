@@ -25,6 +25,7 @@ vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkKWRenderView \
+vtkParallelDecimate \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVAssignment \
@@ -44,6 +45,7 @@ vtkPVImageReader \
 vtkPVImageSlice \
 vtkPVImageSource \
 vtkPVMenuButton \
+vtkPVParallelDecimate \
 vtkPVPolyData \
 vtkPVPolyDataNormals \
 vtkPVPolyDataSource \
@@ -53,6 +55,7 @@ vtkPVShrinkPolyData \
 vtkPVSource \
 vtkPVSourceList \
 vtkPVSphereSource \
+vtkPVTubeFilter \
 vtkPVWindow 
 
 

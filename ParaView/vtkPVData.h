@@ -32,9 +32,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDataSet.h"
 #include "vtkKWPushButton.h"
 
-class vtkActor;
-class vtkDataSetMapper;
-class vtkProp;
 class vtkPVActorComposite;
 class vtkPVSource;
 class vtkPVAssignment;
@@ -64,8 +61,6 @@ public:
   // Returns 0 if there was an error.
   virtual int Create(char *args);
   
-  vtkProp* GetProp();
-  
   // Description:
   // This is a parallel method.  All out satellite datas will get the
   // equivalent actor composite. The main reason this is here is to allow 
@@ -82,6 +77,7 @@ public:
   void Contour();
   void ColorByProcess();
   void Elevation();
+  void Cutter();
 
   // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A PVSOURCE!
@@ -141,8 +137,6 @@ protected:
   
   vtkPVMenuButton *FiltersMenuButton;
   vtkDataSet *Data;
-  vtkDataSetMapper *Mapper;
-  vtkActor *Actor;
 
   vtkPVActorComposite *ActorComposite;
   vtkKWPushButton *ActorCompositeButton;

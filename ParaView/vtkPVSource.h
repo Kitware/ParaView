@@ -54,10 +54,6 @@ public:
   void Clone(vtkPVApplication *app);
     
   // Description:
-  // Get the Prop for this class.
-  virtual vtkProp *GetProp();
-
-  // Description:
   // Get the Window for this class.
   vtkPVWindow *GetWindow();
   
@@ -97,6 +93,10 @@ public:
   // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();  
+
+  // Description:
+  // Sources have no props.
+  vtkProp *GetProp() {return NULL;}
   
 protected:
   vtkPVSource();

@@ -33,25 +33,26 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // Other features:
 // I am going to try to divert the events to a vtkInteractorStyle object.
 // I also have put compositing into this object.  I had to create a separate
-// renderwindow and renderer fro the off screen compositing (Hacks).
-// Eventually I need to merge these back into the main renderer and renderer window.
+// renderwindow and renderer for the off screen compositing (Hacks).
+// Eventually I need to merge these back into the main renderer and renderer
+// window.
 
 
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
 
-#include "vtkKWRenderView.h"
+#include "vtkKWView.h"
 #include "vtkInteractorStyle.h"
 #include "vtkRenderWindowInteractor.h"
 
 class vtkPVApplication;
 
 
-class VTK_EXPORT vtkPVRenderView : public vtkKWRenderView
+class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
 public:
   static vtkPVRenderView* New();
-  vtkTypeMacro(vtkPVRenderView,vtkKWRenderView);
+  vtkTypeMacro(vtkPVRenderView,vtkKWView);
 
   // Description:
   // Duplicate this object in the satellite processes.  Clones will
@@ -105,13 +106,13 @@ public:
   void ResetCameraClippingRange();
 
   // Description:
-  // This method is called in the satellite renderers to comp[ute the bounds of the
-  // actors.
+  // This method is called in the satellite renderers to compute the bounds of
+  // the actors.
   void TransmitBounds();
 
   // Description:
-  // This method is called in the satellite renderers to render and composite the
-  // results.
+  // This method is called in the satellite renderers to render and composite
+  // the results.
   void RenderHack();
   
   // Description:
@@ -119,7 +120,7 @@ public:
   void AddComposite(vtkKWComposite *c);
 
   // Description:
-  // Since the supperclass AddComposite creates the properties and we do not
+  // Since the superclass AddComposite creates the properties and we do not
   // want to deal with UI in the satellite processes ...
   // This is the special call made in the satellite processes.
   void AddCompositeHack(vtkKWComposite *c);
@@ -135,6 +136,14 @@ public:
   // Description:
   // Update all the actors.
   void Update();
+
+  // Description:
+  // Callback method bound to expose events.
+  void Exposed();
+  
+  // Description:
+  // Are we currently in interactive mode?
+  int IsInteractive() { return this->Interactive; }
   
 protected:
 
@@ -145,6 +154,8 @@ protected:
 
   vtkInteractorStyle *InteractorStyle;
   vtkRenderWindowInteractor *Interactor;
+
+  int Interactive;
   
   // For satellite renderers (from the old render slave).
   // I cannot get the RenderView working with the superclass render window.
@@ -154,5 +165,7 @@ protected:
 
 
 #endif
+
+
 
 
