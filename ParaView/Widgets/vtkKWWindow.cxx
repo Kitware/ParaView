@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.143");
+vtkCxxRevisionMacro(vtkKWWindow, "1.144");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1112,7 +1112,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.143 $");
+  this->ExtractRevision(os,"$Revision: 1.144 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1220,7 +1220,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
         }
       }
     int flen = vtkString::Length(filename);
-    for(ii=flen; ii >= (flen-25); ii--)
+    for(ii=flen; ii > (flen-20); ii--)
       {
       if ( filename[ii] == '/' )
         {
