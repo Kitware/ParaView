@@ -494,12 +494,15 @@ void vtkPVArrayCalculator::CreateProperties()
 
 void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
 {
+  char* newFunction;
   char* currentFunction = this->FunctionEntry->GetValue();
   this->ChangeAcceptButtonColor();
-  strcat(currentFunction, newSymbol);
-  this->FunctionEntry->SetValue(currentFunction);
+  newFunction = new char[strlen(currentFunction)+strlen(newSymbol)+1];
+  sprintf(newFunction, "%s%s", currentFunction, newSymbol);
+  this->FunctionEntry->SetValue(newFunction);
   this->Script("%s xview %d", this->FunctionEntry->GetWidgetName(),
                strlen(this->FunctionEntry->GetValue()));
+  delete [] newFunction;
 }
 
 void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
