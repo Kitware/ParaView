@@ -54,7 +54,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.27");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -427,7 +427,6 @@ const char* vtkPVProcessModule::GetDemoPath()
     delete[] demoFile;
     delete[] newPath;
     }
-  util->Delete();
 
 #endif // _WIN32  
 
