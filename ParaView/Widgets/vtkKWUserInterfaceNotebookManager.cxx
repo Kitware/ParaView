@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.1");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.2");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -154,8 +154,8 @@ int vtkKWUserInterfaceNotebookManager::AddPage(
     return -1;
     }
 
-  int id = this->GetPanelId(panel);
-  if (id < 0)
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
     {
     vtkErrorMacro("Can not access the panel to add a page to.");
     return -1;
@@ -164,7 +164,7 @@ int vtkKWUserInterfaceNotebookManager::AddPage(
   // Use the panel id as a tag in the notebook, so that the pages belonging
   // to this panel will correspond to notebook pages sharing a same tag.
 
-  return this->Notebook->AddPage(title, balloon, icon, id);
+  return this->Notebook->AddPage(title, balloon, icon, tag);
 }
 
 //----------------------------------------------------------------------------
@@ -206,8 +206,8 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(
     return NULL;
     }
 
-  int id = this->GetPanelId(panel);
-  if (id < 0)
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
     {
     vtkErrorMacro("Can not access the panel to query a page.");
     return NULL;
@@ -217,7 +217,7 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(
   // pages that share the same tag (i.e. among the pages that belong to the same 
   // panel). This allow pages from different panels to have the same title.
 
-  return this->Notebook->GetFrame(title, id);
+  return this->Notebook->GetFrame(title, tag);
 }
 
 //----------------------------------------------------------------------------
@@ -229,16 +229,17 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(int id)
     return;
     }
 
-  // As a convenience, if the panel that this page was created for has 
-  // not been created yet, it is created now. This allow the GUI creation to 
-  // be delayed until it is really needed.
-
   int tag = this->Notebook->GetPageTag(id);
   vtkKWUserInterfacePanel *panel = this->GetPanel(tag);
-  if (panel && !panel->IsCreated())
+  if (!panel)
     {
-    panel->Create(this->Application);
+    vtkErrorMacro("Can not raise a page from a NULL panel.");
+    return;
     }
+
+  // Make sure the panel is shown (and created)
+
+  this->Show(panel);
   
   // Since each page has a unique id, whatever the panel it belongs to, just 
   // raise the corresponding notebook page.
@@ -270,58 +271,46 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(
     return;
     }
 
-  int id = this->GetPanelId(panel);
-  if (id < 0)
+  // Make sure the panel is shown (and created)
+
+  this->Show(panel);
+  
+  // Raise the notebook page that has this specific title among the notebook 
+  // pages that share the same tag (i.e. among the pages that belong to the same 
+  // panel). This allow pages from different panels to have the same title.
+
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
     {
     vtkErrorMacro("Can not access the panel to raise a page.");
     return;
     }
 
-  // As a convenience, if the panel that this page was created for has 
-  // not been created yet, it is created now. This allow the GUI creation to 
-  // be delayed until it is really needed.
-
-  if (!panel->IsCreated())
-    {
-    panel->Create(this->Application);
-    }
-
-  // Raise the notebook page that has this specific title among the notebook 
-  // pages that share the same tag (i.e. among the pages that belong to the same 
-  // panel). This allow pages from different panels to have the same title.
-
-  this->Notebook->Raise(title, id);
+  this->Notebook->Raise(title, tag);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfaceNotebookManager::Show(
+int vtkKWUserInterfaceNotebookManager::Show(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
     {
     vtkErrorMacro("Can not show all pages if the manager has not been created.");
-    return;
+    return 0;
     }
 
   if (!panel)
     {
     vtkErrorMacro("Can not show all pages from a NULL panel.");
-    return;
+    return 0;
     }
   
   if (!this->HasPanel(panel))
     {
     vtkErrorMacro("Can not show all pages from a panel that is not "
                   "in the manager.");
-    return;
-    }
-
-  int id = this->GetPanelId(panel);
-  if (id < 0)
-    {
-    vtkErrorMacro("Can not access the panel to show all pages.");
-    return;
+    return 0;
     }
 
   // As a convenience, if the panel that this page was created for has 
@@ -336,7 +325,45 @@ void vtkKWUserInterfaceNotebookManager::Show(
   // Show the pages that share the same tag (i.e. the pages that belong to the 
   // same panel).
 
-  this->Notebook->ShowPagesMatchingTag(id);
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
+    {
+    vtkErrorMacro("Can not access the panel to show all pages.");
+    return 0;
+    }
+
+  this->Notebook->ShowPagesMatchingTag(tag);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::Raise(
+  vtkKWUserInterfacePanel *panel)
+{
+  // First show the panel
+
+  if (!this->Show(panel))
+    {
+    return 0;
+    }
+
+  // If the page raised at the moment is part of this panel, then we are 
+  // OK already.
+
+  int tag = this->GetPanelId(panel);
+  int current_id = this->Notebook->GetRaisedPageId();
+
+  if (current_id && tag == this->Notebook->GetPageTag(current_id))
+    {
+    return 1;
+    }
+ 
+  // Otherwise raise the first page
+
+  this->Notebook->RaiseFirstPageMatchingTag(tag);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -363,8 +390,8 @@ int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
     return 0;
     }
 
-  int id = this->GetPanelId(panel);
-  if (id < 0)
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
     {
     vtkErrorMacro("Can not access the panel to remove page widgets.");
     return 0;
@@ -373,7 +400,7 @@ int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
   // Remove the pages that share the same tag (i.e. the pages that 
   // belong to the same panel).
 
-  this->Notebook->RemovePagesMatchingTag(id);
+  this->Notebook->RemovePagesMatchingTag(tag);
 
   return 1;
 }

@@ -136,6 +136,8 @@ public:
   // this panel are shown.
   // In this concrete implementation, this shows all notebook's pages belonging
   // to this panel.
+  // Raise() behaves like Show(), but it will also bring
+  // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show a panel: this
   // will automatically call this method with the proper panel parameter
   // (see vtkKWUserInterfacePanel::Show()).
@@ -143,7 +145,9 @@ public:
   // automatically by calling the panel's Create() method (see 
   // vtkKWUserInterfacePanel::Create()) ; this allows the creation of the 
   // panel to be delayed until it is really needed.
-  virtual void Show(vtkKWUserInterfacePanel *panel);
+  // Return 1 on success, 0 on error.
+  virtual int Show(vtkKWUserInterfacePanel *panel);
+  virtual int Raise(vtkKWUserInterfacePanel *panel);
   
 protected:
   vtkKWUserInterfaceNotebookManager();
