@@ -18,7 +18,6 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
 $pv(vtkTemp1) ChangeInteractorStyle 1
 set ensight [$pv(vtkTemp1) InitializeReadCustom "ensight" "$DataDir/Data/elements.case"]
-$ensight RunningScriptOn
 $ensight AddPointVariable pointScalars
 $ensight AddPointVariable pointVectors
 $ensight AddPointVariable pointTensors
