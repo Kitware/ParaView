@@ -123,8 +123,9 @@ public:
   vtkSetMacro( SoftwareMapperAvailable, int );
 
   // Description:
-  // True if the volume pro mapper can do intermix geometry.
+  // True if the volume pro mapper can do the task.
   vtkGetMacro(CanDoIntermixGeometry, int);
+  vtkGetMacro(CanDoHardwareCursor, int);
   
 protected:
   vtkKWVolumeComposite();
@@ -162,6 +163,7 @@ protected:
   int                                  VolumeProID;
   int                                  LowResVolumeProID;
   int                                  CanDoIntermixGeometry;
+  int                                  CanDoHardwareCursor;
 private:
   vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented
   void operator=(const vtkKWVolumeComposite&); // Not implemented

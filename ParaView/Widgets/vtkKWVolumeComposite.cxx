@@ -151,10 +151,12 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
     if ( this->VolumeProMapper->IsA("vtkOpenGLVolumeProVG500Mapper") )
       {
       this->CanDoIntermixGeometry = 0;
+      this->CanDoHardwareCursor   = 1;
       }
     else
       {
       this->CanDoIntermixGeometry = 1;
+      this->CanDoHardwareCursor   = 0;
       }
     this->VolumeProID = 
       this->LODVolume->AddLOD( this->VolumeProMapper,
@@ -496,7 +498,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.28 $");
+  this->ExtractRevision(os,"$Revision: 1.29 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 
