@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMProxy, "1.30");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -534,6 +534,13 @@ void vtkSMProxy::UpdateInformation()
         {
         prop->UpdateDependentDomains();
         }
+      }
+    
+    vtkSMProxyInternals::ProxyMap::iterator it2 =
+      this->Internals->SubProxies.begin();
+    for( ; it2 != this->Internals->SubProxies.end(); it2++)
+      {
+      it2->second.GetPointer()->UpdateInformation();
       }
     }
 }
