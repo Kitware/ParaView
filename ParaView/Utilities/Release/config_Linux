@@ -2,6 +2,6 @@ PLATFORM="x86-linux"
 CC="gcc322s"
 CXX="c++322s"
 CFLAGS=""
-CXXFLAGS=""
+CXXFLAGS="-Wno-deprecated"
 CMAKE="/usr/local/bin/cmake"
 DISPLAY=:0.0
