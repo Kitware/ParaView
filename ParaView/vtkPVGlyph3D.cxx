@@ -28,7 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVGlyph3D.h"
 #include "vtkGlyph3D.h"
-#include "vtkPVConeSource.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
@@ -63,16 +62,12 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::AcceptCallback()
 {
-  vtkPVConeSource *cone;
   
   if (this->Source == NULL)
     {
-    cone = vtkPVConeSource::New();
-    cone->Clone(this->GetPVApplication());
+    vtkPVPolyDataSource *cone;
+    cone = this->GetWindow()->CreateCone();    
     cone->SetName("glyphCone");
-    this->GetWindow()->GetMainView()->AddComposite(cone);
-    this->GetWindow()->SetCurrentSource(cone);
-
     cone->AcceptCallback();
     this->SetSource(cone->GetPVOutput());
     cone->GetPVOutput()->GetActorComposite()->SetVisibility(0);

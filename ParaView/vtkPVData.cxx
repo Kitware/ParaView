@@ -33,7 +33,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
 #include "vtkPVElevationFilter.h"
-#include "vtkElevationFilter.h"
 #include "vtkPVExtractEdges.h"
 #include "vtkPVColorByProcess.h"
 #include "vtkPVCutter.h"
@@ -41,6 +40,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVMenuButton.h"
+#include "vtkElevationFilter.h"
+#include "vtkSingleContourFilter.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -193,7 +194,7 @@ void vtkPVData::Contour()
   this->Update();
   // This should be replaced by a parallel version.
   range = this->Data->GetScalarRange();
-  contour->SetValue((range[1]+range[0])/2.0);
+  contour->GetContour()->SetFirstValue((range[1]+range[0])/2.0);
       
   contour->SetName("contour");
 

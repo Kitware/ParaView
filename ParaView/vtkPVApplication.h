@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkMultiProcessController.h"
 
+class vtkPVPolyDataSource;
+
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -92,6 +94,14 @@ public:
   // Description:
   // class static method to initialize Tcl/Tk
   static Tcl_Interp *InitializeTcl(int argc, char *argv[]);  
+
+  // Description:
+  // These are used by the UI to create new vtkPVSources.
+  // You pass in the class name and tclName (instance name) of the
+  // vtkSource.  This method creates the vtk object and PV objects
+  // for all processes.
+  vtkPVPolyDataSource *MakePVPolyDataSource(const char *className,
+                                            const char *tclName);
 
 protected:
   vtkPVApplication();

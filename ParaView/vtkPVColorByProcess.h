@@ -43,10 +43,6 @@ public:
   void CreateProperties();
 
   // Description:
-  // Gets the filter cast to the correct type.
-  vtkColorByProcess* GetColorByProcess();
-
-  // Description:
   // I do not want to use "GetGlobalController", so the filter needs to
   // get the controller from the application.
   void SetApplication(vtkKWApplication *app);
@@ -56,7 +52,6 @@ protected:
   ~vtkPVColorByProcess() {};
   vtkPVColorByProcess(const vtkPVColorByProcess&) {};
   void operator=(const vtkPVColorByProcess&) {};
-  
 };
 
 #endif

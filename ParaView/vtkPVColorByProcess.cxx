@@ -51,17 +51,17 @@ vtkPVColorByProcess* vtkPVColorByProcess::New()
 }
 
 //----------------------------------------------------------------------------
-vtkColorByProcess* vtkPVColorByProcess::GetColorByProcess()
-{
-  return vtkColorByProcess::SafeDownCast(this->GetVTKSource());
-}
-
-//----------------------------------------------------------------------------
 void vtkPVColorByProcess::SetApplication(vtkKWApplication *app)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
+  vtkColorByProcess *c = vtkColorByProcess::SafeDownCast(this->GetVTKSource());
 
-  this->GetColorByProcess()->SetController(pvApp->GetController());
+  // Sanity check.
+  if (c)
+    {
+    c->SetController(pvApp->GetController());
+    }
+
   this->vtkPVDataSetToDataSetFilter::SetApplication(app);
 }
 

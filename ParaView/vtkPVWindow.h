@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
+#include "vtkPVPolyDataSource.h"
 #include "vtkPVSourceList.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -55,14 +56,25 @@ public:
   virtual void Create(vtkKWApplication *app, char *args);
 
   // Description:
-  // Open or close a polygonal dataset for viewing.
-  virtual void NewWindow();
-  virtual void Save();
-  virtual void NewCone();
-  virtual void NewImageReader();
-  virtual void NewFractalVolume();
-  virtual void NewSphere();
-  virtual void NewAnimation();
+  // These create new sources.
+  void CreateImageReader();
+  void CreateFractalVolume();
+  vtkPVPolyDataSource *CreateCone();
+  vtkPVPolyDataSource *CreateSTLReader();
+  vtkPVPolyDataSource *CreateSphere();
+  vtkPVPolyDataSource *CreateAxes();
+  vtkPVPolyDataSource *CreateCube();
+  vtkPVPolyDataSource *CreateCylinder();
+  vtkPVPolyDataSource *CreateDisk();
+  vtkPVPolyDataSource *CreateLine();
+  vtkPVPolyDataSource *CreatePlane();
+  vtkPVPolyDataSource *CreatePoints();
+  vtkPVPolyDataSource *CreateSuperQuadric();
+  void CreateAnimation();
+
+  // Description:
+  // I assume this creates a new applciation window.
+  void NewWindow();
   
   // Description:
   // Chaining method to serialize an object and its superclasses.
@@ -102,14 +114,16 @@ public:
   // this class.
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   
+  // Description:
+  // This probably does nothing for now.
+  void Save();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
   vtkPVWindow(const vtkPVWindow&) {};
   void operator=(const vtkPVWindow&) {};
 
-  void SetupCone();
-  
   vtkPVRenderView *MainView;
   vtkKWMenu *CreateMenu;
   
@@ -125,6 +139,9 @@ protected:
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
   vtkPVSourceList *SourceList;
+
+  // Used internally.  Down casts vtkKWApplication to vtkPVApplication
+  vtkPVApplication *GetPVApplication();
 };
 
 

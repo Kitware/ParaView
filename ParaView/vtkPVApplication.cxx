@@ -30,13 +30,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWDialog.h"
 #include "vtkKWWindowCollection.h"
 
+#include "vtkPVPolyDataSource.h"
 #include "vtkMultiProcessController.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkTclUtil.h"
 
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -226,3 +227,40 @@ void vtkPVApplication::Exit()
     }
   this->vtkKWApplication::Exit();
 }
+
+//============================================================================
+// Make instances of sources.
+//============================================================================
+
+//----------------------------------------------------------------------------
+vtkPVPolyDataSource *vtkPVApplication::MakePVPolyDataSource(
+                                          const char *className,
+                                          const char *tclName)
+{
+  vtkSource *s;
+  int error;
+
+  // Create the vtkSource.
+  this->Script("%s %s", className, tclName);
+  this->BroadcastScript("%s %s", className, tclName); 
+
+  // Get the pointer for the Tcl object.
+  s = (vtkSource *)(vtkTclGetPointerFromObject(tclName,
+                                  "vtkSource", this->GetMainInterp(), error));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return NULL;
+    }
+
+  // Create and initialize the PVSource.
+  vtkPVPolyDataSource *pds = vtkPVPolyDataSource::New();
+  pds->Clone(this);
+  pds->SetVTKSource(s);
+  pds->SetVTKSourceTclName(tclName);
+  pds->SetName(tclName);
+  this->BroadcastScript("%s SetVTKSource %s", pds->GetTclName(), tclName); 
+
+  return pds;
+}
+

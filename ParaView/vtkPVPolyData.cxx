@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVShrinkPolyData.h"
 #include "vtkPVGetRemoteGhostCells.h"
-#include "vtkPVConeSource.h"
 #include "vtkPVGlyph3D.h"
 #include "vtkPVPolyDataNormals.h"
 #include "vtkPVTubeFilter.h"

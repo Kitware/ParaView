@@ -47,9 +47,6 @@ ClientData vtkPVColorByProcessNewCommand();
 int vtkPVCommandListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVCommandListNewCommand();
-int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVConeSourceNewCommand();
 int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVContourFilterNewCommand();
@@ -131,9 +128,6 @@ ClientData vtkPVSourceNewCommand();
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceListNewCommand();
-int vtkPVSphereSourceCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVSphereSourceNewCommand();
 int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVTubeFilterNewCommand();
@@ -200,8 +194,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVColorByProcessCommand);
   vtkTclCreateNew(interp,"vtkPVCommandList", vtkPVCommandListNewCommand,
                   vtkPVCommandListCommand);
-  vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
-                  vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
                   vtkPVContourFilterCommand);
   vtkTclCreateNew(interp,"vtkPVCutter", vtkPVCutterNewCommand,
@@ -256,8 +248,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceCommand);
   vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
-  vtkTclCreateNew(interp,"vtkPVSphereSource", vtkPVSphereSourceNewCommand,
-                  vtkPVSphereSourceCommand);
   vtkTclCreateNew(interp,"vtkPVTubeFilter", vtkPVTubeFilterNewCommand,
                   vtkPVTubeFilterCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,

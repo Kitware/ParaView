@@ -165,6 +165,7 @@ public:
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
   const char *GetVTKSourceTclName();
+  vtkSetStringMacro(VTKSourceTclName);
 
   // Description:
   // A method used to broadcast changes resulting from widgets.
