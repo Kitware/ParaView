@@ -70,6 +70,11 @@ public:
   void SetLabel(const char *);
   
   // Description:
+  // Set/Get the margin between the internal frame and the top groove border.
+  void SetMargin(int);
+  int GetMargin();
+  
+  // Description:
   // Get the internal frame.
   vtkGetObjectMacro(Frame, vtkKWWidget);
 
