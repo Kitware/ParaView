@@ -17,6 +17,7 @@ SET( ParaViewServer_SRCS
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
+  vtkMultiDisplayManager.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
@@ -28,12 +29,6 @@ SET( ParaViewServer_SRCS
   vtkXMLPVAnimationWriter.cxx
   )
 
-IF(VTK_USE_MPI)
-  SET( ParaViewServer_SRCS
-    ${ParaViewServer_SRCS}
-    vtkMultiDisplayManager.cxx
-    )
-ENDIF(VTK_USE_MPI)
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   SET( ParaViewServer_SRCS
     ${ParaViewServer_SRCS}
@@ -209,37 +204,39 @@ SET( ParaViewClient_SRCS
 SET(ParaViewBinary_SRCS
   ParaView.cxx)
 
+SET( ParaViewClient_SRCS
+  ${ParaViewClient_SRCS}
+  vtkIceTFactory.cxx
+  vtkPVDeskTopRenderModule.cxx
+  vtkPVDeskTopRenderModuleUI.cxx
+  vtkPVIceTDisplayRenderModule.cxx
+  vtkPVIceTDisplayRenderModuleUI.cxx
+  vtkPVIceTRenderModule.cxx
+  vtkPVIceTRenderModuleUI.cxx
+  )
+SET( ParaViewServer_SRCS
+  ${ParaViewServer_SRCS}
+  vtkDesktopDeliveryServer.cxx
+  vtkIceTClientCompositeManager.cxx
+  )
+SET_SOURCE_FILES_PROPERTIES(
+  vtkIceTFactory.cxx
+  ABSTRACT
+  )
+
 IF (PARAVIEW_USE_ICE_T)
-  SET( ParaViewClient_SRCS
-    ${ParaViewClient_SRCS}
-    #vtkIceTComposite.cxx
-    vtkIceTFactory.cxx
-    vtkPVDeskTopRenderModule.cxx
-    vtkPVDeskTopRenderModuleUI.cxx
-    vtkPVIceTDisplayRenderModule.cxx
-    vtkPVIceTDisplayRenderModuleUI.cxx
-    vtkPVIceTRenderModule.cxx
-    vtkPVIceTRenderModuleUI.cxx
-    )
-  SET( ParaViewServer_SRCS
-    ${ParaViewServer_SRCS}
-    vtkDesktopDeliveryServer.cxx
-    vtkIceTRenderManager.cxx
-    vtkIceTClientCompositeManager.cxx
-    vtkIceTRenderer.cxx
-    )
+  IF(VTK_USE_MPI)
+    SET( ParaViewServer_SRCS
+      ${ParaViewServer_SRCS}
+      vtkIceTRenderManager.cxx
+      vtkIceTRenderer.cxx
+      )
+  ENDIF(VTK_USE_MPI)
   SET( ParaViewShared_SRCS
     ${ParaViewShared_SRCS}
     vtkDesktopDeliveryClient.cxx
     )
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkIceTFactory.cxx
-    ABSTRACT
-    )
 ENDIF (PARAVIEW_USE_ICE_T)
-
-
-
 
 
 SET_SOURCE_FILES_PROPERTIES(
