@@ -70,6 +70,7 @@ public:
   /// Description:
   // Set the range for this scale.
   void SetRange(float min, float max);
+  void GetRange(float &min, float &max);
 
   // Description:
   // Display a label and or a text entry box. These are options. 
@@ -118,6 +119,7 @@ protected:
   vtkKWEntry  *Entry;
   vtkKWWidget *ScaleWidget;
   vtkKWWidget *ScaleLabel;
+  float Range[2];
 };
 
 
