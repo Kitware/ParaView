@@ -75,6 +75,7 @@ SET(Filters_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES( 
+  vtkCTHDataToPolyDataFilter.cxx
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
   ABSTRACT)

@@ -15,7 +15,6 @@
 #include "vtkCTHFractal.h"
 #include "vtkCTHExtractAMRPart.h"
 #include "vtkCTHOutlineFilter.h"
-#include "vtkCTHDataToPolyDataFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkRenderer.h"
@@ -35,9 +34,6 @@ int main()
   vtkCTHOutlineFilter *outline = vtkCTHOutlineFilter::New();
   outline->SetInput( fractal->GetOutput());
   
-  vtkCTHDataToPolyDataFilter *geometry = vtkCTHDataToPolyDataFilter::New();
-  geometry->SetInput( fractal->GetOutput());
-  
   vtkPolyDataMapper *outlineMapper = vtkPolyDataMapper::New();
   outlineMapper->SetInput( outline->GetOutput() );
   
@@ -45,7 +41,7 @@ int main()
   outlineActor->SetMapper( outlineMapper );
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput( geometry->GetOutput() );
+  mapper->SetInput( extract->GetOutput() );
   
   vtkActor *actor = vtkActor::New();
   actor->SetMapper( mapper );
@@ -62,7 +58,6 @@ int main()
   fractal->Delete();
   extract->Delete();
   outline->Delete();
-  geometry->Delete();
   outlineMapper->Delete();
   outlineActor->Delete();
   mapper->Delete();
