@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.3");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.4");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -127,7 +127,7 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
     {
     pvs->SetLabelNoTrace(desc);
     }
-  pvApp->BroadcastScript("%s SetFileName %s", tclName, fname);
+  pvApp->BroadcastScript("%s SetFileName {%s}", tclName, fname);
   
   // Add the new Source to the View, and make it current.
   pvs->SetView(this->GetPVWindow()->GetMainView());
