@@ -50,6 +50,7 @@ $kw(vtkTemp294) SetColorRange 0.300000 0.433010
 $kw(vtkTemp336) SetColorSchemeToRedBlue
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) SetInterpolateColorsFlag 0
 $kw(vtkTemp294) SetCubeAxesVisibility 1
 $kw(vtkTemp294) SetScalarBarVisibility 1
 
