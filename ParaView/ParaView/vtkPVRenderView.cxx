@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.191");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.192");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1977,14 +1977,27 @@ void vtkPVRenderView::InterruptRenderCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CompositeWithFloatCallback()
 {
+  int val = this->CompositeWithFloatCheck->GetState();
+  this->CompositeWithFloatCallback(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CompositeWithFloatCallback(int val)
+{
+  this->AddTraceEntry("$kw(%s) CompositeWithFloatCallback %d", 
+                      this->GetTclName(), val);
+  if ( this->CompositeWithFloatCheck->GetState() != val )
+    {
+    this->CompositeWithFloatCheck->SetState(val);
+    }
+ 
   if (this->Composite)
     {
-    int val = ( ! this->CompositeWithFloatCheck->GetState());
     this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
                                               this->CompositeTclName,
-                                              val);
+                                              !val);
     // Limit of composite manager.
-    if (val == 0) // float
+    if (val != 0) // float
       {
       this->CompositeWithRGBACheck->SetState(1);
       }
@@ -2005,14 +2018,26 @@ void vtkPVRenderView::CompositeWithFloatCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CompositeWithRGBACallback()
 {
+  int val = this->CompositeWithRGBACheck->GetState();
+  this->CompositeWithRGBACallback(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CompositeWithRGBACallback(int val)
+{
+  this->AddTraceEntry("$kw(%s) CompositeWithRGBACallback %d", 
+                      this->GetTclName(), val);
+  if ( this->CompositeWithRGBACheck->GetState() != val )
+    {
+    this->CompositeWithRGBACheck->SetState(val);
+    }
   if (this->Composite)
     {
-    int val = ( ! this->CompositeWithRGBACheck->GetState());
     this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
                                               this->CompositeTclName,
-                                              val);
+                                              !val);
     // Limit of composite manager.
-    if (val == 1) // RGB
+    if (val != 1) // RGB
       {
       this->CompositeWithFloatCheck->SetState(0);
       }
@@ -2033,10 +2058,23 @@ void vtkPVRenderView::CompositeWithRGBACallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CompositeCompressionCallback()
 {
+  int val = this->CompositeCompressionCheck->GetState();
+  this->CompositeCompressionCallback(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CompositeCompressionCallback(int val)
+{
+  this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
+                      this->GetTclName(), val);
+  if ( this->CompositeCompressionCheck->GetState() != val )
+    {
+    this->CompositeCompressionCheck->SetState(val);
+    }
   if (this->Composite)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    if (this->CompositeCompressionCheck->GetState())
+    if (val)
       {
       pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
       }
@@ -2049,7 +2087,7 @@ void vtkPVRenderView::CompositeCompressionCallback()
     this->EventuallyRender();
     }
 
-  if (this->CompositeCompressionCheck->GetState())
+  if (val)
     {
     vtkTimerLog::MarkEvent("--- Enable compression when compositing.");
     }
@@ -2239,7 +2277,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.191 $");
+  this->ExtractRevision(os,"$Revision: 1.192 $");
 }
 
 //------------------------------------------------------------------------------

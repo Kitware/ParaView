@@ -237,8 +237,11 @@ public:
   // Cannot be used from a script because they do not 
   // change the state of the check.
   void CompositeWithFloatCallback();
+  void CompositeWithFloatCallback(int val);
   void CompositeWithRGBACallback();
+  void CompositeWithRGBACallback(int val);
   void CompositeCompressionCallback();
+  void CompositeCompressionCallback(int val);
   
   // Description:
   // Get the triangle strips check button.
