@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWEvent.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
@@ -50,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.41");
+vtkCxxRevisionMacro(vtkKWWidget, "1.42");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -345,7 +344,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
 }
 
 //------------------------------------------------------------------------------
