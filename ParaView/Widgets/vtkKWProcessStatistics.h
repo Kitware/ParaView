@@ -43,11 +43,10 @@ public:
 
   // Description:
   // Retrieve memory information.
-  vtkGetMacro(TotalVirtualMemory, long);
-  vtkGetMacro(AvailableVirtualMemory, long);
-  vtkGetMacro(TotalPhysicalMemory, long);
-  vtkGetMacro(AvailablePhysicalMemory, long);
-  
+  long GetTotalVirtualMemory();
+  long GetAvailableVirtualMemory();
+  long GetTotalPhysicalMemory();
+  long GetAvailablePhysicalMemory();  
 
 protected:
   vtkKWProcessStatistics();

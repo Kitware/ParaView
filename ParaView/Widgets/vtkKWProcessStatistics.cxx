@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.3");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.4");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -210,3 +210,26 @@ int vtkKWProcessStatistics::QueryMemory()
 #endif
 }
 
+long vtkKWProcessStatistics::GetTotalVirtualMemory() 
+{ 
+  this->QueryMemory(); 
+  return this->TotalVirtualMemory; 
+}
+
+long vtkKWProcessStatistics::GetAvailableVirtualMemory() 
+{ 
+  this->QueryMemory(); 
+  return this->AvailableVirtualMemory; 
+}
+
+long vtkKWProcessStatistics::GetTotalPhysicalMemory() 
+{ 
+  this->QueryMemory(); 
+  return this->TotalPhysicalMemory; 
+}
+
+long vtkKWProcessStatistics::GetAvailablePhysicalMemory() 
+{ 
+  this->QueryMemory(); 
+  return this->AvailablePhysicalMemory; 
+}  
