@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.21");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.22");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -486,6 +486,9 @@ void vtkPVColorMap::BackButtonCallback()
     {
     return;
     }
+
+  this->PVRenderView->GetPVWindow()->GetCurrentPVData()->UpdateProperties();
+
   this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
 }
 
