@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.11");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.12");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -479,6 +479,9 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 int vtkPVServerFileDialog::Invoke()
 {   
+  // Get rid of back slashes.
+  this->ConvertLastPath();
+
   this->Application->SetDialogUp(1);
   this->UpdateExtensionsMenu();
   // Side effect of UpdateExtensionsMenu is to Update.
@@ -486,9 +489,6 @@ int vtkPVServerFileDialog::Invoke()
 
   this->Script("wm deiconify %s", this->GetWidgetName());
   this->Script("grab %s", this->GetWidgetName());
-
-  // Get rid of back slashes.
-  this->ConvertLastPath();
 
   this->Done = 0;
   while ( ! this->Done)
@@ -518,6 +518,7 @@ void vtkPVServerFileDialog::ConvertLastPath()
       *p = '/';
       }
     --max;
+    ++p;
     }
 }
 
@@ -529,6 +530,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     ostrstream newdir;
     newdir << this->DirectoryDisplay->GetLabel() << "/" << this->SelectedDirectory << ends;
     this->SetLastPath(newdir.str());
+    this->ConvertLastPath();
     this->Update();
     newdir.rdbuf()->freeze(0);
     return;
@@ -557,22 +559,39 @@ void vtkPVServerFileDialog::CancelCallback()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::DownDirectoryCallback()
 {
-  int idx;
   char *newdir;
+  char *p;
+  char *last;
+  int count = 0;
 
-  idx = static_cast<int>(strlen(this->LastPath));
-  newdir = new char[idx + 1];
+  newdir = new char[strlen(this->LastPath) + 1];
   strcpy(newdir, this->LastPath);
-  while (newdir[idx] != '/')
+
+  p = newdir;
+  while (*p != '\0')
     {
-    if ( idx <= 0)
-      { // Already at lowest directory.
-      return;
+    if (*p == '/')
+      {
+      last = p;
+      count++;
       }
-    --idx;
+    ++p;
     }
-  newdir[idx] = '\0';
-  this->SetLastPath(newdir);
+  
+  // Do not remove the last slash.
+  if (count > 1)
+    {
+    *last = '\0';
+    this->SetLastPath(newdir);
+    }
+  if (count == 1)
+    {
+    last[1] = '\0';
+    this->SetLastPath(newdir);
+    }
+  // If count == 0;
+  // already at top level.
+  // what to do about switching disks?
   delete [] newdir;
   this->Update();
 }
@@ -909,6 +928,7 @@ void vtkPVServerFileDialog::Update()
     this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
     char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
     this->SetLastPath(result);
+    this->ConvertLastPath();
     delete [] result;
     }
 
@@ -921,6 +941,7 @@ void vtkPVServerFileDialog::Update()
     this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
     char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
     this->SetLastPath(result);
+    this->ConvertLastPath();
     delete [] result;
     
     // We will now succeed.
