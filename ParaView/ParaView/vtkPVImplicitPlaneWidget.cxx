@@ -48,7 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkProperty.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -61,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.5");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -210,6 +212,8 @@ void vtkPVImplicitPlaneWidget::Reset()
     {
     return;
     }
+
+  static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
   if ( this->PlaneTclName )
     {
     this->Script("eval %s SetCenter [ %s GetOrigin ]", 
@@ -241,6 +245,8 @@ void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
 void vtkPVImplicitPlaneWidget::Accept()
 {
   this->PlaceWidget();
+  static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
+
   if ( ! this->ModifiedFlag)
     {
     return;
@@ -273,6 +279,7 @@ void vtkPVImplicitPlaneWidget::Accept()
                         this->GetTclName(), val[0], val[1], val[2]);
                         
     }
+
   this->Superclass::Accept();
 }
 
@@ -445,6 +452,20 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       this->Reset();
       }
     }
+
+  vtkImplicitPlaneWidget* plane = 
+    static_cast<vtkImplicitPlaneWidget*>(this->Widget3D);
+  if (pvApp->GetController()->GetNumberOfProcesses() == 1)
+    {
+    plane->GetPlaneProperty()->SetOpacity(0.25);
+    plane->GetSelectedPlaneProperty()->SetOpacity(0.25);
+    }
+  else
+    {
+    plane->GetPlaneProperty()->SetOpacity(1.0);
+    plane->GetSelectedPlaneProperty()->SetOpacity(1.0);
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -464,6 +485,10 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     for (cc=0; cc < 3; cc ++ )
       {
       this->NormalEntry[cc]->SetValue(val[cc], 5);
+      }
+    if (!widget->GetDrawPlane())
+      {
+      widget->SetDrawPlane(1);
       }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
