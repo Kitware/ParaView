@@ -259,6 +259,31 @@
    <!-- End CellDataToPointData -->
    </SourceProxy>
 
+   <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"/>
+           <FixedTypeDomain name="fixed_type"/>
+      </InputProperty>
+
+     <IntVectorProperty 
+        name="PassPointData" 
+        command="SetPassPointData" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+   <!-- End CellDataToPointData -->
+   </SourceProxy>
+
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData">
      <InputProperty
         name="Input"
@@ -585,8 +610,7 @@
           <DataTypeDomain name="input_type">
             <DataType value="vtkCTHData"/>
           </DataTypeDomain>
-          <InputArrayDomain name="input_array" attribute_type="cell"
-                            number_of_components="1"/>
+          <InputArrayDomain name="input_array" attribute_type="cell"/>
      </InputProperty>
 
      <StringVectorProperty 
@@ -769,7 +793,7 @@
    <!-- End CTHAMROutline -->
    </SourceProxy>
 
-   <SourceProxy name="CTHAMRPart" class="vtkCTHExtractAMRPart">
+   <SourceProxy name="CTHAMRPart" class="vtkCTHAMRExtractPart">
     <InputProperty
        name="Input"
        command="SetInput">
