@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWIcon.h"
 #include "vtkKWMenu.h"
@@ -64,16 +65,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPostScriptWriter.h"
+#include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkString.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
 #include "vtkViewport.h"
 #include "vtkWindow.h"
 #include "vtkWindow.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkProperty2D.h"
-#include "vtkString.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -84,7 +85,7 @@ int vtkKWViewFoundMatch;
 
 //----------------------------------------------------------------------------
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
-			     char * vtkNotUsed(arg))
+                             char * vtkNotUsed(arg))
 {  
   if (event->type == Expose)
     {
@@ -192,7 +193,7 @@ vtkKWView::vtkKWView()
   this->MultiPassStillAbortCheckMethod = NULL;
   this->MultiPassStillAbortCheckMethodArg = NULL;
 
-  this->GeneralProperties = vtkKWWidget::New();
+  this->GeneralProperties = vtkKWFrame::New();
 
   this->BackgroundFrame = vtkKWLabeledFrame::New();
   this->BackgroundFrame->SetParent( this->GeneralProperties );
@@ -534,7 +535,7 @@ void vtkKWView::CreateViewProperties()
 
   
   this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
-  this->GeneralProperties->Create(app,"frame","");
+  this->GeneralProperties->Create(app,1);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -845,7 +846,7 @@ void vtkKWView::PrintView()
   this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
   char* path = 
     strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-	   this->Application->GetMainInterp()->result);
+           this->Application->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
     vtkPostScriptWriter *psw = vtkPostScriptWriter::New();
@@ -1005,7 +1006,7 @@ void vtkKWView::EditCopy()
     SetClipboardData (CF_DIB, hDIB);
     ::GlobalUnlock(hDIB);
     CloseClipboard();
-    }		
+    }           
 #endif
   w2i->Delete();
 }
@@ -1018,14 +1019,14 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     char *rbv = 
       pw->GetMenuProperties()->CreateRadioButtonVariable(
-	pw->GetMenuProperties(),"Radio");
+        pw->GetMenuProperties(),"Radio");
     pw->GetMenuProperties()->AddRadioButton(10, 
-					    this->MenuPropertiesName, 
-					    rbv, this, "ShowViewProperties", 
-					    this->GetMenuPropertiesUnderline(),
-					    this->MenuPropertiesHelp ? 
-					    this->MenuPropertiesHelp :
-					    this->MenuPropertiesName
+                                            this->MenuPropertiesName, 
+                                            rbv, this, "ShowViewProperties", 
+                                            this->GetMenuPropertiesUnderline(),
+                                            this->MenuPropertiesHelp ? 
+                                            this->MenuPropertiesHelp :
+                                            this->MenuPropertiesName
       );
     delete [] rbv;
     }
@@ -1066,11 +1067,11 @@ void vtkKWView::Select(vtkKWWindow *pw)
       {
       // if the window prop is empty then pack this one
       if (this->ParentWindow->GetMenuProperties()->GetRadioButtonValue(
-	this->ParentWindow->GetMenuProperties(),"Radio") >= 10)
-	{
-	this->Script("pack %s -side left -anchor nw -fill y",
-		     this->PropertiesParent->GetWidgetName());
-	}
+        this->ParentWindow->GetMenuProperties(),"Radio") >= 10)
+        {
+        this->Script("pack %s -side left -anchor nw -fill y",
+                     this->PropertiesParent->GetWidgetName());
+        }
       }
     }
   this->InvokeEvent(vtkKWEvent::ViewSelectedEvent, 0);
@@ -1372,7 +1373,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.73 $");
+  this->ExtractRevision(os,"$Revision: 1.74 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1406,7 +1407,7 @@ void vtkKWView::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void *vtkKWView::GetMemoryDC()
 {
-#ifdef _WIN32	
+#ifdef _WIN32   
   return (void *)vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryDC();
 #else
@@ -1417,7 +1418,7 @@ void *vtkKWView::GetMemoryDC()
 //----------------------------------------------------------------------------
 unsigned char *vtkKWView::GetMemoryData()
 {
-#ifdef _WIN32	
+#ifdef _WIN32   
   return vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryData();
 #else

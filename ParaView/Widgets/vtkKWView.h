@@ -57,27 +57,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWWindow;
-class vtkViewport;
-class vtkKWCornerAnnotation;
-class vtkKWMenu;
-class vtkKWWindow;
-class vtkWindow;
-class vtkViewport;
-class vtkKWComposite;
-class vtkKWCompositeCollection;
-class vtkKWNotebook;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
-class vtkKWEntry;
+class vtkKWComposite;
+class vtkKWCompositeCollection;
 class vtkKWCornerAnnotation;
-class vtkKWLabeledFrame;
-class vtkRenderer;
-class vtkRenderWindow;
-class vtkTextMapper;
+class vtkKWCornerAnnotation;
+class vtkKWEntry;
+class vtkKWFrame;
 class vtkKWGenericComposite;
-class vtkTextActor;
+class vtkKWLabeledFrame;
+class vtkKWMenu;
+class vtkKWNotebook;
 class vtkKWText;
+class vtkKWWindow;
+class vtkKWWindow;
+class vtkRenderWindow;
+class vtkRenderer;
+class vtkTextActor;
+class vtkTextMapper;
+class vtkViewport;
+class vtkViewport;
+class vtkWindow;
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
@@ -88,7 +89,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Create a View
   virtual void Create(vtkKWApplication* vtkNotUsed(app), 
-		      const char* vtkNotUsed(args)) {}
+                      const char* vtkNotUsed(args)) {}
 
   // Description:
   // Sets up some default event handlers to allow
@@ -103,15 +104,15 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // These are the event handlers that UIs can use or override.
   virtual void AButtonPress(int vtkNotUsed(num), int vtkNotUsed(x), 
-			    int vtkNotUsed(y)) {}
+                            int vtkNotUsed(y)) {}
   virtual void AButtonRelease(int vtkNotUsed(num), int vtkNotUsed(x), 
-			      int vtkNotUsed(y)) {}
+                              int vtkNotUsed(y)) {}
   virtual void AShiftButtonPress(int vtkNotUsed(num), int vtkNotUsed(x),
-				 int vtkNotUsed(y)) {}
+                                 int vtkNotUsed(y)) {}
   virtual void AShiftButtonRelease(int vtkNotUsed(num), int vtkNotUsed(x), 
-				   int vtkNotUsed(y)) {}
+                                   int vtkNotUsed(y)) {}
   virtual void AKeyPress(char vtkNotUsed(key), int vtkNotUsed(x), 
-			 int vtkNotUsed(y)) {}
+                         int vtkNotUsed(y)) {}
   virtual void Button1Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
   virtual void Button2Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
   virtual void Button3Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {}
@@ -193,7 +194,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Render the image.
   virtual void Render();
   virtual void Reset() {};
-	
+        
   // Description:
   // Return the tk widget used for the vtkWindow. This widget
   // is a child of the widget representing the view.
@@ -250,8 +251,8 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   float GetStillUpdateRate(int i) { return this->StillUpdateRates[i]; };
 
   vtkSetClampMacro( RenderMode, int, 
-		    VTK_KW_INTERACTIVE_RENDER,
-		    VTK_KW_DISABLED_RENDER );
+                    VTK_KW_INTERACTIVE_RENDER,
+                    VTK_KW_DISABLED_RENDER );
   vtkGetMacro( RenderMode, int );
   void SetRenderModeToInteractive() 
     { this->RenderMode = VTK_KW_INTERACTIVE_RENDER; };
@@ -385,7 +386,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkTextActor     *HeaderProp;
   vtkTextMapper          *HeaderMapper;
 
-  vtkKWWidget            *GeneralProperties;
+  vtkKWFrame             *GeneralProperties;
   vtkKWLabeledFrame      *BackgroundFrame;
   vtkKWChangeColorButton *BackgroundColor;
 
