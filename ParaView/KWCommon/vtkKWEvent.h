@@ -142,6 +142,7 @@ class VTK_EXPORT vtkKWEvent
     PluginFilterApplyEvent,
     PluginFilterApplyPrepareEvent,
     PluginFilterCancelEvent,
+    PluginFilterListChangedEvent,
     PluginFilterRedoEvent,
     PluginFilterRemoveMeshEvent,
     PluginFilterSelectEvent,

@@ -132,6 +132,7 @@ static const char *vtkKWEventStrings[] = {
   "PluginFilterApplyEvent",
   "PluginFilterApplyPrepareEvent",
   "PluginFilterCancelEvent",
+  "PluginFilterListChangedEvent",
   "PluginFilterRedoEvent",
   "PluginFilterRemoveMeshEvent",
   "PluginFilterSelectEvent",
