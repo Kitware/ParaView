@@ -27,7 +27,7 @@
 
 class vtkXMLPVCollectionWriterInternals;
 
-class VTK_IO_EXPORT vtkXMLPVCollectionWriter : public vtkXMLWriter
+class VTK_EXPORT vtkXMLPVCollectionWriter : public vtkXMLWriter
 {
 public:
   static vtkXMLPVCollectionWriter* New();

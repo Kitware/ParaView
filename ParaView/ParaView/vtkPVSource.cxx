@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.297");
+vtkCxxRevisionMacro(vtkPVSource, "1.298");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1155,6 +1155,10 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
+  if ( ! this->AcceptButtonRed)
+    {
+    return;
+    }
   this->Script("%s configure -cursor watch",
                this->GetPVWindow()->GetWidgetName());
   this->Script("after idle {%s AcceptCallback}", this->GetTclName());
@@ -2645,7 +2649,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.297 $");
+  this->ExtractRevision(os,"$Revision: 1.298 $");
 }
 
 //----------------------------------------------------------------------------
