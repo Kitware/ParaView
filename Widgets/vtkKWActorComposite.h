@@ -55,7 +55,7 @@ public:
 
   // Description:
   // Set the input data for this Actor
-  void SetInput(vtkPolyData *input);
+  virtual void SetInput(vtkPolyData *input);
   vtkPolyData *GetInput() {return this->Mapper->GetInput();};
   
   // Description:
