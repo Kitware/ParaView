@@ -37,6 +37,8 @@ CVS_PASS="paraview"
 
 CMAKE="cmake"
 
+TESTING_TREE=ParaView
+
 # ParaView release root directory.
 RELEASE_ROOT_NAME="ParaViewReleaseRoot"
 RELEASE_ROOT="${HOME}/${RELEASE_ROOT_NAME}"
@@ -397,7 +399,7 @@ tests()
     [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
     echo "Running tests ..." &&
     (
-        cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
+        cd "${PROJECT}-${VERSION}-${PLATFORM}/${TESTING_TREE}" &&
         make test &&
         touch "${PROJECT}-${VERSION}-${PLATFORM}/release.tests"
     ) >Logs/tests.log 2>&1 || error_log Logs/tests.log
@@ -408,7 +410,7 @@ install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -d "${PROJECT}-${VERSION}-${PLATFORM}/release.tests" ] || tests || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/release.tests" ] || tests || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
