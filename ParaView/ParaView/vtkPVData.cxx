@@ -1219,6 +1219,8 @@ void vtkPVData::ChangeColorMapToRedBlue()
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
+
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
@@ -1238,6 +1240,8 @@ void vtkPVData::ChangeColorMapToBlueRed()
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
+
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
@@ -1257,6 +1261,8 @@ void vtkPVData::ChangeColorMapToGrayscale()
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
+
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 
