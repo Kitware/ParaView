@@ -15,6 +15,7 @@ vtkInteractorStyleExtent
 
 CONCRETE = \
 vtkClipPlane \
+vtkCutMaterial \
 vtkCutPlane \
 vtkDummyRenderWindowInteractor \
 vtkImageOutlineFilter \

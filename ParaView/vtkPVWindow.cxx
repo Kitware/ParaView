@@ -934,6 +934,57 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- Cut Material ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkCutMaterial");
+  sInt->SetRootName("CutMaterial");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("MaterialArray");
+  mInt->SetSetCommand("SetMaterialArrayName");
+  mInt->SetGetCommand("GetMaterialArrayName");
+  mInt->AddStringArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Material");
+  mInt->SetSetCommand("SetMaterial");
+  mInt->SetGetCommand("GetMaterial");
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Array");
+  mInt->SetSetCommand("SetArrayName");
+  mInt->SetGetCommand("GetArrayName");
+  mInt->AddStringArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("UpVector");
+  mInt->SetSetCommand("SetUpVector");
+  mInt->SetGetCommand("GetUpVector");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ============= PolyData to PolyData Filters ==============
   
   // ---- Cut Plane ----.
