@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.6");
 
 
 
@@ -226,6 +226,13 @@ void vtkPVIceTRenderModule::InteractiveRender()
   */
   this->Superclass::InteractiveRender();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVIceTRenderModule::SetUseCompositeCompression(int)
+{
+  // IceT does not have this option.
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::PrintSelf(ostream& os, vtkIndent indent)

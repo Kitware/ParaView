@@ -38,6 +38,10 @@ public:
   void StillRender();
   void InteractiveRender();
 
+  // Description:
+  // IceT Does not have this option.
+  void SetUseCompositeCompression(int);
+  
 protected:
   vtkPVIceTRenderModule();
   ~vtkPVIceTRenderModule();
