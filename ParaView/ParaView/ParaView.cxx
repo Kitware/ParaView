@@ -207,6 +207,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
 
+  controller->Finalize();
   controller->Delete();
   
   free(argv[0]);
