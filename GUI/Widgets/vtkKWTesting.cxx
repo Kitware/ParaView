@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.6");
+vtkCxxRevisionMacro(vtkKWTesting, "1.7");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
@@ -108,9 +108,9 @@ int vtkKWTesting::RegressionTest(float thresh)
 
 
 //----------------------------------------------------------------------------
-void vtkKWTesting::AppendTestImage(vtkKWView *RenderView)
+void vtkKWTesting::AppendTestImage(vtkKWView *renderView)
 {
-  if (!RenderView)
+  if (!renderView)
     {
     return;
     }
@@ -121,7 +121,7 @@ void vtkKWTesting::AppendTestImage(vtkKWView *RenderView)
     }
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(RenderView->GetRenderWindow());
+  w2i->SetInput(renderView->GetRenderWindow());
   w2i->Update();
   
   this->AppendFilter->AddInput(w2i->GetOutput());
