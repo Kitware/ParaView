@@ -44,25 +44,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVTreeComposite.h"
+#include "vtkPVRenderModule.h"
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWorldPointPicker);
-vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.6");
+vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.7");
 
-vtkCxxSetObjectMacro(vtkPVWorldPointPicker, Composite, vtkPVTreeComposite);
+vtkCxxSetObjectMacro(vtkPVWorldPointPicker, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker::vtkPVWorldPointPicker()
 {
-  this->Composite = NULL;
+  this->RenderModule = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker::~vtkPVWorldPointPicker()
 {
-  this->SetComposite(NULL);
+  this->SetRenderModule(NULL);
 }
 
 
@@ -77,7 +77,7 @@ int vtkPVWorldPointPicker::Pick(float selectionX, float selectionY,
   float *displayCoord;
   float z;
 
-  if (this->Composite == NULL)
+  if (this->RenderModule == NULL)
     {
     return vtkWorldPointPicker::Pick(selectionX, selectionY, selectionZ, renderer);
     }
@@ -92,7 +92,7 @@ int vtkPVWorldPointPicker::Pick(float selectionX, float selectionY,
   // Invoke start pick method if defined
   this->InvokeEvent(vtkCommand::StartPickEvent,NULL);
 
-  z = this->Composite->GetZ ((int) selectionX, (int) selectionY);
+  z = this->RenderModule->GetZBufferValue ((int) selectionX, (int) selectionY);
   
   // if z is 1.0, we assume the user has picked a point on the
   // screen that has not been rendered into. Use the camera's focal
@@ -145,6 +145,6 @@ void vtkPVWorldPointPicker::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkWorldPointPicker::PrintSelf(os,indent);
 
-  os << indent << "Composite: " << this->Composite << endl;
+  os << indent << "RenderModule: " << this->RenderModule << endl;
 }
 

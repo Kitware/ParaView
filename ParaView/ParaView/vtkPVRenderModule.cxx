@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
+#include "vtkFloatArray.h"
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
@@ -75,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.10");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -488,6 +489,19 @@ void vtkPVRenderModule::SetUseImmediateMode(int val)
     }
 }
 
+//----------------------------------------------------------------------------
+float vtkPVRenderModule::GetZBufferValue(int x, int y)
+{
+  vtkFloatArray *array = vtkFloatArray::New();
+  float val;
+
+  array->SetNumberOfTuples(1);
+  this->RenderWindow->GetZbufferData(x,y, x, y,
+                                     array);
+  val = array->GetValue(0);
+  array->Delete();
+  return val;  
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)

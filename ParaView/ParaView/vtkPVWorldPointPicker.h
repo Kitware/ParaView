@@ -44,14 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkPVWorldPointPicker uses the compositied z buffer to select the world point.
 
 // .SECTION See Also
-// vtkWorldPointPicker vtkTreeComposite
+// vtkWorldPointPicker vtkPVRenderModule
 
 #ifndef __vtkPVWorldPointPicker_h
 #define __vtkPVWorldPointPicker_h
 
 #include "vtkWorldPointPicker.h"
 
-class vtkPVTreeComposite;
+class vtkPVRenderModule;
 
 class VTK_EXPORT vtkPVWorldPointPicker : public vtkWorldPointPicker
 {
@@ -62,19 +62,19 @@ public:
 
   // Description:
   // To use compositied z buffer value, we must have access to the compositer.
-  virtual void SetComposite(vtkPVTreeComposite*);
-  vtkGetObjectMacro(Composite, vtkPVTreeComposite);
+  virtual void SetRenderModule(vtkPVRenderModule*);
+  vtkGetObjectMacro(RenderModule, vtkPVRenderModule);
 
   // Description:
   // A pick method that uses composited zbuffer.
   int Pick(float selectionX, float selectionY, 
            float selectionZ, vtkRenderer *renderer);
-  
+
 protected:
   vtkPVWorldPointPicker();
   ~vtkPVWorldPointPicker();
 
-  vtkPVTreeComposite *Composite;
+  vtkPVRenderModule *RenderModule;
 
   vtkPVWorldPointPicker(const vtkPVWorldPointPicker&); // Not implemented
   void operator=(const vtkPVWorldPointPicker&); // Not implemented

@@ -135,6 +135,11 @@ public:
   vtkGetMacro(RenderInterruptsEnabled,int);
   vtkBooleanMacro(RenderInterruptsEnabled,int);
 
+  // Description:
+  // Get the value of the z buffer at a position. 
+  // This is necessary for picking the center of rotation.
+  virtual float GetZBufferValue(int x, int y);
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
