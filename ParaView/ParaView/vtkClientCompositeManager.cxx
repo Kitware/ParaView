@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.28");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.29");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -331,6 +331,12 @@ void vtkClientCompositeManagerStartRender(vtkObject *caller,
 // Only called in process 0.
 void vtkClientCompositeManager::StartRender()
 {
+  // If we are the satellite ...
+  if ( ! this->ClientFlag)
+    {
+    return this->SatelliteStartRender();
+    }
+
   struct vtkClientRenderWindowInfo winInfo;
   struct vtkClientRendererInfo renInfo;
   int *size;
@@ -375,10 +381,6 @@ void vtkClientCompositeManager::StartRender()
     return;
     }
 
-  // Make sure they all swp buffers at the same time.
-  //vtkRenderWindow* renWin = this->RenderWindow;
-  //renWin->SwapBuffersOff();
-
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   size = this->RenderWindow->GetSize();
@@ -392,61 +394,52 @@ void vtkClientCompositeManager::StartRender()
   controller->TriggerRMI(1, vtkClientCompositeManager::RENDER_RMI_TAG);
 
   // Synchronize the size of the windows.
-  //controller->Send((char*)(&winInfo), 
-  //                 sizeof(vtkClientRenderWindowInfo), 1, 
-  //                 vtkClientCompositeManager::WIN_INFO_TAG);
   // Let the socket controller deal with byte swapping.
-  controller->Send((int*)(&winInfo), 5, 1, 
+  controller->Send((int*)(&winInfo), 
+                   sizeof(vtkClientRenderWindowInfo)/sizeof(int), 1, 
                    vtkClientCompositeManager::WIN_INFO_TAG);
   
   // Make sure the satellite renderers have the same camera I do.
-  // Note: This will lockup unless every process has the same number
-  // of renderers.
+  // Only deal with the first renderer.
   rens->InitTraversal();
   ren = rens->GetNextItem();
-//  while ( (ren = rens->GetNextItem()) )
-//    {
-    cam = ren->GetActiveCamera();
-    lc = ren->GetLights();
-    lc->InitTraversal();
-    light = lc->GetNextItem();
-    cam->GetPosition(renInfo.CameraPosition);
-    cam->GetFocalPoint(renInfo.CameraFocalPoint);
-    cam->GetViewUp(renInfo.CameraViewUp);
-    cam->GetClippingRange(renInfo.CameraClippingRange);
-    renInfo.CameraViewAngle = cam->GetViewAngle();
-    if (cam->GetParallelProjection())
-      {
-      renInfo.ParallelScale = cam->GetParallelScale();
-      }
-    else
-      {
-      renInfo.ParallelScale = 0.0;
-      }
-    if (light)
-      {
-      light->GetPosition(renInfo.LightPosition);
-      light->GetFocalPoint(renInfo.LightFocalPoint);
-      }
-    ren->GetBackground(renInfo.Background);
-    ren->Clear();
-    //controller->Send((char*)(&renInfo),
-    //                 sizeof(struct vtkClientRendererInfo), 1, 
-    //                 vtkCompositeManager::REN_INFO_TAG);
-    // Let the socket controller deal with byte swapping.
-    controller->Send((double*)(&renInfo), 22, 1,
-                     vtkCompositeManager::REN_INFO_TAG);
-//    }
+  cam = ren->GetActiveCamera();
+  lc = ren->GetLights();
+  lc->InitTraversal();
+  light = lc->GetNextItem();
+  cam->GetPosition(renInfo.CameraPosition);
+  cam->GetFocalPoint(renInfo.CameraFocalPoint);
+  cam->GetViewUp(renInfo.CameraViewUp);
+  cam->GetClippingRange(renInfo.CameraClippingRange);
+  renInfo.CameraViewAngle = cam->GetViewAngle();
+  if (cam->GetParallelProjection())
+    {
+    renInfo.ParallelScale = cam->GetParallelScale();
+    }
+  else
+    {
+    renInfo.ParallelScale = 0.0;
+    }
+  if (light)
+    {
+    light->GetPosition(renInfo.LightPosition);
+    light->GetFocalPoint(renInfo.LightFocalPoint);
+    }
+  ren->GetBackground(renInfo.Background);
+  ren->Clear();
+  // Let the socket controller deal with byte swapping.
+  controller->Send((double*)(&renInfo), 
+                   sizeof(struct vtkClientRendererInfo)/sizeof(double), 1,
+                   vtkCompositeManager::REN_INFO_TAG);
   
   if (this->Tiled == 0)
     {
     this->ReceiveAndSetColorBuffer();
-//    this->RenderWindow->EraseOff();
     this->EndRender();
-    cam->SetPosition(renInfo.CameraPosition);
-    cam->SetFocalPoint(renInfo.CameraFocalPoint);
-    cam->SetViewUp(renInfo.CameraViewUp);
-    ren->InvokeEvent(vtkCommand::StartEvent, NULL);
+    // I do not know why the camera is set here.
+    //cam->SetPosition(renInfo.CameraPosition);
+    //cam->SetFocalPoint(renInfo.CameraFocalPoint);
+    //cam->SetViewUp(renInfo.CameraViewUp);
     }
 }
 
@@ -573,6 +566,12 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
 
 void vtkClientCompositeManager::EndRender()
 {
+  // If we are the satellite ...
+  if ( ! this->ClientFlag)
+    {
+    return this->SatelliteEndRender();
+    }
+
   if (this->CompositeData->GetScalarType() != VTK_UNSIGNED_CHAR)
     {
     return;
@@ -841,10 +840,7 @@ void vtkClientCompositeManager::RenderRMI()
       }
     }
 
-  // Get and redistribute renderer information (camera ...)
-  this->SatelliteStartRender();
   this->RenderWindow->Render();
-  this->SatelliteEndRender();
 }
 
 //-------------------------------------------------------------------------
@@ -1008,7 +1004,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
 void vtkClientCompositeManager::SatelliteEndRender()
 {  
   int numProcs, myId;
-  int front = 1;
+  int front = 0;
 
   if (this->Tiled)
     { // Do not need to composite if we are rendering a tiled display. 
@@ -1118,21 +1114,24 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
     }
   this->Modified();
 
-  if (this->RenderWindow)
-    {
-    // Delete the reference.
-    this->RenderWindow->UnRegister(this);
-    this->RenderWindow =  NULL;
-    }
+  //if (this->RenderWindow)
+  //  {
+  //  // Delete the reference.
+  //  this->RenderWindow->UnRegister(this);
+  //  this->RenderWindow =  NULL;
+  //  }
   if (renWin)
     {
-    renWin->Register(this);
-    this->RenderWindow = renWin;
+    //renWin->Register(this);
+    //this->RenderWindow = renWin;
     if (this->Tiled && this->ClientFlag == 0)
       { 
       renWin->FullScreenOn();
       }
     }
+
+  // Superclass sets up renderer start and end events.
+  this->Superclass::SetRenderWindow(renWin);
 }
 
 void vtkClientCompositeManager::SetController(
