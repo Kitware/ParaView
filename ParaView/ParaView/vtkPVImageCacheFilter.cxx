@@ -25,8 +25,9 @@
 #include "vtkExtentSplitter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVImageCacheFilter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVImageCacheFilter, "1.1.2.2");
 vtkStandardNewMacro(vtkPVImageCacheFilter);
 
 //----------------------------------------------------------------------------
@@ -74,8 +75,10 @@ void vtkPVImageCacheFilter::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVImageCacheFilter::UpdateData(vtkDataObject *outObject)
 {
   int idx;
-  vtkImageData *input = this->GetOutput();
+  vtkImageData *input = this->GetInput();
   vtkImageData *output = this->GetOutput();
+
+  vtkTimerLog::MarkStartEvent("Update ImageCache");
 
   this->BuildExtentMap(input, output);
 
@@ -108,6 +111,8 @@ void vtkPVImageCacheFilter::UpdateData(vtkDataObject *outObject)
   // Save the output as cache.
   this->Cache->ShallowCopy(output);
   this->CacheUpdateTime.Modified();
+
+  vtkTimerLog::MarkEndEvent("Update ImageCache");
 }
 
 
@@ -171,6 +176,9 @@ void vtkPVImageCacheFilter::CopyImageExtent(vtkImageData *in,
     {
     this->AllocateOutput(out, in);
     }
+
+  in->GetExtent(inExt);
+  out->GetExtent(outExt);
   this->CopyDataAttributes(ext, in->GetPointData(), inExt, 
                            out->GetPointData(), outExt);
   // We have to worry about dimensionality for cell data.
@@ -219,6 +227,28 @@ void vtkPVImageCacheFilter::CopyDataAttributes(int* copyExt,
                                        vtkDataSetAttributes* in, int* inExt,
                                        vtkDataSetAttributes* out, int* outExt)
 {
+  /*
+  int numArrays;
+  int idx;
+  vtkDataArray* inArray;
+  vtkDataArray* outArray;
+
+
+  numArrays = in->GetNumberOfArrays();
+  if (numArrays != out->GetNumberOfArrays())
+    {
+    vtkErrorMacro("Inconsistent arrays.");
+    return;
+    }
+
+  for (idx = 0; idx < numArrays; ++idx)
+    {
+    inArray = in->GetArray(idx);
+    outArray = out->GetArray(idx);
+    this->CopyArray(copyExt, inArray, inExt, outArray, outExt);
+    }
+  */
+  
   int x, y, z;
   int xMin, xMax;
   int yMin, yMax;
@@ -262,7 +292,121 @@ void vtkPVImageCacheFilter::CopyDataAttributes(int* copyExt,
     zIdIn += zIncIn;
     zIdOut += zIncOut;
     }
+   
 }
+
+
+//----------------------------------------------------------------------------
+// The templated execute function handles all the data types.
+template <class T>
+void vtkImageCacheCopyArray(int *copyExt, T *inPtr, int *inExt, 
+                            T *outPtr, int outExt[6])
+{
+  // Note: all extents are now [min, max+1).
+  int xSpan = (copyExt[1]-copyExt[0])*sizeof(T);
+  T* zInPtr;
+  T* yInPtr;
+  T* zOutPtr;
+  T* yOutPtr;
+  int y, z;
+  int yInInc, zInInc;
+  int yOutInc, zOutInc;
+
+  yInInc = (inExt[1]-inExt[0]);
+  yOutInc = (outExt[1]-outExt[0]);
+  zInInc = (inExt[3]-inExt[2])*yInInc;
+  zOutInc = (outExt[3]-outExt[2])*yOutInc;
+
+  // Move starting point to correct spot in memory.
+  zInPtr = inPtr + (copyExt[0]-inExt[0]) 
+                 + (copyExt[3]-inExt[3])*yInInc
+                 + (copyExt[5]-inExt[5])*zInInc;
+  zOutPtr = outPtr + (copyExt[0]-outExt[0]) 
+                   + (copyExt[3]-outExt[3])*yOutInc
+                   + (copyExt[5]-outExt[5])*zOutInc;
+
+  for (z = copyExt[4]; z < copyExt[5]; ++z)
+    {
+    yInPtr = zInPtr;
+    yOutPtr = zOutPtr;
+    for (y = copyExt[2]; y < copyExt[3]; ++y)
+      {
+      memcpy(yOutPtr, yInPtr, xSpan);
+      yInPtr += yInInc;
+      yOutPtr += yOutInc;
+      }
+    zInPtr += zInInc;
+    zOutPtr += zOutInc;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageCacheFilter::CopyArray(int* copyExt,
+                                      vtkDataArray* in, int* inExt,
+                                      vtkDataArray* out, int* outExt)
+{
+  int numComps;
+  int copyExtC[6];
+  int inExtC[6];
+  int outExtC[6];
+
+  // Although memory has been allocated, the number of tuples has not been set.
+  if (out->GetNumberOfTuples() == 0)
+    {
+    out->SetNumberOfTuples((outExt[1]-outExt[0]+1)*
+                           (outExt[3]-outExt[2]+1)*
+                           (outExt[5]-outExt[4]+1));
+    }
+
+  if (in->GetDataType() != out->GetDataType())
+    {
+    vtkErrorMacro("Type mismatch.");
+    return;
+    }
+  if (in->GetNumberOfComponents() != out->GetNumberOfComponents())
+    {
+    vtkErrorMacro("Component mismatch.");
+    return;
+    }
+
+  // Get pointers
+  void* inPtr = in->GetVoidPointer(0);
+  void* outPtr = out->GetVoidPointer(0);
+
+  // Convert extents to hide components.
+  // Add one to the maxs.  Easier to deal with components.
+  memcpy(copyExtC, copyExt, 6*sizeof(int));
+  memcpy(inExtC, inExt, 6*sizeof(int));
+  memcpy(outExtC, outExt, 6*sizeof(int));
+  numComps = in->GetNumberOfComponents();
+  copyExtC[0] = copyExtC[0]*numComps;
+  copyExtC[1] = (copyExtC[1]+1)*numComps;
+  copyExtC[3] = copyExtC[3]+1;
+  copyExtC[5] = copyExtC[5]+1;
+  inExtC[0] = inExtC[0]*numComps;
+  inExtC[1] = (inExtC[1]+1)*numComps;
+  inExtC[3] = inExtC[3]+1;
+  inExtC[5] = inExtC[5]+1;
+  outExtC[0] = outExtC[0]*numComps;
+  outExtC[1] = (outExtC[1]+1)*numComps;
+  outExtC[3] = outExtC[3]+1;
+  outExtC[5] = outExtC[5]+1;
+
+  switch (in->GetDataType())
+    {
+    vtkTemplateMacro5(vtkImageCacheCopyArray, copyExtC, 
+                      (VTK_TT *)inPtr, inExtC, 
+                      (VTK_TT *)outPtr, outExtC);
+    
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return;
+    }  
+}
+
+
+
+
 
 
 //----------------------------------------------------------------------------
@@ -278,7 +422,7 @@ void vtkPVImageCacheFilter::BuildExtentMap(vtkDataSet *in,
   if (this->Cache && this->CacheUpdateTime > out->GetPipelineMTime())
     {
     // Local cache has highest priority. ID = 0;
-    this->ExtentMap->AddExtentSource(0, 1, this->Cache->GetExtent());
+    this->ExtentMap->AddExtentSource(0, 2, this->Cache->GetExtent());
     }
   else
     {
@@ -289,7 +433,7 @@ void vtkPVImageCacheFilter::BuildExtentMap(vtkDataSet *in,
   if (1 || table == NULL)
     {
     // Add extents available locally. (id = 1).
-    this->ExtentMap->AddExtentSource(1, 2, in->GetWholeExtent());
+    this->ExtentMap->AddExtentSource(1, 1, in->GetWholeExtent());
     }
   else
     {

@@ -35,6 +35,7 @@ class vtkMultiProcessController;
 class vtkExtentSplitter;
 class vtkDataSet;
 class vtkDataSetAttributes;
+class vtkDataArray;
 
 
 class VTK_EXPORT vtkPVImageCacheFilter : public vtkImageToImageFilter
@@ -58,7 +59,9 @@ protected:
   void CopyDataAttributes(int* copyExt,
                           vtkDataSetAttributes* in, int* inExt,
                           vtkDataSetAttributes* out, int* outExt);
-                                       
+  void CopyArray(int* copyExt, vtkDataArray* in, int* inExt,
+                               vtkDataArray* out, int* outExt);
+                                      
   vtkImageData *Cache;
   vtkTimeStamp CacheUpdateTime;
   int OutputAllocated;

@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.3");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.4");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -295,14 +295,6 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-
-  pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
-  pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
-  
-  if (atoi(pm->GetRootResult()) != 1)
-    { // The source can already produce pieces.
-    return;
-    }
   
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
@@ -310,6 +302,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   if((pm->RootScript("%s IsA vtkPolyData", this->VTKDataTclName),
       atoi(pm->GetRootResult())))
     {
+    pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
+    pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
+    if (atoi(pm->GetRootResult()) != 1)
+      { // The source can already produce pieces.
+      return;
+      }
+
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
@@ -319,11 +318,22 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     else
       {
       pm->ServerSimpleScript("vtkTransmitPolyDataPiece pvTemp");
+      pm->ServerSimpleScript(
+        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitPData}}");
+      pm->ServerSimpleScript(
+        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitPData}}");
       }
     }
   else if((pm->RootScript("%s IsA vtkUnstructuredGrid", this->VTKDataTclName),
            atoi(pm->GetRootResult())))
     {
+    pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
+    pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
+    if (atoi(pm->GetRootResult()) != 1)
+      { // The source can already produce pieces.
+      return;
+      }
+
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
@@ -333,6 +343,10 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     else
       {
       pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+      pm->ServerSimpleScript(
+        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
+      pm->ServerSimpleScript(
+        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
       }
     }
   else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
